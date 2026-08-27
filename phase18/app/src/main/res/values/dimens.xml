@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Phase 11A: shared design-token scale. Use semantic names in screens; avoid one-off values. -->
+    <dimen name="milk_shop_space_1">4dp</dimen>
+    <dimen name="milk_shop_space_2">8dp</dimen>
+    <dimen name="milk_shop_space_3">12dp</dimen>
+    <dimen name="milk_shop_space_4">16dp</dimen>
+    <dimen name="milk_shop_space_5">20dp</dimen>
+    <dimen name="milk_shop_space_6">24dp</dimen>
+    <dimen name="milk_shop_space_7">32dp</dimen>
+    <dimen name="milk_shop_space_8">40dp</dimen>
+
+    <dimen name="milk_shop_screen_padding">20dp</dimen>
+    <dimen name="milk_shop_section_gap">24dp</dimen>
+    <dimen name="milk_shop_group_gap">16dp</dimen>
+    <dimen name="milk_shop_field_gap">12dp</dimen>
+    <dimen name="milk_shop_card_padding">16dp</dimen>
+    <dimen name="milk_shop_dialog_padding">24dp</dimen>
+
+    <dimen name="milk_shop_touch_target">48dp</dimen>
+    <dimen name="milk_shop_control_min_height">48dp</dimen>
+    <dimen name="milk_shop_button_min_height">48dp</dimen>
+
+    <dimen name="milk_shop_radius_sm">8dp</dimen>
+    <dimen name="milk_shop_radius_md">12dp</dimen>
+    <dimen name="milk_shop_radius_lg">16dp</dimen>
+    <dimen name="milk_shop_radius_pill">999dp</dimen>
+
+    <dimen name="milk_shop_text_display">28sp</dimen>
+    <dimen name="milk_shop_text_headline">24sp</dimen>
+    <dimen name="milk_shop_text_title">20sp</dimen>
+    <dimen name="milk_shop_text_body">16sp</dimen>
+    <dimen name="milk_shop_text_body_small">14sp</dimen>
+    <dimen name="milk_shop_text_label">14sp</dimen>
+    <dimen name="milk_shop_text_caption">12sp</dimen>
+</resources>

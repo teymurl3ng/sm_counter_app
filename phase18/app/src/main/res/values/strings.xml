@@ -1,0 +1,429 @@
+<resources>
+    <string name="app_name">Milk Shop</string>
+    <string name="dashboard_title">Milk Shop</string>
+    <string name="dashboard_subtitle">Current stock and money balances</string>
+    <string name="stock_title">Stock</string>
+    <string name="money_title">Money Accounts</string>
+    <string name="vendor_balances_title">Vendor Balances</string>
+    <string name="customer_balances_title">Customer Balances</string>
+    <string name="dashboard_milk_label">Milk</string>
+    <string name="dashboard_yogurt_label">Yogurt</string>
+    <string name="dashboard_cash_label">Cash</string>
+    <string name="dashboard_jazzcash_label">JazzCash</string>
+    <string name="dashboard_bank_label">Bank</string>
+
+    <string name="analytics_dashboard_title">Performance Dashboard</string>
+    <string name="analytics_period_loading">Loading report period…</string>
+    <string name="analytics_period_today">Today</string>
+    <string name="analytics_period_week">This Week</string>
+    <string name="analytics_period_month">This Month</string>
+    <string name="analytics_period_year">This Year</string>
+    <string name="analytics_value_loading">Loading analytics…</string>
+    <string name="analytics_report_period">%1$s (%2$s to %3$s)</string>
+    <string name="analytics_sales_card">Sales
+Value: %1$s
+Quantity: %2$s</string>
+    <string name="analytics_operations_card">Operations
+Purchases: %1$s
+Vendor payments: %2$s
+Collections: %3$s</string>
+    <string name="analytics_cashflow_card">Expenses: %1$s
+Salaries: %2$s</string>
+    <string name="analytics_production_card">Milk purchased: %1$s L
+Milk used in production: %2$s L
+Yogurt produced: %3$s kg</string>
+    <string name="analytics_dashboard_error">Could not load the selected report. No accounting data was changed.</string>
+    <string name="value_loading">Loading…</string>
+    <string name="no_vendor_accounts">No vendor accounts yet. Add a vendor below.</string>
+    <string name="no_customer_accounts">No customer accounts yet. Add a customer from the Sales section.</string>
+
+    <string name="purchase_vendor_section">Vendor</string>
+    <string name="purchase_vendor_label">Supplier</string>
+    <string name="purchase_measurements_section">Milk measurements</string>
+    <string name="raw_liters_label">Raw liters</string>
+    <string name="fat_label">Fat %</string>
+    <string name="lr_label">LR</string>
+    <string name="purchase_preview_subtitle">Calculated from the entered measurements.</string>
+    <string name="purchase_title">Milk Purchase</string>
+    <string name="purchase_subtitle">Enter the measurements received at the shop.</string>
+    <string name="add_vendor_button">Add Vendor</string>
+    <string name="add_vendor_title">Add Vendor</string>
+    <string name="vendor_name_hint">Vendor name</string>
+    <string name="vendor_name_required">Enter a vendor name.</string>
+    <string name="vendor_create_failed">Could not create the vendor. Check whether this vendor already exists.</string>
+    <string name="raw_liters_hint">Raw liters</string>
+    <string name="fat_hint">Fat %</string>
+    <string name="lr_hint">LR reading</string>
+    <string name="calculation_preview_title">Calculation Preview</string>
+    <string name="purchase_snf_placeholder">SNF: —</string>
+    <string name="purchase_ts_placeholder">TS: —</string>
+    <string name="purchase_adjusted_placeholder">Adjusted liters: —</string>
+    <string name="purchase_amount_placeholder">Amount owed: —</string>
+    <string name="purchase_snf_format">SNF: %.2f%%</string>
+    <string name="purchase_ts_format">TS: %.2f%%</string>
+    <string name="purchase_adjusted_format">Adjusted liters: %.2f L</string>
+    <string name="purchase_amount_format">Amount owed: ₨ %.2f</string>
+    <string name="save_purchase">Save Purchase</string>
+    <string name="purchase_saving">Saving…</string>
+    <string name="purchase_saved">Purchase saved (event %1$d).</string>
+    <string name="purchase_error_no_vendor">Select or create a vendor first.</string>
+    <string name="purchase_error_raw_liters">Enter raw liters.</string>
+    <string name="purchase_error_raw_liters_positive">Raw liters must be greater than zero.</string>
+    <string name="purchase_error_fat">Enter Fat %.</string>
+    <string name="purchase_error_fat_negative">Fat % cannot be negative.</string>
+    <string name="purchase_error_lr">Enter LR.</string>
+    <string name="purchase_error_lr_positive">LR must be greater than zero.</string>
+    <string name="purchase_error_prefix">Could not save purchase: %1$s</string>
+    <string name="purchase_error_generic">Could not save purchase. Nothing was saved.</string>
+
+    <string name="production_title">Yogurt Production</string>
+    <string name="production_subtitle">Enter the measured milk used and yogurt produced.</string>
+    <string name="milk_used_hint">Milk liters used</string>
+    <string name="yogurt_produced_hint">Yogurt kg produced</string>
+    <string name="save_production">Save Production</string>
+    <string name="production_saving">Saving…</string>
+    <string name="production_saved">Production saved (event %1$d).</string>
+    <string name="production_error_milk_used">Enter milk liters used.</string>
+    <string name="production_error_milk_used_positive">Milk liters used must be greater than zero.</string>
+    <string name="production_error_yogurt_produced">Enter yogurt kg produced.</string>
+    <string name="production_error_yogurt_produced_positive">Yogurt kg produced must be greater than zero.</string>
+    <string name="production_error_prefix">Could not save production: %1$s</string>
+    <string name="production_error_generic">Could not save production. Nothing was saved.</string>
+
+    <string name="vendor_payment_title">Vendor Payment</string>
+    <string name="vendor_payment_subtitle">Reduce a vendor payable using one cash account.</string>
+    <string name="vendor_payment_amount_hint">Amount</string>
+    <string name="save_vendor_payment">Save Vendor Payment</string>
+    <string name="vendor_payment_saving">Saving…</string>
+    <string name="vendor_payment_saved">Vendor payment saved (event %1$d).</string>
+    <string name="vendor_payment_error_no_vendor">Select a vendor first.</string>
+    <string name="vendor_payment_error_no_payment_account">Select a Cash, JazzCash, or Bank account.</string>
+    <string name="vendor_payment_error_amount">Enter the payment amount.</string>
+    <string name="vendor_payment_error_amount_positive">Payment amount must be greater than zero.</string>
+    <string name="vendor_payment_error_prefix">Could not save vendor payment: %1$s</string>
+    <string name="vendor_payment_error_generic">Could not save vendor payment. Nothing was saved.</string>
+
+    <string name="sale_title">Sale</string>
+    <string name="sale_subtitle">Sell milk or yogurt by quantity or value.</string>
+    <string name="sale_input_mode_label">Enter</string>
+    <string name="sale_quantity_option">Quantity</string>
+    <string name="sale_value_option">Value</string>
+    <string name="sale_quantity_hint">Quantity</string>
+    <string name="sale_value_hint">Value</string>
+    <string name="sale_rate_hint">Rate</string>
+    <string name="sale_payment_mode_label">Payment</string>
+    <string name="sale_account_option">Cash / Account</string>
+    <string name="sale_credit_option">On Credit</string>
+    <string name="add_customer_button">Add Customer</string>
+    <string name="add_customer_title">Add Customer</string>
+    <string name="customer_name_hint">Customer name</string>
+    <string name="customer_name_required">Enter a customer name.</string>
+    <string name="customer_create_failed">Could not create the customer. Check whether this customer already exists.</string>
+    <string name="sale_surcharge_label">Delivery surcharge</string>
+    <string name="sale_surcharge_hint">Surcharge</string>
+    <string name="sale_note_hint">Note (optional)</string>
+    <string name="sale_calculation_preview_title">Sale Preview</string>
+    <string name="sale_calculation_placeholder">Enter quantity or value.</string>
+    <string name="save_sale">Save Sale</string>
+    <string name="sale_saving">Saving…</string>
+    <string name="sale_saved">Sale saved (event %1$d). Total: %2$s</string>
+    <string name="sale_error_no_product">Select a product.</string>
+    <string name="sale_error_rate">Enter the sale rate.</string>
+    <string name="sale_error_rate_positive">Rate must be greater than zero.</string>
+    <string name="sale_error_quantity">Enter the sale quantity.</string>
+    <string name="sale_error_quantity_positive">Quantity must be greater than zero.</string>
+    <string name="sale_error_value">Enter the sale value.</string>
+    <string name="sale_error_value_positive">Value must be greater than zero.</string>
+    <string name="sale_error_surcharge">Enter the delivery surcharge.</string>
+    <string name="sale_error_surcharge_negative">Surcharge cannot be negative.</string>
+    <string name="sale_error_no_customer">Select a customer.</string>
+    <string name="sale_error_no_payment_account">Select a Cash, JazzCash, or Bank account.</string>
+    <string name="sale_error_prefix">Could not save sale: %1$s</string>
+    <string name="sale_error_generic">Could not save sale. Nothing was saved.</string>
+
+    <string name="credit_collection_title">Credit Collection</string>
+    <string name="credit_collection_subtitle">Collect an outstanding customer balance into one cash account.</string>
+    <string name="credit_collection_amount_hint">Amount collected</string>
+    <string name="save_credit_collection">Save Credit Collection</string>
+    <string name="credit_collection_saving">Saving…</string>
+    <string name="credit_collection_saved">Credit collection saved (event %1$d).</string>
+    <string name="credit_collection_error_no_customer">Select a customer first.</string>
+    <string name="credit_collection_error_no_payment_account">Select a Cash, JazzCash, or Bank account.</string>
+    <string name="credit_collection_error_amount">Enter the collection amount.</string>
+    <string name="credit_collection_error_amount_positive">Collection amount must be greater than zero.</string>
+    <string name="credit_collection_error_prefix">Could not save credit collection: %1$s</string>
+    <string name="credit_collection_error_generic">Could not save credit collection. Nothing was saved.</string>
+
+    <string name="expense_title">Expense</string>
+    <string name="expense_subtitle">Record a business expense paid from Cash, JazzCash, or Bank.</string>
+    <string name="expense_category_label">Category</string>
+    <string name="expense_amount_hint">Amount</string>
+    <string name="save_expense">Save Expense</string>
+    <string name="expense_saving">Saving…</string>
+    <string name="expense_saved">Expense saved (event %1$d).</string>
+    <string name="expense_error_no_category">Select an expense category.</string>
+    <string name="expense_error_no_payment_account">Select a Cash, JazzCash, or Bank account.</string>
+    <string name="expense_error_amount">Enter the expense amount.</string>
+    <string name="expense_error_amount_positive">Expense amount must be greater than zero.</string>
+    <string name="expense_error_prefix">Could not save expense: %1$s</string>
+    <string name="expense_error_generic">Could not save expense. Nothing was saved.</string>
+
+
+    <string name="salary_title">Salary Payment</string>
+    <string name="salary_subtitle">Pay an employee from Cash, JazzCash, or Bank.</string>
+    <string name="add_employee_button">Add Employee</string>
+    <string name="add_employee_title">Add Employee</string>
+    <string name="employee_name_hint">Employee name</string>
+    <string name="employee_name_required">Enter an employee name.</string>
+    <string name="employee_create_failed">Could not create the employee. Check whether this employee already exists.</string>
+    <string name="salary_amount_hint">Salary amount</string>
+    <string name="save_salary">Save Salary Payment</string>
+    <string name="salary_saving">Saving…</string>
+    <string name="salary_saved">Salary payment saved (event %1$d).</string>
+    <string name="salary_error_no_employee">Select an employee first.</string>
+    <string name="salary_error_no_payment_account">Select a Cash, JazzCash, or Bank account.</string>
+    <string name="salary_error_amount">Enter the salary amount.</string>
+    <string name="salary_error_amount_positive">Salary amount must be greater than zero.</string>
+    <string name="salary_error_prefix">Could not save salary payment: %1$s</string>
+    <string name="salary_error_generic">Could not save salary payment. Nothing was saved.</string>
+
+    <string name="history_title">Transaction History</string>
+    <string name="history_subtitle">Recorded events in reverse chronological order.</string>
+    <string name="history_loading">Loading transaction history…</string>
+    <string name="history_detail_title_initial">Transaction Detail</string>
+    <string name="history_detail_title">Transaction Detail — Event #%1$d</string>
+    <string name="history_detail_initial">Tap a transaction in the history above to view its recorded details and ledger movements.</string>
+    <string name="history_detail_loading">Loading transaction details…</string>
+    <string name="history_empty">No transactions recorded yet.</string>
+
+    <string name="correct_transaction">Correct Transaction</string>
+    <string name="correction_editor_title">Correction</string>
+    <string name="correction_type_format">%1$s — Event #%2$d</string>
+    <string name="correction_amount_hint">Corrected amount</string>
+    <string name="save_correction">Save Correction</string>
+    <string name="cancel_correction">Cancel</string>
+    <string name="correction_saving">Saving correction…</string>
+    <string name="correction_saved">Correction saved (event %1$d).</string>
+    <string name="correction_error_no_event">Select a transaction to correct.</string>
+    <string name="correction_error_unsupported">This transaction type cannot be corrected from the UI yet.</string>
+    <string name="correction_error_prefix">Could not save correction: %1$s</string>
+    <string name="correction_error_generic">Could not save correction. Nothing was saved.</string>
+    <string name="correction_error_purchase_raw">Enter corrected raw liters.</string>
+    <string name="correction_error_purchase_raw_positive">Corrected raw liters must be greater than zero.</string>
+    <string name="correction_error_purchase_fat">Enter corrected Fat %.</string>
+    <string name="correction_error_purchase_fat_negative">Corrected Fat % cannot be negative.</string>
+    <string name="correction_error_purchase_lr">Enter corrected LR.</string>
+    <string name="correction_error_purchase_lr_positive">Corrected LR must be greater than zero.</string>
+    <string name="correction_error_production_milk">Enter corrected milk liters used.</string>
+    <string name="correction_error_production_milk_positive">Corrected milk liters used must be greater than zero.</string>
+    <string name="correction_error_production_yogurt">Enter corrected yogurt kg produced.</string>
+    <string name="correction_error_production_yogurt_positive">Corrected yogurt kg produced must be greater than zero.</string>
+    <string name="correction_error_sale_rate">Enter corrected sale rate.</string>
+    <string name="correction_error_sale_rate_positive">Corrected sale rate must be greater than zero.</string>
+    <string name="correction_error_sale_quantity">Enter corrected quantity.</string>
+    <string name="correction_error_sale_quantity_positive">Corrected quantity must be greater than zero.</string>
+    <string name="correction_error_sale_value">Enter corrected value.</string>
+    <string name="correction_error_sale_value_positive">Corrected value must be greater than zero.</string>
+    <string name="correction_error_sale_surcharge">Enter corrected surcharge.</string>
+    <string name="correction_error_sale_surcharge_negative">Corrected surcharge cannot be negative.</string>
+    <string name="correction_error_monetary_amount">Enter corrected amount.</string>
+    <string name="correction_error_monetary_amount_positive">Corrected amount must be greater than zero.</string>
+
+
+    <string name="business_settings_title">Business Settings</string>
+    <string name="business_settings_subtitle">Manually maintained rates and surcharge defaults used by the business logic.</string>
+    <string name="business_settings_milk_rate_vendor_hint">Vendor milk rate (₨/liter)</string>
+    <string name="business_settings_delivery_fee_vendor_hint">Vendor delivery fee (₨/liter)</string>
+    <string name="business_settings_ts_standard_hint">TS standard (%)</string>
+    <string name="business_settings_retail_rate_milk_hint">Retail milk rate (₨/liter)</string>
+    <string name="business_settings_retail_rate_yogurt_hint">Retail yogurt rate (₨/kg)</string>
+    <string name="business_settings_default_surcharge_hint">Default delivery surcharge (₨)</string>
+    <string name="save_business_settings_button">Save Settings</string>
+    <string name="business_settings_saved">Settings saved.</string>
+
+    <string name="vendor_management_title">Vendors</string>
+    <string name="vendor_management_subtitle">Manage vendor names without changing their historical account identity.</string>
+    <string name="add_vendor_management_button">Add Vendor</string>
+    <string name="add_vendor_management_title">Add Vendor</string>
+    <string name="edit_vendor_title">Edit Vendor</string>
+    <string name="edit_vendor_button">Edit</string>
+    <string name="save_vendor_button">Save</string>
+    <string name="vendor_management_row">%1$s — Payable: %2$s</string>
+    <string name="no_vendor_management_accounts">No vendors yet.</string>
+    <string name="vendor_rename_failed">Could not save the vendor name. Check whether this vendor name already exists.</string>
+
+    <string name="customer_management_title">Customers</string>
+    <string name="customer_management_subtitle">Manage customer names without changing their historical account identity.</string>
+    <string name="add_customer_management_button">Add Customer</string>
+    <string name="add_customer_management_title">Add Customer</string>
+    <string name="edit_customer_title">Edit Customer</string>
+    <string name="edit_customer_button">Edit</string>
+    <string name="save_customer_button">Save</string>
+    <string name="customer_management_row">%1$s — Receivable: %2$s</string>
+    <string name="no_customer_management_accounts">No customers yet.</string>
+    <string name="customer_management_save_failed">Could not save the customer name. Check whether this customer already exists.</string>
+
+    <string name="employee_management_title">Employees</string>
+    <string name="employee_management_subtitle">Manage employee names without changing their historical salary account identity.</string>
+    <string name="add_employee_management_button">Add Employee</string>
+    <string name="add_employee_management_title">Add Employee</string>
+    <string name="edit_employee_title">Edit Employee</string>
+    <string name="edit_employee_button">Edit</string>
+    <string name="save_employee_button">Save</string>
+    <string name="employee_management_row">%1$s — Salary Account: %2$s</string>
+    <string name="no_employee_management_accounts">No employees yet.</string>
+    <string name="employee_management_save_failed">Could not save the employee name. Check whether this employee already exists.</string>
+
+    <string name="budget_title">Budgets &amp; Targets</string>
+    <string name="budget_weekly_targets_title">Weekly Sales &amp; Collections Targets</string>
+    <string name="budget_history_toggle">View Budget History</string>
+    <string name="budget_subtitle">Plan spending and weekly sales and collection targets. Previous versions are preserved.</string>
+    <string name="budget_category_label">Category</string>
+    <string name="budget_period_label">Period</string>
+    <string name="budget_period_loading">Loading period…</string>
+    <string name="budget_period_start_hint">Period start (YYYY-MM-DD)</string>
+    <string name="budget_target_week_hint">Target week start (YYYY-MM-DD)</string>
+    <string name="budget_period_weekly">Weekly budget</string>
+    <string name="budget_period_monthly">Monthly budget</string>
+    <string name="budget_milk_planned_liters">Planned milk: %.2f L</string>
+    <string name="budget_planned_liters_hint">Planned milk liters</string>
+    <string name="budget_amount_hint">Planned amount (₨)</string>
+    <string name="budget_set_button">Save / Revise Budget</string>
+    <string name="budget_copy_previous_button">Copy Previous Period</string>
+    <string name="budget_saved">Budget saved as the current version.</string>
+    <string name="budget_error">Could not save budget: %1$s</string>
+    <string name="budget_no_previous">No previous budget exists for this category.</string>
+    <string name="budget_milk_snapshot">Milk budget: %1$.0f L × ₨%2$.2f = ₨%3$.2f</string>
+    <string name="budget_sales_target">Weekly Sales Target: %1$s</string>
+    <string name="budget_no_sales_target">No sales target this week.</string>
+    <string name="budget_collections_label">Weekly Collections Target</string>
+    <string name="budget_collections_hint">Target cash collected this week (₨)</string>
+    <string name="budget_collections_save">Save / Revise Collections Target</string>
+    <string name="budget_collections_saved">Collections target saved.</string>
+    <string name="budget_collections_no_target">No collections target this week.</string>
+    <string name="budget_summary_loading">Loading budget summary…</string>
+    <string name="budget_summary_header">Current Plan</string>
+    <string name="budget_actual_format">Actual: %1$s</string>
+    <string name="budget_variance_format">Variance: %1$s (%2$s)</string>
+    <string name="budget_variance_zero_target">Variance: %1$s (—)</string>
+    <string name="budget_no_target">No target/budget set for this period.</string>
+    <string name="budget_combined_revenue">Milk + Yogurt actual: %1$s</string>
+    <string name="budget_new_uncollected">New uncollected this week: %1$s</string>
+
+    <string name="backup_title">Backup &amp; Restore</string>
+    <string name="backup_subtitle">Full business data, planning data, settings, and app preferences.</string>
+    <string name="backup_manual_button">Create Backup</string>
+    <string name="backup_restore_button">Restore Backup</string>
+    <string name="backup_created">Backup created: %1$s</string>
+    <string name="backup_failed">Backup failed.
+Reason: %1$s
+What the app did: %2$s</string>
+    <string name="backup_restore_failed">Restore failed.
+Reason: %1$s
+What the app did: %2$s</string>
+    <string name="backup_restore_warning">Restoring replaces the current app data with the selected backup. A safety backup of the current data will be created first.
+
+Selected restore groups:
+%1$s
+
+Do not close the app during restoration.</string>
+    <string name="backup_confirmation_title">Confirm Restore</string>
+    <string name="backup_confirmation_prompt">Type this exact sentence to confirm:
+
+%s</string>
+    <string name="backup_confirmation_mismatch">The confirmation text does not match exactly.</string>
+    <string name="backup_restore_success">Restore completed and the restored state was verified.</string>
+    <string name="backup_success">Encrypted backup created successfully.</string>
+    <string name="backup_meta_format">Created: %1$s
+App version: %2$s
+Schema version: %3$d</string>
+    <string name="backup_select_groups_title">Choose what to restore</string>
+    <string name="backup_group_business">Business data (transactions, corrections, accounts, products, settings)</string>
+    <string name="backup_group_planning">Budgets &amp; targets</string>
+    <string name="backup_group_preferences">App preferences</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_subtitle">Business settings and app preferences.</string>
+    <string name="account_security_title">Account &amp; Security</string>
+    <string name="current_user_format">Signed in as %1$s (%2$s)</string>
+    <string name="manage_users_button">Manage Users</string>
+    <string name="change_passphrase_button">Change My Passphrase</string>
+    <string name="logout_button">Log Out</string>
+    <string name="login_title">Sign in to Saaf Milk</string>
+    <string name="first_owner_title">Create the Owner Account</string>
+    <string name="login_name_hint">Login name</string>
+    <string name="display_name_hint">Display name</string>
+    <string name="passphrase_hint">Passphrase (at least 15 characters)</string>
+    <string name="confirm_passphrase_hint">Confirm passphrase</string>
+    <string name="sign_in_button">Sign In</string>
+    <string name="create_owner_button">Create Owner</string>
+    <string name="recover_owner_button">Recover Owner</string>
+    <string name="recovery_code_hint">Recovery code</string>
+    <string name="recovery_code_title">Save Your Owner Recovery Code</string>
+    <string name="recovery_code_message">Store this code somewhere safe. It is shown only now and replaces any previous recovery code.</string>
+    <string name="authentication_required">Sign in again to continue.</string>
+    <string name="new_user_title">Create User</string>
+    <string name="role_hint">Role</string>
+    <string name="user_management_title">Application Users</string>
+    <string name="reset_passphrase_button">Reset Passphrase</string>
+    <string name="enable_user_button">Enable User</string>
+    <string name="disable_user_button">Disable User</string>
+    <string name="change_role_button">Change Role</string>
+    <string name="current_passphrase_hint">Current passphrase</string>
+    <string name="new_passphrase_hint">New passphrase</string>
+    <string name="management_screen_subtitle">Manage the people and accounts used by daily transactions without changing historical account identity.</string>
+    <string name="business_settings_enter_value">Enter value</string>
+    <string name="app_preferences_section_title">App Preferences</string>
+    <string name="app_preferences_section_subtitle">Personalize appearance and default screen behavior without changing business rules.</string>
+    <string name="app_preferences_title">App Preferences</string>
+    <string name="app_preferences_button">App Preferences</string>
+    <string name="save_preferences">Save Preferences</string>
+    <string name="pref_theme_title">Theme</string>
+    <string name="pref_theme_system">System default</string>
+    <string name="pref_theme_light">Light</string>
+    <string name="pref_theme_dark">Dark</string>
+    <string name="pref_language_title">Language</string>
+    <string name="pref_language_english">English</string>
+    <string name="pref_language_urdu">Urdu</string>
+    <string name="pref_language_note">Urdu translation will be added later.</string>
+    <string name="pref_density_title">Display density</string>
+    <string name="pref_density_comfortable">Comfortable</string>
+    <string name="pref_density_compact">Compact</string>
+    <string name="pref_reporting_period_title">Default reporting period</string>
+    <string name="pref_opening_section_title">Default opening section</string>
+    <string name="pref_opening_dashboard">Dashboard</string>
+    <string name="pref_opening_budgets">Budgets &amp; Targets</string>
+    <string name="pref_opening_backup">Backup &amp; Restore</string>
+    <string name="pref_opening_settings">Settings</string>
+
+    <string name="navigation_menu">Menu</string>
+    <string name="navigation_menu_content_description">Open app navigation</string>
+    <string name="navigation_dashboard">Dashboard</string>
+    <string name="navigation_planning">Budgets &amp; Targets</string>
+    <string name="navigation_transactions">Transactions</string>
+    <string name="navigation_records">History &amp; Corrections</string>
+    <string name="navigation_management">People &amp; Accounts</string>
+    <string name="navigation_settings">Settings</string>
+    <string name="navigation_backup">Backup &amp; Restore</string>
+
+
+    <string name="correction_purchase_section">Milk purchase</string>
+    <string name="correction_production_section">Yogurt production</string>
+    <string name="correction_sale_section">Sale</string>
+    <string name="correction_amount_section">Financial amount</string>
+    <string name="correction_notes_section">Notes</string>
+
+    <string name="budget_setup_section_title">Budget plan</string>
+    <string name="budget_setup_section_subtitle">Set the amount you plan to stay under for the selected category and period.</string>
+
+
+    <string name="budget_period_start_label">Period starts</string>
+    <string name="budget_planned_liters_label">Planned milk quantity</string>
+    <string name="budget_amount_label">Planned amount</string>
+    <string name="budget_status_section_title">Budget status</string>
+    <string name="budget_targets_section_title">Weekly targets</string>
+    <string name="budget_targets_section_subtitle">Review the current sales target and set the weekly collections target.</string>
+    <string name="budget_target_week_label">Target week</string>
+    <string name="budget_collections_target_label">Collections target</string>
+
+</resources>

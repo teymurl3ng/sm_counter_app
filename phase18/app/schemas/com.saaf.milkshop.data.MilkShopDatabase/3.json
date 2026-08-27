@@ -1,0 +1,657 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "1d7c7ee0205609b5fdfe705045933df3",
+    "entities": [
+      {
+        "tableName": "products",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`product_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `unit` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "productId",
+            "columnName": "product_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "product_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_products_name",
+            "unique": true,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_products_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ]
+      },
+      {
+        "tableName": "accounts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`account_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `type` TEXT NOT NULL, `category` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "accountId",
+            "columnName": "account_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "account_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_accounts_name",
+            "unique": true,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_accounts_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ]
+      },
+      {
+        "tableName": "events",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `created_at` TEXT NOT NULL, `occurred_at` TEXT NOT NULL, `event_type` TEXT NOT NULL, `channel` TEXT, `corrects_event_id` INTEGER, `raw_liters` REAL, `fat_percentage` REAL, `lr_reading` REAL, `snf_percentage` REAL, `ts_percentage` REAL, `adjusted_liters` REAL, `amount_owed` REAL, `milk_liters_used` REAL, `yogurt_kg_produced` REAL, `amount` REAL, `milk_rate_used` REAL, `delivery_fee_used` REAL, `ts_standard_used` REAL, `sale_quantity` REAL, `sale_value` REAL, `unit_rate` REAL, `surcharge_applied` REAL NOT NULL, `notes` TEXT, FOREIGN KEY(`corrects_event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "occurredAt",
+            "columnName": "occurred_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventType",
+            "columnName": "event_type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "channel",
+            "columnName": "channel",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "correctsEventId",
+            "columnName": "corrects_event_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "rawLiters",
+            "columnName": "raw_liters",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "fatPercentage",
+            "columnName": "fat_percentage",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "lrReading",
+            "columnName": "lr_reading",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "snfPercentage",
+            "columnName": "snf_percentage",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "tsPercentage",
+            "columnName": "ts_percentage",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "adjustedLiters",
+            "columnName": "adjusted_liters",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "amountOwed",
+            "columnName": "amount_owed",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "milkLitersUsed",
+            "columnName": "milk_liters_used",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "yogurtKgProduced",
+            "columnName": "yogurt_kg_produced",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "milkRateUsed",
+            "columnName": "milk_rate_used",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "deliveryFeeUsed",
+            "columnName": "delivery_fee_used",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "tsStandardUsed",
+            "columnName": "ts_standard_used",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "saleQuantity",
+            "columnName": "sale_quantity",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "saleValue",
+            "columnName": "sale_value",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "unitRate",
+            "columnName": "unit_rate",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "surchargeApplied",
+            "columnName": "surcharge_applied",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "event_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_events_event_type",
+            "unique": false,
+            "columnNames": [
+              "event_type"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_events_event_type` ON `${TABLE_NAME}` (`event_type`)"
+          },
+          {
+            "name": "index_events_occurred_at",
+            "unique": false,
+            "columnNames": [
+              "occurred_at"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_events_occurred_at` ON `${TABLE_NAME}` (`occurred_at`)"
+          },
+          {
+            "name": "index_events_corrects_event_id",
+            "unique": false,
+            "columnNames": [
+              "corrects_event_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_events_corrects_event_id` ON `${TABLE_NAME}` (`corrects_event_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "events",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "corrects_event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "inventory_log",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`log_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `event_id` INTEGER NOT NULL, `product_id` INTEGER NOT NULL, `quantity` REAL NOT NULL, FOREIGN KEY(`event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`product_id`) REFERENCES `products`(`product_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "logId",
+            "columnName": "log_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productId",
+            "columnName": "product_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "log_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_inventory_log_event_id",
+            "unique": false,
+            "columnNames": [
+              "event_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_inventory_log_event_id` ON `${TABLE_NAME}` (`event_id`)"
+          },
+          {
+            "name": "index_inventory_log_product_id",
+            "unique": false,
+            "columnNames": [
+              "product_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_inventory_log_product_id` ON `${TABLE_NAME}` (`product_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "events",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          },
+          {
+            "table": "products",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "product_id"
+            ],
+            "referencedColumns": [
+              "product_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "financial_log",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`log_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `event_id` INTEGER NOT NULL, `account_id` INTEGER NOT NULL, `amount` REAL NOT NULL, FOREIGN KEY(`event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`account_id`) REFERENCES `accounts`(`account_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "logId",
+            "columnName": "log_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accountId",
+            "columnName": "account_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "log_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_financial_log_event_id",
+            "unique": false,
+            "columnNames": [
+              "event_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_financial_log_event_id` ON `${TABLE_NAME}` (`event_id`)"
+          },
+          {
+            "name": "index_financial_log_account_id",
+            "unique": false,
+            "columnNames": [
+              "account_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_financial_log_account_id` ON `${TABLE_NAME}` (`account_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "events",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          },
+          {
+            "table": "accounts",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "account_id"
+            ],
+            "referencedColumns": [
+              "account_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "settings",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`setting_key` TEXT NOT NULL, `setting_value` REAL NOT NULL, `updated_at` TEXT NOT NULL, PRIMARY KEY(`setting_key`))",
+        "fields": [
+          {
+            "fieldPath": "key",
+            "columnName": "setting_key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "setting_value",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "setting_key"
+          ]
+        }
+      },
+      {
+        "tableName": "budget_plans",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`budget_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `category` TEXT NOT NULL, `period_start` TEXT NOT NULL, `period_end_exclusive` TEXT NOT NULL, `planned_liters` REAL, `planned_amount` REAL, `vendor_rate_snapshot` REAL, `retail_rate_snapshot` REAL, `created_at` TEXT NOT NULL, `supersedes_id` INTEGER, `archived` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "budgetId",
+            "columnName": "budget_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "periodStart",
+            "columnName": "period_start",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "periodEndExclusive",
+            "columnName": "period_end_exclusive",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "plannedLiters",
+            "columnName": "planned_liters",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "plannedAmount",
+            "columnName": "planned_amount",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "vendorRateSnapshot",
+            "columnName": "vendor_rate_snapshot",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "retailRateSnapshot",
+            "columnName": "retail_rate_snapshot",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "supersedesId",
+            "columnName": "supersedes_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "archived",
+            "columnName": "archived",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "budget_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_budget_plans_category_period_start_archived",
+            "unique": false,
+            "columnNames": [
+              "category",
+              "period_start",
+              "archived"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_budget_plans_category_period_start_archived` ON `${TABLE_NAME}` (`category`, `period_start`, `archived`)"
+          },
+          {
+            "name": "index_budget_plans_supersedes_id",
+            "unique": false,
+            "columnNames": [
+              "supersedes_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_budget_plans_supersedes_id` ON `${TABLE_NAME}` (`supersedes_id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "collections_targets",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`target_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `week_start` TEXT NOT NULL, `week_end_exclusive` TEXT NOT NULL, `target_amount` REAL NOT NULL, `created_at` TEXT NOT NULL, `supersedes_id` INTEGER, `archived` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "targetId",
+            "columnName": "target_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "weekStart",
+            "columnName": "week_start",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "weekEndExclusive",
+            "columnName": "week_end_exclusive",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "targetAmount",
+            "columnName": "target_amount",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "supersedesId",
+            "columnName": "supersedes_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "archived",
+            "columnName": "archived",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "target_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_collections_targets_week_start_archived",
+            "unique": false,
+            "columnNames": [
+              "week_start",
+              "archived"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_collections_targets_week_start_archived` ON `${TABLE_NAME}` (`week_start`, `archived`)"
+          },
+          {
+            "name": "index_collections_targets_supersedes_id",
+            "unique": false,
+            "columnNames": [
+              "supersedes_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_collections_targets_supersedes_id` ON `${TABLE_NAME}` (`supersedes_id`)"
+          }
+        ]
+      }
+    ],
+    "views": [
+      {
+        "viewName": "current_stock",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT\n            p.product_id,\n            p.name,\n            p.unit,\n            COALESCE(SUM(il.quantity), 0) AS quantity_on_hand\n        FROM products p\n        LEFT JOIN inventory_log il ON il.product_id = p.product_id\n        GROUP BY p.product_id, p.name, p.unit"
+      },
+      {
+        "viewName": "account_balances",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT\n            a.account_id,\n            a.name,\n            a.type,\n            a.category,\n            ROUND(COALESCE(SUM(fl.amount), 0), 2) AS balance\n        FROM accounts a\n        LEFT JOIN financial_log fl ON fl.account_id = a.account_id\n        GROUP BY a.account_id, a.name, a.type, a.category"
+      },
+      {
+        "viewName": "purchase_calculation_audit",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT\n            e.event_id,\n            e.raw_liters,\n            e.fat_percentage,\n            e.lr_reading,\n            e.milk_rate_used,\n            e.delivery_fee_used,\n            e.ts_standard_used,\n            (0.25 * e.lr_reading) + (0.22 * e.fat_percentage) + 0.72 AS expected_snf_percentage,\n            e.fat_percentage + ((0.25 * e.lr_reading) + (0.22 * e.fat_percentage) + 0.72) AS expected_ts_percentage,\n            e.raw_liters * (\n                (\n                    e.fat_percentage +\n                    ((0.25 * e.lr_reading) + (0.22 * e.fat_percentage) + 0.72)\n                ) / e.ts_standard_used\n            ) AS expected_adjusted_liters,\n            (\n                e.raw_liters * (\n                    (\n                        e.fat_percentage +\n                        ((0.25 * e.lr_reading) + (0.22 * e.fat_percentage) + 0.72)\n                    ) / e.ts_standard_used\n                ) * e.milk_rate_used\n            ) + (e.raw_liters * e.delivery_fee_used) AS expected_amount_owed\n        FROM events e\n        WHERE e.event_type = 'PURCHASE_RECEIPT'"
+      },
+      {
+        "viewName": "sale_calculation_audit",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT\n            e.event_id,\n            e.sale_quantity,\n            e.sale_value,\n            e.unit_rate,\n            e.surcharge_applied,\n            ROUND(e.sale_quantity * e.unit_rate, 2) AS expected_value_from_quantity,\n            ROUND(e.sale_value / e.unit_rate, 4) AS expected_quantity_from_value,\n            ROUND(e.sale_value + e.surcharge_applied, 2) AS expected_total\n        FROM events e\n        WHERE e.event_type = 'SALE'"
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1d7c7ee0205609b5fdfe705045933df3')"
+    ]
+  }
+}

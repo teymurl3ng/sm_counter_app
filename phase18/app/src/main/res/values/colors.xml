@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Phase 11A: Material-style semantic color roles.
+         These are design tokens only; existing screens are migrated in later checkpoints. -->
+    <color name="milk_shop_color_primary">#315B72</color>
+    <color name="milk_shop_color_on_primary">#FFFFFF</color>
+    <color name="milk_shop_color_primary_container">#CBE6F5</color>
+    <color name="milk_shop_color_on_primary_container">#0E2B3A</color>
+
+    <color name="milk_shop_color_secondary">#52636A</color>
+    <color name="milk_shop_color_on_secondary">#FFFFFF</color>
+    <color name="milk_shop_color_secondary_container">#D5E5EA</color>
+    <color name="milk_shop_color_on_secondary_container">#0F1D21</color>
+
+    <color name="milk_shop_color_background">#FAFAF8</color>
+    <color name="milk_shop_color_on_background">#1A1C1D</color>
+    <color name="milk_shop_color_surface">#FAFAF8</color>
+    <color name="milk_shop_color_on_surface">#1A1C1D</color>
+    <color name="milk_shop_color_surface_variant">#E0E7EA</color>
+    <color name="milk_shop_color_on_surface_variant">#41484C</color>
+    <color name="milk_shop_color_outline">#72797D</color>
+    <color name="milk_shop_color_outline_variant">#C1C8CC</color>
+
+    <color name="milk_shop_color_success">#2E6A3A</color>
+    <color name="milk_shop_color_warning">#8A5900</color>
+    <color name="milk_shop_color_error">#B3261E</color>
+    <color name="milk_shop_color_on_error">#FFFFFF</color>
+    <color name="milk_shop_color_on_status">#FFFFFF</color>
+
+    <color name="milk_shop_color_scrim">#52000000</color>
+</resources>

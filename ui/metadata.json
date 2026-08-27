@@ -1,0 +1,8 @@
+{
+  "name": "Milk Shop Manager",
+  "description": "Comprehensive Milk & Pure Dairy Shop Management System for daily operations, customer Khata credit accounts, supplier procurements, wholesale, retail counter POS, expenses, and register reconciliation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -81,7 +81,19 @@ The runtime advertises thirteen implemented actions: the eight Phase 7 actions, 
 - The old prototype view model remains inactive and is not imported by the packaged app.
 - No Room schema, frozen business formula, frozen DTO, or canonical bridge endpoint changed.
 
-## 6. Verification checkpoint
+## 6. Structural refactor checkpoint
+
+Before starting Supplier Profiles, the active hybrid path was reorganized without changing its public behavior:
+
+- the 733-line Phase 8 shell was split into authentication, workspace navigation, Product, Customer, shared UI, and shared model modules; the shell is now 207 lines and no new handwritten React module exceeds 207 lines;
+- the 518-line bridge dispatcher was split into protocol validation, domain handlers, JSON mapping, and a 56-line dispatcher;
+- the 660-line Phase 5 read-model service remains the stable caller-facing façade but is now 47 lines, delegating to focused identity/master-data, operational, financial, costing/planning, and security readers;
+- generated contract projections and inactive inherited prototype screens were deliberately left alone;
+- future handwritten files should be reviewed for separation when they approach roughly 300–400 lines, with responsibility and cohesion taking priority over an arbitrary number.
+
+The checkpoint changed no Room schema, DTO shape, bridge action, permission rule, accounting formula, element ID, or user workflow. Its focused device regression covered the Phase 5 read model and Phase 7–8 hybrid flows: **13/13 PASS**.
+
+## 7. Verification checkpoint
 
 Physical device: `SM-A065F`.
 
@@ -97,7 +109,7 @@ Physical device: `SM-A065F`.
 
 The focused tests prove Product owner update/archive/restore and Customer owner create/rename/profile/deactivate/restore with Room readback and durable actor audit, direct cashier denial, missing-record and duplicate-name error mapping, absence of an editable customer balance, and packaged React round trips.
 
-## 7. Current limitations and next milestone
+## 8. Current limitations and next milestone
 
 Phase 8 is not complete. Authentication, Products, and Customer Profiles execute through the active React product. Supplier, employee, transactions, ledgers, reports, settings, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
 
@@ -105,4 +117,4 @@ The next milestone is **Supplier Profiles**, followed by Employees. It should re
 
 ## Plain English
 
-The Products and Customers parts of Saaf Milk are now real. The owner can maintain customer details and deactivate someone without erasing what they owe or their past transactions. Customer balances cannot be typed over; they still come from actual shop activity. Phase 8 remains open, and Suppliers are next.
+The Products and Customers parts of Saaf Milk are now real. Their code has also been separated into smaller, clearly named parts before more screens are added. The owner can maintain customer details and deactivate someone without erasing what they owe or their past transactions. Customer balances cannot be typed over; they still come from actual shop activity. Phase 8 remains open, and Suppliers are next.

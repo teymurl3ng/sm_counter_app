@@ -233,7 +233,7 @@ The packaged React/WebView/Android vertical slice is implemented and device-prov
 
 ## Phase 8 — IN PROGRESS
 
-The screen capability ledger is in `PHASE8.md`. Products and Customer Profiles are complete with active/inactive lifecycle management, exact PKR handling, protected customer balances, awaited native refresh, Kotlin permission enforcement, durable actor audit, and packaged physical-device evidence. The runtime subset is now thirteen actions while the frozen contract remains version 1 with 78 operations. The full connected suite passes 133/133. Supplier Profiles are the current continuation point.
+The screen capability ledger is in `PHASE8.md`. Products and Customer Profiles are complete with active/inactive lifecycle management, exact PKR handling, protected customer balances, awaited native refresh, Kotlin permission enforcement, durable actor audit, and packaged physical-device evidence. Before Supplier work, the active React shell, bridge dispatcher, and Phase 5 read-model service were split into focused modules without changing behavior; the structural checkpoint passed 13/13 focused device tests. The runtime subset is now thirteen actions while the frozen contract remains version 1 with 78 operations. The full connected suite passes 133/133. Supplier Profiles are the current continuation point.
 
 ---
 

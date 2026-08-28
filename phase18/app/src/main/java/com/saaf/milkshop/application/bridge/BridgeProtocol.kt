@@ -1,0 +1,184 @@
+package com.saaf.milkshop.application.bridge
+
+import com.saaf.milkshop.domain.ProductCatalogInput
+import com.saaf.milkshop.domain.SecurityFailure
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
+import java.math.BigDecimal
+import java.util.UUID
+
+internal object HybridBridgeActions {
+    const val BRIDGE_INFO = "system.bridgeInfo"
+    const val BOOTSTRAP_STATUS = "query.bootstrapStatus"
+    const val BOOTSTRAP_OWNER = "command.auth.bootstrapOwner"
+    const val LOGIN = "command.auth.login"
+    const val LOGOUT = "command.auth.logout"
+    const val CURRENT_SESSION = "query.currentSession"
+    const val MASTER_DATA = "query.masterData"
+    const val CREATE_PRODUCT = "command.createProduct"
+    const val UPDATE_PRODUCT = "command.updateProduct"
+    const val SET_PRODUCT_ARCHIVED = "command.setProductArchived"
+    const val CREATE_CUSTOMER = "command.createCustomer"
+    const val RENAME_CUSTOMER = "command.renameCustomer"
+    const val SAVE_CUSTOMER_PROFILE = "command.saveCustomerProfile"
+
+    val authentication = setOf(BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN, LOGOUT, CURRENT_SESSION)
+    val masterData = setOf(MASTER_DATA, CREATE_PRODUCT, UPDATE_PRODUCT, SET_PRODUCT_ARCHIVED, CREATE_CUSTOMER, RENAME_CUSTOMER, SAVE_CUSTOMER_PROFILE)
+    val supported = listOf(BRIDGE_INFO) + authentication + masterData
+    val authByAction = supported.associateWith { action ->
+        if (action in setOf(BRIDGE_INFO, BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN)) "none" else "session"
+    }
+}
+
+internal data class BridgeRequest(
+    val requestId: String,
+    val action: String,
+    val sessionHandle: String?,
+    val payload: JSONObject,
+) {
+    fun requireSession(): String = sessionHandle
+        ?: throw BridgeProtocolFailure("unauthenticated", "Sign in to continue")
+}
+
+internal data class BridgeFailure(
+    val code: String,
+    val message: String,
+    val field: String? = null,
+    val retryable: Boolean = false,
+)
+
+internal fun parseBridgeRequest(envelope: JSONObject): BridgeRequest {
+    strictObject(
+        envelope,
+        required = setOf("contractVersion", "requestId", "action", "payload"),
+        allowed = setOf("contractVersion", "requestId", "action", "sessionHandle", "payload"),
+    )
+    val version = envelope.get("contractVersion")
+    if (version !is Int && version !is Long || (version as Number).toLong() != BridgeContractSnapshot.VERSION.toLong()) {
+        throw BridgeProtocolFailure("invalid_request", "Bridge contract version does not match")
+    }
+    val requestId = envelope.requiredString("requestId")
+    runCatching { UUID.fromString(requestId) }.getOrElse {
+        throw BridgeProtocolFailure("invalid_request", "requestId must be a UUID", "requestId")
+    }
+    val action = envelope.requiredString("action")
+    if (action !in HybridBridgeActions.supported) {
+        throw BridgeProtocolFailure("invalid_request", "This action is not available in the current app slice", "action")
+    }
+    val payload = envelope.get("payload") as? JSONObject
+        ?: throw BridgeProtocolFailure("invalid_request", "payload must be an object", "payload")
+    val session = if (envelope.has("sessionHandle") && !envelope.isNull("sessionHandle")) {
+        envelope.requiredString("sessionHandle")
+    } else null
+    val auth = HybridBridgeActions.authByAction.getValue(action)
+    if (auth == "session" && session == null) throw BridgeProtocolFailure("unauthenticated", "Sign in to continue")
+    if (auth == "none" && envelope.has("sessionHandle")) {
+        throw BridgeProtocolFailure("invalid_request", "sessionHandle is not accepted for this action", "sessionHandle")
+    }
+    return BridgeRequest(requestId, action, session, payload)
+}
+
+internal fun successEnvelope(request: BridgeRequest, data: JSONObject): JSONObject = JSONObject()
+    .put("contractVersion", BridgeContractSnapshot.VERSION)
+    .put("requestId", request.requestId)
+    .put("action", request.action)
+    .put("ok", true)
+    .put("data", data)
+
+internal fun failureEnvelope(requestId: String, action: String, failure: BridgeFailure): JSONObject = JSONObject()
+    .put("contractVersion", BridgeContractSnapshot.VERSION)
+    .put("requestId", requestId)
+    .put("action", action)
+    .put("ok", false)
+    .put("error", JSONObject().put("code", failure.code).put("message", failure.message).putNullable("field", failure.field).put("retryable", failure.retryable))
+
+internal fun mapBridgeFailure(error: Throwable): BridgeFailure = when (error) {
+    is BridgeProtocolFailure -> BridgeFailure(error.code, error.message ?: "The request is invalid", error.field)
+    is BridgeCommandConflict -> BridgeFailure("conflict", error.message ?: "The current state no longer permits this action")
+    is BridgeCommandNotFound -> BridgeFailure("not_found", error.message ?: "The requested record no longer exists")
+    is SecurityFailure.Authentication -> BridgeFailure("authentication_failed", SecurityFailure.GENERIC_AUTH_FAILURE)
+    is SecurityFailure.SessionExpired -> BridgeFailure("session_expired", "Your session expired. Sign in again.")
+    is SecurityFailure.PermissionDenied -> BridgeFailure("permission_denied", "You do not have permission to perform this action.")
+    is SecurityFailure.RecentAuthenticationRequired -> BridgeFailure("recent_authentication_required", "Enter your passphrase again to perform this sensitive action.")
+    is SecurityFailure.Validation -> BridgeFailure("validation_failed", error.message ?: "Check the entered information")
+    is JSONException -> BridgeFailure("invalid_request", "The request is not valid JSON")
+    is IllegalArgumentException -> BridgeFailure("validation_failed", error.message ?: "Check the entered information")
+    else -> BridgeFailure("internal_error", "The app could not complete this request")
+}
+
+internal fun JSONObject.requiredString(name: String): String {
+    if (!has(name) || isNull(name) || get(name) !is String) throw BridgeProtocolFailure("invalid_request", "$name must be text", name)
+    return getString(name)
+}
+
+internal fun JSONObject.requiredBoolean(name: String): Boolean {
+    if (!has(name) || isNull(name) || get(name) !is Boolean) throw BridgeProtocolFailure("invalid_request", "$name must be true or false", name)
+    return getBoolean(name)
+}
+
+internal fun JSONObject.nullableString(name: String): String? {
+    if (!has(name)) throw BridgeProtocolFailure("invalid_request", "$name is required", name)
+    if (isNull(name)) return null
+    if (get(name) !is String) throw BridgeProtocolFailure("invalid_request", "$name must be text or null", name)
+    return getString(name)
+}
+
+internal fun JSONObject.nullablePaisa(name: String): Long? {
+    val raw = nullableString(name) ?: return null
+    if (!Regex("-?(0|[1-9][0-9]*)").matches(raw)) throw BridgeProtocolFailure("validation_failed", "$name must be whole PKR paisa", name)
+    return raw.toLongOrNull() ?: throw BridgeProtocolFailure("validation_failed", "$name is outside the supported range", name)
+}
+
+internal fun JSONObject.requiredId(name: String): Long {
+    val raw = requiredString(name)
+    if (!Regex("[1-9][0-9]*").matches(raw)) throw BridgeProtocolFailure("validation_failed", "$name must be a positive record ID", name)
+    return raw.toLongOrNull() ?: throw BridgeProtocolFailure("validation_failed", "$name is outside the supported range", name)
+}
+
+internal fun JSONObject.nullableDecimal(name: String): BigDecimal? {
+    val raw = nullableString(name) ?: return null
+    if (!Regex("-?(0|[1-9][0-9]*)(\\.[0-9]+)?").matches(raw)) throw BridgeProtocolFailure("validation_failed", "$name must be a decimal value", name)
+    return runCatching { BigDecimal(raw) }.getOrElse { throw BridgeProtocolFailure("validation_failed", "$name is outside the supported range", name) }
+}
+
+internal fun JSONObject.productInput(includeProductId: Boolean): Pair<Long?, ProductCatalogInput> {
+    val commonFields = setOf("name", "unitCode", "defaultSaleRatePaisaPerUnit", "inventoryTracking", "notes")
+    strictPayload(this, if (includeProductId) commonFields + "productId" else commonFields)
+    val productId = if (includeProductId) requiredId("productId") else null
+    val unit = requiredString("unitCode")
+    if (unit !in setOf("Liters", "Kg")) throw BridgeProtocolFailure("validation_failed", "Choose Liters or Kg", "unitCode")
+    val ratePaisa = nullablePaisa("defaultSaleRatePaisaPerUnit")
+    if (ratePaisa != null && ratePaisa <= 0L) throw BridgeProtocolFailure("validation_failed", "Default sale rate must be greater than zero", "defaultSaleRatePaisaPerUnit")
+    return productId to ProductCatalogInput(
+        name = requiredString("name"),
+        unit = unit,
+        defaultSaleRate = ratePaisa?.let { BigDecimal(it).movePointLeft(2).toDouble() },
+        inventoryTracking = requiredBoolean("inventoryTracking"),
+        notes = nullableString("notes"),
+    )
+}
+
+internal fun strictPayload(payload: JSONObject, fields: Set<String>) = strictObject(payload, required = fields, allowed = fields)
+
+internal fun strictObject(value: JSONObject, required: Set<String>, allowed: Set<String>) {
+    val actual = value.keys().asSequence().toSet()
+    val missing = required - actual
+    val unknown = actual - allowed
+    if (missing.isNotEmpty()) {
+        val field = missing.sorted().first()
+        throw BridgeProtocolFailure("invalid_request", "Missing field: $field", field)
+    }
+    if (unknown.isNotEmpty()) {
+        val field = unknown.sorted().first()
+        throw BridgeProtocolFailure("invalid_request", "Unknown field: $field", field)
+    }
+}
+
+internal class BridgeProtocolFailure(val code: String, message: String, val field: String? = null) : IllegalArgumentException(message)
+
+internal fun JSONObject.putNullable(name: String, value: Any?): JSONObject = put(name, value ?: JSONObject.NULL)
+
+internal fun jsonArray(values: Iterable<String>): JSONArray = JSONArray().apply { values.forEach(::put) }
+
+internal fun <T> jsonArray(values: Iterable<T>, transform: (T) -> JSONObject): JSONArray = JSONArray().apply { values.forEach { put(transform(it)) } }

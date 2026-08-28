@@ -4,6 +4,8 @@ import com.saaf.milkshop.application.readmodels.HybridReadModelService
 import com.saaf.milkshop.application.readmodels.decimal
 import com.saaf.milkshop.application.readmodels.money
 import com.saaf.milkshop.domain.VendorPurchaseInput
+import com.saaf.milkshop.domain.VendorPaymentInput
+import com.saaf.milkshop.domain.CreditCollectionInput
 import com.saaf.milkshop.domain.SaleInput
 import com.saaf.milkshop.domain.SalePayment
 import com.saaf.milkshop.domain.YogurtProductionInput
@@ -22,6 +24,8 @@ internal class OperationsBridgeHandler(
         HybridBridgeActions.RECORD_PURCHASE -> recordPurchase(request)
         HybridBridgeActions.RECORD_SALE -> recordSale(request)
         HybridBridgeActions.RECORD_PRODUCTION -> recordProduction(request)
+        HybridBridgeActions.RECORD_VENDOR_PAYMENT -> recordVendorPayment(request)
+        HybridBridgeActions.RECORD_CREDIT_COLLECTION -> recordCreditCollection(request)
         HybridBridgeActions.RECORD_EXPENSE -> recordExpense(request)
         else -> unavailableBridgeAction()
     }
@@ -201,12 +205,69 @@ internal class OperationsBridgeHandler(
         return JSONObject().put("eventId", result.eventId.toString())
     }
 
+    private suspend fun recordVendorPayment(request: BridgeRequest): JSONObject {
+        val payment = paymentInput(request, "vendorAccountId", "Supplier payment")
+        val result = commands.recordVendorPayment(
+            request.requireSession(),
+            VendorPaymentInput(
+                vendorAccountId = payment.partyAccountId,
+                paymentAccountId = payment.paymentAccountId,
+                amount = payment.amount,
+                occurredAt = payment.occurredAt,
+                notes = payment.notes,
+            ),
+        )
+        return JSONObject().put("eventId", result.eventId.toString())
+    }
+
+    private suspend fun recordCreditCollection(request: BridgeRequest): JSONObject {
+        val payment = paymentInput(request, "customerAccountId", "Collection amount")
+        val result = commands.recordCreditCollection(
+            request.requireSession(),
+            CreditCollectionInput(
+                customerAccountId = payment.partyAccountId,
+                paymentAccountId = payment.paymentAccountId,
+                amount = payment.amount,
+                occurredAt = payment.occurredAt,
+                notes = payment.notes,
+            ),
+        )
+        return JSONObject().put("eventId", result.eventId.toString())
+    }
+
+    private fun paymentInput(request: BridgeRequest, partyField: String, amountLabel: String): BridgePaymentInput {
+        strictObject(
+            request.payload,
+            required = setOf(partyField, "paymentAccountId", "amountPaisa", "occurredAt"),
+            allowed = setOf(partyField, "paymentAccountId", "amountPaisa", "occurredAt", "notes"),
+        )
+        val amountPaisa = request.payload.requiredPaisa("amountPaisa")
+        if (amountPaisa <= 0L) {
+            throw BridgeProtocolFailure("validation_failed", "$amountLabel must be greater than zero", "amountPaisa")
+        }
+        return BridgePaymentInput(
+            partyAccountId = request.payload.requiredId(partyField),
+            paymentAccountId = request.payload.requiredId("paymentAccountId"),
+            amount = BigDecimal(amountPaisa).movePointLeft(2).toDouble(),
+            occurredAt = request.payload.requiredDate("occurredAt"),
+            notes = request.payload.optionalString("notes"),
+        )
+    }
+
     private fun positiveDecimal(payload: JSONObject, field: String, message: String): Double {
         val value = payload.requiredDecimal(field).toFiniteDouble(field)
         if (value <= 0.0) throw BridgeProtocolFailure("validation_failed", message, field)
         return value
     }
 }
+
+private data class BridgePaymentInput(
+    val partyAccountId: Long,
+    val paymentAccountId: Long,
+    val amount: Double,
+    val occurredAt: String,
+    val notes: String?,
+)
 
 private fun BridgeRequest.dateRange(): Pair<String, String> {
     strictPayload(payload, setOf("startDateInclusive", "endDateExclusive"))

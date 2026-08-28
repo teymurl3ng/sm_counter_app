@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-08-28 — hybrid Phases 0–7 are complete; Phase 8 screen-by-screen native-backed UI wiring is in progress, with management, core Settings, Opening State, supplier milk purchase, paid/credit sales, milk-to-yogurt production, and expenses complete. Supplier/customer payments are the next Daily Operations substep. Substantial Phase 9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
+Status: RECONCILED 2026-08-28 — hybrid Phases 0–7 are complete; Phase 8 screen-by-screen native-backed UI wiring is in progress, with management, core Settings, Opening State, supplier milk purchase, paid/credit sales, milk-to-yogurt production, expenses, and supplier/customer payments complete. Salary payment is the next Daily Operations substep. Substantial Phase 9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
 
 ## What this repository contains
 
@@ -35,7 +35,7 @@ SQL blueprint SHA-256:
 
 **Phase 8 — Screen-by-Screen Native UI Wiring: IN PROGRESS**
 
-The Phase 7 shell remains intact. Phase 8 now provides native-backed management screens, Attendance, editable store identity, core shop-wide rates, Expense Categories, optional Opening State setup/correction, operational/cashier/financial summaries, supplier milk purchase, paid or customer-credit sales, milk-to-yogurt production, and expenses. Currency remains fixed to PKR. Purchase, sale, production, and expense posting behavior remains native-only. The runtime exposes 37 of the frozen contract's 78 operations. The complete connected-device regression passes 164/164. Phase 8 remains open; supplier/customer payments are next.
+The Phase 7 shell remains intact. Phase 8 now provides native-backed management screens, Attendance, editable store identity, core shop-wide rates, Expense Categories, optional Opening State setup/correction, operational/cashier/financial summaries, supplier milk purchase, paid or customer-credit sales, milk-to-yogurt production, expenses, supplier payments, and customer collections. Currency remains fixed to PKR. Purchase, sale, production, expense, and payment posting behavior remains native-only. The runtime exposes 39 of the frozen contract's 78 operations. The complete connected-device regression passes 168/168. Phase 8 remains open; salary payment is next.
 
 ## Approved security track
 
@@ -83,7 +83,7 @@ Phase 6 — Bridge Contract (`bridge/CONTRACT.md`) ✅
 
 Phase 7 — Hybrid Shell / Vertical Slice ✅
 
-Phase 8 — UI Wiring ◐ (management, core settings, Opening State, purchases, sales, production, and expenses complete; supplier/customer payments next)
+Phase 8 — UI Wiring ◐ (management, core settings, Opening State, purchases, sales, production, expenses, and supplier/customer payments complete; salary payment next)
 
 Phase 9 — Runtime / Navigation / Device Integration ◐ (native lifecycle credit only; hybrid runtime absent)
 
@@ -134,8 +134,9 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 8 focused Daily Operations sales suite: 4/4 passed on the physical device.
 - Phase 8 focused Daily Operations production suite: 4/4 passed on the physical device.
 - Phase 8 focused Daily Operations expense suite: 4/4 passed on the physical device.
-- Complete connected-device instrumentation regression: 164/164 passed, 0 skipped, 0 failed.
+- Phase 8 focused Daily Operations payment suite: 4/4 passed on the physical device.
+- Complete connected-device instrumentation regression: 168/168 passed, 0 skipped, 0 failed.
 
 ## Next gate
 
-Phases 3–7 are closed and Phase 8 is active. Management, core settings, optional Opening State, supplier purchases, paid/credit sales, milk-to-yogurt production, and expenses are native-backed and device-proven. The active React shell, native bridge handlers/services, and Phase 5 read-model façade remain split into focused modules. Next, wire supplier payments and customer collections without moving account direction, balances, or reporting into React. Every screen must continue to await native mutations, show truthful outcomes, refresh declared queries, receive a hybrid integration test, and retire its corresponding mock/local behavior. See `PHASE8.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–7 are closed and Phase 8 is active. Management, core settings, optional Opening State, supplier purchases, paid/credit sales, milk-to-yogurt production, expenses, supplier payments, and customer collections are native-backed and device-proven. The active React shell, native bridge handlers/services, and Phase 5 read-model façade remain split into focused modules. Next, wire salary payments without moving employee balance direction, Cash/Bank posting, or reporting into React. Every screen must continue to await native mutations, show truthful outcomes, refresh declared queries, receive a hybrid integration test, and retire its corresponding mock/local behavior. See `PHASE8.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.

@@ -33,7 +33,7 @@ export function TextInput({ id, label, value, onChange, type = 'text', autoCompl
 }
 
 export function FilterButton({ id, active, onClick, children }: { id: string; active: boolean; onClick(): void; children: ReactNode }) {
-  return <button id={id} onClick={onClick} className={`rounded-lg px-3 py-2 text-xs font-bold ${active ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-500'}`}>{children}</button>;
+  return <button type="button" id={id} onClick={onClick} className={`rounded-lg px-3 py-2 text-xs font-bold ${active ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-500'}`}>{children}</button>;
 }
 
 export function SummaryCard({ label, value }: { label: string; value: string }) {

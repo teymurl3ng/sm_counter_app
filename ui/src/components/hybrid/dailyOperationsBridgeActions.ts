@@ -1,6 +1,6 @@
 import type { EventMutationResultDto, IsoDateString, PurchaseRecordedResultDto, SaleRecordedResultDto, SessionHandle } from '../../bridge/contract.generated';
 import { callNative, rupeesToPaisa, validateDecimalInput } from '../../bridge/nativeBridge';
-import type { ExpenseDraft, ProductionDraft, PurchaseDraft, SaleDraft } from './hybridModels';
+import type { ExpenseDraft, PaymentDraft, ProductionDraft, PurchaseDraft, SaleDraft } from './hybridModels';
 
 type RunAndRefreshResult = <T>(operation: () => Promise<T>, success: string) => Promise<T>;
 
@@ -60,5 +60,18 @@ export function dailyOperationsBridgeActions(
     }, session);
   }, 'Expense recorded successfully.');
 
-  return { recordExpense, recordProduction, recordPurchase, recordSale };
+  const recordPayment = (draft: PaymentDraft): Promise<EventMutationResultDto> => runAndRefresh(async () => {
+    if (!session) throw new Error('Sign in to record a payment.');
+    const common = {
+      paymentAccountId: draft.paymentAccountId,
+      amountPaisa: rupeesToPaisa(draft.amountRupees),
+      occurredAt: draft.occurredAt as IsoDateString,
+      ...(draft.notes.trim() ? { notes: draft.notes.trim() } : {}),
+    };
+    return draft.kind === 'supplier'
+      ? callNative('command.recordVendorPayment', { vendorAccountId: draft.partyAccountId, ...common }, session)
+      : callNative('command.recordCreditCollection', { customerAccountId: draft.partyAccountId, ...common }, session);
+  }, draft.kind === 'supplier' ? 'Supplier payment recorded.' : 'Customer collection recorded.');
+
+  return { recordExpense, recordPayment, recordProduction, recordPurchase, recordSale };
 }

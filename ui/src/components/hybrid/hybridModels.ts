@@ -101,6 +101,15 @@ export type ExpenseDraft = {
   notes: string;
 };
 
+export type PaymentDraft = {
+  kind: 'supplier' | 'customer';
+  partyAccountId: Int64String;
+  paymentAccountId: Int64String;
+  amountRupees: string;
+  occurredAt: string;
+  notes: string;
+};
+
 export function todayInput(): string {
   const date = new Date();
   const month = String(date.getMonth() + 1).padStart(2, '0');

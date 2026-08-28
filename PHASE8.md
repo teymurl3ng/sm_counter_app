@@ -1,6 +1,6 @@
 # Phase 8 — Screen-by-Screen Native UI Wiring
 
-**Status: IN PROGRESS — management, core Settings, Opening State, purchases, sales, production, and expenses complete 2026-08-28**
+**Status: IN PROGRESS — management, core Settings, Opening State, purchases, sales, production, expenses, and supplier/customer payments complete 2026-08-28**
 
 ## 1. Purpose and working rule
 
@@ -27,7 +27,7 @@ The frozen logic specification, SQL blueprint, Phase 5 DTO catalog, and Phase 6 
 | Employees and attendance | `query.masterData`, `query.transactionReferences`, `query.attendance`, employee/profile/attendance commands | **Milestone 4 complete** | Employee records remain separate from app logins; operators can mark attendance without profile authority. |
 | Expense categories and core settings | `query.businessSettings`, store/rate/category commands | **Milestone 5 complete** | Editable store identity, fixed PKR, shop-wide rates, and non-destructive category lifecycle. |
 | Opening state setup/correction | business-settings/reference queries, opening commands, recent authentication | **Milestone 6 complete** | Optional fresh-install snapshot, explicit directions, and append-only correction. |
-| Daily operations | dashboard/reference/financial queries and purchase/sale/production/expense/payment/spoilage commands | **Purchases, sales, production, and expenses complete** | Supplier/customer payments are next; no UI-side totals, stock mutation, or accounting formulas. |
+| Daily operations | dashboard/reference/financial queries and purchase/sale/production/expense/payment/spoilage commands | **Purchases, sales, production, expenses, and supplier/customer payments complete** | Salary payment is next; no UI-side totals, stock mutation, or accounting formulas. |
 | Deliveries / wholesale | transaction references, deliveries, sale and delivery commands | Queued | Preserve delivery status and sale-link semantics. |
 | Customer/supplier ledgers | account-ledger query plus collection/payment commands | Queued | Display canonical native balances only. |
 | History and corrections | event history/detail and correction command | Queued | Never edit or delete historical events in place. |
@@ -201,7 +201,23 @@ Expense wiring exposed a least-privilege omission in frozen contract version 1: 
 
 The runtime now advertises thirty-seven implemented actions: `query.financialOverview` and `command.recordExpense` join the prior thirty-five. No Room schema, expense posting rule, account direction, permission bundle, or business formula changed.
 
-## 13. Safety and business boundaries
+## 13. Milestone 11 — Daily Operations: Supplier and Customer Payments
+
+The Daily Work area now also provides native-backed supplier payments and customer credit collections:
+
+- owners, admins, and managers with `SUPPLIER_PAYMENT` permission can pay an active supplier; cashiers, managers, admins, and owners with `SALE_AND_COLLECTION` permission can collect money from an active customer;
+- the shared form accepts the relevant supplier/customer, Cash/Bank account, exact PKR amount, business date, and optional notes;
+- a supplier payment atomically reduces both the supplier payable and selected Cash/Bank balance through the existing `VendorPaymentService`;
+- a customer collection atomically reduces the customer receivable and increases the selected Cash/Bank balance through the existing `CreditCollectionService`;
+- payments greater than the current saved party balance remain valid advances, matching the existing native business rule instead of introducing an undocumented UI cap;
+- inactive or mismatched party accounts, invalid payment accounts, non-positive amounts, closed history, expired sessions, and insufficient permission are rejected without posting;
+- each successful payment receives durable actor attribution and a security-audit entry;
+- the authoritative financial overview refreshes supplier/customer balances and period payment totals for full-financial roles, while the cashier summary refreshes collection totals and Cash/Bank balances without revealing the full financial report;
+- packaged device evidence covers both form modes through the bridge to canonical Room financial movements and actor audit.
+
+The runtime now advertises thirty-nine implemented actions: `command.recordVendorPayment` and `command.recordCreditCollection` join the prior thirty-seven. Contract version 2 remains at 78 operations with the same manifest hash. No Room schema, payment direction, advance rule, permission bundle, or business formula changed.
+
+## 14. Safety and business boundaries
 
 - Archiving changes future availability; it does not delete products or rewrite transaction history.
 - Inventory quantity remains event-derived. This screen has no direct “set stock” operation.
@@ -230,23 +246,25 @@ The runtime now advertises thirty-seven implemented actions: `query.financialOve
 - React never calculates sale quantity/value conversion, delivery charge, total, stock, cash, or customer balance; it renders the native result.
 - React never calculates production conversion, yield, cost, or loss; it records the physical inputs/outputs and renders the committed native result.
 - React never calculates expense postings, balances, or daily totals; it submits exact inputs and renders native results.
+- React never calculates supplier payable, customer receivable, payment-account movements, or payment totals; it submits exact inputs and renders native results.
+- Supplier/customer payments intentionally allow advances; the native ledgers remain the authority for the resulting signed balance.
 - A closed business date returns `day_closed` before posting, and the database close-day trigger remains the final guard.
 - The old prototype view model remains inactive and is not imported by the packaged app.
 - No Room schema, frozen business formula, permission bundle, or canonical bridge endpoint changed. The additive `TransactionReferencesDto.expenseCategories` field is the documented contract-v2 amendment.
 
-## 14. Structural refactor checkpoint
+## 15. Structural refactor checkpoint
 
 Before starting Supplier Profiles, the active hybrid path was reorganized without changing its public behavior:
 
-- the 733-line Phase 8 shell was split into authentication, workspace navigation, Product, Customer, Supplier, Employee Profile, Attendance, Business Settings, Expense Categories, Opening State, Daily Work, bridge-action, shared UI, and shared model modules; Daily Work orchestration and the Purchase, Sale, Production, and Expense forms remain separate focused modules, while the coordinating shell remains compact;
+- the 733-line Phase 8 shell was split into authentication, workspace navigation, Product, Customer, Supplier, Employee Profile, Attendance, Business Settings, Expense Categories, Opening State, Daily Work, bridge-action, shared UI, and shared model modules; Daily Work orchestration and the Purchase, Sale, Production, Expense, and Payment forms remain separate focused modules, while the coordinating shell remains compact;
 - the former 353-line multi-domain bridge-handler container was removed. Authentication, Master Data, Employees/Attendance, Settings/Opening State, and Daily Operations now live in focused handlers; purchase orchestration and actor audit are further separated into a focused command service;
 - the 660-line Phase 5 read-model service remains the stable caller-facing façade but is now 47 lines, delegating to focused identity/master-data, operational, financial, costing/planning, and security readers;
 - generated contract projections and inactive inherited prototype screens were deliberately left alone;
 - future handwritten files should be reviewed for separation when they approach roughly 300–400 lines, with responsibility and cohesion taking priority over an arbitrary number.
 
-The structural checkpoint changed no Room schema, permission rule, accounting formula, element ID, or existing user workflow. The focused purchase, sale, production, and expense suites are each **4/4 PASS**. The complete suite is now **164/164 PASS**.
+The structural checkpoint changed no Room schema, permission rule, accounting formula, element ID, or existing user workflow. The focused purchase, sale, production, expense, and payment suites are each **4/4 PASS**. The complete suite is now **168/168 PASS**.
 
-## 15. Verification checkpoint
+## 16. Verification checkpoint
 
 Physical device: `SM-A065F`.
 
@@ -260,7 +278,8 @@ Physical device: `SM-A065F`.
 - Phase 8 focused Daily Operations sales suite — **4/4 PASS**;
 - Phase 8 focused Daily Operations production suite — **4/4 PASS**;
 - Phase 8 focused Daily Operations expense suite — **4/4 PASS**;
-- complete connected-device regression — **164/164 PASS**, 0 skipped, 0 failed, 0 errors;
+- Phase 8 focused Daily Operations payment suite — **4/4 PASS**;
+- complete connected-device regression — **168/168 PASS**, 0 skipped, 0 failed, 0 errors;
 - host-side debug unit suite — **7/7 PASS**;
 - TypeScript check and production Vite build — PASS;
 - explicit web bundle packaging and Android asset gate — PASS;
@@ -268,14 +287,14 @@ Physical device: `SM-A065F`.
 - bridge contract drift check — version 2, 78 operations, SHA-256 `AB374869603B9D773AD86B56EF801DA8C4493816C7301B05214AE596E33D0920` — PASS;
 - frozen logic-spec and SQL hashes — unchanged.
 
-The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; expense-category lifecycle; opening-state record/correction; supplier milk purchases; sales; production; and expenses with Room readback and durable actor audit. Expense evidence covers cashier-only active category/payment references, exact two-sided financial movements, authoritative daily expense totals, archived/invalid account rejection, closed-history and role denial, and the packaged form.
+The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; expense-category lifecycle; opening-state record/correction; supplier milk purchases; sales; production; expenses; supplier payments; and customer collections with Room readback and durable actor audit. Payment evidence covers least-privilege party references, exact two-sided financial movements, authoritative payment totals and balances, inactive/invalid account rejection, closed-history and role denial, advance-compatible posting, and both packaged form modes.
 
-## 16. Current limitations and next milestone
+## 17. Current limitations and next milestone
 
-Phase 8 is not complete. Authentication, management screens, core settings, Opening State, operational and financial summaries, supplier milk purchase, sales, production, and expenses execute through the active React product. Payments, spoilage, ledgers, reports, costing/planning controls, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
+Phase 8 is not complete. Authentication, management screens, core settings, Opening State, operational and financial summaries, supplier milk purchase, sales, production, expenses, supplier payments, and customer collections execute through the active React product. Salary payments, spoilage, ledgers, reports, costing/planning controls, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
 
-The next milestone is the **supplier/customer payment substep of Daily Operations**. Continue with the contracted native supplier-payment and customer-collection commands, keeping payable/receivable direction, balances, and account posting out of React. Subsequent coherent substeps remain salary payment and spoilage.
+The next milestone is the **salary-payment substep of Daily Operations**. Continue with the contracted native salary-payment command, keeping employee balance direction, Cash/Bank posting, and reporting out of React. The subsequent coherent substep remains spoilage.
 
 ## Plain English
 
-Staff can now record incoming supplier milk, outgoing paid or credit sales, completed milk-to-yogurt batches, and everyday shop expenses. An expense reduces the selected Cash or Bank balance and is saved under the chosen active category; cashiers can do this without seeing full financial reports or changing settings. Phase 8 remains open, and supplier/customer payments are next.
+Staff can now record incoming supplier milk, outgoing paid or credit sales, completed milk-to-yogurt batches, everyday shop expenses, money paid to suppliers, and money collected from credit customers. Supplier payments reduce shop cash and the amount owed to that supplier; customer collections increase shop cash and reduce what that customer owes. Advances are allowed and remain visible as signed balances. Phase 8 remains open, and employee salary payments are next.

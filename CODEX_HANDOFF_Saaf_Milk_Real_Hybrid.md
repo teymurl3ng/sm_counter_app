@@ -16,9 +16,9 @@ Read those files before changing code.
 
 ## Current superseding checkpoint — 2026-08-28
 
-The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–7 are complete and Phase 8 is in progress. `PHASE8.md` contains the active screen ledger; management, core settings, optional Opening State, supplier milk purchase, paid/credit sales, milk-to-yogurt production, and expenses are complete. Supplier/customer payments are the next Daily Operations substep.
+The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–7 are complete and Phase 8 is in progress. `PHASE8.md` contains the active screen ledger; management, core settings, optional Opening State, supplier milk purchase, paid/credit sales, milk-to-yogurt production, expenses, and supplier/customer payments are complete. Salary payment is the next Daily Operations substep.
 
-Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE8.md` for current status. Phase 8 now exposes thirty-seven runtime actions, including operational/cashier/financial summaries, supplier purchase, sales, production, and expenses. The complete connected-device suite passes 164/164 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7. Remaining React screen wiring is incomplete.
+Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE8.md` for current status. Phase 8 now exposes thirty-nine runtime actions, including operational/cashier/financial summaries, supplier purchase, sales, production, expenses, supplier payments, and customer collections. The complete connected-device suite passes 168/168 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7. Remaining React screen wiring is incomplete.
 
 Application user accounts and native role-based authorization are explicitly approved as a required cross-phase capability. Their schema-7 model, encrypted backup boundary, native credential UI, app-owned sessions, private staff enrollment/reset, user administration, role-aware navigation, and command-boundary authorization are implemented. Phase 7 now integrates first-owner setup, login, logout, resume checks, current-session state, and one protected/audited product command with React; remaining account/security screens belong to Phase 8. Application users are security principals separate from employee/salary profiles, with an optional link between them. The schema-v6 daily-close actor name/role is transitional asserted metadata, not authenticated identity.
 
@@ -27,7 +27,7 @@ The two completed Phase 3 design tracks were:
 1. authenticated users, credentials, roles/permissions, sessions, recovery, audit actor IDs, migration, and backup/restore security;
 2. authoritative costing/COGS and profitability semantics.
 
-The researched recommendations for native security and costing are implemented and device-verified. Phase 8 is now active: management, core settings, optional Opening State, supplier purchase, sales, production, and expenses are complete. Supplier/customer payments are next; broad React product completion has not been claimed.
+The researched recommendations for native security and costing are implemented and device-verified. Phase 8 is now active: management, core settings, optional Opening State, supplier purchase, sales, production, expenses, and supplier/customer payments are complete. Salary payment is next; broad React product completion has not been claimed.
 
 ---
 
@@ -233,7 +233,7 @@ The packaged React/WebView/Android vertical slice is implemented and device-prov
 
 ## Phase 8 — IN PROGRESS
 
-The screen capability ledger is in `PHASE8.md`. Management, core settings, optional Opening State, supplier purchase, paid/credit sales, milk-to-yogurt production, and expenses are complete with awaited native refresh, Kotlin permission enforcement, durable actor audit, and packaged physical-device evidence. Daily Work orchestration, Purchase, Sale, Production, and Expense are separate React modules; native operations parsing and command audit remain separate focused files. The runtime subset is now thirty-seven actions while the frozen contract remains version 2 with 78 operations. The focused purchase, sale, production, and expense suites each pass 4/4 and the full connected suite passes 164/164. Supplier/customer payments are the current continuation point and must retain native-only payable/receivable direction, account posting, balances, and reporting.
+The screen capability ledger is in `PHASE8.md`. Management, core settings, optional Opening State, supplier purchase, paid/credit sales, milk-to-yogurt production, expenses, supplier payments, and customer collections are complete with awaited native refresh, Kotlin permission enforcement, durable actor audit, and packaged physical-device evidence. Daily Work orchestration, Purchase, Sale, Production, Expense, and Payment are separate React modules; native operations parsing and command audit remain separate focused files. The runtime subset is now thirty-nine actions while the frozen contract remains version 2 with 78 operations. The focused purchase, sale, production, expense, and payment suites each pass 4/4 and the full connected suite passes 168/168. Salary payment is the current continuation point and must retain native-only employee balance direction, Cash/Bank posting, and reporting.
 
 ---
 

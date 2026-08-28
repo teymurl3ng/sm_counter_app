@@ -76,8 +76,8 @@ Portable backup format 2 uses Argon2id-derived AES-256-GCM. Automatic local snap
 | 4 — Native Automated Tests | **Complete** | Preserve the `PHASE4.md` evidence matrix and keep the complete regression green as later native/bridge capabilities are added. |
 | 5 — Native Read Models | **Complete** | Preserve `PHASE5_DTO_CATALOG.md`: integer-PKR-paisa money, canonical decimal quantities, explicit correction/coverage state, permission-aware reads, stable costing codes, and no credential/session-handle material. |
 | 6 — Bridge Contract | **Complete** | Preserve contract version 1, its manifest hash, lossless/authenticated envelopes, generated TypeScript/Kotlin projections, and mandatory pre-build drift checker. |
-| 7 — Hybrid Vertical Slice | **Native authentication prerequisites completed early; hybrid slice not started** | Prove packaged React → WebView → bridge → Kotlin → Room → React on a physical device with one authenticated query and one protected mutation. |
-| 8 — Screen Wiring | **Not started** | Replace React mock/local state screen-by-screen with awaited native queries and commands plus hybrid integration tests. Apply plain-language financial labels and actionable error states; never display raw accounting/status codes to shop users. Contextual info-button explanations are deferred for later product review. |
+| 7 — Hybrid Vertical Slice | **Complete** | Preserve the separately built packaged assets, restricted app-assets origin, contract handshake, memory-only session flow, protected product command/audit, and 3-test physical-device proof. |
+| 8 — Screen Wiring | **In progress — Products complete** | Product list/add/edit/archive/restore is native-backed and device-proven. Customer Profiles are next. Continue replacing mock/local state screen-by-screen with awaited native queries and commands plus hybrid integration tests. Apply plain-language financial labels and actionable error states; never display raw accounting/status codes to shop users. Contextual info-button explanations are deferred for later product review. |
 | 9 — Runtime Integration | **Partial native credit; hybrid work not started** | Prove WebView navigation, lifecycle, process recreation, keyboard, errors, logout/back-stack protection, and session expiry. |
 | 10 — Functional Completion | **Not started** | Close the capability matrix with every retained capability genuinely native-backed and wired. |
 | 11 — Integrity/Recovery/Concurrency | **Substantial security/backup early credit; still open** | Complete concurrent-write, backup-during-write, large-history, repeated recovery, and remaining session/concurrency tests. Reassess the deliberately deferred lower-of-cost/NRV subsystem against the approved materiality and business triggers before hardening closes. |
@@ -89,7 +89,7 @@ Portable backup format 2 uses Argon2id-derived AES-256-GCM. Automatic local snap
 
 ## Current verification credit
 
-The connected-device native regression suite passes **124/124**, with zero skipped, failed, or errored tests; the host-side debug unit suite passes **7/7**. The Phase 5 additions cover bootstrap/current-session views, exact PKR/decimal representation, corrected-history state, permission-separated operational/financial/settings/user/audit reads, costing-code stability, and forbidden-secret DTO scanning. Phase 6 contract version 1 defines 78 operations and its generated Kotlin/TypeScript projections pass the checker and both consumer compilations. `PHASE4.md` records the native-test audit; `PHASE5.md` and `PHASE5_DTO_CATALOG.md` record the read boundary; `PHASE6.md` and `bridge/CONTRACT.md` record the message boundary. This is not yet evidence for runtime WebView or end-to-end hybrid behavior.
+The Phase 7 checkpoint passed **127/127** connected-device tests. After the first three Phase 8 product-management tests were added, the current complete suite passes **130/130**, with zero skipped, failed, or errored tests; the host-side debug unit suite passes **7/7**. The three Phase 7 tests prove the canonical owner/auth/session messages, direct permission-bypass denial, packaged app-assets/WebView settings, React login, a protected product write with durable actor audit, Room readback/refresh, lifecycle resume, and logout. Phase 6 contract version 1 still defines 78 operations; Phase 7 intentionally dispatched only its eight-operation proof subset before Phase 8 expanded the runtime to ten. `PHASE4.md` records the native-test audit; `PHASE5.md` and `PHASE5_DTO_CATALOG.md` record the read boundary; `PHASE6.md` and `bridge/CONTRACT.md` record the message boundary; `PHASE7.md` records the first end-to-end runtime proof; `PHASE8.md` records the active screen ledger.
 
 The two immutable hashes remain:
 
@@ -102,8 +102,8 @@ The two immutable hashes remain:
 2. **Completed:** formally close Phase 4 with a criterion-by-criterion native/security coverage audit and focused gap tests.
 3. **Completed:** implement and freeze the Phase 5 hybrid-facing native read-model/DTO catalog.
 4. **Completed:** create the Phase 6 canonical bridge contract and drift checker.
-5. Prove the Phase 7 authenticated physical-device hybrid vertical slice before scaling.
-6. Perform Phase 8 screen-by-screen wiring, replacing all mock/local business behavior.
+5. **Completed:** prove the Phase 7 authenticated physical-device hybrid vertical slice before scaling.
+6. **In progress:** perform Phase 8 screen-by-screen wiring. Product Management is complete; Customer Profiles are next.
 7. Complete Phases 9–10 runtime integration and capability closure.
 8. Apply the early Phase 11 credit, finish its remaining concurrency/recovery gates, and perform the deferred NRV trigger review before hardening closes.
 9. Complete hybrid UI fidelity and mock/dead-state cleanup in Phases 12–13.
@@ -111,4 +111,4 @@ The two immutable hashes remain:
 
 ## Immediate next gate
 
-Phases 3–6 are complete. The immediate gate is Phase 7: prove one authenticated packaged React → origin-restricted WebView bridge → Kotlin → Room → React round trip on a physical device, including contract version/hash negotiation, one permission-checked query, one protected mutation, verified actor attribution, stable error handling, and native-backed refresh. The existing React prototype's hardcoded `costRate` values and client-side profit calculations remain non-authoritative and must not be copied or revived.
+Phases 3–7 are complete and Phase 8 is active. The first migrated screen, Product Management, now provides native list/add/edit/archive/restore with physical-device integration evidence; the full suite passes 130/130. The immediate gate is Customer Profiles, using the established master-data pattern and contracted customer operations without client-side balance editing. Continue one screen at a time and do not expose all remaining actions in one batch. The existing React prototype's hardcoded `costRate` values and client-side profit calculations remain non-authoritative and must not be copied or revived.

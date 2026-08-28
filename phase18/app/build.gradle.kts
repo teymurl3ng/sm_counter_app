@@ -37,6 +37,26 @@ android {
     }
 }
 
+val verifyHybridWebAssets by tasks.registering {
+    group = "verification"
+    description = "Checks that the separately built Phase 7 web bundle is ready for APK packaging."
+    val hybridAssets = layout.projectDirectory.dir("src/main/assets/hybrid")
+    inputs.dir(hybridAssets)
+    doLast {
+        val index = hybridAssets.file("index.html").asFile
+        check(index.isFile) {
+            "Missing packaged hybrid UI. Run ../scripts/build-web-ui.ps1 before Gradle packaging."
+        }
+        check(index.readText().contains("type=\"module\"")) {
+            "Packaged hybrid index.html does not contain the expected ES module entry."
+        }
+    }
+}
+
+tasks.matching { it.name == "preBuild" }.configureEach {
+    dependsOn(verifyHybridWebAssets)
+}
+
 ksp {
     arg("room.schemaLocation", "${projectDir}/schemas")
     arg("room.generateKotlin", "true")
@@ -46,6 +66,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.lifecycle.viewmodel)
+    implementation("androidx.webkit:webkit:1.17.0")
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.sqlite.bundled)
     // Room 3.0.1 migration metadata uses serialization-json 1.8.1. Keep

@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Theme.SaafMilk.Hybrid" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowBackground">#F7F6F0</item>
+        <item name="android:colorAccent">#047857</item>
+        <item name="android:statusBarColor">#064E3B</item>
+        <item name="android:navigationBarColor">#FFFFFF</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
     <!-- Phase 11A: a small, reusable View-system layer inspired by Material 3's role-based design. -->
     <style name="MilkShop.Text.Display" parent="@android:style/TextAppearance.Material.Headline">
         <item name="android:textSize">@dimen/milk_shop_text_display</item>

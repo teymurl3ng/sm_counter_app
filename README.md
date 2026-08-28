@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-08-28 — hybrid Phases 0–6 are complete; the Phase 7 authenticated physical-device vertical slice is the next gate. Substantial Phase 7/9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
+Status: RECONCILED 2026-08-28 — hybrid Phases 0–7 are complete; Phase 8 screen-by-screen native-backed UI wiring is in progress, with Product Management complete and Customer Profiles next. Substantial Phase 9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
 
 ## What this repository contains
 
@@ -20,6 +20,8 @@ Status: RECONCILED 2026-08-28 — hybrid Phases 0–6 are complete; the Phase 7 
 - `PHASE5_DTO_CATALOG.md` — frozen hybrid-facing Kotlin query/DTO catalog, representation rules, code sets, and security exclusions.
 - `PHASE6.md` — completed canonical bridge-contract boundary, generated projections, drift gate, verification, and Phase 7 handoff.
 - `bridge/CONTRACT.md` and `bridge/contract.json` — frozen human-readable and machine-readable bridge contract version 1.
+- `PHASE7.md` — completed packaged React/WebView/Android vertical slice, authenticated bridge proof, physical-device evidence, and Phase 8 handoff.
+- `PHASE8.md` — current screen capability ledger, completed native-backed Products milestone, verification, limitations, and next screen.
 
 ## Immutable baselines
 
@@ -31,9 +33,9 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 6 — Canonical Bridge Contract: COMPLETE**
+**Phase 8 — Screen-by-Screen Native UI Wiring: IN PROGRESS**
 
-Bridge contract version 1 is frozen with 78 unique query, command, and system operations. It defines lossless PKR/ID/decimal transport, authenticated envelopes, native-owned authority, stable errors, validation, persistence, refresh, backup file ownership, and version negotiation. Generated Kotlin and TypeScript projections compile, and both Android and UI builds run the mandatory drift checker. Phase 7 is next; no runtime WebView bridge or broad React wiring has started.
+The Phase 7 shell remains intact. Phase 8 milestone 1 replaces its product proof with a complete Products workspace: native list/add/edit/archive/restore, exact PKR conversion, awaited refresh, Android permission enforcement, and durable actor audit. The runtime now exposes 10 of the frozen contract's 78 operations. The complete connected-device regression passes 130/130. Phase 8 remains open; Customer Profiles are next.
 
 ## Approved security track
 
@@ -79,9 +81,9 @@ Phase 5 — Native Read-Model Expansion ✅
 
 Phase 6 — Bridge Contract (`bridge/CONTRACT.md`) ✅
 
-Phase 7 — Hybrid Shell / Vertical Slice ⏳ (native authentication prerequisite complete; actual hybrid slice absent)
+Phase 7 — Hybrid Shell / Vertical Slice ✅
 
-Phase 8 — UI Wiring ⏳
+Phase 8 — UI Wiring ◐ (Products complete; Customers next)
 
 Phase 9 — Runtime / Navigation / Device Integration ◐ (native lifecycle credit only; hybrid runtime absent)
 
@@ -121,8 +123,10 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 5 hybrid read-model suite: 4/4 passed.
 - Phase 6 bridge contract: version 1, 78 endpoints, generated Kotlin/TypeScript projections and both pre-build drift gates pass.
 - Host-side debug unit tests: 7/7 passed.
-- Complete connected-device instrumentation regression: 124/124 passed, 0 skipped, 0 failed.
+- Phase 7 focused hybrid vertical-slice suite: 3/3 passed on the physical device.
+- Phase 8 focused Product Management suite: 3/3 passed on the physical device.
+- Complete connected-device instrumentation regression: 130/130 passed, 0 skipped, 0 failed.
 
 ## Next gate
 
-Phases 3–6 are closed. Next, implement the narrow Phase 7 authenticated physical-device vertical slice: packaged origin-restricted React/WebView transport, contract version/hash negotiation, native session handling, one permission-checked query, and one protected mutation with verified actor attribution and Room persistence. Do not scale to broad screen wiring until that full round trip passes on the phone. The costing explanation/info-button idea remains deferred; future UI must still translate native codes into plain shop language. See `ROADMAP_RECONCILIATION_2026-08-27.md` for the exact credited and remaining gates.
+Phases 3–7 are closed and Phase 8 is active. Product Management is the completed reference screen. Next, migrate Customer Profiles using `query.masterData` and the contracted customer commands, without client-side balance editing or local business state. Every screen must continue to await native mutations, show truthful outcomes, refresh declared queries, receive a hybrid integration test, and retire its corresponding mock/local behavior. The costing explanation/info-button idea remains deferred; UI labels must still translate native codes into plain shop language. See `PHASE8.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.

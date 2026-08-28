@@ -16,18 +16,18 @@ Read those files before changing code.
 
 ## Current superseding checkpoint — 2026-08-28
 
-The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. It preserves the locked roadmap while assigning valid early credit to native work originally planned across Phases 7, 9, and 11. Root Phases 3–6 are complete. `PHASE4.md` contains the criterion-by-criterion native test audit; `PHASE5.md` and `PHASE5_DTO_CATALOG.md` contain the frozen permission-aware hybrid read boundary; `PHASE6.md`, `bridge/CONTRACT.md`, and `bridge/contract.json` contain canonical bridge contract version 1 and its drift gate. The Phase 7 authenticated physical-device vertical slice is next. Broad React delivery remains later.
+The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. It preserves the locked roadmap while assigning valid early credit to native work originally planned across Phases 9 and 11. Root Phases 3–7 are complete and Phase 8 is in progress. `PHASE4.md` contains the native test audit; `PHASE5.md` and `PHASE5_DTO_CATALOG.md` contain the frozen read boundary; `PHASE6.md`, `bridge/CONTRACT.md`, and `bridge/contract.json` contain bridge contract version 1; `PHASE7.md` contains the packaged authenticated physical-device vertical slice; `PHASE8.md` contains the active screen ledger and completed Products milestone. Customer Profiles are next.
 
-Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE6.md` for current status. Additive Room schema versions 4 through 8 are implemented and device-verified. Schema 7 security, schema 8 costing, encrypted portable backup format 2, Android-Keystore local snapshots, the authenticated native shell/user-administration flow, the Phase 5 read-model catalog, and the Phase 6 message contract are implemented. The complete connected-device suite passes 124/124 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7. The runtime WebView bridge and React wiring remain incomplete.
+Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE8.md` for current status. Additive Room schema versions 4 through 8 are implemented and device-verified. Schema 7 security, schema 8 costing, encrypted backups, the native authenticated shell, Phase 5 read models, Phase 6 contract, and the Phase 7 runtime slice are implemented. Phase 8 now exposes ten runtime actions and a complete Products screen. The complete connected-device suite passes 130/130 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7. Remaining React screen wiring is incomplete.
 
-Application user accounts and native role-based authorization are explicitly approved as a required cross-phase capability. Their schema-7 model, encrypted backup boundary, native credential UI, app-owned sessions, private staff enrollment/reset, user administration, role-aware navigation, and command-boundary authorization are implemented; React/bridge integration is not. Application users are security principals separate from employee/salary profiles, with an optional link between them. The schema-v6 daily-close actor name/role is transitional asserted metadata, not authenticated identity.
+Application user accounts and native role-based authorization are explicitly approved as a required cross-phase capability. Their schema-7 model, encrypted backup boundary, native credential UI, app-owned sessions, private staff enrollment/reset, user administration, role-aware navigation, and command-boundary authorization are implemented. Phase 7 now integrates first-owner setup, login, logout, resume checks, current-session state, and one protected/audited product command with React; remaining account/security screens belong to Phase 8. Application users are security principals separate from employee/salary profiles, with an optional link between them. The schema-v6 daily-close actor name/role is transitional asserted metadata, not authenticated identity.
 
 The two completed Phase 3 design tracks were:
 
 1. authenticated users, credentials, roles/permissions, sessions, recovery, audit actor IDs, migration, and backup/restore security;
 2. authoritative costing/COGS and profitability semantics.
 
-The researched recommendation for gate 1 is `PHASE3_USER_ACCOUNTS_DESIGN_PROPOSAL.md`. The user explicitly approved it on 2026-08-27. Its native security and native-shell scope is implemented and device-verified. Gate 2 was approved and implemented in schema 8 with moving-weighted-average Milk cost, versioned Yogurt conversion cost, opening-basis provenance, yield/loss controls, deterministic replay, honest coverage states, and costing-aware encrypted backup/restore. Phase 4 audited their executable evidence, Phase 5 exposed the safe native facts and stable codes required by future screens, and Phase 6 froze their message contract. None of this should be mistaken for a completed runtime bridge or React delivery. Phase 7 is next.
+The researched recommendation for gate 1 is `PHASE3_USER_ACCOUNTS_DESIGN_PROPOSAL.md`. The user explicitly approved it on 2026-08-27. Its native security and native-shell scope is implemented and device-verified. Gate 2 was approved and implemented in schema 8 with moving-weighted-average Milk cost, versioned Yogurt conversion cost, opening-basis provenance, yield/loss controls, deterministic replay, honest coverage states, and costing-aware encrypted backup/restore. Phase 4 audited executable evidence, Phase 5 exposed safe native facts, Phase 6 froze their message contract, and Phase 7 proved the first packaged runtime round trip. Phase 8 is now active: Product Management is complete and Customer Profiles are next; broad React product completion has not been claimed.
 
 ---
 
@@ -225,7 +225,15 @@ The permission-aware hybrid-facing native query/DTO layer is implemented in `app
 
 ## Phase 6 — COMPLETE
 
-Canonical bridge contract version 1 is frozen in `bridge/CONTRACT.md` and `bridge/contract.json` with 78 query/command/system operations. It defines lossless scalar encoding, authenticated envelopes, native-owned authority and actor attribution, 19 stable error codes, validation, persistence, refresh, backup picker/ticket boundaries, and version/hash negotiation. Generated Kotlin and TypeScript projections compile, and Android `preBuild` plus UI `prebuild` run the drift checker. Phase 7 is the current continuation point; no runtime bridge is implied.
+Canonical bridge contract version 1 is frozen in `bridge/CONTRACT.md` and `bridge/contract.json` with 78 query/command/system operations. It defines lossless scalar encoding, authenticated envelopes, native-owned authority and actor attribution, 19 stable error codes, validation, persistence, refresh, backup picker/ticket boundaries, and version/hash negotiation. Generated Kotlin and TypeScript projections compile, and Android `preBuild` plus UI `prebuild` run the drift checker.
+
+## Phase 7 — COMPLETE
+
+The packaged React/WebView/Android vertical slice is implemented and device-proven in `PHASE7.md`. `HybridActivity` is the launcher, local assets use the restricted app-assets HTTPS origin, and a separate web-build script supplies Android assets without hiding npm inside Gradle. The eight-action runtime subset covers contract negotiation, first-owner/login/logout/session resume, native product reads, and one protected product create with durable actor audit. The full connected suite passes 127/127. Phase 8 is the current continuation point.
+
+## Phase 8 — IN PROGRESS
+
+The screen capability ledger is in `PHASE8.md`. Product Management is complete with active/archived lists, add, edit, archive, restore, exact PKR handling, awaited native refresh, Kotlin permission enforcement, durable actor audit, and packaged physical-device evidence. The runtime subset is now ten actions while the frozen contract remains version 1 with 78 operations. The full connected suite passes 130/130. Customer Profiles are the current continuation point.
 
 ---
 
@@ -480,7 +488,7 @@ Define authenticated-session, login/logout, user-administration, permission-deni
 
 ## Phase 7
 
-Hybrid shell / vertical slice.
+Completed hybrid shell / vertical slice; preserve the implementation and evidence in `PHASE7.md`.
 
 Preferred asset delivery:
 
@@ -609,4 +617,4 @@ After opening the repo, begin with:
 
 > Read `README.md`, `PHASE0.md`, `PHASE1.md`, `PHASE2.md`, `PHASE3.md`, `POSTMORTEM.md`, and this `CODEX_HANDOFF_Saaf_Milk_Real_Hybrid.md`. Inspect the current Phase 3 native ledger implementation and the untouched Phase 18 business core. Verify the frozen logic-spec and SQL hashes and rerun the existing native Android-test Kotlin compile. Do not modify the frozen SQL/spec or invent new formulas. Report the exact repo/build status and the next safe Phase 3 implementation step. If the next step requires a schema/business-rule amendment, stop for explicit authorization before changing it.
 
-That text is historical provenance only. The current continuation point is the Phase 7 authenticated physical-device vertical slice using the frozen Phase 6 contract, described at the top of this handoff and in `ROADMAP_RECONCILIATION_2026-08-27.md`.
+That text is historical provenance only. The current continuation point is Phase 8 screen-by-screen native-backed UI wiring from the proven Phase 7 slice, described at the top of this handoff and in `ROADMAP_RECONCILIATION_2026-08-27.md`.

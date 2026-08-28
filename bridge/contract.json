@@ -1,0 +1,311 @@
+{
+  "contractVersion": 1,
+  "transport": {
+    "requestEnvelope": ["contractVersion", "requestId", "action", "sessionHandle", "payload"],
+    "responseEnvelope": ["contractVersion", "requestId", "action", "ok", "data", "error"],
+    "int64Encoding": "base10_string",
+    "moneyEncoding": "integer_pkr_paisa_base10_string",
+    "decimalEncoding": "canonical_base10_string",
+    "sessionLocation": "request_envelope_only",
+    "commandRetry": "never_automatic"
+  },
+  "dtoStringFieldEncodings": {
+    "decimal": [
+      "BusinessSettingsDto.tsStandardPercent",
+      "OpeningInventoryBalanceDto.quantity",
+      "ProductDto.quantityOnHand",
+      "CustomerDto.dailyQuota",
+      "TransactionReferencesDto.tsStandardPercent",
+      "StockPositionDto.quantityOnHand",
+      "DailyTotalsDto.saleQuantity",
+      "DailyTotalsDto.purchasedMilkLiters",
+      "DailyTotalsDto.producedYogurtKg",
+      "DailyTotalsDto.productionMilkUsedLiters",
+      "OperationalTotalsDto.saleQuantity",
+      "OperationalTotalsDto.purchasedMilkLiters",
+      "OperationalTotalsDto.producedYogurtKg",
+      "OperationalTotalsDto.productionMilkUsedLiters",
+      "InventoryMovementDto.quantity",
+      "DeliveryDto.quantity",
+      "SpoilageDto.quantity",
+      "ProductProfitabilityDto.quantitySold",
+      "ProductProfitabilityDto.grossMarginPercent",
+      "CostingPolicyComponentDto.basisQuantityKg",
+      "CostingPolicyDto.normalCapacityKg",
+      "CostingPolicyDto.conversionCostPaisaPerKg",
+      "OpeningCostBasisDto.quantity",
+      "YieldPolicyDto.medianYieldRatio",
+      "YieldPolicyDto.madYieldRatio",
+      "YieldPolicyDto.lowerAlertLimit",
+      "YieldPolicyDto.upperAlertLimit",
+      "YieldAlertDto.yieldRatio",
+      "ProductionLossAssessmentDto.abnormalMilkLiters",
+      "BudgetPlanDto.plannedLiters"
+    ],
+    "date": [
+      "OpeningStateDto.openingDate",
+      "EmployeeDto.joinDate",
+      "DailyTotalsDto.startDateInclusive",
+      "DailyTotalsDto.endDateExclusive",
+      "OperationalTotalsDto.startDateInclusive",
+      "OperationalTotalsDto.endDateExclusive",
+      "CashierSummaryDto.startDateInclusive",
+      "CashierSummaryDto.endDateExclusive",
+      "DeliveryDto.businessDate",
+      "AttendanceDto.businessDate",
+      "CashCountDto.businessDate",
+      "DailyCloseActionDto.businessDate",
+      "ProfitabilityReportDto.startInclusive",
+      "ProfitabilityReportDto.endExclusive",
+      "YieldPolicyDto.sampleStartDate",
+      "YieldPolicyDto.sampleEndDate",
+      "YieldPolicyDto.effectiveFrom",
+      "BudgetPlanDto.periodStart",
+      "BudgetPlanDto.periodEndExclusive",
+      "CollectionsTargetDto.weekStart",
+      "CollectionsTargetDto.weekEndExclusive"
+    ],
+    "month": [
+      "CostingPolicyDto.calendarMonth"
+    ],
+    "instant": [
+      "StoreIdentityDto.updatedAt",
+      "EventHistoryDto.createdAt",
+      "EventHistoryDto.occurredAt",
+      "AccountLedgerEntryDto.occurredAt",
+      "AccountLedgerEntryDto.createdAt",
+      "DeliveryDto.statusOccurredAt",
+      "AttendanceDto.createdAt",
+      "SpoilageDto.occurredAt",
+      "CashCountDto.countedAt",
+      "DailyCloseActionDto.createdAt",
+      "CostingPolicyDto.approvedAt",
+      "OpeningCostBasisDto.createdAt",
+      "YieldPolicyDto.approvedAt",
+      "ProductionLossAssessmentDto.assessedAt",
+      "BudgetPlanDto.createdAt",
+      "CollectionsTargetDto.createdAt",
+      "UserAdministrationDto.createdAt",
+      "UserAdministrationDto.updatedAt",
+      "UserAdministrationDto.disabledAt",
+      "SecurityAuditDto.occurredAt"
+    ]
+  },
+  "errorCodes": [
+    "invalid_request",
+    "validation_failed",
+    "authentication_failed",
+    "unauthenticated",
+    "session_expired",
+    "permission_denied",
+    "recent_authentication_required",
+    "rate_limited",
+    "not_found",
+    "conflict",
+    "day_closed",
+    "insufficient_stock",
+    "user_cancelled",
+    "backup_wrong_passphrase",
+    "backup_tampered",
+    "backup_incompatible",
+    "restore_ticket_expired",
+    "io_failed",
+    "internal_error"
+  ],
+  "enums": {
+    "AppRoleCode": ["owner", "admin", "manager", "cashier", "operator"],
+    "AttendanceStatusCode": ["present", "absent", "half_day"],
+    "DeliveryStatusCode": ["delivered", "cancelled"],
+    "SalePaymentKindCode": ["account", "credit"],
+    "CorrectionTypeCode": ["purchase", "production", "sale", "monetary", "spoilage"],
+    "ProductUnitCode": ["Liters", "Kg"],
+    "CostReviewReasonCode": ["monthly", "component_change", "capacity_change", "process_change", "quarterly_variance"],
+    "CostComponentCode": ["culture", "packaging", "variable_energy", "direct_labor", "fixed_production_overhead"],
+    "OpeningBasisKindCode": ["documented_historical", "owner_estimate"],
+    "LossClassificationCode": ["ordinary", "abnormal"],
+    "LossReasonCode": ["spill", "contamination", "power_failure", "equipment_failure", "measurement_correction", "other"]
+  },
+  "types": {
+    "BridgeInfoDto": {
+      "contractVersion": "number",
+      "contractSha256": "string",
+      "supportedActions": "list:string"
+    },
+    "SessionGrantDto": {
+      "sessionHandle": "session",
+      "currentSession": "CurrentSessionDto"
+    },
+    "OwnerBootstrapResultDto": {
+      "sessionHandle": "session",
+      "currentSession": "CurrentSessionDto",
+      "oneTimeRecoveryCode": "secret"
+    },
+    "OwnerRecoveryResultDto": {
+      "sessionHandle": "session",
+      "currentSession": "CurrentSessionDto",
+      "replacementRecoveryCode": "secret"
+    },
+    "EnrollmentChallengeDto": {
+      "targetUserId": "id",
+      "enrollmentToken": "secret"
+    },
+    "EventMutationResultDto": {
+      "eventId": "id"
+    },
+    "EntityMutationResultDto": {
+      "entityId": "id"
+    },
+    "PurchaseRecordedResultDto": {
+      "eventId": "id",
+      "snfPercent": "decimal",
+      "tsPercent": "decimal",
+      "adjustedLiters": "decimal",
+      "amountOwedPaisa": "paisa"
+    },
+    "SaleRecordedResultDto": {
+      "eventId": "id",
+      "quantity": "decimal",
+      "valuePaisa": "paisa",
+      "surchargePaisa": "paisa",
+      "totalPaisa": "paisa"
+    },
+    "CashCountResultDto": {
+      "countId": "id",
+      "countedCashPaisa": "paisa",
+      "expectedCashPaisa": "paisa",
+      "variancePaisa": "paisa"
+    },
+    "DailyCloseResultDto": {
+      "actionId": "id",
+      "statusCode": "string",
+      "countedCashPaisa": {"type": "paisa", "nullable": true},
+      "expectedCashPaisa": {"type": "paisa", "nullable": true},
+      "variancePaisa": {"type": "paisa", "nullable": true}
+    },
+    "BudgetMutationResultDto": {
+      "budgetId": "id",
+      "plannedAmountPaisa": "paisa",
+      "salesTargetPaisa": {"type": "paisa", "nullable": true}
+    },
+    "CollectionsTargetMutationResultDto": {
+      "targetId": "id",
+      "targetAmountPaisa": "paisa"
+    },
+    "OpeningInventoryInput": {
+      "productId": "id",
+      "quantity": "decimal"
+    },
+    "OpeningAccountInput": {
+      "accountId": "id",
+      "balancePaisa": "paisa"
+    },
+    "CostComponentInput": {
+      "componentCode": "enum:CostComponentCode",
+      "sourceAmountPaisa": "paisa",
+      "basisQuantityKg": "decimal"
+    },
+    "BackupExportResultDto": {
+      "displayName": "string",
+      "createdAt": "instant",
+      "formatVersion": "number"
+    },
+    "BackupInspectionDto": {
+      "restoreTicket": "ticket",
+      "createdAt": "instant",
+      "formatVersion": "number",
+      "containsSecurityState": "boolean",
+      "requiresEmptyInstallation": "boolean"
+    },
+    "BackupRestoreResultDto": {
+      "restored": "boolean",
+      "sessionsInvalidated": "boolean"
+    }
+  },
+  "endpoints": [
+    {"action":"query.bootstrapStatus","kind":"query","auth":"none","permission":null,"nativeMethod":"bootstrapStatus","request":{},"responseType":"BootstrapStatusDto","errors":["internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.currentSession","kind":"query","auth":"session","permission":"VIEW_OPERATIONAL","nativeMethod":"currentSession","request":{},"responseType":"CurrentSessionDto","errors":["unauthenticated","session_expired","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.dashboard","kind":"query","auth":"session","permission":"VIEW_OPERATIONAL","nativeMethod":"dashboard","request":{"startDateInclusive":"date","endDateExclusive":"date"},"responseType":"DashboardDto","errors":["invalid_request","session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.cashierSummary","kind":"query","auth":"session","permission":"SALE_AND_COLLECTION","nativeMethod":"cashierSummary","request":{"startDateInclusive":"date","endDateExclusive":"date"},"responseType":"CashierSummaryDto","errors":["invalid_request","session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.financialOverview","kind":"query","auth":"session","permission":"VIEW_FULL_FINANCIAL","nativeMethod":"financialOverview","request":{"startDateInclusive":"date","endDateExclusive":"date"},"responseType":"FinancialOverviewDto","errors":["invalid_request","session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.businessSettings","kind":"query","auth":"session","permission":"MANAGE_BUSINESS_SETTINGS","nativeMethod":"businessSettings","request":{},"responseType":"BusinessSettingsDto","errors":["session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.masterData","kind":"query","auth":"session","permission":"MANAGE_MASTER_DATA","nativeMethod":"masterData","request":{},"responseType":"MasterDataDto","errors":["session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.transactionReferences","kind":"query","auth":"session","permission":"VIEW_OPERATIONAL","nativeMethod":"transactionReferences","request":{},"responseType":"TransactionReferencesDto","errors":["session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.eventHistory","kind":"query","auth":"session","permission":"VIEW_OPERATIONAL","nativeMethod":"eventHistory","request":{},"responseType":"List<EventHistoryDto>","errors":["session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.eventDetail","kind":"query","auth":"session","permission":"VIEW_OPERATIONAL","nativeMethod":"eventDetail","request":{"eventId":"id"},"responseType":"EventDetailDto","errors":["invalid_request","not_found","session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.accountLedger","kind":"query","auth":"session","permission":"VIEW_FULL_FINANCIAL","nativeMethod":"accountLedger","request":{"accountId":"id"},"responseType":"AccountLedgerDto","errors":["invalid_request","not_found","session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.deliveries","kind":"query","auth":"session","permission":"DELIVERY","nativeMethod":"deliveries","request":{},"responseType":"List<DeliveryDto>","errors":["session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.attendance","kind":"query","auth":"session","permission":"ATTENDANCE","nativeMethod":"attendance","request":{"businessDate":"date"},"responseType":"List<AttendanceDto>","errors":["invalid_request","session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.spoilageHistory","kind":"query","auth":"session","permission":"PRODUCTION_AND_SPOILAGE","nativeMethod":"spoilageHistory","request":{},"responseType":"List<SpoilageDto>","errors":["session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.reconciliationArchive","kind":"query","auth":"session","permission":"CASH_COUNT_AND_CLOSE","nativeMethod":"reconciliationArchive","request":{},"responseType":"ReconciliationArchiveDto","errors":["session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.profitabilityReport","kind":"query","auth":"session","permission":"VIEW_FULL_FINANCIAL","nativeMethod":"profitabilityReport","request":{"startInclusive":"date","endExclusive":"date"},"responseType":"ProfitabilityReportDto","errors":["invalid_request","session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.costingManagement","kind":"query","auth":"session","permission":"MANAGE_BUSINESS_SETTINGS","nativeMethod":"costingManagement","request":{},"responseType":"CostingManagementDto","errors":["session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.planning","kind":"query","auth":"session","permission":"MANAGE_BUSINESS_SETTINGS","nativeMethod":"planning","request":{},"responseType":"PlanningDto","errors":["session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.users","kind":"query","auth":"session","permission":"MANAGE_STAFF_USERS","nativeMethod":"users","request":{},"responseType":"List<UserAdministrationDto>","errors":["session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"query.securityAudit","kind":"query","auth":"session","permission":"VIEW_SECURITY_AUDIT","nativeMethod":"securityAudit","request":{},"responseType":"List<SecurityAuditDto>","errors":["session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
+
+    {"action":"command.auth.bootstrapOwner","kind":"command","auth":"none","permission":null,"request":{"loginName":"string","displayName":"string","passphrase":"secret"},"responseType":"OwnerBootstrapResultDto","errors":["validation_failed","conflict","internal_error"],"persistence":"creates first owner, credential, recovery verifier, audit entry, and memory-only session","refresh":["query.bootstrapStatus","query.currentSession"]},
+    {"action":"command.auth.login","kind":"command","auth":"none","permission":null,"request":{"loginName":"string","passphrase":"secret"},"responseType":"SessionGrantDto","errors":["authentication_failed","rate_limited","internal_error"],"persistence":"creates memory-only session; may upgrade verifier work factors and writes audit state","refresh":["query.currentSession"]},
+    {"action":"command.auth.logout","kind":"command","auth":"session","permission":null,"request":{},"responseType":"BridgeUnit","errors":["session_expired","internal_error"],"persistence":"invalidates the supplied memory-only session and writes audit entry","refresh":["query.bootstrapStatus"]},
+    {"action":"command.auth.reauthenticate","kind":"command","auth":"session","permission":null,"request":{"passphrase":"secret"},"responseType":"BridgeUnit","errors":["authentication_failed","session_expired","rate_limited","internal_error"],"persistence":"updates memory-only recent-authentication time and writes audit entry","refresh":[]},
+    {"action":"command.auth.changeOwnPassphrase","kind":"command","auth":"session","permission":null,"request":{"currentPassphrase":"secret","newPassphrase":"secret"},"responseType":"BridgeUnit","errors":["validation_failed","authentication_failed","session_expired","internal_error"],"persistence":"replaces current user's verifier, invalidates other sessions, and writes audit entry","refresh":["query.currentSession"]},
+    {"action":"command.auth.recoverOwner","kind":"command","auth":"none","permission":null,"request":{"loginName":"string","recoveryCode":"secret","newPassphrase":"secret"},"responseType":"OwnerRecoveryResultDto","errors":["validation_failed","authentication_failed","rate_limited","internal_error"],"persistence":"rotates owner credential and recovery verifier, invalidates sessions, writes audit, and creates new session","refresh":["query.bootstrapStatus","query.currentSession"]},
+    {"action":"command.auth.beginUserEnrollment","kind":"command","auth":"session","permission":"MANAGE_STAFF_USERS","recentAuth":false,"request":{"loginName":"string","displayName":"string","roleCode":"enum:AppRoleCode","employeeAccountId":{"type":"id","required":true,"nullable":true}},"responseType":"EnrollmentChallengeDto","errors":["validation_failed","conflict","session_expired","permission_denied","recent_authentication_required","internal_error"],"persistence":"creates setup-required user and audit entry; privileged roles also require recent authentication","refresh":["query.users","query.securityAudit"]},
+    {"action":"command.auth.resumeUserEnrollment","kind":"command","auth":"session","permission":"MANAGE_STAFF_USERS","recentAuth":true,"request":{"targetUserId":"id"},"responseType":"EnrollmentChallengeDto","errors":["validation_failed","not_found","session_expired","permission_denied","recent_authentication_required","internal_error"],"persistence":"creates memory-only enrollment challenge only","refresh":[]},
+    {"action":"command.auth.completeEnrollment","kind":"command","auth":"enrollment","permission":null,"request":{"enrollmentToken":"secret","passphrase":"secret"},"responseType":"UserAdministrationDto","errors":["validation_failed","authentication_failed","conflict","internal_error"],"persistence":"stores verifier, clears setup-required state, consumes challenge, and writes audit entry","refresh":["query.users","query.securityAudit"]},
+    {"action":"command.auth.changeUserRole","kind":"command","auth":"session","permission":"MANAGE_STAFF_USERS","recentAuth":true,"request":{"targetUserId":"id","roleCode":"enum:AppRoleCode"},"responseType":"BridgeUnit","errors":["validation_failed","not_found","conflict","session_expired","permission_denied","recent_authentication_required","internal_error"],"persistence":"updates role, invalidates target sessions, and writes audit entry; privileged roles are owner-only","refresh":["query.users","query.securityAudit"]},
+    {"action":"command.auth.setUserEnabled","kind":"command","auth":"session","permission":"MANAGE_STAFF_USERS","recentAuth":true,"request":{"targetUserId":"id","enabled":"boolean"},"responseType":"BridgeUnit","errors":["validation_failed","not_found","conflict","session_expired","permission_denied","recent_authentication_required","internal_error"],"persistence":"updates status, invalidates target sessions when needed, and writes audit entry","refresh":["query.users","query.securityAudit"]},
+    {"action":"command.auth.beginCredentialReset","kind":"command","auth":"session","permission":"MANAGE_STAFF_USERS","recentAuth":true,"request":{"targetUserId":"id"},"responseType":"EnrollmentChallengeDto","errors":["validation_failed","not_found","session_expired","permission_denied","recent_authentication_required","internal_error"],"persistence":"marks setup required, invalidates target sessions, creates memory-only challenge, and writes audit entry","refresh":["query.users","query.securityAudit"]},
+
+    {"action":"command.recordPurchase","kind":"command","auth":"session","permission":"PURCHASE","request":{"vendorAccountId":"id","occurredAt":"date","rawLiters":"decimal","fatPercent":"decimal","lrReading":"decimal","notes":{"type":"string","required":false}},"responseType":"PurchaseRecordedResultDto","errors":["validation_failed","not_found","day_closed","session_expired","permission_denied","internal_error"],"persistence":"appends purchase event and canonical inventory/financial movements with verified actor attribution","refresh":["query.dashboard","query.financialOverview","query.eventHistory","query.transactionReferences","query.profitabilityReport"]},
+    {"action":"command.recordSale","kind":"command","auth":"session","permission":"SALE_AND_COLLECTION","request":{"productId":"id","occurredAt":"date","channelCode":{"type":"string","required":true,"nullable":true},"unitRatePaisa":"paisa","quantity":{"type":"decimal","required":true,"nullable":true},"valuePaisa":{"type":"paisa","required":true,"nullable":true},"paymentKindCode":"enum:SalePaymentKindCode","paymentAccountId":{"type":"id","required":true,"nullable":true},"customerAccountId":{"type":"id","required":true,"nullable":true},"surchargeEnabled":"boolean","surchargePaisa":{"type":"paisa","required":true,"nullable":true},"notes":{"type":"string","required":false}},"responseType":"SaleRecordedResultDto","errors":["validation_failed","not_found","insufficient_stock","day_closed","session_expired","permission_denied","internal_error"],"persistence":"appends sale event and canonical inventory/financial movements with verified actor attribution","refresh":["query.dashboard","query.cashierSummary","query.financialOverview","query.eventHistory","query.accountLedger","query.profitabilityReport"]},
+    {"action":"command.recordProduction","kind":"command","auth":"session","permission":"PRODUCTION_AND_SPOILAGE","request":{"occurredAt":"date","milkLitersUsed":"decimal","yogurtKgProduced":"decimal","notes":{"type":"string","required":false}},"responseType":"EventMutationResultDto","errors":["validation_failed","insufficient_stock","day_closed","session_expired","permission_denied","internal_error"],"persistence":"appends production event and canonical inventory movements with verified actor attribution","refresh":["query.dashboard","query.eventHistory","query.costingManagement","query.profitabilityReport"]},
+    {"action":"command.recordVendorPayment","kind":"command","auth":"session","permission":"SUPPLIER_PAYMENT","request":{"vendorAccountId":"id","paymentAccountId":"id","amountPaisa":"paisa","occurredAt":"date","notes":{"type":"string","required":false}},"responseType":"EventMutationResultDto","errors":["validation_failed","not_found","day_closed","session_expired","permission_denied","internal_error"],"persistence":"appends vendor-payment event and canonical financial movements with verified actor attribution","refresh":["query.financialOverview","query.eventHistory","query.accountLedger","query.dashboard"]},
+    {"action":"command.recordCreditCollection","kind":"command","auth":"session","permission":"SALE_AND_COLLECTION","request":{"customerAccountId":"id","paymentAccountId":"id","amountPaisa":"paisa","occurredAt":"date","notes":{"type":"string","required":false}},"responseType":"EventMutationResultDto","errors":["validation_failed","not_found","day_closed","session_expired","permission_denied","internal_error"],"persistence":"appends collection event and canonical financial movements with verified actor attribution","refresh":["query.cashierSummary","query.financialOverview","query.eventHistory","query.accountLedger","query.dashboard"]},
+    {"action":"command.recordExpense","kind":"command","auth":"session","permission":"EXPENSE","request":{"expenseCategoryAccountId":"id","paymentAccountId":"id","amountPaisa":"paisa","occurredAt":"date","notes":{"type":"string","required":false}},"responseType":"EventMutationResultDto","errors":["validation_failed","not_found","day_closed","session_expired","permission_denied","internal_error"],"persistence":"appends expense event and canonical financial movements with verified actor attribution","refresh":["query.financialOverview","query.eventHistory","query.dashboard","query.profitabilityReport"]},
+    {"action":"command.recordSalaryPayment","kind":"command","auth":"session","permission":"SALARY_PAYMENT","request":{"employeeAccountId":"id","paymentAccountId":"id","amountPaisa":"paisa","occurredAt":"date","notes":{"type":"string","required":false}},"responseType":"EventMutationResultDto","errors":["validation_failed","not_found","day_closed","session_expired","permission_denied","internal_error"],"persistence":"appends salary event and canonical financial movements with verified actor attribution","refresh":["query.financialOverview","query.eventHistory","query.dashboard","query.profitabilityReport"]},
+    {"action":"command.recordSpoilage","kind":"command","auth":"session","permission":"PRODUCTION_AND_SPOILAGE","request":{"productId":"id","quantity":"decimal","occurredAt":"date","reasonCode":"string","notes":{"type":"string","required":false}},"responseType":"EventMutationResultDto","errors":["validation_failed","not_found","insufficient_stock","day_closed","session_expired","permission_denied","internal_error"],"persistence":"appends spoilage event/detail and inventory movement with verified actor attribution","refresh":["query.dashboard","query.spoilageHistory","query.eventHistory","query.profitabilityReport"]},
+    {"action":"command.correctEvent","kind":"command","auth":"session","permission":"CORRECTION","request":{"correctionTypeCode":"enum:CorrectionTypeCode","originalEventId":"id","occurredAt":"date","rawLiters":{"type":"decimal","required":false},"fatPercent":{"type":"decimal","required":false},"lrReading":{"type":"decimal","required":false},"milkLitersUsed":{"type":"decimal","required":false},"yogurtKgProduced":{"type":"decimal","required":false},"unitRatePaisa":{"type":"paisa","required":false},"quantity":{"type":"decimal","required":false},"valuePaisa":{"type":"paisa","required":false},"surchargePaisa":{"type":"paisa","required":false},"channelCode":{"type":"string","required":false},"amountPaisa":{"type":"paisa","required":false},"reasonCode":{"type":"string","required":false},"notes":{"type":"string","required":false}},"responseType":"EventMutationResultDto","errors":["validation_failed","not_found","conflict","insufficient_stock","day_closed","session_expired","permission_denied","internal_error"],"persistence":"appends a typed correction event and only canonical delta movements with verified actor attribution","refresh":["query.dashboard","query.cashierSummary","query.financialOverview","query.eventHistory","query.accountLedger","query.spoilageHistory","query.profitabilityReport","query.costingManagement"]},
+
+    {"action":"command.saveStoreIdentity","kind":"command","auth":"session","permission":"MANAGE_BUSINESS_SETTINGS","request":{"storeName":"string","phone":{"type":"string","nullable":true},"address":{"type":"string","nullable":true}},"responseType":"BridgeUnit","errors":["validation_failed","session_expired","permission_denied","internal_error"],"persistence":"upserts singleton PKR store profile","refresh":["query.businessSettings"]},
+    {"action":"command.updateBusinessSettings","kind":"command","auth":"session","permission":"MANAGE_BUSINESS_SETTINGS","request":{"vendorMilkRatePaisaPerUnit":"paisa","vendorDeliveryFeePaisaPerUnit":"paisa","tsStandardPercent":"decimal","retailMilkRatePaisaPerUnit":"paisa","retailYogurtRatePaisaPerUnit":"paisa","defaultDeliverySurchargePaisa":"paisa"},"responseType":"BridgeUnit","errors":["validation_failed","session_expired","permission_denied","internal_error"],"persistence":"updates native business setting values atomically","refresh":["query.businessSettings","query.transactionReferences"]},
+    {"action":"command.recordOpeningState","kind":"command","auth":"session","permission":"MANAGE_BUSINESS_SETTINGS","recentAuth":true,"request":{"openingDate":"date","inventoryBalances":"list:OpeningInventoryInput","accountBalances":"list:OpeningAccountInput","notes":{"type":"string","required":false}},"responseType":"EventMutationResultDto","errors":["validation_failed","conflict","recent_authentication_required","session_expired","permission_denied","internal_error"],"persistence":"creates one initial opening event and canonical balances only on an unused installation","refresh":["query.businessSettings","query.dashboard","query.financialOverview","query.eventHistory"]},
+    {"action":"command.correctOpeningState","kind":"command","auth":"session","permission":"MANAGE_BUSINESS_SETTINGS","recentAuth":true,"request":{"openingDate":"date","inventoryBalances":"list:OpeningInventoryInput","accountBalances":"list:OpeningAccountInput","notes":{"type":"string","required":false}},"responseType":"EventMutationResultDto","errors":["validation_failed","not_found","recent_authentication_required","session_expired","permission_denied","internal_error"],"persistence":"appends complete corrected opening truth and only delta movements","refresh":["query.businessSettings","query.dashboard","query.financialOverview","query.eventHistory","query.profitabilityReport"]},
+
+    {"action":"command.createProduct","kind":"command","auth":"session","permission":"MANAGE_MASTER_DATA","request":{"name":"string","unitCode":"enum:ProductUnitCode","defaultSaleRatePaisaPerUnit":{"type":"paisa","nullable":true},"inventoryTracking":"boolean","notes":{"type":"string","nullable":true}},"responseType":"EntityMutationResultDto","errors":["validation_failed","conflict","session_expired","permission_denied","internal_error"],"persistence":"creates product and profile","refresh":["query.masterData","query.transactionReferences","query.dashboard"]},
+    {"action":"command.updateProduct","kind":"command","auth":"session","permission":"MANAGE_MASTER_DATA","request":{"productId":"id","name":"string","unitCode":"enum:ProductUnitCode","defaultSaleRatePaisaPerUnit":{"type":"paisa","nullable":true},"inventoryTracking":"boolean","notes":{"type":"string","nullable":true}},"responseType":"BridgeUnit","errors":["validation_failed","not_found","conflict","session_expired","permission_denied","internal_error"],"persistence":"updates product identity/profile without rewriting history","refresh":["query.masterData","query.transactionReferences","query.dashboard","query.eventHistory"]},
+    {"action":"command.setProductArchived","kind":"command","auth":"session","permission":"MANAGE_MASTER_DATA","request":{"productId":"id","archived":"boolean"},"responseType":"BridgeUnit","errors":["validation_failed","not_found","conflict","session_expired","permission_denied","internal_error"],"persistence":"updates product archive flag without deleting history","refresh":["query.masterData","query.transactionReferences","query.dashboard"]},
+    {"action":"command.createCustomer","kind":"command","auth":"session","permission":"MANAGE_MASTER_DATA","request":{"name":"string"},"responseType":"EntityMutationResultDto","errors":["validation_failed","conflict","session_expired","permission_denied","internal_error"],"persistence":"creates customer account and profile","refresh":["query.masterData","query.transactionReferences","query.financialOverview"]},
+    {"action":"command.renameCustomer","kind":"command","auth":"session","permission":"MANAGE_MASTER_DATA","request":{"accountId":"id","name":"string"},"responseType":"BridgeUnit","errors":["validation_failed","not_found","conflict","session_expired","permission_denied","internal_error"],"persistence":"renames customer account without rewriting history","refresh":["query.masterData","query.transactionReferences","query.financialOverview","query.accountLedger"]},
+    {"action":"command.saveCustomerProfile","kind":"command","auth":"session","permission":"MANAGE_MASTER_DATA","request":{"accountId":"id","phone":{"type":"string","nullable":true},"areaRoute":{"type":"string","nullable":true},"address":{"type":"string","nullable":true},"notes":{"type":"string","nullable":true},"creditLimitPaisa":{"type":"paisa","nullable":true},"dailyQuota":{"type":"decimal","nullable":true},"active":"boolean"},"responseType":"BridgeUnit","errors":["validation_failed","not_found","session_expired","permission_denied","internal_error"],"persistence":"upserts customer profile","refresh":["query.masterData","query.transactionReferences"]},
+    {"action":"command.createVendor","kind":"command","auth":"session","permission":"MANAGE_MASTER_DATA","request":{"name":"string"},"responseType":"EntityMutationResultDto","errors":["validation_failed","conflict","session_expired","permission_denied","internal_error"],"persistence":"creates vendor account and profile","refresh":["query.masterData","query.transactionReferences","query.financialOverview"]},
+    {"action":"command.renameVendor","kind":"command","auth":"session","permission":"MANAGE_MASTER_DATA","request":{"accountId":"id","name":"string"},"responseType":"BridgeUnit","errors":["validation_failed","not_found","conflict","session_expired","permission_denied","internal_error"],"persistence":"renames vendor account without rewriting history","refresh":["query.masterData","query.transactionReferences","query.financialOverview","query.accountLedger"]},
+    {"action":"command.saveVendorProfile","kind":"command","auth":"session","permission":"MANAGE_MASTER_DATA","request":{"accountId":"id","phone":{"type":"string","nullable":true},"location":{"type":"string","nullable":true},"notes":{"type":"string","nullable":true},"active":"boolean"},"responseType":"BridgeUnit","errors":["validation_failed","not_found","session_expired","permission_denied","internal_error"],"persistence":"upserts vendor profile","refresh":["query.masterData","query.transactionReferences"]},
+    {"action":"command.createEmployee","kind":"command","auth":"session","permission":"MANAGE_MASTER_DATA","request":{"name":"string"},"responseType":"EntityMutationResultDto","errors":["validation_failed","conflict","session_expired","permission_denied","internal_error"],"persistence":"creates salary account and employee profile","refresh":["query.masterData","query.transactionReferences"]},
+    {"action":"command.renameEmployee","kind":"command","auth":"session","permission":"MANAGE_MASTER_DATA","request":{"accountId":"id","name":"string"},"responseType":"BridgeUnit","errors":["validation_failed","not_found","conflict","session_expired","permission_denied","internal_error"],"persistence":"renames employee salary account without rewriting history","refresh":["query.masterData","query.transactionReferences","query.attendance"]},
+    {"action":"command.saveEmployeeProfile","kind":"command","auth":"session","permission":"MANAGE_MASTER_DATA","request":{"accountId":"id","roleLabel":{"type":"string","nullable":true},"phone":{"type":"string","nullable":true},"referenceSalaryPaisa":{"type":"paisa","nullable":true},"salaryPeriodCode":{"type":"string","nullable":true},"joinDate":{"type":"date","nullable":true},"active":"boolean"},"responseType":"BridgeUnit","errors":["validation_failed","not_found","session_expired","permission_denied","internal_error"],"persistence":"upserts employee profile","refresh":["query.masterData","query.transactionReferences"]},
+    {"action":"command.createExpenseCategory","kind":"command","auth":"session","permission":"MANAGE_MASTER_DATA","request":{"displayName":"string"},"responseType":"EntityMutationResultDto","errors":["validation_failed","conflict","session_expired","permission_denied","internal_error"],"persistence":"creates operating-expense account and category profile","refresh":["query.masterData","query.businessSettings","query.transactionReferences"]},
+    {"action":"command.setExpenseCategoryArchived","kind":"command","auth":"session","permission":"MANAGE_MASTER_DATA","request":{"accountId":"id","archived":"boolean"},"responseType":"BridgeUnit","errors":["validation_failed","not_found","conflict","session_expired","permission_denied","internal_error"],"persistence":"updates category active state without deleting history","refresh":["query.masterData","query.businessSettings","query.transactionReferences"]},
+
+    {"action":"command.recordAttendance","kind":"command","auth":"session","permission":"ATTENDANCE","request":{"employeeAccountId":"id","businessDate":"date","statusCode":"enum:AttendanceStatusCode","notes":{"type":"string","required":false}},"responseType":"EntityMutationResultDto","errors":["validation_failed","not_found","day_closed","session_expired","permission_denied","internal_error"],"persistence":"archives prior same-day attendance and appends revised record","refresh":["query.attendance"]},
+    {"action":"command.createDelivery","kind":"command","auth":"session","permission":"DELIVERY","request":{"customerAccountId":"id","productId":"id","quantity":"decimal","route":{"type":"string","required":false},"businessDate":"date","saleEventId":{"type":"id","required":true,"nullable":true},"notes":{"type":"string","required":false}},"responseType":"EntityMutationResultDto","errors":["validation_failed","not_found","conflict","day_closed","session_expired","permission_denied","internal_error"],"persistence":"creates delivery and initial pending status","refresh":["query.deliveries"]},
+    {"action":"command.transitionDelivery","kind":"command","auth":"session","permission":"DELIVERY","request":{"deliveryId":"id","statusCode":"enum:DeliveryStatusCode","notes":{"type":"string","required":false}},"responseType":"BridgeUnit","errors":["validation_failed","not_found","conflict","day_closed","session_expired","permission_denied","internal_error"],"persistence":"appends terminal delivery status","refresh":["query.deliveries"]},
+    {"action":"command.linkDeliverySale","kind":"command","auth":"session","permission":"DELIVERY","request":{"deliveryId":"id","saleEventId":"id"},"responseType":"BridgeUnit","errors":["validation_failed","not_found","conflict","session_expired","permission_denied","internal_error"],"persistence":"links delivery to one matching sale without creating revenue","refresh":["query.deliveries","query.eventDetail"]},
+    {"action":"command.archiveDelivery","kind":"command","auth":"session","permission":"DELIVERY","request":{"deliveryId":"id"},"responseType":"BridgeUnit","errors":["not_found","conflict","day_closed","session_expired","permission_denied","internal_error"],"persistence":"marks delivery archived without deleting status history","refresh":["query.deliveries"]},
+    {"action":"command.recordPhysicalCashCount","kind":"command","auth":"session","permission":"CASH_COUNT_AND_CLOSE","request":{"accountId":"id","businessDate":"date","countedCashPaisa":"paisa","notes":{"type":"string","required":false}},"responseType":"CashCountResultDto","errors":["validation_failed","not_found","day_closed","session_expired","permission_denied","internal_error"],"persistence":"appends physical count only; never posts a balancing ledger entry","refresh":["query.reconciliationArchive"]},
+    {"action":"command.closeBusinessDate","kind":"command","auth":"session","permission":"CASH_COUNT_AND_CLOSE","request":{"businessDate":"date","physicalCashCountId":"id","varianceReason":{"type":"string","required":false}},"responseType":"DailyCloseResultDto","errors":["validation_failed","not_found","conflict","session_expired","permission_denied","internal_error"],"persistence":"appends verified close action referencing latest count","refresh":["query.reconciliationArchive","query.securityAudit"]},
+    {"action":"command.reopenBusinessDate","kind":"command","auth":"session","permission":"REOPEN_DAY","recentAuth":true,"request":{"businessDate":"date","reason":"string"},"responseType":"DailyCloseResultDto","errors":["validation_failed","not_found","conflict","recent_authentication_required","session_expired","permission_denied","internal_error"],"persistence":"appends verified reopen action; never rewrites ledger","refresh":["query.reconciliationArchive","query.securityAudit"]},
+
+    {"action":"command.upsertBudget","kind":"command","auth":"session","permission":"MANAGE_BUSINESS_SETTINGS","request":{"categoryCode":"string","periodStart":"date","periodEndExclusive":"date","plannedLiters":{"type":"decimal","required":true,"nullable":true},"plannedAmountPaisa":{"type":"paisa","required":true,"nullable":true}},"responseType":"BudgetMutationResultDto","errors":["validation_failed","conflict","session_expired","permission_denied","internal_error"],"persistence":"archives active same-period version and appends budget version","refresh":["query.planning"]},
+    {"action":"command.copyPreviousBudget","kind":"command","auth":"session","permission":"MANAGE_BUSINESS_SETTINGS","request":{"categoryCode":"string","periodStart":"date","periodEndExclusive":"date"},"responseType":"BudgetMutationResultDto","errors":["validation_failed","not_found","conflict","session_expired","permission_denied","internal_error"],"persistence":"copies prior values into a new active budget version","refresh":["query.planning"]},
+    {"action":"command.upsertCollectionsTarget","kind":"command","auth":"session","permission":"MANAGE_BUSINESS_SETTINGS","request":{"weekStart":"date","targetAmountPaisa":"paisa"},"responseType":"CollectionsTargetMutationResultDto","errors":["validation_failed","conflict","session_expired","permission_denied","internal_error"],"persistence":"archives active same-week target and appends target version","refresh":["query.planning"]},
+    {"action":"command.approveCostingPolicy","kind":"command","auth":"session","permission":"MANAGE_BUSINESS_SETTINGS","recentAuth":true,"request":{"calendarMonth":"month","normalCapacityKg":"decimal","reviewReasonCode":"enum:CostReviewReasonCode","components":"list:CostComponentInput","notes":{"type":"string","required":false},"supersedesPolicyId":{"type":"id","required":true,"nullable":true}},"responseType":"EntityMutationResultDto","errors":["validation_failed","conflict","recent_authentication_required","session_expired","permission_denied","internal_error"],"persistence":"appends immutable monthly costing-policy version and components","refresh":["query.costingManagement","query.profitabilityReport"]},
+    {"action":"command.recordOpeningCostBasis","kind":"command","auth":"session","permission":"MANAGE_BUSINESS_SETTINGS","recentAuth":true,"request":{"openingEventId":"id","productId":"id","quantity":"decimal","totalCostPaisa":"paisa","basisKindCode":"enum:OpeningBasisKindCode","evidenceNotes":{"type":"string","required":false},"supersedesBasisId":{"type":"id","required":true,"nullable":true}},"responseType":"EntityMutationResultDto","errors":["validation_failed","not_found","conflict","recent_authentication_required","session_expired","permission_denied","internal_error"],"persistence":"appends immutable opening cost-basis version","refresh":["query.costingManagement","query.profitabilityReport"]},
+    {"action":"command.approveYieldPolicy","kind":"command","auth":"session","permission":"MANAGE_BUSINESS_SETTINGS","recentAuth":true,"request":{"acceptedProductionEventIds":"list:id","effectiveFrom":"date","supersedesYieldPolicyId":{"type":"id","required":true,"nullable":true}},"responseType":"EntityMutationResultDto","errors":["validation_failed","not_found","conflict","recent_authentication_required","session_expired","permission_denied","internal_error"],"persistence":"appends statistically derived immutable yield-policy version","refresh":["query.costingManagement","query.profitabilityReport"]},
+    {"action":"command.recordProductionLossAssessment","kind":"command","auth":"session","permission":"MANAGE_BUSINESS_SETTINGS","recentAuth":true,"request":{"productionEventId":"id","classificationCode":"enum:LossClassificationCode","abnormalMilkLiters":"decimal","reasonCode":"enum:LossReasonCode","notes":{"type":"string","required":false},"supersedesAssessmentId":{"type":"id","required":true,"nullable":true}},"responseType":"EntityMutationResultDto","errors":["validation_failed","not_found","conflict","recent_authentication_required","session_expired","permission_denied","internal_error"],"persistence":"appends immutable loss-assessment version","refresh":["query.costingManagement","query.profitabilityReport"]},
+
+    {"action":"system.bridgeInfo","kind":"system","auth":"none","permission":null,"request":{},"responseType":"BridgeInfoDto","errors":["internal_error"],"persistence":"none","refresh":[]},
+    {"action":"system.exportEncryptedBackup","kind":"system","auth":"session","permission":"CREATE_EXPORT_BACKUP","recentAuth":true,"request":{"passphrase":"secret","suggestedFileName":{"type":"string","required":false}},"responseType":"BackupExportResultDto","errors":["validation_failed","user_cancelled","recent_authentication_required","session_expired","permission_denied","io_failed","internal_error"],"persistence":"native picker writes encrypted portable backup; database is read-only","refresh":["query.securityAudit"]},
+    {"action":"system.inspectEncryptedBackup","kind":"system","auth":"session","permission":"RESTORE_BACKUP","recentAuth":true,"request":{"passphrase":"secret"},"responseType":"BackupInspectionDto","errors":["user_cancelled","backup_wrong_passphrase","backup_tampered","backup_incompatible","recent_authentication_required","session_expired","permission_denied","io_failed","internal_error"],"persistence":"native picker reads and authenticates backup then issues one-use memory-only restore ticket","refresh":[]},
+    {"action":"system.restoreInspectedBackup","kind":"system","auth":"session","permission":"RESTORE_BACKUP","recentAuth":true,"request":{"restoreTicket":"ticket","confirmRestore":"boolean"},"responseType":"BackupRestoreResultDto","errors":["validation_failed","restore_ticket_expired","backup_incompatible","conflict","recent_authentication_required","session_expired","permission_denied","io_failed","internal_error"],"persistence":"atomically replaces supported durable state, rebuilds projections, consumes ticket, and invalidates every session","refresh":["query.bootstrapStatus"]}
+  ]
+}

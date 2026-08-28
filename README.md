@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-08-28 — hybrid Phases 0–5 are complete; Phase 6 canonical bridge-contract design is the next gate. Substantial Phase 7/9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
+Status: RECONCILED 2026-08-28 — hybrid Phases 0–6 are complete; the Phase 7 authenticated physical-device vertical slice is the next gate. Substantial Phase 7/9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
 
 ## What this repository contains
 
@@ -18,6 +18,8 @@ Status: RECONCILED 2026-08-28 — hybrid Phases 0–5 are complete; Phase 6 cano
 - `PHASE4.md` — completed criterion-by-criterion native automated-test audit, gap closure, evidence matrix, and verification record.
 - `PHASE5.md` — completed native read-model expansion, permission boundary, verification, and next gate.
 - `PHASE5_DTO_CATALOG.md` — frozen hybrid-facing Kotlin query/DTO catalog, representation rules, code sets, and security exclusions.
+- `PHASE6.md` — completed canonical bridge-contract boundary, generated projections, drift gate, verification, and Phase 7 handoff.
+- `bridge/CONTRACT.md` and `bridge/contract.json` — frozen human-readable and machine-readable bridge contract version 1.
 
 ## Immutable baselines
 
@@ -29,9 +31,9 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 5 — Native Read-Model Expansion: COMPLETE**
+**Phase 6 — Canonical Bridge Contract: COMPLETE**
 
-The permission-aware hybrid-facing Kotlin DTO/query catalog is implemented and frozen. Money crosses this future boundary as integer PKR paisa, quantities/ratios as canonical decimal strings, corrections and unknown-cost states remain explicit, and credential/recovery/session-handle material is excluded. The complete connected-device regression passes 124/124. Phase 6 is next; React/bridge wiring has not started.
+Bridge contract version 1 is frozen with 78 unique query, command, and system operations. It defines lossless PKR/ID/decimal transport, authenticated envelopes, native-owned authority, stable errors, validation, persistence, refresh, backup file ownership, and version negotiation. Generated Kotlin and TypeScript projections compile, and both Android and UI builds run the mandatory drift checker. Phase 7 is next; no runtime WebView bridge or broad React wiring has started.
 
 ## Approved security track
 
@@ -75,7 +77,7 @@ Phase 4 — Native Automated Tests ✅
 
 Phase 5 — Native Read-Model Expansion ✅
 
-Phase 6 — Bridge Contract (`bridge/CONTRACT.md`) ⏳ (next)
+Phase 6 — Bridge Contract (`bridge/CONTRACT.md`) ✅
 
 Phase 7 — Hybrid Shell / Vertical Slice ⏳ (native authentication prerequisite complete; actual hybrid slice absent)
 
@@ -117,9 +119,10 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Focused backup/restore suite: 8/8 passed, including portable and local confidentiality checks, wrong-passphrase rejection, tamper rejection, security round-trips, session invalidation, and transient lockout-state exclusion.
 - Phase 4 security gap-closure suite: 9/9 passed.
 - Phase 5 hybrid read-model suite: 4/4 passed.
+- Phase 6 bridge contract: version 1, 78 endpoints, generated Kotlin/TypeScript projections and both pre-build drift gates pass.
 - Host-side debug unit tests: 7/7 passed.
 - Complete connected-device instrumentation regression: 124/124 passed, 0 skipped, 0 failed.
 
 ## Next gate
 
-Phases 3–5 are closed. Next, create the Phase 6 canonical `bridge/CONTRACT.md`, including authenticated query/command envelopes, lossless ID handling, consistent error codes, refresh behavior, and a mandatory Kotlin/TypeScript drift checker. The costing explanation/info-button idea remains deferred; future UI must still translate native codes into plain shop language. React/hybrid UI wiring remains later delivery work. See `ROADMAP_RECONCILIATION_2026-08-27.md` for the exact credited and remaining gates.
+Phases 3–6 are closed. Next, implement the narrow Phase 7 authenticated physical-device vertical slice: packaged origin-restricted React/WebView transport, contract version/hash negotiation, native session handling, one permission-checked query, and one protected mutation with verified actor attribution and Room persistence. Do not scale to broad screen wiring until that full round trip passes on the phone. The costing explanation/info-button idea remains deferred; future UI must still translate native codes into plain shop language. See `ROADMAP_RECONCILIATION_2026-08-27.md` for the exact credited and remaining gates.

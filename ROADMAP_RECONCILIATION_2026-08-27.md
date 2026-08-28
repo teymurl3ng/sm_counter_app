@@ -75,7 +75,7 @@ Portable backup format 2 uses Argon2id-derived AES-256-GCM. Automatic local snap
 | 3 — Native Expansion | **Complete** | Preserve the approved schema-4 through schema-8 native contracts; no React/bridge completion is implied. |
 | 4 — Native Automated Tests | **Complete** | Preserve the `PHASE4.md` evidence matrix and keep the complete regression green as later native/bridge capabilities are added. |
 | 5 — Native Read Models | **Complete** | Preserve `PHASE5_DTO_CATALOG.md`: integer-PKR-paisa money, canonical decimal quantities, explicit correction/coverage state, permission-aware reads, stable costing codes, and no credential/session-handle material. |
-| 6 — Bridge Contract | **Next** | Create `bridge/CONTRACT.md` and a mandatory TypeScript/Kotlin drift checker before bridge implementation. |
+| 6 — Bridge Contract | **Complete** | Preserve contract version 1, its manifest hash, lossless/authenticated envelopes, generated TypeScript/Kotlin projections, and mandatory pre-build drift checker. |
 | 7 — Hybrid Vertical Slice | **Native authentication prerequisites completed early; hybrid slice not started** | Prove packaged React → WebView → bridge → Kotlin → Room → React on a physical device with one authenticated query and one protected mutation. |
 | 8 — Screen Wiring | **Not started** | Replace React mock/local state screen-by-screen with awaited native queries and commands plus hybrid integration tests. Apply plain-language financial labels and actionable error states; never display raw accounting/status codes to shop users. Contextual info-button explanations are deferred for later product review. |
 | 9 — Runtime Integration | **Partial native credit; hybrid work not started** | Prove WebView navigation, lifecycle, process recreation, keyboard, errors, logout/back-stack protection, and session expiry. |
@@ -89,7 +89,7 @@ Portable backup format 2 uses Argon2id-derived AES-256-GCM. Automatic local snap
 
 ## Current verification credit
 
-The connected-device native regression suite passes **124/124**, with zero skipped, failed, or errored tests; the host-side debug unit suite passes **7/7**. The Phase 5 additions cover bootstrap/current-session views, exact PKR/decimal representation, corrected-history state, permission-separated operational/financial/settings/user/audit reads, costing-code stability, and forbidden-secret DTO scanning. `PHASE4.md` records the earlier complete native-test audit, while `PHASE5.md` and `PHASE5_DTO_CATALOG.md` record the new read boundary. This is not evidence for bridge or hybrid UI behavior.
+The connected-device native regression suite passes **124/124**, with zero skipped, failed, or errored tests; the host-side debug unit suite passes **7/7**. The Phase 5 additions cover bootstrap/current-session views, exact PKR/decimal representation, corrected-history state, permission-separated operational/financial/settings/user/audit reads, costing-code stability, and forbidden-secret DTO scanning. Phase 6 contract version 1 defines 78 operations and its generated Kotlin/TypeScript projections pass the checker and both consumer compilations. `PHASE4.md` records the native-test audit; `PHASE5.md` and `PHASE5_DTO_CATALOG.md` record the read boundary; `PHASE6.md` and `bridge/CONTRACT.md` record the message boundary. This is not yet evidence for runtime WebView or end-to-end hybrid behavior.
 
 The two immutable hashes remain:
 
@@ -101,7 +101,7 @@ The two immutable hashes remain:
 1. **Completed:** close Phase 3 by researching, approving, implementing, and documenting authoritative costing/profitability semantics.
 2. **Completed:** formally close Phase 4 with a criterion-by-criterion native/security coverage audit and focused gap tests.
 3. **Completed:** implement and freeze the Phase 5 hybrid-facing native read-model/DTO catalog.
-4. Create the Phase 6 canonical bridge contract and drift checker.
+4. **Completed:** create the Phase 6 canonical bridge contract and drift checker.
 5. Prove the Phase 7 authenticated physical-device hybrid vertical slice before scaling.
 6. Perform Phase 8 screen-by-screen wiring, replacing all mock/local business behavior.
 7. Complete Phases 9–10 runtime integration and capability closure.
@@ -111,4 +111,4 @@ The two immutable hashes remain:
 
 ## Immediate next gate
 
-Phases 3–5 are complete and device-verified. The immediate gate is Phase 6: define the canonical bridge contract, consistent authenticated error/envelope behavior, lossless identifiers, refresh rules, and Kotlin/TypeScript drift checker from the frozen Phase 5 DTO catalog. The existing React prototype's hardcoded `costRate` values and client-side profit calculations remain non-authoritative and must not be copied or revived.
+Phases 3–6 are complete. The immediate gate is Phase 7: prove one authenticated packaged React → origin-restricted WebView bridge → Kotlin → Room → React round trip on a physical device, including contract version/hash negotiation, one permission-checked query, one protected mutation, verified actor attribution, stable error handling, and native-backed refresh. The existing React prototype's hardcoded `costRate` values and client-side profit calculations remain non-authoritative and must not be copied or revived.

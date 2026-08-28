@@ -31,3 +31,7 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# Python verification cache
+__pycache__/
+*.pyc

@@ -12,6 +12,7 @@ import com.saaf.milkshop.application.readmodels.ProductDto
 import com.saaf.milkshop.application.readmodels.VendorDto
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.ProductCatalogInput
+import com.saaf.milkshop.domain.CustomerProfileInput
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.domain.UserSecurityService
 import org.json.JSONArray
@@ -141,6 +142,54 @@ class HybridBridgeDispatcher(
             JSONObject()
         }
 
+        ACTION_CREATE_CUSTOMER -> {
+            strictPayload(request.payload, setOf("name"))
+            val accountId = commands.createCustomer(
+                request.requireSession(),
+                request.payload.requiredString("name"),
+            )
+            JSONObject().put("entityId", accountId.toString())
+        }
+
+        ACTION_RENAME_CUSTOMER -> {
+            strictPayload(request.payload, setOf("accountId", "name"))
+            commands.renameCustomer(
+                request.requireSession(),
+                request.payload.requiredId("accountId"),
+                request.payload.requiredString("name"),
+            )
+            JSONObject()
+        }
+
+        ACTION_SAVE_CUSTOMER_PROFILE -> {
+            strictPayload(
+                request.payload,
+                setOf("accountId", "phone", "areaRoute", "address", "notes", "creditLimitPaisa", "dailyQuota", "active"),
+            )
+            val creditLimitPaisa = request.payload.nullablePaisa("creditLimitPaisa")
+            if (creditLimitPaisa != null && creditLimitPaisa < 0L) {
+                throw BridgeProtocolFailure("validation_failed", "Credit limit cannot be negative", "creditLimitPaisa")
+            }
+            val dailyQuota = request.payload.nullableDecimal("dailyQuota")
+            if (dailyQuota != null && dailyQuota < BigDecimal.ZERO) {
+                throw BridgeProtocolFailure("validation_failed", "Daily quota cannot be negative", "dailyQuota")
+            }
+            commands.saveCustomerProfile(
+                request.requireSession(),
+                request.payload.requiredId("accountId"),
+                CustomerProfileInput(
+                    phone = request.payload.nullableString("phone"),
+                    areaRoute = request.payload.nullableString("areaRoute"),
+                    address = request.payload.nullableString("address"),
+                    notes = request.payload.nullableString("notes"),
+                    creditLimit = creditLimitPaisa?.let { BigDecimal(it).movePointLeft(2).toDouble() },
+                    dailyQuota = dailyQuota?.toDouble(),
+                    active = request.payload.requiredBoolean("active"),
+                ),
+            )
+            JSONObject()
+        }
+
         else -> throw BridgeProtocolFailure("invalid_request", "This action is not available in the current app slice")
     }
 
@@ -245,6 +294,9 @@ class HybridBridgeDispatcher(
         const val ACTION_CREATE_PRODUCT = "command.createProduct"
         const val ACTION_UPDATE_PRODUCT = "command.updateProduct"
         const val ACTION_SET_PRODUCT_ARCHIVED = "command.setProductArchived"
+        const val ACTION_CREATE_CUSTOMER = "command.createCustomer"
+        const val ACTION_RENAME_CUSTOMER = "command.renameCustomer"
+        const val ACTION_SAVE_CUSTOMER_PROFILE = "command.saveCustomerProfile"
 
         val SUPPORTED_ACTIONS = listOf(
             ACTION_BRIDGE_INFO,
@@ -257,6 +309,9 @@ class HybridBridgeDispatcher(
             ACTION_CREATE_PRODUCT,
             ACTION_UPDATE_PRODUCT,
             ACTION_SET_PRODUCT_ARCHIVED,
+            ACTION_CREATE_CUSTOMER,
+            ACTION_RENAME_CUSTOMER,
+            ACTION_SAVE_CUSTOMER_PROFILE,
         )
 
         private val AUTH_BY_ACTION = mapOf(
@@ -270,6 +325,9 @@ class HybridBridgeDispatcher(
             ACTION_CREATE_PRODUCT to "session",
             ACTION_UPDATE_PRODUCT to "session",
             ACTION_SET_PRODUCT_ARCHIVED to "session",
+            ACTION_CREATE_CUSTOMER to "session",
+            ACTION_RENAME_CUSTOMER to "session",
+            ACTION_SAVE_CUSTOMER_PROFILE to "session",
         )
     }
 }
@@ -382,6 +440,16 @@ private fun JSONObject.requiredId(name: String): Long {
     }
     return raw.toLongOrNull()
         ?: throw BridgeProtocolFailure("validation_failed", "$name is outside the supported range", name)
+}
+
+private fun JSONObject.nullableDecimal(name: String): BigDecimal? {
+    val raw = nullableString(name) ?: return null
+    if (!Regex("-?(0|[1-9][0-9]*)(\\.[0-9]+)?").matches(raw)) {
+        throw BridgeProtocolFailure("validation_failed", "$name must be a decimal value", name)
+    }
+    return runCatching { BigDecimal(raw) }.getOrElse {
+        throw BridgeProtocolFailure("validation_failed", "$name is outside the supported range", name)
+    }
 }
 
 private fun JSONObject.productInput(includeProductId: Boolean): Pair<Long?, ProductCatalogInput> {

@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-08-28 — hybrid Phases 0–7 are complete; Phase 8 screen-by-screen native-backed UI wiring is in progress, with Product Management complete and Customer Profiles next. Substantial Phase 9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
+Status: RECONCILED 2026-08-28 — hybrid Phases 0–7 are complete; Phase 8 screen-by-screen native-backed UI wiring is in progress, with Products and Customer Profiles complete and Suppliers next. Substantial Phase 9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
 
 ## What this repository contains
 
@@ -35,7 +35,7 @@ SQL blueprint SHA-256:
 
 **Phase 8 — Screen-by-Screen Native UI Wiring: IN PROGRESS**
 
-The Phase 7 shell remains intact. Phase 8 milestone 1 replaces its product proof with a complete Products workspace: native list/add/edit/archive/restore, exact PKR conversion, awaited refresh, Android permission enforcement, and durable actor audit. The runtime now exposes 10 of the frozen contract's 78 operations. The complete connected-device regression passes 130/130. Phase 8 remains open; Customer Profiles are next.
+The Phase 7 shell remains intact. Phase 8 now provides complete native-backed Products and Customer Profiles areas. Customers support list/search/add/rename/profile/deactivate/restore while their canonical balances remain native-read-only. The runtime exposes 13 of the frozen contract's 78 operations. The complete connected-device regression passes 133/133. Phase 8 remains open; Suppliers are next.
 
 ## Approved security track
 
@@ -83,7 +83,7 @@ Phase 6 — Bridge Contract (`bridge/CONTRACT.md`) ✅
 
 Phase 7 — Hybrid Shell / Vertical Slice ✅
 
-Phase 8 — UI Wiring ◐ (Products complete; Customers next)
+Phase 8 — UI Wiring ◐ (Products and Customers complete; Suppliers next)
 
 Phase 9 — Runtime / Navigation / Device Integration ◐ (native lifecycle credit only; hybrid runtime absent)
 
@@ -125,8 +125,9 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Host-side debug unit tests: 7/7 passed.
 - Phase 7 focused hybrid vertical-slice suite: 3/3 passed on the physical device.
 - Phase 8 focused Product Management suite: 3/3 passed on the physical device.
-- Complete connected-device instrumentation regression: 130/130 passed, 0 skipped, 0 failed.
+- Phase 8 focused Customer Profiles suite: 3/3 passed on the physical device.
+- Complete connected-device instrumentation regression: 133/133 passed, 0 skipped, 0 failed.
 
 ## Next gate
 
-Phases 3–7 are closed and Phase 8 is active. Product Management is the completed reference screen. Next, migrate Customer Profiles using `query.masterData` and the contracted customer commands, without client-side balance editing or local business state. Every screen must continue to await native mutations, show truthful outcomes, refresh declared queries, receive a hybrid integration test, and retire its corresponding mock/local behavior. The costing explanation/info-button idea remains deferred; UI labels must still translate native codes into plain shop language. See `PHASE8.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–7 are closed and Phase 8 is active. Products and Customer Profiles are complete reference screens. Next, migrate Supplier Profiles using `query.masterData` and the contracted vendor commands, retaining native balances and omitting the prototype's unsupported per-supplier milk-rate field. Every screen must continue to await native mutations, show truthful outcomes, refresh declared queries, receive a hybrid integration test, and retire its corresponding mock/local behavior. The costing explanation/info-button idea remains deferred; UI labels must still translate native codes into plain shop language. See `PHASE8.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.

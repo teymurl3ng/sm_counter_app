@@ -8,6 +8,7 @@ import {
   type BridgeRequestPayloadByAction,
   type BridgeResponse,
   type BridgeResponseByAction,
+  type DecimalString,
   type PaisaString,
   type SessionHandle,
 } from './contract.generated';
@@ -43,6 +44,9 @@ export const RUNTIME_ACTIONS = [
   'command.createProduct',
   'command.updateProduct',
   'command.setProductArchived',
+  'command.createCustomer',
+  'command.renameCustomer',
+  'command.saveCustomerProfile',
 ] as const satisfies ReadonlyArray<BridgeAction>;
 
 export class NativeBridgeError extends Error {
@@ -164,4 +168,12 @@ export function paisaToRupeesInput(value: PaisaString | null): string {
   const whole = padded.slice(0, -2).replace(/^0+(?=[0-9])/, '');
   const fraction = padded.slice(-2);
   return `${negative ? '-' : ''}${whole}.${fraction}`;
+}
+
+export function validateDecimalInput(value: string, label: string): DecimalString {
+  const clean = value.trim();
+  if (!/^(0|[1-9][0-9]*)(?:\.[0-9]+)?$/.test(clean)) {
+    throw new Error(`Enter ${label} as zero or a positive number.`);
+  }
+  return clean as DecimalString;
 }

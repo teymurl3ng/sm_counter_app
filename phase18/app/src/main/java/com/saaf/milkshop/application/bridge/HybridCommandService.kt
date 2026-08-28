@@ -4,6 +4,9 @@ import androidx.room3.withWriteTransaction
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.data.SecurityAuditEntryEntity
 import com.saaf.milkshop.domain.AppPermission
+import com.saaf.milkshop.domain.CustomerManagementService
+import com.saaf.milkshop.domain.CustomerProfileInput
+import com.saaf.milkshop.domain.CustomerProfileService
 import com.saaf.milkshop.domain.ProductCatalogInput
 import com.saaf.milkshop.domain.ProductCatalogService
 import com.saaf.milkshop.domain.UserSecurityService
@@ -76,9 +79,77 @@ class HybridCommandService(
             )
         }
 
+    suspend fun createCustomer(sessionHandle: String, name: String): Long =
+        database.withWriteTransaction {
+            val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_MASTER_DATA)
+            requireUniqueCustomerName(name)
+            val accountId = CustomerManagementService(database).create(name)
+            recordMasterDataAudit(
+                action = ACTION_CREATE_CUSTOMER,
+                entityName = "account_id",
+                entityId = accountId,
+                actorUserId = actor.userId,
+                actorName = actor.displayName,
+                actorRole = actor.role,
+            )
+            accountId
+        }
+
+    suspend fun renameCustomer(sessionHandle: String, accountId: Long, name: String) =
+        database.withWriteTransaction {
+            val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_MASTER_DATA)
+            requireCustomer(accountId)
+            requireUniqueCustomerName(name, exceptAccountId = accountId)
+            CustomerManagementService(database).rename(accountId, name)
+            recordMasterDataAudit(
+                action = ACTION_RENAME_CUSTOMER,
+                entityName = "account_id",
+                entityId = accountId,
+                actorUserId = actor.userId,
+                actorName = actor.displayName,
+                actorRole = actor.role,
+            )
+        }
+
+    suspend fun saveCustomerProfile(
+        sessionHandle: String,
+        accountId: Long,
+        input: CustomerProfileInput,
+    ) = database.withWriteTransaction {
+        val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_MASTER_DATA)
+        requireCustomer(accountId)
+        CustomerProfileService(database).save(accountId, input)
+        recordMasterDataAudit(
+            action = ACTION_SAVE_CUSTOMER_PROFILE,
+            entityName = "account_id",
+            entityId = accountId,
+            actorUserId = actor.userId,
+            actorName = actor.displayName,
+            actorRole = actor.role,
+        )
+    }
+
     private suspend fun recordProductAudit(
         action: String,
         productId: Long,
+        actorUserId: Long,
+        actorName: String,
+        actorRole: String,
+    ) {
+        recordMasterDataAudit(
+            action = action,
+            entityName = "product_id",
+            entityId = productId,
+            actorUserId = actorUserId,
+            actorName = actorName,
+            actorRole = actorRole,
+        )
+    }
+
+    private suspend fun recordMasterDataAudit(
+        action: String,
+        entityName: String,
+        entityId: Long,
         actorUserId: Long,
         actorName: String,
         actorRole: String,
@@ -91,9 +162,26 @@ class HybridCommandService(
                 actorUserId = actorUserId,
                 actorNameSnapshot = actorName,
                 actorRoleSnapshot = actorRole,
-                details = "product_id=$productId",
+                details = "$entityName=$entityId",
             )
         )
+    }
+
+    private suspend fun requireCustomer(accountId: Long) {
+        val account = database.accountDao().findById(accountId)
+            ?: throw BridgeCommandNotFound("This customer no longer exists")
+        if (account.category != "Customer") {
+            throw BridgeCommandNotFound("This customer no longer exists")
+        }
+    }
+
+    private suspend fun requireUniqueCustomerName(name: String, exceptAccountId: Long? = null) {
+        val candidate = name.trim().removePrefix("Customer: ").trim()
+        val duplicate = database.accountDao().findByCategory("Customer").any { account ->
+            account.accountId != exceptAccountId &&
+                account.name.removePrefix("Customer: ").trim().equals(candidate, ignoreCase = true)
+        }
+        if (duplicate) throw BridgeCommandConflict("A customer with this name already exists")
     }
 
     companion object {
@@ -101,6 +189,9 @@ class HybridCommandService(
         const val ACTION_UPDATE_PRODUCT = "bridge_update_product"
         const val ACTION_ARCHIVE_PRODUCT = "bridge_archive_product"
         const val ACTION_RESTORE_PRODUCT = "bridge_restore_product"
+        const val ACTION_CREATE_CUSTOMER = "bridge_create_customer"
+        const val ACTION_RENAME_CUSTOMER = "bridge_rename_customer"
+        const val ACTION_SAVE_CUSTOMER_PROFILE = "bridge_save_customer_profile"
         const val RESULT_SUCCESS = "success"
     }
 }

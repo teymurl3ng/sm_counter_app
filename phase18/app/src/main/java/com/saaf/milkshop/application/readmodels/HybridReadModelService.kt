@@ -162,7 +162,7 @@ class HybridReadModelService(
                 val profile = customerProfiles[account.accountId]
                 CustomerDto(
                     accountId = account.accountId,
-                    name = account.name,
+                    name = account.name.removePrefix("Customer: ").trim(),
                     canonicalBalancePaisa = money(balances[account.accountId]?.balance ?: 0.0),
                     phone = profile?.phone,
                     areaRoute = profile?.areaRoute,

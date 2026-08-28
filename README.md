@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-08-28 — hybrid Phases 0–7 are complete; Phase 8 screen-by-screen native-backed UI wiring is in progress, with Products, Customer Profiles, and Supplier Profiles complete and Employees/Attendance next. Substantial Phase 9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
+Status: RECONCILED 2026-08-28 — hybrid Phases 0–7 are complete; Phase 8 screen-by-screen native-backed UI wiring is in progress, with Products, Customer Profiles, Supplier Profiles, and Employees/Attendance complete and Expense Categories/Settings next. Substantial Phase 9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
 
 ## What this repository contains
 
@@ -35,7 +35,7 @@ SQL blueprint SHA-256:
 
 **Phase 8 — Screen-by-Screen Native UI Wiring: IN PROGRESS**
 
-The Phase 7 shell remains intact. Phase 8 now provides complete native-backed Products, Customer Profiles, and Supplier Profiles areas. Customers and suppliers support list/search/add/rename/profile/deactivate/restore while their canonical balances remain native-read-only. Supplier profiles contain no per-supplier milk-rate override. The runtime exposes 16 of the frozen contract's 78 operations. The complete connected-device regression passes 136/136. Phase 8 remains open; Employees and Attendance are next.
+The Phase 7 shell remains intact. Phase 8 now provides complete native-backed Products, Customer Profiles, Supplier Profiles, Employees, and Attendance areas. Employee records remain separate from application logins; attendance-only operators can mark daily attendance without editing profiles, and revisions preserve prior records. The runtime exposes 22 of the frozen contract's 78 operations. The complete connected-device regression passes 140/140. Phase 8 remains open; Expense Categories and Settings are next.
 
 ## Approved security track
 
@@ -83,7 +83,7 @@ Phase 6 — Bridge Contract (`bridge/CONTRACT.md`) ✅
 
 Phase 7 — Hybrid Shell / Vertical Slice ✅
 
-Phase 8 — UI Wiring ◐ (Products, Customers, and Suppliers complete; Employees/Attendance next)
+Phase 8 — UI Wiring ◐ (Products, Customers, Suppliers, and Employees/Attendance complete; Expense Categories/Settings next)
 
 Phase 9 — Runtime / Navigation / Device Integration ◐ (native lifecycle credit only; hybrid runtime absent)
 
@@ -127,8 +127,9 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 8 focused Product Management suite: 3/3 passed on the physical device.
 - Phase 8 focused Customer Profiles suite: 3/3 passed on the physical device.
 - Phase 8 focused Supplier Profiles suite: 3/3 passed on the physical device.
-- Complete connected-device instrumentation regression: 136/136 passed, 0 skipped, 0 failed.
+- Phase 8 focused Employees/Attendance suite: 4/4 passed on the physical device.
+- Complete connected-device instrumentation regression: 140/140 passed, 0 skipped, 0 failed.
 
 ## Next gate
 
-Phases 3–7 are closed and Phase 8 is active. Products, Customer Profiles, and Supplier Profiles are complete reference screens. The active React shell, native bridge dispatcher, and Phase 5 read-model façade have passed a behavior-preserving structural split, so new screens should extend the domain modules instead of rebuilding monoliths. Next, migrate Employees and Attendance while keeping employee records separate from login accounts and retaining optional explicit linkage. Every screen must continue to await native mutations, show truthful outcomes, refresh declared queries, receive a hybrid integration test, and retire its corresponding mock/local behavior. The costing explanation/info-button idea remains deferred; UI labels must still translate native codes into plain shop language. See `PHASE8.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–7 are closed and Phase 8 is active. Products, Customer Profiles, Supplier Profiles, and Employees/Attendance are complete reference screens. Employee records remain separate from login accounts, and attendance revisions preserve history. The active React shell, native bridge dispatcher, and Phase 5 read-model façade remain split into focused modules. Next, migrate Expense Categories and Settings with editable store identity and PKR-native values. Every screen must continue to await native mutations, show truthful outcomes, refresh declared queries, receive a hybrid integration test, and retire its corresponding mock/local behavior. The costing explanation/info-button idea remains deferred; UI labels must still translate native codes into plain shop language. See `PHASE8.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.

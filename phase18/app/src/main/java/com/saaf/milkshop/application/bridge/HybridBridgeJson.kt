@@ -1,13 +1,18 @@
 package com.saaf.milkshop.application.bridge
 
 import com.saaf.milkshop.application.readmodels.BootstrapStatusDto
+import com.saaf.milkshop.application.readmodels.AccountReferenceDto
+import com.saaf.milkshop.application.readmodels.AttendanceDto
 import com.saaf.milkshop.application.readmodels.CurrentSessionDto
 import com.saaf.milkshop.application.readmodels.CustomerDto
 import com.saaf.milkshop.application.readmodels.EmployeeDto
 import com.saaf.milkshop.application.readmodels.ExpenseCategoryDto
 import com.saaf.milkshop.application.readmodels.MasterDataDto
 import com.saaf.milkshop.application.readmodels.ProductDto
+import com.saaf.milkshop.application.readmodels.ProductReferenceDto
+import com.saaf.milkshop.application.readmodels.TransactionReferencesDto
 import com.saaf.milkshop.application.readmodels.VendorDto
+import org.json.JSONArray
 import org.json.JSONObject
 
 internal fun bootstrapStatusJson(value: BootstrapStatusDto): JSONObject = JSONObject().put("needsOwnerBootstrap", value.needsOwnerBootstrap)
@@ -27,6 +32,32 @@ internal fun masterDataJson(value: MasterDataDto): JSONObject = JSONObject()
     .put("vendors", jsonArray(value.vendors, ::vendorJson))
     .put("employees", jsonArray(value.employees, ::employeeJson))
     .put("expenseCategories", jsonArray(value.expenseCategories, ::expenseCategoryJson))
+
+internal fun transactionReferencesJson(value: TransactionReferencesDto): JSONObject = JSONObject()
+    .put("products", jsonArray(value.products, ::productReferenceJson))
+    .put("customers", jsonArray(value.customers, ::accountReferenceJson))
+    .put("vendors", jsonArray(value.vendors, ::accountReferenceJson))
+    .put("employees", jsonArray(value.employees, ::accountReferenceJson))
+    .put("paymentAccounts", jsonArray(value.paymentAccounts, ::accountReferenceJson))
+    .putNullable("vendorMilkRatePaisaPerUnit", value.vendorMilkRatePaisaPerUnit?.toString())
+    .putNullable("vendorDeliveryFeePaisaPerUnit", value.vendorDeliveryFeePaisaPerUnit?.toString())
+    .putNullable("tsStandardPercent", value.tsStandardPercent)
+    .putNullable("retailMilkRatePaisaPerUnit", value.retailMilkRatePaisaPerUnit?.toString())
+    .putNullable("retailYogurtRatePaisaPerUnit", value.retailYogurtRatePaisaPerUnit?.toString())
+    .putNullable("defaultDeliverySurchargePaisa", value.defaultDeliverySurchargePaisa?.toString())
+
+internal fun attendanceJson(values: List<AttendanceDto>): JSONArray = jsonArray(values, ::attendanceItemJson)
+
+private fun productReferenceJson(value: ProductReferenceDto): JSONObject = JSONObject()
+    .put("productId", value.productId.toString()).put("name", value.name).put("unit", value.unit)
+
+private fun accountReferenceJson(value: AccountReferenceDto): JSONObject = JSONObject()
+    .put("accountId", value.accountId.toString()).put("name", value.name)
+
+private fun attendanceItemJson(value: AttendanceDto): JSONObject = JSONObject()
+    .put("attendanceId", value.attendanceId.toString()).put("employeeAccountId", value.employeeAccountId.toString())
+    .put("employeeName", value.employeeName).put("businessDate", value.businessDate).put("statusCode", value.statusCode)
+    .putNullable("notes", value.notes).put("createdAt", value.createdAt)
 
 private fun productJson(value: ProductDto): JSONObject = JSONObject()
     .put("productId", value.productId.toString()).put("name", value.name).put("unit", value.unit)

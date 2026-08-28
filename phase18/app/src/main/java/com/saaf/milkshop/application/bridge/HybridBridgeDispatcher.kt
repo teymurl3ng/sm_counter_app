@@ -13,6 +13,7 @@ class HybridBridgeDispatcher(
     private val reads = HybridReadModelService(database, security)
     private val authentication = AuthenticationBridgeHandler(reads, security, onSessionChanged)
     private val masterData = MasterDataBridgeHandler(reads, HybridCommandService(database, security))
+    private val employees = EmployeeBridgeHandler(reads, EmployeeBridgeCommandService(database, security))
     private val inFlightRequestIds = ConcurrentHashMap.newKeySet<String>()
 
     suspend fun dispatch(rawMessage: String): String {
@@ -39,13 +40,14 @@ class HybridBridgeDispatcher(
         }
     }
 
-    private suspend fun execute(request: BridgeRequest): JSONObject = when (request.action) {
+    private suspend fun execute(request: BridgeRequest): Any = when (request.action) {
         HybridBridgeActions.BRIDGE_INFO -> JSONObject()
             .put("contractVersion", BridgeContractSnapshot.VERSION)
             .put("contractSha256", BridgeContractSnapshot.CONTRACT_SHA256)
             .put("supportedActions", jsonArray(HybridBridgeActions.supported))
         in HybridBridgeActions.authentication -> authentication.execute(request)
         in HybridBridgeActions.masterData -> masterData.execute(request)
+        in HybridBridgeActions.employees -> employees.execute(request)
         else -> throw BridgeProtocolFailure("invalid_request", "This action is not available in the current app slice")
     }
 

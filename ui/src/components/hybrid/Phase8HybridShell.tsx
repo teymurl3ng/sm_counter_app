@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { CustomerDto, CurrentSessionDto, MasterDataDto, ProductDto, SessionHandle, VendorDto } from '../../bridge/contract.generated';
+import type { CustomerDto, CurrentSessionDto, MasterDataDto, ProductDto, SessionHandle, TransactionReferencesDto, VendorDto } from '../../bridge/contract.generated';
 import { callNative, NativeBridgeError, paisaToRupeesInput, rupeesToPaisa, validateDecimalInput, verifyNativeContract } from '../../bridge/nativeBridge';
 import { Login, OwnerSetup, RecoveryCodeScreen } from './AuthScreens';
 import { CenteredMessage } from './HybridUi';
 import { ManagementWorkspace } from './ManagementWorkspace';
+import { employeeBridgeActions } from './employeeBridgeActions';
 import { errorMessage, type CustomerDraft, type HybridStage, type ProductDraft, type SupplierDraft } from './hybridModels';
 
 export function Phase8HybridShell() {
@@ -11,23 +12,26 @@ export function Phase8HybridShell() {
   const [session, setSession] = useState<SessionHandle | null>(null);
   const [currentUser, setCurrentUser] = useState<CurrentSessionDto | null>(null);
   const [masterData, setMasterData] = useState<MasterDataDto | null>(null);
+  const [transactionReferences, setTransactionReferences] = useState<TransactionReferencesDto | null>(null);
   const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const loadMasterData = useCallback(async (activeSession: SessionHandle, user: CurrentSessionDto) => {
-    if (!user.effectivePermissionCodes.includes('manage_master_data')) {
-      setMasterData(null);
-      return;
-    }
-    setMasterData(await callNative('query.masterData', {}, activeSession));
+  const loadAuthorizedData = useCallback(async (activeSession: SessionHandle, user: CurrentSessionDto) => {
+    const [loadedMasterData, loadedReferences] = await Promise.all([
+      user.effectivePermissionCodes.includes('manage_master_data') ? callNative('query.masterData', {}, activeSession) : Promise.resolve(null),
+      user.effectivePermissionCodes.includes('attendance') ? callNative('query.transactionReferences', {}, activeSession) : Promise.resolve(null),
+    ]);
+    setMasterData(loadedMasterData);
+    setTransactionReferences(loadedReferences);
   }, []);
 
   const clearSession = useCallback(() => {
     setSession(null);
     setCurrentUser(null);
     setMasterData(null);
+    setTransactionReferences(null);
     setRecoveryCode(null);
     setNotice(null);
     setStage('login');
@@ -57,7 +61,7 @@ export function Phase8HybridShell() {
         try {
           const user = await callNative('query.currentSession', {}, session);
           setCurrentUser(user);
-          await loadMasterData(session, user);
+          await loadAuthorizedData(session, user);
         } catch (failure) {
           if (failure instanceof NativeBridgeError && failure.code === 'session_expired') {
             clearSession();
@@ -70,7 +74,7 @@ export function Phase8HybridShell() {
     };
     document.addEventListener('visibilitychange', resume);
     return () => document.removeEventListener('visibilitychange', resume);
-  }, [clearSession, loadMasterData, session]);
+  }, [clearSession, loadAuthorizedData, session]);
 
   const withMasterDataRefresh = async (operation: () => Promise<void>, success: string) => {
     if (!session || !currentUser) return;
@@ -79,7 +83,7 @@ export function Phase8HybridShell() {
     setNotice(null);
     try {
       await operation();
-      await loadMasterData(session, currentUser);
+      await loadAuthorizedData(session, currentUser);
       setNotice(success);
     } catch (failure) {
       setError(errorMessage(failure));
@@ -123,7 +127,7 @@ export function Phase8HybridShell() {
         await callNative('command.saveCustomerProfile', customerProfilePayload(draft, accountId), session);
       }, customer ? 'Customer changes saved.' : 'Customer added successfully.');
     } catch (failure) {
-      if (session && currentUser) await loadMasterData(session, currentUser).catch(() => undefined);
+      if (session && currentUser) await loadAuthorizedData(session, currentUser).catch(() => undefined);
       throw failure;
     }
   };
@@ -160,7 +164,7 @@ export function Phase8HybridShell() {
         await callNative('command.saveVendorProfile', supplierProfilePayload(draft, accountId), session);
       }, supplier ? 'Supplier changes saved.' : 'Supplier added successfully.');
     } catch (failure) {
-      if (session && currentUser) await loadMasterData(session, currentUser).catch(() => undefined);
+      if (session && currentUser) await loadAuthorizedData(session, currentUser).catch(() => undefined);
       throw failure;
     }
   };
@@ -185,7 +189,7 @@ export function Phase8HybridShell() {
       const result = await callNative('command.auth.bootstrapOwner', { loginName, displayName, passphrase });
       setSession(result.sessionHandle);
       setCurrentUser(result.currentSession);
-      await loadMasterData(result.sessionHandle, result.currentSession);
+      await loadAuthorizedData(result.sessionHandle, result.currentSession);
       setRecoveryCode(result.oneTimeRecoveryCode);
       setStage('recovery');
     } catch (failure) {
@@ -201,7 +205,7 @@ export function Phase8HybridShell() {
       const result = await callNative('command.auth.login', { loginName, passphrase });
       setSession(result.sessionHandle);
       setCurrentUser(result.currentSession);
-      await loadMasterData(result.sessionHandle, result.currentSession);
+      await loadAuthorizedData(result.sessionHandle, result.currentSession);
       setStage('ready');
     } catch (failure) {
       setError(errorMessage(failure));
@@ -224,11 +228,14 @@ export function Phase8HybridShell() {
       .finally(() => setBusy(false));
   };
 
+  const employeeActions = employeeBridgeActions(session, withMasterDataRefresh);
+
   return <ManagementWorkspace
     busy={busy}
     currentUser={currentUser}
     error={error}
     masterData={masterData}
+    transactionReferences={transactionReferences}
     notice={notice}
     onLogout={logout}
     onSaveProduct={saveProduct}
@@ -239,5 +246,9 @@ export function Phase8HybridShell() {
     onSetCustomerActive={setCustomerActive}
     onSaveSupplier={saveSupplier}
     onSetSupplierActive={setSupplierActive}
+    onSaveEmployee={employeeActions.saveEmployee}
+    onSetEmployeeActive={employeeActions.setEmployeeActive}
+    onLoadAttendance={employeeActions.loadAttendance}
+    onRecordAttendance={employeeActions.recordAttendance}
   />;
 }

@@ -116,7 +116,7 @@ internal class HybridIdentityReadService(
                 val profile = employeeProfiles[account.accountId]
                 EmployeeDto(
                     accountId = account.accountId,
-                    name = account.name,
+                    name = account.name.removePrefix("Employee: ").trim(),
                     canonicalBalancePaisa = money(balances[account.accountId]?.balance ?: 0.0),
                     roleLabel = profile?.role,
                     phone = profile?.phone,

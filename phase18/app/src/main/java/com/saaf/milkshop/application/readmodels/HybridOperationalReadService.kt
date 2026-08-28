@@ -51,6 +51,7 @@ internal class HybridOperationalReadService(
         val needsPaymentAccounts = canSell || canPaySupplier || canPaySalary || allows(AppPermission.EXPENSE)
         val settings = database.settingsDao().getAll().associate { it.key to it.value }
         val productProfiles = database.productProfileDao().all().associateBy { it.productId }
+        val employeeProfiles = database.employeeProfileDao().all().associateBy { it.accountId }
         suspend fun refs(category: String) = database.accountDao().findByCategory(category).map { AccountReferenceDto(it.accountId, it.name) }
         val settingKeys = com.saaf.milkshop.domain.SettingKeys
         return TransactionReferencesDto(
@@ -59,7 +60,11 @@ internal class HybridOperationalReadService(
             }.map { ProductReferenceDto(it.productId, it.name, it.unit) },
             customers = if (canSell || canDeliver) refs("Customer") else emptyList(),
             vendors = if (canPurchase || canPaySupplier) refs("Vendor") else emptyList(),
-            employees = if (canPaySalary || canAttend) refs("Salary") else emptyList(),
+            employees = if (canPaySalary || canAttend) {
+                database.accountDao().findByCategory("Salary")
+                    .filter { employeeProfiles[it.accountId]?.active != false }
+                    .map { AccountReferenceDto(it.accountId, it.name.removePrefix("Employee: ").trim()) }
+            } else emptyList(),
             paymentAccounts = if (needsPaymentAccounts) refs("Cash/Bank") else emptyList(),
             vendorMilkRatePaisaPerUnit = settings[settingKeys.MILK_RATE_VENDOR]?.takeIf { canPurchase }?.let(::money),
             vendorDeliveryFeePaisaPerUnit = settings[settingKeys.DELIVERY_FEE_VENDOR]?.takeIf { canPurchase }?.let(::money),
@@ -122,7 +127,7 @@ internal class HybridOperationalReadService(
         security.requirePermission(sessionHandle, AppPermission.ATTENDANCE)
         return database.accountDao().findByCategory("Salary").mapNotNull { employee ->
             database.attendanceDao().current(employee.accountId, businessDate)?.let {
-                AttendanceDto(it.attendanceId, employee.accountId, employee.name, it.businessDate, it.status, it.notes, it.createdAt)
+                AttendanceDto(it.attendanceId, employee.accountId, employee.name.removePrefix("Employee: ").trim(), it.businessDate, it.status, it.notes, it.createdAt)
             }
         }
     }

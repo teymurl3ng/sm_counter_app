@@ -29,6 +29,16 @@ export type SupplierDraft = {
   active: boolean;
 };
 
+export type EmployeeDraft = {
+  name: string;
+  roleLabel: string;
+  phone: string;
+  referenceSalaryRupees: string;
+  salaryPeriodCode: string;
+  joinDate: string;
+  active: boolean;
+};
+
 export function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'The app could not complete this request.';
 }

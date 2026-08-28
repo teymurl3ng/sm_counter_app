@@ -6,6 +6,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.util.UUID
 
 internal object HybridBridgeActions {
@@ -25,6 +26,12 @@ internal object HybridBridgeActions {
     const val CREATE_VENDOR = "command.createVendor"
     const val RENAME_VENDOR = "command.renameVendor"
     const val SAVE_VENDOR_PROFILE = "command.saveVendorProfile"
+    const val TRANSACTION_REFERENCES = "query.transactionReferences"
+    const val ATTENDANCE = "query.attendance"
+    const val CREATE_EMPLOYEE = "command.createEmployee"
+    const val RENAME_EMPLOYEE = "command.renameEmployee"
+    const val SAVE_EMPLOYEE_PROFILE = "command.saveEmployeeProfile"
+    const val RECORD_ATTENDANCE = "command.recordAttendance"
 
     val authentication = setOf(BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN, LOGOUT, CURRENT_SESSION)
     val masterData = setOf(
@@ -38,8 +45,10 @@ internal object HybridBridgeActions {
         CREATE_VENDOR,
         RENAME_VENDOR,
         SAVE_VENDOR_PROFILE,
+        TRANSACTION_REFERENCES,
     )
-    val supported = listOf(BRIDGE_INFO) + authentication + masterData
+    val employees = setOf(ATTENDANCE, CREATE_EMPLOYEE, RENAME_EMPLOYEE, SAVE_EMPLOYEE_PROFILE, RECORD_ATTENDANCE)
+    val supported = listOf(BRIDGE_INFO) + authentication + masterData + employees
     val authByAction = supported.associateWith { action ->
         if (action in setOf(BRIDGE_INFO, BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN)) "none" else "session"
     }
@@ -93,7 +102,7 @@ internal fun parseBridgeRequest(envelope: JSONObject): BridgeRequest {
     return BridgeRequest(requestId, action, session, payload)
 }
 
-internal fun successEnvelope(request: BridgeRequest, data: JSONObject): JSONObject = JSONObject()
+internal fun successEnvelope(request: BridgeRequest, data: Any): JSONObject = JSONObject()
     .put("contractVersion", BridgeContractSnapshot.VERSION)
     .put("requestId", request.requestId)
     .put("action", request.action)
@@ -154,6 +163,28 @@ internal fun JSONObject.nullableDecimal(name: String): BigDecimal? {
     val raw = nullableString(name) ?: return null
     if (!Regex("-?(0|[1-9][0-9]*)(\\.[0-9]+)?").matches(raw)) throw BridgeProtocolFailure("validation_failed", "$name must be a decimal value", name)
     return runCatching { BigDecimal(raw) }.getOrElse { throw BridgeProtocolFailure("validation_failed", "$name is outside the supported range", name) }
+}
+
+internal fun JSONObject.requiredDate(name: String): String {
+    val value = requiredString(name)
+    runCatching { LocalDate.parse(value) }.getOrElse {
+        throw BridgeProtocolFailure("validation_failed", "$name must be a valid date", name)
+    }
+    return value
+}
+
+internal fun JSONObject.nullableDate(name: String): String? {
+    val value = nullableString(name) ?: return null
+    runCatching { LocalDate.parse(value) }.getOrElse {
+        throw BridgeProtocolFailure("validation_failed", "$name must be a valid date", name)
+    }
+    return value
+}
+
+internal fun JSONObject.optionalString(name: String): String? {
+    if (!has(name)) return null
+    if (isNull(name) || get(name) !is String) throw BridgeProtocolFailure("invalid_request", "$name must be text", name)
+    return getString(name)
 }
 
 internal fun JSONObject.productInput(includeProductId: Boolean): Pair<Long?, ProductCatalogInput> {

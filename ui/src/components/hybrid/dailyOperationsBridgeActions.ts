@@ -1,6 +1,6 @@
-import type { IsoDateString, PurchaseRecordedResultDto, SaleRecordedResultDto, SessionHandle } from '../../bridge/contract.generated';
+import type { EventMutationResultDto, IsoDateString, PurchaseRecordedResultDto, SaleRecordedResultDto, SessionHandle } from '../../bridge/contract.generated';
 import { callNative, rupeesToPaisa, validateDecimalInput } from '../../bridge/nativeBridge';
-import type { PurchaseDraft, SaleDraft } from './hybridModels';
+import type { ProductionDraft, PurchaseDraft, SaleDraft } from './hybridModels';
 
 type RunAndRefreshResult = <T>(operation: () => Promise<T>, success: string) => Promise<T>;
 
@@ -39,5 +39,15 @@ export function dailyOperationsBridgeActions(
     }, session);
   }, 'Sale recorded successfully.');
 
-  return { recordPurchase, recordSale };
+  const recordProduction = (draft: ProductionDraft): Promise<EventMutationResultDto> => runAndRefresh(async () => {
+    if (!session) throw new Error('Sign in to record production.');
+    return callNative('command.recordProduction', {
+      occurredAt: draft.occurredAt as IsoDateString,
+      milkLitersUsed: validateDecimalInput(draft.milkLitersUsed, 'the milk used'),
+      yogurtKgProduced: validateDecimalInput(draft.yogurtKgProduced, 'the yogurt produced'),
+      ...(draft.notes.trim() ? { notes: draft.notes.trim() } : {}),
+    }, session);
+  }, 'Production batch recorded.');
+
+  return { recordProduction, recordPurchase, recordSale };
 }

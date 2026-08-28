@@ -13,6 +13,9 @@ import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.domain.VendorPurchaseInput
 import com.saaf.milkshop.domain.VendorPurchaseResult
 import com.saaf.milkshop.domain.VendorPurchaseService
+import com.saaf.milkshop.domain.YogurtProductionInput
+import com.saaf.milkshop.domain.YogurtProductionResult
+import com.saaf.milkshop.domain.YogurtProductionService
 import java.time.Instant
 
 internal class OperationsBridgeCommandService(
@@ -99,6 +102,33 @@ internal class OperationsBridgeCommandService(
             result
         }
 
+    suspend fun recordProduction(
+        sessionHandle: String,
+        input: YogurtProductionInput,
+    ): YogurtProductionResult = database.withWriteTransaction {
+        val actor = security.requirePermission(sessionHandle, AppPermission.PRODUCTION_AND_SPOILAGE)
+        if (database.dailyCloseDao().isPostingClosed(input.occurredAt)) {
+            throw BridgeCommandDayClosed("This business day is closed. Reopen it before recording production.")
+        }
+        val result = try {
+            YogurtProductionService(database).record(input)
+        } catch (error: Throwable) {
+            if (error.hasMessage("Insufficient stock for this product")) {
+                throw BridgeCommandInsufficientStock("There is not enough Milk in stock for this production batch.")
+            }
+            throw error
+        }
+        attribute(result.eventId, actor.userId, actor.displayName, actor.role)
+        audit(
+            ACTION_RECORD_PRODUCTION,
+            "event_id=${result.eventId}",
+            actor.userId,
+            actor.displayName,
+            actor.role,
+        )
+        result
+    }
+
     private suspend fun attribute(eventId: Long, actorUserId: Long, actorName: String, actorRole: String) {
         database.eventActorLinkDao().insert(
             EventActorLinkEntity(
@@ -134,6 +164,7 @@ internal class OperationsBridgeCommandService(
     companion object {
         const val ACTION_RECORD_PURCHASE = "bridge_record_purchase"
         const val ACTION_RECORD_SALE = "bridge_record_sale"
+        const val ACTION_RECORD_PRODUCTION = "bridge_record_production"
         const val RESULT_SUCCESS = "success"
     }
 }

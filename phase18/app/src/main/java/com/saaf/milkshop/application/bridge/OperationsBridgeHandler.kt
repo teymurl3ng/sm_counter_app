@@ -6,6 +6,7 @@ import com.saaf.milkshop.application.readmodels.money
 import com.saaf.milkshop.domain.VendorPurchaseInput
 import com.saaf.milkshop.domain.SaleInput
 import com.saaf.milkshop.domain.SalePayment
+import com.saaf.milkshop.domain.YogurtProductionInput
 import org.json.JSONObject
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -19,6 +20,7 @@ internal class OperationsBridgeHandler(
         HybridBridgeActions.CASHIER_SUMMARY -> cashierSummary(request)
         HybridBridgeActions.RECORD_PURCHASE -> recordPurchase(request)
         HybridBridgeActions.RECORD_SALE -> recordSale(request)
+        HybridBridgeActions.RECORD_PRODUCTION -> recordProduction(request)
         else -> unavailableBridgeAction()
     }
 
@@ -141,6 +143,34 @@ internal class OperationsBridgeHandler(
             .put("valuePaisa", money(result.value).toString())
             .put("surchargePaisa", money(result.surcharge).toString())
             .put("totalPaisa", money(result.total).toString())
+    }
+
+    private suspend fun recordProduction(request: BridgeRequest): JSONObject {
+        strictObject(
+            request.payload,
+            required = setOf("occurredAt", "milkLitersUsed", "yogurtKgProduced"),
+            allowed = setOf("occurredAt", "milkLitersUsed", "yogurtKgProduced", "notes"),
+        )
+        val milkUsed = positiveDecimal(
+            request.payload,
+            "milkLitersUsed",
+            "Milk used must be greater than zero",
+        )
+        val yogurtProduced = positiveDecimal(
+            request.payload,
+            "yogurtKgProduced",
+            "Yogurt produced must be greater than zero",
+        )
+        val result = commands.recordProduction(
+            request.requireSession(),
+            YogurtProductionInput(
+                occurredAt = request.payload.requiredDate("occurredAt"),
+                milkLitersUsed = milkUsed,
+                yogurtKgProduced = yogurtProduced,
+                notes = request.payload.optionalString("notes"),
+            ),
+        )
+        return JSONObject().put("eventId", result.eventId.toString())
     }
 
     private fun positiveDecimal(payload: JSONObject, field: String, message: String): Double {

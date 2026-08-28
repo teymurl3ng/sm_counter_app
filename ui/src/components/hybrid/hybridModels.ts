@@ -86,6 +86,13 @@ export type SaleDraft = {
   notes: string;
 };
 
+export type ProductionDraft = {
+  occurredAt: string;
+  milkLitersUsed: string;
+  yogurtKgProduced: string;
+  notes: string;
+};
+
 export function todayInput(): string {
   const date = new Date();
   const month = String(date.getMonth() + 1).padStart(2, '0');

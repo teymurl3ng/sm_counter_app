@@ -55,6 +55,7 @@ export const RUNTIME_ACTIONS = [
   'query.cashierSummary',
   'command.recordPurchase',
   'command.recordSale',
+  'command.recordProduction',
   'query.attendance',
   'command.createEmployee',
   'command.renameEmployee',

@@ -1,6 +1,6 @@
 # Phase 8 — Screen-by-Screen Native UI Wiring
 
-**Status: IN PROGRESS — management, core Settings, Opening State, supplier purchases, and sales complete 2026-08-28**
+**Status: IN PROGRESS — management, core Settings, Opening State, purchases, sales, and production complete 2026-08-28**
 
 ## 1. Purpose and working rule
 
@@ -27,7 +27,7 @@ The frozen logic specification, SQL blueprint, Phase 5 DTO catalog, and Phase 6 
 | Employees and attendance | `query.masterData`, `query.transactionReferences`, `query.attendance`, employee/profile/attendance commands | **Milestone 4 complete** | Employee records remain separate from app logins; operators can mark attendance without profile authority. |
 | Expense categories and core settings | `query.businessSettings`, store/rate/category commands | **Milestone 5 complete** | Editable store identity, fixed PKR, shop-wide rates, and non-destructive category lifecycle. |
 | Opening state setup/correction | business-settings/reference queries, opening commands, recent authentication | **Milestone 6 complete** | Optional fresh-install snapshot, explicit directions, and append-only correction. |
-| Daily operations | dashboard/reference queries and purchase/sale/production/expense/payment/spoilage commands | **Next** | No UI-side totals, stock mutation, or cost formulas. |
+| Daily operations | dashboard/reference queries and purchase/sale/production/expense/payment/spoilage commands | **Purchases, sales, and production complete** | Expenses are next; no UI-side totals, stock mutation, or cost formulas. |
 | Deliveries / wholesale | transaction references, deliveries, sale and delivery commands | Queued | Preserve delivery status and sale-link semantics. |
 | Customer/supplier ledgers | account-ledger query plus collection/payment commands | Queued | Display canonical native balances only. |
 | History and corrections | event history/detail and correction command | Queued | Never edit or delete historical events in place. |
@@ -167,7 +167,24 @@ The Daily Work area now also provides native-backed sales:
 
 The runtime now advertises thirty-four implemented actions: `query.cashierSummary` and `command.recordSale` join the prior thirty-two. The canonical contract remains version 1 with 78 operations. No Room schema, sale formula, surcharge rule, or account-direction rule changed.
 
-## 11. Safety and business boundaries
+## 11. Milestone 9 — Daily Operations: Production
+
+The Daily Work area now also provides native-backed milk-to-yogurt production:
+
+- operators, managers, admins, and owners with production permission can record a completed yogurt batch;
+- the form accepts business date, physical milk liters used, physical yogurt kilograms produced, and optional notes;
+- current authoritative Milk stock is shown as a reference, while React performs no stock, yield, cost, or loss calculation;
+- Kotlin validates positive quantities, active seeded Milk/Yogurt products, available Milk stock, permission, session, and open business history;
+- a successful batch atomically reduces Milk stock and increases Yogurt stock through the existing `YogurtProductionService`;
+- the saved batch remains available to the separate native yield-policy review, including the truthful `calibration_pending` state when no policy is active;
+- recording production never automatically creates an abnormal-loss assessment or invents a financial loss;
+- each successful production event receives durable actor attribution and a security-audit entry;
+- the awaited mutation refreshes dashboard stock, event history, costing management, and profitability reporting as declared by the frozen contract;
+- packaged device evidence covers the React form through the bridge to canonical Room inventory movements and actor audit.
+
+The runtime now advertises thirty-five implemented actions: `command.recordProduction` joins the prior thirty-four. The canonical contract remains version 1 with 78 operations. No Room schema, production formula, yield policy, loss rule, or costing rule changed.
+
+## 12. Safety and business boundaries
 
 - Archiving changes future availability; it does not delete products or rewrite transaction history.
 - Inventory quantity remains event-derived. This screen has no direct “set stock” operation.
@@ -194,23 +211,24 @@ The runtime now advertises thirty-four implemented actions: `query.cashierSummar
 - React never decides whether recent authentication is valid; the native session clock and credential verifier remain authoritative.
 - React never calculates purchase quality, payable, stock, or supplier balance; it renders the native result.
 - React never calculates sale quantity/value conversion, delivery charge, total, stock, cash, or customer balance; it renders the native result.
+- React never calculates production conversion, yield, cost, or loss; it records the physical inputs/outputs and renders the committed native result.
 - A closed business date returns `day_closed` before posting, and the database close-day trigger remains the final guard.
 - The old prototype view model remains inactive and is not imported by the packaged app.
 - No Room schema, frozen business formula, frozen DTO, or canonical bridge endpoint changed.
 
-## 12. Structural refactor checkpoint
+## 13. Structural refactor checkpoint
 
 Before starting Supplier Profiles, the active hybrid path was reorganized without changing its public behavior:
 
-- the 733-line Phase 8 shell was split into authentication, workspace navigation, Product, Customer, Supplier, Employee Profile, Attendance, Business Settings, Expense Categories, Opening State, Daily Work, bridge-action, shared UI, and shared model modules; Daily Work orchestration is 38 lines, Purchase and Sale forms are separate 53- and 93-line modules, and the coordinating shell remains 223 lines;
+- the 733-line Phase 8 shell was split into authentication, workspace navigation, Product, Customer, Supplier, Employee Profile, Attendance, Business Settings, Expense Categories, Opening State, Daily Work, bridge-action, shared UI, and shared model modules; Daily Work orchestration and the Purchase, Sale, and Production forms remain separate focused modules, while the coordinating shell remains compact;
 - the former 353-line multi-domain bridge-handler container was removed. Authentication, Master Data, Employees/Attendance, Settings/Opening State, and Daily Operations now live in focused handlers; purchase orchestration and actor audit are further separated into a focused command service;
 - the 660-line Phase 5 read-model service remains the stable caller-facing façade but is now 47 lines, delegating to focused identity/master-data, operational, financial, costing/planning, and security readers;
 - generated contract projections and inactive inherited prototype screens were deliberately left alone;
 - future handwritten files should be reviewed for separation when they approach roughly 300–400 lines, with responsibility and cohesion taking priority over an arbitrary number.
 
-The structural checkpoint changed no Room schema, DTO shape, permission rule, accounting formula, element ID, or existing user workflow. The focused purchase and sale suites are each **4/4 PASS**. The complete suite is now **156/156 PASS**.
+The structural checkpoint changed no Room schema, DTO shape, permission rule, accounting formula, element ID, or existing user workflow. The focused purchase, sale, and production suites are each **4/4 PASS**. The complete suite is now **160/160 PASS**.
 
-## 13. Verification checkpoint
+## 14. Verification checkpoint
 
 Physical device: `SM-A065F`.
 
@@ -222,7 +240,8 @@ Physical device: `SM-A065F`.
 - Phase 8 focused Opening State suite — **4/4 PASS**;
 - Phase 8 focused Daily Operations purchase suite — **4/4 PASS**;
 - Phase 8 focused Daily Operations sales suite — **4/4 PASS**;
-- complete connected-device regression — **156/156 PASS**, 0 skipped, 0 failed, 0 errors;
+- Phase 8 focused Daily Operations production suite — **4/4 PASS**;
+- complete connected-device regression — **160/160 PASS**, 0 skipped, 0 failed, 0 errors;
 - host-side debug unit suite — **7/7 PASS**;
 - TypeScript check and production Vite build — PASS;
 - explicit web bundle packaging and Android asset gate — PASS;
@@ -230,14 +249,14 @@ Physical device: `SM-A065F`.
 - Phase 6 contract drift check — version 1, 78 operations, original SHA-256 — PASS;
 - frozen logic-spec and SQL hashes — unchanged.
 
-The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; expense-category lifecycle; opening-state record/correction; supplier milk purchases; and sales with Room readback and durable actor audit. Sales evidence covers cash and credit destinations, quantity and PKR-value input modes, native default surcharge, canonical channel codes, insufficient-stock rollback, closed-history rejection, operator denial, cashier summary/dashboard refresh, and the packaged form.
+The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; expense-category lifecycle; opening-state record/correction; supplier milk purchases; sales; and production with Room readback and durable actor audit. Production evidence covers exact Milk/Yogurt stock movement, insufficient-stock rollback, permission and closed-history rejection, calibration-pending yield review, absence of automatic loss posting, dashboard refresh, and the packaged form.
 
-## 14. Current limitations and next milestone
+## 15. Current limitations and next milestone
 
-Phase 8 is not complete. Authentication, management screens, core settings, Opening State, the operational dashboard, supplier milk purchase, and sales execute through the active React product. Production, expenses, payments, spoilage, ledgers, reports, costing/planning controls, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
+Phase 8 is not complete. Authentication, management screens, core settings, Opening State, the operational dashboard, supplier milk purchase, sales, and production execute through the active React product. Expenses, payments, spoilage, ledgers, reports, costing/planning controls, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
 
-The next milestone is the **production substep of Daily Operations**. Continue with the contracted native milk-to-yogurt production command, keeping stock conversion, yield tracking, costing, and loss assessment out of React. Subsequent coherent substeps remain expense, supplier/customer payments, salary payment, and spoilage.
+The next milestone is the **expense substep of Daily Operations**. Continue with the contracted native expense command and authoritative financial overview, keeping account selection, posting direction, balances, and reporting out of React. Subsequent coherent substeps remain supplier/customer payments, salary payment, and spoilage.
 
 ## Plain English
 
-Staff can now record both incoming supplier milk and outgoing paid or credit sales. The app updates stock and the correct cash, bank, supplier, or customer balance without staff doing accounting calculations. Phase 8 remains open; recording milk-to-yogurt production is next.
+Staff can now record incoming supplier milk, outgoing paid or credit sales, and completed milk-to-yogurt batches. A production entry reduces the saved Milk stock and increases the saved Yogurt stock; it does not silently declare wastage or financial loss. Phase 8 remains open, and recording shop expenses is next.

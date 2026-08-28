@@ -196,6 +196,7 @@ export function Phase8HybridShell() {
     onLogout={logout}
     onRecordPurchase={dailyOperationsActions.recordPurchase}
     onRecordSale={dailyOperationsActions.recordSale}
+    onRecordProduction={dailyOperationsActions.recordProduction}
     onSaveProduct={masterDataActions.saveProduct}
     onSetProductArchived={masterDataActions.setProductArchived}
     onSaveCustomer={masterDataActions.saveCustomer}

@@ -64,7 +64,24 @@ interface BackupDataDao {
     suspend fun securityAuditEntries(): List<SecurityAuditEntryEntity>
     @Query("SELECT * FROM event_actor_links ORDER BY event_id")
     suspend fun eventActorLinks(): List<EventActorLinkEntity>
+    @Query("SELECT * FROM costing_policy_versions ORDER BY policy_id")
+    suspend fun costingPolicyVersions(): List<CostingPolicyVersionEntity>
+    @Query("SELECT * FROM costing_policy_components ORDER BY policy_id, component_code")
+    suspend fun costingPolicyComponents(): List<CostingPolicyComponentEntity>
+    @Query("SELECT * FROM inventory_cost_basis_entries ORDER BY basis_id")
+    suspend fun inventoryCostBasisEntries(): List<InventoryCostBasisEntity>
+    @Query("SELECT * FROM yield_policy_versions ORDER BY yield_policy_id")
+    suspend fun yieldPolicyVersions(): List<YieldPolicyVersionEntity>
+    @Query("SELECT * FROM production_loss_assessments ORDER BY assessment_id")
+    suspend fun productionLossAssessments(): List<ProductionLossAssessmentEntity>
 
+    @Query("DELETE FROM inventory_cost_movements") suspend fun deleteInventoryCostMovements()
+    @Query("DELETE FROM cost_projection_state") suspend fun deleteCostProjectionState()
+    @Query("DELETE FROM costing_policy_components") suspend fun deleteCostingPolicyComponents()
+    @Query("DELETE FROM production_loss_assessments") suspend fun deleteProductionLossAssessments()
+    @Query("DELETE FROM yield_policy_versions") suspend fun deleteYieldPolicyVersions()
+    @Query("DELETE FROM inventory_cost_basis_entries") suspend fun deleteInventoryCostBasisEntries()
+    @Query("DELETE FROM costing_policy_versions") suspend fun deleteCostingPolicyVersions()
     @Query("DELETE FROM daily_close_actions") suspend fun deleteDailyCloseActions()
     @Query("DELETE FROM opening_account_entries") suspend fun deleteOpeningAccountEntries()
     @Query("DELETE FROM opening_inventory_entries") suspend fun deleteOpeningInventoryEntries()
@@ -120,6 +137,11 @@ interface BackupDataDao {
     @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertSavedRecoveryCodes(rows: List<SavedRecoveryCodeEntity>)
     @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertSecurityAuditEntries(rows: List<SecurityAuditEntryEntity>)
     @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertEventActorLinks(rows: List<EventActorLinkEntity>)
+    @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertCostingPolicyVersions(rows: List<CostingPolicyVersionEntity>)
+    @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertCostingPolicyComponents(rows: List<CostingPolicyComponentEntity>)
+    @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertInventoryCostBasisEntries(rows: List<InventoryCostBasisEntity>)
+    @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertYieldPolicyVersions(rows: List<YieldPolicyVersionEntity>)
+    @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertProductionLossAssessments(rows: List<ProductionLossAssessmentEntity>)
 
     @Query("INSERT OR IGNORE INTO product_profiles(product_id, inventory_tracking, archived, created_at) SELECT product_id, 1, 0, CURRENT_TIMESTAMP FROM products")
     suspend fun backfillProductProfiles()

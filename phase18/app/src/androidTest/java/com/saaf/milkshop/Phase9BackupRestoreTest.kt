@@ -7,6 +7,9 @@ import com.saaf.milkshop.domain.AttendanceInput
 import com.saaf.milkshop.domain.AttendanceService
 import com.saaf.milkshop.domain.CustomerManagementService
 import com.saaf.milkshop.domain.CreateUserInput
+import com.saaf.milkshop.domain.ConversionCostComponentInput
+import com.saaf.milkshop.domain.CostingPolicyInput
+import com.saaf.milkshop.domain.CostingPolicyService
 import com.saaf.milkshop.domain.DailyCloseInput
 import com.saaf.milkshop.domain.DailyCloseService
 import com.saaf.milkshop.domain.DailyReopenInput
@@ -37,6 +40,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
+import java.math.BigDecimal
 import org.json.JSONObject
 
 @RunWith(AndroidJUnit4::class)
@@ -133,6 +137,21 @@ class Phase9BackupRestoreTest {
             val sourceSessions = NativeSessionManager()
             val sourceSecurity = UserSecurityService(source, sourceSessions)
             val owner = sourceSecurity.bootstrapOwner("backup.owner", "Backup Owner", ownerPassphrase)
+            val costingPolicy = CostingPolicyService(source, sourceSecurity).approve(
+                owner.session.sessionId,
+                CostingPolicyInput(
+                    calendarMonth = "2026-08",
+                    normalCapacityKg = BigDecimal("100"),
+                    reviewReason = "monthly",
+                    components = listOf(
+                        ConversionCostComponentInput("culture", 1_000, BigDecimal.ONE),
+                        ConversionCostComponentInput("packaging", 500, BigDecimal.ONE),
+                        ConversionCostComponentInput("variable_energy", 300, BigDecimal.ONE),
+                        ConversionCostComponentInput("direct_labor", 200, BigDecimal.ONE),
+                        ConversionCostComponentInput("fixed_production_overhead", 10_000, BigDecimal("100")),
+                    ),
+                ),
+            )
             val adminEnrollment = sourceSecurity.beginUserEnrollment(
                 owner.session.sessionId,
                 CreateUserInput("backup.admin", "Backup Admin", "admin"),
@@ -191,6 +210,9 @@ class Phase9BackupRestoreTest {
             assertTrue(restored.userCredentialDao().find(owner.user.userId)!!.lastFailedAtEpochMs == null)
             assertNotNull(restored.savedRecoveryCodeDao().current(owner.user.userId))
             assertEquals(owner.user.userId, DailyCloseService(restored).history("2026-08-27").single().actorUserId)
+            assertEquals(costingPolicy.version.policyId, restored.costingPolicyDao().activeForMonth("2026-08")!!.policyId)
+            assertEquals(5, restored.costingPolicyDao().components(costingPolicy.version.policyId).size)
+            assertTrue(restored.inventoryCostProjectionDao().allMovements().isEmpty())
             assertTrue(UserSecurityService(restored).login("backup.owner", ownerPassphrase).sessionId.isNotBlank())
         } finally {
             source.close()
@@ -265,7 +287,7 @@ class Phase9BackupRestoreTest {
             val manager = BackupManager(context)
             val export = manager.exportSnapshot(source, Uri.fromFile(backupFile))
             assertTrue(export.isSuccess)
-            assertEquals(7, export.getOrThrow().schemaVersion)
+            assertEquals(BackupManager.CURRENT_SCHEMA_VERSION, export.getOrThrow().schemaVersion)
             val restore = manager.restore(
                 restored,
                 Uri.fromFile(backupFile),

@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -15,6 +16,13 @@ import org.junit.runner.RunWith
 class Phase3SecurityShellUiTest {
     @Test
     fun authenticatedOwnerSessionUnlocksShellAndAccountControls() {
+        // A complete device suite can outlast the emulator's screen timeout.
+        // Normalize that external device state before testing Activity visibility.
+        val uiAutomation = InstrumentationRegistry.getInstrumentation().uiAutomation
+        uiAutomation.executeShellCommand("input keyevent KEYCODE_WAKEUP").close()
+        uiAutomation.executeShellCommand("wm dismiss-keyguard").close()
+        SystemClock.sleep(250)
+
         val scenario = ActivityScenario.launch(MainActivity::class.java)
         try {
             val deadline = SystemClock.uptimeMillis() + 5_000L

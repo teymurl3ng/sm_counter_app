@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-08-27 — hybrid Phase 3 remains open only for authoritative costing/COGS; substantial Phase 4/7/9/11 native prerequisites were completed early and are credited without declaring those hybrid phases complete.
+Status: RECONCILED 2026-08-28 — hybrid Phases 0–5 are complete; Phase 6 canonical bridge-contract design is the next gate. Substantial Phase 7/9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
 
 ## What this repository contains
 
@@ -13,7 +13,11 @@ Status: RECONCILED 2026-08-27 — hybrid Phase 3 remains open only for authorita
 - `PHASE3.md` — native reuse map, first native expansion, proposed persistence changes, and approval gate.
 - `PHASE3_USER_ACCOUNTS_DESIGN_PROPOSAL.md` — approved native identity, credential, authorization, session, recovery, audit, migration, and secure-backup contract.
 - `ROADMAP_RECONCILIATION_2026-08-27.md` — authoritative current phase ledger, early-work credits, remaining gates, and revised execution order.
-- `PHASE3_COGS_PROFITABILITY_DECISION_PROPOSAL.md` — proposed standards-based inventory-costing, spoilage-valuation, gross-profit, and honest operating-result contract; awaiting approval.
+- `PHASE3_COGS_PROFITABILITY_DECISION_PROPOSAL.md` — approved standards-based inventory-costing, spoilage-valuation, gross-profit, and honest operating-result contract.
+- `PHASE3_COGS_IMPLEMENTATION_DESIGN.md` — implemented schema-8 costing source/projection, service, migration, backup, and test design.
+- `PHASE4.md` — completed criterion-by-criterion native automated-test audit, gap closure, evidence matrix, and verification record.
+- `PHASE5.md` — completed native read-model expansion, permission boundary, verification, and next gate.
+- `PHASE5_DTO_CATALOG.md` — frozen hybrid-facing Kotlin query/DTO catalog, representation rules, code sets, and security exclusions.
 
 ## Immutable baselines
 
@@ -25,9 +29,9 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 3 — Native Phase 18 Capability Expansion: IN PROGRESS**
+**Phase 5 — Native Read-Model Expansion: COMPLETE**
 
-The approved Tier 1 native expansion now includes product metadata/archive state, customer/vendor/employee profiles, attendance, deliveries, spoilage, physical cash counts, dynamic expense categories, account-specific ledgers, editable store identity, one-time auditable opening state, controlled daily close/reopen/reclose history, and schema-version-7 native security. The native application now owns bootstrap/login/logout/recovery sessions, user administration, role-aware navigation, and permission checks at protected application-command boundaries. React/bridge wiring has not started.
+The permission-aware hybrid-facing Kotlin DTO/query catalog is implemented and frozen. Money crosses this future boundary as integer PKR paisa, quantities/ratios as canonical decimal strings, corrections and unknown-cost states remain explicit, and credential/recovery/session-handle material is excluded. The complete connected-device regression passes 124/124. Phase 6 is next; React/bridge wiring has not started.
 
 ## Approved security track
 
@@ -65,13 +69,13 @@ Phase 1 — Capability Inventory ✅
 
 Phase 2 — Desired Product Capability Decisions ✅
 
-Phase 3 — Native Phase 18 Capability Expansion 🔧 (only authoritative COGS/profitability remains)
+Phase 3 — Native Phase 18 Capability Expansion ✅
 
-Phase 4 — Native Automated Tests ◐ (substantial early credit; formal coverage closure follows COGS)
+Phase 4 — Native Automated Tests ✅
 
-Phase 5 — Native Read-Model Expansion ◐ (native foundation exists; hybrid DTO contract is not frozen)
+Phase 5 — Native Read-Model Expansion ✅
 
-Phase 6 — Bridge Contract (`bridge/CONTRACT.md`) ⏳
+Phase 6 — Bridge Contract (`bridge/CONTRACT.md`) ⏳ (next)
 
 Phase 7 — Hybrid Shell / Vertical Slice ⏳ (native authentication prerequisite complete; actual hybrid slice absent)
 
@@ -97,20 +101,25 @@ Phase 16 — Release Readiness ⏳
 
 Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with its status, scope, changes, verification, and relevant hashes. Do not overwrite prior phase records; corrections create an explicitly named patch note in the current phase while the phase record records the final state.
 
-## Latest Phase 3 verification
+## Latest native verification
 
 - Frozen logic-spec and SQL hashes still match the Phase 0 values.
-- Room schema version 7 and migrations through `MIGRATION_6_7` are implemented.
+- Room schema version 8 and migrations through `MIGRATION_7_8` are implemented.
 - Kotlin and Android-test Kotlin compilation pass.
-- Room schema 3→4, 4→5, 5→6, and 6→7 migration validation passes on the connected device; migration 6→7 creates no artificial user, credential, session, or attribution.
+- Room schema 3→4 through 7→8 migration validation passes on the connected device; migrations create no artificial opening, security, or costing source truth.
 - Phase 3 ledger/capability tests pass.
 - Legacy format-1 business backup/restore round trips still pass, including chronological replay of daily close/reopen/reclose history.
 - Encrypted format-2 export/restore preserves user identities, roles/status, Argon2id credential verifiers, recovery verifiers, security audit, event attribution, and verified daily-close actor IDs; active sessions are never serialized and all supplied in-memory sessions are invalidated after restore.
 - Native first-owner setup, login, logout, owner recovery, passphrase change, private staff enrollment/reset, user/role/status administration, lifecycle session handling, role-aware navigation, and protected-command authorization are implemented.
+- Authoritative Milk/Yogurt historical-cost management reporting is implemented with moving weighted average, versioned monthly Yogurt conversion cost, append-only opening cost bases, calibrated yield review, explicit abnormal-loss assessment, deterministic correction replay, honest incomplete-coverage states, and deferred NRV disclosure.
+- Encrypted backups preserve costing source truth and rebuild derived cost projections; legacy backups remain supported. Plain security-free backup is rejected when protected costing sources require actor identity.
 - Focused user-security plus authenticated-shell suite: 8/8 passed.
 - Focused backup/restore suite: 8/8 passed, including portable and local confidentiality checks, wrong-passphrase rejection, tamper rejection, security round-trips, session invalidation, and transient lockout-state exclusion.
-- Complete connected-device instrumentation regression: 103/103 passed, 0 skipped, 0 failed.
+- Phase 4 security gap-closure suite: 9/9 passed.
+- Phase 5 hybrid read-model suite: 4/4 passed.
+- Host-side debug unit tests: 7/7 passed.
+- Complete connected-device instrumentation regression: 124/124 passed, 0 skipped, 0 failed.
 
-## Next Phase 3 decision
+## Next gate
 
-The sole remaining Phase 3 product decision is authoritative costing and COGS/profitability semantics. A researched recommendation is now proposed in `PHASE3_COGS_PROFITABILITY_DECISION_PROPOSAL.md` and awaits explicit approval before schema or code changes. The bridge and React/hybrid UI remain later delivery phases, not unfinished Phase 3 work. See `ROADMAP_RECONCILIATION_2026-08-27.md` for the exact credited and remaining gates.
+Phases 3–5 are closed. Next, create the Phase 6 canonical `bridge/CONTRACT.md`, including authenticated query/command envelopes, lossless ID handling, consistent error codes, refresh behavior, and a mandatory Kotlin/TypeScript drift checker. The costing explanation/info-button idea remains deferred; future UI must still translate native codes into plain shop language. React/hybrid UI wiring remains later delivery work. See `ROADMAP_RECONCILIATION_2026-08-27.md` for the exact credited and remaining gates.

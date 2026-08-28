@@ -116,11 +116,14 @@ data class PasswordHash(
 
 class Argon2idPasswordHasher(
     private val secureRandom: SecureRandom = SecureRandom(),
+    private val targetMemoryKib: Int = MEMORY_KIB,
+    private val targetIterations: Int = ITERATIONS,
+    private val targetParallelism: Int = PARALLELISM,
 ) {
     fun hash(passphrase: CharArray): PasswordHash {
         val salt = ByteArray(SALT_BYTES).also(secureRandom::nextBytes)
-        val verifier = derive(passphrase, salt, MEMORY_KIB, ITERATIONS, PARALLELISM)
-        return PasswordHash(ALGORITHM, salt, verifier, MEMORY_KIB, ITERATIONS, PARALLELISM)
+        val verifier = derive(passphrase, salt, targetMemoryKib, targetIterations, targetParallelism)
+        return PasswordHash(ALGORITHM, salt, verifier, targetMemoryKib, targetIterations, targetParallelism)
     }
 
     fun verify(passphrase: CharArray, credential: UserCredentialEntity): Boolean {
@@ -138,6 +141,15 @@ class Argon2idPasswordHasher(
             candidate.fill(0)
         }
     }
+
+    fun needsUpgrade(credential: UserCredentialEntity): Boolean =
+        credential.algorithm == ALGORITHM && (
+            credential.memoryKib < targetMemoryKib ||
+                credential.iterations < targetIterations ||
+                credential.parallelism < targetParallelism ||
+                credential.salt.size < SALT_BYTES ||
+                credential.verifier.size < VERIFIER_BYTES
+            )
 
     private fun derive(
         passphrase: CharArray,
@@ -323,6 +335,7 @@ class UserSecurityService(
     private val nowEpochMs: () -> Long = System::currentTimeMillis,
 ) {
     private val enrollmentTokens = ConcurrentHashMap<String, Long>()
+    private val authenticationEqualizer = dummyCredential
     suspend fun needsOwnerBootstrap(): Boolean = database.appUserDao().count() == 0L
 
     suspend fun bootstrapOwner(
@@ -362,27 +375,32 @@ class UserSecurityService(
 
     suspend fun login(loginName: String, passphrase: CharArray): NativeSession {
         val login = runCatching { AppPasswordPolicy.normalizeLoginName(loginName) }.getOrNull()
-            ?: throw SecurityFailure.Authentication()
-        val user = database.appUserDao().findByLoginName(login)
+        val user = login?.let { database.appUserDao().findByLoginName(it) }
         val credential = user?.let { database.userCredentialDao().find(it.userId) }
         val now = nowEpochMs()
-        if (user == null || credential == null || user.status != STATUS_ACTIVE ||
-            user.credentialSetupRequired ||
-            credential.lockedUntilEpochMs?.let { it > now } == true
-        ) {
+        val available = user != null && credential != null && user.status == STATUS_ACTIVE &&
+            !user.credentialSetupRequired && credential.lockedUntilEpochMs?.let { it > now } != true
+        val verified = passwordHasher.verify(passphrase, credential ?: authenticationEqualizer)
+        if (!available || !verified) {
+            if (available) {
+                val activeUser = requireNotNull(user)
+                val activeCredential = requireNotNull(credential)
+                val count = activeCredential.failedAttemptCount + 1
+                val lockedUntil = failureDelayMs(count)?.let { now + it }
+                database.userCredentialDao().recordFailure(activeUser.userId, count, now, lockedUntil)
+            }
             audit(user, ACTION_LOGIN, RESULT_FAILURE, REASON_AUTH_FAILED, targetUserId = user?.userId)
             throw SecurityFailure.Authentication()
         }
 
-        if (!passwordHasher.verify(passphrase, credential)) {
-            val count = credential.failedAttemptCount + 1
-            val lockedUntil = failureDelayMs(count)?.let { now + it }
-            database.userCredentialDao().recordFailure(user.userId, count, now, lockedUntil)
-            audit(user, ACTION_LOGIN, RESULT_FAILURE, REASON_AUTH_FAILED, targetUserId = user.userId)
-            throw SecurityFailure.Authentication()
+        if (passwordHasher.needsUpgrade(credential)) {
+            val upgraded = passwordHasher.hash(passphrase)
+            database.userCredentialDao().save(
+                upgraded.toEntity(user.userId, timestamp(), mustChange = credential.mustChange)
+            )
+        } else {
+            database.userCredentialDao().clearFailures(user.userId)
         }
-
-        database.userCredentialDao().clearFailures(user.userId)
         val session = sessions.start(user.userId)
         audit(user, ACTION_LOGIN, RESULT_SUCCESS, targetUserId = user.userId)
         return session
@@ -702,6 +720,25 @@ class UserSecurityService(
     private fun timestamp(): String = Instant.ofEpochMilli(nowEpochMs()).toString()
 
     companion object {
+        private val dummyCredential: UserCredentialEntity by lazy {
+            val dummyPassphrase = "non-user timing equalizer value".toCharArray()
+            try {
+                val hash = Argon2idPasswordHasher().hash(dummyPassphrase)
+                UserCredentialEntity(
+                    userId = Long.MIN_VALUE,
+                    algorithm = hash.algorithm,
+                    salt = hash.salt,
+                    verifier = hash.verifier,
+                    memoryKib = hash.memoryKib,
+                    iterations = hash.iterations,
+                    parallelism = hash.parallelism,
+                    changedAt = "1970-01-01T00:00:00Z",
+                )
+            } finally {
+                dummyPassphrase.fill('\u0000')
+            }
+        }
+
         const val STATUS_ACTIVE = "active"
         const val STATUS_DISABLED = "disabled"
         const val RESULT_SUCCESS = "success"

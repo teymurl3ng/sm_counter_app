@@ -1,6 +1,6 @@
 # Saaf Milk Hybrid Rebuild — Roadmap Reconciliation
 
-**Status: ACTIVE — approved for adoption on 2026-08-27**
+**Status: ACTIVE — approved for adoption on 2026-08-27; implementation ledger updated 2026-08-28**
 
 ## Purpose
 
@@ -59,6 +59,8 @@ Schema version 6 adds append-only close/reopen/reclose history, physical-count r
 
 Schema version 7 adds users separate from employees, Argon2id credentials, fixed role/permission bundles, memory-only sessions, recovery, audit attribution, verified daily-close actors, migration safety, and secure backup boundaries. Upgrades create no artificial users.
 
+Schema version 8 adds immutable costing-policy, opening-cost-basis, yield-policy, and production-loss source records plus rebuildable inventory-cost projections. It implements authoritative Milk/Yogurt historical-cost management reporting, moving weighted average, Yogurt conversion cost, spoilage/abnormal-loss valuation, correction replay, and explicit coverage disclosures. Upgrades create no artificial cost source or opening-cost truth.
+
 The native authenticated shell now provides deliberate first-owner setup, login/logout/recovery, passphrase changes, recent reauthentication, private staff enrollment/reset, owner/admin user administration, role-aware navigation, protected-content lifecycle behavior, and permission checks at protected application-command boundaries.
 
 Portable backup format 2 uses Argon2id-derived AES-256-GCM. Automatic local snapshots use AES-256-GCM under a non-exportable Android Keystore key. Security-bearing backups exclude active sessions and transient failed-login/lockout timing state.
@@ -70,24 +72,24 @@ Portable backup format 2 uses Argon2id-derived AES-256-GCM. Automatic local snap
 | 0 — Freeze & Baseline | **Complete** | Continue verifying the two frozen hashes at every material checkpoint. |
 | 1 — Capability Inventory | **Complete** | Preserve the inventory as the UI/native comparison baseline. |
 | 2 — Product Decisions | **Complete** | New business semantics still require explicit amendments. |
-| 3 — Native Expansion | **Open: one domain track remains** | Approve and implement authoritative COGS, spoilage valuation, gross profit, net profit, and per-product profitability. |
-| 4 — Native Automated Tests | **Substantial early credit; not formally closed** | Add tests for the approved costing model, then audit every Phase 4 criterion, including direct permission bypass, recent reauthentication, lockout, restart, and revocation coverage. |
-| 5 — Native Read Models | **Partial foundation exists** | Define, review, and freeze the hybrid-facing DTO catalog, including safe security/session/permission views and no credential material. |
-| 6 — Bridge Contract | **Not started** | Create `bridge/CONTRACT.md` and a mandatory TypeScript/Kotlin drift checker before bridge implementation. |
+| 3 — Native Expansion | **Complete** | Preserve the approved schema-4 through schema-8 native contracts; no React/bridge completion is implied. |
+| 4 — Native Automated Tests | **Complete** | Preserve the `PHASE4.md` evidence matrix and keep the complete regression green as later native/bridge capabilities are added. |
+| 5 — Native Read Models | **Complete** | Preserve `PHASE5_DTO_CATALOG.md`: integer-PKR-paisa money, canonical decimal quantities, explicit correction/coverage state, permission-aware reads, stable costing codes, and no credential/session-handle material. |
+| 6 — Bridge Contract | **Next** | Create `bridge/CONTRACT.md` and a mandatory TypeScript/Kotlin drift checker before bridge implementation. |
 | 7 — Hybrid Vertical Slice | **Native authentication prerequisites completed early; hybrid slice not started** | Prove packaged React → WebView → bridge → Kotlin → Room → React on a physical device with one authenticated query and one protected mutation. |
-| 8 — Screen Wiring | **Not started** | Replace React mock/local state screen-by-screen with awaited native queries and commands plus hybrid integration tests. |
+| 8 — Screen Wiring | **Not started** | Replace React mock/local state screen-by-screen with awaited native queries and commands plus hybrid integration tests. Apply plain-language financial labels and actionable error states; never display raw accounting/status codes to shop users. Contextual info-button explanations are deferred for later product review. |
 | 9 — Runtime Integration | **Partial native credit; hybrid work not started** | Prove WebView navigation, lifecycle, process recreation, keyboard, errors, logout/back-stack protection, and session expiry. |
 | 10 — Functional Completion | **Not started** | Close the capability matrix with every retained capability genuinely native-backed and wired. |
-| 11 — Integrity/Recovery/Concurrency | **Substantial security/backup early credit; still open** | Complete concurrent-write, backup-during-write, large-history, repeated recovery, and remaining session/concurrency tests. |
-| 12 — UI Fidelity | **Not started for the hybrid product** | Compare the packaged physical-device React UI with the approved visual target without changing business semantics. |
+| 11 — Integrity/Recovery/Concurrency | **Substantial security/backup early credit; still open** | Complete concurrent-write, backup-during-write, large-history, repeated recovery, and remaining session/concurrency tests. Reassess the deliberately deferred lower-of-cost/NRV subsystem against the approved materiality and business triggers before hardening closes. |
+| 12 — UI Fidelity | **Not started for the hybrid product** | Compare the packaged physical-device React UI with the approved visual target without changing business semantics, and verify that accounting precision is preserved without requiring accounting literacy. |
 | 13 — Dead/Mock/Misleading Cleanup | **Not started** | Remove localStorage business state, hardcoded business data, UI-side accounting, synthetic reports, dead controls, mock users, and misleading success paths. |
 | 14 — Final Device QA | **Native instrumentation credit only; hybrid acceptance not started** | Run the full hybrid device and role/permission bypass matrix. |
-| 15 — Shopkeeper QA | **Not started** | Simulate a complete business day, mistakes/corrections, backup/restore, account administration, and independently checked totals. |
+| 15 — Shopkeeper QA | **Not started** | Have non-accountant shop users simulate a complete business day, mistakes/corrections, backup/restore, account administration, and independently checked totals without coaching in accounting terminology. |
 | 16 — Release Readiness | **Not started** | Produce a reproducible release build, migration/security review, final report, archive, and release package. |
 
 ## Current verification credit
 
-The connected-device native regression suite passes **103/103**, with zero skipped, failed, or errored tests. This is valid evidence for completed native work and early Phase 4/11 credit. It is not evidence for bridge or hybrid UI behavior.
+The connected-device native regression suite passes **124/124**, with zero skipped, failed, or errored tests; the host-side debug unit suite passes **7/7**. The Phase 5 additions cover bootstrap/current-session views, exact PKR/decimal representation, corrected-history state, permission-separated operational/financial/settings/user/audit reads, costing-code stability, and forbidden-secret DTO scanning. `PHASE4.md` records the earlier complete native-test audit, while `PHASE5.md` and `PHASE5_DTO_CATALOG.md` record the new read boundary. This is not evidence for bridge or hybrid UI behavior.
 
 The two immutable hashes remain:
 
@@ -96,19 +98,17 @@ The two immutable hashes remain:
 
 ## Revised execution order
 
-1. Close Phase 3 by researching, approving, implementing, and documenting authoritative costing/profitability semantics.
-2. Formally close Phase 4 with costing tests and a criterion-by-criterion native/security coverage audit.
-3. Complete and freeze the Phase 5 hybrid-facing native read-model/DTO catalog.
+1. **Completed:** close Phase 3 by researching, approving, implementing, and documenting authoritative costing/profitability semantics.
+2. **Completed:** formally close Phase 4 with a criterion-by-criterion native/security coverage audit and focused gap tests.
+3. **Completed:** implement and freeze the Phase 5 hybrid-facing native read-model/DTO catalog.
 4. Create the Phase 6 canonical bridge contract and drift checker.
 5. Prove the Phase 7 authenticated physical-device hybrid vertical slice before scaling.
 6. Perform Phase 8 screen-by-screen wiring, replacing all mock/local business behavior.
 7. Complete Phases 9–10 runtime integration and capability closure.
-8. Apply the early Phase 11 credit, then finish its remaining concurrency/recovery gates.
+8. Apply the early Phase 11 credit, finish its remaining concurrency/recovery gates, and perform the deferred NRV trigger review before hardening closes.
 9. Complete hybrid UI fidelity and mock/dead-state cleanup in Phases 12–13.
 10. Run device, shopkeeper, and release gates in Phases 14–16.
 
 ## Immediate next gate
 
-The COGS/profitability decision record is now proposed in `PHASE3_COGS_PROFITABILITY_DECISION_PROPOSAL.md`. It establishes recommended treatment for purchased milk, transformed yogurt, other products, opening inventory, spoilage, valuation, corrections, coverage gaps, and historical reporting. The existing React prototype's hardcoded `costRate` values and client-side profit calculations are not authoritative and must not be copied into Kotlin.
-
-No costing implementation begins until the proposed semantics and migration implications are explicitly approved.
+Phases 3–5 are complete and device-verified. The immediate gate is Phase 6: define the canonical bridge contract, consistent authenticated error/envelope behavior, lossless identifiers, refresh rules, and Kotlin/TypeScript drift checker from the frozen Phase 5 DTO catalog. The existing React prototype's hardcoded `costRate` values and client-side profit calculations remain non-authoritative and must not be copied or revived.

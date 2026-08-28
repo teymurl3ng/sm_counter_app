@@ -8,7 +8,7 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import androidx.sqlite.execSQL
 
 @Database(
-    version = 7,
+    version = 8,
     exportSchema = true,
     entities = [
         ProductEntity::class,
@@ -39,6 +39,13 @@ import androidx.sqlite.execSQL
         SavedRecoveryCodeEntity::class,
         SecurityAuditEntryEntity::class,
         EventActorLinkEntity::class,
+        CostingPolicyVersionEntity::class,
+        CostingPolicyComponentEntity::class,
+        InventoryCostBasisEntity::class,
+        YieldPolicyVersionEntity::class,
+        ProductionLossAssessmentEntity::class,
+        InventoryCostMovementEntity::class,
+        CostProjectionStateEntity::class,
     ],
     views = [
         CurrentStockView::class,
@@ -76,6 +83,11 @@ abstract class MilkShopDatabase : RoomDatabase() {
     abstract fun savedRecoveryCodeDao(): SavedRecoveryCodeDao
     abstract fun securityAuditDao(): SecurityAuditDao
     abstract fun eventActorLinkDao(): EventActorLinkDao
+    abstract fun costingPolicyDao(): CostingPolicyDao
+    abstract fun inventoryCostBasisDao(): InventoryCostBasisDao
+    abstract fun yieldPolicyDao(): YieldPolicyDao
+    abstract fun productionLossAssessmentDao(): ProductionLossAssessmentDao
+    abstract fun inventoryCostProjectionDao(): InventoryCostProjectionDao
 
     companion object {
         private const val DATABASE_NAME = "milk_shop.db"
@@ -172,13 +184,20 @@ abstract class MilkShopDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_7_8 = object : androidx.room3.migration.Migration(7, 8) {
+            override suspend fun migrate(connection: androidx.sqlite.SQLiteConnection) {
+                Phase3CostingMigrationSql.createStatements.forEach(connection::execSQL)
+                Phase3CostingMigrationSql.immutableTriggers.forEach(connection::execSQL)
+            }
+        }
+
         fun create(context: Context): MilkShopDatabase =
             Room.databaseBuilder<MilkShopDatabase>(
                 context = context.applicationContext,
                 name = DATABASE_NAME,
             )
                 .setDriver(BundledSQLiteDriver())
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
                 .addCallback(DatabaseCallback())
                 .build()
 
@@ -186,7 +205,7 @@ abstract class MilkShopDatabase : RoomDatabase() {
         fun createInMemory(): MilkShopDatabase =
             Room.inMemoryDatabaseBuilder<MilkShopDatabase>()
                 .setDriver(BundledSQLiteDriver())
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
                 .addCallback(DatabaseCallback())
                 .build()
     }
@@ -197,6 +216,7 @@ abstract class MilkShopDatabase : RoomDatabase() {
             DatabaseSql.seedStatements.forEach(connection::execSQL)
             Phase3MigrationSql.backfillStatements.forEach(connection::execSQL)
             Phase3SecurityMigrationSql.createTriggers.forEach(connection::execSQL)
+            Phase3CostingMigrationSql.immutableTriggers.forEach(connection::execSQL)
         }
 
         override suspend fun onOpen(connection: androidx.sqlite.SQLiteConnection) {

@@ -9,25 +9,25 @@ This is not the earlier experimental hybrid project. The working source is the c
 - the untouched **Phase 18 Kotlin/Room checkpoint**;
 - the latest **AI Studio React/Vite UI**;
 - the locked **POSTMORTEM.md** playbook;
-- the root phase records `PHASE0.md` through `PHASE3.md`;
+- the root phase records `PHASE0.md` through `PHASE5.md`;
 - the root `README.md`.
 
 Read those files before changing code.
 
-## Current superseding checkpoint — 2026-08-27
+## Current superseding checkpoint — 2026-08-28
 
-The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. It preserves the locked roadmap while assigning valid early credit to native work originally planned across Phases 4, 7, 9, and 11. Root Phase 3 now has one remaining domain gate: authoritative COGS/profitability semantics. The researched recommendation is `PHASE3_COGS_PROFITABILITY_DECISION_PROPOSAL.md` and awaits explicit approval. Bridge and React delivery remain later phases.
+The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. It preserves the locked roadmap while assigning valid early credit to native work originally planned across Phases 7, 9, and 11. Root Phases 3–5 are complete. `PHASE4.md` contains the criterion-by-criterion native test audit; `PHASE5.md` and `PHASE5_DTO_CATALOG.md` contain the implemented and frozen permission-aware hybrid read boundary. Phase 6 canonical bridge-contract design is next. React delivery remains later.
 
-Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and `PHASE3.md` for current status. Additive Room schema versions 4 through 7 are implemented and device-verified. Schema 7, encrypted portable backup format 2, Android-Keystore local snapshots, and the authenticated native shell/user-administration flow are implemented. The complete connected-device suite passes 103/103 with 0 skipped and 0 failed. React/bridge wiring remains incomplete.
+Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE5.md` for current status. Additive Room schema versions 4 through 8 are implemented and device-verified. Schema 7 security, schema 8 costing, encrypted portable backup format 2, Android-Keystore local snapshots, the authenticated native shell/user-administration flow, and the Phase 5 read-model catalog are implemented. The complete connected-device suite passes 124/124 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7. Bridge/React wiring remains incomplete.
 
 Application user accounts and native role-based authorization are explicitly approved as a required cross-phase capability. Their schema-7 model, encrypted backup boundary, native credential UI, app-owned sessions, private staff enrollment/reset, user administration, role-aware navigation, and command-boundary authorization are implemented; React/bridge integration is not. Application users are security principals separate from employee/salary profiles, with an optional link between them. The schema-v6 daily-close actor name/role is transitional asserted metadata, not authenticated identity.
 
-The two approved Phase 3 design tracks were:
+The two completed Phase 3 design tracks were:
 
 1. authenticated users, credentials, roles/permissions, sessions, recovery, audit actor IDs, migration, and backup/restore security;
 2. authoritative costing/COGS and profitability semantics.
 
-The researched recommendation for gate 1 is `PHASE3_USER_ACCOUNTS_DESIGN_PROPOSAL.md`. The user explicitly approved it on 2026-08-27. Its native security and native-shell scope is implemented and device-verified. This must not be mistaken for completed React/bridge delivery. Gate 2—authoritative costing/COGS—is now the sole remaining Phase 3 domain decision.
+The researched recommendation for gate 1 is `PHASE3_USER_ACCOUNTS_DESIGN_PROPOSAL.md`. The user explicitly approved it on 2026-08-27. Its native security and native-shell scope is implemented and device-verified. Gate 2 was approved and implemented in schema 8 with moving-weighted-average Milk cost, versioned Yogurt conversion cost, opening-basis provenance, yield/loss controls, deterministic replay, honest coverage states, and costing-aware encrypted backup/restore. Phase 4 audited their executable evidence, and Phase 5 exposed the safe native facts and stable codes required by future screens. None of this should be mistaken for completed React/bridge delivery. Phase 6 is next.
 
 ---
 
@@ -205,15 +205,21 @@ Full AI Studio ↔ Phase 18 capability inventory.
 
 Desired product capability decisions approved.
 
-## Phase 3 — IN PROGRESS
+## Phase 3 — COMPLETE
 
 Goal:
 
 > Expand the native Phase 18 layer so it genuinely supports the approved product before bridge/UI wiring.
 
-Phase 3 started with a safe no-schema native derivation.
+Phase 3 started with a safe no-schema native derivation and closed after the approved schema-8 costing foundation was implemented and device-verified. Phase 4 later closed the native/security test matrix. Use `ROADMAP_RECONCILIATION_2026-08-27.md` for cross-phase credits and the current execution order.
 
-Superseding status: all approved Tier 1/Tier 2 and native-security expansion work is implemented and device-verified. Authoritative COGS/profitability is the sole remaining Phase 3 domain gate. Use `ROADMAP_RECONCILIATION_2026-08-27.md` for cross-phase credits and the current execution order.
+## Phase 4 — COMPLETE
+
+The native automated-test gate is closed in `PHASE4.md`. Nine focused security tests filled the audited gaps, and credential verification supports safe work-factor upgrades and equalized unavailable-account comparison paths.
+
+## Phase 5 — COMPLETE
+
+The permission-aware hybrid-facing native query/DTO layer is implemented in `application/readmodels` and frozen in `PHASE5_DTO_CATALOG.md`. It covers operational and financial positions, settings/opening state, profiles, references, corrected history/detail, ledgers, delivery/attendance/spoilage, reconciliation, profitability/costing controls, planning, current session/permissions, authorized users, and durable audit actors. Money is integer PKR paisa, quantities are canonical decimal strings, and credential/recovery/session-handle material is excluded. Four new tests bring the complete device suite to 124/124. Phase 6 is the current continuation point.
 
 ---
 
@@ -599,4 +605,4 @@ After opening the repo, begin with:
 
 > Read `README.md`, `PHASE0.md`, `PHASE1.md`, `PHASE2.md`, `PHASE3.md`, `POSTMORTEM.md`, and this `CODEX_HANDOFF_Saaf_Milk_Real_Hybrid.md`. Inspect the current Phase 3 native ledger implementation and the untouched Phase 18 business core. Verify the frozen logic-spec and SQL hashes and rerun the existing native Android-test Kotlin compile. Do not modify the frozen SQL/spec or invent new formulas. Report the exact repo/build status and the next safe Phase 3 implementation step. If the next step requires a schema/business-rule amendment, stop for explicit authorization before changing it.
 
-That is the correct continuation point.
+That text is historical provenance only. The current continuation point is Phase 6 canonical bridge-contract design from the frozen Phase 5 catalog, described at the top of this handoff and in `ROADMAP_RECONCILIATION_2026-08-27.md`.

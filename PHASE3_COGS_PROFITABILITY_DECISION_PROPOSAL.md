@@ -1,6 +1,6 @@
 # Phase 3 — COGS and Profitability Decision Proposal
 
-**Status: PROPOSED — awaiting explicit approval; no costing implementation is authorized by this document**
+**Status: APPROVED — user authorized continuation on 2026-08-27 after the yield, conversion-cost, NRV-deferral, user-account, and plain-language revisions**
 
 **Prepared: 2026-08-27**
 
@@ -10,7 +10,7 @@ Approve an authoritative inventory-costing and management-profitability model fo
 
 The recommended model is:
 
-> **Perpetual moving weighted-average actual acquisition cost, with effective-dated standard conversion cost for yogurt production, append-only cost-basis/valuation adjustments, and explicitly reported incomplete cost coverage.**
+> **Perpetual moving weighted-average actual acquisition cost, with effective-dated standard conversion cost for yogurt production, append-only cost-basis initialization, explicit spoilage loss, and honestly reported cost coverage.**
 
 This is designed around the shop's commingled, high-turnover milk/yogurt inventory and the application's existing append-only event/correction architecture.
 
@@ -21,6 +21,8 @@ IAS 2 requires inventory to be measured at the lower of cost and net realisable 
 IFRS for SMEs uses the same relevant foundation: purchase and conversion cost, FIFO or weighted average for interchangeable inventory, impairment when carrying amount is not recoverable, and expense recognition when inventory is sold. Its standard-cost technique is permitted only when it approximates cost and is regularly reviewed.
 
 Pakistan's SECP guide states that the applicable reporting framework depends on company classification; medium and small companies may fall under IFRS for SMEs or AFRS for SSEs, with specified options to use notified IFRS. Therefore this proposal uses IAS 2/IFRS-for-SMEs inventory principles as a strong design basis, but the application must not advertise statutory IFRS compliance without an accountant confirming the shop's legal form, applicable framework, policies, and complete books.
+
+The initial COGS release deliberately implements historical-cost management reporting, not the complete lower-of-cost/NRV measurement model. That is a sequencing decision based on the shop's fast-turning, highly perishable inventory—not a claim that IAS 2 permits NRV to be ignored in statutory accounts. Until formal NRV review, write-down, and reversal support exists, every affected report must identify itself as cost-based management reporting and must not claim IFRS/statutory inventory valuation.
 
 Authoritative references:
 
@@ -152,18 +154,66 @@ yogurt output cost = milk input cost + applied conversion cost
 yogurt receipt quantity = measured yogurt kg produced
 ```
 
-The actual measured output receives the complete milk input cost. Normal yield loss is therefore absorbed into the yogurt produced rather than recorded as a second unexplained loss.
+The actual measured output receives the milk input cost except for any separately identified abnormal input loss. Ordinary process variation is therefore absorbed into the yogurt produced rather than recorded as a second unexplained loss.
+
+#### Concrete yield baseline and abnormal-loss rule
+
+The frozen core specification's `17 L → 14.5 kg` (~85%) example remains a reference-only sanity check. It is not silently promoted into a costing formula or a universal loss threshold.
+
+Yield is monitored as:
+
+```text
+batch yield ratio = usable yogurt kg produced / milk litres charged to the batch
+```
+
+The application uses this concrete calibration procedure:
+
+1. **Calibration state:** collect at least 30 accepted batches spanning at least 28 calendar days. A batch is accepted for calibration only when its effective corrected measurements are complete and it has no identified equipment failure, contamination, spill, rejected output, or unresolved measurement issue.
+2. **Provisional reference:** while fewer than 30 accepted batches exist, display the observed ratio and the specification's ~85% sanity reference, but do not automatically label any variance normal or abnormal.
+3. **Baseline:** after calibration, calculate the median yield ratio and the median absolute deviation (`MAD`) from the accepted batches. The median/MAD pair is used because it is less distorted by occasional extreme batches than a simple mean/standard deviation.
+4. **Yield-review limits:** flag a batch outside `median ± max(3 × 1.4826 × MAD, 0.03)`. The `0.03` floor means the alert band can never be narrower than three percentage points on either side merely because early observations happen to be identical.
+5. **Human classification:** an alert is a review trigger, not an accounting entry. An owner/manager must choose one of: correct a measurement; accept explained ordinary variance; or record an abnormal loss with measured input-equivalent quantity and reason.
+6. **Incident override:** a known spill, burn, contamination/curdling incident, power/equipment failure, operator mistake, or rejected batch is abnormal even when the final ratio falls inside the statistical band.
+7. **No automatic loss invention:** the system never converts the gap between expected and actual output into a spoilage quantity. An abnormal input loss must be measured or deliberately estimated by an authorized user, documented, and audited.
+
+For a batch with an approved abnormal Milk-equivalent loss:
+
+```text
+abnormal loss cost = abnormal milk-equivalent litres × Milk average cost before production
+yogurt material cost = total milk input cost - abnormal loss cost
+```
+
+The abnormal loss is expensed separately. It is not loaded into the remaining yogurt. A finished-yogurt loss is recorded after production through the ordinary `SPOILAGE` event at Yogurt carrying cost.
+
+The yield baseline is versioned and reviewed monthly. The app may propose a replacement from the latest eligible batches, but only an owner can approve a new version; earlier batches and reports keep the policy that applied at their time. This statistical rule is an operational control for detecting exceptions, not a claim that IAS 2 prescribes a dairy yield percentage.
 
 ### 6.4 Conversion-cost recommendation
 
-IAS 2 includes direct labour and systematic fixed/variable production overhead in conversion cost. The current app does not contain reliable batch-level actual conversion costs. The recommended small-business solution is an effective-dated **standard yogurt conversion cost per kilogram**, configured by an owner from normal culture/ingredients, production fuel/utilities, direct production labour, and production overhead.
+IAS 2 includes direct labour and systematic fixed/variable production overhead in conversion cost. The current app does not contain reliable batch-level actual conversion costs. The recommended small-business solution is an effective-dated **standard yogurt conversion cost per kilogram** backed by explicit cost components rather than a single unexplained rate.
+
+Each policy version records:
+
+- normal culture/ingredient cost per kg;
+- normal packaging cost per kg when packaging is required to bring the product to saleable condition;
+- variable production fuel/electricity cost per kg;
+- direct production labour cost per kg;
+- monthly fixed production-overhead pool;
+- normal monthly production capacity in kg;
+- fixed overhead rate per kg (`overhead pool / normal capacity`);
+- resulting total standard conversion cost per kg;
+- source/evidence note, preparer, approver, approval timestamp, and effective date.
+
+Selling/distribution cost, unrelated administration, abnormal waste, and finished-goods storage are excluded. Milk material cost is also excluded from this standard because each batch already receives its actual moving-average Milk cost.
 
 Controls:
 
-- each production event snapshots the active conversion-cost policy;
-- the policy is versioned and never overwrites history;
-- the app requires review at least monthly and whenever production economics materially change;
-- a stale policy produces a visible warning and blocks claims of complete standards-based profit;
+- each production event snapshots the active conversion-cost policy and applied amount;
+- a policy is approved for one calendar month and never overwrites history;
+- at the first production batch of a new month, the previous policy is copied only as a draft and requires owner review/approval, even when every amount is unchanged;
+- production is not blocked when review is overdue, but it continues under the last approved rate with `stale_conversion_policy`, and complete COGS/profit claims are withheld until review;
+- an immediate mid-month policy review is triggered when a component price or normal-capacity estimate changes by at least 10%, or whenever recipe/process, packaging, wage, energy tariff, or production equipment changes materially;
+- Milk purchase-rate changes do not trigger conversion-policy revision because Milk is costed separately at actual moving average;
+- once per quarter, the owner compares applied standard conversion cost with the best available actual component totals; an absolute variance of 10% or more requires an explanation and a revised next policy, while a smaller variance may retain the rate with a recorded review note;
 - abnormal waste, selling costs, unrelated administration, and ordinary finished-goods storage are excluded;
 - the standard must approximate actual normal cost; it is not a desired-margin input.
 
@@ -187,23 +237,29 @@ Explicit `SPOILAGE` is valued at the product's average carrying cost immediately
 
 The report presents it as a separate **Inventory loss — spoilage** line rather than allowing staff to type a loss rate. IAS 2 requires inventory losses to be expensed when they occur.
 
-Production's normal measured yield difference remains absorbed in yogurt output cost. An abnormal, separately identified loss uses the spoilage workflow and is expensed. Corrections restate quantity and trigger deterministic cost recalculation from the earliest affected point.
+Ordinary process variance within the approved/reviewed yield policy remains absorbed in yogurt output cost. Identified abnormal Milk-equivalent loss is recorded against the production batch and expensed; finished-yogurt loss uses the spoilage workflow. A yield alert alone never invents a loss. Corrections restate quantity/classification and trigger deterministic cost recalculation from the earliest affected point.
 
-## 8. Lower of cost and net realisable value
+## 8. NRV scope decision—deferred from the initial COGS release
 
-Perishable inventory can become worth less than its recorded cost even before it is physically discarded. A standards-aligned design therefore needs an append-only owner/admin valuation adjustment:
+Lower-of-cost/NRV measurement, including capped reversals of prior write-downs, is a valid standards requirement. It is also a separate valuation subsystem from the operational costing needed to calculate COGS. For this shop, Milk and Yogurt turn quickly or become explicit spoilage; a distinct NRV impairment is expected to be exceptional. Building the full evidence, approval, linkage, reversal, reporting, backup, and test surface now would delay the higher-value cost foundation.
 
-- product and quantity/value scope;
-- assessment date;
-- estimated ordinary selling price;
-- estimated completion and necessary selling costs;
-- resulting net realisable value;
-- write-down amount and reason/evidence;
-- reversal linked to the original write-down, capped at the un-reversed amount.
+The initial release therefore includes:
 
-This adjustment changes carrying cost, not physical quantity. It is separate from spoilage and cannot be used to increase inventory above historical cost.
+- moving-weighted-average historical cost;
+- explicit spoilage and identified abnormal-loss expense;
+- no NRV write-down or reversal records;
+- visible report metadata: `reporting_basis = cost_based_management` and `valuation_scope = cost_only_no_nrv`;
+- no statement that inventory values or reports are IFRS/statutory compliant.
 
-The daily operational UI need not force an NRV review on every transaction, but reporting-period close must expose unresolved valuation-review status before claiming standards-aligned inventory value.
+This deferral must be reconsidered during Phase 11 hardening—or earlier—if any of these triggers occurs:
+
+- material unsold inventory is routinely carried beyond its normal short shelf life;
+- products are repeatedly marked down or expected selling price falls below carrying cost;
+- reporting dates regularly contain material saleable inventory exposed to price deterioration;
+- longer-lived manufactured products or general merchandise enter the authoritative cost model;
+- the accountant, auditor, lender, regulator, or applicable reporting framework requires formal NRV evidence.
+
+If triggered, the later design should add append-only owner/admin write-downs, evidence of estimated selling/completion costs, linkage to affected product/value scope, and reversals capped at the original write-down. Until that subsystem is delivered, spoilage must remain a quantity loss—not a substitute mechanism for saleable inventory whose NRV has declined.
 
 ## 9. Corrections and chronological replay
 
@@ -252,9 +308,9 @@ gross margin % = product gross profit / product sales revenue × 100
 
 Reports show sold quantity, sales revenue, COGS, gross profit, and margin by product. Average unit cost is a read-only derived value, never an editable product master field.
 
-### 11.4 Inventory losses and write-downs
+### 11.4 Inventory losses
 
-Show spoilage losses and NRV write-downs/reversals separately after gross profit. They remain part of the recorded operating result and retain product attribution.
+Show spoilage and identified abnormal losses separately after gross profit. They remain part of the recorded operating result and retain product attribution. The initial release has no NRV write-down/reversal line because formal NRV valuation is deferred under Section 8.
 
 ### 11.5 Recorded operating result—not statutory net profit
 
@@ -268,7 +324,7 @@ Recorded operating result
  + delivery surcharge income
  - COGS
  - spoilage loss
- - net NRV write-downs
+ - identified abnormal inventory/process loss
  - recorded operating expenses
  - recorded salary payments
 ```
@@ -279,16 +335,53 @@ The React labels “Net Period Income” and “Take-home net profit” must not
 
 ## 12. Cost coverage and report honesty
 
-Every report returns a coverage status:
+Every report returns a cost-coverage status:
 
-- `complete` — all included quantities have authoritative cost provenance and required valuation review is current;
+- `complete` — all included quantities have authoritative historical-cost provenance;
 - `partial` — some products/periods are costed and others are unavailable;
 - `missing_basis` — positive stock or sales depend on unknown opening/acquisition cost;
 - `unsupported_flow` — a product lacks an approved cost-bearing acquisition/production workflow;
-- `stale_conversion_policy` — production used or depends on an overdue standard-cost review;
-- `valuation_review_due` — NRV assessment is required for the reporting close.
+- `stale_conversion_policy` — production used or depends on an overdue standard-cost review.
 
 Missing cost never silently becomes zero. Aggregate profit is withheld or clearly marked partial when coverage is incomplete.
+
+Cost coverage and valuation scope are different dimensions. Even a `complete` cost report must expose `reporting_basis = cost_based_management` and `valuation_scope = cost_only_no_nrv`; `complete` must never be presented as complete statutory or IFRS valuation coverage.
+
+### 12.1 Plain-language operating rule
+
+Financial literacy is not a prerequisite for operating Saaf Milk. The software owns the accounting rules; shop users enter facts they can directly observe and understand.
+
+The product has two language layers:
+
+- the native model, audit trail, exports, and technical documentation retain precise accounting names and stable machine codes;
+- the everyday UI translates those concepts into plain shop language, shows the practical meaning, and states the next action when something is incomplete.
+
+Formal terminology may appear as optional help or on an accountant-facing export, but a staff member must never need to understand terms such as COGS, NRV, carrying value, impairment, weighted average, conversion overhead, or cost provenance to complete ordinary work.
+
+Required everyday translations include:
+
+| Formal/internal concept | Everyday presentation |
+|---|---|
+| COGS | **Cost of products sold** |
+| Gross profit | **Profit from products sold—before shop expenses** |
+| Spoilage loss | **Cost of spoiled stock** |
+| Recorded operating result | **Estimated result from everything entered in this app** |
+| `missing_basis` | **Profit cannot be calculated yet—opening stock cost is missing** |
+| `unsupported_flow` | **Profit is not available for this product yet—how it enters stock has not been set up** |
+| `stale_conversion_policy` | **Yogurt-making cost needs owner review** |
+| `cost_only_no_nrv` | **Advanced accountant valuation is not included in this report** |
+
+The estimated-result screen must also say: **This is not cash in hand, owner take-home money, tax profit, or complete annual accounts.** A short **How was this calculated?** view shows the plain additions and deductions without exposing editable formulas.
+
+Interaction rules:
+
+- staff record observed facts—litres, kilograms, prices, quantities, and what physically happened;
+- the engine calculates product cost, loss value, and report classifications;
+- calculated rates and accounting classifications are not editable text fields;
+- setup asks concrete questions such as culture/packaging cost, usual batch output, and monthly production fuel/electricity—not abstract questions about allocating conversion overhead;
+- yield incidents use operational choices such as spill, contamination, power failure, or measurement correction; approved mappings determine the accounting treatment;
+- every unavailable number is replaced with a plain reason and a direct resolution step, never zero, a raw status code, or an unexplained blank;
+- staff are not asked to guess; genuinely exceptional accounting judgments are restricted to a guided owner/admin workflow and may be left pending for an accountant.
 
 ## 13. Proposed additive native model
 
@@ -298,14 +391,13 @@ Candidate source records:
 
 - effective-dated `costing_policy_versions`;
 - append-only `inventory_cost_basis_entries` for deliberate opening/migration estimates;
-- append-only `inventory_valuation_adjustments` with linked reversals;
 - production events or linked details that snapshot applied conversion policy/cost.
 
 Candidate derived projection:
 
 - `inventory_cost_movements` linked to event/product, containing quantity, cost-in/cost-out, running quantity, running carrying cost, and coverage status.
 
-Source policy/basis/valuation records are business data and must be backed up. Derived cost movements may be rebuilt after restore, but any persisted projection must be verified against deterministic replay before commit.
+Source policy and basis records are business data and must be backed up. Derived cost movements may be rebuilt after restore, but any persisted projection must be verified against deterministic replay before commit.
 
 ## 14. Required tests before delivery
 
@@ -314,14 +406,22 @@ Source policy/basis/valuation records are business data and must be backed up. D
 - sale releases historical moving-average cost, not current settings;
 - full pool depletion leaves zero quantity and zero carrying cost;
 - normal yogurt yield transfers all milk input cost to measured output;
+- yield calibration requires 30 accepted batches over at least 28 days and does not auto-post from an alert;
+- median/MAD alert limits, incident override, authorized classification, and version preservation;
+- identified abnormal Milk-equivalent loss is excluded from yogurt cost and separately expensed;
 - effective-dated conversion-cost snapshot and stale-policy warning;
+- monthly conversion-policy approval, 10%/process change trigger, and quarterly actual-versus-standard review;
+- conversion policy is component-backed and excludes Milk material, selling, unrelated administration, abnormal waste, and finished-goods storage;
 - production and purchase correction rebuild downstream COGS;
 - sale and spoilage corrections restate cost correctly;
 - fresh opening quantity requires cost basis;
 - existing unknown basis remains unavailable until deliberate owner initialization;
 - unknown/unsupported product cost is never zero-filled;
 - spoilage loss uses native carrying cost and cannot accept a caller rate;
-- NRV write-down and capped reversal;
+- report metadata/disclosures cannot imply statutory or IFRS valuation and distinguish cost coverage from the deferred NRV scope;
+- everyday screens translate formal accounting concepts and machine codes into the approved plain-language labels, reasons, and next actions;
+- staff workflows require only observable shop facts and never expose an editable calculated cost, loss rate, or accounting classification;
+- shopkeeper acceptance confirms that ordinary sale, purchase, production, spoilage, correction, and report workflows can be completed without knowing accounting terminology;
 - surcharge separated from product revenue;
 - partial coverage withholds or labels aggregate profit;
 - paisa rounding and residual allocation;
@@ -335,17 +435,18 @@ Source policy/basis/valuation records are business data and must be backed up. D
 1. **Use perpetual moving weighted average** for interchangeable inventory.
 2. **Use purchase amount owed, including inbound delivery fee, as Milk acquisition cost.**
 3. **Require historical cost for fresh opening inventory and an audited owner-supplied initialization when an upgraded installation lacks cost provenance.** Never invent or zero-fill it.
-4. **Transfer Milk carrying cost into Yogurt and apply an effective-dated standard conversion cost per kg**, reviewed at least monthly and when economics materially change.
-5. **Treat explicit spoilage as a separately reported inventory loss at native carrying cost; absorb normal production yield loss into output cost.**
-6. **Support append-only lower-of-cost/NRV write-downs and capped reversals** before claiming standards-aligned inventory valuation.
+4. **Transfer Milk carrying cost into Yogurt and apply a component-backed standard conversion cost per kg.** Approve one version per calendar month, trigger immediate review for a ≥10% component/capacity change or material process change, and require explanation/revision when the quarterly actual-versus-standard variance reaches 10%.
+5. **Define normal yield through a versioned shop-specific calibration:** at least 30 accepted batches across 28 days, median/MAD alert limits, human review, and no automatic accounting loss. Ordinary process variance is absorbed into output; identified abnormal Milk-equivalent loss or finished-product spoilage is separately expensed.
+6. **Defer formal lower-of-cost/NRV write-down and reversal support from the initial COGS release.** Ship historical-cost management reporting plus explicit spoilage/abnormal loss, expose `cost_only_no_nrv`, make no IFRS/statutory valuation claim, and reassess the deferral during Phase 11 or when a trigger in Section 8 occurs.
 7. **Limit authoritative product profitability to approved cost-bearing flows.** Other products remain unavailable until their acquisition/production workflow is approved.
 8. **Separate delivery surcharge income from product revenue.**
 9. **Label the initial bottom line “Recorded operating result,” not “net profit,”** until a complete accounting scope is approved.
 10. **Use integer paisa plus BigDecimal calculations for new cost values**, with a documented event-level rounding rule.
 11. **Rebuild derived cost projections from effective corrected truth** rather than mutating historical events or trusting React calculations.
+12. **Make financial literacy unnecessary for ordinary use.** Keep precise accounting concepts inside the native/audit layer, translate them into approved plain shop language, ask users only for observable facts, and always provide a reason plus next action when a result cannot be calculated.
 
 ## 16. Recommendation
 
-Approve all eleven decisions as one coherent policy. They produce useful, auditable management margins without pretending missing information is zero or claiming that a transaction app is already a complete statutory accounting system.
+Approve all twelve decisions as one coherent policy. They produce useful, auditable management margins without requiring shop users to understand accounting, pretending missing information is zero, or claiming that a transaction app is already a complete statutory accounting system.
 
 After approval, the next checkpoint is an additive schema/service/test design. No React COGS or profitability screen should be enabled before the native cost engine and coverage statuses pass the focused and full device suites.

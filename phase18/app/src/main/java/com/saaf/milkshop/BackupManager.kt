@@ -9,6 +9,7 @@ import com.saaf.milkshop.domain.AppPasswordPolicy
 import com.saaf.milkshop.domain.Argon2idPasswordHasher
 import com.saaf.milkshop.domain.NativeSessionManager
 import androidx.room3.withWriteTransaction
+import androidx.room3.executeSQL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator
@@ -35,7 +36,7 @@ class BackupManager(private val context: Context) {
     companion object {
         const val LEGACY_FORMAT_VERSION = 1
         const val FORMAT_VERSION = 2
-        const val CURRENT_SCHEMA_VERSION = 7
+        const val CURRENT_SCHEMA_VERSION = 8
         const val FULL_GROUP = "business"
         const val PLANNING_GROUP = "planning"
         const val PREFERENCES_GROUP = "preferences"
@@ -305,6 +306,14 @@ class BackupManager(private val context: Context) {
             val data = json.getJSONObject("data")
             val backupDao = database.backupDataDao()
             if (selection.business) {
+                Phase3CostingMigrationSql.immutableTriggerNames.forEach { executeSQL("DROP TRIGGER IF EXISTS $it") }
+                backupDao.deleteInventoryCostMovements()
+                backupDao.deleteCostProjectionState()
+                backupDao.deleteCostingPolicyComponents()
+                backupDao.deleteProductionLossAssessments()
+                backupDao.deleteYieldPolicyVersions()
+                backupDao.deleteInventoryCostBasisEntries()
+                backupDao.deleteCostingPolicyVersions()
                 backupDao.deleteDailyCloseActions()
                 backupDao.deleteOpeningAccountEntries()
                 backupDao.deleteOpeningInventoryEntries()
@@ -357,6 +366,11 @@ class BackupManager(private val context: Context) {
                     backupDao.updateAppUsers(users)
                     backupDao.insertUserCredentials(readUserCredentials(data.getJSONArray("user_credentials")))
                     backupDao.insertSavedRecoveryCodes(readSavedRecoveryCodes(data.getJSONArray("saved_recovery_codes")))
+                    backupDao.insertCostingPolicyVersions(readCostingPolicyVersions(data.optJSONArray("costing_policy_versions")))
+                    backupDao.insertCostingPolicyComponents(readCostingPolicyComponents(data.optJSONArray("costing_policy_components")))
+                    backupDao.insertInventoryCostBasisEntries(readInventoryCostBasisEntries(data.optJSONArray("inventory_cost_basis_entries")))
+                    backupDao.insertYieldPolicyVersions(readYieldPolicyVersions(data.optJSONArray("yield_policy_versions")))
+                    backupDao.insertProductionLossAssessments(readProductionLossAssessments(data.optJSONArray("production_loss_assessments")))
                 }
 
                 backupDao.insertAttendanceRecords(readAttendanceRecords(data.optJSONArray("attendance_records")))
@@ -378,6 +392,7 @@ class BackupManager(private val context: Context) {
                 backupDao.backfillVendorProfiles()
                 backupDao.backfillEmployeeProfiles()
                 backupDao.backfillExpenseCategoryProfiles()
+                Phase3CostingMigrationSql.immutableTriggers.forEach { executeSQL(it) }
             }
             if (selection.planning) {
                 backupDao.deleteBudgets()
@@ -404,6 +419,17 @@ class BackupManager(private val context: Context) {
         formatVersion: Int = LEGACY_FORMAT_VERSION,
     ): ByteArray {
         val dao = database.backupDataDao()
+        val costingPolicies = dao.costingPolicyVersions()
+        val costingComponents = dao.costingPolicyComponents()
+        val costBases = dao.inventoryCostBasisEntries()
+        val yieldPolicies = dao.yieldPolicyVersions()
+        val lossAssessments = dao.productionLossAssessments()
+        require(includeSecurity || (
+            costingPolicies.isEmpty() && costingComponents.isEmpty() && costBases.isEmpty() &&
+                yieldPolicies.isEmpty() && lossAssessments.isEmpty()
+            )) {
+            "Costing policy and opening-cost history require an encrypted backup"
+        }
         val root = JSONObject()
         val now = LocalDateTime.now()
         root.put("metadata", JSONObject().apply {
@@ -444,6 +470,11 @@ class BackupManager(private val context: Context) {
                 put("saved_recovery_codes", JSONArray(dao.savedRecoveryCodes().map(::savedRecoveryCodeJson)))
                 put("security_audit_entries", JSONArray(dao.securityAuditEntries().map(::securityAuditEntryJson)))
                 put("event_actor_links", JSONArray(dao.eventActorLinks().map(::eventActorLinkJson)))
+                put("costing_policy_versions", JSONArray(costingPolicies.map(::costingPolicyVersionJson)))
+                put("costing_policy_components", JSONArray(costingComponents.map(::costingPolicyComponentJson)))
+                put("inventory_cost_basis_entries", JSONArray(costBases.map(::inventoryCostBasisJson)))
+                put("yield_policy_versions", JSONArray(yieldPolicies.map(::yieldPolicyVersionJson)))
+                put("production_loss_assessments", JSONArray(lossAssessments.map(::productionLossAssessmentJson)))
             }
         })
         val unsigned = root.toString()
@@ -845,6 +876,34 @@ class BackupManager(private val context: Context) {
         put("event_id", v.eventId); put("actor_user_id", v.actorUserId); put("actor_name_snapshot", v.actorNameSnapshot)
         put("actor_role_snapshot", v.actorRoleSnapshot); put("attributed_at", v.attributedAt)
     }
+    private fun costingPolicyVersionJson(v: CostingPolicyVersionEntity) = JSONObject().apply {
+        put("policy_id", v.policyId); put("calendar_month", v.calendarMonth); put("normal_capacity_kg", v.normalCapacityKg)
+        put("review_reason", v.reviewReason); putNullable("notes", v.notes); put("approved_at", v.approvedAt)
+        put("approved_by_user_id", v.approvedByUserId); putNullable("supersedes_policy_id", v.supersedesPolicyId)
+    }
+    private fun costingPolicyComponentJson(v: CostingPolicyComponentEntity) = JSONObject().apply {
+        put("policy_id", v.policyId); put("component_code", v.componentCode); put("source_amount_paisa", v.sourceAmountPaisa)
+        put("basis_quantity_kg", v.basisQuantityKg)
+    }
+    private fun inventoryCostBasisJson(v: InventoryCostBasisEntity) = JSONObject().apply {
+        put("basis_id", v.basisId); put("opening_event_id", v.openingEventId); put("product_id", v.productId)
+        put("quantity", v.quantity); put("total_cost_paisa", v.totalCostPaisa); put("basis_kind", v.basisKind)
+        putNullable("evidence_notes", v.evidenceNotes); put("created_at", v.createdAt); put("created_by_user_id", v.createdByUserId)
+        putNullable("supersedes_basis_id", v.supersedesBasisId)
+    }
+    private fun yieldPolicyVersionJson(v: YieldPolicyVersionEntity) = JSONObject().apply {
+        put("yield_policy_id", v.yieldPolicyId); put("sample_start_date", v.sampleStartDate); put("sample_end_date", v.sampleEndDate)
+        put("accepted_batch_count", v.acceptedBatchCount); put("median_yield_ratio", v.medianYieldRatio); put("mad_yield_ratio", v.madYieldRatio)
+        put("lower_alert_limit", v.lowerAlertLimit); put("upper_alert_limit", v.upperAlertLimit); put("effective_from", v.effectiveFrom)
+        put("approved_at", v.approvedAt); put("approved_by_user_id", v.approvedByUserId)
+        putNullable("supersedes_yield_policy_id", v.supersedesYieldPolicyId)
+    }
+    private fun productionLossAssessmentJson(v: ProductionLossAssessmentEntity) = JSONObject().apply {
+        put("assessment_id", v.assessmentId); put("production_event_id", v.productionEventId); put("classification", v.classification)
+        put("abnormal_milk_liters", v.abnormalMilkLiters); put("reason_code", v.reasonCode); putNullable("notes", v.notes)
+        put("assessed_at", v.assessedAt); put("assessed_by_user_id", v.assessedByUserId)
+        putNullable("supersedes_assessment_id", v.supersedesAssessmentId)
+    }
 
     private fun JSONObject.putNullable(key: String, value: Any?) { put(key, value ?: JSONObject.NULL) }
 
@@ -955,6 +1014,41 @@ class BackupManager(private val context: Context) {
         EventActorLinkEntity(
             eventId = it.getLong("event_id"), actorUserId = it.getLong("actor_user_id"), actorNameSnapshot = it.getString("actor_name_snapshot"),
             actorRoleSnapshot = it.getString("actor_role_snapshot"), attributedAt = it.getString("attributed_at")
+        )
+    } }
+    private fun readCostingPolicyVersions(a: JSONArray?): List<CostingPolicyVersionEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
+        CostingPolicyVersionEntity(
+            policyId = it.getLong("policy_id"), calendarMonth = it.getString("calendar_month"), normalCapacityKg = it.getString("normal_capacity_kg"),
+            reviewReason = it.getString("review_reason"), notes = it.optStringOrNull("notes"), approvedAt = it.getString("approved_at"),
+            approvedByUserId = it.getLong("approved_by_user_id"), supersedesPolicyId = it.optLongOrNull("supersedes_policy_id")
+        )
+    } }
+    private fun readCostingPolicyComponents(a: JSONArray?): List<CostingPolicyComponentEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
+        CostingPolicyComponentEntity(it.getLong("policy_id"), it.getString("component_code"), it.getLong("source_amount_paisa"), it.getString("basis_quantity_kg"))
+    } }
+    private fun readInventoryCostBasisEntries(a: JSONArray?): List<InventoryCostBasisEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
+        InventoryCostBasisEntity(
+            basisId = it.getLong("basis_id"), openingEventId = it.getLong("opening_event_id"), productId = it.getLong("product_id"),
+            quantity = it.getString("quantity"), totalCostPaisa = it.getLong("total_cost_paisa"), basisKind = it.getString("basis_kind"),
+            evidenceNotes = it.optStringOrNull("evidence_notes"), createdAt = it.getString("created_at"), createdByUserId = it.getLong("created_by_user_id"),
+            supersedesBasisId = it.optLongOrNull("supersedes_basis_id")
+        )
+    } }
+    private fun readYieldPolicyVersions(a: JSONArray?): List<YieldPolicyVersionEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
+        YieldPolicyVersionEntity(
+            yieldPolicyId = it.getLong("yield_policy_id"), sampleStartDate = it.getString("sample_start_date"), sampleEndDate = it.getString("sample_end_date"),
+            acceptedBatchCount = it.getInt("accepted_batch_count"), medianYieldRatio = it.getString("median_yield_ratio"), madYieldRatio = it.getString("mad_yield_ratio"),
+            lowerAlertLimit = it.getString("lower_alert_limit"), upperAlertLimit = it.getString("upper_alert_limit"), effectiveFrom = it.getString("effective_from"),
+            approvedAt = it.getString("approved_at"), approvedByUserId = it.getLong("approved_by_user_id"),
+            supersedesYieldPolicyId = it.optLongOrNull("supersedes_yield_policy_id")
+        )
+    } }
+    private fun readProductionLossAssessments(a: JSONArray?): List<ProductionLossAssessmentEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
+        ProductionLossAssessmentEntity(
+            assessmentId = it.getLong("assessment_id"), productionEventId = it.getLong("production_event_id"), classification = it.getString("classification"),
+            abnormalMilkLiters = it.getString("abnormal_milk_liters"), reasonCode = it.getString("reason_code"), notes = it.optStringOrNull("notes"),
+            assessedAt = it.getString("assessed_at"), assessedByUserId = it.getLong("assessed_by_user_id"),
+            supersedesAssessmentId = it.optLongOrNull("supersedes_assessment_id")
         )
     } }
 

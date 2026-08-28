@@ -1,6 +1,6 @@
 # Phase 3 — Native Phase 18 Capability Expansion
 
-**Status: IN PROGRESS — reconciled 2026-08-27; all approved Tier 1/Tier 2 and native-security work is implemented and device-verified, with authoritative costing/COGS as the sole remaining Phase 3 domain gate**
+**Status: COMPLETE — reconciled 2026-08-28; all approved native expansion, security, and authoritative Milk/Yogurt costing work is implemented and device-verified**
 
 Current cross-phase status and early-work credits are defined in `ROADMAP_RECONCILIATION_2026-08-27.md`. React/bridge delivery remains in its original later phases and is not a Phase 3 completion gate.
 
@@ -211,7 +211,7 @@ Approval should cover these principles:
 6. Product metadata/archive support may be added without allowing direct stock assignment.
 7. At the schema-v4 checkpoint, opening state, daily-close locking semantics and COGS/costing remained separate design approvals before their business rules could be coded.
 
-The SQL blueprint and frozen logic specification remain byte-for-byte unchanged. Store identity/opening state and daily-close controls were subsequently approved and implemented in schema versions 5 and 6. COGS/costing remains a separate future decision.
+The SQL blueprint and frozen logic specification remain byte-for-byte unchanged. Store identity/opening state and daily-close controls were subsequently approved and implemented in schema versions 5 and 6. At that historical checkpoint, COGS/costing still required a separate future decision; it was later approved and delivered in schema version 8 as recorded below.
 
 ---
 
@@ -408,18 +408,42 @@ Legacy format-1 `.milkbackup` remains readable checksummed JSON and excludes sch
 
 Automatic app-private snapshots now use AES-256-GCM under a non-exportable random key generated and held by Android Keystore. The authenticated payload contains user/security state but never active sessions or transient failed-login counters, failure timestamps, or lockout deadlines. Local files can be read only while the same installation's Keystore key remains available; security-bearing local restore requires a pre-owner-setup destination and invalidates all supplied sessions.
 
-Verification on connected device `SM-A065F`:
+Schema-7 checkpoint verification on connected device `SM-A065F`:
 
 - Kotlin and Android-test Kotlin compilation — PASS;
 - targeted user-security, migration, and authenticated-shell suite — 11/11 PASS;
 - focused backup/restore suite — 8/8 PASS;
 - complete connected-device regression — 103/103 PASS, 0 skipped, 0 failed.
 
-## Remaining Phase 3 gate
+## Phase 3 completion — schema-8 costing foundation
 
-The sole remaining Phase 3 domain gate is COGS, spoilage valuation, gross profit, net profit, and per-product profitability. The researched recommendation is recorded in `PHASE3_COGS_PROFITABILITY_DECISION_PROPOSAL.md`; it awaits explicit approval before any migration or implementation.
+The user approved `PHASE3_COGS_PROFITABILITY_DECISION_PROPOSAL.md`; `PHASE3_COGS_IMPLEMENTATION_DESIGN.md` records the implemented contract. Room schema version 8 now provides append-only costing-policy, opening-cost-basis, yield-policy, and production-loss source truth plus deterministic rebuildable projections.
+
+The native layer implements:
+
+- moving-weighted-average Milk acquisition cost with integer-paisa residual handling;
+- effective-dated, component-backed monthly Yogurt conversion cost;
+- exact-quantity, evidence-labelled opening cost bases without fabricated upgrade entries;
+- median/MAD yield calibration after 30 accepted batches spanning at least 28 days;
+- review alerts that never invent an abnormal loss, plus explicit authorized loss assessments;
+- correction-leaf replay for purchase, production, sale, spoilage, and abnormal-loss costing;
+- per-product sales, COGS, gross profit/margin, spoilage, abnormal loss, and recorded operating-result reads;
+- null/withheld results and stable coverage codes where cost is not supportable;
+- encrypted source-truth backup/restore with derived projection rebuild.
+
+Formal lower-of-cost/NRV write-down/reversal support is deliberately deferred under the approved materiality trigger. Reports identify themselves as `cost_based_management` / `cost_only_no_nrv`; they do not claim statutory profit or IFRS compliance. General merchandise acquisition costing is also outside this first slice.
+
+Verification on connected device `SM-A065F`:
+
+- Kotlin and Android-test Kotlin compilation — PASS;
+- focused costing plus backup/restore suite — 14/14 PASS;
+- complete connected-device regression — 111/111 PASS, 0 skipped, 0 failed;
+- migration 7→8 creates no artificial cost source/opening-cost truth;
+- frozen specification and SQL blueprint hashes remain unchanged.
 
 The canonical bridge contract and React/hybrid UI integration remain required, but they belong to Phases 6–10 rather than Phase 3. No React/bridge wiring is part of this checkpoint; the authenticated XML/native shell is complete and receives early cross-phase credit in the reconciliation record.
+
+The proposed contextual financial info-button layer is deferred. This does not relax the later UI requirement to use plain shop language, translate reason/action codes, and avoid exposing raw accounting jargon.
 
 ## Build Fix / Verification Update
 

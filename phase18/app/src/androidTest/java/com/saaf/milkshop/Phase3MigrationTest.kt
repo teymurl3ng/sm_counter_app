@@ -28,7 +28,7 @@ class Phase3MigrationTest {
         databaseFactory = {
             Room.databaseBuilder<MilkShopDatabase>(context, databaseName)
                 .setDriver(BundledSQLiteDriver())
-                .addMigrations(MilkShopDatabase.MIGRATION_3_4, MilkShopDatabase.MIGRATION_4_5, MilkShopDatabase.MIGRATION_5_6, MilkShopDatabase.MIGRATION_6_7)
+                .addMigrations(MilkShopDatabase.MIGRATION_3_4, MilkShopDatabase.MIGRATION_4_5, MilkShopDatabase.MIGRATION_5_6, MilkShopDatabase.MIGRATION_6_7, MilkShopDatabase.MIGRATION_7_8)
                 .build()
         },
         autoMigrationSpecs = emptyList(),
@@ -116,6 +116,51 @@ class Phase3MigrationTest {
             assertEquals(0L, connection.scalarLong("SELECT COUNT(*) FROM saved_recovery_codes"))
             assertEquals(0L, connection.scalarLong("SELECT COUNT(*) FROM security_audit_entries"))
             assertEquals(0L, connection.scalarLong("SELECT COUNT(*) FROM event_actor_links"))
+        }
+    }
+
+    @Test
+    fun migration7To8_preservesExistingLedger_andCreatesNoArtificialCostTruth() = runBlocking {
+        context.deleteDatabase(databaseName)
+        helper.createDatabase(7).apply {
+            execSQL(
+                """
+                INSERT INTO events(created_at, occurred_at, event_type, amount, surcharge_applied)
+                VALUES ('2026-08-27T00:00:00Z', '2026-08-27', 'VENDOR_PAYMENT', 100, 0)
+                """.trimIndent()
+            )
+            close()
+        }
+
+        helper.runMigrationsAndValidate(8, listOf(MilkShopDatabase.MIGRATION_7_8)).use { connection ->
+            assertEquals(1L, connection.scalarLong("SELECT COUNT(*) FROM events"))
+            assertEquals(0L, connection.scalarLong("SELECT COUNT(*) FROM costing_policy_versions"))
+            assertEquals(0L, connection.scalarLong("SELECT COUNT(*) FROM costing_policy_components"))
+            assertEquals(0L, connection.scalarLong("SELECT COUNT(*) FROM inventory_cost_basis_entries"))
+            assertEquals(0L, connection.scalarLong("SELECT COUNT(*) FROM yield_policy_versions"))
+            assertEquals(0L, connection.scalarLong("SELECT COUNT(*) FROM production_loss_assessments"))
+            assertEquals(0L, connection.scalarLong("SELECT COUNT(*) FROM inventory_cost_movements"))
+            assertEquals(0L, connection.scalarLong("SELECT COUNT(*) FROM cost_projection_state"))
+
+            connection.execSQL(
+                """
+                INSERT INTO app_users(login_name, display_name, role, status, credential_setup_required, created_at, updated_at)
+                VALUES ('migration.owner', 'Migration Owner', 'owner', 'active', 0, '2026-08-27T00:00:00Z', '2026-08-27T00:00:00Z')
+                """.trimIndent()
+            )
+            connection.execSQL(
+                """
+                INSERT INTO costing_policy_versions(calendar_month, normal_capacity_kg, review_reason, approved_at, approved_by_user_id)
+                VALUES ('2026-08', '100', 'monthly', '2026-08-27T00:00:00Z', 1)
+                """.trimIndent()
+            )
+            var immutable = false
+            try {
+                connection.execSQL("UPDATE costing_policy_versions SET notes = 'changed' WHERE policy_id = 1")
+            } catch (_: Exception) {
+                immutable = true
+            }
+            assertEquals(true, immutable)
         }
     }
 

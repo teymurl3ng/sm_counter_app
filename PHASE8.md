@@ -163,13 +163,13 @@ The runtime now advertises thirty implemented actions. `command.auth.reauthentic
 
 Before starting Supplier Profiles, the active hybrid path was reorganized without changing its public behavior:
 
-- the 733-line Phase 8 shell was split into authentication, workspace navigation, Product, Customer, Supplier, Employee Profile, Attendance, Business Settings, Expense Categories, Opening State, bridge-action, shared UI, and shared model modules; after Opening State wiring the shell is 266 lines and the new opening modules are 105 and 52 lines;
-- the 518-line bridge dispatcher was split into protocol validation, domain handlers, JSON mapping, and a 56-line dispatcher;
+- the 733-line Phase 8 shell was split into authentication, workspace navigation, Product, Customer, Supplier, Employee Profile, Attendance, Business Settings, Expense Categories, Opening State, bridge-action, shared UI, and shared model modules; the latest checkpoint extracted the remaining Product/Customer/Supplier command construction into a 105-line `masterDataBridgeActions` module and reduced the shell from 266 to 181 lines;
+- the former 353-line multi-domain bridge-handler container was removed. Authentication, Master Data, Employees/Attendance, and Settings/Opening State now live in focused 76-, 120-, 85-, and 148-line handlers, while the dispatcher remains 60 lines;
 - the 660-line Phase 5 read-model service remains the stable caller-facing façade but is now 47 lines, delegating to focused identity/master-data, operational, financial, costing/planning, and security readers;
 - generated contract projections and inactive inherited prototype screens were deliberately left alone;
 - future handwritten files should be reviewed for separation when they approach roughly 300–400 lines, with responsibility and cohesion taking priority over an arbitrary number.
 
-The checkpoint changed no Room schema, DTO shape, bridge action, permission rule, accounting formula, element ID, or user workflow. Its focused device regression covered the Phase 5 read model and Phase 7–8 hybrid flows: **13/13 PASS**.
+The checkpoint changed no Room schema, DTO shape, bridge action, permission rule, accounting formula, element ID, or user workflow. The latest focused device regression covered authentication plus every refactored Phase 8 workflow: **24/24 PASS**. The complete suite remained **148/148 PASS**.
 
 ## 11. Verification checkpoint
 

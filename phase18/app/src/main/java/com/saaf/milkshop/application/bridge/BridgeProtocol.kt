@@ -245,6 +245,9 @@ internal fun strictObject(value: JSONObject, required: Set<String>, allowed: Set
 
 internal class BridgeProtocolFailure(val code: String, message: String, val field: String? = null) : IllegalArgumentException(message)
 
+internal fun unavailableBridgeAction(): Nothing =
+    throw BridgeProtocolFailure("invalid_request", "This action is not available in the current app slice")
+
 internal fun JSONObject.putNullable(name: String, value: Any?): JSONObject = put(name, value ?: JSONObject.NULL)
 
 internal fun jsonArray(values: Iterable<String>): JSONArray = JSONArray().apply { values.forEach(::put) }

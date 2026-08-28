@@ -233,7 +233,7 @@ The packaged React/WebView/Android vertical slice is implemented and device-prov
 
 ## Phase 8 — IN PROGRESS
 
-The screen capability ledger is in `PHASE8.md`. Master-data, attendance, editable store identity, shop-wide PKR rates, expense categories, and optional Opening State are complete with awaited native refresh, Kotlin permission enforcement, recent authentication where required, durable actor audit, and packaged physical-device evidence. The active React shell, bridge dispatcher, and Phase 5 read-model service remain split into focused modules. The runtime subset is now thirty actions while the frozen contract remains version 1 with 78 operations. The full connected suite passes 148/148. Daily Operations is the current continuation point and must retain native-only totals, stock, balances, and costing.
+The screen capability ledger is in `PHASE8.md`. Master-data, attendance, editable store identity, shop-wide PKR rates, expense categories, and optional Opening State are complete with awaited native refresh, Kotlin permission enforcement, recent authentication where required, durable actor audit, and packaged physical-device evidence. The active React shell is 181 lines after master-data actions were extracted; native Authentication, Master Data, Employees/Attendance, and Settings/Opening State handlers are separate focused files, and the dispatcher remains 60 lines. The runtime subset is now thirty actions while the frozen contract remains version 1 with 78 operations. The focused structural suite passes 24/24 and the full connected suite passes 148/148. Daily Operations is the current continuation point and must retain native-only totals, stock, balances, and costing.
 
 ---
 

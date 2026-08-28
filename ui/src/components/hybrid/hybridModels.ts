@@ -61,6 +61,15 @@ export type OpeningStateDraft = {
   notes: string;
 };
 
+export type PurchaseDraft = {
+  vendorAccountId: Int64String;
+  occurredAt: string;
+  rawLiters: string;
+  fatPercent: string;
+  lrReading: string;
+  notes: string;
+};
+
 export type OpeningAccountOption = {
   accountId: Int64String;
   name: string;

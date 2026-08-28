@@ -51,6 +51,8 @@ internal class HybridOperationalReadService(
         val needsPaymentAccounts = canSell || canPaySupplier || canPaySalary || allows(AppPermission.EXPENSE)
         val settings = database.settingsDao().getAll().associate { it.key to it.value }
         val productProfiles = database.productProfileDao().all().associateBy { it.productId }
+        val customerProfiles = database.customerProfileDao().all().associateBy { it.accountId }
+        val vendorProfiles = database.vendorProfileDao().all().associateBy { it.accountId }
         val employeeProfiles = database.employeeProfileDao().all().associateBy { it.accountId }
         suspend fun refs(category: String) = database.accountDao().findByCategory(category).map { AccountReferenceDto(it.accountId, it.name) }
         val settingKeys = com.saaf.milkshop.domain.SettingKeys
@@ -58,8 +60,8 @@ internal class HybridOperationalReadService(
             products = database.productDao().all().filter { product ->
                 (canSell || canPurchase || canProduce || canDeliver) && productProfiles[product.productId]?.archived != true
             }.map { ProductReferenceDto(it.productId, it.name, it.unit) },
-            customers = if (canSell || canDeliver) refs("Customer") else emptyList(),
-            vendors = if (canPurchase || canPaySupplier) refs("Vendor") else emptyList(),
+            customers = if (canSell || canDeliver) refs("Customer").filter { customerProfiles[it.accountId]?.active != false } else emptyList(),
+            vendors = if (canPurchase || canPaySupplier) refs("Vendor").filter { vendorProfiles[it.accountId]?.active != false } else emptyList(),
             employees = if (canPaySalary || canAttend) {
                 database.accountDao().findByCategory("Salary")
                     .filter { employeeProfiles[it.accountId]?.active != false }

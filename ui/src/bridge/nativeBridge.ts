@@ -51,6 +51,8 @@ export const RUNTIME_ACTIONS = [
   'command.renameVendor',
   'command.saveVendorProfile',
   'query.transactionReferences',
+  'query.dashboard',
+  'command.recordPurchase',
   'query.attendance',
   'command.createEmployee',
   'command.renameEmployee',

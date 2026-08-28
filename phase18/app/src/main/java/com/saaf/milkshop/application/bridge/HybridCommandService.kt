@@ -17,6 +17,7 @@ import java.time.Instant
 
 class BridgeCommandConflict(message: String) : IllegalStateException(message)
 class BridgeCommandNotFound(message: String) : IllegalStateException(message)
+class BridgeCommandDayClosed(message: String) : IllegalStateException(message)
 
 /**
  * Authenticated application-command boundary for the Phase 7 proof slice.

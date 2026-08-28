@@ -5,6 +5,7 @@ import com.saaf.milkshop.application.readmodels.BusinessSettingsDto
 import com.saaf.milkshop.application.readmodels.AccountReferenceDto
 import com.saaf.milkshop.application.readmodels.AttendanceDto
 import com.saaf.milkshop.application.readmodels.CurrentSessionDto
+import com.saaf.milkshop.application.readmodels.DashboardDto
 import com.saaf.milkshop.application.readmodels.CustomerDto
 import com.saaf.milkshop.application.readmodels.EmployeeDto
 import com.saaf.milkshop.application.readmodels.ExpenseCategoryDto
@@ -69,6 +70,20 @@ internal fun transactionReferencesJson(value: TransactionReferencesDto): JSONObj
     .putNullable("retailMilkRatePaisaPerUnit", value.retailMilkRatePaisaPerUnit?.toString())
     .putNullable("retailYogurtRatePaisaPerUnit", value.retailYogurtRatePaisaPerUnit?.toString())
     .putNullable("defaultDeliverySurchargePaisa", value.defaultDeliverySurchargePaisa?.toString())
+
+internal fun dashboardJson(value: DashboardDto): JSONObject = JSONObject()
+    .put("stock", jsonArray(value.stock) { stock ->
+        JSONObject().put("productId", stock.productId.toString()).put("name", stock.name)
+            .put("unit", stock.unit).put("quantityOnHand", stock.quantityOnHand)
+    })
+    .put("totals", JSONObject()
+        .put("startDateInclusive", value.totals.startDateInclusive)
+        .put("endDateExclusive", value.totals.endDateExclusive)
+        .put("eventCount", value.totals.eventCount.toString())
+        .put("saleQuantity", value.totals.saleQuantity)
+        .put("purchasedMilkLiters", value.totals.purchasedMilkLiters)
+        .put("producedYogurtKg", value.totals.producedYogurtKg)
+        .put("productionMilkUsedLiters", value.totals.productionMilkUsedLiters))
 
 internal fun attendanceJson(values: List<AttendanceDto>): JSONArray = jsonArray(values, ::attendanceItemJson)
 

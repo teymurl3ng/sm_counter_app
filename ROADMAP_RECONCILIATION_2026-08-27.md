@@ -77,7 +77,7 @@ Portable backup format 2 uses Argon2id-derived AES-256-GCM. Automatic local snap
 | 5 — Native Read Models | **Complete** | Preserve `PHASE5_DTO_CATALOG.md`: integer-PKR-paisa money, canonical decimal quantities, explicit correction/coverage state, permission-aware reads, stable costing codes, and no credential/session-handle material. |
 | 6 — Bridge Contract | **Complete** | Preserve contract version 1, its manifest hash, lossless/authenticated envelopes, generated TypeScript/Kotlin projections, and mandatory pre-build drift checker. |
 | 7 — Hybrid Vertical Slice | **Complete** | Preserve the separately built packaged assets, restricted app-assets origin, contract handshake, memory-only session flow, protected product command/audit, and 3-test physical-device proof. |
-| 8 — Screen Wiring | **In progress — management, settings, and opening state complete** | Products, Customers, Suppliers, Employees/Attendance, editable store identity, shop-wide PKR rates, Expense Categories, and optional Opening State are native-backed and device-proven. Daily Operations is next. Continue replacing mock/local state screen-by-screen with awaited native queries and commands plus hybrid integration tests. |
+| 8 — Screen Wiring | **In progress — first Daily Operations slice complete** | Management, core settings, Opening State, the operational dashboard, and supplier milk purchase are native-backed and device-proven. Sales is next. Continue replacing mock/local state screen-by-screen with awaited native queries and commands plus hybrid integration tests. |
 | 9 — Runtime Integration | **Partial native credit; hybrid work not started** | Prove WebView navigation, lifecycle, process recreation, keyboard, errors, logout/back-stack protection, and session expiry. |
 | 10 — Functional Completion | **Not started** | Close the capability matrix with every retained capability genuinely native-backed and wired. |
 | 11 — Integrity/Recovery/Concurrency | **Substantial security/backup early credit; still open** | Complete concurrent-write, backup-during-write, large-history, repeated recovery, and remaining session/concurrency tests. Reassess the deliberately deferred lower-of-cost/NRV subsystem against the approved materiality and business triggers before hardening closes. |
@@ -89,7 +89,7 @@ Portable backup format 2 uses Argon2id-derived AES-256-GCM. Automatic local snap
 
 ## Current verification credit
 
-The Phase 7 checkpoint passed **127/127** connected-device tests. Twenty-one Phase 8 focused tests bring the current complete suite to **148/148**, with zero skipped, failed, or errored tests; the host-side debug unit suite passes **7/7**. Phase 8 now proves native master-data lifecycle, attendance revision history, editable PKR store identity, exact shop-wide rates, expense-category lifecycle, optional Opening State record/correction, permission-bypass denial, recent authentication, audit, and packaged-screen evidence. Phase 6 contract version 1 still defines 78 operations; the runtime now implements thirty. `PHASE8.md` records the active screen ledger.
+The Phase 7 checkpoint passed **127/127** connected-device tests. Twenty-five Phase 8 focused tests bring the current complete suite to **152/152**, with zero skipped, failed, or errored tests; the host-side debug unit suite passes **7/7**. Phase 8 now also proves exact native supplier-purchase calculation/posting, dashboard refresh, closed-day and permission rejection, actor audit, and packaged-screen evidence. Phase 6 contract version 1 still defines 78 operations; the runtime now implements thirty-two. `PHASE8.md` records the active screen ledger.
 
 The two immutable hashes remain:
 
@@ -103,7 +103,7 @@ The two immutable hashes remain:
 3. **Completed:** implement and freeze the Phase 5 hybrid-facing native read-model/DTO catalog.
 4. **Completed:** create the Phase 6 canonical bridge contract and drift checker.
 5. **Completed:** prove the Phase 7 authenticated physical-device hybrid vertical slice before scaling.
-6. **In progress:** perform Phase 8 screen-by-screen wiring. Products, Customer Profiles, Supplier Profiles, Employees/Attendance, core Settings, and optional Opening State are complete; Daily Operations is next.
+6. **In progress:** perform Phase 8 screen-by-screen wiring. Management, core Settings, optional Opening State, dashboard, and supplier milk purchase are complete; sales is next.
 7. Complete Phases 9–10 runtime integration and capability closure.
 8. Apply the early Phase 11 credit, finish its remaining concurrency/recovery gates, and perform the deferred NRV trigger review before hardening closes.
 9. Complete hybrid UI fidelity and mock/dead-state cleanup in Phases 12–13.
@@ -111,4 +111,4 @@ The two immutable hashes remain:
 
 ## Immediate next gate
 
-Phases 3–7 are complete and Phase 8 is active. Master-data, attendance, core settings, expense categories, and optional Opening State now have physical-device evidence; the full suite passes 148/148. The immediate gate is Daily Operations, split into coherent purchase, sale, production, expense, payment, and spoilage substeps backed only by native commands and declared refreshes. Prototype `costRate` values and client-side stock, balance, or profit calculations remain non-authoritative.
+Phases 3–7 are complete and Phase 8 is active. Management, core settings, optional Opening State, dashboard, and supplier milk purchase now have physical-device evidence; the full suite passes 152/152. The immediate gate is the sales substep of Daily Operations, followed by production, expense, payment, and spoilage slices backed only by native commands and declared refreshes. Prototype `costRate` values and client-side stock, balance, or profit calculations remain non-authoritative.

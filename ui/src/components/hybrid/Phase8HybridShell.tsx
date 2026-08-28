@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { BusinessSettingsDto, CurrentSessionDto, MasterDataDto, SessionHandle, TransactionReferencesDto } from '../../bridge/contract.generated';
+import type { BusinessSettingsDto, CurrentSessionDto, DashboardDto, IsoDateString, MasterDataDto, SessionHandle, TransactionReferencesDto } from '../../bridge/contract.generated';
 import { callNative, NativeBridgeError, verifyNativeContract } from '../../bridge/nativeBridge';
 import { Login, OwnerSetup, RecoveryCodeScreen } from './AuthScreens';
 import { CenteredMessage } from './HybridUi';
 import { ManagementWorkspace } from './ManagementWorkspace';
 import { employeeBridgeActions } from './employeeBridgeActions';
+import { dailyOperationsBridgeActions } from './dailyOperationsBridgeActions';
 import { masterDataBridgeActions } from './masterDataBridgeActions';
 import { settingsBridgeActions } from './settingsBridgeActions';
 import { errorMessage, type HybridStage } from './hybridModels';
@@ -16,20 +17,25 @@ export function Phase8HybridShell() {
   const [masterData, setMasterData] = useState<MasterDataDto | null>(null);
   const [businessSettings, setBusinessSettings] = useState<BusinessSettingsDto | null>(null);
   const [transactionReferences, setTransactionReferences] = useState<TransactionReferencesDto | null>(null);
+  const [dashboard, setDashboard] = useState<DashboardDto | null>(null);
   const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   const loadAuthorizedData = useCallback(async (activeSession: SessionHandle, user: CurrentSessionDto) => {
-    const [loadedMasterData, loadedReferences, loadedSettings] = await Promise.all([
+    const today = localDate(0);
+    const tomorrow = localDate(1);
+    const [loadedMasterData, loadedReferences, loadedSettings, loadedDashboard] = await Promise.all([
       user.effectivePermissionCodes.includes('manage_master_data') ? callNative('query.masterData', {}, activeSession) : Promise.resolve(null),
-      (user.effectivePermissionCodes.includes('attendance') || user.effectivePermissionCodes.includes('manage_business_settings')) ? callNative('query.transactionReferences', {}, activeSession) : Promise.resolve(null),
+      user.effectivePermissionCodes.includes('view_operational') ? callNative('query.transactionReferences', {}, activeSession) : Promise.resolve(null),
       user.effectivePermissionCodes.includes('manage_business_settings') ? callNative('query.businessSettings', {}, activeSession) : Promise.resolve(null),
+      user.effectivePermissionCodes.includes('view_operational') ? callNative('query.dashboard', { startDateInclusive: today, endDateExclusive: tomorrow }, activeSession) : Promise.resolve(null),
     ]);
     setMasterData(loadedMasterData);
     setTransactionReferences(loadedReferences);
     setBusinessSettings(loadedSettings);
+    setDashboard(loadedDashboard);
   }, []);
 
   const clearSession = useCallback(() => {
@@ -38,6 +44,7 @@ export function Phase8HybridShell() {
     setMasterData(null);
     setBusinessSettings(null);
     setTransactionReferences(null);
+    setDashboard(null);
     setRecoveryCode(null);
     setNotice(null);
     setStage('login');
@@ -99,6 +106,24 @@ export function Phase8HybridShell() {
     }
   };
 
+  const withResultRefresh = async <T,>(operation: () => Promise<T>, success: string): Promise<T> => {
+    if (!session || !currentUser) throw new Error('Sign in to continue.');
+    setBusy(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const result = await operation();
+      await loadAuthorizedData(session, currentUser);
+      setNotice(success);
+      return result;
+    } catch (failure) {
+      setError(errorMessage(failure));
+      throw failure;
+    } finally {
+      setBusy(false);
+    }
+  };
+
   if (stage === 'checking') return <CenteredMessage title="Opening Saaf Milk" message="Checking the secure app connection…" />;
   if (stage === 'blocked') return <CenteredMessage title="Saaf Milk cannot open" message={error ?? 'The secure app connection is unavailable.'} />;
   if (stage === 'setup') return <OwnerSetup busy={busy} error={error} onSubmit={async (loginName, displayName, passphrase) => {
@@ -152,16 +177,19 @@ export function Phase8HybridShell() {
     if (session && currentUser) await loadAuthorizedData(session, currentUser);
   });
   const settingsActions = settingsBridgeActions(session, withMasterDataRefresh);
+  const dailyOperationsActions = dailyOperationsBridgeActions(session, withResultRefresh);
 
   return <ManagementWorkspace
     busy={busy}
     currentUser={currentUser}
     error={error}
     masterData={masterData}
+    dashboard={dashboard}
     businessSettings={businessSettings}
     transactionReferences={transactionReferences}
     notice={notice}
     onLogout={logout}
+    onRecordPurchase={dailyOperationsActions.recordPurchase}
     onSaveProduct={masterDataActions.saveProduct}
     onSetProductArchived={masterDataActions.setProductArchived}
     onSaveCustomer={masterDataActions.saveCustomer}
@@ -178,4 +206,12 @@ export function Phase8HybridShell() {
     onCreateExpenseCategory={settingsActions.createExpenseCategory}
     onSetExpenseCategoryArchived={settingsActions.setExpenseCategoryArchived}
   />;
+}
+
+function localDate(daysFromToday: number): IsoDateString {
+  const date = new Date();
+  date.setDate(date.getDate() + daysFromToday);
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}` as IsoDateString;
 }

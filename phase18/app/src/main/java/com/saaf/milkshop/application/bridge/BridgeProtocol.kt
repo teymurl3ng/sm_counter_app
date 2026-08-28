@@ -32,6 +32,11 @@ internal object HybridBridgeActions {
     const val RENAME_EMPLOYEE = "command.renameEmployee"
     const val SAVE_EMPLOYEE_PROFILE = "command.saveEmployeeProfile"
     const val RECORD_ATTENDANCE = "command.recordAttendance"
+    const val BUSINESS_SETTINGS = "query.businessSettings"
+    const val SAVE_STORE_IDENTITY = "command.saveStoreIdentity"
+    const val UPDATE_BUSINESS_SETTINGS = "command.updateBusinessSettings"
+    const val CREATE_EXPENSE_CATEGORY = "command.createExpenseCategory"
+    const val SET_EXPENSE_CATEGORY_ARCHIVED = "command.setExpenseCategoryArchived"
 
     val authentication = setOf(BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN, LOGOUT, CURRENT_SESSION)
     val masterData = setOf(
@@ -48,7 +53,8 @@ internal object HybridBridgeActions {
         TRANSACTION_REFERENCES,
     )
     val employees = setOf(ATTENDANCE, CREATE_EMPLOYEE, RENAME_EMPLOYEE, SAVE_EMPLOYEE_PROFILE, RECORD_ATTENDANCE)
-    val supported = listOf(BRIDGE_INFO) + authentication + masterData + employees
+    val settings = setOf(BUSINESS_SETTINGS, SAVE_STORE_IDENTITY, UPDATE_BUSINESS_SETTINGS, CREATE_EXPENSE_CATEGORY, SET_EXPENSE_CATEGORY_ARCHIVED)
+    val supported = listOf(BRIDGE_INFO) + authentication + masterData + employees + settings
     val authByAction = supported.associateWith { action ->
         if (action in setOf(BRIDGE_INFO, BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN)) "none" else "session"
     }
@@ -153,6 +159,9 @@ internal fun JSONObject.nullablePaisa(name: String): Long? {
     return raw.toLongOrNull() ?: throw BridgeProtocolFailure("validation_failed", "$name is outside the supported range", name)
 }
 
+internal fun JSONObject.requiredPaisa(name: String): Long = nullablePaisa(name)
+    ?: throw BridgeProtocolFailure("invalid_request", "$name must be an integer paisa string", name)
+
 internal fun JSONObject.requiredId(name: String): Long {
     val raw = requiredString(name)
     if (!Regex("[1-9][0-9]*").matches(raw)) throw BridgeProtocolFailure("validation_failed", "$name must be a positive record ID", name)
@@ -164,6 +173,9 @@ internal fun JSONObject.nullableDecimal(name: String): BigDecimal? {
     if (!Regex("-?(0|[1-9][0-9]*)(\\.[0-9]+)?").matches(raw)) throw BridgeProtocolFailure("validation_failed", "$name must be a decimal value", name)
     return runCatching { BigDecimal(raw) }.getOrElse { throw BridgeProtocolFailure("validation_failed", "$name is outside the supported range", name) }
 }
+
+internal fun JSONObject.requiredDecimal(name: String): BigDecimal = nullableDecimal(name)
+    ?: throw BridgeProtocolFailure("invalid_request", "$name must be a decimal string", name)
 
 internal fun JSONObject.requiredDate(name: String): String {
     val value = requiredString(name)

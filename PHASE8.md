@@ -1,6 +1,6 @@
 # Phase 8 — Screen-by-Screen Native UI Wiring
 
-**Status: IN PROGRESS — Products, Customer Profiles, Supplier Profiles, and Employees/Attendance complete 2026-08-28**
+**Status: IN PROGRESS — Products, Customers, Suppliers, Employees/Attendance, and core Settings complete 2026-08-28**
 
 ## 1. Purpose and working rule
 
@@ -25,7 +25,8 @@ The frozen logic specification, SQL blueprint, Phase 5 DTO catalog, and Phase 6 
 | Customers | `query.masterData`, create/rename/save-profile customer commands | **Milestone 2 complete** | Balance remains native-read-only; inactive customers retain history. |
 | Suppliers | `query.masterData`, create/rename/save-profile vendor commands | **Milestone 3 complete** | Balance remains native-read-only; no per-supplier milk rate. |
 | Employees and attendance | `query.masterData`, `query.transactionReferences`, `query.attendance`, employee/profile/attendance commands | **Milestone 4 complete** | Employee records remain separate from app logins; operators can mark attendance without profile authority. |
-| Expense categories and settings | `query.businessSettings`, master-data/settings commands | **Next** | Use editable store identity and PKR-native settings. |
+| Expense categories and core settings | `query.businessSettings`, store/rate/category commands | **Milestone 5 complete** | Editable store identity, fixed PKR, shop-wide rates, and non-destructive category lifecycle. |
+| Opening state setup/correction | business-settings/reference queries, opening commands, recent authentication | **Next** | Complete before daily operations so a fresh shop can deliberately record real starting balances. |
 | Daily operations | dashboard/reference queries and purchase/sale/production/expense/payment/spoilage commands | Queued | No UI-side totals, stock mutation, or cost formulas. |
 | Deliveries / wholesale | transaction references, deliveries, sale and delivery commands | Queued | Preserve delivery status and sale-link semantics. |
 | Customer/supplier ledgers | account-ledger query plus collection/payment commands | Queued | Display canonical native balances only. |
@@ -97,7 +98,23 @@ The active app now provides a native-backed Employees area:
 
 The runtime advertises twenty-two implemented actions. This adds `query.transactionReferences`, `query.attendance`, the three employee profile commands, and `command.recordAttendance` to the prior sixteen. The canonical contract remains version 1 with 78 operations; unimplemented actions are not advertised by the runtime handshake.
 
-## 7. Safety and business boundaries
+## 7. Milestone 5 — Expense Categories and Core Settings
+
+The active app now provides a permission-aware Settings area:
+
+- editable shop name, optional phone, and optional address, persisted as the singleton store identity;
+- fixed read-only `PKR` currency enforced again by the native store service;
+- exact PKR/paisa handling for supplier milk rate, supplier delivery fee, retail milk/yogurt rates, and default delivery surcharge;
+- canonical decimal handling for the native total-solids quality standard;
+- clear wording that these are shop-wide defaults and that React performs no purchase/sale calculation;
+- manager-accessible expense-category add, deactivate, and restore without granting business-rate authority;
+- retained category/account identity and historical expense meaning when a category is deactivated;
+- native positive-value, duplicate-name, missing-record, session, and permission enforcement;
+- durable actor snapshots for store, rate, and category changes.
+
+The runtime now advertises twenty-seven implemented actions: `query.businessSettings`, the two store/rate commands, and the two expense-category commands join the prior twenty-two. The canonical contract remains version 1 with 78 operations.
+
+## 8. Safety and business boundaries
 
 - Archiving changes future availability; it does not delete products or rewrite transaction history.
 - Inventory quantity remains event-derived. This screen has no direct “set stock” operation.
@@ -114,14 +131,18 @@ The runtime advertises twenty-two implemented actions. This adds `query.transact
 - Reference salary is planning/profile information; the canonical employee balance still comes only from saved salary transactions.
 - Attendance revisions preserve the superseded record. Inactive employees cannot receive new attendance marks.
 - Operators with attendance permission receive active employee references, not unrestricted master-data access.
+- Store identity is editable; it is not hardcoded in React. Currency remains database-constrained to PKR.
+- Business rates must be greater than zero and are stored through the existing atomic native settings service.
+- Supplier profiles still cannot override the shop-wide milk buying rate.
+- Expense-category deactivation removes future selection only; it does not delete the account or old expenses.
 - The old prototype view model remains inactive and is not imported by the packaged app.
 - No Room schema, frozen business formula, frozen DTO, or canonical bridge endpoint changed.
 
-## 8. Structural refactor checkpoint
+## 9. Structural refactor checkpoint
 
 Before starting Supplier Profiles, the active hybrid path was reorganized without changing its public behavior:
 
-- the 733-line Phase 8 shell was split into authentication, workspace navigation, Product, Customer, Supplier, Employee Profile, Attendance, bridge-action, shared UI, and shared model modules; after Employee/Attendance wiring the shell is 254 lines and no new handwritten React module exceeds 254 lines;
+- the 733-line Phase 8 shell was split into authentication, workspace navigation, Product, Customer, Supplier, Employee Profile, Attendance, Business Settings, Expense Categories, bridge-action, shared UI, and shared model modules; after Settings wiring the shell is 265 lines and no new handwritten React module exceeds 265 lines;
 - the 518-line bridge dispatcher was split into protocol validation, domain handlers, JSON mapping, and a 56-line dispatcher;
 - the 660-line Phase 5 read-model service remains the stable caller-facing façade but is now 47 lines, delegating to focused identity/master-data, operational, financial, costing/planning, and security readers;
 - generated contract projections and inactive inherited prototype screens were deliberately left alone;
@@ -129,7 +150,7 @@ Before starting Supplier Profiles, the active hybrid path was reorganized withou
 
 The checkpoint changed no Room schema, DTO shape, bridge action, permission rule, accounting formula, element ID, or user workflow. Its focused device regression covered the Phase 5 read model and Phase 7–8 hybrid flows: **13/13 PASS**.
 
-## 9. Verification checkpoint
+## 10. Verification checkpoint
 
 Physical device: `SM-A065F`.
 
@@ -137,7 +158,8 @@ Physical device: `SM-A065F`.
 - Phase 8 focused Customer Profiles suite — **3/3 PASS**;
 - Phase 8 focused Supplier Profiles suite — **3/3 PASS**;
 - Phase 8 focused Employees/Attendance suite — **4/4 PASS**;
-- complete connected-device regression — **140/140 PASS**, 0 skipped, 0 failed, 0 errors;
+- Phase 8 focused Settings/Expense Categories suite — **4/4 PASS**;
+- complete connected-device regression — **144/144 PASS**, 0 skipped, 0 failed, 0 errors;
 - host-side debug unit suite — **7/7 PASS**;
 - TypeScript check and production Vite build — PASS;
 - explicit web bundle packaging and Android asset gate — PASS;
@@ -145,14 +167,14 @@ Physical device: `SM-A065F`.
 - Phase 6 contract drift check — version 1, 78 operations, original SHA-256 — PASS;
 - frozen logic-spec and SQL hashes — unchanged.
 
-The focused tests prove Product owner update/archive/restore, Customer owner create/rename/profile/deactivate/restore, Supplier owner create/rename/profile/deactivate/restore, and Employee owner profile lifecycle with Room readback and durable actor audit. Attendance evidence covers operator access, same-day revision with preserved history, cashier denial, inactive-employee rejection, the absence of employee login/balance fields, and a packaged React-to-Room round trip.
+The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; and expense-category lifecycle with Room readback and durable actor audit. Settings evidence also covers positive-value validation, manager/operator separation, duplicate and missing category handling, and a packaged React-to-Room round trip. A full-suite-only timing failure in the new packaged test was traced to checking Room before the awaited UI save completed; the assertion now waits for the native success notice, after which both focused and complete suites pass.
 
-## 10. Current limitations and next milestone
+## 11. Current limitations and next milestone
 
-Phase 8 is not complete. Authentication, Products, Customer Profiles, Supplier Profiles, Employees, and Attendance execute through the active React product. Transactions, ledgers, reports, settings, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
+Phase 8 is not complete. Authentication, Products, Customer Profiles, Supplier Profiles, Employees, Attendance, editable store identity, core business rates, and expense categories execute through the active React product. Opening state, transactions, ledgers, reports, costing/planning controls, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
 
-The next milestone is **Expense Categories and Settings**. It must keep store identity editable, use PKR consistently, expose only native-authoritative values, and preserve the approved distinction between shop-wide rates and profile data.
+The next milestone is **Opening State Setup and Correction**. It must remain optional, be available only before the first business event for a fresh installation, never create artificial entries on upgrade, require recent native authentication, and append corrections rather than rewriting the original record. Completing it before Daily Operations prevents a new shop from accidentally starting transactions before deciding whether real opening balances need recording.
 
 ## Plain English
 
-The Products, Customers, Suppliers, Employees, and Attendance parts of Saaf Milk are now real. You can maintain staff details and mark or correct daily attendance without accidentally giving anyone an app account. Old attendance marks remain in history when corrected, salary balances cannot be typed over, and attendance operators cannot edit employee profiles. Phase 8 remains open, and Expense Categories and Settings are next.
+The shop name, contact details, PKR rates, and expense categories are now real and saved by the native app. Managers can maintain expense categories without being allowed to change shop-wide prices. Deactivating a category does not erase old expenses. Phase 8 remains open; the next step is the optional opening-balance workflow that a fresh shop may use before recording its first real transaction.

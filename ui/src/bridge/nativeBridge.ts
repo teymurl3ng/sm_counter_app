@@ -56,6 +56,11 @@ export const RUNTIME_ACTIONS = [
   'command.renameEmployee',
   'command.saveEmployeeProfile',
   'command.recordAttendance',
+  'query.businessSettings',
+  'command.saveStoreIdentity',
+  'command.updateBusinessSettings',
+  'command.createExpenseCategory',
+  'command.setExpenseCategoryArchived',
 ] as const satisfies ReadonlyArray<BridgeAction>;
 
 export class NativeBridgeError extends Error {

@@ -5,6 +5,8 @@ import com.saaf.milkshop.domain.CustomerProfileInput
 import com.saaf.milkshop.domain.AttendanceInput
 import com.saaf.milkshop.domain.AttendanceService
 import com.saaf.milkshop.domain.EmployeeProfileInput
+import com.saaf.milkshop.domain.BusinessSettings
+import com.saaf.milkshop.domain.StoreIdentityInput
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.domain.VendorProfileInput
 import org.json.JSONObject
@@ -206,6 +208,79 @@ internal class EmployeeBridgeHandler(
             ),
         )
         return JSONObject().put("entityId", attendanceId.toString())
+    }
+}
+
+internal class SettingsBridgeHandler(
+    private val reads: HybridReadModelService,
+    private val commands: SettingsBridgeCommandService,
+) {
+    suspend fun execute(request: BridgeRequest): JSONObject = when (request.action) {
+        HybridBridgeActions.BUSINESS_SETTINGS -> {
+            strictPayload(request.payload, emptySet())
+            businessSettingsJson(reads.businessSettings(request.requireSession()))
+        }
+        HybridBridgeActions.SAVE_STORE_IDENTITY -> {
+            strictPayload(request.payload, setOf("storeName", "phone", "address"))
+            commands.saveStoreIdentity(
+                request.requireSession(),
+                StoreIdentityInput(
+                    storeName = request.payload.requiredString("storeName"),
+                    phone = request.payload.nullableString("phone"),
+                    address = request.payload.nullableString("address"),
+                ),
+            )
+            JSONObject()
+        }
+        HybridBridgeActions.UPDATE_BUSINESS_SETTINGS -> updateBusinessSettings(request)
+        HybridBridgeActions.CREATE_EXPENSE_CATEGORY -> {
+            strictPayload(request.payload, setOf("displayName"))
+            JSONObject().put(
+                "entityId",
+                commands.createExpenseCategory(request.requireSession(), request.payload.requiredString("displayName")).toString(),
+            )
+        }
+        HybridBridgeActions.SET_EXPENSE_CATEGORY_ARCHIVED -> {
+            strictPayload(request.payload, setOf("accountId", "archived"))
+            commands.setExpenseCategoryArchived(
+                request.requireSession(),
+                request.payload.requiredId("accountId"),
+                request.payload.requiredBoolean("archived"),
+            )
+            JSONObject()
+        }
+        else -> unavailable()
+    }
+
+    private suspend fun updateBusinessSettings(request: BridgeRequest): JSONObject {
+        strictPayload(
+            request.payload,
+            setOf(
+                "vendorMilkRatePaisaPerUnit", "vendorDeliveryFeePaisaPerUnit", "tsStandardPercent",
+                "retailMilkRatePaisaPerUnit", "retailYogurtRatePaisaPerUnit", "defaultDeliverySurchargePaisa",
+            ),
+        )
+        fun positiveMoney(field: String): Double {
+            val value = request.payload.requiredPaisa(field)
+            if (value <= 0L) throw BridgeProtocolFailure("validation_failed", "$field must be greater than zero", field)
+            return BigDecimal(value).movePointLeft(2).toDouble()
+        }
+        val tsStandard = request.payload.requiredDecimal("tsStandardPercent").toDouble()
+        if (tsStandard <= 0.0 || !tsStandard.isFinite()) {
+            throw BridgeProtocolFailure("validation_failed", "tsStandardPercent must be greater than zero", "tsStandardPercent")
+        }
+        commands.updateBusinessSettings(
+            request.requireSession(),
+            BusinessSettings(
+                milkRateVendor = positiveMoney("vendorMilkRatePaisaPerUnit"),
+                deliveryFeeVendor = positiveMoney("vendorDeliveryFeePaisaPerUnit"),
+                tsStandard = tsStandard,
+                retailRateMilk = positiveMoney("retailMilkRatePaisaPerUnit"),
+                retailRateYogurt = positiveMoney("retailYogurtRatePaisaPerUnit"),
+                defaultDeliverySurcharge = positiveMoney("defaultDeliverySurchargePaisa"),
+            ),
+        )
+        return JSONObject()
     }
 }
 

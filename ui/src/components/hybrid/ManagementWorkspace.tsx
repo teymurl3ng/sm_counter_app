@@ -1,19 +1,21 @@
 import { useState, type ReactNode } from 'react';
-import { ClipboardCheck, LogOut, PackagePlus, Truck, Users } from 'lucide-react';
-import type { AccountReferenceDto, AttendanceDto, AttendanceStatusCode, CustomerDto, CurrentSessionDto, EmployeeDto, MasterDataDto, ProductDto, TransactionReferencesDto, VendorDto } from '../../bridge/contract.generated';
+import { ClipboardCheck, LogOut, PackagePlus, Settings, Truck, Users } from 'lucide-react';
+import type { AccountReferenceDto, AttendanceDto, AttendanceStatusCode, BusinessSettingsDto, CustomerDto, CurrentSessionDto, EmployeeDto, ExpenseCategoryDto, MasterDataDto, ProductDto, TransactionReferencesDto, VendorDto } from '../../bridge/contract.generated';
 import { CustomerProfilesScreen } from './CustomerProfilesScreen';
 import { EmployeeAttendanceScreen } from './EmployeeAttendanceScreen';
 import { ProductManagementScreen } from './ProductManagementScreen';
 import { SupplierProfilesScreen } from './SupplierProfilesScreen';
-import { plainRole, type CustomerDraft, type EmployeeDraft, type ProductDraft, type SupplierDraft } from './hybridModels';
+import { SettingsWorkspaceScreen } from './SettingsWorkspaceScreen';
+import { plainRole, type BusinessRatesDraft, type CustomerDraft, type EmployeeDraft, type ProductDraft, type StoreIdentityDraft, type SupplierDraft } from './hybridModels';
 
-type ManagementArea = 'products' | 'customers' | 'suppliers' | 'employees';
+type ManagementArea = 'products' | 'customers' | 'suppliers' | 'employees' | 'settings';
 
 export function ManagementWorkspace({
   busy,
   currentUser,
   error,
   masterData,
+  businessSettings,
   transactionReferences,
   notice,
   onLogout,
@@ -27,11 +29,16 @@ export function ManagementWorkspace({
   onSetEmployeeActive,
   onLoadAttendance,
   onRecordAttendance,
+  onSaveStoreIdentity,
+  onUpdateBusinessSettings,
+  onCreateExpenseCategory,
+  onSetExpenseCategoryArchived,
 }: {
   busy: boolean;
   currentUser: CurrentSessionDto | null;
   error: string | null;
   masterData: MasterDataDto | null;
+  businessSettings: BusinessSettingsDto | null;
   transactionReferences: TransactionReferencesDto | null;
   notice: string | null;
   onLogout(): void;
@@ -45,11 +52,16 @@ export function ManagementWorkspace({
   onSetEmployeeActive(employee: EmployeeDto, active: boolean): Promise<void>;
   onLoadAttendance(businessDate: string): Promise<ReadonlyArray<AttendanceDto>>;
   onRecordAttendance(employeeAccountId: AccountReferenceDto['accountId'], businessDate: string, statusCode: AttendanceStatusCode, notes: string): Promise<void>;
+  onSaveStoreIdentity(draft: StoreIdentityDraft): Promise<void>;
+  onUpdateBusinessSettings(draft: BusinessRatesDraft): Promise<void>;
+  onCreateExpenseCategory(displayName: string): Promise<void>;
+  onSetExpenseCategoryArchived(category: ExpenseCategoryDto, archived: boolean): Promise<void>;
 }) {
   const canManage = currentUser?.effectivePermissionCodes.includes('manage_master_data') === true;
   const canAttend = currentUser?.effectivePermissionCodes.includes('attendance') === true;
+  const canManageSettings = currentUser?.effectivePermissionCodes.includes('manage_business_settings') === true;
   const [area, setArea] = useState<ManagementArea>(canManage ? 'products' : 'employees');
-  const title = area === 'products' ? 'Products' : area === 'customers' ? 'Customers' : area === 'suppliers' ? 'Suppliers' : 'Employees';
+  const title = area === 'products' ? 'Products' : area === 'customers' ? 'Customers' : area === 'suppliers' ? 'Suppliers' : area === 'employees' ? 'Employees' : 'Settings';
   const attendanceEmployees = masterData?.employees.filter((employee) => employee.active).map(({ accountId, name }) => ({ accountId, name })) ?? transactionReferences?.employees ?? [];
 
   return <main className="min-h-screen bg-[#f7f6f0] pb-10 text-slate-900">
@@ -65,10 +77,13 @@ export function ManagementWorkspace({
         {canManage && <AreaButton id="customers-nav" active={area === 'customers'} onClick={() => setArea('customers')}><Users className="h-4 w-4" />Customers</AreaButton>}
         {canManage && <AreaButton id="suppliers-nav" active={area === 'suppliers'} onClick={() => setArea('suppliers')}><Truck className="h-4 w-4" />Suppliers</AreaButton>}
         {(canManage || canAttend) && <AreaButton id="employees-nav" active={area === 'employees'} onClick={() => setArea('employees')}><ClipboardCheck className="h-4 w-4" />Employees</AreaButton>}
+        {(canManage || canManageSettings) && <AreaButton id="settings-nav" active={area === 'settings'} onClick={() => setArea('settings')}><Settings className="h-4 w-4" />Settings</AreaButton>}
       </div>
     </nav>
     <div className="mx-auto max-w-4xl px-4 py-6">
-      {area === 'employees' && (canManage || canAttend) ? (
+      {area === 'settings' && (canManage || canManageSettings) ? (
+        <SettingsWorkspaceScreen busy={busy} canManageSettings={canManageSettings} categories={masterData?.expenseCategories ?? businessSettings?.expenseCategories ?? null} settings={businessSettings} error={error} notice={notice} onSaveStore={onSaveStoreIdentity} onSaveRates={onUpdateBusinessSettings} onCreateCategory={onCreateExpenseCategory} onSetCategoryArchived={onSetExpenseCategoryArchived} />
+      ) : area === 'employees' && (canManage || canAttend) ? (
         <EmployeeAttendanceScreen busy={busy} canManage={canManage} employees={masterData?.employees ?? null} attendanceEmployees={attendanceEmployees} error={error} notice={notice} onSaveEmployee={onSaveEmployee} onSetEmployeeActive={onSetEmployeeActive} onLoadAttendance={onLoadAttendance} onRecordAttendance={onRecordAttendance} />
       ) : !canManage ? <Unavailable /> : area === 'products' ? (
         <ProductManagementScreen busy={busy} masterData={masterData} error={error} notice={notice} onSave={onSaveProduct} onSetArchived={onSetProductArchived} />

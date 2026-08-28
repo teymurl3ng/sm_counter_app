@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { CustomerDto, CurrentSessionDto, MasterDataDto, ProductDto, SessionHandle, TransactionReferencesDto, VendorDto } from '../../bridge/contract.generated';
+import type { BusinessSettingsDto, CustomerDto, CurrentSessionDto, MasterDataDto, ProductDto, SessionHandle, TransactionReferencesDto, VendorDto } from '../../bridge/contract.generated';
 import { callNative, NativeBridgeError, paisaToRupeesInput, rupeesToPaisa, validateDecimalInput, verifyNativeContract } from '../../bridge/nativeBridge';
 import { Login, OwnerSetup, RecoveryCodeScreen } from './AuthScreens';
 import { CenteredMessage } from './HybridUi';
 import { ManagementWorkspace } from './ManagementWorkspace';
 import { employeeBridgeActions } from './employeeBridgeActions';
+import { settingsBridgeActions } from './settingsBridgeActions';
 import { errorMessage, type CustomerDraft, type HybridStage, type ProductDraft, type SupplierDraft } from './hybridModels';
 
 export function Phase8HybridShell() {
@@ -12,6 +13,7 @@ export function Phase8HybridShell() {
   const [session, setSession] = useState<SessionHandle | null>(null);
   const [currentUser, setCurrentUser] = useState<CurrentSessionDto | null>(null);
   const [masterData, setMasterData] = useState<MasterDataDto | null>(null);
+  const [businessSettings, setBusinessSettings] = useState<BusinessSettingsDto | null>(null);
   const [transactionReferences, setTransactionReferences] = useState<TransactionReferencesDto | null>(null);
   const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -19,18 +21,21 @@ export function Phase8HybridShell() {
   const [busy, setBusy] = useState(false);
 
   const loadAuthorizedData = useCallback(async (activeSession: SessionHandle, user: CurrentSessionDto) => {
-    const [loadedMasterData, loadedReferences] = await Promise.all([
+    const [loadedMasterData, loadedReferences, loadedSettings] = await Promise.all([
       user.effectivePermissionCodes.includes('manage_master_data') ? callNative('query.masterData', {}, activeSession) : Promise.resolve(null),
       user.effectivePermissionCodes.includes('attendance') ? callNative('query.transactionReferences', {}, activeSession) : Promise.resolve(null),
+      user.effectivePermissionCodes.includes('manage_business_settings') ? callNative('query.businessSettings', {}, activeSession) : Promise.resolve(null),
     ]);
     setMasterData(loadedMasterData);
     setTransactionReferences(loadedReferences);
+    setBusinessSettings(loadedSettings);
   }, []);
 
   const clearSession = useCallback(() => {
     setSession(null);
     setCurrentUser(null);
     setMasterData(null);
+    setBusinessSettings(null);
     setTransactionReferences(null);
     setRecoveryCode(null);
     setNotice(null);
@@ -229,12 +234,14 @@ export function Phase8HybridShell() {
   };
 
   const employeeActions = employeeBridgeActions(session, withMasterDataRefresh);
+  const settingsActions = settingsBridgeActions(session, withMasterDataRefresh);
 
   return <ManagementWorkspace
     busy={busy}
     currentUser={currentUser}
     error={error}
     masterData={masterData}
+    businessSettings={businessSettings}
     transactionReferences={transactionReferences}
     notice={notice}
     onLogout={logout}
@@ -250,5 +257,9 @@ export function Phase8HybridShell() {
     onSetEmployeeActive={employeeActions.setEmployeeActive}
     onLoadAttendance={employeeActions.loadAttendance}
     onRecordAttendance={employeeActions.recordAttendance}
+    onSaveStoreIdentity={settingsActions.saveStoreIdentity}
+    onUpdateBusinessSettings={settingsActions.updateBusinessSettings}
+    onCreateExpenseCategory={settingsActions.createExpenseCategory}
+    onSetExpenseCategoryArchived={settingsActions.setExpenseCategoryArchived}
   />;
 }

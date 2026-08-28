@@ -1,6 +1,7 @@
 package com.saaf.milkshop.application.bridge
 
 import com.saaf.milkshop.application.readmodels.BootstrapStatusDto
+import com.saaf.milkshop.application.readmodels.BusinessSettingsDto
 import com.saaf.milkshop.application.readmodels.AccountReferenceDto
 import com.saaf.milkshop.application.readmodels.AttendanceDto
 import com.saaf.milkshop.application.readmodels.CurrentSessionDto
@@ -31,6 +32,29 @@ internal fun masterDataJson(value: MasterDataDto): JSONObject = JSONObject()
     .put("customers", jsonArray(value.customers, ::customerJson))
     .put("vendors", jsonArray(value.vendors, ::vendorJson))
     .put("employees", jsonArray(value.employees, ::employeeJson))
+    .put("expenseCategories", jsonArray(value.expenseCategories, ::expenseCategoryJson))
+
+internal fun businessSettingsJson(value: BusinessSettingsDto): JSONObject = JSONObject()
+    .putNullable("store", value.store?.let { store ->
+        JSONObject().put("storeName", store.storeName).put("currencyCode", store.currencyCode)
+            .putNullable("phone", store.phone).putNullable("address", store.address).put("updatedAt", store.updatedAt)
+    })
+    .put("vendorMilkRatePaisaPerUnit", value.vendorMilkRatePaisaPerUnit.toString())
+    .put("vendorDeliveryFeePaisaPerUnit", value.vendorDeliveryFeePaisaPerUnit.toString())
+    .put("tsStandardPercent", value.tsStandardPercent)
+    .put("retailMilkRatePaisaPerUnit", value.retailMilkRatePaisaPerUnit.toString())
+    .put("retailYogurtRatePaisaPerUnit", value.retailYogurtRatePaisaPerUnit.toString())
+    .put("defaultDeliverySurchargePaisa", value.defaultDeliverySurchargePaisa.toString())
+    .putNullable("openingState", value.openingState?.let { opening ->
+        JSONObject().put("eventId", opening.eventId.toString()).put("openingDate", opening.openingDate)
+            .put("inventoryBalances", jsonArray(opening.inventoryBalances) { balance ->
+                JSONObject().put("productId", balance.productId.toString()).put("quantity", balance.quantity)
+            })
+            .put("accountBalances", jsonArray(opening.accountBalances) { balance ->
+                JSONObject().put("accountId", balance.accountId.toString()).put("balancePaisa", balance.balancePaisa.toString())
+            })
+            .putNullable("notes", opening.notes)
+    })
     .put("expenseCategories", jsonArray(value.expenseCategories, ::expenseCategoryJson))
 
 internal fun transactionReferencesJson(value: TransactionReferencesDto): JSONObject = JSONObject()

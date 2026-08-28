@@ -39,6 +39,21 @@ export type EmployeeDraft = {
   active: boolean;
 };
 
+export type StoreIdentityDraft = {
+  storeName: string;
+  phone: string;
+  address: string;
+};
+
+export type BusinessRatesDraft = {
+  vendorMilkRateRupees: string;
+  vendorDeliveryFeeRupees: string;
+  tsStandardPercent: string;
+  retailMilkRateRupees: string;
+  retailYogurtRateRupees: string;
+  defaultDeliverySurchargeRupees: string;
+};
+
 export function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'The app could not complete this request.';
 }

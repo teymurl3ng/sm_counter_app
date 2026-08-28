@@ -134,6 +134,7 @@ data class TransactionReferencesDto(
     val vendors: List<AccountReferenceDto>,
     val employees: List<AccountReferenceDto>,
     val paymentAccounts: List<AccountReferenceDto>,
+    val expenseCategories: List<ExpenseCategoryDto>,
     val vendorMilkRatePaisaPerUnit: Long?,
     val vendorDeliveryFeePaisaPerUnit: Long?,
     val tsStandardPercent: String?,

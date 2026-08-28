@@ -32,7 +32,7 @@ Phase 5 defines native queries and response shapes only. It does not define Java
 | `financialOverview(sessionHandle, start, end)` | `VIEW_FULL_FINANCIAL` | `FinancialOverviewDto` | Customer/vendor balances and full period totals. |
 | `businessSettings(sessionHandle)` | `MANAGE_BUSINESS_SETTINGS` | `BusinessSettingsDto` | Editable store identity, PKR, business rates, opening state, expense categories. |
 | `masterData(sessionHandle)` | `MANAGE_MASTER_DATA` | `MasterDataDto` | Full product/customer/vendor/employee profiles and canonical positions. |
-| `transactionReferences(sessionHandle)` | `VIEW_OPERATIONAL` | `TransactionReferencesDto` | Native lookup lists/rates filtered to the signed-in role's actual transaction duties. Unauthorized lists are empty and unauthorized rates are null. |
+| `transactionReferences(sessionHandle)` | `VIEW_OPERATIONAL` | `TransactionReferencesDto` | Native lookup lists/rates filtered to the signed-in role's actual transaction duties. Contract v2 adds active expense categories for `EXPENSE` users; unauthorized lists are empty and unauthorized rates are null. |
 | `eventHistory(sessionHandle)` | `VIEW_OPERATIONAL` | `List<EventHistoryDto>` | Complete append-only event history with correction, superseded, and durable actor fields. |
 | `eventDetail(sessionHandle, eventId)` | `VIEW_OPERATIONAL` | `EventDetailDto` | Inventory movements for operational users; financial movements are present only with `VIEW_FULL_FINANCIAL`. |
 | `accountLedger(sessionHandle, accountId)` | `VIEW_FULL_FINANCIAL` | `AccountLedgerDto` | Canonical customer/vendor movement ledger and running/current balance. |

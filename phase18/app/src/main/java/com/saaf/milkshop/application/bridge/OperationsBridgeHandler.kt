@@ -18,9 +18,11 @@ internal class OperationsBridgeHandler(
     suspend fun execute(request: BridgeRequest): JSONObject = when (request.action) {
         HybridBridgeActions.DASHBOARD -> dashboard(request)
         HybridBridgeActions.CASHIER_SUMMARY -> cashierSummary(request)
+        HybridBridgeActions.FINANCIAL_OVERVIEW -> financialOverview(request)
         HybridBridgeActions.RECORD_PURCHASE -> recordPurchase(request)
         HybridBridgeActions.RECORD_SALE -> recordSale(request)
         HybridBridgeActions.RECORD_PRODUCTION -> recordProduction(request)
+        HybridBridgeActions.RECORD_EXPENSE -> recordExpense(request)
         else -> unavailableBridgeAction()
     }
 
@@ -32,6 +34,11 @@ internal class OperationsBridgeHandler(
     private suspend fun cashierSummary(request: BridgeRequest): JSONObject {
         val (start, end) = request.dateRange()
         return cashierSummaryJson(reads.cashierSummary(request.requireSession(), start, end))
+    }
+
+    private suspend fun financialOverview(request: BridgeRequest): JSONObject {
+        val (start, end) = request.dateRange()
+        return financialOverviewJson(reads.financialOverview(request.requireSession(), start, end))
     }
 
     private suspend fun recordPurchase(request: BridgeRequest): JSONObject {
@@ -169,6 +176,27 @@ internal class OperationsBridgeHandler(
                 yogurtKgProduced = yogurtProduced,
                 notes = request.payload.optionalString("notes"),
             ),
+        )
+        return JSONObject().put("eventId", result.eventId.toString())
+    }
+
+    private suspend fun recordExpense(request: BridgeRequest): JSONObject {
+        strictObject(
+            request.payload,
+            required = setOf("expenseCategoryAccountId", "paymentAccountId", "amountPaisa", "occurredAt"),
+            allowed = setOf("expenseCategoryAccountId", "paymentAccountId", "amountPaisa", "occurredAt", "notes"),
+        )
+        val amountPaisa = request.payload.requiredPaisa("amountPaisa")
+        if (amountPaisa <= 0L) {
+            throw BridgeProtocolFailure("validation_failed", "Expense amount must be greater than zero", "amountPaisa")
+        }
+        val result = commands.recordExpense(
+            request.requireSession(),
+            expenseCategoryAccountId = request.payload.requiredId("expenseCategoryAccountId"),
+            paymentAccountId = request.payload.requiredId("paymentAccountId"),
+            amount = BigDecimal(amountPaisa).movePointLeft(2).toDouble(),
+            occurredAt = request.payload.requiredDate("occurredAt"),
+            notes = request.payload.optionalString("notes"),
         )
         return JSONObject().put("eventId", result.eventId.toString())
     }

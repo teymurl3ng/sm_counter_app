@@ -10,6 +10,7 @@ import com.saaf.milkshop.application.readmodels.DashboardDto
 import com.saaf.milkshop.application.readmodels.CustomerDto
 import com.saaf.milkshop.application.readmodels.EmployeeDto
 import com.saaf.milkshop.application.readmodels.ExpenseCategoryDto
+import com.saaf.milkshop.application.readmodels.FinancialOverviewDto
 import com.saaf.milkshop.application.readmodels.MasterDataDto
 import com.saaf.milkshop.application.readmodels.ProductDto
 import com.saaf.milkshop.application.readmodels.ProductReferenceDto
@@ -65,6 +66,7 @@ internal fun transactionReferencesJson(value: TransactionReferencesDto): JSONObj
     .put("vendors", jsonArray(value.vendors, ::accountReferenceJson))
     .put("employees", jsonArray(value.employees, ::accountReferenceJson))
     .put("paymentAccounts", jsonArray(value.paymentAccounts, ::accountReferenceJson))
+    .put("expenseCategories", jsonArray(value.expenseCategories, ::expenseCategoryJson))
     .putNullable("vendorMilkRatePaisaPerUnit", value.vendorMilkRatePaisaPerUnit?.toString())
     .putNullable("vendorDeliveryFeePaisaPerUnit", value.vendorDeliveryFeePaisaPerUnit?.toString())
     .putNullable("tsStandardPercent", value.tsStandardPercent)
@@ -97,6 +99,24 @@ internal fun cashierSummaryJson(value: CashierSummaryDto): JSONObject = JSONObje
     .put("salesValuePaisa", value.salesValuePaisa.toString())
     .put("creditCollectionsPaisa", value.creditCollectionsPaisa.toString())
 
+internal fun financialOverviewJson(value: FinancialOverviewDto): JSONObject = JSONObject()
+    .put("customers", jsonArray(value.customers, ::accountPositionJson))
+    .put("vendors", jsonArray(value.vendors, ::accountPositionJson))
+    .put("totals", JSONObject()
+        .put("startDateInclusive", value.totals.startDateInclusive)
+        .put("endDateExclusive", value.totals.endDateExclusive)
+        .put("eventCount", value.totals.eventCount.toString())
+        .put("salesValuePaisa", value.totals.salesValuePaisa.toString())
+        .put("saleQuantity", value.totals.saleQuantity)
+        .put("purchaseAmountPaisa", value.totals.purchaseAmountPaisa.toString())
+        .put("purchasedMilkLiters", value.totals.purchasedMilkLiters)
+        .put("producedYogurtKg", value.totals.producedYogurtKg)
+        .put("productionMilkUsedLiters", value.totals.productionMilkUsedLiters)
+        .put("vendorPaymentsPaisa", value.totals.vendorPaymentsPaisa.toString())
+        .put("creditCollectionsPaisa", value.totals.creditCollectionsPaisa.toString())
+        .put("operatingExpensesPaisa", value.totals.operatingExpensesPaisa.toString())
+        .put("salaryPaymentsPaisa", value.totals.salaryPaymentsPaisa.toString()))
+
 internal fun attendanceJson(values: List<AttendanceDto>): JSONArray = jsonArray(values, ::attendanceItemJson)
 
 private fun productReferenceJson(value: ProductReferenceDto): JSONObject = JSONObject()
@@ -104,6 +124,10 @@ private fun productReferenceJson(value: ProductReferenceDto): JSONObject = JSONO
 
 private fun accountReferenceJson(value: AccountReferenceDto): JSONObject = JSONObject()
     .put("accountId", value.accountId.toString()).put("name", value.name)
+
+private fun accountPositionJson(value: com.saaf.milkshop.application.readmodels.AccountPositionDto): JSONObject = JSONObject()
+    .put("accountId", value.accountId.toString()).put("name", value.name)
+    .put("categoryCode", value.categoryCode).put("canonicalBalancePaisa", value.canonicalBalancePaisa.toString())
 
 private fun attendanceItemJson(value: AttendanceDto): JSONObject = JSONObject()
     .put("attendanceId", value.attendanceId.toString()).put("employeeAccountId", value.employeeAccountId.toString())

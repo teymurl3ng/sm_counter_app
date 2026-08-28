@@ -1,6 +1,6 @@
 import type { EventMutationResultDto, IsoDateString, PurchaseRecordedResultDto, SaleRecordedResultDto, SessionHandle } from '../../bridge/contract.generated';
 import { callNative, rupeesToPaisa, validateDecimalInput } from '../../bridge/nativeBridge';
-import type { ProductionDraft, PurchaseDraft, SaleDraft } from './hybridModels';
+import type { ExpenseDraft, ProductionDraft, PurchaseDraft, SaleDraft } from './hybridModels';
 
 type RunAndRefreshResult = <T>(operation: () => Promise<T>, success: string) => Promise<T>;
 
@@ -49,5 +49,16 @@ export function dailyOperationsBridgeActions(
     }, session);
   }, 'Production batch recorded.');
 
-  return { recordProduction, recordPurchase, recordSale };
+  const recordExpense = (draft: ExpenseDraft): Promise<EventMutationResultDto> => runAndRefresh(async () => {
+    if (!session) throw new Error('Sign in to record an expense.');
+    return callNative('command.recordExpense', {
+      expenseCategoryAccountId: draft.expenseCategoryAccountId,
+      paymentAccountId: draft.paymentAccountId,
+      amountPaisa: rupeesToPaisa(draft.amountRupees),
+      occurredAt: draft.occurredAt as IsoDateString,
+      ...(draft.notes.trim() ? { notes: draft.notes.trim() } : {}),
+    }, session);
+  }, 'Expense recorded successfully.');
+
+  return { recordExpense, recordProduction, recordPurchase, recordSale };
 }

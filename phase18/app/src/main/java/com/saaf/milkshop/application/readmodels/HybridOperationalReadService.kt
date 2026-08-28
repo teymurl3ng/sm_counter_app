@@ -45,10 +45,11 @@ internal class HybridOperationalReadService(
         val canPurchase = allows(AppPermission.PURCHASE)
         val canPaySupplier = allows(AppPermission.SUPPLIER_PAYMENT)
         val canPaySalary = allows(AppPermission.SALARY_PAYMENT)
+        val canRecordExpense = allows(AppPermission.EXPENSE)
         val canProduce = allows(AppPermission.PRODUCTION_AND_SPOILAGE)
         val canDeliver = allows(AppPermission.DELIVERY)
         val canAttend = allows(AppPermission.ATTENDANCE)
-        val needsPaymentAccounts = canSell || canPaySupplier || canPaySalary || allows(AppPermission.EXPENSE)
+        val needsPaymentAccounts = canSell || canPaySupplier || canPaySalary || canRecordExpense
         val settings = database.settingsDao().getAll().associate { it.key to it.value }
         val productProfiles = database.productProfileDao().all().associateBy { it.productId }
         val customerProfiles = database.customerProfileDao().all().associateBy { it.accountId }
@@ -75,6 +76,11 @@ internal class HybridOperationalReadService(
                     .map { AccountReferenceDto(it.accountId, it.name.removePrefix("Employee: ").trim()) }
             } else emptyList(),
             paymentAccounts = if (needsPaymentAccounts) refs("Cash/Bank") else emptyList(),
+            expenseCategories = if (canRecordExpense) {
+                database.expenseCategoryProfileDao().all()
+                    .filter { it.active }
+                    .map { ExpenseCategoryDto(it.accountId, it.displayName, it.active) }
+            } else emptyList(),
             vendorMilkRatePaisaPerUnit = settings[settingKeys.MILK_RATE_VENDOR]?.takeIf { canPurchase }?.let(::money),
             vendorDeliveryFeePaisaPerUnit = settings[settingKeys.DELIVERY_FEE_VENDOR]?.takeIf { canPurchase }?.let(::money),
             tsStandardPercent = settings[settingKeys.TS_STANDARD]?.takeIf { canPurchase }?.let(::decimal),

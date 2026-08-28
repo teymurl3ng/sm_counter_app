@@ -5,6 +5,9 @@ import com.saaf.milkshop.data.EventActorLinkEntity
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.data.SecurityAuditEntryEntity
 import com.saaf.milkshop.domain.AppPermission
+import com.saaf.milkshop.domain.ExpenseInput
+import com.saaf.milkshop.domain.ExpenseResult
+import com.saaf.milkshop.domain.ExpenseService
 import com.saaf.milkshop.domain.SaleInput
 import com.saaf.milkshop.domain.SalePayment
 import com.saaf.milkshop.domain.SaleResult
@@ -129,6 +132,41 @@ internal class OperationsBridgeCommandService(
         result
     }
 
+    suspend fun recordExpense(
+        sessionHandle: String,
+        expenseCategoryAccountId: Long,
+        paymentAccountId: Long,
+        amount: Double,
+        occurredAt: String,
+        notes: String?,
+    ): ExpenseResult = database.withWriteTransaction {
+        val actor = security.requirePermission(sessionHandle, AppPermission.EXPENSE)
+        val category = database.expenseCategoryProfileDao().findByAccountId(expenseCategoryAccountId)
+        val categoryAccount = database.accountDao().findById(expenseCategoryAccountId)
+        if (category?.active != true || categoryAccount?.category != "Operating Expense") {
+            throw BridgeCommandNotFound("Choose an active expense category")
+        }
+        val paymentAccount = database.accountDao().findById(paymentAccountId)
+        if (paymentAccount?.category != "Cash/Bank") {
+            throw BridgeCommandNotFound("Choose a valid cash or bank account")
+        }
+        if (database.dailyCloseDao().isPostingClosed(occurredAt)) {
+            throw BridgeCommandDayClosed("This business day is closed. Reopen it before recording the expense.")
+        }
+        val result = ExpenseService(database).record(
+            ExpenseInput(category.displayName, paymentAccountId, amount, occurredAt, notes)
+        )
+        attribute(result.eventId, actor.userId, actor.displayName, actor.role)
+        audit(
+            ACTION_RECORD_EXPENSE,
+            "event_id=${result.eventId};expense_category_account_id=$expenseCategoryAccountId;payment_account_id=$paymentAccountId",
+            actor.userId,
+            actor.displayName,
+            actor.role,
+        )
+        result
+    }
+
     private suspend fun attribute(eventId: Long, actorUserId: Long, actorName: String, actorRole: String) {
         database.eventActorLinkDao().insert(
             EventActorLinkEntity(
@@ -165,6 +203,7 @@ internal class OperationsBridgeCommandService(
         const val ACTION_RECORD_PURCHASE = "bridge_record_purchase"
         const val ACTION_RECORD_SALE = "bridge_record_sale"
         const val ACTION_RECORD_PRODUCTION = "bridge_record_production"
+        const val ACTION_RECORD_EXPENSE = "bridge_record_expense"
         const val RESULT_SUCCESS = "success"
     }
 }

@@ -10,8 +10,8 @@ data class BridgeEndpointContract(
 )
 
 object BridgeContractSnapshot {
-    const val VERSION = 1
-    const val CONTRACT_SHA256 = "30AA8461C61B1A99376CA9B45AFFD6EDAD829AE9B4E6746AA7FE67E7270C9F27"
+    const val VERSION = 2
+    const val CONTRACT_SHA256 = "AB374869603B9D773AD86B56EF801DA8C4493816C7301B05214AE596E33D0920"
     val errorCodes = setOf(
         "invalid_request",
         "validation_failed",

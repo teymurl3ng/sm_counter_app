@@ -91,8 +91,8 @@ def validate_fields(fields: dict, enums: dict, named_types: set[str], context: s
 
 
 def validate(contract: dict, dtos: dict[str, list[tuple[str, str]]], read_source: str, permissions: set[str]) -> None:
-    if contract.get("contractVersion") != 1:
-        raise ContractError("contractVersion must be 1")
+    if contract.get("contractVersion") != 2:
+        raise ContractError("contractVersion must be 2")
     endpoints = contract.get("endpoints")
     if not isinstance(endpoints, list) or not endpoints:
         raise ContractError("endpoints must be a non-empty list")

@@ -16,9 +16,9 @@ Read those files before changing code.
 
 ## Current superseding checkpoint — 2026-08-28
 
-The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–7 are complete and Phase 8 is in progress. `PHASE8.md` contains the active screen ledger; management, core settings, optional Opening State, supplier milk purchase, paid/credit sales, and milk-to-yogurt production are complete. Expenses are the next Daily Operations substep.
+The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–7 are complete and Phase 8 is in progress. `PHASE8.md` contains the active screen ledger; management, core settings, optional Opening State, supplier milk purchase, paid/credit sales, milk-to-yogurt production, and expenses are complete. Supplier/customer payments are the next Daily Operations substep.
 
-Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE8.md` for current status. Phase 8 now exposes thirty-five runtime actions, including operational/cashier summaries, supplier purchase, sales, and production. The complete connected-device suite passes 160/160 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7. Remaining React screen wiring is incomplete.
+Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE8.md` for current status. Phase 8 now exposes thirty-seven runtime actions, including operational/cashier/financial summaries, supplier purchase, sales, production, and expenses. The complete connected-device suite passes 164/164 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7. Remaining React screen wiring is incomplete.
 
 Application user accounts and native role-based authorization are explicitly approved as a required cross-phase capability. Their schema-7 model, encrypted backup boundary, native credential UI, app-owned sessions, private staff enrollment/reset, user administration, role-aware navigation, and command-boundary authorization are implemented. Phase 7 now integrates first-owner setup, login, logout, resume checks, current-session state, and one protected/audited product command with React; remaining account/security screens belong to Phase 8. Application users are security principals separate from employee/salary profiles, with an optional link between them. The schema-v6 daily-close actor name/role is transitional asserted metadata, not authenticated identity.
 
@@ -27,7 +27,7 @@ The two completed Phase 3 design tracks were:
 1. authenticated users, credentials, roles/permissions, sessions, recovery, audit actor IDs, migration, and backup/restore security;
 2. authoritative costing/COGS and profitability semantics.
 
-The researched recommendations for native security and costing are implemented and device-verified. Phase 8 is now active: management, core settings, optional Opening State, supplier purchase, sales, and production are complete. Expenses are next; broad React product completion has not been claimed.
+The researched recommendations for native security and costing are implemented and device-verified. Phase 8 is now active: management, core settings, optional Opening State, supplier purchase, sales, production, and expenses are complete. Supplier/customer payments are next; broad React product completion has not been claimed.
 
 ---
 
@@ -225,7 +225,7 @@ The permission-aware hybrid-facing native query/DTO layer is implemented in `app
 
 ## Phase 6 — COMPLETE
 
-Canonical bridge contract version 1 is frozen in `bridge/CONTRACT.md` and `bridge/contract.json` with 78 query/command/system operations. It defines lossless scalar encoding, authenticated envelopes, native-owned authority and actor attribution, 19 stable error codes, validation, persistence, refresh, backup picker/ticket boundaries, and version/hash negotiation. Generated Kotlin and TypeScript projections compile, and Android `preBuild` plus UI `prebuild` run the drift checker.
+Canonical bridge contract version 2 is frozen in `bridge/CONTRACT.md` and `bridge/contract.json` with the same 78 query/command/system operations. V2 adds only role-filtered active expense categories to `TransactionReferencesDto`, correcting cashier expense lookup without granting settings/master-data authority. It retains lossless scalar encoding, authenticated envelopes, native-owned authority and actor attribution, 19 stable error codes, validation, persistence, refresh, backup picker/ticket boundaries, and version/hash negotiation. Generated Kotlin and TypeScript projections compile, and Android `preBuild` plus UI `prebuild` run the drift checker.
 
 ## Phase 7 — COMPLETE
 
@@ -233,7 +233,7 @@ The packaged React/WebView/Android vertical slice is implemented and device-prov
 
 ## Phase 8 — IN PROGRESS
 
-The screen capability ledger is in `PHASE8.md`. Management, core settings, optional Opening State, supplier purchase, paid/credit sales, and milk-to-yogurt production are complete with awaited native refresh, Kotlin permission enforcement, durable actor audit, and packaged physical-device evidence. Daily Work orchestration, Purchase, Sale, and Production are separate React modules; native operations parsing and command audit remain separate focused files. The runtime subset is now thirty-five actions while the frozen contract remains version 1 with 78 operations. The focused purchase, sale, and production suites each pass 4/4 and the full connected suite passes 160/160. Expenses are the current continuation point and must retain native-only account posting, balances, and reporting.
+The screen capability ledger is in `PHASE8.md`. Management, core settings, optional Opening State, supplier purchase, paid/credit sales, milk-to-yogurt production, and expenses are complete with awaited native refresh, Kotlin permission enforcement, durable actor audit, and packaged physical-device evidence. Daily Work orchestration, Purchase, Sale, Production, and Expense are separate React modules; native operations parsing and command audit remain separate focused files. The runtime subset is now thirty-seven actions while the frozen contract remains version 2 with 78 operations. The focused purchase, sale, production, and expense suites each pass 4/4 and the full connected suite passes 164/164. Supplier/customer payments are the current continuation point and must retain native-only payable/receivable direction, account posting, balances, and reporting.
 
 ---
 
@@ -458,7 +458,7 @@ Do not invent UI variants such as:
 - `credit_delivery`
 - `credit_wholesale`
 
-All bridge values are now defined in contract version 1. Change them only through the documented manifest/version/drift workflow.
+All bridge values are now defined in contract version 2. Change them only through the documented manifest/version/drift workflow.
 
 ---
 

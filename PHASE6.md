@@ -16,9 +16,9 @@ This phase defines messages only. It does not expose a JavaScript interface, imp
 - `phase18/app/src/main/java/com/saaf/milkshop/application/bridge/BridgeContractSnapshot.kt` is the generated Kotlin version/hash/action snapshot.
 - `ui/src/bridge/contract.generated.ts` is the generated TypeScript scalar, DTO, request, response, error, envelope, and endpoint projection.
 
-Contract version 1 contains 78 unique operations: 20 queries, 54 commands, and 4 system operations. Its canonical manifest SHA-256 is:
+Contract version 2 contains the same 78 unique operations: 20 queries, 54 commands, and 4 system operations. Version 2 is an additive least-privilege correction that exposes active expense categories inside the already role-filtered `TransactionReferencesDto`; no endpoint or command request changed. Its canonical manifest SHA-256 is:
 
-`30AA8461C61B1A99376CA9B45AFFD6EDAD829AE9B4E6746AA7FE67E7270C9F27`
+`AB374869603B9D773AD86B56EF801DA8C4493816C7301B05214AE596E33D0920`
 
 ## 3. Representation and security decisions
 
@@ -47,7 +47,7 @@ Android `preBuild` depends on the checker. The UI `prebuild` script also runs it
 
 ## 5. Verification
 
-- Canonical contract validation — PASS: version 1, 78 endpoints, expected SHA-256.
+- Canonical contract validation — PASS: version 2, 78 endpoints, generated SHA-256.
 - TypeScript type check (`npm run lint`) — PASS.
 - Production React/Vite build, including `prebuild` drift gate — PASS. The existing large-chunk advisory remains a non-failing later optimization item.
 - Kotlin and Android-test Kotlin compilation — PASS; Gradle ran `verifyBridgeContract` before `app:preBuild`.

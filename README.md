@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-08-28 — hybrid Phases 0–7 are complete; Phase 8 screen-by-screen native-backed UI wiring is in progress, with management, core Settings, Opening State, supplier milk purchase, paid/credit sales, and milk-to-yogurt production complete. Expenses are the next Daily Operations substep. Substantial Phase 9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
+Status: RECONCILED 2026-08-28 — hybrid Phases 0–7 are complete; Phase 8 screen-by-screen native-backed UI wiring is in progress, with management, core Settings, Opening State, supplier milk purchase, paid/credit sales, milk-to-yogurt production, and expenses complete. Supplier/customer payments are the next Daily Operations substep. Substantial Phase 9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
 
 ## What this repository contains
 
@@ -19,7 +19,7 @@ Status: RECONCILED 2026-08-28 — hybrid Phases 0–7 are complete; Phase 8 scre
 - `PHASE5.md` — completed native read-model expansion, permission boundary, verification, and next gate.
 - `PHASE5_DTO_CATALOG.md` — frozen hybrid-facing Kotlin query/DTO catalog, representation rules, code sets, and security exclusions.
 - `PHASE6.md` — completed canonical bridge-contract boundary, generated projections, drift gate, verification, and Phase 7 handoff.
-- `bridge/CONTRACT.md` and `bridge/contract.json` — frozen human-readable and machine-readable bridge contract version 1.
+- `bridge/CONTRACT.md` and `bridge/contract.json` — frozen human-readable and machine-readable bridge contract version 2.
 - `PHASE7.md` — completed packaged React/WebView/Android vertical slice, authenticated bridge proof, physical-device evidence, and Phase 8 handoff.
 - `PHASE8.md` — current screen capability ledger, completed native-backed milestones through Opening State, verification, limitations, and next screen.
 
@@ -35,7 +35,7 @@ SQL blueprint SHA-256:
 
 **Phase 8 — Screen-by-Screen Native UI Wiring: IN PROGRESS**
 
-The Phase 7 shell remains intact. Phase 8 now provides native-backed management screens, Attendance, editable store identity, core shop-wide rates, Expense Categories, optional Opening State setup/correction, operational/cashier summaries, supplier milk purchase, paid or customer-credit sales, and milk-to-yogurt production. Currency remains fixed to PKR. Purchase, sale, and production stock/accounting behavior remains native-only. The runtime exposes 35 of the frozen contract's 78 operations. The complete connected-device regression passes 160/160. Phase 8 remains open; expenses are the next Daily Operations substep.
+The Phase 7 shell remains intact. Phase 8 now provides native-backed management screens, Attendance, editable store identity, core shop-wide rates, Expense Categories, optional Opening State setup/correction, operational/cashier/financial summaries, supplier milk purchase, paid or customer-credit sales, milk-to-yogurt production, and expenses. Currency remains fixed to PKR. Purchase, sale, production, and expense posting behavior remains native-only. The runtime exposes 37 of the frozen contract's 78 operations. The complete connected-device regression passes 164/164. Phase 8 remains open; supplier/customer payments are next.
 
 ## Approved security track
 
@@ -83,7 +83,7 @@ Phase 6 — Bridge Contract (`bridge/CONTRACT.md`) ✅
 
 Phase 7 — Hybrid Shell / Vertical Slice ✅
 
-Phase 8 — UI Wiring ◐ (management, core settings, Opening State, purchases, sales, and production complete; expenses next)
+Phase 8 — UI Wiring ◐ (management, core settings, Opening State, purchases, sales, production, and expenses complete; supplier/customer payments next)
 
 Phase 9 — Runtime / Navigation / Device Integration ◐ (native lifecycle credit only; hybrid runtime absent)
 
@@ -121,7 +121,7 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Focused backup/restore suite: 8/8 passed, including portable and local confidentiality checks, wrong-passphrase rejection, tamper rejection, security round-trips, session invalidation, and transient lockout-state exclusion.
 - Phase 4 security gap-closure suite: 9/9 passed.
 - Phase 5 hybrid read-model suite: 4/4 passed.
-- Phase 6 bridge contract: version 1, 78 endpoints, generated Kotlin/TypeScript projections and both pre-build drift gates pass.
+- Bridge contract: version 2, 78 endpoints, generated Kotlin/TypeScript projections and both pre-build drift gates pass; v2 adds least-privilege active expense references without changing endpoints.
 - Host-side debug unit tests: 7/7 passed.
 - Phase 7 focused hybrid vertical-slice suite: 3/3 passed on the physical device.
 - Phase 8 focused Product Management suite: 3/3 passed on the physical device.
@@ -133,8 +133,9 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 8 focused Daily Operations purchase suite: 4/4 passed on the physical device.
 - Phase 8 focused Daily Operations sales suite: 4/4 passed on the physical device.
 - Phase 8 focused Daily Operations production suite: 4/4 passed on the physical device.
-- Complete connected-device instrumentation regression: 160/160 passed, 0 skipped, 0 failed.
+- Phase 8 focused Daily Operations expense suite: 4/4 passed on the physical device.
+- Complete connected-device instrumentation regression: 164/164 passed, 0 skipped, 0 failed.
 
 ## Next gate
 
-Phases 3–7 are closed and Phase 8 is active. Management, core settings, optional Opening State, supplier purchases, paid/credit sales, and milk-to-yogurt production are native-backed and device-proven. The active React shell, native bridge handlers/services, and Phase 5 read-model façade remain split into focused modules. Next, wire expenses without moving account posting, balances, or reporting into React. Every screen must continue to await native mutations, show truthful outcomes, refresh declared queries, receive a hybrid integration test, and retire its corresponding mock/local behavior. See `PHASE8.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–7 are closed and Phase 8 is active. Management, core settings, optional Opening State, supplier purchases, paid/credit sales, milk-to-yogurt production, and expenses are native-backed and device-proven. The active React shell, native bridge handlers/services, and Phase 5 read-model façade remain split into focused modules. Next, wire supplier payments and customer collections without moving account direction, balances, or reporting into React. Every screen must continue to await native mutations, show truthful outcomes, refresh declared queries, receive a hybrid integration test, and retire its corresponding mock/local behavior. See `PHASE8.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.

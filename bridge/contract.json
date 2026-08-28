@@ -1,5 +1,5 @@
 {
-  "contractVersion": 1,
+  "contractVersion": 2,
   "transport": {
     "requestEnvelope": ["contractVersion", "requestId", "action", "sessionHandle", "payload"],
     "responseEnvelope": ["contractVersion", "requestId", "action", "ok", "data", "error"],

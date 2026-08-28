@@ -10,6 +10,9 @@ import com.saaf.milkshop.domain.CustomerProfileService
 import com.saaf.milkshop.domain.ProductCatalogInput
 import com.saaf.milkshop.domain.ProductCatalogService
 import com.saaf.milkshop.domain.UserSecurityService
+import com.saaf.milkshop.domain.VendorManagementService
+import com.saaf.milkshop.domain.VendorProfileInput
+import com.saaf.milkshop.domain.VendorProfileService
 import java.time.Instant
 
 class BridgeCommandConflict(message: String) : IllegalStateException(message)
@@ -129,6 +132,56 @@ class HybridCommandService(
         )
     }
 
+    suspend fun createVendor(sessionHandle: String, name: String): Long =
+        database.withWriteTransaction {
+            val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_MASTER_DATA)
+            requireUniqueVendorName(name)
+            val accountId = VendorManagementService(database).create(name)
+            recordMasterDataAudit(
+                action = ACTION_CREATE_VENDOR,
+                entityName = "account_id",
+                entityId = accountId,
+                actorUserId = actor.userId,
+                actorName = actor.displayName,
+                actorRole = actor.role,
+            )
+            accountId
+        }
+
+    suspend fun renameVendor(sessionHandle: String, accountId: Long, name: String) =
+        database.withWriteTransaction {
+            val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_MASTER_DATA)
+            requireVendor(accountId)
+            requireUniqueVendorName(name, exceptAccountId = accountId)
+            VendorManagementService(database).rename(accountId, name)
+            recordMasterDataAudit(
+                action = ACTION_RENAME_VENDOR,
+                entityName = "account_id",
+                entityId = accountId,
+                actorUserId = actor.userId,
+                actorName = actor.displayName,
+                actorRole = actor.role,
+            )
+        }
+
+    suspend fun saveVendorProfile(
+        sessionHandle: String,
+        accountId: Long,
+        input: VendorProfileInput,
+    ) = database.withWriteTransaction {
+        val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_MASTER_DATA)
+        requireVendor(accountId)
+        VendorProfileService(database).save(accountId, input)
+        recordMasterDataAudit(
+            action = ACTION_SAVE_VENDOR_PROFILE,
+            entityName = "account_id",
+            entityId = accountId,
+            actorUserId = actor.userId,
+            actorName = actor.displayName,
+            actorRole = actor.role,
+        )
+    }
+
     private suspend fun recordProductAudit(
         action: String,
         productId: Long,
@@ -175,6 +228,14 @@ class HybridCommandService(
         }
     }
 
+    private suspend fun requireVendor(accountId: Long) {
+        val account = database.accountDao().findById(accountId)
+            ?: throw BridgeCommandNotFound("This supplier no longer exists")
+        if (account.category != "Vendor") {
+            throw BridgeCommandNotFound("This supplier no longer exists")
+        }
+    }
+
     private suspend fun requireUniqueCustomerName(name: String, exceptAccountId: Long? = null) {
         val candidate = name.trim().removePrefix("Customer: ").trim()
         val duplicate = database.accountDao().findByCategory("Customer").any { account ->
@@ -182,6 +243,15 @@ class HybridCommandService(
                 account.name.removePrefix("Customer: ").trim().equals(candidate, ignoreCase = true)
         }
         if (duplicate) throw BridgeCommandConflict("A customer with this name already exists")
+    }
+
+    private suspend fun requireUniqueVendorName(name: String, exceptAccountId: Long? = null) {
+        val candidate = name.trim().removePrefix("Vendor: ").trim()
+        val duplicate = database.accountDao().findByCategory("Vendor").any { account ->
+            account.accountId != exceptAccountId &&
+                account.name.removePrefix("Vendor: ").trim().equals(candidate, ignoreCase = true)
+        }
+        if (duplicate) throw BridgeCommandConflict("A supplier with this name already exists")
     }
 
     companion object {
@@ -192,6 +262,9 @@ class HybridCommandService(
         const val ACTION_CREATE_CUSTOMER = "bridge_create_customer"
         const val ACTION_RENAME_CUSTOMER = "bridge_rename_customer"
         const val ACTION_SAVE_CUSTOMER_PROFILE = "bridge_save_customer_profile"
+        const val ACTION_CREATE_VENDOR = "bridge_create_vendor"
+        const val ACTION_RENAME_VENDOR = "bridge_rename_vendor"
+        const val ACTION_SAVE_VENDOR_PROFILE = "bridge_save_vendor_profile"
         const val RESULT_SUCCESS = "success"
     }
 }

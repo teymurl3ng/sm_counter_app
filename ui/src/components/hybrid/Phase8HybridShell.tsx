@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { CustomerDto, CurrentSessionDto, MasterDataDto, ProductDto, SessionHandle } from '../../bridge/contract.generated';
+import type { CustomerDto, CurrentSessionDto, MasterDataDto, ProductDto, SessionHandle, VendorDto } from '../../bridge/contract.generated';
 import { callNative, NativeBridgeError, paisaToRupeesInput, rupeesToPaisa, validateDecimalInput, verifyNativeContract } from '../../bridge/nativeBridge';
 import { Login, OwnerSetup, RecoveryCodeScreen } from './AuthScreens';
 import { CenteredMessage } from './HybridUi';
 import { ManagementWorkspace } from './ManagementWorkspace';
-import { errorMessage, type CustomerDraft, type HybridStage, type ProductDraft } from './hybridModels';
+import { errorMessage, type CustomerDraft, type HybridStage, type ProductDraft, type SupplierDraft } from './hybridModels';
 
 export function Phase8HybridShell() {
   const [stage, setStage] = useState<HybridStage>('checking');
@@ -142,6 +142,40 @@ export function Phase8HybridShell() {
     }, customer.accountId), session);
   }, active ? `${customer.name} restored to active customers.` : `${customer.name} moved to inactive customers.`);
 
+  const supplierProfilePayload = (draft: SupplierDraft, accountId: VendorDto['accountId']) => ({
+    accountId,
+    phone: draft.phone.trim() || null,
+    location: draft.location.trim() || null,
+    notes: draft.notes.trim() || null,
+    active: draft.active,
+  });
+
+  const saveSupplier = async (draft: SupplierDraft, supplier?: VendorDto) => {
+    try {
+      await withMasterDataRefresh(async () => {
+        if (!session) return;
+        let accountId = supplier?.accountId;
+        if (!accountId) accountId = (await callNative('command.createVendor', { name: draft.name }, session)).entityId;
+        else if (draft.name.trim() !== supplier?.name) await callNative('command.renameVendor', { accountId, name: draft.name }, session);
+        await callNative('command.saveVendorProfile', supplierProfilePayload(draft, accountId), session);
+      }, supplier ? 'Supplier changes saved.' : 'Supplier added successfully.');
+    } catch (failure) {
+      if (session && currentUser) await loadMasterData(session, currentUser).catch(() => undefined);
+      throw failure;
+    }
+  };
+
+  const setSupplierActive = (supplier: VendorDto, active: boolean) => withMasterDataRefresh(async () => {
+    if (!session) return;
+    await callNative('command.saveVendorProfile', supplierProfilePayload({
+      name: supplier.name,
+      phone: supplier.phone ?? '',
+      location: supplier.location ?? '',
+      notes: supplier.notes ?? '',
+      active,
+    }, supplier.accountId), session);
+  }, active ? `${supplier.name} restored to active suppliers.` : `${supplier.name} moved to inactive suppliers.`);
+
   if (stage === 'checking') return <CenteredMessage title="Opening Saaf Milk" message="Checking the secure app connection…" />;
   if (stage === 'blocked') return <CenteredMessage title="Saaf Milk cannot open" message={error ?? 'The secure app connection is unavailable.'} />;
   if (stage === 'setup') return <OwnerSetup busy={busy} error={error} onSubmit={async (loginName, displayName, passphrase) => {
@@ -203,5 +237,7 @@ export function Phase8HybridShell() {
     }, archived ? `${product.name} moved to archived products.` : `${product.name} restored to active products.`)}
     onSaveCustomer={saveCustomer}
     onSetCustomerActive={setCustomerActive}
+    onSaveSupplier={saveSupplier}
+    onSetSupplierActive={setSupplierActive}
   />;
 }

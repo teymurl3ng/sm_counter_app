@@ -21,6 +21,14 @@ export type CustomerDraft = {
   active: boolean;
 };
 
+export type SupplierDraft = {
+  name: string;
+  phone: string;
+  location: string;
+  notes: string;
+  active: boolean;
+};
+
 export function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'The app could not complete this request.';
 }

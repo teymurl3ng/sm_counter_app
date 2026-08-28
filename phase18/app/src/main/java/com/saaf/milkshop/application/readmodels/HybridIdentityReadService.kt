@@ -104,7 +104,7 @@ internal class HybridIdentityReadService(
                 val profile = vendorProfiles[account.accountId]
                 VendorDto(
                     accountId = account.accountId,
-                    name = account.name,
+                    name = account.name.removePrefix("Vendor: ").trim(),
                     canonicalBalancePaisa = money(balances[account.accountId]?.balance ?: 0.0),
                     phone = profile?.phone,
                     location = profile?.location,

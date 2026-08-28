@@ -1,6 +1,6 @@
 # Phase 8 — Screen-by-Screen Native UI Wiring
 
-**Status: IN PROGRESS — Products and Customer Profiles complete 2026-08-28**
+**Status: IN PROGRESS — Products, Customer Profiles, and Supplier Profiles complete 2026-08-28**
 
 ## 1. Purpose and working rule
 
@@ -23,8 +23,8 @@ The frozen logic specification, SQL blueprint, Phase 5 DTO catalog, and Phase 6 
 | Owner bootstrap, login, logout, resume | `query.bootstrapStatus`, `query.currentSession`, auth commands | **Proven in Phase 7; retained** | Recovery and own-passphrase screens remain. |
 | Products | `query.masterData`, create/update/archive product commands | **Milestone 1 complete** | Preserve as the reference screen pattern. |
 | Customers | `query.masterData`, create/rename/save-profile customer commands | **Milestone 2 complete** | Balance remains native-read-only; inactive customers retain history. |
-| Suppliers | `query.masterData`, create/rename/save-profile vendor commands | **Next** | Use native canonical vendor identity and balances. |
-| Employees and attendance | `query.masterData`, `query.attendance`, employee/profile/attendance commands | Queued | Keep app users separate from employee profiles. |
+| Suppliers | `query.masterData`, create/rename/save-profile vendor commands | **Milestone 3 complete** | Balance remains native-read-only; no per-supplier milk rate. |
+| Employees and attendance | `query.masterData`, `query.attendance`, employee/profile/attendance commands | **Next** | Keep app users separate from employee profiles. |
 | Expense categories and settings | `query.businessSettings`, master-data/settings commands | Queued | Use editable store identity and PKR-native settings. |
 | Daily operations | dashboard/reference queries and purchase/sale/production/expense/payment/spoilage commands | Queued | No UI-side totals, stock mutation, or cost formulas. |
 | Deliveries / wholesale | transaction references, deliveries, sale and delivery commands | Queued | Preserve delivery status and sale-link semantics. |
@@ -66,9 +66,23 @@ The active app now provides a native-backed Customers area beside Products:
 - durable actor snapshots for create, rename, profile change, deactivate, and restore;
 - cleaned shop-facing customer names while the internal `Customer: ` account prefix remains a persistence concern only.
 
-The runtime advertises thirteen implemented actions: the eight Phase 7 actions, the two additional Product actions, and `command.createCustomer`, `command.renameCustomer`, and `command.saveCustomerProfile`. The canonical contract remains version 1 with 78 operations; unimplemented actions are not advertised by the runtime handshake.
+## 5. Milestone 3 — Supplier Profiles
 
-## 5. Safety and business boundaries
+The active app now provides a native-backed Suppliers area beside Products and Customers:
+
+- active and inactive supplier counts, filters, and local presentation-only search;
+- add and rename supplier identity without changing the canonical account ID or rewriting history;
+- phone, location, and notes profile fields;
+- explicit deactivation warning and restoration;
+- canonical balance display sourced from saved purchases and payments, with no editable balance field;
+- no per-supplier milk-rate field—the approved shop-wide purchase settings remain authoritative;
+- native duplicate-name, missing-record, session, and permission enforcement;
+- durable actor snapshots for create, rename, profile change, deactivate, and restore;
+- clean shop-facing supplier names while the internal `Vendor: ` account prefix remains a persistence concern only.
+
+The runtime advertises sixteen implemented actions: the thirteen prior actions plus `command.createVendor`, `command.renameVendor`, and `command.saveVendorProfile`. The canonical contract remains version 1 with 78 operations; unimplemented actions are not advertised by the runtime handshake.
+
+## 6. Safety and business boundaries
 
 - Archiving changes future availability; it does not delete products or rewrite transaction history.
 - Inventory quantity remains event-derived. This screen has no direct “set stock” operation.
@@ -78,14 +92,17 @@ The runtime advertises thirteen implemented actions: the eight Phase 7 actions, 
 - Customer balances are read-only projections of native financial events. The profile screen cannot create, edit, or clear a balance.
 - Deactivating a customer prevents new operations but preserves their identity, balance, and history.
 - Customer credit limit is a profile control, not the customer's balance.
+- Supplier balances are read-only projections of native purchase and payment events.
+- Deactivating a supplier prevents new operations but preserves identity, payable balance, and history.
+- Supplier profiles do not override the shop-wide milk purchase rate or delivery-fee settings.
 - The old prototype view model remains inactive and is not imported by the packaged app.
 - No Room schema, frozen business formula, frozen DTO, or canonical bridge endpoint changed.
 
-## 6. Structural refactor checkpoint
+## 7. Structural refactor checkpoint
 
 Before starting Supplier Profiles, the active hybrid path was reorganized without changing its public behavior:
 
-- the 733-line Phase 8 shell was split into authentication, workspace navigation, Product, Customer, shared UI, and shared model modules; the shell is now 207 lines and no new handwritten React module exceeds 207 lines;
+- the 733-line Phase 8 shell was split into authentication, workspace navigation, Product, Customer, Supplier, shared UI, and shared model modules; after Supplier wiring the shell is 243 lines and no new handwritten React module exceeds 243 lines;
 - the 518-line bridge dispatcher was split into protocol validation, domain handlers, JSON mapping, and a 56-line dispatcher;
 - the 660-line Phase 5 read-model service remains the stable caller-facing façade but is now 47 lines, delegating to focused identity/master-data, operational, financial, costing/planning, and security readers;
 - generated contract projections and inactive inherited prototype screens were deliberately left alone;
@@ -93,13 +110,14 @@ Before starting Supplier Profiles, the active hybrid path was reorganized withou
 
 The checkpoint changed no Room schema, DTO shape, bridge action, permission rule, accounting formula, element ID, or user workflow. Its focused device regression covered the Phase 5 read model and Phase 7–8 hybrid flows: **13/13 PASS**.
 
-## 7. Verification checkpoint
+## 8. Verification checkpoint
 
 Physical device: `SM-A065F`.
 
 - Phase 8 focused product-management suite — **3/3 PASS**;
 - Phase 8 focused Customer Profiles suite — **3/3 PASS**;
-- complete connected-device regression — **133/133 PASS**, 0 skipped, 0 failed, 0 errors;
+- Phase 8 focused Supplier Profiles suite — **3/3 PASS**;
+- complete connected-device regression — **136/136 PASS**, 0 skipped, 0 failed, 0 errors;
 - host-side debug unit suite — **7/7 PASS**;
 - TypeScript check and production Vite build — PASS;
 - explicit web bundle packaging and Android asset gate — PASS;
@@ -107,14 +125,14 @@ Physical device: `SM-A065F`.
 - Phase 6 contract drift check — version 1, 78 operations, original SHA-256 — PASS;
 - frozen logic-spec and SQL hashes — unchanged.
 
-The focused tests prove Product owner update/archive/restore and Customer owner create/rename/profile/deactivate/restore with Room readback and durable actor audit, direct cashier denial, missing-record and duplicate-name error mapping, absence of an editable customer balance, and packaged React round trips.
+The focused tests prove Product owner update/archive/restore, Customer owner create/rename/profile/deactivate/restore, and Supplier owner create/rename/profile/deactivate/restore with Room readback and durable actor audit. They also prove direct cashier denial, missing-record and duplicate-name error mapping, absence of editable customer/supplier balances and per-supplier rates, and packaged React round trips.
 
-## 8. Current limitations and next milestone
+## 9. Current limitations and next milestone
 
-Phase 8 is not complete. Authentication, Products, and Customer Profiles execute through the active React product. Supplier, employee, transactions, ledgers, reports, settings, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
+Phase 8 is not complete. Authentication, Products, Customer Profiles, and Supplier Profiles execute through the active React product. Employee, transactions, ledgers, reports, settings, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
 
-The next milestone is **Supplier Profiles**, followed by Employees. It should reuse the established master-data screen pattern, retain native supplier balances, and avoid reviving the prototype's unsupported per-supplier milk-rate behavior.
+The next milestone is **Employees and Attendance**. It must keep employee shop records separate from application user accounts: an employee may optionally be linked to a login, but creating or editing an employee must not silently grant app access.
 
 ## Plain English
 
-The Products and Customers parts of Saaf Milk are now real. Their code has also been separated into smaller, clearly named parts before more screens are added. The owner can maintain customer details and deactivate someone without erasing what they owe or their past transactions. Customer balances cannot be typed over; they still come from actual shop activity. Phase 8 remains open, and Suppliers are next.
+The Products, Customers, and Suppliers parts of Saaf Milk are now real. The owner can maintain supplier contact details or deactivate a supplier without erasing what the shop owes or any past purchases and payments. Supplier balances cannot be typed over, and individual suppliers cannot be given hidden milk rates. Phase 8 remains open, and Employees and Attendance are next.

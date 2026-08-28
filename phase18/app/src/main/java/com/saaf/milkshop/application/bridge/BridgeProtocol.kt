@@ -22,9 +22,23 @@ internal object HybridBridgeActions {
     const val CREATE_CUSTOMER = "command.createCustomer"
     const val RENAME_CUSTOMER = "command.renameCustomer"
     const val SAVE_CUSTOMER_PROFILE = "command.saveCustomerProfile"
+    const val CREATE_VENDOR = "command.createVendor"
+    const val RENAME_VENDOR = "command.renameVendor"
+    const val SAVE_VENDOR_PROFILE = "command.saveVendorProfile"
 
     val authentication = setOf(BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN, LOGOUT, CURRENT_SESSION)
-    val masterData = setOf(MASTER_DATA, CREATE_PRODUCT, UPDATE_PRODUCT, SET_PRODUCT_ARCHIVED, CREATE_CUSTOMER, RENAME_CUSTOMER, SAVE_CUSTOMER_PROFILE)
+    val masterData = setOf(
+        MASTER_DATA,
+        CREATE_PRODUCT,
+        UPDATE_PRODUCT,
+        SET_PRODUCT_ARCHIVED,
+        CREATE_CUSTOMER,
+        RENAME_CUSTOMER,
+        SAVE_CUSTOMER_PROFILE,
+        CREATE_VENDOR,
+        RENAME_VENDOR,
+        SAVE_VENDOR_PROFILE,
+    )
     val supported = listOf(BRIDGE_INFO) + authentication + masterData
     val authByAction = supported.associateWith { action ->
         if (action in setOf(BRIDGE_INFO, BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN)) "none" else "session"

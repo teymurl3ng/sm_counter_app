@@ -3,6 +3,7 @@ package com.saaf.milkshop.application.bridge
 import com.saaf.milkshop.application.readmodels.HybridReadModelService
 import com.saaf.milkshop.domain.CustomerProfileInput
 import com.saaf.milkshop.domain.UserSecurityService
+import com.saaf.milkshop.domain.VendorProfileInput
 import org.json.JSONObject
 import java.math.BigDecimal
 
@@ -90,6 +91,16 @@ internal class MasterDataBridgeHandler(
             JSONObject()
         }
         HybridBridgeActions.SAVE_CUSTOMER_PROFILE -> saveCustomerProfile(request)
+        HybridBridgeActions.CREATE_VENDOR -> {
+            strictPayload(request.payload, setOf("name"))
+            JSONObject().put("entityId", commands.createVendor(request.requireSession(), request.payload.requiredString("name")).toString())
+        }
+        HybridBridgeActions.RENAME_VENDOR -> {
+            strictPayload(request.payload, setOf("accountId", "name"))
+            commands.renameVendor(request.requireSession(), request.payload.requiredId("accountId"), request.payload.requiredString("name"))
+            JSONObject()
+        }
+        HybridBridgeActions.SAVE_VENDOR_PROFILE -> saveVendorProfile(request)
         else -> unavailable()
     }
 
@@ -107,6 +118,21 @@ internal class MasterDataBridgeHandler(
                 address = request.payload.nullableString("address"), notes = request.payload.nullableString("notes"),
                 creditLimit = creditLimitPaisa?.let { BigDecimal(it).movePointLeft(2).toDouble() },
                 dailyQuota = dailyQuota?.toDouble(), active = request.payload.requiredBoolean("active"),
+            ),
+        )
+        return JSONObject()
+    }
+
+    private suspend fun saveVendorProfile(request: BridgeRequest): JSONObject {
+        strictPayload(request.payload, setOf("accountId", "phone", "location", "notes", "active"))
+        commands.saveVendorProfile(
+            request.requireSession(),
+            request.payload.requiredId("accountId"),
+            VendorProfileInput(
+                phone = request.payload.nullableString("phone"),
+                location = request.payload.nullableString("location"),
+                notes = request.payload.nullableString("notes"),
+                active = request.payload.requiredBoolean("active"),
             ),
         )
         return JSONObject()

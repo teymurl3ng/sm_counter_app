@@ -1,4 +1,4 @@
-import type { ProductUnitCode } from '../../bridge/contract.generated';
+import type { Int64String, ProductUnitCode } from '../../bridge/contract.generated';
 
 export type HybridStage = 'checking' | 'setup' | 'login' | 'recovery' | 'ready' | 'blocked';
 
@@ -52,6 +52,19 @@ export type BusinessRatesDraft = {
   retailMilkRateRupees: string;
   retailYogurtRateRupees: string;
   defaultDeliverySurchargeRupees: string;
+};
+
+export type OpeningStateDraft = {
+  openingDate: string;
+  productQuantities: Record<Int64String, string>;
+  accountBalancesRupees: Record<Int64String, string>;
+  notes: string;
+};
+
+export type OpeningAccountOption = {
+  accountId: Int64String;
+  name: string;
+  kind: 'Cash or bank' | 'Customer owes shop' | 'Shop owes supplier';
 };
 
 export function errorMessage(error: unknown): string {

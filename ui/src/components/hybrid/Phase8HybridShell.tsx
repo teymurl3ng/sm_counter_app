@@ -23,7 +23,7 @@ export function Phase8HybridShell() {
   const loadAuthorizedData = useCallback(async (activeSession: SessionHandle, user: CurrentSessionDto) => {
     const [loadedMasterData, loadedReferences, loadedSettings] = await Promise.all([
       user.effectivePermissionCodes.includes('manage_master_data') ? callNative('query.masterData', {}, activeSession) : Promise.resolve(null),
-      user.effectivePermissionCodes.includes('attendance') ? callNative('query.transactionReferences', {}, activeSession) : Promise.resolve(null),
+      (user.effectivePermissionCodes.includes('attendance') || user.effectivePermissionCodes.includes('manage_business_settings')) ? callNative('query.transactionReferences', {}, activeSession) : Promise.resolve(null),
       user.effectivePermissionCodes.includes('manage_business_settings') ? callNative('query.businessSettings', {}, activeSession) : Promise.resolve(null),
     ]);
     setMasterData(loadedMasterData);
@@ -259,6 +259,7 @@ export function Phase8HybridShell() {
     onRecordAttendance={employeeActions.recordAttendance}
     onSaveStoreIdentity={settingsActions.saveStoreIdentity}
     onUpdateBusinessSettings={settingsActions.updateBusinessSettings}
+    onSaveOpeningState={settingsActions.saveOpeningState}
     onCreateExpenseCategory={settingsActions.createExpenseCategory}
     onSetExpenseCategoryArchived={settingsActions.setExpenseCategoryArchived}
   />;

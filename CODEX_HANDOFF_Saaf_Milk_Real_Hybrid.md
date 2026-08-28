@@ -16,9 +16,9 @@ Read those files before changing code.
 
 ## Current superseding checkpoint — 2026-08-28
 
-The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–7 are complete and Phase 8 is in progress. `PHASE8.md` contains the active screen ledger and completed Products, Customer Profiles, Supplier Profiles, Employees/Attendance, editable Store/Rate Settings, and Expense Categories milestones. Optional Opening State setup/correction is next, before Daily Operations.
+The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–7 are complete and Phase 8 is in progress. `PHASE8.md` contains the active screen ledger and completed Products, Customer Profiles, Supplier Profiles, Employees/Attendance, editable Store/Rate Settings, Expense Categories, and optional Opening State milestones. Daily Operations is next.
 
-Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE8.md` for current status. Phase 8 now exposes twenty-seven runtime actions and complete master-data, attendance, editable store identity, shop-wide PKR rate, and expense-category screens. The complete connected-device suite passes 144/144 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7. Remaining React screen wiring is incomplete.
+Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE8.md` for current status. Phase 8 now exposes thirty runtime actions and complete master-data, attendance, editable store identity, shop-wide PKR rate, expense-category, and optional Opening State screens. The complete connected-device suite passes 148/148 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7. Remaining React screen wiring is incomplete.
 
 Application user accounts and native role-based authorization are explicitly approved as a required cross-phase capability. Their schema-7 model, encrypted backup boundary, native credential UI, app-owned sessions, private staff enrollment/reset, user administration, role-aware navigation, and command-boundary authorization are implemented. Phase 7 now integrates first-owner setup, login, logout, resume checks, current-session state, and one protected/audited product command with React; remaining account/security screens belong to Phase 8. Application users are security principals separate from employee/salary profiles, with an optional link between them. The schema-v6 daily-close actor name/role is transitional asserted metadata, not authenticated identity.
 
@@ -27,7 +27,7 @@ The two completed Phase 3 design tracks were:
 1. authenticated users, credentials, roles/permissions, sessions, recovery, audit actor IDs, migration, and backup/restore security;
 2. authoritative costing/COGS and profitability semantics.
 
-The researched recommendations for native security and costing are implemented and device-verified. Phase 8 is now active: Products, Customer Profiles, Supplier Profiles, Employees/Attendance, editable Store/Rate Settings, and Expense Categories are complete. Optional Opening State is next; broad React product completion has not been claimed.
+The researched recommendations for native security and costing are implemented and device-verified. Phase 8 is now active: Products, Customer Profiles, Supplier Profiles, Employees/Attendance, editable Store/Rate Settings, Expense Categories, and optional Opening State are complete. Daily Operations is next; broad React product completion has not been claimed.
 
 ---
 
@@ -233,7 +233,7 @@ The packaged React/WebView/Android vertical slice is implemented and device-prov
 
 ## Phase 8 — IN PROGRESS
 
-The screen capability ledger is in `PHASE8.md`. Master-data, attendance, editable store identity, shop-wide PKR rates, and expense categories are complete with awaited native refresh, Kotlin permission enforcement, durable actor audit, and packaged physical-device evidence. The active React shell, bridge dispatcher, and Phase 5 read-model service remain split into focused modules. The runtime subset is now twenty-seven actions while the frozen contract remains version 1 with 78 operations. The full connected suite passes 144/144. Optional Opening State setup/correction is the current continuation point and must retain recent-authentication and append-only audit boundaries.
+The screen capability ledger is in `PHASE8.md`. Master-data, attendance, editable store identity, shop-wide PKR rates, expense categories, and optional Opening State are complete with awaited native refresh, Kotlin permission enforcement, recent authentication where required, durable actor audit, and packaged physical-device evidence. The active React shell, bridge dispatcher, and Phase 5 read-model service remain split into focused modules. The runtime subset is now thirty actions while the frozen contract remains version 1 with 78 operations. The full connected suite passes 148/148. Daily Operations is the current continuation point and must retain native-only totals, stock, balances, and costing.
 
 ---
 

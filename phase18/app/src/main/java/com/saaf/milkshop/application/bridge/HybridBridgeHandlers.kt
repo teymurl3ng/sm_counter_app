@@ -6,9 +6,13 @@ import com.saaf.milkshop.domain.AttendanceInput
 import com.saaf.milkshop.domain.AttendanceService
 import com.saaf.milkshop.domain.EmployeeProfileInput
 import com.saaf.milkshop.domain.BusinessSettings
+import com.saaf.milkshop.domain.OpeningAccountBalance
+import com.saaf.milkshop.domain.OpeningInventoryBalance
+import com.saaf.milkshop.domain.OpeningStateInput
 import com.saaf.milkshop.domain.StoreIdentityInput
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.domain.VendorProfileInput
+import org.json.JSONArray
 import org.json.JSONObject
 import java.math.BigDecimal
 
@@ -22,6 +26,7 @@ internal class AuthenticationBridgeHandler(
         HybridBridgeActions.BOOTSTRAP_OWNER -> bootstrapOwner(request)
         HybridBridgeActions.LOGIN -> login(request)
         HybridBridgeActions.LOGOUT -> logout(request)
+        HybridBridgeActions.REAUTHENTICATE -> reauthenticate(request)
         HybridBridgeActions.CURRENT_SESSION -> currentSession(request)
         else -> unavailable()
     }
@@ -58,6 +63,17 @@ internal class AuthenticationBridgeHandler(
         security.logout(request.requireSession())
         onSessionChanged(null)
         return JSONObject()
+    }
+
+    private suspend fun reauthenticate(request: BridgeRequest): JSONObject {
+        strictPayload(request.payload, setOf("passphrase"))
+        val passphrase = request.payload.requiredString("passphrase").toCharArray()
+        return try {
+            security.reauthenticate(request.requireSession(), passphrase)
+            JSONObject()
+        } finally {
+            passphrase.fill('\u0000')
+        }
     }
 
     private suspend fun currentSession(request: BridgeRequest): JSONObject {
@@ -249,7 +265,43 @@ internal class SettingsBridgeHandler(
             )
             JSONObject()
         }
+        HybridBridgeActions.RECORD_OPENING_STATE -> openingState(request, correction = false)
+        HybridBridgeActions.CORRECT_OPENING_STATE -> openingState(request, correction = true)
         else -> unavailable()
+    }
+
+    private suspend fun openingState(request: BridgeRequest, correction: Boolean): JSONObject {
+        strictObject(
+            request.payload,
+            required = setOf("openingDate", "inventoryBalances", "accountBalances"),
+            allowed = setOf("openingDate", "inventoryBalances", "accountBalances", "notes"),
+        )
+        val input = OpeningStateInput(
+            openingDate = request.payload.requiredDate("openingDate"),
+            inventoryBalances = request.payload.requiredArray("inventoryBalances").mapObjects("inventoryBalances") { item ->
+                strictPayload(item, setOf("productId", "quantity"))
+                val quantity = item.requiredDecimal("quantity")
+                if (quantity < BigDecimal.ZERO) {
+                    throw BridgeProtocolFailure("validation_failed", "Opening quantity cannot be negative", "quantity")
+                }
+                OpeningInventoryBalance(item.requiredId("productId"), quantity.toDouble())
+            },
+            accountBalances = request.payload.requiredArray("accountBalances").mapObjects("accountBalances") { item ->
+                strictPayload(item, setOf("accountId", "balancePaisa"))
+                val balancePaisa = item.requiredPaisa("balancePaisa")
+                if (balancePaisa < 0L) {
+                    throw BridgeProtocolFailure("validation_failed", "Opening balance cannot be negative", "balancePaisa")
+                }
+                OpeningAccountBalance(item.requiredId("accountId"), BigDecimal(balancePaisa).movePointLeft(2).toDouble())
+            },
+            notes = request.payload.optionalString("notes"),
+        )
+        val eventId = if (correction) {
+            commands.correctOpeningState(request.requireSession(), input)
+        } else {
+            commands.recordOpeningState(request.requireSession(), input)
+        }
+        return JSONObject().put("eventId", eventId.toString())
     }
 
     private suspend fun updateBusinessSettings(request: BridgeRequest): JSONObject {
@@ -283,5 +335,19 @@ internal class SettingsBridgeHandler(
         return JSONObject()
     }
 }
+
+private fun JSONObject.requiredArray(name: String): JSONArray {
+    if (!has(name) || isNull(name) || get(name) !is JSONArray) {
+        throw BridgeProtocolFailure("invalid_request", "$name must be a list", name)
+    }
+    return getJSONArray(name)
+}
+
+private inline fun <T> JSONArray.mapObjects(field: String, transform: (JSONObject) -> T): List<T> =
+    (0 until length()).map { index ->
+        val item = get(index) as? JSONObject
+            ?: throw BridgeProtocolFailure("invalid_request", "$field entries must be objects", field)
+        transform(item)
+    }
 
 private fun unavailable(): Nothing = throw BridgeProtocolFailure("invalid_request", "This action is not available in the current app slice")

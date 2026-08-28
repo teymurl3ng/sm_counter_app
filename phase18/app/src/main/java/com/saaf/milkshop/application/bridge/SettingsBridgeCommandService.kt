@@ -2,11 +2,14 @@ package com.saaf.milkshop.application.bridge
 
 import androidx.room3.withWriteTransaction
 import com.saaf.milkshop.data.MilkShopDatabase
+import com.saaf.milkshop.data.EventActorLinkEntity
 import com.saaf.milkshop.data.SecurityAuditEntryEntity
 import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.BusinessSettings
 import com.saaf.milkshop.domain.BusinessSettingsService
 import com.saaf.milkshop.domain.ExpenseCategoryManagementService
+import com.saaf.milkshop.domain.OpeningStateInput
+import com.saaf.milkshop.domain.OpeningStateService
 import com.saaf.milkshop.domain.StoreIdentityInput
 import com.saaf.milkshop.domain.StoreIdentityService
 import com.saaf.milkshop.domain.UserSecurityService
@@ -56,6 +59,47 @@ internal class SettingsBridgeCommandService(
             )
         }
 
+    suspend fun recordOpeningState(sessionHandle: String, input: OpeningStateInput): Long =
+        database.withWriteTransaction {
+            val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_BUSINESS_SETTINGS)
+            security.sessionManager().requireRecentAuthentication(sessionHandle)
+            if (database.openingStateDao().initialCount() != 0) {
+                throw BridgeCommandConflict("Opening balances have already been recorded")
+            }
+            if (database.eventDao().count() != 0) {
+                throw BridgeCommandConflict("Opening balances can only be recorded before the first business activity")
+            }
+            val snapshot = OpeningStateService(database).record(input)
+            attribute(snapshot.eventId, actor.userId, actor.displayName, actor.role)
+            audit(ACTION_RECORD_OPENING_STATE, "event_id=${snapshot.eventId}", actor.userId, actor.displayName, actor.role)
+            snapshot.eventId
+        }
+
+    suspend fun correctOpeningState(sessionHandle: String, input: OpeningStateInput): Long =
+        database.withWriteTransaction {
+            val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_BUSINESS_SETTINGS)
+            security.sessionManager().requireRecentAuthentication(sessionHandle)
+            if (OpeningStateService(database).current() == null) {
+                throw BridgeCommandNotFound("Opening balances have not been recorded")
+            }
+            val snapshot = OpeningStateService(database).correct(input)
+            attribute(snapshot.eventId, actor.userId, actor.displayName, actor.role)
+            audit(ACTION_CORRECT_OPENING_STATE, "event_id=${snapshot.eventId}", actor.userId, actor.displayName, actor.role)
+            snapshot.eventId
+        }
+
+    private suspend fun attribute(eventId: Long, actorUserId: Long, actorName: String, actorRole: String) {
+        database.eventActorLinkDao().insert(
+            EventActorLinkEntity(
+                eventId = eventId,
+                actorUserId = actorUserId,
+                actorNameSnapshot = actorName,
+                actorRoleSnapshot = actorRole,
+                attributedAt = Instant.now().toString(),
+            )
+        )
+    }
+
     private suspend fun audit(action: String, details: String, actorUserId: Long, actorName: String, actorRole: String) {
         database.securityAuditDao().insert(
             SecurityAuditEntryEntity(
@@ -70,6 +114,8 @@ internal class SettingsBridgeCommandService(
         const val ACTION_UPDATE_BUSINESS_SETTINGS = "bridge_update_business_settings"
         const val ACTION_CREATE_EXPENSE_CATEGORY = "bridge_create_expense_category"
         const val ACTION_SET_EXPENSE_CATEGORY_ARCHIVED = "bridge_set_expense_category_archived"
+        const val ACTION_RECORD_OPENING_STATE = "bridge_record_opening_state"
+        const val ACTION_CORRECT_OPENING_STATE = "bridge_correct_opening_state"
         const val RESULT_SUCCESS = "success"
     }
 }

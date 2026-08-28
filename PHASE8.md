@@ -1,6 +1,6 @@
 # Phase 8 — Screen-by-Screen Native UI Wiring
 
-**Status: IN PROGRESS — Products, Customers, Suppliers, Employees/Attendance, and core Settings complete 2026-08-28**
+**Status: IN PROGRESS — Products, Customers, Suppliers, Employees/Attendance, core Settings, and Opening State complete 2026-08-28**
 
 ## 1. Purpose and working rule
 
@@ -26,8 +26,8 @@ The frozen logic specification, SQL blueprint, Phase 5 DTO catalog, and Phase 6 
 | Suppliers | `query.masterData`, create/rename/save-profile vendor commands | **Milestone 3 complete** | Balance remains native-read-only; no per-supplier milk rate. |
 | Employees and attendance | `query.masterData`, `query.transactionReferences`, `query.attendance`, employee/profile/attendance commands | **Milestone 4 complete** | Employee records remain separate from app logins; operators can mark attendance without profile authority. |
 | Expense categories and core settings | `query.businessSettings`, store/rate/category commands | **Milestone 5 complete** | Editable store identity, fixed PKR, shop-wide rates, and non-destructive category lifecycle. |
-| Opening state setup/correction | business-settings/reference queries, opening commands, recent authentication | **Next** | Complete before daily operations so a fresh shop can deliberately record real starting balances. |
-| Daily operations | dashboard/reference queries and purchase/sale/production/expense/payment/spoilage commands | Queued | No UI-side totals, stock mutation, or cost formulas. |
+| Opening state setup/correction | business-settings/reference queries, opening commands, recent authentication | **Milestone 6 complete** | Optional fresh-install snapshot, explicit directions, and append-only correction. |
+| Daily operations | dashboard/reference queries and purchase/sale/production/expense/payment/spoilage commands | **Next** | No UI-side totals, stock mutation, or cost formulas. |
 | Deliveries / wholesale | transaction references, deliveries, sale and delivery commands | Queued | Preserve delivery status and sale-link semantics. |
 | Customer/supplier ledgers | account-ledger query plus collection/payment commands | Queued | Display canonical native balances only. |
 | History and corrections | event history/detail and correction command | Queued | Never edit or delete historical events in place. |
@@ -114,7 +114,24 @@ The active app now provides a permission-aware Settings area:
 
 The runtime now advertises twenty-seven implemented actions: `query.businessSettings`, the two store/rate commands, and the two expense-category commands join the prior twenty-two. The canonical contract remains version 1 with 78 operations.
 
-## 8. Safety and business boundaries
+## 8. Milestone 6 — Opening State Setup and Correction
+
+The active Settings workspace now includes the approved optional opening-balance workflow:
+
+- a fresh installation may record real pre-existing stock, cash/bank, customer dues, and supplier dues before its first business event;
+- all-zero shops skip setup and receive no artificial opening event;
+- upgraded or already-used installations cannot receive a late artificial opening entry;
+- shop-facing directions distinguish “customer owes shop” from “shop owes supplier” without debit/credit terminology;
+- initial entries accept only active, inventory-tracked products and active customer/supplier accounts; correction retains previously referenced archived/inactive records;
+- the complete corrected opening picture is restated, while inventory and financial ledgers receive only the difference from the previous snapshot;
+- the original event remains immutable and every correction points to the prior current event;
+- owner/admin business-settings permission and a passphrase confirmed within five minutes are enforced natively;
+- each opening event has a durable actor link and security-audit entry;
+- the React workflow awaits reauthentication and the native command, then refreshes business settings and references.
+
+The runtime now advertises thirty implemented actions. `command.auth.reauthenticate`, `command.recordOpeningState`, and `command.correctOpeningState` join the prior twenty-seven. The canonical contract remains version 1 with 78 operations.
+
+## 9. Safety and business boundaries
 
 - Archiving changes future availability; it does not delete products or rewrite transaction history.
 - Inventory quantity remains event-derived. This screen has no direct “set stock” operation.
@@ -135,14 +152,18 @@ The runtime now advertises twenty-seven implemented actions: `query.businessSett
 - Business rates must be greater than zero and are stored through the existing atomic native settings service.
 - Supplier profiles still cannot override the shop-wide milk buying rate.
 - Expense-category deactivation removes future selection only; it does not delete the account or old expenses.
+- Opening state is optional and one-time; zero balances create no event.
+- Initial opening state is rejected after any real business event, including on upgraded installations with history.
+- Opening corrections append a new full snapshot and delta postings; they never overwrite or delete the original event.
+- React never decides whether recent authentication is valid; the native session clock and credential verifier remain authoritative.
 - The old prototype view model remains inactive and is not imported by the packaged app.
 - No Room schema, frozen business formula, frozen DTO, or canonical bridge endpoint changed.
 
-## 9. Structural refactor checkpoint
+## 10. Structural refactor checkpoint
 
 Before starting Supplier Profiles, the active hybrid path was reorganized without changing its public behavior:
 
-- the 733-line Phase 8 shell was split into authentication, workspace navigation, Product, Customer, Supplier, Employee Profile, Attendance, Business Settings, Expense Categories, bridge-action, shared UI, and shared model modules; after Settings wiring the shell is 265 lines and no new handwritten React module exceeds 265 lines;
+- the 733-line Phase 8 shell was split into authentication, workspace navigation, Product, Customer, Supplier, Employee Profile, Attendance, Business Settings, Expense Categories, Opening State, bridge-action, shared UI, and shared model modules; after Opening State wiring the shell is 266 lines and the new opening modules are 105 and 52 lines;
 - the 518-line bridge dispatcher was split into protocol validation, domain handlers, JSON mapping, and a 56-line dispatcher;
 - the 660-line Phase 5 read-model service remains the stable caller-facing façade but is now 47 lines, delegating to focused identity/master-data, operational, financial, costing/planning, and security readers;
 - generated contract projections and inactive inherited prototype screens were deliberately left alone;
@@ -150,7 +171,7 @@ Before starting Supplier Profiles, the active hybrid path was reorganized withou
 
 The checkpoint changed no Room schema, DTO shape, bridge action, permission rule, accounting formula, element ID, or user workflow. Its focused device regression covered the Phase 5 read model and Phase 7–8 hybrid flows: **13/13 PASS**.
 
-## 10. Verification checkpoint
+## 11. Verification checkpoint
 
 Physical device: `SM-A065F`.
 
@@ -159,7 +180,8 @@ Physical device: `SM-A065F`.
 - Phase 8 focused Supplier Profiles suite — **3/3 PASS**;
 - Phase 8 focused Employees/Attendance suite — **4/4 PASS**;
 - Phase 8 focused Settings/Expense Categories suite — **4/4 PASS**;
-- complete connected-device regression — **144/144 PASS**, 0 skipped, 0 failed, 0 errors;
+- Phase 8 focused Opening State suite — **4/4 PASS**;
+- complete connected-device regression — **148/148 PASS**, 0 skipped, 0 failed, 0 errors;
 - host-side debug unit suite — **7/7 PASS**;
 - TypeScript check and production Vite build — PASS;
 - explicit web bundle packaging and Android asset gate — PASS;
@@ -167,14 +189,14 @@ Physical device: `SM-A065F`.
 - Phase 6 contract drift check — version 1, 78 operations, original SHA-256 — PASS;
 - frozen logic-spec and SQL hashes — unchanged.
 
-The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; and expense-category lifecycle with Room readback and durable actor audit. Settings evidence also covers positive-value validation, manager/operator separation, duplicate and missing category handling, and a packaged React-to-Room round trip. A full-suite-only timing failure in the new packaged test was traced to checking Room before the awaited UI save completed; the assertion now waits for the native success notice, after which both focused and complete suites pass.
+The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; expense-category lifecycle; and opening-state record/correction behavior with Room readback and durable actor audit. Opening evidence covers five-minute reauthentication, wrong-passphrase and permission denial, late-install conflict, exact PKR/quantity serialization, delta-only correction postings, retained history, and the packaged confirmation screen.
 
-## 11. Current limitations and next milestone
+## 12. Current limitations and next milestone
 
-Phase 8 is not complete. Authentication, Products, Customer Profiles, Supplier Profiles, Employees, Attendance, editable store identity, core business rates, and expense categories execute through the active React product. Opening state, transactions, ledgers, reports, costing/planning controls, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
+Phase 8 is not complete. Authentication, Products, Customer Profiles, Supplier Profiles, Employees, Attendance, editable store identity, core business rates, expense categories, and Opening State execute through the active React product. Transactions, ledgers, reports, costing/planning controls, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
 
-The next milestone is **Opening State Setup and Correction**. It must remain optional, be available only before the first business event for a fresh installation, never create artificial entries on upgrade, require recent native authentication, and append corrections rather than rewriting the original record. Completing it before Daily Operations prevents a new shop from accidentally starting transactions before deciding whether real opening balances need recording.
+The next milestone is **Daily Operations**. Wire the authoritative dashboard/reference reads and the approved purchase, sale, production, expense, payment, and spoilage commands in coherent substeps. React must not calculate totals, stock, balances, or cost; each mutation must await native truth and refresh only the declared reads.
 
 ## Plain English
 
-The shop name, contact details, PKR rates, and expense categories are now real and saved by the native app. Managers can maintain expense categories without being allowed to change shop-wide prices. Deactivating a category does not erase old expenses. Phase 8 remains open; the next step is the optional opening-balance workflow that a fresh shop may use before recording its first real transaction.
+The shop name, PKR rates, expense categories, and optional starting balances are now real and saved by the native app. A new shop can record stock and money that already existed; an existing installation cannot be given fake starting figures. Corrections keep the old record and apply only the difference. Phase 8 remains open; the next step is the day-to-day purchase, sale, production, expense, payment, and spoilage workspace.

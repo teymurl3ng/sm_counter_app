@@ -15,6 +15,7 @@ internal object HybridBridgeActions {
     const val BOOTSTRAP_OWNER = "command.auth.bootstrapOwner"
     const val LOGIN = "command.auth.login"
     const val LOGOUT = "command.auth.logout"
+    const val REAUTHENTICATE = "command.auth.reauthenticate"
     const val CURRENT_SESSION = "query.currentSession"
     const val MASTER_DATA = "query.masterData"
     const val CREATE_PRODUCT = "command.createProduct"
@@ -37,8 +38,10 @@ internal object HybridBridgeActions {
     const val UPDATE_BUSINESS_SETTINGS = "command.updateBusinessSettings"
     const val CREATE_EXPENSE_CATEGORY = "command.createExpenseCategory"
     const val SET_EXPENSE_CATEGORY_ARCHIVED = "command.setExpenseCategoryArchived"
+    const val RECORD_OPENING_STATE = "command.recordOpeningState"
+    const val CORRECT_OPENING_STATE = "command.correctOpeningState"
 
-    val authentication = setOf(BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN, LOGOUT, CURRENT_SESSION)
+    val authentication = setOf(BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN, LOGOUT, REAUTHENTICATE, CURRENT_SESSION)
     val masterData = setOf(
         MASTER_DATA,
         CREATE_PRODUCT,
@@ -53,7 +56,15 @@ internal object HybridBridgeActions {
         TRANSACTION_REFERENCES,
     )
     val employees = setOf(ATTENDANCE, CREATE_EMPLOYEE, RENAME_EMPLOYEE, SAVE_EMPLOYEE_PROFILE, RECORD_ATTENDANCE)
-    val settings = setOf(BUSINESS_SETTINGS, SAVE_STORE_IDENTITY, UPDATE_BUSINESS_SETTINGS, CREATE_EXPENSE_CATEGORY, SET_EXPENSE_CATEGORY_ARCHIVED)
+    val settings = setOf(
+        BUSINESS_SETTINGS,
+        SAVE_STORE_IDENTITY,
+        UPDATE_BUSINESS_SETTINGS,
+        CREATE_EXPENSE_CATEGORY,
+        SET_EXPENSE_CATEGORY_ARCHIVED,
+        RECORD_OPENING_STATE,
+        CORRECT_OPENING_STATE,
+    )
     val supported = listOf(BRIDGE_INFO) + authentication + masterData + employees + settings
     val authByAction = supported.associateWith { action ->
         if (action in setOf(BRIDGE_INFO, BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN)) "none" else "session"

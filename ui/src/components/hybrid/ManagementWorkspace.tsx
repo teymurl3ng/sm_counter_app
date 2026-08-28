@@ -6,7 +6,7 @@ import { EmployeeAttendanceScreen } from './EmployeeAttendanceScreen';
 import { ProductManagementScreen } from './ProductManagementScreen';
 import { SupplierProfilesScreen } from './SupplierProfilesScreen';
 import { SettingsWorkspaceScreen } from './SettingsWorkspaceScreen';
-import { plainRole, type BusinessRatesDraft, type CustomerDraft, type EmployeeDraft, type ProductDraft, type StoreIdentityDraft, type SupplierDraft } from './hybridModels';
+import { plainRole, type BusinessRatesDraft, type CustomerDraft, type EmployeeDraft, type OpeningStateDraft, type ProductDraft, type StoreIdentityDraft, type SupplierDraft } from './hybridModels';
 
 type ManagementArea = 'products' | 'customers' | 'suppliers' | 'employees' | 'settings';
 
@@ -31,6 +31,7 @@ export function ManagementWorkspace({
   onRecordAttendance,
   onSaveStoreIdentity,
   onUpdateBusinessSettings,
+  onSaveOpeningState,
   onCreateExpenseCategory,
   onSetExpenseCategoryArchived,
 }: {
@@ -54,6 +55,7 @@ export function ManagementWorkspace({
   onRecordAttendance(employeeAccountId: AccountReferenceDto['accountId'], businessDate: string, statusCode: AttendanceStatusCode, notes: string): Promise<void>;
   onSaveStoreIdentity(draft: StoreIdentityDraft): Promise<void>;
   onUpdateBusinessSettings(draft: BusinessRatesDraft): Promise<void>;
+  onSaveOpeningState(draft: OpeningStateDraft, passphrase: string, correction: boolean): Promise<void>;
   onCreateExpenseCategory(displayName: string): Promise<void>;
   onSetExpenseCategoryArchived(category: ExpenseCategoryDto, archived: boolean): Promise<void>;
 }) {
@@ -82,7 +84,7 @@ export function ManagementWorkspace({
     </nav>
     <div className="mx-auto max-w-4xl px-4 py-6">
       {area === 'settings' && (canManage || canManageSettings) ? (
-        <SettingsWorkspaceScreen busy={busy} canManageSettings={canManageSettings} categories={masterData?.expenseCategories ?? businessSettings?.expenseCategories ?? null} settings={businessSettings} error={error} notice={notice} onSaveStore={onSaveStoreIdentity} onSaveRates={onUpdateBusinessSettings} onCreateCategory={onCreateExpenseCategory} onSetCategoryArchived={onSetExpenseCategoryArchived} />
+        <SettingsWorkspaceScreen busy={busy} canManageSettings={canManageSettings} categories={masterData?.expenseCategories ?? businessSettings?.expenseCategories ?? null} masterData={masterData} references={transactionReferences} settings={businessSettings} error={error} notice={notice} onSaveStore={onSaveStoreIdentity} onSaveRates={onUpdateBusinessSettings} onSaveOpening={onSaveOpeningState} onCreateCategory={onCreateExpenseCategory} onSetCategoryArchived={onSetExpenseCategoryArchived} />
       ) : area === 'employees' && (canManage || canAttend) ? (
         <EmployeeAttendanceScreen busy={busy} canManage={canManage} employees={masterData?.employees ?? null} attendanceEmployees={attendanceEmployees} error={error} notice={notice} onSaveEmployee={onSaveEmployee} onSetEmployeeActive={onSetEmployeeActive} onLoadAttendance={onLoadAttendance} onRecordAttendance={onRecordAttendance} />
       ) : !canManage ? <Unavailable /> : area === 'products' ? (

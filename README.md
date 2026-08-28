@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-08-28 — hybrid Phases 0–7 are complete; Phase 8 screen-by-screen native-backed UI wiring is in progress, with Products, Customers, Suppliers, Employees/Attendance, and core Settings complete and Opening State next. Substantial Phase 9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
+Status: RECONCILED 2026-08-28 — hybrid Phases 0–7 are complete; Phase 8 screen-by-screen native-backed UI wiring is in progress, with Products, Customers, Suppliers, Employees/Attendance, core Settings, and Opening State complete and Daily Operations next. Substantial Phase 9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
 
 ## What this repository contains
 
@@ -21,7 +21,7 @@ Status: RECONCILED 2026-08-28 — hybrid Phases 0–7 are complete; Phase 8 scre
 - `PHASE6.md` — completed canonical bridge-contract boundary, generated projections, drift gate, verification, and Phase 7 handoff.
 - `bridge/CONTRACT.md` and `bridge/contract.json` — frozen human-readable and machine-readable bridge contract version 1.
 - `PHASE7.md` — completed packaged React/WebView/Android vertical slice, authenticated bridge proof, physical-device evidence, and Phase 8 handoff.
-- `PHASE8.md` — current screen capability ledger, completed native-backed Products milestone, verification, limitations, and next screen.
+- `PHASE8.md` — current screen capability ledger, completed native-backed milestones through Opening State, verification, limitations, and next screen.
 
 ## Immutable baselines
 
@@ -35,7 +35,7 @@ SQL blueprint SHA-256:
 
 **Phase 8 — Screen-by-Screen Native UI Wiring: IN PROGRESS**
 
-The Phase 7 shell remains intact. Phase 8 now provides native-backed Products, Customer Profiles, Supplier Profiles, Employees, Attendance, editable store identity, core shop-wide rates, and Expense Categories. Currency remains fixed to PKR; managers may maintain expense categories without changing business-wide rates. The runtime exposes 27 of the frozen contract's 78 operations. The complete connected-device regression passes 144/144. Phase 8 remains open; optional Opening State setup/correction is next, before Daily Operations.
+The Phase 7 shell remains intact. Phase 8 now provides native-backed Products, Customer Profiles, Supplier Profiles, Employees, Attendance, editable store identity, core shop-wide rates, Expense Categories, and optional Opening State setup/correction. Currency remains fixed to PKR; managers may maintain expense categories without changing business-wide rates. Starting balances require owner/admin authority plus a recent passphrase and cannot be added after real business activity. The runtime exposes 30 of the frozen contract's 78 operations. The complete connected-device regression passes 148/148. Phase 8 remains open; Daily Operations is next.
 
 ## Approved security track
 
@@ -83,7 +83,7 @@ Phase 6 — Bridge Contract (`bridge/CONTRACT.md`) ✅
 
 Phase 7 — Hybrid Shell / Vertical Slice ✅
 
-Phase 8 — UI Wiring ◐ (master data, attendance, and core settings complete; Opening State next)
+Phase 8 — UI Wiring ◐ (master data, attendance, core settings, and Opening State complete; Daily Operations next)
 
 Phase 9 — Runtime / Navigation / Device Integration ◐ (native lifecycle credit only; hybrid runtime absent)
 
@@ -129,8 +129,9 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 8 focused Supplier Profiles suite: 3/3 passed on the physical device.
 - Phase 8 focused Employees/Attendance suite: 4/4 passed on the physical device.
 - Phase 8 focused Settings/Expense Categories suite: 4/4 passed on the physical device.
-- Complete connected-device instrumentation regression: 144/144 passed, 0 skipped, 0 failed.
+- Phase 8 focused Opening State suite: 4/4 passed on the physical device.
+- Complete connected-device instrumentation regression: 148/148 passed, 0 skipped, 0 failed.
 
 ## Next gate
 
-Phases 3–7 are closed and Phase 8 is active. Products, Customer Profiles, Supplier Profiles, Employees/Attendance, editable store identity, shop-wide PKR rates, and Expense Categories are complete reference screens. The active React shell, native bridge dispatcher, and Phase 5 read-model façade remain split into focused modules. Next, wire optional Opening State setup/correction with recent native authentication before exposing Daily Operations. Upgraded installations must never receive artificial opening entries. Every screen must continue to await native mutations, show truthful outcomes, refresh declared queries, receive a hybrid integration test, and retire its corresponding mock/local behavior. See `PHASE8.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–7 are closed and Phase 8 is active. Products, Customer Profiles, Supplier Profiles, Employees/Attendance, editable store identity, shop-wide PKR rates, Expense Categories, and optional Opening State are complete reference screens. The active React shell, native bridge dispatcher, and Phase 5 read-model façade remain split into focused modules. Next, wire Daily Operations in coherent substeps without moving totals, stock, balances, or costing into React. Every screen must continue to await native mutations, show truthful outcomes, refresh declared queries, receive a hybrid integration test, and retire its corresponding mock/local behavior. See `PHASE8.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.

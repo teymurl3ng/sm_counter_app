@@ -1,4 +1,4 @@
-import type { Int64String, ProductUnitCode } from '../../bridge/contract.generated';
+import type { Int64String, ProductUnitCode, SalePaymentKindCode } from '../../bridge/contract.generated';
 
 export type HybridStage = 'checking' | 'setup' | 'login' | 'recovery' | 'ready' | 'blocked';
 
@@ -69,6 +69,29 @@ export type PurchaseDraft = {
   lrReading: string;
   notes: string;
 };
+
+export type SaleDraft = {
+  productId: Int64String;
+  occurredAt: string;
+  channelKind: 'retail' | 'wholesale';
+  entryMode: 'quantity' | 'value';
+  unitRateRupees: string;
+  quantity: string;
+  valueRupees: string;
+  paymentKind: SalePaymentKindCode;
+  paymentAccountId: Int64String | null;
+  customerAccountId: Int64String | null;
+  surchargeEnabled: boolean;
+  surchargeRupees: string;
+  notes: string;
+};
+
+export function todayInput(): string {
+  const date = new Date();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+}
 
 export type OpeningAccountOption = {
   accountId: Int64String;

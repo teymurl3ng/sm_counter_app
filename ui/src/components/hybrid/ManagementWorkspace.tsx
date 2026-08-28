@@ -1,13 +1,13 @@
 import { useState, type ReactNode } from 'react';
 import { ClipboardCheck, LogOut, PackagePlus, Settings, ShoppingBasket, Truck, Users } from 'lucide-react';
-import type { AccountReferenceDto, AttendanceDto, AttendanceStatusCode, BusinessSettingsDto, CustomerDto, CurrentSessionDto, DashboardDto, EmployeeDto, ExpenseCategoryDto, MasterDataDto, ProductDto, PurchaseRecordedResultDto, TransactionReferencesDto, VendorDto } from '../../bridge/contract.generated';
+import type { AccountReferenceDto, AttendanceDto, AttendanceStatusCode, BusinessSettingsDto, CashierSummaryDto, CustomerDto, CurrentSessionDto, DashboardDto, EmployeeDto, ExpenseCategoryDto, MasterDataDto, ProductDto, PurchaseRecordedResultDto, SaleRecordedResultDto, TransactionReferencesDto, VendorDto } from '../../bridge/contract.generated';
 import { CustomerProfilesScreen } from './CustomerProfilesScreen';
 import { DailyOperationsWorkspace } from './DailyOperationsWorkspace';
 import { EmployeeAttendanceScreen } from './EmployeeAttendanceScreen';
 import { ProductManagementScreen } from './ProductManagementScreen';
 import { SupplierProfilesScreen } from './SupplierProfilesScreen';
 import { SettingsWorkspaceScreen } from './SettingsWorkspaceScreen';
-import { plainRole, type BusinessRatesDraft, type CustomerDraft, type EmployeeDraft, type OpeningStateDraft, type ProductDraft, type PurchaseDraft, type StoreIdentityDraft, type SupplierDraft } from './hybridModels';
+import { plainRole, type BusinessRatesDraft, type CustomerDraft, type EmployeeDraft, type OpeningStateDraft, type ProductDraft, type PurchaseDraft, type SaleDraft, type StoreIdentityDraft, type SupplierDraft } from './hybridModels';
 
 type ManagementArea = 'operations' | 'products' | 'customers' | 'suppliers' | 'employees' | 'settings';
 
@@ -17,11 +17,13 @@ export function ManagementWorkspace({
   error,
   masterData,
   dashboard,
+  cashierSummary,
   businessSettings,
   transactionReferences,
   notice,
   onLogout,
   onRecordPurchase,
+  onRecordSale,
   onSaveProduct,
   onSetProductArchived,
   onSaveCustomer,
@@ -43,11 +45,13 @@ export function ManagementWorkspace({
   error: string | null;
   masterData: MasterDataDto | null;
   dashboard: DashboardDto | null;
+  cashierSummary: CashierSummaryDto | null;
   businessSettings: BusinessSettingsDto | null;
   transactionReferences: TransactionReferencesDto | null;
   notice: string | null;
   onLogout(): void;
   onRecordPurchase(draft: PurchaseDraft): Promise<PurchaseRecordedResultDto>;
+  onRecordSale(draft: SaleDraft): Promise<SaleRecordedResultDto>;
   onSaveProduct(draft: ProductDraft, productId?: ProductDto['productId']): Promise<void>;
   onSetProductArchived(product: ProductDto, archived: boolean): Promise<void>;
   onSaveCustomer(draft: CustomerDraft, customer?: CustomerDto): Promise<void>;
@@ -68,7 +72,9 @@ export function ManagementWorkspace({
   const canAttend = currentUser?.effectivePermissionCodes.includes('attendance') === true;
   const canManageSettings = currentUser?.effectivePermissionCodes.includes('manage_business_settings') === true;
   const canPurchase = currentUser?.effectivePermissionCodes.includes('purchase') === true;
-  const [area, setArea] = useState<ManagementArea>(canManage ? 'products' : canPurchase ? 'operations' : 'employees');
+  const canSell = currentUser?.effectivePermissionCodes.includes('sale_and_collection') === true;
+  const canOperate = canPurchase || canSell;
+  const [area, setArea] = useState<ManagementArea>(canManage ? 'products' : canOperate ? 'operations' : 'employees');
   const title = area === 'operations' ? 'Daily work' : area === 'products' ? 'Products' : area === 'customers' ? 'Customers' : area === 'suppliers' ? 'Suppliers' : area === 'employees' ? 'Employees' : 'Settings';
   const attendanceEmployees = masterData?.employees.filter((employee) => employee.active).map(({ accountId, name }) => ({ accountId, name })) ?? transactionReferences?.employees ?? [];
 
@@ -81,7 +87,7 @@ export function ManagementWorkspace({
     </header>
     <nav className="border-b border-slate-200 bg-white px-4" aria-label="Management areas">
       <div className="mx-auto flex max-w-4xl gap-2 overflow-x-auto py-2">
-        {canPurchase && <AreaButton id="operations-nav" active={area === 'operations'} onClick={() => setArea('operations')}><ShoppingBasket className="h-4 w-4" />Daily work</AreaButton>}
+        {canOperate && <AreaButton id="operations-nav" active={area === 'operations'} onClick={() => setArea('operations')}><ShoppingBasket className="h-4 w-4" />Daily work</AreaButton>}
         {canManage && <AreaButton id="products-nav" active={area === 'products'} onClick={() => setArea('products')}><PackagePlus className="h-4 w-4" />Products</AreaButton>}
         {canManage && <AreaButton id="customers-nav" active={area === 'customers'} onClick={() => setArea('customers')}><Users className="h-4 w-4" />Customers</AreaButton>}
         {canManage && <AreaButton id="suppliers-nav" active={area === 'suppliers'} onClick={() => setArea('suppliers')}><Truck className="h-4 w-4" />Suppliers</AreaButton>}
@@ -90,8 +96,8 @@ export function ManagementWorkspace({
       </div>
     </nav>
     <div className="mx-auto max-w-4xl px-4 py-6">
-      {area === 'operations' && canPurchase ? (
-        <DailyOperationsWorkspace busy={busy} dashboard={dashboard} references={transactionReferences} error={error} notice={notice} onRecordPurchase={onRecordPurchase} />
+      {area === 'operations' && canOperate ? (
+        <DailyOperationsWorkspace busy={busy} canPurchase={canPurchase} canSell={canSell} dashboard={dashboard} cashierSummary={cashierSummary} references={transactionReferences} error={error} notice={notice} onRecordPurchase={onRecordPurchase} onRecordSale={onRecordSale} />
       ) : area === 'settings' && (canManage || canManageSettings) ? (
         <SettingsWorkspaceScreen busy={busy} canManageSettings={canManageSettings} categories={masterData?.expenseCategories ?? businessSettings?.expenseCategories ?? null} masterData={masterData} references={transactionReferences} settings={businessSettings} error={error} notice={notice} onSaveStore={onSaveStoreIdentity} onSaveRates={onUpdateBusinessSettings} onSaveOpening={onSaveOpeningState} onCreateCategory={onCreateExpenseCategory} onSetCategoryArchived={onSetExpenseCategoryArchived} />
       ) : area === 'employees' && (canManage || canAttend) ? (

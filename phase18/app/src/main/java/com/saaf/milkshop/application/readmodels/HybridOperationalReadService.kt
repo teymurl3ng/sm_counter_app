@@ -54,7 +54,14 @@ internal class HybridOperationalReadService(
         val customerProfiles = database.customerProfileDao().all().associateBy { it.accountId }
         val vendorProfiles = database.vendorProfileDao().all().associateBy { it.accountId }
         val employeeProfiles = database.employeeProfileDao().all().associateBy { it.accountId }
-        suspend fun refs(category: String) = database.accountDao().findByCategory(category).map { AccountReferenceDto(it.accountId, it.name) }
+        suspend fun refs(category: String) = database.accountDao().findByCategory(category).map {
+            val name = when (category) {
+                "Customer" -> it.name.removePrefix("Customer: ").trim()
+                "Vendor" -> it.name.removePrefix("Vendor: ").trim()
+                else -> it.name
+            }
+            AccountReferenceDto(it.accountId, name)
+        }
         val settingKeys = com.saaf.milkshop.domain.SettingKeys
         return TransactionReferencesDto(
             products = database.productDao().all().filter { product ->

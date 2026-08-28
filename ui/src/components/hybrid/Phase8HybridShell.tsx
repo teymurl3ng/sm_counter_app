@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { BusinessSettingsDto, CurrentSessionDto, DashboardDto, IsoDateString, MasterDataDto, SessionHandle, TransactionReferencesDto } from '../../bridge/contract.generated';
+import type { BusinessSettingsDto, CashierSummaryDto, CurrentSessionDto, DashboardDto, IsoDateString, MasterDataDto, SessionHandle, TransactionReferencesDto } from '../../bridge/contract.generated';
 import { callNative, NativeBridgeError, verifyNativeContract } from '../../bridge/nativeBridge';
 import { Login, OwnerSetup, RecoveryCodeScreen } from './AuthScreens';
 import { CenteredMessage } from './HybridUi';
@@ -18,6 +18,7 @@ export function Phase8HybridShell() {
   const [businessSettings, setBusinessSettings] = useState<BusinessSettingsDto | null>(null);
   const [transactionReferences, setTransactionReferences] = useState<TransactionReferencesDto | null>(null);
   const [dashboard, setDashboard] = useState<DashboardDto | null>(null);
+  const [cashierSummary, setCashierSummary] = useState<CashierSummaryDto | null>(null);
   const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -26,16 +27,18 @@ export function Phase8HybridShell() {
   const loadAuthorizedData = useCallback(async (activeSession: SessionHandle, user: CurrentSessionDto) => {
     const today = localDate(0);
     const tomorrow = localDate(1);
-    const [loadedMasterData, loadedReferences, loadedSettings, loadedDashboard] = await Promise.all([
+    const [loadedMasterData, loadedReferences, loadedSettings, loadedDashboard, loadedCashierSummary] = await Promise.all([
       user.effectivePermissionCodes.includes('manage_master_data') ? callNative('query.masterData', {}, activeSession) : Promise.resolve(null),
       user.effectivePermissionCodes.includes('view_operational') ? callNative('query.transactionReferences', {}, activeSession) : Promise.resolve(null),
       user.effectivePermissionCodes.includes('manage_business_settings') ? callNative('query.businessSettings', {}, activeSession) : Promise.resolve(null),
       user.effectivePermissionCodes.includes('view_operational') ? callNative('query.dashboard', { startDateInclusive: today, endDateExclusive: tomorrow }, activeSession) : Promise.resolve(null),
+      user.effectivePermissionCodes.includes('sale_and_collection') ? callNative('query.cashierSummary', { startDateInclusive: today, endDateExclusive: tomorrow }, activeSession) : Promise.resolve(null),
     ]);
     setMasterData(loadedMasterData);
     setTransactionReferences(loadedReferences);
     setBusinessSettings(loadedSettings);
     setDashboard(loadedDashboard);
+    setCashierSummary(loadedCashierSummary);
   }, []);
 
   const clearSession = useCallback(() => {
@@ -45,6 +48,7 @@ export function Phase8HybridShell() {
     setBusinessSettings(null);
     setTransactionReferences(null);
     setDashboard(null);
+    setCashierSummary(null);
     setRecoveryCode(null);
     setNotice(null);
     setStage('login');
@@ -185,11 +189,13 @@ export function Phase8HybridShell() {
     error={error}
     masterData={masterData}
     dashboard={dashboard}
+    cashierSummary={cashierSummary}
     businessSettings={businessSettings}
     transactionReferences={transactionReferences}
     notice={notice}
     onLogout={logout}
     onRecordPurchase={dailyOperationsActions.recordPurchase}
+    onRecordSale={dailyOperationsActions.recordSale}
     onSaveProduct={masterDataActions.saveProduct}
     onSetProductArchived={masterDataActions.setProductArchived}
     onSaveCustomer={masterDataActions.saveCustomer}

@@ -2,6 +2,7 @@ package com.saaf.milkshop.application.bridge
 
 import com.saaf.milkshop.application.readmodels.BootstrapStatusDto
 import com.saaf.milkshop.application.readmodels.BusinessSettingsDto
+import com.saaf.milkshop.application.readmodels.CashierSummaryDto
 import com.saaf.milkshop.application.readmodels.AccountReferenceDto
 import com.saaf.milkshop.application.readmodels.AttendanceDto
 import com.saaf.milkshop.application.readmodels.CurrentSessionDto
@@ -84,6 +85,17 @@ internal fun dashboardJson(value: DashboardDto): JSONObject = JSONObject()
         .put("purchasedMilkLiters", value.totals.purchasedMilkLiters)
         .put("producedYogurtKg", value.totals.producedYogurtKg)
         .put("productionMilkUsedLiters", value.totals.productionMilkUsedLiters))
+
+internal fun cashierSummaryJson(value: CashierSummaryDto): JSONObject = JSONObject()
+    .put("paymentAccounts", jsonArray(value.paymentAccounts) { account ->
+        JSONObject().put("accountId", account.accountId.toString()).put("name", account.name)
+            .put("categoryCode", account.categoryCode)
+            .put("canonicalBalancePaisa", account.canonicalBalancePaisa.toString())
+    })
+    .put("startDateInclusive", value.startDateInclusive)
+    .put("endDateExclusive", value.endDateExclusive)
+    .put("salesValuePaisa", value.salesValuePaisa.toString())
+    .put("creditCollectionsPaisa", value.creditCollectionsPaisa.toString())
 
 internal fun attendanceJson(values: List<AttendanceDto>): JSONArray = jsonArray(values, ::attendanceItemJson)
 

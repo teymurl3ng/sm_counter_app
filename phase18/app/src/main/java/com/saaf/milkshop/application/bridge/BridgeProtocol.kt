@@ -29,7 +29,9 @@ internal object HybridBridgeActions {
     const val SAVE_VENDOR_PROFILE = "command.saveVendorProfile"
     const val TRANSACTION_REFERENCES = "query.transactionReferences"
     const val DASHBOARD = "query.dashboard"
+    const val CASHIER_SUMMARY = "query.cashierSummary"
     const val RECORD_PURCHASE = "command.recordPurchase"
+    const val RECORD_SALE = "command.recordSale"
     const val ATTENDANCE = "query.attendance"
     const val CREATE_EMPLOYEE = "command.createEmployee"
     const val RENAME_EMPLOYEE = "command.renameEmployee"
@@ -67,7 +69,7 @@ internal object HybridBridgeActions {
         RECORD_OPENING_STATE,
         CORRECT_OPENING_STATE,
     )
-    val operations = setOf(DASHBOARD, RECORD_PURCHASE)
+    val operations = setOf(DASHBOARD, CASHIER_SUMMARY, RECORD_PURCHASE, RECORD_SALE)
     val supported = listOf(BRIDGE_INFO) + authentication + masterData + employees + settings + operations
     val authByAction = supported.associateWith { action ->
         if (action in setOf(BRIDGE_INFO, BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN)) "none" else "session"
@@ -141,6 +143,7 @@ internal fun mapBridgeFailure(error: Throwable): BridgeFailure = when (error) {
     is BridgeCommandConflict -> BridgeFailure("conflict", error.message ?: "The current state no longer permits this action")
     is BridgeCommandNotFound -> BridgeFailure("not_found", error.message ?: "The requested record no longer exists")
     is BridgeCommandDayClosed -> BridgeFailure("day_closed", error.message ?: "This business day is closed")
+    is BridgeCommandInsufficientStock -> BridgeFailure("insufficient_stock", error.message ?: "There is not enough stock for this operation")
     is SecurityFailure.Authentication -> BridgeFailure("authentication_failed", SecurityFailure.GENERIC_AUTH_FAILURE)
     is SecurityFailure.SessionExpired -> BridgeFailure("session_expired", "Your session expired. Sign in again.")
     is SecurityFailure.PermissionDenied -> BridgeFailure("permission_denied", "You do not have permission to perform this action.")

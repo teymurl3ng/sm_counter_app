@@ -1,6 +1,6 @@
-import type { IsoDateString, PurchaseRecordedResultDto, SessionHandle } from '../../bridge/contract.generated';
-import { callNative, validateDecimalInput } from '../../bridge/nativeBridge';
-import type { PurchaseDraft } from './hybridModels';
+import type { IsoDateString, PurchaseRecordedResultDto, SaleRecordedResultDto, SessionHandle } from '../../bridge/contract.generated';
+import { callNative, rupeesToPaisa, validateDecimalInput } from '../../bridge/nativeBridge';
+import type { PurchaseDraft, SaleDraft } from './hybridModels';
 
 type RunAndRefreshResult = <T>(operation: () => Promise<T>, success: string) => Promise<T>;
 
@@ -20,5 +20,24 @@ export function dailyOperationsBridgeActions(
     }, session);
   }, 'Supplier milk purchase recorded.');
 
-  return { recordPurchase };
+  const recordSale = (draft: SaleDraft): Promise<SaleRecordedResultDto> => runAndRefresh(async () => {
+    if (!session) throw new Error('Sign in to record a sale.');
+    const channelCode = draft.paymentKind === 'credit' ? `credit-${draft.channelKind}` : draft.channelKind;
+    return callNative('command.recordSale', {
+      productId: draft.productId,
+      occurredAt: draft.occurredAt as IsoDateString,
+      channelCode,
+      unitRatePaisa: rupeesToPaisa(draft.unitRateRupees),
+      quantity: draft.entryMode === 'quantity' ? validateDecimalInput(draft.quantity, 'the quantity sold') : null,
+      valuePaisa: draft.entryMode === 'value' ? rupeesToPaisa(draft.valueRupees) : null,
+      paymentKindCode: draft.paymentKind,
+      paymentAccountId: draft.paymentKind === 'account' ? draft.paymentAccountId : null,
+      customerAccountId: draft.paymentKind === 'credit' ? draft.customerAccountId : null,
+      surchargeEnabled: draft.surchargeEnabled,
+      surchargePaisa: draft.surchargeEnabled && draft.surchargeRupees.trim() ? rupeesToPaisa(draft.surchargeRupees) : null,
+      ...(draft.notes.trim() ? { notes: draft.notes.trim() } : {}),
+    }, session);
+  }, 'Sale recorded successfully.');
+
+  return { recordPurchase, recordSale };
 }

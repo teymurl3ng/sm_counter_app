@@ -9,6 +9,32 @@ import androidx.room3.Query
 interface DailyCloseDao {
     @Query(
         """
+        SELECT CASE WHEN
+          NOT EXISTS (
+              SELECT 1 FROM daily_close_actions exact_action
+              WHERE exact_action.business_date = :businessDate
+                AND exact_action.action = 'reopen'
+                AND NOT EXISTS (
+                    SELECT 1 FROM daily_close_actions child
+                    WHERE child.supersedes_action_id = exact_action.action_id
+                )
+          )
+          AND EXISTS (
+              SELECT 1 FROM daily_close_actions lock_action
+              WHERE lock_action.business_date >= :businessDate
+                AND lock_action.action = 'close'
+                AND NOT EXISTS (
+                    SELECT 1 FROM daily_close_actions child
+                    WHERE child.supersedes_action_id = lock_action.action_id
+                )
+          )
+        THEN 1 ELSE 0 END
+        """
+    )
+    suspend fun isPostingClosed(businessDate: String): Boolean
+
+    @Query(
+        """
         SELECT * FROM daily_close_actions dca
         WHERE dca.business_date = :businessDate
           AND NOT EXISTS (

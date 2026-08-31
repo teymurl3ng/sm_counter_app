@@ -1,6 +1,6 @@
 import type { EventMutationResultDto, IsoDateString, PurchaseRecordedResultDto, SaleRecordedResultDto, SessionHandle } from '../../bridge/contract.generated';
 import { callNative, rupeesToPaisa, validateDecimalInput } from '../../bridge/nativeBridge';
-import type { ExpenseDraft, PaymentDraft, ProductionDraft, PurchaseDraft, SalaryPaymentDraft, SaleDraft } from './hybridModels';
+import type { ExpenseDraft, PaymentDraft, ProductionDraft, PurchaseDraft, SalaryPaymentDraft, SaleDraft, SpoilageDraft } from './hybridModels';
 
 type RunAndRefreshResult = <T>(operation: () => Promise<T>, success: string) => Promise<T>;
 
@@ -84,5 +84,16 @@ export function dailyOperationsBridgeActions(
     }, session);
   }, 'Salary payment recorded.');
 
-  return { recordExpense, recordPayment, recordProduction, recordPurchase, recordSalaryPayment, recordSale };
+  const recordSpoilage = (draft: SpoilageDraft): Promise<EventMutationResultDto> => runAndRefresh(async () => {
+    if (!session) throw new Error('Sign in to record spoiled stock.');
+    return callNative('command.recordSpoilage', {
+      productId: draft.productId,
+      quantity: validateDecimalInput(draft.quantity, 'the quantity lost'),
+      occurredAt: draft.occurredAt as IsoDateString,
+      reasonCode: draft.reasonCode,
+      ...(draft.notes.trim() ? { notes: draft.notes.trim() } : {}),
+    }, session);
+  }, 'Spoiled stock recorded.');
+
+  return { recordExpense, recordPayment, recordProduction, recordPurchase, recordSalaryPayment, recordSale, recordSpoilage };
 }

@@ -119,6 +119,13 @@ internal fun financialOverviewJson(value: FinancialOverviewDto): JSONObject = JS
 
 internal fun attendanceJson(values: List<AttendanceDto>): JSONArray = jsonArray(values, ::attendanceItemJson)
 
+internal fun spoilageJson(value: com.saaf.milkshop.application.readmodels.SpoilageDto): JSONObject = JSONObject()
+    .put("eventId", value.eventId.toString()).put("occurredAt", value.occurredAt)
+    .put("productId", value.productId.toString()).put("productName", value.productName).put("unit", value.unit)
+    .put("quantity", value.quantity).put("reasonCode", value.reasonCode)
+    .putNullable("correctsEventId", value.correctsEventId?.toString()).put("isSuperseded", value.isSuperseded)
+    .putNullable("notes", value.notes)
+
 private fun productReferenceJson(value: ProductReferenceDto): JSONObject = JSONObject()
     .put("productId", value.productId.toString()).put("name", value.name).put("unit", value.unit)
 

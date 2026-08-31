@@ -9,6 +9,7 @@ import com.saaf.milkshop.domain.CreditCollectionInput
 import com.saaf.milkshop.domain.SaleInput
 import com.saaf.milkshop.domain.SalePayment
 import com.saaf.milkshop.domain.SalaryPaymentInput
+import com.saaf.milkshop.domain.SpoilageInput
 import com.saaf.milkshop.domain.YogurtProductionInput
 import org.json.JSONObject
 import java.math.BigDecimal
@@ -18,7 +19,7 @@ internal class OperationsBridgeHandler(
     private val reads: HybridReadModelService,
     private val commands: OperationsBridgeCommandService,
 ) {
-    suspend fun execute(request: BridgeRequest): JSONObject = when (request.action) {
+    suspend fun execute(request: BridgeRequest): Any = when (request.action) {
         HybridBridgeActions.DASHBOARD -> dashboard(request)
         HybridBridgeActions.CASHIER_SUMMARY -> cashierSummary(request)
         HybridBridgeActions.FINANCIAL_OVERVIEW -> financialOverview(request)
@@ -29,6 +30,8 @@ internal class OperationsBridgeHandler(
         HybridBridgeActions.RECORD_CREDIT_COLLECTION -> recordCreditCollection(request)
         HybridBridgeActions.RECORD_EXPENSE -> recordExpense(request)
         HybridBridgeActions.RECORD_SALARY_PAYMENT -> recordSalaryPayment(request)
+        HybridBridgeActions.SPOILAGE_HISTORY -> spoilageHistory(request)
+        HybridBridgeActions.RECORD_SPOILAGE -> recordSpoilage(request)
         else -> unavailableBridgeAction()
     }
 
@@ -45,6 +48,11 @@ internal class OperationsBridgeHandler(
     private suspend fun financialOverview(request: BridgeRequest): JSONObject {
         val (start, end) = request.dateRange()
         return financialOverviewJson(reads.financialOverview(request.requireSession(), start, end))
+    }
+
+    private suspend fun spoilageHistory(request: BridgeRequest): org.json.JSONArray {
+        strictPayload(request.payload, emptySet())
+        return jsonArray(reads.spoilageHistory(request.requireSession()), ::spoilageJson)
     }
 
     private suspend fun recordPurchase(request: BridgeRequest): JSONObject {
@@ -247,6 +255,25 @@ internal class OperationsBridgeHandler(
                 amount = payment.amount,
                 occurredAt = payment.occurredAt,
                 notes = payment.notes,
+            ),
+        )
+        return JSONObject().put("eventId", result.eventId.toString())
+    }
+
+    private suspend fun recordSpoilage(request: BridgeRequest): JSONObject {
+        strictObject(
+            request.payload,
+            required = setOf("productId", "quantity", "occurredAt", "reasonCode"),
+            allowed = setOf("productId", "quantity", "occurredAt", "reasonCode", "notes"),
+        )
+        val result = commands.recordSpoilage(
+            request.requireSession(),
+            SpoilageInput(
+                productId = request.payload.requiredId("productId"),
+                quantity = positiveDecimal(request.payload, "quantity", "Spoilage quantity must be greater than zero"),
+                occurredAt = request.payload.requiredDate("occurredAt"),
+                reason = request.payload.requiredString("reasonCode"),
+                notes = request.payload.optionalString("notes"),
             ),
         )
         return JSONObject().put("eventId", result.eventId.toString())

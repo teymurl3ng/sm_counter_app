@@ -18,6 +18,9 @@ import com.saaf.milkshop.domain.SaleService
 import com.saaf.milkshop.domain.SalaryPaymentInput
 import com.saaf.milkshop.domain.SalaryPaymentResult
 import com.saaf.milkshop.domain.SalaryPaymentService
+import com.saaf.milkshop.domain.SpoilageInput
+import com.saaf.milkshop.domain.SpoilageResult
+import com.saaf.milkshop.domain.SpoilageService
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.domain.VendorPurchaseInput
 import com.saaf.milkshop.domain.VendorPurchaseResult
@@ -248,6 +251,36 @@ internal class OperationsBridgeCommandService(
         result
     }
 
+    suspend fun recordSpoilage(
+        sessionHandle: String,
+        input: SpoilageInput,
+    ): SpoilageResult = database.withWriteTransaction {
+        val actor = security.requirePermission(sessionHandle, AppPermission.PRODUCTION_AND_SPOILAGE)
+        val product = database.productDao().findById(input.productId)
+        val profile = database.productProfileDao().findByProductId(input.productId)
+        if (product == null || profile?.archived == true || profile?.inventoryTracking == false) {
+            throw BridgeCommandNotFound("Choose an active inventory-tracked product")
+        }
+        requireOpenDate(input.occurredAt, "spoilage")
+        val result = try {
+            SpoilageService(database).record(input)
+        } catch (error: Throwable) {
+            if (error.hasMessage("Insufficient stock for this product")) {
+                throw BridgeCommandInsufficientStock("There is not enough ${product.name} in stock for this spoilage entry.")
+            }
+            throw error
+        }
+        attribute(result.eventId, actor.userId, actor.displayName, actor.role)
+        audit(
+            ACTION_RECORD_SPOILAGE,
+            "event_id=${result.eventId};product_id=${input.productId}",
+            actor.userId,
+            actor.displayName,
+            actor.role,
+        )
+        result
+    }
+
     private suspend fun requirePaymentAccount(accountId: Long) {
         if (database.accountDao().findById(accountId)?.category != "Cash/Bank") {
             throw BridgeCommandNotFound("Choose a valid cash or bank account")
@@ -300,6 +333,7 @@ internal class OperationsBridgeCommandService(
         const val ACTION_RECORD_VENDOR_PAYMENT = "bridge_record_vendor_payment"
         const val ACTION_RECORD_CREDIT_COLLECTION = "bridge_record_credit_collection"
         const val ACTION_RECORD_SALARY_PAYMENT = "bridge_record_salary_payment"
+        const val ACTION_RECORD_SPOILAGE = "bridge_record_spoilage"
         const val RESULT_SUCCESS = "success"
     }
 }

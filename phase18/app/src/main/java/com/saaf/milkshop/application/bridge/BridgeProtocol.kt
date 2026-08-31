@@ -38,6 +38,8 @@ internal object HybridBridgeActions {
     const val RECORD_CREDIT_COLLECTION = "command.recordCreditCollection"
     const val RECORD_EXPENSE = "command.recordExpense"
     const val RECORD_SALARY_PAYMENT = "command.recordSalaryPayment"
+    const val SPOILAGE_HISTORY = "query.spoilageHistory"
+    const val RECORD_SPOILAGE = "command.recordSpoilage"
     const val ATTENDANCE = "query.attendance"
     const val CREATE_EMPLOYEE = "command.createEmployee"
     const val RENAME_EMPLOYEE = "command.renameEmployee"
@@ -86,6 +88,8 @@ internal object HybridBridgeActions {
         RECORD_CREDIT_COLLECTION,
         RECORD_EXPENSE,
         RECORD_SALARY_PAYMENT,
+        SPOILAGE_HISTORY,
+        RECORD_SPOILAGE,
     )
     val supported = listOf(BRIDGE_INFO) + authentication + masterData + employees + settings + operations
     val authByAction = supported.associateWith { action ->

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { BusinessSettingsDto, CashierSummaryDto, CurrentSessionDto, DashboardDto, FinancialOverviewDto, IsoDateString, MasterDataDto, SessionHandle, TransactionReferencesDto } from '../../bridge/contract.generated';
+import type { BusinessSettingsDto, CashierSummaryDto, CurrentSessionDto, DashboardDto, FinancialOverviewDto, IsoDateString, MasterDataDto, SessionHandle, SpoilageDto, TransactionReferencesDto } from '../../bridge/contract.generated';
 import { callNative, NativeBridgeError, verifyNativeContract } from '../../bridge/nativeBridge';
 import { Login, OwnerSetup, RecoveryCodeScreen } from './AuthScreens';
 import { CenteredMessage } from './HybridUi';
@@ -20,6 +20,7 @@ export function Phase8HybridShell() {
   const [dashboard, setDashboard] = useState<DashboardDto | null>(null);
   const [cashierSummary, setCashierSummary] = useState<CashierSummaryDto | null>(null);
   const [financialOverview, setFinancialOverview] = useState<FinancialOverviewDto | null>(null);
+  const [spoilageHistory, setSpoilageHistory] = useState<ReadonlyArray<SpoilageDto> | null>(null);
   const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -28,13 +29,14 @@ export function Phase8HybridShell() {
   const loadAuthorizedData = useCallback(async (activeSession: SessionHandle, user: CurrentSessionDto) => {
     const today = localDate(0);
     const tomorrow = localDate(1);
-    const [loadedMasterData, loadedReferences, loadedSettings, loadedDashboard, loadedCashierSummary, loadedFinancialOverview] = await Promise.all([
+    const [loadedMasterData, loadedReferences, loadedSettings, loadedDashboard, loadedCashierSummary, loadedFinancialOverview, loadedSpoilageHistory] = await Promise.all([
       user.effectivePermissionCodes.includes('manage_master_data') ? callNative('query.masterData', {}, activeSession) : Promise.resolve(null),
       user.effectivePermissionCodes.includes('view_operational') ? callNative('query.transactionReferences', {}, activeSession) : Promise.resolve(null),
       user.effectivePermissionCodes.includes('manage_business_settings') ? callNative('query.businessSettings', {}, activeSession) : Promise.resolve(null),
       user.effectivePermissionCodes.includes('view_operational') ? callNative('query.dashboard', { startDateInclusive: today, endDateExclusive: tomorrow }, activeSession) : Promise.resolve(null),
       user.effectivePermissionCodes.includes('sale_and_collection') ? callNative('query.cashierSummary', { startDateInclusive: today, endDateExclusive: tomorrow }, activeSession) : Promise.resolve(null),
       user.effectivePermissionCodes.includes('view_full_financial') ? callNative('query.financialOverview', { startDateInclusive: today, endDateExclusive: tomorrow }, activeSession) : Promise.resolve(null),
+      user.effectivePermissionCodes.includes('production_and_spoilage') ? callNative('query.spoilageHistory', {}, activeSession) : Promise.resolve(null),
     ]);
     setMasterData(loadedMasterData);
     setTransactionReferences(loadedReferences);
@@ -42,6 +44,7 @@ export function Phase8HybridShell() {
     setDashboard(loadedDashboard);
     setCashierSummary(loadedCashierSummary);
     setFinancialOverview(loadedFinancialOverview);
+    setSpoilageHistory(loadedSpoilageHistory);
   }, []);
 
   const clearSession = useCallback(() => {
@@ -53,6 +56,7 @@ export function Phase8HybridShell() {
     setDashboard(null);
     setCashierSummary(null);
     setFinancialOverview(null);
+    setSpoilageHistory(null);
     setRecoveryCode(null);
     setNotice(null);
     setStage('login');
@@ -195,6 +199,7 @@ export function Phase8HybridShell() {
     dashboard={dashboard}
     cashierSummary={cashierSummary}
     financialOverview={financialOverview}
+    spoilageHistory={spoilageHistory}
     businessSettings={businessSettings}
     transactionReferences={transactionReferences}
     notice={notice}
@@ -205,6 +210,7 @@ export function Phase8HybridShell() {
     onRecordExpense={dailyOperationsActions.recordExpense}
     onRecordPayment={dailyOperationsActions.recordPayment}
     onRecordSalaryPayment={dailyOperationsActions.recordSalaryPayment}
+    onRecordSpoilage={dailyOperationsActions.recordSpoilage}
     onSaveProduct={masterDataActions.saveProduct}
     onSetProductArchived={masterDataActions.setProductArchived}
     onSaveCustomer={masterDataActions.saveCustomer}

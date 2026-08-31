@@ -118,6 +118,14 @@ export type SalaryPaymentDraft = {
   notes: string;
 };
 
+export type SpoilageDraft = {
+  productId: Int64String;
+  quantity: string;
+  occurredAt: string;
+  reasonCode: string;
+  notes: string;
+};
+
 export function todayInput(): string {
   const date = new Date();
   const month = String(date.getMonth() + 1).padStart(2, '0');

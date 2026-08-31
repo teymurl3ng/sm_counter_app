@@ -1,13 +1,13 @@
 import { useState, type ReactNode } from 'react';
 import { ClipboardCheck, LogOut, PackagePlus, Settings, ShoppingBasket, Truck, Users } from 'lucide-react';
-import type { AccountReferenceDto, AttendanceDto, AttendanceStatusCode, BusinessSettingsDto, CashierSummaryDto, CustomerDto, CurrentSessionDto, DashboardDto, EmployeeDto, EventMutationResultDto, ExpenseCategoryDto, FinancialOverviewDto, MasterDataDto, ProductDto, PurchaseRecordedResultDto, SaleRecordedResultDto, TransactionReferencesDto, VendorDto } from '../../bridge/contract.generated';
+import type { AccountReferenceDto, AttendanceDto, AttendanceStatusCode, BusinessSettingsDto, CashierSummaryDto, CustomerDto, CurrentSessionDto, DashboardDto, EmployeeDto, EventMutationResultDto, ExpenseCategoryDto, FinancialOverviewDto, MasterDataDto, ProductDto, PurchaseRecordedResultDto, SaleRecordedResultDto, SpoilageDto, TransactionReferencesDto, VendorDto } from '../../bridge/contract.generated';
 import { CustomerProfilesScreen } from './CustomerProfilesScreen';
 import { DailyOperationsWorkspace } from './DailyOperationsWorkspace';
 import { EmployeeAttendanceScreen } from './EmployeeAttendanceScreen';
 import { ProductManagementScreen } from './ProductManagementScreen';
 import { SupplierProfilesScreen } from './SupplierProfilesScreen';
 import { SettingsWorkspaceScreen } from './SettingsWorkspaceScreen';
-import { plainRole, type BusinessRatesDraft, type CustomerDraft, type EmployeeDraft, type ExpenseDraft, type OpeningStateDraft, type PaymentDraft, type ProductDraft, type ProductionDraft, type PurchaseDraft, type SalaryPaymentDraft, type SaleDraft, type StoreIdentityDraft, type SupplierDraft } from './hybridModels';
+import { plainRole, type BusinessRatesDraft, type CustomerDraft, type EmployeeDraft, type ExpenseDraft, type OpeningStateDraft, type PaymentDraft, type ProductDraft, type ProductionDraft, type PurchaseDraft, type SalaryPaymentDraft, type SaleDraft, type SpoilageDraft, type StoreIdentityDraft, type SupplierDraft } from './hybridModels';
 
 type ManagementArea = 'operations' | 'products' | 'customers' | 'suppliers' | 'employees' | 'settings';
 
@@ -19,6 +19,7 @@ export function ManagementWorkspace({
   dashboard,
   cashierSummary,
   financialOverview,
+  spoilageHistory,
   businessSettings,
   transactionReferences,
   notice,
@@ -29,6 +30,7 @@ export function ManagementWorkspace({
   onRecordExpense,
   onRecordPayment,
   onRecordSalaryPayment,
+  onRecordSpoilage,
   onSaveProduct,
   onSetProductArchived,
   onSaveCustomer,
@@ -52,6 +54,7 @@ export function ManagementWorkspace({
   dashboard: DashboardDto | null;
   cashierSummary: CashierSummaryDto | null;
   financialOverview: FinancialOverviewDto | null;
+  spoilageHistory: ReadonlyArray<SpoilageDto> | null;
   businessSettings: BusinessSettingsDto | null;
   transactionReferences: TransactionReferencesDto | null;
   notice: string | null;
@@ -62,6 +65,7 @@ export function ManagementWorkspace({
   onRecordExpense(draft: ExpenseDraft): Promise<EventMutationResultDto>;
   onRecordPayment(draft: PaymentDraft): Promise<EventMutationResultDto>;
   onRecordSalaryPayment(draft: SalaryPaymentDraft): Promise<EventMutationResultDto>;
+  onRecordSpoilage(draft: SpoilageDraft): Promise<EventMutationResultDto>;
   onSaveProduct(draft: ProductDraft, productId?: ProductDto['productId']): Promise<void>;
   onSetProductArchived(product: ProductDto, archived: boolean): Promise<void>;
   onSaveCustomer(draft: CustomerDraft, customer?: CustomerDto): Promise<void>;
@@ -111,7 +115,7 @@ export function ManagementWorkspace({
     </nav>
     <div className="mx-auto max-w-4xl px-4 py-6">
       {area === 'operations' && canOperate ? (
-        <DailyOperationsWorkspace busy={busy} canCollectCustomer={canSell} canExpense={canExpense} canPaySalary={canPaySalary} canPaySupplier={canPaySupplier} canProduce={canProduce} canPurchase={canPurchase} canSell={canSell} dashboard={dashboard} cashierSummary={cashierSummary} financialOverview={financialOverview} references={transactionReferences} error={error} notice={notice} onRecordExpense={onRecordExpense} onRecordPayment={onRecordPayment} onRecordProduction={onRecordProduction} onRecordPurchase={onRecordPurchase} onRecordSalaryPayment={onRecordSalaryPayment} onRecordSale={onRecordSale} />
+        <DailyOperationsWorkspace busy={busy} canCollectCustomer={canSell} canExpense={canExpense} canPaySalary={canPaySalary} canPaySupplier={canPaySupplier} canProduce={canProduce} canPurchase={canPurchase} canSell={canSell} dashboard={dashboard} cashierSummary={cashierSummary} financialOverview={financialOverview} spoilageHistory={spoilageHistory} references={transactionReferences} error={error} notice={notice} onRecordExpense={onRecordExpense} onRecordPayment={onRecordPayment} onRecordProduction={onRecordProduction} onRecordPurchase={onRecordPurchase} onRecordSalaryPayment={onRecordSalaryPayment} onRecordSale={onRecordSale} onRecordSpoilage={onRecordSpoilage} />
       ) : area === 'settings' && (canManage || canManageSettings) ? (
         <SettingsWorkspaceScreen busy={busy} canManageSettings={canManageSettings} categories={masterData?.expenseCategories ?? businessSettings?.expenseCategories ?? null} masterData={masterData} references={transactionReferences} settings={businessSettings} error={error} notice={notice} onSaveStore={onSaveStoreIdentity} onSaveRates={onUpdateBusinessSettings} onSaveOpening={onSaveOpeningState} onCreateCategory={onCreateExpenseCategory} onSetCategoryArchived={onSetExpenseCategoryArchived} />
       ) : area === 'employees' && (canManage || canAttend) ? (

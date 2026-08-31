@@ -62,6 +62,8 @@ export const RUNTIME_ACTIONS = [
   'command.recordCreditCollection',
   'command.recordExpense',
   'command.recordSalaryPayment',
+  'query.spoilageHistory',
+  'command.recordSpoilage',
   'query.attendance',
   'command.createEmployee',
   'command.renameEmployee',

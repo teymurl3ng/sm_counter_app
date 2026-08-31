@@ -2,6 +2,8 @@
 
 Status: RECONCILED 2026-08-31 — hybrid Phases 0–7 are complete; Phase 8 screen-by-screen native-backed UI wiring is in progress, with management, core Settings, Opening State, supplier milk purchase, paid/credit sales, milk-to-yogurt production, expenses, supplier/customer payments, and salary payments complete. Spoilage is the next Daily Operations substep. Substantial Phase 9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
 
+Latest physical-device checkpoint: salary payments are verified, with spoilage queued next.
+
 ## What this repository contains
 
 - `phase18/` — Phase 18-derived native project. Its logic specification and SQL blueprint remain frozen; approved hybrid native extensions are implemented in the Kotlin/Room source.

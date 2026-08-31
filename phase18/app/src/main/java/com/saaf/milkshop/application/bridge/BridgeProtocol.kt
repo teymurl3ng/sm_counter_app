@@ -40,6 +40,11 @@ internal object HybridBridgeActions {
     const val RECORD_SALARY_PAYMENT = "command.recordSalaryPayment"
     const val SPOILAGE_HISTORY = "query.spoilageHistory"
     const val RECORD_SPOILAGE = "command.recordSpoilage"
+    const val DELIVERIES = "query.deliveries"
+    const val CREATE_DELIVERY = "command.createDelivery"
+    const val TRANSITION_DELIVERY = "command.transitionDelivery"
+    const val LINK_DELIVERY_SALE = "command.linkDeliverySale"
+    const val ARCHIVE_DELIVERY = "command.archiveDelivery"
     const val ATTENDANCE = "query.attendance"
     const val CREATE_EMPLOYEE = "command.createEmployee"
     const val RENAME_EMPLOYEE = "command.renameEmployee"
@@ -91,7 +96,8 @@ internal object HybridBridgeActions {
         SPOILAGE_HISTORY,
         RECORD_SPOILAGE,
     )
-    val supported = listOf(BRIDGE_INFO) + authentication + masterData + employees + settings + operations
+    val deliveries = setOf(DELIVERIES, CREATE_DELIVERY, TRANSITION_DELIVERY, LINK_DELIVERY_SALE, ARCHIVE_DELIVERY)
+    val supported = listOf(BRIDGE_INFO) + authentication + masterData + employees + settings + operations + deliveries
     val authByAction = supported.associateWith { action ->
         if (action in setOf(BRIDGE_INFO, BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN)) "none" else "session"
     }

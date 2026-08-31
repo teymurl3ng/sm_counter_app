@@ -123,7 +123,7 @@ internal class HybridOperationalReadService(
             DeliveryDto(
                 deliveryId = delivery.deliveryId,
                 customerAccountId = delivery.customerAccountId,
-                customerName = customer?.name ?: "Customer #${delivery.customerAccountId}",
+                customerName = customer?.name?.removePrefix("Customer: ")?.trim() ?: "Customer #${delivery.customerAccountId}",
                 productId = delivery.productId,
                 productName = product?.name ?: "Product #${delivery.productId}",
                 unit = product?.unit ?: "",

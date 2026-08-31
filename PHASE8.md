@@ -28,8 +28,8 @@ The frozen logic specification, SQL blueprint, Phase 5 DTO catalog, and Phase 6 
 | Expense categories and core settings | `query.businessSettings`, store/rate/category commands | **Milestone 5 complete** | Editable store identity, fixed PKR, shop-wide rates, and non-destructive category lifecycle. |
 | Opening state setup/correction | business-settings/reference queries, opening commands, recent authentication | **Milestone 6 complete** | Optional fresh-install snapshot, explicit directions, and append-only correction. |
 | Daily operations | dashboard/reference/financial queries and purchase/sale/production/expense/payment/spoilage commands | **Milestones 7–13 complete** | No UI-side totals, stock mutation, cost rates, or accounting formulas. |
-| Deliveries / wholesale | transaction references, deliveries, sale and delivery commands | **Next** | Preserve delivery status and sale-link semantics. |
-| Customer/supplier ledgers | account-ledger query plus collection/payment commands | Queued | Display canonical native balances only. |
+| Deliveries / wholesale | transaction references, deliveries, sale and delivery commands | **Milestone 14 complete** | Pending/terminal history and optional sale linkage remain logistical records, not duplicate revenue. |
+| Customer/supplier ledgers | account-ledger query plus collection/payment commands | **Next** | Display canonical native balances only. |
 | History and corrections | event history/detail and correction command | Queued | Never edit or delete historical events in place. |
 | Cash count and daily close | reconciliation query and count/close/reopen commands | Queued | Keep verified native actor and closed-day enforcement. |
 | Dashboard and reports | dashboard, cashier, financial, profitability queries | Queued | Translate coverage/costing codes into plain shop language. |
@@ -247,7 +247,24 @@ The Daily Work area now provides native-backed spoilage/wastage recording:
 
 The runtime now advertises forty-two implemented actions: `query.spoilageHistory` and `command.recordSpoilage` join the prior forty. Contract version 2 remains at 78 operations with the same manifest hash. No Room schema, stock rule, spoilage valuation rule, permission bundle, or business formula changed.
 
-## 16. Safety and business boundaries
+## 16. Milestone 14 — Deliveries / Wholesale
+
+The active app now provides a separate native-backed Deliveries area:
+
+- all current application roles receive only the existing `DELIVERY` permission boundary; React visibility does not grant authority;
+- staff can create a pending delivery for an active customer and product with exact quantity, business date, optional route, notes, and optional originating sale record number;
+- the active list renders native customer/product names, quantity/unit, route, date, sale link, and latest status instead of keeping a second local delivery list;
+- only a pending delivery may append one terminal `delivered` or `cancelled` status, preserving the earlier pending row and any completion/cancellation note;
+- completed or cancelled deliveries can be archived from the active list without deleting the delivery or status history;
+- an unlinked delivery can later reference one matching canonical `SALE` event; product and credit-customer mismatches are rejected, and linking never creates revenue, stock, cash, or customer-balance movements;
+- create, transition, and archive reject protected closed business dates, while missing/inactive records, invalid quantities/statuses, duplicate links, expired sessions, and direct unauthenticated calls fail without partial writes;
+- each successful delivery command writes a verified actor security-audit entry;
+- awaited mutations refresh the authoritative delivery list, and packaged physical-device evidence covers create, status transition, archive, Room persistence, and visible screen refresh;
+- the bridge handler, command service, action adapter, create form, list, and workspace are separate focused files rather than growing the Daily Operations modules.
+
+The runtime now advertises forty-seven implemented actions: `query.deliveries` and the four delivery commands join the prior forty-two. Contract version 2 remains at 78 operations with the same manifest hash. No Room schema, sale formula, revenue rule, stock movement, permission bundle, or frozen business formula changed.
+
+## 17. Safety and business boundaries
 
 - Archiving changes future availability; it does not delete products or rewrite transaction history.
 - Inventory quantity remains event-derived. This screen has no direct “set stock” operation.
@@ -282,23 +299,26 @@ The runtime now advertises forty-two implemented actions: `query.spoilageHistory
 - A salary payment records paid salary cost. It does not create or settle a separate salary-payable balance.
 - React never calculates spoilage cost or changes stock locally; it submits the lost quantity and reason, then renders native stock/history results.
 - Spoilage is limited to active inventory-tracked products and cannot reduce stock below zero.
+- A delivery is a logistical record. Creating, linking, completing, cancelling, or archiving it never records a sale or payment.
+- Sale linkage accepts only one matching canonical sale and preserves the sale as the sole source of revenue, stock, cash, and customer-balance effects.
+- Delivery status changes append history; archive hides a record from the active list without deleting its identity or status trail.
 - A closed business date returns `day_closed` before posting, and the database close-day trigger remains the final guard.
 - The old prototype view model remains inactive and is not imported by the packaged app.
 - No Room schema, frozen business formula, permission bundle, or canonical bridge endpoint changed. The additive `TransactionReferencesDto.expenseCategories` field is the documented contract-v2 amendment.
 
-## 17. Structural refactor checkpoint
+## 18. Structural refactor checkpoint
 
 Before starting Supplier Profiles, the active hybrid path was reorganized without changing its public behavior:
 
-- the 733-line Phase 8 shell was split into authentication, workspace navigation, Product, Customer, Supplier, Employee Profile, Attendance, Business Settings, Expense Categories, Opening State, Daily Work, bridge-action, shared UI, and shared model modules; Daily Work orchestration and the Purchase, Sale, Production, Expense, Payment, Salary Payment, and Spoilage forms remain separate focused modules, while the coordinating shell remains compact;
+- the 733-line Phase 8 shell was split into authentication, workspace navigation, Product, Customer, Supplier, Employee Profile, Attendance, Business Settings, Expense Categories, Opening State, Daily Work, Deliveries, bridge-action, shared UI, and shared model modules; Daily Work orchestration and its operation forms remain separate, while Deliveries has separate workspace, create-form, list, and action-adapter modules and the coordinating shell remains compact;
 - the former 353-line multi-domain bridge-handler container was removed. Authentication, Master Data, Employees/Attendance, Settings/Opening State, and Daily Operations now live in focused handlers; purchase orchestration and actor audit are further separated into a focused command service;
 - the 660-line Phase 5 read-model service remains the stable caller-facing façade but is now 47 lines, delegating to focused identity/master-data, operational, financial, costing/planning, and security readers;
 - generated contract projections and inactive inherited prototype screens were deliberately left alone;
 - future handwritten files should be reviewed for separation when they approach roughly 300–400 lines, with responsibility and cohesion taking priority over an arbitrary number.
 
-The structural checkpoint changed no Room schema, permission rule, accounting formula, element ID, or existing user workflow. The two growing Daily Operations Kotlin files remain cohesive at 343 and 342 lines, inside the 300–400-line review band, while the new React spoilage form is a separate 72-line module. The focused purchase, sale, production, expense, payment, salary-payment, and spoilage suites are each **4/4 PASS**. The complete suite is now **176/176 PASS**.
+The structural checkpoint changed no Room schema, permission rule, accounting formula, or existing user workflow. The two growing Daily Operations Kotlin files remain cohesive at 343 and 342 lines, inside the 300–400-line review band. Delivery work is isolated in a 121-line command service, an 89-line handler, and React modules no larger than 58 lines. The focused purchase, sale, production, expense, payment, salary-payment, spoilage, and delivery suites are each **4/4 PASS**. The complete suite is now **180/180 PASS**.
 
-## 18. Verification checkpoint
+## 19. Verification checkpoint
 
 Physical device: `SM-A065F`.
 
@@ -315,7 +335,8 @@ Physical device: `SM-A065F`.
 - Phase 8 focused Daily Operations payment suite — **4/4 PASS**;
 - Phase 8 focused Daily Operations salary-payment suite — **4/4 PASS**;
 - Phase 8 focused Daily Operations spoilage suite — **4/4 PASS**;
-- complete connected-device regression — **176/176 PASS**, 0 skipped, 0 failed, 0 errors;
+- Phase 8 focused Deliveries/wholesale suite — **4/4 PASS**;
+- complete connected-device regression — **180/180 PASS**, 0 skipped, 0 failed, 0 errors;
 - host-side debug unit suite — **7/7 PASS**;
 - TypeScript check and production Vite build — PASS;
 - explicit web bundle packaging and Android asset gate — PASS;
@@ -323,16 +344,16 @@ Physical device: `SM-A065F`.
 - bridge contract drift check — version 2, 78 operations, SHA-256 `AB374869603B9D773AD86B56EF801DA8C4493816C7301B05214AE596E33D0920` — PASS;
 - frozen logic-spec and SQL hashes — unchanged.
 
-The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; expense-category lifecycle; opening-state record/correction; supplier milk purchases; sales; production; expenses; supplier payments; customer collections; salary payments; and spoilage with Room readback and durable actor audit. Spoilage evidence covers exact stock movement, reason/detail persistence, native history and dashboard refresh, unavailable-product and insufficient-stock rejection, closed-history and role denial, and the packaged form.
+The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; expense-category lifecycle; opening-state record/correction; supplier milk purchases; sales; production; expenses; supplier payments; customer collections; salary payments; spoilage; and delivery lifecycle with Room readback and durable actor audit. Delivery evidence covers pending creation, matching sale linkage without duplicate revenue, append-only terminal status, non-destructive archive, invalid/mismatched/closed-day rejection, runtime advertisement, and the packaged form.
 
-## 19. Current limitations and next milestone
+## 20. Current limitations and next milestone
 
-Phase 8 is not complete. Authentication, management screens, core settings, Opening State, operational and financial summaries, supplier milk purchase, sales, production, expenses, supplier payments, customer collections, salary payments, and spoilage execute through the active React product. Deliveries/wholesale, ledgers, history/corrections, cash close, reports, costing/planning controls, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
+Phase 8 is not complete. Authentication, management screens, core settings, Opening State, operational and financial summaries, supplier milk purchase, sales, production, expenses, supplier payments, customer collections, salary payments, spoilage, and deliveries/wholesale execute through the active React product. Ledgers, history/corrections, cash close, reports, costing/planning controls, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
 
 Phase 8 remains device-local. Multiple named users and native role enforcement are supported on one installation. Periodic encrypted Google Drive/cloud backup is recorded for a later Phase 10 design gate and Phase 11 hardening; optional read-only owner-phone snapshot viewing will be decided there. Phase 8 must not improvise networking or present backup as live synchronization.
 
-The next milestone is **Deliveries / wholesale**. Continue with the contracted delivery query and commands, preserving the native link to the originating sale plus append-only delivery-status history.
+The next milestone is **Customer/supplier ledgers**. Continue with the contracted account-ledger query and existing collection/payment commands, displaying canonical native balances and history without React-side accounting.
 
 ## Plain English
 
-Staff can now record stock that spoiled, spilled, or otherwise became unsellable. The app removes the exact saved quantity, remembers the reason and staff member, and blocks impossible or closed-date entries; nobody enters or guesses a financial loss rate. Phase 8 remains open, and deliveries/wholesale is next.
+Staff can now add a delivery, see whether it is pending, delivered, or cancelled, and remove finished items from the active list without erasing their history. A delivery may point to the sale that caused it, but it never charges the customer or changes stock a second time. Phase 8 remains open, and customer/supplier ledgers are next.

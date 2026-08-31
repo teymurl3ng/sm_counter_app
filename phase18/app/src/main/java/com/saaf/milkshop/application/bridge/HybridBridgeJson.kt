@@ -7,6 +7,7 @@ import com.saaf.milkshop.application.readmodels.AccountReferenceDto
 import com.saaf.milkshop.application.readmodels.AttendanceDto
 import com.saaf.milkshop.application.readmodels.CurrentSessionDto
 import com.saaf.milkshop.application.readmodels.DashboardDto
+import com.saaf.milkshop.application.readmodels.DeliveryDto
 import com.saaf.milkshop.application.readmodels.CustomerDto
 import com.saaf.milkshop.application.readmodels.EmployeeDto
 import com.saaf.milkshop.application.readmodels.ExpenseCategoryDto
@@ -125,6 +126,15 @@ internal fun spoilageJson(value: com.saaf.milkshop.application.readmodels.Spoila
     .put("quantity", value.quantity).put("reasonCode", value.reasonCode)
     .putNullable("correctsEventId", value.correctsEventId?.toString()).put("isSuperseded", value.isSuperseded)
     .putNullable("notes", value.notes)
+
+internal fun deliveriesJson(values: List<DeliveryDto>): JSONArray = jsonArray(values) { value ->
+    JSONObject().put("deliveryId", value.deliveryId.toString())
+        .put("customerAccountId", value.customerAccountId.toString()).put("customerName", value.customerName)
+        .put("productId", value.productId.toString()).put("productName", value.productName).put("unit", value.unit)
+        .put("quantity", value.quantity).putNullable("route", value.route).put("businessDate", value.businessDate)
+        .putNullable("saleEventId", value.saleEventId?.toString()).putNullable("statusCode", value.statusCode)
+        .putNullable("statusOccurredAt", value.statusOccurredAt).putNullable("notes", value.notes)
+}
 
 private fun productReferenceJson(value: ProductReferenceDto): JSONObject = JSONObject()
     .put("productId", value.productId.toString()).put("name", value.name).put("unit", value.unit)

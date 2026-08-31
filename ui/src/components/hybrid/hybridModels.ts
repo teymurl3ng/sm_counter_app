@@ -126,6 +126,16 @@ export type SpoilageDraft = {
   notes: string;
 };
 
+export type DeliveryDraft = {
+  customerAccountId: Int64String;
+  productId: Int64String;
+  quantity: string;
+  route: string;
+  businessDate: string;
+  saleEventId: Int64String | null;
+  notes: string;
+};
+
 export function todayInput(): string {
   const date = new Date();
   const month = String(date.getMonth() + 1).padStart(2, '0');

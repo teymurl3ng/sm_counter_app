@@ -8,6 +8,7 @@ import com.saaf.milkshop.domain.VendorPaymentInput
 import com.saaf.milkshop.domain.CreditCollectionInput
 import com.saaf.milkshop.domain.SaleInput
 import com.saaf.milkshop.domain.SalePayment
+import com.saaf.milkshop.domain.SalaryPaymentInput
 import com.saaf.milkshop.domain.YogurtProductionInput
 import org.json.JSONObject
 import java.math.BigDecimal
@@ -27,6 +28,7 @@ internal class OperationsBridgeHandler(
         HybridBridgeActions.RECORD_VENDOR_PAYMENT -> recordVendorPayment(request)
         HybridBridgeActions.RECORD_CREDIT_COLLECTION -> recordCreditCollection(request)
         HybridBridgeActions.RECORD_EXPENSE -> recordExpense(request)
+        HybridBridgeActions.RECORD_SALARY_PAYMENT -> recordSalaryPayment(request)
         else -> unavailableBridgeAction()
     }
 
@@ -226,6 +228,21 @@ internal class OperationsBridgeHandler(
             request.requireSession(),
             CreditCollectionInput(
                 customerAccountId = payment.partyAccountId,
+                paymentAccountId = payment.paymentAccountId,
+                amount = payment.amount,
+                occurredAt = payment.occurredAt,
+                notes = payment.notes,
+            ),
+        )
+        return JSONObject().put("eventId", result.eventId.toString())
+    }
+
+    private suspend fun recordSalaryPayment(request: BridgeRequest): JSONObject {
+        val payment = paymentInput(request, "employeeAccountId", "Salary amount")
+        val result = commands.recordSalaryPayment(
+            request.requireSession(),
+            SalaryPaymentInput(
+                employeeAccountId = payment.partyAccountId,
                 paymentAccountId = payment.paymentAccountId,
                 amount = payment.amount,
                 occurredAt = payment.occurredAt,

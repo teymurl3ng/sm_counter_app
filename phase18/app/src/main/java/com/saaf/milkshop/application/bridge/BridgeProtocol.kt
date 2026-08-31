@@ -37,6 +37,7 @@ internal object HybridBridgeActions {
     const val RECORD_VENDOR_PAYMENT = "command.recordVendorPayment"
     const val RECORD_CREDIT_COLLECTION = "command.recordCreditCollection"
     const val RECORD_EXPENSE = "command.recordExpense"
+    const val RECORD_SALARY_PAYMENT = "command.recordSalaryPayment"
     const val ATTENDANCE = "query.attendance"
     const val CREATE_EMPLOYEE = "command.createEmployee"
     const val RENAME_EMPLOYEE = "command.renameEmployee"
@@ -84,6 +85,7 @@ internal object HybridBridgeActions {
         RECORD_VENDOR_PAYMENT,
         RECORD_CREDIT_COLLECTION,
         RECORD_EXPENSE,
+        RECORD_SALARY_PAYMENT,
     )
     val supported = listOf(BRIDGE_INFO) + authentication + masterData + employees + settings + operations
     val authByAction = supported.associateWith { action ->

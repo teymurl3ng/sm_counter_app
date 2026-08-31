@@ -204,6 +204,7 @@ export function Phase8HybridShell() {
     onRecordProduction={dailyOperationsActions.recordProduction}
     onRecordExpense={dailyOperationsActions.recordExpense}
     onRecordPayment={dailyOperationsActions.recordPayment}
+    onRecordSalaryPayment={dailyOperationsActions.recordSalaryPayment}
     onSaveProduct={masterDataActions.saveProduct}
     onSetProductArchived={masterDataActions.setProductArchived}
     onSaveCustomer={masterDataActions.saveCustomer}

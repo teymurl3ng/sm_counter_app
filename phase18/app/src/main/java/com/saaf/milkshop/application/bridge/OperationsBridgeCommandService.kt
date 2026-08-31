@@ -15,6 +15,9 @@ import com.saaf.milkshop.domain.SaleInput
 import com.saaf.milkshop.domain.SalePayment
 import com.saaf.milkshop.domain.SaleResult
 import com.saaf.milkshop.domain.SaleService
+import com.saaf.milkshop.domain.SalaryPaymentInput
+import com.saaf.milkshop.domain.SalaryPaymentResult
+import com.saaf.milkshop.domain.SalaryPaymentService
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.domain.VendorPurchaseInput
 import com.saaf.milkshop.domain.VendorPurchaseResult
@@ -221,6 +224,30 @@ internal class OperationsBridgeCommandService(
         result
     }
 
+    suspend fun recordSalaryPayment(
+        sessionHandle: String,
+        input: SalaryPaymentInput,
+    ): SalaryPaymentResult = database.withWriteTransaction {
+        val actor = security.requirePermission(sessionHandle, AppPermission.SALARY_PAYMENT)
+        val employee = database.accountDao().findById(input.employeeAccountId)
+        val employeeProfile = database.employeeProfileDao().findByAccountId(input.employeeAccountId)
+        if (employee?.category != "Salary" || employeeProfile?.active != true) {
+            throw BridgeCommandNotFound("Choose an active employee")
+        }
+        requirePaymentAccount(input.paymentAccountId)
+        requireOpenDate(input.occurredAt, "salary payment")
+        val result = SalaryPaymentService(database).record(input)
+        attribute(result.eventId, actor.userId, actor.displayName, actor.role)
+        audit(
+            ACTION_RECORD_SALARY_PAYMENT,
+            "event_id=${result.eventId};employee_account_id=${input.employeeAccountId};payment_account_id=${input.paymentAccountId}",
+            actor.userId,
+            actor.displayName,
+            actor.role,
+        )
+        result
+    }
+
     private suspend fun requirePaymentAccount(accountId: Long) {
         if (database.accountDao().findById(accountId)?.category != "Cash/Bank") {
             throw BridgeCommandNotFound("Choose a valid cash or bank account")
@@ -272,6 +299,7 @@ internal class OperationsBridgeCommandService(
         const val ACTION_RECORD_EXPENSE = "bridge_record_expense"
         const val ACTION_RECORD_VENDOR_PAYMENT = "bridge_record_vendor_payment"
         const val ACTION_RECORD_CREDIT_COLLECTION = "bridge_record_credit_collection"
+        const val ACTION_RECORD_SALARY_PAYMENT = "bridge_record_salary_payment"
         const val RESULT_SUCCESS = "success"
     }
 }

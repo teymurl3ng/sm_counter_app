@@ -1,6 +1,6 @@
 import type { EventMutationResultDto, IsoDateString, PurchaseRecordedResultDto, SaleRecordedResultDto, SessionHandle } from '../../bridge/contract.generated';
 import { callNative, rupeesToPaisa, validateDecimalInput } from '../../bridge/nativeBridge';
-import type { ExpenseDraft, PaymentDraft, ProductionDraft, PurchaseDraft, SaleDraft } from './hybridModels';
+import type { ExpenseDraft, PaymentDraft, ProductionDraft, PurchaseDraft, SalaryPaymentDraft, SaleDraft } from './hybridModels';
 
 type RunAndRefreshResult = <T>(operation: () => Promise<T>, success: string) => Promise<T>;
 
@@ -73,5 +73,16 @@ export function dailyOperationsBridgeActions(
       : callNative('command.recordCreditCollection', { customerAccountId: draft.partyAccountId, ...common }, session);
   }, draft.kind === 'supplier' ? 'Supplier payment recorded.' : 'Customer collection recorded.');
 
-  return { recordExpense, recordPayment, recordProduction, recordPurchase, recordSale };
+  const recordSalaryPayment = (draft: SalaryPaymentDraft): Promise<EventMutationResultDto> => runAndRefresh(async () => {
+    if (!session) throw new Error('Sign in to record a salary payment.');
+    return callNative('command.recordSalaryPayment', {
+      employeeAccountId: draft.employeeAccountId,
+      paymentAccountId: draft.paymentAccountId,
+      amountPaisa: rupeesToPaisa(draft.amountRupees),
+      occurredAt: draft.occurredAt as IsoDateString,
+      ...(draft.notes.trim() ? { notes: draft.notes.trim() } : {}),
+    }, session);
+  }, 'Salary payment recorded.');
+
+  return { recordExpense, recordPayment, recordProduction, recordPurchase, recordSalaryPayment, recordSale };
 }

@@ -39,6 +39,7 @@ export const RUNTIME_ACTIONS = [
   'command.auth.bootstrapOwner',
   'command.auth.login',
   'command.auth.logout',
+  'command.auth.reauthenticate',
   'query.currentSession',
   'query.masterData',
   'command.createProduct',
@@ -60,6 +61,7 @@ export const RUNTIME_ACTIONS = [
   'command.recordVendorPayment',
   'command.recordCreditCollection',
   'command.recordExpense',
+  'command.recordSalaryPayment',
   'query.attendance',
   'command.createEmployee',
   'command.renameEmployee',
@@ -70,6 +72,8 @@ export const RUNTIME_ACTIONS = [
   'command.updateBusinessSettings',
   'command.createExpenseCategory',
   'command.setExpenseCategoryArchived',
+  'command.recordOpeningState',
+  'command.correctOpeningState',
 ] as const satisfies ReadonlyArray<BridgeAction>;
 
 export class NativeBridgeError extends Error {

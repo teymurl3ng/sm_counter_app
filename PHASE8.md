@@ -329,6 +329,8 @@ The focused tests prove Product, Customer, Supplier, and Employee lifecycle; att
 
 Phase 8 is not complete. Authentication, management screens, core settings, Opening State, operational and financial summaries, supplier milk purchase, sales, production, expenses, supplier payments, customer collections, salary payments, and spoilage execute through the active React product. Deliveries/wholesale, ledgers, history/corrections, cash close, reports, costing/planning controls, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
 
+Phase 8 remains device-local. Multiple named users and native role enforcement are supported on one installation. Periodic encrypted Google Drive/cloud backup is recorded for a later Phase 10 design gate and Phase 11 hardening; optional read-only owner-phone snapshot viewing will be decided there. Phase 8 must not improvise networking or present backup as live synchronization.
+
 The next milestone is **Deliveries / wholesale**. Continue with the contracted delivery query and commands, preserving the native link to the originating sale plus append-only delivery-status history.
 
 ## Plain English

@@ -1,6 +1,6 @@
 # Saaf Milk Hybrid Rebuild — Roadmap Reconciliation
 
-**Status: ACTIVE — approved for adoption on 2026-08-27; implementation ledger updated 2026-08-28**
+**Status: ACTIVE — approved for adoption on 2026-08-27; implementation ledger updated 2026-08-31**
 
 ## Purpose
 
@@ -43,6 +43,21 @@ The reconciliation preserves these non-negotiable contracts:
 - no migrated installation receives an artificial opening event, owner, credential, session, or privileged audit record;
 - no phase is considered complete merely because part of its work was delivered early.
 
+## Approved periodic cloud-backup direction — details deferred 2026-08-31
+
+Application users, cloud backup, and live multi-device access are separate capabilities:
+
+- the implemented schema-7 user system supports multiple named owner/admin/manager/operator/cashier identities on one installation, with native permissions and durable actor audit;
+- the current product remains offline-first and device-local: each installation owns its own Room database, there is no Internet permission or synchronization service, and encrypted backup/restore is migration and recovery rather than live sharing;
+- the approved next direction is periodic encrypted off-device backup, with Google Drive as the example provider; cadence, network/charging conditions, retention, account ownership, and recovery UX will be decided at its design gate;
+- the shop device must continue accepting authorized work without Internet, queue a missed backup safely, and retry without creating ambiguous or corrupt copies;
+- the encrypted backup must preserve clerk identities and actor attribution so a recovered or explicitly viewed snapshot still shows who recorded each operation;
+- periodic backup alone does not provide a live shared database. If owner-phone visibility is still desired, the later design must explicitly choose between a safe read-only view of the latest verified snapshot and true synchronization;
+- restoring successive backups into two independently writable installations is not synchronization and must not be presented as such;
+- React must not become a second accounting engine.
+
+Before implementation, Phase 10 must produce and obtain approval for a concrete periodic-cloud-backup design covering provider/account authorization, Android background scheduling, encryption before upload, backup naming/versioning, cadence, Wi-Fi/mobile-data and charging policy, retention, missed-run retry, integrity verification, owner notification, restore selection, privacy, quota/cost, and sign-out/revocation behavior. The same gate may evaluate an optional read-only owner-phone snapshot viewer, but live multi-device writing remains a separate future decision. The current local credential, bridge, and backup contracts remain authoritative until that design is approved.
+
 ## Implemented product foundation
 
 ### Inherited native foundation
@@ -78,14 +93,14 @@ Portable backup format 2 uses Argon2id-derived AES-256-GCM. Automatic local snap
 | 6 — Bridge Contract | **Complete; additive v2 correction recorded** | Preserve contract version 2, its manifest hash, lossless/authenticated envelopes, generated TypeScript/Kotlin projections, and mandatory pre-build drift checker. V2 adds only role-filtered active expense categories to transaction references. |
 | 7 — Hybrid Vertical Slice | **Complete** | Preserve the separately built packaged assets, restricted app-assets origin, contract handshake, memory-only session flow, protected product command/audit, and 3-test physical-device proof. |
 | 8 — Screen Wiring | **In progress — Daily Operations through spoilage complete** | Management, core settings, Opening State, operational/cashier/financial summaries, supplier purchase, paid/credit sales, milk-to-yogurt production, expenses, supplier payments, customer collections, salary payments, and spoilage are native-backed and device-proven. Deliveries/wholesale is next. Continue replacing mock/local state screen-by-screen with awaited native queries and commands plus hybrid integration tests. |
-| 9 — Runtime Integration | **Partial native credit; hybrid work not started** | Prove WebView navigation, lifecycle, process recreation, keyboard, errors, logout/back-stack protection, and session expiry. |
-| 10 — Functional Completion | **Not started** | Close the capability matrix with every retained capability genuinely native-backed and wired. |
-| 11 — Integrity/Recovery/Concurrency | **Substantial security/backup early credit; still open** | Complete concurrent-write, backup-during-write, large-history, repeated recovery, and remaining session/concurrency tests. Reassess the deliberately deferred lower-of-cost/NRV subsystem against the approved materiality and business triggers before hardening closes. |
+| 9 — Runtime Integration | **Partial native credit; hybrid work not started** | Preserve the existing AndroidX WebKit, restricted `WebViewAssetLoader` origin, and origin-checked `WebMessageListener`. Prove one WebView per active presentation lifecycle without ordinary React navigation reloads; safe configuration/process recreation; Android Back/logout protection; renderer/error recovery; deliberate keyboard/IME, system-bar, and inset behavior; one central vertical scroll region; and fixed/floating application navigation above system navigation. |
+| 10 — Functional Completion | **Not started; periodic cloud-backup design gate added** | Close the local capability matrix with every retained capability genuinely native-backed and wired. Replace broad post-mutation reloads with contract-declared, screen-scoped refresh and caching; add transport batching only if measurement justifies it. Produce and approve the periodic encrypted Google Drive/cloud-backup design, implement the approved minimum, and separately decide whether the owner phone needs only a read-only latest-snapshot view or any later synchronization. |
+| 11 — Integrity/Recovery/Concurrency | **Substantial security/backup early credit; still open** | Complete concurrent-write, backup-during-write, large-history, repeated recovery, and remaining session/concurrency tests. For periodic cloud backup, prove scheduling, missed-run retry, upload idempotency, encryption/integrity, retention, provider sign-out/revocation, wrong-account behavior, restore selection, actor preservation, and honest backup-versus-sync boundaries. Reassess the deliberately deferred lower-of-cost/NRV subsystem against the approved materiality and business triggers before hardening closes. |
 | 12 — UI Fidelity | **Not started for the hybrid product** | Compare the packaged physical-device React UI with the approved visual target without changing business semantics, and verify that accounting precision is preserved without requiring accounting literacy. |
 | 13 — Dead/Mock/Misleading Cleanup | **Not started** | Remove localStorage business state, hardcoded business data, UI-side accounting, synthetic reports, dead controls, mock users, and misleading success paths. |
-| 14 — Final Device QA | **Native instrumentation credit only; hybrid acceptance not started** | Run the full hybrid device and role/permission bypass matrix. |
-| 15 — Shopkeeper QA | **Not started** | Have non-accountant shop users simulate a complete business day, mistakes/corrections, backup/restore, account administration, and independently checked totals without coaching in accounting terminology. |
-| 16 — Release Readiness | **Not started** | Produce a reproducible release build, migration/security review, final report, archive, and release package. |
+| 14 — Final Device QA | **Native instrumentation credit only; hybrid acceptance not started** | Run the full hybrid device and role/permission bypass matrix. If cloud backup ships, test real periodic upload, offline/missed scheduling, retry, provider sign-out/revocation, retention, corrupt/wrong-passphrase rejection, and restore on a second device. Test owner-phone viewing separately if that optional scope is approved. |
+| 15 — Shopkeeper QA | **Not started** | Have non-accountant shop users simulate a complete business day, mistakes/corrections, periodic cloud backup, restore, account administration, and independently checked totals without coaching in accounting terminology. If snapshot viewing is approved, include a clerk entering work and the owner confirming the latest available snapshot from the owner's phone. |
+| 16 — Release Readiness | **Not started** | Produce a reproducible release build, migration/security review, final report, archive, and release package. Any cloud-backup release also requires documented provider authorization, encrypted-secret handling, privacy/retention rules, quota/cost behavior, recovery procedure, and safe offline/degraded operation. |
 
 ## Current verification credit
 
@@ -104,10 +119,11 @@ The two immutable hashes remain:
 4. **Completed:** create the Phase 6 canonical bridge contract and drift checker.
 5. **Completed:** prove the Phase 7 authenticated physical-device hybrid vertical slice before scaling.
 6. **In progress:** perform Phase 8 screen-by-screen wiring. Management, core Settings, optional Opening State, supplier purchases, sales, production, expenses, supplier/customer payments, salary payments, and spoilage are complete; deliveries/wholesale is next.
-7. Complete Phases 9–10 runtime integration and capability closure.
-8. Apply the early Phase 11 credit, finish its remaining concurrency/recovery gates, and perform the deferred NRV trigger review before hardening closes.
-9. Complete hybrid UI fidelity and mock/dead-state cleanup in Phases 12–13.
-10. Run device, shopkeeper, and release gates in Phases 14–16.
+7. Complete Phase 9 runtime integration, including the recorded WebView lifecycle, navigation, transfer-efficiency, keyboard, system-bar, and inset work.
+8. Complete Phase 10 local capability closure, then pass the explicit periodic encrypted cloud-backup approval gate; decide owner-phone snapshot viewing separately from live synchronization.
+9. Apply the early Phase 11 credit, finish local and cloud-backup integrity/recovery gates, and perform the deferred NRV trigger review before hardening closes.
+10. Complete hybrid UI fidelity and mock/dead-state cleanup in Phases 12–13.
+11. Run device, shopkeeper, and release gates in Phases 14–16, including real periodic-cloud-backup and second-device restore evidence plus owner-phone snapshot viewing if approved.
 
 ## Immediate next gate
 

@@ -39,6 +39,8 @@ SQL blueprint SHA-256:
 
 The Phase 7 shell remains intact. Phase 8 now provides native-backed management screens, Attendance, editable store identity, core shop-wide rates, Expense Categories, optional Opening State setup/correction, operational/cashier/financial summaries, supplier milk purchase, paid or customer-credit sales, milk-to-yogurt production, expenses, supplier payments, customer collections, salary payments, and spoilage. Currency remains fixed to PKR. Purchase, sale, production, expense, payment, and spoilage posting behavior remains native-only. The runtime exposes 42 of the frozen contract's 78 operations. The complete connected-device regression passes 176/176. Phase 8 remains open; deliveries/wholesale is next.
 
+The current release architecture is multi-user but device-local: named roles share one installation and one Room database. The approved next direction is periodic encrypted off-device backup, with Google Drive as the example provider and the exact cadence/retention/network rules deferred to a Phase 10 design gate. Backup protects and transfers a verified snapshot; it is not live synchronization between two writable phones. That gate will separately decide whether the owner's phone should offer a safe read-only view of the latest snapshot.
+
 ## Approved security track
 
 - Application users are security principals and are distinct from employee/salary profiles. A user may optionally link to one employee, but an employee record does not grant application access.
@@ -87,21 +89,21 @@ Phase 7 — Hybrid Shell / Vertical Slice ✅
 
 Phase 8 — UI Wiring ◐ (management, core settings, Opening State, purchases, sales, production, expenses, supplier/customer payments, salary payments, and spoilage complete; deliveries/wholesale next)
 
-Phase 9 — Runtime / Navigation / Device Integration ◐ (native lifecycle credit only; hybrid runtime absent)
+Phase 9 — Runtime / Navigation / Device Integration ◐ (native lifecycle credit only; WebView recreation, Back behavior, targeted refresh, keyboard/insets, and fixed application navigation remain)
 
-Phase 10 — Functional Product Completion ⏳
+Phase 10 — Functional Product Completion ⏳ (includes the periodic encrypted Google Drive/cloud-backup design gate, approved implementation, and a separate owner-phone snapshot-view decision)
 
-Phase 11 — Integrity / Recovery / Concurrency ◐ (security/backup credit; concurrency and hybrid recovery remain)
+Phase 11 — Integrity / Recovery / Concurrency ◐ (security/backup credit; local concurrency, hybrid recovery, and periodic-cloud-backup integrity remain)
 
 Phase 12 — UI Fidelity ⏳
 
 Phase 13 — Dead/Mock/Misleading UI Cleanup ⏳
 
-Phase 14 — Final Device QA ⏳
+Phase 14 — Final Device QA ⏳ (includes real scheduled-cloud-backup, retry, and second-device restore testing)
 
-Phase 15 — Final Shopkeeper QA ⏳
+Phase 15 — Final Shopkeeper QA ⏳ (includes periodic backup/recovery and owner-phone snapshot viewing if approved)
 
-Phase 16 — Release Readiness ⏳
+Phase 16 — Release Readiness ⏳ (includes cloud-provider authorization, privacy, quota, and recovery readiness if cloud backup ships)
 
 ## Rule for phase records
 

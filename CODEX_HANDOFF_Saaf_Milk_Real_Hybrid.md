@@ -22,6 +22,8 @@ Sections below that describe the original schema-expansion approval gate are ret
 
 Application user accounts and native role-based authorization are explicitly approved as a required cross-phase capability. Their schema-7 model, encrypted backup boundary, native credential UI, app-owned sessions, private staff enrollment/reset, user administration, role-aware navigation, and command-boundary authorization are implemented. Phase 7 now integrates first-owner setup, login, logout, resume checks, current-session state, and one protected/audited product command with React; remaining account/security screens belong to Phase 8. Application users are security principals separate from employee/salary profiles, with an optional link between them. The schema-v6 daily-close actor name/role is transitional asserted metadata, not authenticated identity.
 
+The owner approved periodic encrypted off-device backup as the next remote-data direction on 2026-08-31, with Google Drive as the example provider and cadence/retention/network details deliberately deferred. This is not implemented by the current local Room/user system and must not be confused with live synchronization. `ROADMAP_RECONCILIATION_2026-08-27.md` assigns the cloud-backup design gate to Phase 10, scheduling/retry/integrity/restore hardening to Phase 11, and real provider/second-device acceptance to Phases 14–16. The same Phase 10 gate will separately decide whether the owner's phone should offer a read-only latest-snapshot view; multi-writer synchronization is not currently approved. Until that design is approved, the existing device-local security and business contracts remain authoritative.
+
 The two completed Phase 3 design tracks were:
 
 1. authenticated users, credentials, roles/permissions, sessions, recovery, audit actor IDs, migration, and backup/restore security;
@@ -516,15 +518,15 @@ Wire login/logout and authorized user administration. Navigation and controls ma
 
 ## Phases 9–10
 
-Prove session persistence/expiry across lifecycle and process recreation, protect the back stack after logout, and wire verified user attribution and authorization across every protected capability. Replace transitional caller-asserted daily-close actor metadata with the verified native user.
+Prove session persistence/expiry across lifecycle and process recreation, protect the back stack after logout, retain one non-reloading React/WebView presentation path, deliberately handle keyboard/system bars/insets and fixed application navigation, and avoid broad repeated bridge/state refreshes. Wire verified user attribution and authorization across every protected capability and replace transitional caller-asserted daily-close actor metadata with the verified native user. Phase 10 must also design and obtain approval for periodic encrypted Google Drive/cloud backup and separately decide whether read-only owner-phone snapshot viewing belongs in scope.
 
 ## Phases 11–13
 
-Harden credential storage, failed-attempt throttling/lockout, owner recovery, account disablement, concurrent session behavior, audit retention, and secure backup/restore. Remove mock users, default credentials, UI-only guards, and misleading controls that appear usable without permission.
+Harden credential storage, failed-attempt throttling/lockout, owner recovery, account disablement, concurrent session behavior, audit retention, and secure backup/restore. For periodic cloud backup, also harden background scheduling, missed-run retry, idempotent upload, retention, provider sign-out/revocation, encryption/integrity, actor preservation, second-device restore, and backup/sync separation. Remove mock users, default credentials, UI-only guards, and misleading controls that appear usable without permission.
 
 ## Phases 14–16
 
-Run a physical-device role/permission and bypass matrix; shopkeeper-test user creation, role change, disablement, logout, recovery, close/reopen attribution, and a complete business day under real roles. Release must require deliberate first-owner setup, contain no default password/PIN, and include migration, recovery, session, and backup security checks.
+Run a physical-device role/permission and bypass matrix; shopkeeper-test user creation, role change, disablement, logout, recovery, close/reopen attribution, and a complete business day under real roles. If cloud backup ships, prove scheduled upload, offline retry, integrity, retention, provider sign-out, and restore on a second device; test owner-phone read-only snapshot viewing separately if approved. Release must require deliberate first-owner setup, contain no default password/PIN, and include migration, recovery, session, backup, and cloud-provider operational/security checks.
 
 ---
 

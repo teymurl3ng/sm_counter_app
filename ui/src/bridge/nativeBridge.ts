@@ -69,6 +69,7 @@ export const RUNTIME_ACTIONS = [
   'command.transitionDelivery',
   'command.linkDeliverySale',
   'command.archiveDelivery',
+  'query.accountLedger',
   'query.attendance',
   'command.createEmployee',
   'command.renameEmployee',

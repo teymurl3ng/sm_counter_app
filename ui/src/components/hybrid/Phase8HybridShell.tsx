@@ -7,6 +7,7 @@ import { ManagementWorkspace } from './ManagementWorkspace';
 import { employeeBridgeActions } from './employeeBridgeActions';
 import { dailyOperationsBridgeActions } from './dailyOperationsBridgeActions';
 import { deliveryBridgeActions } from './deliveryBridgeActions';
+import { ledgerBridgeActions } from './ledgerBridgeActions';
 import { masterDataBridgeActions } from './masterDataBridgeActions';
 import { settingsBridgeActions } from './settingsBridgeActions';
 import { errorMessage, type HybridStage } from './hybridModels';
@@ -196,6 +197,7 @@ export function Phase8HybridShell() {
   const settingsActions = settingsBridgeActions(session, withMasterDataRefresh);
   const dailyOperationsActions = dailyOperationsBridgeActions(session, withResultRefresh);
   const deliveryActions = deliveryBridgeActions(session, withResultRefresh);
+  const ledgerActions = ledgerBridgeActions(session);
 
   return <ManagementWorkspace
     busy={busy}
@@ -222,6 +224,7 @@ export function Phase8HybridShell() {
     onTransitionDelivery={deliveryActions.transitionDelivery}
     onLinkDeliverySale={deliveryActions.linkDeliverySale}
     onArchiveDelivery={deliveryActions.archiveDelivery}
+    onLoadAccountLedger={ledgerActions.loadAccountLedger}
     onSaveProduct={masterDataActions.saveProduct}
     onSetProductArchived={masterDataActions.setProductArchived}
     onSaveCustomer={masterDataActions.saveCustomer}

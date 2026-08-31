@@ -16,10 +16,10 @@ internal class HybridFinancialReadService(
         val position = AnalyticsService(database).currentPosition()
         return FinancialOverviewDto(
             customers = position.accountBalances.filter { it.category == "Customer" }.map {
-                AccountPositionDto(it.accountId, it.name, it.category, money(it.balance))
+                AccountPositionDto(it.accountId, it.name.removePrefix("Customer: ").trim(), it.category, money(it.balance))
             },
             vendors = position.accountBalances.filter { it.category == "Vendor" }.map {
-                AccountPositionDto(it.accountId, it.name, it.category, money(it.balance))
+                AccountPositionDto(it.accountId, it.name.removePrefix("Vendor: ").trim(), it.category, money(it.balance))
             },
             totals = AnalyticsService(database).periodSummary(startDateInclusive, endDateExclusive).toFinancialTotalsDto(),
         )

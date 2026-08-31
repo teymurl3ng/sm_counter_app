@@ -4,6 +4,7 @@ import com.saaf.milkshop.application.readmodels.BootstrapStatusDto
 import com.saaf.milkshop.application.readmodels.BusinessSettingsDto
 import com.saaf.milkshop.application.readmodels.CashierSummaryDto
 import com.saaf.milkshop.application.readmodels.AccountReferenceDto
+import com.saaf.milkshop.application.readmodels.AccountLedgerDto
 import com.saaf.milkshop.application.readmodels.AttendanceDto
 import com.saaf.milkshop.application.readmodels.CurrentSessionDto
 import com.saaf.milkshop.application.readmodels.DashboardDto
@@ -135,6 +136,19 @@ internal fun deliveriesJson(values: List<DeliveryDto>): JSONArray = jsonArray(va
         .putNullable("saleEventId", value.saleEventId?.toString()).putNullable("statusCode", value.statusCode)
         .putNullable("statusOccurredAt", value.statusOccurredAt).putNullable("notes", value.notes)
 }
+
+internal fun accountLedgerJson(value: AccountLedgerDto): JSONObject = JSONObject()
+    .put("accountId", value.accountId.toString()).put("accountName", value.accountName)
+    .put("displayName", value.displayName).put("categoryCode", value.categoryCode)
+    .put("currentBalancePaisa", value.currentBalancePaisa.toString())
+    .put("entries", jsonArray(value.entries) { entry ->
+        JSONObject().put("logId", entry.logId.toString()).put("eventId", entry.eventId.toString())
+            .put("occurredAt", entry.occurredAt).put("createdAt", entry.createdAt)
+            .put("eventTypeCode", entry.eventTypeCode).putNullable("channelCode", entry.channelCode)
+            .put("movementPaisa", entry.movementPaisa.toString()).put("balanceAfterPaisa", entry.balanceAfterPaisa.toString())
+            .putNullable("correctsEventId", entry.correctsEventId?.toString()).put("isCorrection", entry.isCorrection)
+            .put("isSuperseded", entry.isSuperseded).putNullable("notes", entry.notes)
+    })
 
 private fun productReferenceJson(value: ProductReferenceDto): JSONObject = JSONObject()
     .put("productId", value.productId.toString()).put("name", value.name).put("unit", value.unit)

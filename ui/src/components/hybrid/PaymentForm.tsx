@@ -7,16 +7,18 @@ import { errorMessage, todayInput, type PaymentDraft } from './hybridModels';
 
 type RecordedPayment = PaymentDraft & EventMutationResultDto & { partyName: string; paymentAccountName: string };
 
-export function PaymentForm({ busy, canCollectCustomer, canPaySupplier, references, financialOverview, onRecordPayment }: {
+export function PaymentForm({ busy, canCollectCustomer, canPaySupplier, references, financialOverview, initialKind, initialPartyAccountId = '', onRecordPayment }: {
   busy: boolean;
   canCollectCustomer: boolean;
   canPaySupplier: boolean;
   references: TransactionReferencesDto | null;
   financialOverview: FinancialOverviewDto | null;
+  initialKind?: PaymentDraft['kind'];
+  initialPartyAccountId?: Int64String | '';
   onRecordPayment(draft: PaymentDraft): Promise<EventMutationResultDto>;
 }) {
-  const [kind, setKind] = useState<PaymentDraft['kind']>(canPaySupplier ? 'supplier' : 'customer');
-  const [partyAccountId, setPartyAccountId] = useState('');
+  const [kind, setKind] = useState<PaymentDraft['kind']>(initialKind ?? (canPaySupplier ? 'supplier' : 'customer'));
+  const [partyAccountId, setPartyAccountId] = useState(initialPartyAccountId);
   const [paymentAccountId, setPaymentAccountId] = useState('');
   const [amountRupees, setAmountRupees] = useState('');
   const [occurredAt, setOccurredAt] = useState(todayInput());
@@ -46,7 +48,7 @@ export function PaymentForm({ busy, canCollectCustomer, canPaySupplier, referenc
       {canPaySupplier && canCollectCustomer && <div className="mb-5 flex rounded-xl bg-slate-200 p-1"><FilterButton id="payment-mode-supplier" active={kind === 'supplier'} onClick={() => switchKind('supplier')}>Pay supplier</FilterButton><FilterButton id="payment-mode-customer" active={kind === 'customer'} onClick={() => switchKind('customer')}>Collect customer money</FilterButton></div>}
       {parties.length === 0 ? <Notice message={`No active ${kind === 'supplier' ? 'supplier' : 'customer'} is available.`} /> : <>
         <div className="grid gap-x-4 sm:grid-cols-2">
-          <label className="mb-4 block text-sm font-semibold text-slate-700">{kind === 'supplier' ? 'Supplier being paid' : 'Customer paying the shop'}<select id="payment-party" required value={partyAccountId} onChange={(event) => setPartyAccountId(event.target.value)} className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5"><option value="">Choose {kind}</option>{parties.map((item) => <option key={item.accountId} value={item.accountId}>{item.name}</option>)}</select></label>
+          <label className="mb-4 block text-sm font-semibold text-slate-700">{kind === 'supplier' ? 'Supplier being paid' : 'Customer paying the shop'}<select id="payment-party" required value={partyAccountId} onChange={(event) => setPartyAccountId(event.target.value as Int64String | '')} className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5"><option value="">Choose {kind}</option>{parties.map((item) => <option key={item.accountId} value={item.accountId}>{item.name}</option>)}</select></label>
           <label className="mb-4 block text-sm font-semibold text-slate-700">{kind === 'supplier' ? 'Pay from' : 'Money received in'}<select id="payment-account" required value={paymentAccountId} onChange={(event) => setPaymentAccountId(event.target.value)} className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5"><option value="">Choose cash or bank</option>{references.paymentAccounts.map((item) => <option key={item.accountId} value={item.accountId}>{item.name}</option>)}</select></label>
           <TextInput id="payment-amount" label="Amount (PKR)" value={amountRupees} onChange={setAmountRupees} inputMode="decimal" />
           <TextInput id="payment-date" label="Business date" type="date" value={occurredAt} onChange={setOccurredAt} />

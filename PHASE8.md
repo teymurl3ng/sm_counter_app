@@ -1,6 +1,6 @@
 # Phase 8 — Screen-by-Screen Native UI Wiring
 
-**Status: IN PROGRESS — management, core Settings, Opening State, purchases, sales, production, expenses, supplier/customer payments, salary payments, and spoilage complete 2026-08-31**
+**Status: IN PROGRESS — milestones through customer/supplier ledgers complete 2026-08-31**
 
 ## 1. Purpose and working rule
 
@@ -29,7 +29,7 @@ The frozen logic specification, SQL blueprint, Phase 5 DTO catalog, and Phase 6 
 | Opening state setup/correction | business-settings/reference queries, opening commands, recent authentication | **Milestone 6 complete** | Optional fresh-install snapshot, explicit directions, and append-only correction. |
 | Daily operations | dashboard/reference/financial queries and purchase/sale/production/expense/payment/spoilage commands | **Milestones 7–13 complete** | No UI-side totals, stock mutation, cost rates, or accounting formulas. |
 | Deliveries / wholesale | transaction references, deliveries, sale and delivery commands | **Milestone 14 complete** | Pending/terminal history and optional sale linkage remain logistical records, not duplicate revenue. |
-| Customer/supplier ledgers | account-ledger query plus collection/payment commands | **Next** | Display canonical native balances only. |
+| Customer/supplier ledgers | account-ledger query plus collection/payment commands | **Milestone 15 complete** | Canonical balances, movements, running balances, inactive history, and contextual payments are device-proven. |
 | History and corrections | event history/detail and correction command | Queued | Never edit or delete historical events in place. |
 | Cash count and daily close | reconciliation query and count/close/reopen commands | Queued | Keep verified native actor and closed-day enforcement. |
 | Dashboard and reports | dashboard, cashier, financial, profitability queries | Queued | Translate coverage/costing codes into plain shop language. |
@@ -264,7 +264,22 @@ The active app now provides a separate native-backed Deliveries area:
 
 The runtime now advertises forty-seven implemented actions: `query.deliveries` and the four delivery commands join the prior forty-two. Contract version 2 remains at 78 operations with the same manifest hash. No Room schema, sale formula, revenue rule, stock movement, permission bundle, or frozen business formula changed.
 
-## 17. Safety and business boundaries
+## 17. Milestone 15 — Customer and Supplier Ledgers
+
+The active app now provides a permission-aware Accounts area:
+
+- owners, admins, and managers with `VIEW_FULL_FINANCIAL` can browse customer and supplier balances; cashiers and operators remain denied by Kotlin even if they call the bridge directly;
+- the balance list uses `query.financialOverview`, presents “customer owes shop,” “shop owes supplier,” and advance states in plain language, and performs no money calculation beyond formatting and sign explanation;
+- selecting an account loads `query.accountLedger` on demand, with event movements, native running balance after each entry, correction links, superseded markers, dates, notes, and the canonical current balance;
+- internal `Customer: ` and `Vendor: ` prefixes remain in persistence but are removed from shop-facing overview and ledger names;
+- inactive customers and suppliers retain readable balances and history, while new payments remain disabled because operational references include active parties only;
+- the existing native-backed supplier/customer Payment form is reused rather than copied, preselects the chosen account, and reloads that ledger after a successful payment;
+- the ledger service derives entries only from canonical `financial_log` rows and native correction relationships; React never rebuilds a balance or posts an accounting movement;
+- focused physical-device evidence covers exact customer and supplier movements/running balances, inactive-history retention, permission and record failures, runtime advertisement, packaged ledger display, and contextual customer payment posting.
+
+The runtime now advertises forty-eight implemented actions: `query.accountLedger` joins the prior forty-seven. Contract version 2 remains at 78 operations with the same manifest hash. No Room schema, account direction, payment rule, permission bundle, or frozen business formula changed.
+
+## 18. Safety and business boundaries
 
 - Archiving changes future availability; it does not delete products or rewrite transaction history.
 - Inventory quantity remains event-derived. This screen has no direct “set stock” operation.
@@ -295,6 +310,8 @@ The runtime now advertises forty-seven implemented actions: `query.deliveries` a
 - React never calculates expense postings, balances, or daily totals; it submits exact inputs and renders native results.
 - React never calculates supplier payable, customer receivable, payment-account movements, or payment totals; it submits exact inputs and renders native results.
 - Supplier/customer payments intentionally allow advances; the native ledgers remain the authority for the resulting signed balance.
+- React does not sum ledger entries or calculate running/current balances; it displays the movement and balance-after values returned by Kotlin and only translates their sign into shop-facing words.
+- Inactive customer and supplier histories remain readable, but only active operational references can start a new payment.
 - React never calculates salary due, copies the reference salary into a payment, or calculates Salary/Cash movements; it records only the amount actually paid and renders the native result.
 - A salary payment records paid salary cost. It does not create or settle a separate salary-payable balance.
 - React never calculates spoilage cost or changes stock locally; it submits the lost quantity and reason, then renders native stock/history results.
@@ -306,7 +323,7 @@ The runtime now advertises forty-seven implemented actions: `query.deliveries` a
 - The old prototype view model remains inactive and is not imported by the packaged app.
 - No Room schema, frozen business formula, permission bundle, or canonical bridge endpoint changed. The additive `TransactionReferencesDto.expenseCategories` field is the documented contract-v2 amendment.
 
-## 18. Structural refactor checkpoint
+## 19. Structural refactor checkpoint
 
 Before starting Supplier Profiles, the active hybrid path was reorganized without changing its public behavior:
 
@@ -316,9 +333,9 @@ Before starting Supplier Profiles, the active hybrid path was reorganized withou
 - generated contract projections and inactive inherited prototype screens were deliberately left alone;
 - future handwritten files should be reviewed for separation when they approach roughly 300–400 lines, with responsibility and cohesion taking priority over an arbitrary number.
 
-The structural checkpoint changed no Room schema, permission rule, accounting formula, or existing user workflow. The two growing Daily Operations Kotlin files remain cohesive at 343 and 342 lines, inside the 300–400-line review band. Delivery work is isolated in a 121-line command service, an 89-line handler, and React modules no larger than 58 lines. The focused purchase, sale, production, expense, payment, salary-payment, spoilage, and delivery suites are each **4/4 PASS**. The complete suite is now **180/180 PASS**.
+The structural checkpoint changed no Room schema, permission rule, accounting formula, or existing user workflow. The two growing Daily Operations Kotlin files remain cohesive at 343 and 342 lines, inside the 300–400-line review band. Delivery work is isolated in a 121-line command service and an 89-line handler. Ledger work adds a 27-line handler and focused React modules no larger than 54 lines; the main workspace and shell remain below 300 lines. The focused purchase, sale, production, expense, payment, salary-payment, spoilage, delivery, and ledger suites are each **4/4 PASS**. The complete suite is now **184/184 PASS**.
 
-## 19. Verification checkpoint
+## 20. Verification checkpoint
 
 Physical device: `SM-A065F`.
 
@@ -336,7 +353,8 @@ Physical device: `SM-A065F`.
 - Phase 8 focused Daily Operations salary-payment suite — **4/4 PASS**;
 - Phase 8 focused Daily Operations spoilage suite — **4/4 PASS**;
 - Phase 8 focused Deliveries/wholesale suite — **4/4 PASS**;
-- complete connected-device regression — **180/180 PASS**, 0 skipped, 0 failed, 0 errors;
+- Phase 8 focused Customer/Supplier Ledgers suite — **4/4 PASS**;
+- complete connected-device regression — **184/184 PASS**, 0 skipped, 0 failed, 0 errors;
 - host-side debug unit suite — **7/7 PASS**;
 - TypeScript check and production Vite build — PASS;
 - explicit web bundle packaging and Android asset gate — PASS;
@@ -344,16 +362,16 @@ Physical device: `SM-A065F`.
 - bridge contract drift check — version 2, 78 operations, SHA-256 `AB374869603B9D773AD86B56EF801DA8C4493816C7301B05214AE596E33D0920` — PASS;
 - frozen logic-spec and SQL hashes — unchanged.
 
-The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; expense-category lifecycle; opening-state record/correction; supplier milk purchases; sales; production; expenses; supplier payments; customer collections; salary payments; spoilage; and delivery lifecycle with Room readback and durable actor audit. Delivery evidence covers pending creation, matching sale linkage without duplicate revenue, append-only terminal status, non-destructive archive, invalid/mismatched/closed-day rejection, runtime advertisement, and the packaged form.
+The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; expense-category lifecycle; opening-state record/correction; supplier milk purchases; sales; production; expenses; supplier payments; customer collections; salary payments; spoilage; delivery lifecycle; and account ledgers with Room readback and durable actor audit. Ledger evidence covers exact native movements and running balances, clean display names, inactive-history retention, permission/missing/non-party rejection, runtime advertisement, packaged account display, contextual payment posting, and post-payment history refresh.
 
-## 20. Current limitations and next milestone
+## 21. Current limitations and next milestone
 
-Phase 8 is not complete. Authentication, management screens, core settings, Opening State, operational and financial summaries, supplier milk purchase, sales, production, expenses, supplier payments, customer collections, salary payments, spoilage, and deliveries/wholesale execute through the active React product. Ledgers, history/corrections, cash close, reports, costing/planning controls, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
+Phase 8 is not complete. Authentication, management screens, core settings, Opening State, operational and financial summaries, supplier milk purchase, sales, production, expenses, supplier payments, customer collections, salary payments, spoilage, deliveries/wholesale, and customer/supplier ledgers execute through the active React product. History/corrections, cash close, reports, costing/planning controls, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
 
 Phase 8 remains device-local. Multiple named users and native role enforcement are supported on one installation. Periodic encrypted Google Drive/cloud backup is recorded for a later Phase 10 design gate and Phase 11 hardening; optional read-only owner-phone snapshot viewing will be decided there. Phase 8 must not improvise networking or present backup as live synchronization.
 
-The next milestone is **Customer/supplier ledgers**. Continue with the contracted account-ledger query and existing collection/payment commands, displaying canonical native balances and history without React-side accounting.
+The next milestone is **History and corrections**. Continue with the contracted event-history/detail queries and correction command, preserving append-only records, native authorization, correction links, and superseded-event visibility without editing or deleting history in React.
 
 ## Plain English
 
-Staff can now add a delivery, see whether it is pending, delivered, or cancelled, and remove finished items from the active list without erasing their history. A delivery may point to the sale that caused it, but it never charges the customer or changes stock a second time. Phase 8 remains open, and customer/supplier ledgers are next.
+The owner and financial managers can now open Accounts, see who owes the shop and what the shop owes suppliers, inspect every saved change behind a balance, and record a payment from that account. Old inactive accounts keep their history but cannot receive new payments. Phase 8 remains open, and history/corrections are next.

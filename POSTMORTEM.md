@@ -1000,6 +1000,18 @@ Audit:
 
 Do not change business semantics.
 
+### Deferred presentation-performance note — 2026-09-01
+
+The assessment-only Samsung review found that the hybrid presentation architecture is already sound: one WebView is retained through normal React navigation, assets are local, React mounts once, native bridge/database work is off the Android main thread, scoped post-mutation refresh exists, and forced lifecycle stress did not demonstrate a continuing WebView leak. Warm Activity recreation and hot foreground return were already fast in the debug measurements.
+
+Phase 12 must therefore treat performance as measured UI fidelity, not as a broad rewrite. On a profileable release-equivalent build, measure Android first-draw and React-ready time, then consider at most these focused presentation pilots if the evidence still supports them:
+
+1. remove the unconditional restoration wait while preserving secure session restoration and process-death behavior;
+2. A/B test AndroidX WebKit asynchronous WebView startup without adding an artificial loading screen;
+3. load the first required workspace before unrelated datasets and avoid duplicate dashboard reads, while preserving freshness, authorization, accounting, and audit behavior.
+
+Do not introduce multiple WebViews, network-hosted startup assets, speculative JavaScript chunking, blanket memoization, unsafe whole-database caching, optimistic accounting writes, or reduced validation/authorization. Internal large-history query batching belongs to Phase 11 when scale tests justify it. R8/resource shrinking, Baseline Profiles, Startup Profiles, and release benchmark configuration belong to Phase 16 release readiness.
+
 ## Phase 13 — Dead / Mock / Misleading UI Cleanup
 
 Search for:

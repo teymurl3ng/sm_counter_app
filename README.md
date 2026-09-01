@@ -1,8 +1,8 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-01 — hybrid Phases 0–8 are complete and Phase 9 Runtime / Navigation / Device Integration is in progress. Grouped navigation, isolated QA data, predictable Android Back behavior, structural hardening, secure Activity/WebView recreation, deliberate keyboard/system-inset behavior, and targeted bridge/state refresh are physical-device verified. All 78 frozen bridge operations remain native-backed. Substantial Phase 9/11 native prerequisites completed early remain credited without declaring those later phases complete.
+Status: RECONCILED 2026-09-01 — hybrid Phases 0–9 are complete. Runtime / Navigation / Device Integration now includes grouped navigation, isolated QA data, predictable Android Back behavior, structural hardening, secure Activity/WebView recreation, deliberate keyboard/system-inset behavior, targeted bridge/state refresh, and secure renderer-failure recovery. All 78 frozen bridge operations remain native-backed. Substantial Phase 10/11 native prerequisites completed early remain credited without declaring those later phases complete.
 
-Latest physical-device checkpoint: the complete isolated-QA connected-device suite passes 216/216; host-side tests pass 7/7.
+Latest physical-device checkpoint: the complete isolated-QA connected-device suite passes 218/218; host-side tests pass 7/7.
 
 ## What this repository contains
 
@@ -24,7 +24,7 @@ Latest physical-device checkpoint: the complete isolated-QA connected-device sui
 - `bridge/CONTRACT.md` and `bridge/contract.json` — frozen human-readable and machine-readable bridge contract version 2.
 - `PHASE7.md` — completed packaged React/WebView/Android vertical slice, authenticated bridge proof, physical-device evidence, and Phase 8 handoff.
 - `PHASE8.md` — completed screen capability ledger, all 21 native-backed milestones, verification, limitations, and Phase 9 handoff.
-- `PHASE9.md` — active runtime/navigation/device-integration ledger, completed grouped-navigation, isolated-QA, Android Back, structural-hardening, and secure-recreation milestones, plus the next gate.
+- `PHASE9.md` — completed runtime/navigation/device-integration ledger, including grouped navigation, lifecycle, keyboard/insets, targeted refresh, renderer recovery, and physical-device evidence.
 
 ## Immutable baselines
 
@@ -36,9 +36,9 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 8 — Screen-by-Screen Native UI Wiring: COMPLETE**
+**Phase 9 — Runtime / Navigation / Device Integration: COMPLETE**
 
-The Phase 7 shell remains intact. Phase 8 provides native-backed management screens, Attendance, editable store identity, core shop-wide rates, Expense Categories, optional Opening State setup/correction, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, Dashboard/Reports, Costing/Planning, Staff/Security, and Encrypted Backup/Restore. Currency remains fixed to PKR. Posting behavior remains native-only; deliveries never duplicate sale revenue; ledgers and reports display canonical native values without React-side accounting; corrections and close/reopen actions remain append-only; physical counts never create balancing money entries. The Access area provides private staff enrollment/reset, role/status control, personal passphrase changes, owner recovery, and durable security history without React-side authority. The Backup area keeps file selection, encryption, inspection, and restore inside Android-owned boundaries; a successful restore replaces the active copy and invalidates every session. The runtime implements all 78 frozen operations. The complete connected-device regression passes 211/211.
+Phase 8's native-backed shop screens and all 78 frozen operations remain intact. Phase 9 adds grouped role-aware navigation, predictable Android Back behavior, a separate QA installation, focused file boundaries, one non-reloading React/WebView presentation, secure Activity recreation, deliberate keyboard/system-inset behavior, targeted state refresh with bridge-transfer measurement, and native recovery from main-page or WebView-renderer failure. A recovery reload creates a fresh WebView and revalidates the memory-only session before protected information appears. The complete isolated-QA physical-device regression passes 218/218.
 
 The current release architecture is multi-user but device-local: named roles share one installation and one Room database. The approved next direction is periodic encrypted off-device backup, with Google Drive as the example provider and the exact cadence/retention/network rules deferred to a Phase 10 design gate. Backup protects and transfers a verified snapshot; it is not live synchronization between two writable phones. That gate will separately decide whether the owner's phone should offer a safe read-only view of the latest snapshot.
 
@@ -90,7 +90,7 @@ Phase 7 — Hybrid Shell / Vertical Slice ✅
 
 Phase 8 — UI Wiring ✅ (all 21 milestones complete; all 78 bridge operations native-backed and device-proven)
 
-Phase 9 — Runtime / Navigation / Device Integration ◐ (grouped navigation, isolated QA data, Android Back, structural hardening, secure Activity/WebView recreation, keyboard/system-inset handling, and targeted refresh/transfer measurement complete; renderer recovery remains)
+Phase 9 — Runtime / Navigation / Device Integration ✅ (all six milestones complete, including secure renderer recovery; 218/218 device regression)
 
 Phase 10 — Functional Product Completion ⏳ (includes the periodic encrypted Google Drive/cloud-backup design gate, approved implementation, and a separate owner-phone snapshot-view decision)
 
@@ -150,8 +150,9 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 8 focused Costing/Planning suite: 5/5 passed on the physical device.
 - Phase 8 focused Staff Users/Security Audit suite: 5/5 passed on the physical device.
 - Phase 8 focused Encrypted Backup/Restore suite: 5/5 passed on the physical device.
-- Complete isolated-QA connected-device instrumentation regression: 216/216 passed, 0 skipped, 0 failed.
+- Phase 9 focused real-renderer termination and secure recovery suite: 2/2 passed on the physical device.
+- Complete isolated-QA connected-device instrumentation regression: 218/218 passed, 0 skipped, 0 failed.
 
 ## Next gate
 
-Phases 3–8 are closed and Phase 9 is active. Every retained Phase 8 screen family and all 78 bridge operations remain native-backed and device-proven. Grouped navigation, separate QA storage, Android Back coordination, useful fragmentation, secure Activity/WebView recreation, deliberate keyboard/system-inset behavior, and measured targeted refresh are complete; the full isolated-QA Samsung suite passes 216/216. Next, implement renderer/error recovery and run the final Phase 9 regression. Google Drive scheduling remains deferred to the Phase 10 design gate. See `PHASE9.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–9 are closed. Every retained screen family and all 78 bridge operations remain native-backed and device-proven. The complete isolated-QA Samsung suite passes 218/218, including real WebView-renderer termination with secure valid-session recovery and invalid-session rejection. Next, begin Phase 10's functional-product-completion review and explicit periodic encrypted Google Drive/cloud-backup design gate; decide owner-phone snapshot viewing separately from live synchronization. See `PHASE9.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.

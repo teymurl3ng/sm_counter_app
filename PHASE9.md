@@ -1,6 +1,6 @@
 # Phase 9 — Runtime, Navigation, and Device Integration
 
-**Status: IN PROGRESS — navigation, isolated QA, Android Back, structural hardening, secure Activity recreation, keyboard/system-inset handling, and targeted refresh/transfer measurement complete 2026-09-01**
+**Status: COMPLETE — all runtime, navigation, device-integration, recovery, and final physical-device gates passed 2026-09-01**
 
 ## 1. Reconciled scope
 
@@ -105,18 +105,32 @@ Implemented:
 - a Samsung proof that ordinary React navigation transfers no bridge data and a product save uses exactly one command plus two relevant queries instead of one command plus up to ten queries;
 - preservation of the full parallel authorized load at login/recreation, when the complete permission-appropriate workspace state is genuinely required.
 
-## 7. Remaining milestone order
+## 7. Milestone 6 — Renderer/Error Recovery and Phase Closure
+
+Status: **COMPLETE — physical-device verified 2026-09-01**.
+
+Implemented:
+
+- native handling for main-frame load errors, main-frame HTTP failures, and Android WebView renderer termination;
+- immediate removal and destruction of a failed WebView so damaged or stale protected content cannot remain visible;
+- a native safe-area-aware recovery screen that explains the failure without exposing session or business data;
+- an explicit secure reload action that creates a fresh Activity and WebView and revalidates any still-live memory-only session before restoring protected navigation;
+- forced return to Login when the session is missing or invalid during recovery, with no protected navigation rendered first;
+- safe Android Back behavior from the recovery screen;
+- physical Samsung tests that terminate the real WebView renderer for both valid-session recovery and invalid-session rejection.
+
+## 8. Completed milestone order
 
 1. **Complete:** responsive grouped navigation;
 2. **Complete:** isolated QA/test data, Android Back/overlay coordination, and useful Phase 8/9 file fragmentation;
 3. **Complete:** WebView lifecycle, Activity recreation, and protected-session restoration;
 4. **Complete:** keyboard, system bars, and display insets;
 5. **Complete:** refresh/transfer measurement and targeted-state improvements;
-6. renderer/error recovery and final Phase 9 physical-device regression.
+6. **Complete:** renderer/error recovery and final Phase 9 physical-device regression.
 
 The order may combine closely related tests, but Phase 9 does not absorb the Phase 10 periodic cloud-backup design gate or the Phase 12 visual-fidelity phase.
 
-## 8. Verification baseline
+## 9. Verification baseline
 
 Inherited from completed Phase 8:
 
@@ -169,7 +183,15 @@ Phase 9 Milestone 5 verification:
 - host-side debug unit suite — **7/7 PASS**;
 - TypeScript no-emit check, production Vite build, Android asset packaging, Kotlin compilation, Android-test compilation, bridge drift gate, and packaged-asset gate — PASS.
 
-## 9. Device-test isolation requirement
+Phase 9 Milestone 6 verification:
+
+- focused real-renderer termination and secure recovery suite on `SM-A065F` — **2/2 PASS**;
+- complete isolated-QA connected-device regression — **218/218 PASS**, 0 skipped, 0 failed;
+- host-side debug unit suite — **7/7 PASS**;
+- TypeScript no-emit check, production Vite build, Android asset packaging, Kotlin compilation, Android-test compilation, bridge drift gate, and packaged-asset gate — PASS;
+- bridge contract remains version 2 with all 78 operations and SHA-256 `AB374869603B9D773AD86B56EF801DA8C4493816C7301B05214AE596E33D0920`.
+
+## 10. Device-test isolation requirement
 
 Instrumentation must be run with `-Psaaf.isolatedQa=true`. That property adds the `.qa` application-ID suffix to the debug target, so the QA app has independent Android storage and may safely bootstrap its instrumentation owner. The normal `com.saaf.milkshop` debug installation is not cleared, borrowed, or authenticated by the test runner. Release code contains no authentication bypass.
 
@@ -177,4 +199,4 @@ Do not run the mutating complete instrumentation suite without the isolated-QA p
 
 ## Plain English
 
-Phase 8 made every shop screen work with real saved data. Phase 9 is making it behave like a proper phone app. The menu is grouped, Back behaves normally, screen recreation is secure, forms stay usable with the keyboard, and the app now rereads only the shop information affected by an action. For example, saving a product no longer reloads deliveries, financial reports, spoilage, history, cash closing, and settings. The final Phase 9 milestone is safe display-engine failure recovery and the closing physical-device regression.
+Phase 8 made every shop screen work with real saved data. Phase 9 now makes it behave like a proper phone app. The menu is grouped, Back behaves normally, screen recreation is secure, forms stay usable with the keyboard, and the app rereads only the shop information affected by an action. If Android's screen-rendering engine stops, the broken screen is removed and replaced by a clear Reload screen; the app checks the login again before showing private shop information. Phase 9 is closed. The next gate is Phase 10's product-completion and periodic encrypted cloud-backup design work.

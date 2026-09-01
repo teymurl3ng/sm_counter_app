@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.view.ViewGroup
 import android.webkit.RenderProcessGoneDetail
+import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
@@ -30,7 +31,7 @@ internal class SecureHybridWebViewHost(
     activity: ComponentActivity,
     private val scope: CoroutineScope,
     private val dispatch: suspend (String) -> String,
-    private val onFatalError: (String) -> Unit,
+    private val onDisplayFailure: (String) -> Unit,
     private val restorationState: HybridRestorationState?,
     private val onActiveAreaChanged: (String) -> Unit,
 ) : AutoCloseable {
@@ -40,6 +41,8 @@ internal class SecureHybridWebViewHost(
     private val restorationScript = restorationState?.let(::restorationScript)
     private var documentStartScript: androidx.webkit.ScriptHandler? = null
     private lateinit var windowInsetsPublisher: HybridWindowInsetsPublisher
+    private var displayFailed = false
+    private var closed = false
 
     @SuppressLint("SetJavaScriptEnabled")
     val webView = WebView(activity).apply {
@@ -69,9 +72,21 @@ internal class SecureHybridWebViewHost(
                 if (url == HYBRID_ENTRY_URL) windowInsetsPublisher.onPageReady()
             }
 
+            override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+                if (request.isForMainFrame) handleDisplayFailure(view, "The packaged app screen could not be loaded.")
+            }
+
+            override fun onReceivedHttpError(view: WebView, request: WebResourceRequest, errorResponse: WebResourceResponse) {
+                if (request.isForMainFrame && errorResponse.statusCode >= 400) {
+                    handleDisplayFailure(view, "The packaged app screen could not be loaded.")
+                }
+            }
+
             override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
-                view.destroy()
-                onFatalError("The app display stopped unexpectedly. Close and reopen Saaf Milk; your saved records are safe.")
+                handleDisplayFailure(
+                    view,
+                    if (detail.didCrash()) "Android's app display process stopped unexpectedly." else "Android stopped the app display process.",
+                )
                 return true
             }
         }
@@ -112,12 +127,26 @@ internal class SecureHybridWebViewHost(
     fun load() = webView.loadUrl(HYBRID_ENTRY_URL)
 
     override fun close() {
+        if (closed) return
+        closed = true
+        if (!displayFailed) releaseWebView(destroy = true)
+    }
+
+    private fun handleDisplayFailure(view: WebView, message: String) {
+        if (displayFailed || closed) return
+        displayFailed = true
+        releaseWebView(destroy = true, failedView = view)
+        onDisplayFailure(message)
+    }
+
+    private fun releaseWebView(destroy: Boolean, failedView: WebView = webView) {
         windowInsetsPublisher.close()
         documentStartScript?.remove()
         documentStartScript = null
-        webView.stopLoading()
-        webView.webViewClient = WebViewClient()
-        webView.destroy()
+        failedView.stopLoading()
+        failedView.webViewClient = WebViewClient()
+        (failedView.parent as? ViewGroup)?.removeView(failedView)
+        if (destroy) failedView.destroy()
     }
 
     private fun isPackagedOrigin(uri: Uri): Boolean =

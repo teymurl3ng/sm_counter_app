@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="hybrid_failure_root" type="id" />
+    <item name="hybrid_failure_title" type="id" />
+    <item name="hybrid_failure_message" type="id" />
+    <item name="hybrid_recovery_action" type="id" />
+</resources>

@@ -1,10 +1,8 @@
 package com.saaf.milkshop.hybrid
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.WindowManager
 import android.webkit.WebView
-import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.WindowCompat
@@ -27,6 +25,7 @@ class HybridActivity : ComponentActivity() {
     private var ownedBackupDocumentPicker: HybridBackupDocumentPicker? = null
     private var evaluatingBackPress = false
     private var activeArea: String? = null
+    private var rendererRecoveryVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +52,7 @@ class HybridActivity : ComponentActivity() {
             activity = this,
             scope = activityScope,
             dispatch = bridgeDispatcher::dispatch,
-            onFatalError = ::showFatalError,
+            onDisplayFailure = ::showDisplayRecovery,
             restorationState = if (savedInstanceState != null) {
                 applicationState.currentSessionId?.let { HybridRestorationState(it, activeArea) }
             } else {
@@ -91,10 +90,15 @@ class HybridActivity : ComponentActivity() {
 
     fun webViewForTesting(): WebView = webViewHost.webView
     fun activeAreaForTesting(): String? = activeArea
+    fun rendererRecoveryVisibleForTesting(): Boolean = rendererRecoveryVisible
 
     private fun installBackHandler() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                if (rendererRecoveryVisible) {
+                    moveTaskToBack(true)
+                    return
+                }
                 if (evaluatingBackPress || !::webViewHost.isInitialized) return
                 evaluatingBackPress = true
                 webViewHost.webView.evaluateJavascript(BACK_HANDLER_SCRIPT) { result ->
@@ -118,15 +122,38 @@ class HybridActivity : ComponentActivity() {
         if (BuildConfig.DEBUG) backupDocumentPickerForTesting else null
 
     private fun showFatalError(message: String) {
+        rendererRecoveryVisible = false
+        configureFailureSystemBars()
+        setContentView(createHybridFailureView(
+            context = this,
+            title = "Saaf Milk cannot open",
+            message = message,
+        ))
+    }
+
+    private fun showDisplayRecovery(message: String) {
+        if (isFinishing || isDestroyed || rendererRecoveryVisible) return
+        rendererRecoveryVisible = true
+        evaluatingBackPress = false
+        configureFailureSystemBars()
         setContentView(
-            TextView(this).apply {
-                text = message
-                textSize = 18f
-                setTextColor(Color.rgb(30, 41, 59))
-                setBackgroundColor(Color.rgb(247, 246, 240))
-                setPadding(48, 96, 48, 48)
-            },
+            createHybridFailureView(
+                context = this,
+                title = "The app display needs to restart",
+                message = "$message Your saved shop records were not erased. Reloading will securely check your login again before showing protected information.",
+                recoveryAction = {
+                    rendererRecoveryVisible = false
+                    recreate()
+                },
+            ),
         )
+    }
+
+    private fun configureFailureSystemBars() {
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            isAppearanceLightStatusBars = true
+            isAppearanceLightNavigationBars = true
+        }
     }
 
     companion object {

@@ -39,6 +39,7 @@ internal class SecureHybridWebViewHost(
         .build()
     private val restorationScript = restorationState?.let(::restorationScript)
     private var documentStartScript: androidx.webkit.ScriptHandler? = null
+    private lateinit var windowInsetsPublisher: HybridWindowInsetsPublisher
 
     @SuppressLint("SetJavaScriptEnabled")
     val webView = WebView(activity).apply {
@@ -65,6 +66,7 @@ internal class SecureHybridWebViewHost(
                 if (documentStartScript == null && url == HYBRID_ENTRY_URL) {
                     restorationScript?.let { view.evaluateJavascript(it, null) }
                 }
+                if (url == HYBRID_ENTRY_URL) windowInsetsPublisher.onPageReady()
             }
 
             override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
@@ -76,6 +78,8 @@ internal class SecureHybridWebViewHost(
     }
 
     init {
+        windowInsetsPublisher = HybridWindowInsetsPublisher(webView)
+        windowInsetsPublisher.attach()
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
         if (restorationScript != null && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
             documentStartScript = WebViewCompat.addDocumentStartJavaScript(webView, restorationScript, setOf(APP_ORIGIN))
@@ -108,6 +112,7 @@ internal class SecureHybridWebViewHost(
     fun load() = webView.loadUrl(HYBRID_ENTRY_URL)
 
     override fun close() {
+        windowInsetsPublisher.close()
         documentStartScript?.remove()
         documentStartScript = null
         webView.stopLoading()

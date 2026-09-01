@@ -17,8 +17,10 @@ import { backupBridgeActions } from './backupBridgeActions';
 import { errorMessage } from './hybridModels';
 import { useAuthorizedWorkspaceData } from './useAuthorizedWorkspaceData';
 import { useHybridSession } from './useHybridSession';
+import { useUsableViewport } from './useUsableViewport';
 
 export function HybridAppShell() {
+  useUsableViewport();
   const {
     masterData,
     businessSettings,

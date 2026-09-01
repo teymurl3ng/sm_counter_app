@@ -29,15 +29,15 @@ export function HybridNavigation({ items, activeArea, onSelect }: {
   const columnCount = primary.length + (secondary.length > 0 ? 1 : 0);
 
   return <>
-    <nav id="app-navigation" className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-2 pt-1 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur md:sticky md:top-0 md:bottom-auto md:border-y md:px-4 md:py-2 md:shadow-sm" aria-label="Application areas" style={{ paddingBottom: 'max(0.35rem, env(safe-area-inset-bottom))' }}>
+    <nav id="app-navigation" className="hybrid-navigation fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-2 pt-1 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur md:sticky md:top-0 md:bottom-auto md:border-y md:px-4 md:py-2 md:shadow-sm" aria-label="Application areas">
       <div id="primary-navigation" className="mx-auto grid max-w-4xl gap-1" style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
         {primary.map((item) => <NavigationButton key={item.area} item={item} active={item.area === activeArea} onClick={() => select(item.area)} />)}
         {secondary.length > 0 && <button id="navigation-more-button" type="button" aria-expanded={open} aria-controls="navigation-more-panel" onClick={() => setOpen(true)} className={`flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-bold md:min-h-0 md:flex-row md:gap-2 md:px-3 md:text-sm ${secondaryActive ? 'bg-emerald-50 text-emerald-800' : 'text-slate-500'}`}><Menu className="h-5 w-5 md:h-4 md:w-4" /><span className="truncate">More</span></button>}
       </div>
     </nav>
-    {secondary.length > 0 && <div id="navigation-more-layer" className={`fixed inset-0 z-50 flex items-end bg-slate-950/45 transition-opacity md:items-center md:justify-center md:p-5 ${open ? 'visible opacity-100' : 'pointer-events-none invisible opacity-0'}`} aria-hidden={!open}>
+    {secondary.length > 0 && <div id="navigation-more-layer" className={`hybrid-overlay fixed inset-0 z-50 flex items-end bg-slate-950/45 transition-opacity md:items-center md:justify-center md:p-5 ${open ? 'visible opacity-100' : 'pointer-events-none invisible opacity-0'}`} aria-hidden={!open}>
       <button type="button" className="absolute inset-0" onClick={() => setOpen(false)} aria-label="Close navigation menu" tabIndex={open ? 0 : -1} />
-      <section id="navigation-more-panel" role="dialog" aria-modal="true" aria-labelledby="navigation-more-title" className="relative max-h-[85vh] w-full overflow-y-auto rounded-t-3xl bg-[#f7f6f0] p-5 pb-8 shadow-2xl md:max-w-2xl md:rounded-3xl">
+      <section id="navigation-more-panel" role="dialog" aria-modal="true" aria-labelledby="navigation-more-title" className="hybrid-navigation-panel relative w-full overflow-y-auto rounded-t-3xl bg-[#f7f6f0] p-5 pb-8 shadow-2xl md:max-w-2xl md:rounded-3xl">
         <div className="mb-5 flex items-center justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">Saaf Milk</p><h2 id="navigation-more-title" className="mt-1 text-xl font-bold text-slate-900">More areas</h2></div><button id="close-navigation-more" type="button" data-native-back-close onClick={() => setOpen(false)} className="rounded-xl bg-white p-2.5 text-slate-500 shadow-sm" aria-label="Close"><X className="h-5 w-5" /></button></div>
         <div className="grid gap-5 sm:grid-cols-2">{groupOrder.map((group) => {
           const groupItems = secondary.filter((item) => item.group === group);

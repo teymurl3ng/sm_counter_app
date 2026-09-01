@@ -13,7 +13,8 @@
         <activity
             android:name=".hybrid.HybridActivity"
             android:exported="true"
-            android:theme="@style/Theme.SaafMilk.Hybrid">
+            android:theme="@style/Theme.SaafMilk.Hybrid"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

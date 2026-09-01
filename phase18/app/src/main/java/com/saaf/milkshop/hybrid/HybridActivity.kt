@@ -2,6 +2,7 @@ package com.saaf.milkshop.hybrid
 
 import android.graphics.Color
 import android.os.Bundle
+import android.view.WindowManager
 import android.webkit.WebView
 import android.widget.TextView
 import androidx.activity.ComponentActivity
@@ -105,9 +106,10 @@ class HybridActivity : ComponentActivity() {
     }
 
     private fun configureSystemBars() {
-        WindowCompat.setDecorFitsSystemWindows(window, true)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         WindowCompat.getInsetsController(window, window.decorView).apply {
-            isAppearanceLightStatusBars = true
+            isAppearanceLightStatusBars = false
             isAppearanceLightNavigationBars = true
         }
     }

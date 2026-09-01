@@ -62,7 +62,7 @@ export function Login({ busy, error, notice, onSubmit, onRecover }: {
 
 export function RecoveryCodeScreen({ recoveryCode, onSaved }: { recoveryCode: string; onSaved(): void }) {
   return (
-    <main className="min-h-screen bg-[#f7f6f0] px-5 py-10 text-slate-900">
+    <main className="hybrid-screen bg-[#f7f6f0] px-5 py-10 text-slate-900">
       <section className="mx-auto max-w-lg rounded-3xl border border-amber-200 bg-white p-6 shadow-xl shadow-amber-950/5">
         <ShieldCheck className="mb-4 h-10 w-10 text-emerald-700" />
         <h1 className="text-2xl font-bold">Save the owner recovery code</h1>
@@ -75,5 +75,5 @@ export function RecoveryCodeScreen({ recoveryCode, onSaved }: { recoveryCode: st
 }
 
 function AuthCard({ title, description, error, notice = null, onSubmit, children }: { title: string; description: string; error: string | null; notice?: string | null; onSubmit(event: FormEvent): void; children: ReactNode }) {
-  return <main className="min-h-screen bg-[#f7f6f0] px-5 py-10 text-slate-900"><form onSubmit={onSubmit} className="mx-auto max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-emerald-950/5"><ShieldCheck className="mb-4 h-10 w-10 text-emerald-700" /><p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700">Saaf Milk</p><h1 className="mt-1 text-2xl font-bold">{title}</h1><p className="mb-6 mt-2 text-sm text-slate-600">{description}</p>{notice && <Notice message={notice} success />}{error && <Notice message={error} />}{children}</form></main>;
+  return <main className="hybrid-screen bg-[#f7f6f0] px-5 py-10 text-slate-900"><form onSubmit={onSubmit} className="mx-auto max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-emerald-950/5"><ShieldCheck className="mb-4 h-10 w-10 text-emerald-700" /><p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700">Saaf Milk</p><h1 className="mt-1 text-2xl font-bold">{title}</h1><p className="mb-6 mt-2 text-sm text-slate-600">{description}</p>{notice && <Notice message={notice} success />}{error && <Notice message={error} />}{children}</form></main>;
 }

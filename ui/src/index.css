@@ -3,13 +3,64 @@
 html {
   scrollbar-gutter: stable;
   overflow-y: scroll;
+  --saaf-system-top: env(safe-area-inset-top, 0px);
+  --saaf-system-bottom: env(safe-area-inset-bottom, 0px);
+  --saaf-ime-bottom: 0px;
+  --saaf-visual-viewport-height: 100dvh;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
 }
 
 @layer base {
   body {
     @apply antialiased bg-[#f7f6f0] text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-900;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    min-height: var(--saaf-visual-viewport-height);
+    overscroll-behavior-y: none;
   }
+}
+
+.hybrid-screen {
+  min-height: var(--saaf-visual-viewport-height);
+}
+
+.hybrid-header {
+  padding-top: max(1.75rem, calc(var(--saaf-system-top) + 0.75rem));
+}
+
+.hybrid-navigation {
+  padding-bottom: max(0.35rem, var(--saaf-system-bottom));
+}
+
+.hybrid-overlay {
+  height: var(--saaf-visual-viewport-height);
+  padding-top: var(--saaf-system-top);
+  padding-bottom: var(--saaf-system-bottom);
+}
+
+.hybrid-dialog-panel {
+  max-height: calc(var(--saaf-visual-viewport-height) - var(--saaf-system-top) - var(--saaf-system-bottom));
+}
+
+.hybrid-navigation-panel {
+  max-height: min(85vh, calc(var(--saaf-visual-viewport-height) - var(--saaf-system-top) - var(--saaf-system-bottom)));
+}
+
+html[data-ime-visible="true"] #app-navigation {
+  display: none;
+}
+
+html[data-ime-visible="true"] .hybrid-management-screen {
+  padding-bottom: 1rem;
+}
+
+html[data-ime-visible="true"] .hybrid-overlay {
+  padding-bottom: 0;
 }
 
 @keyframes fadeIn {

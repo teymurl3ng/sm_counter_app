@@ -1,6 +1,6 @@
 # Phase 9 — Runtime, Navigation, and Device Integration
 
-**Status: IN PROGRESS — navigation, isolated QA, Android Back, structural hardening, and secure Activity recreation complete 2026-09-01**
+**Status: IN PROGRESS — navigation, isolated QA, Android Back, structural hardening, secure Activity recreation, and keyboard/system-inset handling complete 2026-09-01**
 
 ## 1. Reconciled scope
 
@@ -76,18 +76,32 @@ Implemented:
 - invalid/expired restoration is rejected before protected navigation renders and clears the stale application-level reference;
 - each recreated Activity owns exactly one new WebView and destroys the previous Activity's WebView cleanly.
 
-## 5. Remaining milestone order
+## 5. Milestone 4 — Keyboard, System Bars, and Display Insets
+
+Status: **COMPLETE — physical-device verified 2026-09-01**.
+
+Implemented:
+
+- intentional edge-to-edge window ownership with transparent system bars and readable light status-bar/dark navigation-bar icon contrast;
+- explicit `adjustResize` keyboard policy in both the Activity manifest and runtime window configuration;
+- native `WindowInsetsCompat` observation that publishes status-bar, navigation-bar, and IME measurements to the packaged page without adding a general-purpose bridge capability;
+- `viewport-fit=cover`, `interactive-widget=resizes-content`, and live `visualViewport` sizing for the single long-lived React presentation;
+- safe top/bottom spacing for the header, fixed application navigation, dialogs, and the grouped More sheet;
+- focused-field visibility correction after keyboard/viewport movement, while the phone navigation temporarily hides during typing and returns after the keyboard closes;
+- a focused physical-device test that opens a real product dialog, invokes the Samsung keyboard, and proves the lower field and dialog remain inside the usable viewport.
+
+## 6. Remaining milestone order
 
 1. **Complete:** responsive grouped navigation;
 2. **Complete:** isolated QA/test data, Android Back/overlay coordination, and useful Phase 8/9 file fragmentation;
 3. **Complete:** WebView lifecycle, Activity recreation, and protected-session restoration;
-4. keyboard, system bars, and display insets;
+4. **Complete:** keyboard, system bars, and display insets;
 5. refresh/transfer measurement and targeted-state improvements;
 6. renderer/error recovery and final Phase 9 physical-device regression.
 
 The order may combine closely related tests, but Phase 9 does not absorb the Phase 10 periodic cloud-backup design gate or the Phase 12 visual-fidelity phase.
 
-## 6. Verification baseline
+## 7. Verification baseline
 
 Inherited from completed Phase 8:
 
@@ -124,7 +138,15 @@ Phase 9 Milestone 3 verification:
 - host-side debug unit suite — **7/7 PASS**;
 - TypeScript no-emit check, production Vite build, Android asset packaging, Kotlin compilation, Android-test compilation, bridge drift gate, and packaged-asset gate — PASS.
 
-## 7. Device-test isolation requirement
+Phase 9 Milestone 4 verification:
+
+- focused live keyboard/system-inset suite on `SM-A065F` — **1/1 PASS**;
+- combined Phase 9 navigation, recreation, and keyboard/inset suite — **4/4 PASS**;
+- complete isolated-QA connected-device regression — **215/215 PASS**, 0 skipped, 0 failed;
+- host-side debug unit suite — **7/7 PASS**;
+- TypeScript no-emit check, production Vite build, Android asset packaging, Kotlin compilation, Android-test compilation, bridge drift gate, and packaged-asset gate — PASS.
+
+## 8. Device-test isolation requirement
 
 Instrumentation must be run with `-Psaaf.isolatedQa=true`. That property adds the `.qa` application-ID suffix to the debug target, so the QA app has independent Android storage and may safely bootstrap its instrumentation owner. The normal `com.saaf.milkshop` debug installation is not cleared, borrowed, or authenticated by the test runner. Release code contains no authentication bypass.
 
@@ -132,4 +154,4 @@ Do not run the mutating complete instrumentation suite without the isolated-QA p
 
 ## Plain English
 
-Phase 8 made every shop screen work with real saved data. Phase 9 is making it behave like a proper phone app. The long menu is grouped, tests use a separate QA installation, Back behaves normally, and the biggest mixed-purpose files are split. If Android rebuilds the screen, a still-valid login returns to the same authorized area; an expired login or a fresh app opening must show Login. No password or login token is saved to disk for this. Next comes deliberate keyboard, system-bar, and screen-inset behavior.
+Phase 8 made every shop screen work with real saved data. Phase 9 is making it behave like a proper phone app. The menu is grouped, Back behaves normally, screen recreation is secure, and forms now stay usable when the phone keyboard opens. The app header, bottom menu, dialogs, and phone bars also respect the real Samsung screen edges. Next comes reducing unnecessary background data reloads, then safe display-engine failure recovery and the final Phase 9 regression.

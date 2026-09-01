@@ -3,8 +3,8 @@ import { CheckCircle2, ShieldCheck, X } from 'lucide-react';
 
 export function Dialog({ title, onClose, children }: { title: string; onClose(): void; children: ReactNode }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-end bg-slate-950/40 p-0 sm:items-center sm:justify-center sm:p-4">
-      <section role="dialog" aria-modal="true" className="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:max-w-lg sm:rounded-3xl">
+    <div className="hybrid-overlay fixed inset-0 z-50 flex items-end bg-slate-950/40 p-0 sm:items-center sm:justify-center sm:p-4">
+      <section role="dialog" aria-modal="true" className="hybrid-dialog-panel w-full overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:max-w-lg sm:rounded-3xl">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-xl font-bold">{title}</h2>
           <button type="button" data-native-back-close onClick={onClose} className="rounded-lg p-2 text-slate-500" aria-label="Close"><X className="h-5 w-5" /></button>
@@ -45,5 +45,5 @@ export function Notice({ message, success = false }: { message: string; success?
 }
 
 export function CenteredMessage({ title, message }: { title: string; message: string }) {
-  return <main className="flex min-h-screen items-center justify-center bg-[#f7f6f0] px-5 text-slate-900"><section className="max-w-md rounded-3xl border border-slate-200 bg-white p-7 text-center shadow-xl"><ShieldCheck className="mx-auto mb-4 h-10 w-10 text-emerald-700" /><h1 className="text-xl font-bold">{title}</h1><p className="mt-2 text-sm leading-6 text-slate-600">{message}</p></section></main>;
+  return <main className="hybrid-screen flex items-center justify-center bg-[#f7f6f0] px-5 text-slate-900"><section className="max-w-md rounded-3xl border border-slate-200 bg-white p-7 text-center shadow-xl"><ShieldCheck className="mx-auto mb-4 h-10 w-10 text-emerald-700" /><h1 className="text-xl font-bold">{title}</h1><p className="mt-2 text-sm leading-6 text-slate-600">{message}</p></section></main>;
 }

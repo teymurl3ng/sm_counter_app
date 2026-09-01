@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-01 — hybrid Phases 0–9 are complete and Phase 10 is active at checkpoint 10.1, the capability-matrix closure audit. Runtime / Navigation / Device Integration includes grouped navigation, isolated QA data, predictable Android Back behavior, structural hardening, secure Activity/WebView recreation, deliberate keyboard/system-inset behavior, targeted bridge/state refresh, and secure renderer-failure recovery. All 78 frozen bridge operations remain native-backed. Substantial Phase 10/11 native prerequisites completed early remain credited without prematurely declaring those later phases complete.
+Status: RECONCILED 2026-09-01 — hybrid Phases 0–9 are complete and Phase 10 checkpoint 10.1 is complete. The capability audit confirms all 78 operations and 16 retained workflow families are genuinely native-backed; checkpoint 10.2 will close two native-authoritative planning-presentation gaps. Runtime / Navigation / Device Integration includes grouped navigation, isolated QA data, predictable Android Back behavior, structural hardening, secure Activity/WebView recreation, deliberate keyboard/system-inset behavior, targeted bridge/state refresh, and secure renderer-failure recovery. Substantial Phase 10/11 native prerequisites completed early remain credited without prematurely declaring those later phases complete.
 
 Latest physical-device checkpoint: the complete isolated-QA connected-device suite passes 218/218; host-side tests pass 7/7.
 
@@ -92,7 +92,7 @@ Phase 8 — UI Wiring ✅ (all 21 milestones complete; all 78 bridge operations 
 
 Phase 9 — Runtime / Navigation / Device Integration ✅ (all six milestones complete, including secure renderer recovery; 218/218 device regression)
 
-Phase 10 — Functional Product Completion 🚧 (active; begins with capability-matrix closure, then the periodic encrypted Google Drive/cloud-backup design gate, approved implementation, and a separate owner-phone snapshot-view decision)
+Phase 10 — Functional Product Completion 🚧 (checkpoint 10.1 complete; checkpoint 10.2 closes derived sales-target and budget-versus-actual presentation before the cloud-backup design gate)
 
 Phase 11 — Integrity / Recovery / Concurrency ◐ (security/backup credit; local concurrency, hybrid recovery, and periodic-cloud-backup integrity remain)
 
@@ -155,4 +155,4 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 
 ## Next gate
 
-Phases 3–9 are closed. Every retained screen family and all 78 bridge operations remain native-backed and device-proven. The complete isolated-QA Samsung suite passes 218/218, including real WebView-renderer termination with secure valid-session recovery and invalid-session rejection. Phase 10 is active at checkpoint 10.1, the capability-matrix closure audit; its later explicit design gate covers periodic encrypted Google Drive/cloud backup and the separate owner-phone snapshot-view decision. See `PHASE10.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–9 are closed. Every retained screen family and all 78 bridge operations remain native-backed and device-proven. The complete isolated-QA Samsung suite passes 218/218, including real WebView-renderer termination with secure valid-session recovery and invalid-session rejection. Phase 10.1 is closed by `PHASE10_CAPABILITY_AUDIT.md`; Phase 10.2 is next, followed by the periodic encrypted Google Drive/cloud-backup design gate and separate owner-phone snapshot-view decision. See `PHASE10.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.

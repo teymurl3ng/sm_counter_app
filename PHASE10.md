@@ -1,6 +1,6 @@
 # Phase 10 — Functional Product Completion
 
-Status: **IN PROGRESS** — opened 2026-09-01
+Status: **IN PROGRESS — checkpoint 10.1 complete; checkpoint 10.2 next**
 
 ## 1. Purpose
 
@@ -23,9 +23,11 @@ The phase also owns the approved design gate for periodic encrypted off-device b
 
 ## 3. Ordered completion plan
 
-### 10.1 — Capability-matrix closure audit
+### 10.1 — Capability-matrix closure audit ✅
 
 Reconcile the approved capability inventory, the 78 bridge operations, the native read/command services, and every retained production screen. Record any genuine missing, dead, duplicated, misleading, or UI-only path. This checkpoint is assessment-first and must not invent new product scope.
+
+Completed 2026-09-01. `PHASE10_CAPABILITY_AUDIT.md` confirms all 78 operations and all 16 retained screen/workflow families are genuinely native-backed. It records two narrow local planning-presentation gaps for checkpoint 10.2, presentation preferences/receipt export for Phase 12, inactive prototype cleanup for Phase 13, and release optimization for Phase 16.
 
 ### 10.2 — Local capability closure
 
@@ -57,7 +59,7 @@ The 2026-09-01 assessment found no reason for a broad performance rewrite. Its f
 
 ## 5. Current checkpoint
 
-Begin **10.1 — Capability-matrix closure audit**. Application code has not yet changed for Phase 10.
+Begin **10.2 — Local capability closure**. Its approved scope is limited to native-authoritative derived sales-target visibility and budget-versus-actual visibility. The required additive read-model/bridge amendment must be designed before implementation; React must not calculate either value. Application code has not yet changed for Phase 10.
 
 ## Plain English
 

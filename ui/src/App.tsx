@@ -1,5 +1,5 @@
-import { Phase8HybridShell } from './components/hybrid/Phase8HybridShell';
+import { HybridAppShell } from './components/hybrid/HybridAppShell';
 
 export default function App() {
-  return <Phase8HybridShell />;
+  return <HybridAppShell />;
 }

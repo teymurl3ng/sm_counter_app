@@ -3,6 +3,8 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+val isolatedQaData = providers.gradleProperty("saaf.isolatedQa").orNull.equals("true", ignoreCase = true)
+
 android {
     namespace = "com.saaf.milkshop"
     compileSdk = 36
@@ -22,6 +24,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            if (isolatedQaData) {
+                applicationIdSuffix = ".qa"
+                versionNameSuffix = "-qa"
+            }
+        }
         release {
             isMinifyEnabled = false
         }

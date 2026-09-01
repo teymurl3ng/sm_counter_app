@@ -1,6 +1,6 @@
 # Phase 9 — Runtime, Navigation, and Device Integration
 
-**Status: IN PROGRESS — responsive navigation milestone complete 2026-09-01**
+**Status: IN PROGRESS — navigation, isolated QA data, Android Back, and structural-hardening milestones complete 2026-09-01**
 
 ## 1. Reconciled scope
 
@@ -46,18 +46,32 @@ Implemented:
 
 Packaged Samsung evidence proves four direct destinations, grouped secondary destinations, no document-width overflow, sheet close/selection behavior, one unchanged WebView instance, one unchanged packaged URL, and no additional page navigation entry while changing areas.
 
-## 3. Remaining milestone order
+## 3. Milestone 2 — Isolated QA, Android Back, and Structural Hardening
+
+Status: **COMPLETE — physical-device verified 2026-09-01**.
+
+Implemented:
+
+- opt-in `-Psaaf.isolatedQa=true` debug application ID suffix `.qa`, giving instrumentation a separate installation and data directory while leaving the normal debug app untouched;
+- one shared packaged-WebView instrumentation driver instead of repeated login/input/evaluation helpers;
+- Android Back coordination that closes an active dialog/More sheet, returns a secondary area to the first authorized primary area, and backgrounds the task at the root;
+- same-WebView and same-packaged-URL proof across navigation and Back actions;
+- the active React shell renamed from its historical Phase 8 name and split into a 155-line composition root, a session/authentication hook, and an authorized-data hook;
+- `HybridActivity` reduced to lifecycle/composition responsibilities, with separate secure WebView hosting and Android document-picker classes;
+- `BackupManager` reduced from 1,115 lines to a 476-line facade/coordinator, with separate cryptography, restore, and JSON codec collaborators and no backup-format or schema change.
+
+## 4. Remaining milestone order
 
 1. **Complete:** responsive grouped navigation;
-2. isolated QA/test application data, then Android Back and in-app overlay/navigation coordination;
+2. **Complete:** isolated QA/test data, Android Back/overlay coordination, and useful Phase 8/9 file fragmentation;
 3. WebView lifecycle, recreation, and protected-session restoration;
 4. keyboard, system bars, and display insets;
 5. refresh/transfer measurement and targeted-state improvements;
-6. renderer/error recovery and complete physical-device regression.
+6. renderer/error recovery and final Phase 9 physical-device regression.
 
 The order may combine closely related tests, but Phase 9 does not absorb the Phase 10 periodic cloud-backup design gate or the Phase 12 visual-fidelity phase.
 
-## 4. Verification baseline
+## 5. Verification baseline
 
 Inherited from completed Phase 8:
 
@@ -76,12 +90,21 @@ Phase 9 Milestone 1 verification:
 - Kotlin and Android-test Kotlin compilation — PASS;
 - bridge drift/asset gates — PASS.
 
-## 5. Device-test isolation requirement
+Phase 9 Milestone 2 verification:
 
-The existing debug instrumentation target shares the installed debug app's package data. When the Samsung contained a different real/demo owner, the legacy test runner correctly rejected its instrumentation password before running any test. The test was changed only for the exact read-only Phase 9 navigation class: it may start a memory-only session for an existing active owner, without changing credentials or saved records.
+- focused packaged navigation/Android Back runtime test on `SM-A065F` — **1/1 PASS**;
+- focused encrypted/local backup and restore suites after fragmentation — **13/13 PASS**;
+- complete isolated-QA connected-device regression — **212/212 PASS**, 0 skipped, 0 failed;
+- host-side debug unit suite — **7/7 PASS**;
+- TypeScript no-emit check, production Vite build, Android asset packaging, Kotlin compilation, Android-test compilation, bridge drift gate, and packaged-asset gate — PASS;
+- frozen logic-spec and SQL blueprint SHA-256 values — unchanged and verified.
 
-Do not run the mutating complete instrumentation suite against a phone copy containing data the user wants to keep. Before the next complete regression, provide a separate QA application ID/data sandbox or a dedicated clean emulator/device workflow. Release code contains no authentication bypass.
+## 6. Device-test isolation requirement
+
+Instrumentation must be run with `-Psaaf.isolatedQa=true`. That property adds the `.qa` application-ID suffix to the debug target, so the QA app has independent Android storage and may safely bootstrap its instrumentation owner. The normal `com.saaf.milkshop` debug installation is not cleared, borrowed, or authenticated by the test runner. Release code contains no authentication bypass.
+
+Do not run the mutating complete instrumentation suite without the isolated-QA property against a phone copy containing data the user wants to keep.
 
 ## Plain English
 
-Phase 8 made every shop screen work with the real saved data. Phase 9 makes the app behave properly as a phone app. The long menu strip is now replaced by four everyday buttons and a grouped More panel. Next we will separate the automated testing copy from the copy you inspect, then make Android's Back button close menus/dialogs or return through app areas safely instead of accidentally leaving a protected screen.
+Phase 8 made every shop screen work with real saved data. Phase 9 is making it behave like a proper phone app. The long menu is grouped, automated tests now use a separate QA installation, and the phone's Back button closes what is open before returning to Dashboard or leaving the app. The biggest mixed-purpose files were also split without changing calculations or backup compatibility. Next comes safe screen/session restoration when Android recreates the app.

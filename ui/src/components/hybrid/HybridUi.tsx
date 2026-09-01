@@ -7,7 +7,7 @@ export function Dialog({ title, onClose, children }: { title: string; onClose():
       <section role="dialog" aria-modal="true" className="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:max-w-lg sm:rounded-3xl">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-xl font-bold">{title}</h2>
-          <button type="button" onClick={onClose} className="rounded-lg p-2 text-slate-500" aria-label="Close"><X className="h-5 w-5" /></button>
+          <button type="button" data-native-back-close onClick={onClose} className="rounded-lg p-2 text-slate-500" aria-label="Close"><X className="h-5 w-5" /></button>
         </div>
         {children}
       </section>

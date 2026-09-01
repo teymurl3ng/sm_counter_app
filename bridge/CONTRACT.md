@@ -1,14 +1,14 @@
 # Saaf Milk Canonical Bridge Contract
 
-**Status: FROZEN — contract version 2 — 2026-08-28**
+**Status: FROZEN — contract version 3 — 2026-09-01**
 
-Manifest SHA-256: `AB374869603B9D773AD86B56EF801DA8C4493816C7301B05214AE596E33D0920`
+Manifest SHA-256: `2B4FA647E2BFE4F3A12EA9CC12516E93CD52EEEA6BFA3508BE48E6991A88B08B`
 
 ## 1. Authority and scope
 
 This is the single normative bridge/API contract between the packaged React UI and Kotlin. `bridge/contract.json` is its machine-readable endpoint/schema appendix and is incorporated into this contract. `scripts/verify-bridge-contract.py` proves that appendix, the Kotlin endpoint snapshot, the TypeScript action/types projection, the frozen Phase 5 DTO names, permissions, and native read methods remain aligned.
 
-Contract version 2 retains all version-1 endpoints and request shapes. Its only DTO amendment adds role-filtered active `expenseCategories` to `TransactionReferencesDto`, allowing expense-authorized cashiers to obtain valid category IDs without receiving business-settings or master-data authority.
+Contract version 3 retains all 78 version-2 endpoints and every request shape. It preserves version 2's role-filtered active `expenseCategories` amendment and additively extends the existing `PlanningDto` response with native-authoritative budget actuals, variances, derived sales targets, actual sales, and collection-target actuals. No new persistence or command authority is introduced; React formats these values but never calculates them.
 
 Authority remains:
 
@@ -30,7 +30,7 @@ JavaScript sends one UTF-8 JSON object through `saafMilkNative.postMessage(...)`
 
 ```json
 {
-  "contractVersion": 2,
+  "contractVersion": 3,
   "requestId": "2f721b62-89bf-4e83-b7a8-bbe2a122d18f",
   "action": "query.dashboard",
   "sessionHandle": "opaque-memory-only-value",
@@ -53,7 +53,7 @@ JavaScript sends one UTF-8 JSON object through `saafMilkNative.postMessage(...)`
 
 ```json
 {
-  "contractVersion": 2,
+  "contractVersion": 3,
   "requestId": "2f721b62-89bf-4e83-b7a8-bbe2a122d18f",
   "action": "query.dashboard",
   "ok": true,
@@ -67,7 +67,7 @@ JavaScript sends one UTF-8 JSON object through `saafMilkNative.postMessage(...)`
 
 ```json
 {
-  "contractVersion": 2,
+  "contractVersion": 3,
   "requestId": "2f721b62-89bf-4e83-b7a8-bbe2a122d18f",
   "action": "query.dashboard",
   "ok": false,

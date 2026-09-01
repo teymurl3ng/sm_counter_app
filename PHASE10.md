@@ -1,6 +1,6 @@
 # Phase 10 — Functional Product Completion
 
-Status: **IN PROGRESS — checkpoint 10.1 complete; checkpoint 10.2 next**
+Status: **IN PROGRESS — checkpoints 10.1–10.2 complete; checkpoint 10.3 next**
 
 ## 1. Purpose
 
@@ -14,7 +14,7 @@ The phase also owns the approved design gate for periodic encrypted off-device b
 
 ## 2. Locked boundaries
 
-- Preserve the 78-operation contract-v2 surface and its drift checker unless an explicitly approved additive capability is required.
+- Preserve the 78-operation contract-v3 surface and its drift checker. Version 3 is the approved additive Phase 10.2 response-only amendment; future changes still require the documented version/hash workflow.
 - Preserve native Room data as the only business truth; React must not calculate or persist a second ledger.
 - Preserve verified users, permissions, memory-only sessions, actor attribution, audit history, corrections, daily-close rules, costing rules, and encrypted backup boundaries.
 - Existing installations must not receive artificial users, opening entries, costing sources, balances, or other invented business history.
@@ -29,9 +29,17 @@ Reconcile the approved capability inventory, the 78 bridge operations, the nativ
 
 Completed 2026-09-01. `PHASE10_CAPABILITY_AUDIT.md` confirms all 78 operations and all 16 retained screen/workflow families are genuinely native-backed. It records two narrow local planning-presentation gaps for checkpoint 10.2, presentation preferences/receipt export for Phase 12, inactive prototype cleanup for Phase 13, and release optimization for Phase 16.
 
-### 10.2 — Local capability closure
+### 10.2 — Local capability closure ✅
 
 Implement only confirmed Phase 10 gaps. Keep refreshes screen-scoped where the frozen contract supports them, and add bridge batching only when measurement shows that it is useful and correctness-neutral.
+
+Completed 2026-09-01. Contract version 3 retains the same 78 operations and every version-2 request shape while extending `query.planning` with native-authoritative:
+
+- recorded spending and actual-minus-plan variance for each saved budget;
+- a derived sales target, actual sales, and sales-minus-target variance for Milk plans;
+- actual collections and collected-minus-target variance for each collection target.
+
+Kotlin derives and rounds every money value from canonical effective events and saved rate snapshots. React only formats the returned PKR-paisa strings. The display is isolated in `PlanningStatusCards.tsx`, so later UI fidelity work can rearrange the cards without touching calculations. Focused device verification passes 6/6 and the complete isolated Samsung suite passes 219/219.
 
 ### 10.3 — Periodic encrypted cloud-backup design gate
 
@@ -59,7 +67,7 @@ The 2026-09-01 assessment found no reason for a broad performance rewrite. Its f
 
 ## 5. Current checkpoint
 
-Begin **10.2 — Local capability closure**. Its approved scope is limited to native-authoritative derived sales-target visibility and budget-versus-actual visibility. The required additive read-model/bridge amendment must be designed before implementation; React must not calculate either value. Application code has not yet changed for Phase 10.
+Begin **10.3 — Periodic encrypted cloud-backup design gate**. Produce an approval-ready proposal before adding Internet permission, provider SDKs, background scheduling, cloud authorization, or owner-phone behavior. The current device-local database and encrypted manual backup remain authoritative until that proposal is approved.
 
 ## Plain English
 

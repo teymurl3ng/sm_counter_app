@@ -18,7 +18,7 @@ Read those files before changing code.
 
 The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–9 are complete. `PHASE8.md` contains the completed screen ledger. `PHASE9.md` records the completed grouped-navigation, isolated-QA, Android Back, structural-hardening, secure Activity/WebView recreation, keyboard/system-inset, targeted refresh/transfer, and renderer/error-recovery milestones.
 
-Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE9.md` for current status. The runtime exposes all seventy-eight frozen actions, including operational/cashier/financial/profitability summaries, Daily Work commands, delivery lifecycle, account ledgers, event history/detail, typed corrections, reconciliation, versioned costing/planning controls, personal credentials, owner recovery, staff enrollment/administration, security audit, and encrypted export/inspection/restore. The complete isolated-QA connected-device suite passes 218/218 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7.
+Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE10.md` for current status. The runtime exposes all seventy-eight frozen actions, including operational/cashier/financial/profitability summaries, Daily Work commands, delivery lifecycle, account ledgers, event history/detail, typed corrections, reconciliation, versioned costing/planning controls, personal credentials, owner recovery, staff enrollment/administration, security audit, and encrypted export/inspection/restore. The complete isolated-QA connected-device suite passes 219/219 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7.
 
 Application user accounts and native role-based authorization are explicitly approved as a required cross-phase capability. Their schema-7 model, encrypted backup boundary, app-owned sessions, private staff enrollment/reset, user administration, role-aware navigation, recovery, security audit, and command-boundary authorization are implemented and now wired into React. Application users are security principals separate from employee/salary profiles, with an optional link between them. The schema-v6 daily-close actor name/role is transitional asserted metadata, not authenticated identity.
 
@@ -29,7 +29,7 @@ The two completed Phase 3 design tracks were:
 1. authenticated users, credentials, roles/permissions, sessions, recovery, audit actor IDs, migration, and backup/restore security;
 2. authoritative costing/COGS and profitability semantics.
 
-The researched recommendations for native security and costing are implemented and device-verified. Phase 8 is complete: every retained screen family and all 78 frozen operations execute through the active native-backed React product. Phase 9 runtime/navigation/device integration is also complete, including secure renderer recovery; the full Samsung suite passes 218/218. Phase 10 checkpoint 10.1 is complete: `PHASE10_CAPABILITY_AUDIT.md` confirms the core capability matrix and records only two local planning-presentation gaps for checkpoint 10.2. The periodic encrypted cloud-backup design gate follows. The assessment-only 2026-09-01 presentation-performance findings and approved display/receipt preferences are deferred to Phase 12 UI Fidelity, with release compiler/profile work assigned to Phase 16; no broad performance rewrite is approved. Later fidelity, cleanup, acceptance, and release phases remain open.
+The researched recommendations for native security and costing are implemented and device-verified. Phase 8 and Phase 9 are complete. Phase 10 checkpoints 10.1–10.2 are also complete: `PHASE10_CAPABILITY_AUDIT.md` confirms the core capability matrix, and contract v3 closes both local planning-presentation gaps with native-authoritative targets, actuals, and variances. The full isolated Samsung suite passes 219/219. Checkpoint 10.3, the periodic encrypted cloud-backup design gate, is next. The assessment-only presentation-performance findings and approved display/receipt preferences remain deferred to Phase 12 UI Fidelity, with release compiler/profile work assigned to Phase 16.
 
 ---
 
@@ -227,7 +227,7 @@ The permission-aware hybrid-facing native query/DTO layer is implemented in `app
 
 ## Phase 6 — COMPLETE
 
-Canonical bridge contract version 2 is frozen in `bridge/CONTRACT.md` and `bridge/contract.json` with the same 78 query/command/system operations. V2 adds only role-filtered active expense categories to `TransactionReferencesDto`, correcting cashier expense lookup without granting settings/master-data authority. It retains lossless scalar encoding, authenticated envelopes, native-owned authority and actor attribution, 19 stable error codes, validation, persistence, refresh, backup picker/ticket boundaries, and version/hash negotiation. Generated Kotlin and TypeScript projections compile, and Android `preBuild` plus UI `prebuild` run the drift checker.
+Canonical bridge contract version 3 is frozen in `bridge/CONTRACT.md` and `bridge/contract.json` with the same 78 query/command/system operations and every version-2 request unchanged. V2 added role-filtered expense references; v3 additively exposes native-authoritative planning targets, actuals, and variances through `PlanningDto`. It retains lossless scalar encoding, authenticated envelopes, native-owned authority and actor attribution, 19 stable error codes, validation, persistence, refresh, backup picker/ticket boundaries, and version/hash negotiation. Generated Kotlin and TypeScript projections compile, and Android `preBuild` plus UI `prebuild` run the drift checker.
 
 ## Phase 7 — COMPLETE
 
@@ -239,7 +239,7 @@ The completed screen capability ledger is in `PHASE8.md`. Management, core setti
 
 ## Phase 9 — COMPLETE
 
-The completed runtime/navigation/device-integration ledger is in `PHASE9.md`. The application now has grouped role-aware navigation, isolated QA storage, predictable Android Back behavior, secure Activity recreation, deliberate keyboard/system-inset behavior, targeted measured state refresh, and native renderer/error recovery. The real-renderer termination suite passes 2/2 and the full isolated-QA connected suite passes 218/218. Phase 10 Functional Product Completion and its periodic encrypted cloud-backup design gate are the current continuation point.
+The completed runtime/navigation/device-integration ledger is in `PHASE9.md`. The application has grouped role-aware navigation, isolated QA storage, predictable Android Back behavior, secure Activity recreation, deliberate keyboard/system-inset behavior, targeted measured state refresh, and native renderer/error recovery. Phase 10.2 raises the complete isolated-QA suite to 219/219. Phase 10.3, the periodic encrypted cloud-backup design gate, is the current continuation point.
 
 ---
 
@@ -464,7 +464,7 @@ Do not invent UI variants such as:
 - `credit_delivery`
 - `credit_wholesale`
 
-All bridge values are now defined in contract version 2. Change them only through the documented manifest/version/drift workflow.
+All bridge values are now defined in contract version 3. Change them only through the documented manifest/version/drift workflow.
 
 ---
 

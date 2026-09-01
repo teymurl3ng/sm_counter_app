@@ -3,6 +3,8 @@ package com.saaf.milkshop.application.readmodels
 import com.saaf.milkshop.data.BudgetPlanEntity
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
+import com.saaf.milkshop.domain.AnalyticsBudgetActuals
+import com.saaf.milkshop.domain.AnalyticsService
 import com.saaf.milkshop.domain.BUDGET_CATEGORY_MILK_PURCHASES
 import com.saaf.milkshop.domain.CostCoverageCode
 import com.saaf.milkshop.domain.CostReportingScope
@@ -132,28 +134,59 @@ internal class HybridCostingPlanningReadService(
             val categories = listOf(BUDGET_CATEGORY_MILK_PURCHASES) + OPERATING_BUDGET_CATEGORIES
             categories.forEach { category -> addAll(database.budgetPlanDao().findAllForCategory(category)) }
         }.sortedWith(compareByDescending<BudgetPlanEntity> { it.periodStart }.thenByDescending { it.budgetId })
+        val collectionTargets = database.collectionsTargetDao().findAll()
+        val periods = buildSet {
+            budgets.forEach { add(it.periodStart to it.periodEndExclusive) }
+            collectionTargets.forEach { add(it.weekStart to it.weekEndExclusive) }
+        }
+        val analytics = AnalyticsService(database)
+        val actualsByPeriod = mutableMapOf<Pair<String, String>, AnalyticsBudgetActuals>()
+        periods.forEach { period ->
+            actualsByPeriod[period] = analytics.budgetActuals(period.first, period.second)
+        }
         return PlanningDto(
             budgets = budgets.map {
+                val actuals = actualsByPeriod.getValue(it.periodStart to it.periodEndExclusive)
+                val actualAmountPaisa = money(
+                    if (it.category == BUDGET_CATEGORY_MILK_PURCHASES) actuals.milkPurchaseAmount
+                    else actuals.expenseByCategory[it.category] ?: 0.0,
+                )
+                val plannedAmountPaisa = it.plannedAmount?.let(::money)
+                val salesTargetPaisa = if (it.category == BUDGET_CATEGORY_MILK_PURCHASES) {
+                    val liters = it.plannedLiters
+                    val retailRate = it.retailRateSnapshot
+                    if (liters != null && retailRate != null) money(liters * retailRate) else null
+                } else null
+                val actualSalesPaisa = salesTargetPaisa?.let { money(actuals.salesValue) }
                 BudgetPlanDto(
                     budgetId = it.budgetId,
                     categoryCode = it.category,
                     periodStart = it.periodStart,
                     periodEndExclusive = it.periodEndExclusive,
                     plannedLiters = it.plannedLiters?.let(::decimal),
-                    plannedAmountPaisa = it.plannedAmount?.let(::money),
+                    plannedAmountPaisa = plannedAmountPaisa,
+                    actualAmountPaisa = actualAmountPaisa,
+                    variancePaisa = plannedAmountPaisa?.let { planned -> actualAmountPaisa - planned },
                     vendorRateSnapshotPaisaPerUnit = it.vendorRateSnapshot?.let(::money),
                     retailRateSnapshotPaisaPerUnit = it.retailRateSnapshot?.let(::money),
+                    salesTargetPaisa = salesTargetPaisa,
+                    actualSalesPaisa = actualSalesPaisa,
+                    salesVariancePaisa = if (salesTargetPaisa != null && actualSalesPaisa != null) actualSalesPaisa - salesTargetPaisa else null,
                     createdAt = it.createdAt,
                     supersedesId = it.supersedesId,
                     archived = it.archived,
                 )
             },
-            collectionTargets = database.collectionsTargetDao().findAll().map {
+            collectionTargets = collectionTargets.map {
+                val actualCollectedPaisa = money(actualsByPeriod.getValue(it.weekStart to it.weekEndExclusive).creditCollections)
+                val targetAmountPaisa = money(it.targetAmount)
                 CollectionsTargetDto(
                     targetId = it.targetId,
                     weekStart = it.weekStart,
                     weekEndExclusive = it.weekEndExclusive,
-                    targetAmountPaisa = money(it.targetAmount),
+                    targetAmountPaisa = targetAmountPaisa,
+                    actualCollectedPaisa = actualCollectedPaisa,
+                    variancePaisa = actualCollectedPaisa - targetAmountPaisa,
                     createdAt = it.createdAt,
                     supersedesId = it.supersedesId,
                     archived = it.archived,

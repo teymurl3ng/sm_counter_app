@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from 'react';
 import type { PlanningDto } from '../../bridge/contract.generated';
-import { formatPaisa } from '../../bridge/nativeBridge';
 import { TextInput } from './HybridUi';
 import { nextMondayInput, nextMonthInput, periodEnd } from './costingPlanningPresentation';
 import { PLANNING_CATEGORIES, type BudgetDraft, type CollectionsTargetDraft } from './costingPlanningModels';
+import { BudgetPlanCard, CollectionsTargetCard } from './PlanningStatusCards';
 
 export function PlanningControls({ busy, planning, onSaveBudget, onCopyBudget, onSaveCollectionsTarget }: {
   busy: boolean;
@@ -67,13 +67,8 @@ export function PlanningControls({ busy, planning, onSaveBudget, onCopyBudget, o
       <div className="border-b border-slate-100 p-5"><h2 className="text-lg font-bold">Saved plans</h2><p className="mt-1 text-sm text-slate-500">Changing a plan keeps the old version for accountability.</p></div>
       <div id="saved-plans-list" className="divide-y divide-slate-100">
         {activeBudgets.length === 0 && activeTargets.length === 0 && <p className="p-5 text-sm text-slate-500">No current plans have been saved.</p>}
-        {activeBudgets.map((item) => <article key={`budget-${item.budgetId}`} className="p-4">
-          <div className="flex items-start justify-between gap-3"><div><h3 className="font-bold">{item.categoryCode}</h3><p className="mt-1 text-xs text-slate-500">{item.periodStart} to before {item.periodEndExclusive}</p></div><span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">Current</span></div>
-          <p className="mt-3 text-lg font-bold">{item.plannedLiters !== null ? `${item.plannedLiters} liters` : formatPaisa(item.plannedAmountPaisa)}</p>
-          {item.plannedLiters !== null && item.plannedAmountPaisa !== null && <p className="text-sm text-slate-600">Expected buying cost: {formatPaisa(item.plannedAmountPaisa)}</p>}
-          {item.plannedLiters !== null && item.retailRateSnapshotPaisaPerUnit !== null && <p className="text-xs text-slate-500">The app saved the milk buying and selling rates used for this plan.</p>}
-        </article>)}
-        {activeTargets.map((item) => <article key={`target-${item.targetId}`} className="p-4"><div className="flex items-start justify-between gap-3"><div><h3 className="font-bold">Customer collections</h3><p className="mt-1 text-xs text-slate-500">Week of {item.weekStart}</p></div><span className="rounded-full bg-sky-50 px-2.5 py-1 text-xs font-bold text-sky-800">Target</span></div><p className="mt-3 text-lg font-bold">{formatPaisa(item.targetAmountPaisa)}</p></article>)}
+        {activeBudgets.map((item) => <BudgetPlanCard key={`budget-${item.budgetId}`} item={item} />)}
+        {activeTargets.map((item) => <CollectionsTargetCard key={`target-${item.targetId}`} item={item} />)}
       </div>
       <p className="border-t border-slate-100 bg-slate-50 p-4 text-xs leading-5 text-slate-600">Plans are for comparison only. Saving one does not create a purchase, expense, sale, or payment.</p>
     </section>

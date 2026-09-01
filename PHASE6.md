@@ -20,6 +20,12 @@ Contract version 2 contains the same 78 unique operations: 20 queries, 54 comman
 
 `AB374869603B9D773AD86B56EF801DA8C4493816C7301B05214AE596E33D0920`
 
+### Phase 10 additive amendment — contract version 3
+
+Checkpoint 10.2 advances the canonical contract to version 3 without adding or removing an operation and without changing any request. The existing `PlanningDto` response now carries native-calculated budget actuals/variances, derived sales targets and actual sales/variance, plus collection-target actuals/variance. Kotlin remains the sole calculator. The version-3 manifest SHA-256 is:
+
+`2B4FA647E2BFE4F3A12EA9CC12516E93CD52EEEA6BFA3508BE48E6991A88B08B`
+
 ## 3. Representation and security decisions
 
 1. Native 64-bit IDs/counts, integer PKR paisa, and precise decimal quantities cross JSON as branded base-10 strings. They never depend on JavaScript floating-point precision.
@@ -47,7 +53,7 @@ Android `preBuild` depends on the checker. The UI `prebuild` script also runs it
 
 ## 5. Verification
 
-- Canonical contract validation — PASS: version 2, 78 endpoints, generated SHA-256.
+- Canonical contract validation — PASS: current version 3, 78 endpoints, generated SHA-256; the historical version-2 amendment above remains recorded.
 - TypeScript type check (`npm run lint`) — PASS.
 - Production React/Vite build, including `prebuild` drift gate — PASS. The existing large-chunk advisory remains a non-failing later optimization item.
 - Kotlin and Android-test Kotlin compilation — PASS; Gradle ran `verifyBridgeContract` before `app:preBuild`.

@@ -60,7 +60,9 @@ class Phase8CostingPlanningTest {
         val owner = security.bootstrapOwner("planning.owner", "Planning Owner", OWNER_PASSWORD.toCharArray())
         val session = owner.session.sessionId
         val first = budgetPayload("2026-09-07", "2026-09-14", "100")
-        assertTrue(dispatch("command.upsertBudget", first, session).getBoolean("ok"))
+        val firstResult = dispatch("command.upsertBudget", first, session)
+        assertTrue(firstResult.getBoolean("ok"))
+        assertTrue(firstResult.getJSONObject("data").getLong("salesTargetPaisa") > 0L)
         assertTrue(dispatch("command.upsertBudget", budgetPayload("2026-09-07", "2026-09-14", "120"), session).getBoolean("ok"))
         val copied = dispatch("command.copyPreviousBudget", JSONObject()
             .put("categoryCode", "Milk purchases").put("periodStart", "2026-09-14").put("periodEndExclusive", "2026-09-21"), session)
@@ -75,8 +77,16 @@ class Phase8CostingPlanningTest {
         val revisedPeriod = (0 until budgets.length()).map(budgets::getJSONObject).filter { it.getString("periodStart") == "2026-09-07" }
         assertEquals(2, revisedPeriod.size)
         assertTrue(revisedPeriod.any { it.getBoolean("archived") && it.getString("plannedLiters") == "100" })
-        assertTrue(revisedPeriod.any { !it.getBoolean("archived") && it.getString("plannedLiters") == "120" })
-        assertEquals("40000000", planning.getJSONArray("collectionTargets").getJSONObject(0).getString("targetAmountPaisa"))
+        val activeBudget = revisedPeriod.single { !it.getBoolean("archived") && it.getString("plannedLiters") == "120" }
+        assertEquals("0", activeBudget.getString("actualAmountPaisa"))
+        assertEquals((-activeBudget.getLong("plannedAmountPaisa")).toString(), activeBudget.getString("variancePaisa"))
+        assertTrue(activeBudget.getLong("salesTargetPaisa") > 0L)
+        assertEquals("0", activeBudget.getString("actualSalesPaisa"))
+        assertEquals((-activeBudget.getLong("salesTargetPaisa")).toString(), activeBudget.getString("salesVariancePaisa"))
+        val savedTarget = planning.getJSONArray("collectionTargets").getJSONObject(0)
+        assertEquals("40000000", savedTarget.getString("targetAmountPaisa"))
+        assertEquals("0", savedTarget.getString("actualCollectedPaisa"))
+        assertEquals("-40000000", savedTarget.getString("variancePaisa"))
         val audits = database.securityAuditDao().all().map { it.action }
         assertTrue(audits.containsAll(listOf(
             CostingPlanningBridgeCommandService.ACTION_UPSERT_BUDGET,

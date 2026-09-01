@@ -1,8 +1,8 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-01 — hybrid Phases 0–9 are complete and Phase 10 checkpoint 10.1 is complete. The capability audit confirms all 78 operations and 16 retained workflow families are genuinely native-backed; checkpoint 10.2 will close two native-authoritative planning-presentation gaps. Runtime / Navigation / Device Integration includes grouped navigation, isolated QA data, predictable Android Back behavior, structural hardening, secure Activity/WebView recreation, deliberate keyboard/system-inset behavior, targeted bridge/state refresh, and secure renderer-failure recovery. Substantial Phase 10/11 native prerequisites completed early remain credited without prematurely declaring those later phases complete.
+Status: RECONCILED 2026-09-01 — hybrid Phases 0–9 and Phase 10 checkpoints 10.1–10.2 are complete. The capability audit confirms all 78 operations and 16 retained workflow families are genuinely native-backed; contract v3 now exposes native-authoritative plan targets, actuals, and variances. Phase 10 continues at the periodic encrypted cloud-backup design gate. Substantial Phase 11 prerequisites completed early remain credited without prematurely declaring that phase complete.
 
-Latest physical-device checkpoint: the complete isolated-QA connected-device suite passes 218/218; host-side tests pass 7/7.
+Latest physical-device checkpoint: the complete isolated-QA connected-device suite passes 219/219; host-side tests pass 7/7.
 
 ## What this repository contains
 
@@ -21,7 +21,7 @@ Latest physical-device checkpoint: the complete isolated-QA connected-device sui
 - `PHASE5.md` — completed native read-model expansion, permission boundary, verification, and next gate.
 - `PHASE5_DTO_CATALOG.md` — frozen hybrid-facing Kotlin query/DTO catalog, representation rules, code sets, and security exclusions.
 - `PHASE6.md` — completed canonical bridge-contract boundary, generated projections, drift gate, verification, and Phase 7 handoff.
-- `bridge/CONTRACT.md` and `bridge/contract.json` — frozen human-readable and machine-readable bridge contract version 2.
+- `bridge/CONTRACT.md` and `bridge/contract.json` — frozen human-readable and machine-readable bridge contract version 3.
 - `PHASE7.md` — completed packaged React/WebView/Android vertical slice, authenticated bridge proof, physical-device evidence, and Phase 8 handoff.
 - `PHASE8.md` — completed screen capability ledger, all 21 native-backed milestones, verification, limitations, and Phase 9 handoff.
 - `PHASE9.md` — completed runtime/navigation/device-integration ledger, including grouped navigation, lifecycle, keyboard/insets, targeted refresh, renderer recovery, and physical-device evidence.
@@ -92,7 +92,7 @@ Phase 8 — UI Wiring ✅ (all 21 milestones complete; all 78 bridge operations 
 
 Phase 9 — Runtime / Navigation / Device Integration ✅ (all six milestones complete, including secure renderer recovery; 218/218 device regression)
 
-Phase 10 — Functional Product Completion 🚧 (checkpoint 10.1 complete; checkpoint 10.2 closes derived sales-target and budget-versus-actual presentation before the cloud-backup design gate)
+Phase 10 — Functional Product Completion 🚧 (checkpoints 10.1–10.2 complete; checkpoint 10.3 is the periodic encrypted cloud-backup design gate)
 
 Phase 11 — Integrity / Recovery / Concurrency ◐ (security/backup credit; local concurrency, hybrid recovery, and periodic-cloud-backup integrity remain)
 
@@ -126,7 +126,7 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Focused backup/restore suite: 8/8 passed, including portable and local confidentiality checks, wrong-passphrase rejection, tamper rejection, security round-trips, session invalidation, and transient lockout-state exclusion.
 - Phase 4 security gap-closure suite: 9/9 passed.
 - Phase 5 hybrid read-model suite: 4/4 passed.
-- Bridge contract: version 2, 78 endpoints, generated Kotlin/TypeScript projections and both pre-build drift gates pass; v2 adds least-privilege active expense references without changing endpoints.
+- Bridge contract: version 3, 78 endpoints, generated Kotlin/TypeScript projections and both pre-build drift gates pass; v3 retains all v2 requests and adds native-authoritative planning comparison response fields.
 - Host-side debug unit tests: 7/7 passed.
 - Phase 7 focused hybrid vertical-slice suite: 3/3 passed on the physical device.
 - Phase 8 focused Product Management suite: 3/3 passed on the physical device.
@@ -151,8 +151,8 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 8 focused Staff Users/Security Audit suite: 5/5 passed on the physical device.
 - Phase 8 focused Encrypted Backup/Restore suite: 5/5 passed on the physical device.
 - Phase 9 focused real-renderer termination and secure recovery suite: 2/2 passed on the physical device.
-- Complete isolated-QA connected-device instrumentation regression: 218/218 passed, 0 skipped, 0 failed.
+- Complete isolated-QA connected-device instrumentation regression: 219/219 passed, 0 skipped, 0 failed.
 
 ## Next gate
 
-Phases 3–9 are closed. Every retained screen family and all 78 bridge operations remain native-backed and device-proven. The complete isolated-QA Samsung suite passes 218/218, including real WebView-renderer termination with secure valid-session recovery and invalid-session rejection. Phase 10.1 is closed by `PHASE10_CAPABILITY_AUDIT.md`; Phase 10.2 is next, followed by the periodic encrypted Google Drive/cloud-backup design gate and separate owner-phone snapshot-view decision. See `PHASE10.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–9 are closed. Every retained screen family and all 78 bridge operations remain native-backed and device-proven. Phase 10.1's capability audit and Phase 10.2's native planning comparisons are complete under contract v3; the complete isolated-QA Samsung suite passes 219/219. Phase 10.3 is next: the periodic encrypted Google Drive/cloud-backup design gate and separate owner-phone snapshot-view decision. See `PHASE10.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.

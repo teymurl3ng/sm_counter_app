@@ -123,3 +123,7 @@ Cloud backup remains outside 10.2 and cannot begin before its separate design ap
 ## Plain English
 
 Every important shop action is real and connected to the Android database. The only local functions still worth completing now are showing the sales target created by a milk plan and showing whether saved plans matched actual shop results. Display preferences, Urdu selection, and printable receipts will be handled with the full UI redesign so we do not build them twice.
+
+## Post-audit closure note — 2026-09-01
+
+Checkpoint 10.2 closed both recorded local gaps. The additive contract-v3 amendment retains all 78 endpoints and request shapes, adds only native-authoritative planning comparison response fields, and passes the complete isolated Samsung regression 219/219. Phase 10 now continues at checkpoint 10.3.

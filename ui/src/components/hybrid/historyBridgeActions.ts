@@ -1,10 +1,11 @@
 import type { CommandCorrectEventRequest, EventDetailDto, EventHistoryDto, EventMutationResultDto, Int64String, IsoDateString, SessionHandle } from '../../bridge/contract.generated';
 import { callNative, rupeesToPaisa, validateDecimalInput } from '../../bridge/nativeBridge';
 import type { CorrectionDraft } from './hybridModels';
+import type { RefreshPlan, RunAndRefresh } from './authorizedDataRefresh';
 
-type Refresh = <T>(operation: () => Promise<T>, success: string) => Promise<T>;
+const CORRECTION_REFRESH: RefreshPlan = ['masterData', 'dashboard', 'cashierSummary', 'financialOverview', 'spoilageHistory', 'eventHistory', 'reconciliationArchive'];
 
-export function historyBridgeActions(session: SessionHandle | null, refresh: Refresh) {
+export function historyBridgeActions(session: SessionHandle | null, refresh: RunAndRefresh) {
   const requireSession = (): SessionHandle => {
     if (!session) throw new Error('Sign in to view transaction history.');
     return session;
@@ -14,6 +15,7 @@ export function historyBridgeActions(session: SessionHandle | null, refresh: Ref
   const correctEvent = (draft: CorrectionDraft): Promise<EventMutationResultDto> => refresh(
     () => callNative('command.correctEvent', correctionRequest(draft), requireSession()),
     `Correction saved for record #${draft.originalEventId}.`,
+    CORRECTION_REFRESH,
   );
   return { loadEventHistory, loadEventDetail, correctEvent };
 }

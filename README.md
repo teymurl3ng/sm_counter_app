@@ -1,8 +1,8 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-01 — hybrid Phases 0–8 are complete and Phase 9 Runtime / Navigation / Device Integration is in progress. Grouped navigation, isolated QA data, predictable Android Back behavior, structural hardening, secure Activity/WebView recreation, and deliberate keyboard/system-inset behavior are physical-device verified. All 78 frozen bridge operations remain native-backed. Substantial Phase 9/11 native prerequisites completed early remain credited without declaring those later phases complete.
+Status: RECONCILED 2026-09-01 — hybrid Phases 0–8 are complete and Phase 9 Runtime / Navigation / Device Integration is in progress. Grouped navigation, isolated QA data, predictable Android Back behavior, structural hardening, secure Activity/WebView recreation, deliberate keyboard/system-inset behavior, and targeted bridge/state refresh are physical-device verified. All 78 frozen bridge operations remain native-backed. Substantial Phase 9/11 native prerequisites completed early remain credited without declaring those later phases complete.
 
-Latest physical-device checkpoint: the complete isolated-QA connected-device suite passes 215/215; host-side tests pass 7/7.
+Latest physical-device checkpoint: the complete isolated-QA connected-device suite passes 216/216; host-side tests pass 7/7.
 
 ## What this repository contains
 
@@ -90,7 +90,7 @@ Phase 7 — Hybrid Shell / Vertical Slice ✅
 
 Phase 8 — UI Wiring ✅ (all 21 milestones complete; all 78 bridge operations native-backed and device-proven)
 
-Phase 9 — Runtime / Navigation / Device Integration ◐ (grouped navigation, isolated QA data, Android Back, structural hardening, secure Activity/WebView recreation, and keyboard/system-inset handling complete; targeted refresh and renderer recovery remain)
+Phase 9 — Runtime / Navigation / Device Integration ◐ (grouped navigation, isolated QA data, Android Back, structural hardening, secure Activity/WebView recreation, keyboard/system-inset handling, and targeted refresh/transfer measurement complete; renderer recovery remains)
 
 Phase 10 — Functional Product Completion ⏳ (includes the periodic encrypted Google Drive/cloud-backup design gate, approved implementation, and a separate owner-phone snapshot-view decision)
 
@@ -150,8 +150,8 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 8 focused Costing/Planning suite: 5/5 passed on the physical device.
 - Phase 8 focused Staff Users/Security Audit suite: 5/5 passed on the physical device.
 - Phase 8 focused Encrypted Backup/Restore suite: 5/5 passed on the physical device.
-- Complete isolated-QA connected-device instrumentation regression: 215/215 passed, 0 skipped, 0 failed.
+- Complete isolated-QA connected-device instrumentation regression: 216/216 passed, 0 skipped, 0 failed.
 
 ## Next gate
 
-Phases 3–8 are closed and Phase 9 is active. Every retained Phase 8 screen family and all 78 bridge operations remain native-backed and device-proven. Grouped navigation, separate QA storage, Android Back coordination, useful fragmentation, secure Activity/WebView recreation, and deliberate keyboard/system-inset behavior are complete; the full isolated-QA Samsung suite passes 215/215. Next, measure and reduce unnecessary bridge/state refreshes, followed by renderer recovery. Google Drive scheduling remains deferred to the Phase 10 design gate. See `PHASE9.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–8 are closed and Phase 9 is active. Every retained Phase 8 screen family and all 78 bridge operations remain native-backed and device-proven. Grouped navigation, separate QA storage, Android Back coordination, useful fragmentation, secure Activity/WebView recreation, deliberate keyboard/system-inset behavior, and measured targeted refresh are complete; the full isolated-QA Samsung suite passes 216/216. Next, implement renderer/error recovery and run the final Phase 9 regression. Google Drive scheduling remains deferred to the Phase 10 design gate. See `PHASE9.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.

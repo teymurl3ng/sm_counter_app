@@ -1,6 +1,6 @@
 # Phase 9 — Runtime, Navigation, and Device Integration
 
-**Status: IN PROGRESS — navigation, isolated QA, Android Back, structural hardening, secure Activity recreation, and keyboard/system-inset handling complete 2026-09-01**
+**Status: IN PROGRESS — navigation, isolated QA, Android Back, structural hardening, secure Activity recreation, keyboard/system-inset handling, and targeted refresh/transfer measurement complete 2026-09-01**
 
 ## 1. Reconciled scope
 
@@ -90,18 +90,33 @@ Implemented:
 - focused-field visibility correction after keyboard/viewport movement, while the phone navigation temporarily hides during typing and returns after the keyboard closes;
 - a focused physical-device test that opens a real product dialog, invokes the Samsung keyboard, and proves the lower field and dialog remain inside the usable viewport.
 
-## 6. Remaining milestone order
+## 6. Milestone 5 — Targeted Refresh and Transfer Measurement
+
+Status: **COMPLETE — physical-device verified 2026-09-01**.
+
+Implemented:
+
+- one explicit authorized-data slice catalog covering the ten existing workspace query families without changing the frozen bridge contract;
+- per-operation refresh plans so product/customer/supplier/employee changes refresh master data and transaction references rather than every authorized data set;
+- operation-specific refresh plans for Daily Work, deliveries, Settings, corrections, and cash closing, preserving every screen value affected by each native command;
+- Attendance continues to reload its selected date locally, while its save no longer triggers an unrelated workspace reload;
+- Planning mutations reload only Planning, while costing/yield/loss mutations reload only Costing after their initial two-query screen load;
+- anonymous in-memory bridge metrics for call count, failures, request/response character counts, and total duration by action; payload content and session handles are never retained in metrics;
+- a Samsung proof that ordinary React navigation transfers no bridge data and a product save uses exactly one command plus two relevant queries instead of one command plus up to ten queries;
+- preservation of the full parallel authorized load at login/recreation, when the complete permission-appropriate workspace state is genuinely required.
+
+## 7. Remaining milestone order
 
 1. **Complete:** responsive grouped navigation;
 2. **Complete:** isolated QA/test data, Android Back/overlay coordination, and useful Phase 8/9 file fragmentation;
 3. **Complete:** WebView lifecycle, Activity recreation, and protected-session restoration;
 4. **Complete:** keyboard, system bars, and display insets;
-5. refresh/transfer measurement and targeted-state improvements;
+5. **Complete:** refresh/transfer measurement and targeted-state improvements;
 6. renderer/error recovery and final Phase 9 physical-device regression.
 
 The order may combine closely related tests, but Phase 9 does not absorb the Phase 10 periodic cloud-backup design gate or the Phase 12 visual-fidelity phase.
 
-## 7. Verification baseline
+## 8. Verification baseline
 
 Inherited from completed Phase 8:
 
@@ -146,7 +161,15 @@ Phase 9 Milestone 4 verification:
 - host-side debug unit suite — **7/7 PASS**;
 - TypeScript no-emit check, production Vite build, Android asset packaging, Kotlin compilation, Android-test compilation, bridge drift gate, and packaged-asset gate — PASS.
 
-## 8. Device-test isolation requirement
+Phase 9 Milestone 5 verification:
+
+- focused navigation/targeted-refresh/transfer-measurement suite on `SM-A065F` — **1/1 PASS**;
+- combined Phase 9 navigation, recreation, keyboard/inset, and targeted-refresh suite — **5/5 PASS**;
+- complete isolated-QA connected-device regression — **216/216 PASS**, 0 skipped, 0 failed;
+- host-side debug unit suite — **7/7 PASS**;
+- TypeScript no-emit check, production Vite build, Android asset packaging, Kotlin compilation, Android-test compilation, bridge drift gate, and packaged-asset gate — PASS.
+
+## 9. Device-test isolation requirement
 
 Instrumentation must be run with `-Psaaf.isolatedQa=true`. That property adds the `.qa` application-ID suffix to the debug target, so the QA app has independent Android storage and may safely bootstrap its instrumentation owner. The normal `com.saaf.milkshop` debug installation is not cleared, borrowed, or authenticated by the test runner. Release code contains no authentication bypass.
 
@@ -154,4 +177,4 @@ Do not run the mutating complete instrumentation suite without the isolated-QA p
 
 ## Plain English
 
-Phase 8 made every shop screen work with real saved data. Phase 9 is making it behave like a proper phone app. The menu is grouped, Back behaves normally, screen recreation is secure, and forms now stay usable when the phone keyboard opens. The app header, bottom menu, dialogs, and phone bars also respect the real Samsung screen edges. Next comes reducing unnecessary background data reloads, then safe display-engine failure recovery and the final Phase 9 regression.
+Phase 8 made every shop screen work with real saved data. Phase 9 is making it behave like a proper phone app. The menu is grouped, Back behaves normally, screen recreation is secure, forms stay usable with the keyboard, and the app now rereads only the shop information affected by an action. For example, saving a product no longer reloads deliveries, financial reports, spoilage, history, cash closing, and settings. The final Phase 9 milestone is safe display-engine failure recovery and the closing physical-device regression.

@@ -1,12 +1,17 @@
 import type { EventMutationResultDto, IsoDateString, PurchaseRecordedResultDto, SaleRecordedResultDto, SessionHandle } from '../../bridge/contract.generated';
 import { callNative, rupeesToPaisa, validateDecimalInput } from '../../bridge/nativeBridge';
 import type { ExpenseDraft, PaymentDraft, ProductionDraft, PurchaseDraft, SalaryPaymentDraft, SaleDraft, SpoilageDraft } from './hybridModels';
+import type { RefreshPlan, RunAndRefresh } from './authorizedDataRefresh';
 
-type RunAndRefreshResult = <T>(operation: () => Promise<T>, success: string) => Promise<T>;
+const PURCHASE_REFRESH: RefreshPlan = ['masterData', 'dashboard', 'financialOverview', 'eventHistory'];
+const SALE_REFRESH: RefreshPlan = ['masterData', 'dashboard', 'cashierSummary', 'financialOverview', 'eventHistory', 'reconciliationArchive'];
+const PRODUCTION_REFRESH: RefreshPlan = ['masterData', 'dashboard', 'financialOverview', 'eventHistory'];
+const MONEY_REFRESH: RefreshPlan = ['masterData', 'dashboard', 'cashierSummary', 'financialOverview', 'eventHistory', 'reconciliationArchive'];
+const SPOILAGE_REFRESH: RefreshPlan = ['masterData', 'dashboard', 'financialOverview', 'spoilageHistory', 'eventHistory'];
 
 export function dailyOperationsBridgeActions(
   session: SessionHandle | null,
-  runAndRefresh: RunAndRefreshResult,
+  runAndRefresh: RunAndRefresh,
 ) {
   const recordPurchase = (draft: PurchaseDraft): Promise<PurchaseRecordedResultDto> => runAndRefresh(async () => {
     if (!session) throw new Error('Sign in to record a purchase.');
@@ -18,7 +23,7 @@ export function dailyOperationsBridgeActions(
       lrReading: validateDecimalInput(draft.lrReading, 'the LR reading'),
       ...(draft.notes.trim() ? { notes: draft.notes.trim() } : {}),
     }, session);
-  }, 'Supplier milk purchase recorded.');
+  }, 'Supplier milk purchase recorded.', PURCHASE_REFRESH);
 
   const recordSale = (draft: SaleDraft): Promise<SaleRecordedResultDto> => runAndRefresh(async () => {
     if (!session) throw new Error('Sign in to record a sale.');
@@ -37,7 +42,7 @@ export function dailyOperationsBridgeActions(
       surchargePaisa: draft.surchargeEnabled && draft.surchargeRupees.trim() ? rupeesToPaisa(draft.surchargeRupees) : null,
       ...(draft.notes.trim() ? { notes: draft.notes.trim() } : {}),
     }, session);
-  }, 'Sale recorded successfully.');
+  }, 'Sale recorded successfully.', SALE_REFRESH);
 
   const recordProduction = (draft: ProductionDraft): Promise<EventMutationResultDto> => runAndRefresh(async () => {
     if (!session) throw new Error('Sign in to record production.');
@@ -47,7 +52,7 @@ export function dailyOperationsBridgeActions(
       yogurtKgProduced: validateDecimalInput(draft.yogurtKgProduced, 'the yogurt produced'),
       ...(draft.notes.trim() ? { notes: draft.notes.trim() } : {}),
     }, session);
-  }, 'Production batch recorded.');
+  }, 'Production batch recorded.', PRODUCTION_REFRESH);
 
   const recordExpense = (draft: ExpenseDraft): Promise<EventMutationResultDto> => runAndRefresh(async () => {
     if (!session) throw new Error('Sign in to record an expense.');
@@ -58,7 +63,7 @@ export function dailyOperationsBridgeActions(
       occurredAt: draft.occurredAt as IsoDateString,
       ...(draft.notes.trim() ? { notes: draft.notes.trim() } : {}),
     }, session);
-  }, 'Expense recorded successfully.');
+  }, 'Expense recorded successfully.', MONEY_REFRESH);
 
   const recordPayment = (draft: PaymentDraft): Promise<EventMutationResultDto> => runAndRefresh(async () => {
     if (!session) throw new Error('Sign in to record a payment.');
@@ -71,7 +76,7 @@ export function dailyOperationsBridgeActions(
     return draft.kind === 'supplier'
       ? callNative('command.recordVendorPayment', { vendorAccountId: draft.partyAccountId, ...common }, session)
       : callNative('command.recordCreditCollection', { customerAccountId: draft.partyAccountId, ...common }, session);
-  }, draft.kind === 'supplier' ? 'Supplier payment recorded.' : 'Customer collection recorded.');
+  }, draft.kind === 'supplier' ? 'Supplier payment recorded.' : 'Customer collection recorded.', MONEY_REFRESH);
 
   const recordSalaryPayment = (draft: SalaryPaymentDraft): Promise<EventMutationResultDto> => runAndRefresh(async () => {
     if (!session) throw new Error('Sign in to record a salary payment.');
@@ -82,7 +87,7 @@ export function dailyOperationsBridgeActions(
       occurredAt: draft.occurredAt as IsoDateString,
       ...(draft.notes.trim() ? { notes: draft.notes.trim() } : {}),
     }, session);
-  }, 'Salary payment recorded.');
+  }, 'Salary payment recorded.', MONEY_REFRESH);
 
   const recordSpoilage = (draft: SpoilageDraft): Promise<EventMutationResultDto> => runAndRefresh(async () => {
     if (!session) throw new Error('Sign in to record spoiled stock.');
@@ -93,7 +98,7 @@ export function dailyOperationsBridgeActions(
       reasonCode: draft.reasonCode,
       ...(draft.notes.trim() ? { notes: draft.notes.trim() } : {}),
     }, session);
-  }, 'Spoiled stock recorded.');
+  }, 'Spoiled stock recorded.', SPOILAGE_REFRESH);
 
   return { recordExpense, recordPayment, recordProduction, recordPurchase, recordSalaryPayment, recordSale, recordSpoilage };
 }

@@ -1,9 +1,10 @@
 import type { CustomerDto, ProductDto, SessionHandle, VendorDto } from '../../bridge/contract.generated';
 import { callNative, paisaToRupeesInput, rupeesToPaisa, validateDecimalInput } from '../../bridge/nativeBridge';
 import type { CustomerDraft, ProductDraft, SupplierDraft } from './hybridModels';
+import type { RefreshPlan, RunAndRefresh } from './authorizedDataRefresh';
 
-type RunAndRefresh = (operation: () => Promise<void>, success: string) => Promise<void>;
-type RefreshAuthorizedData = () => Promise<void>;
+type RefreshAuthorizedData = (refresh: RefreshPlan) => Promise<void>;
+const MASTER_RECORDS: RefreshPlan = ['masterData', 'transactionReferences'];
 
 export function masterDataBridgeActions(
   session: SessionHandle | null,
@@ -21,11 +22,11 @@ export function masterDataBridgeActions(
     };
     if (productId) await callNative('command.updateProduct', { productId, ...payload }, session);
     else await callNative('command.createProduct', payload, session);
-  }, productId ? 'Product changes saved.' : 'Product added successfully.');
+  }, productId ? 'Product changes saved.' : 'Product added successfully.', MASTER_RECORDS);
 
   const setProductArchived = (product: ProductDto, archived: boolean) => runAndRefresh(async () => {
     if (session) await callNative('command.setProductArchived', { productId: product.productId, archived }, session);
-  }, archived ? `${product.name} moved to archived products.` : `${product.name} restored to active products.`);
+  }, archived ? `${product.name} moved to archived products.` : `${product.name} restored to active products.`, MASTER_RECORDS);
 
   const customerProfilePayload = (draft: CustomerDraft, accountId: CustomerDto['accountId']) => ({
     accountId,
@@ -46,9 +47,9 @@ export function masterDataBridgeActions(
         if (!accountId) accountId = (await callNative('command.createCustomer', { name: draft.name }, session)).entityId;
         else if (draft.name.trim() !== customer?.name) await callNative('command.renameCustomer', { accountId, name: draft.name }, session);
         await callNative('command.saveCustomerProfile', customerProfilePayload(draft, accountId), session);
-      }, customer ? 'Customer changes saved.' : 'Customer added successfully.');
+      }, customer ? 'Customer changes saved.' : 'Customer added successfully.', MASTER_RECORDS);
     } catch (failure) {
-      await refreshAuthorizedData().catch(() => undefined);
+      await refreshAuthorizedData(MASTER_RECORDS).catch(() => undefined);
       throw failure;
     }
   };
@@ -65,7 +66,7 @@ export function masterDataBridgeActions(
       dailyQuota: customer.dailyQuota ?? '',
       active,
     }, customer.accountId), session);
-  }, active ? `${customer.name} restored to active customers.` : `${customer.name} moved to inactive customers.`);
+  }, active ? `${customer.name} restored to active customers.` : `${customer.name} moved to inactive customers.`, MASTER_RECORDS);
 
   const supplierProfilePayload = (draft: SupplierDraft, accountId: VendorDto['accountId']) => ({
     accountId,
@@ -83,9 +84,9 @@ export function masterDataBridgeActions(
         if (!accountId) accountId = (await callNative('command.createVendor', { name: draft.name }, session)).entityId;
         else if (draft.name.trim() !== supplier?.name) await callNative('command.renameVendor', { accountId, name: draft.name }, session);
         await callNative('command.saveVendorProfile', supplierProfilePayload(draft, accountId), session);
-      }, supplier ? 'Supplier changes saved.' : 'Supplier added successfully.');
+      }, supplier ? 'Supplier changes saved.' : 'Supplier added successfully.', MASTER_RECORDS);
     } catch (failure) {
-      await refreshAuthorizedData().catch(() => undefined);
+      await refreshAuthorizedData(MASTER_RECORDS).catch(() => undefined);
       throw failure;
     }
   };
@@ -99,7 +100,7 @@ export function masterDataBridgeActions(
       notes: supplier.notes ?? '',
       active,
     }, supplier.accountId), session);
-  }, active ? `${supplier.name} restored to active suppliers.` : `${supplier.name} moved to inactive suppliers.`);
+  }, active ? `${supplier.name} restored to active suppliers.` : `${supplier.name} moved to inactive suppliers.`, MASTER_RECORDS);
 
   return { saveCustomer, saveProduct, saveSupplier, setCustomerActive, setProductArchived, setSupplierActive };
 }

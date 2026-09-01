@@ -1,8 +1,9 @@
 import type { DeliveryDto, DeliveryStatusCode, EntityMutationResultDto, IsoDateString, Int64String, SessionHandle } from '../../bridge/contract.generated';
 import { callNative, validateDecimalInput } from '../../bridge/nativeBridge';
 import type { DeliveryDraft } from './hybridModels';
+import type { RunAndRefresh } from './authorizedDataRefresh';
 
-type RunAndRefresh = <T>(operation: () => Promise<T>, success: string) => Promise<T>;
+const DELIVERY_RECORDS = ['deliveries'] as const;
 
 export function deliveryBridgeActions(session: SessionHandle | null, runAndRefresh: RunAndRefresh) {
   const createDelivery = (draft: DeliveryDraft): Promise<EntityMutationResultDto> => runAndRefresh(async () => {
@@ -16,7 +17,7 @@ export function deliveryBridgeActions(session: SessionHandle | null, runAndRefre
       ...(draft.route.trim() ? { route: draft.route.trim() } : {}),
       ...(draft.notes.trim() ? { notes: draft.notes.trim() } : {}),
     }, session);
-  }, 'Delivery added to the pending list.');
+  }, 'Delivery added to the pending list.', DELIVERY_RECORDS);
 
   const transitionDelivery = async (delivery: DeliveryDto, statusCode: DeliveryStatusCode, notes: string) => {
     await runAndRefresh(async () => {
@@ -26,21 +27,21 @@ export function deliveryBridgeActions(session: SessionHandle | null, runAndRefre
         statusCode,
         ...(notes.trim() ? { notes: notes.trim() } : {}),
       }, session);
-    }, statusCode === 'delivered' ? 'Delivery marked as delivered.' : 'Delivery cancelled.');
+    }, statusCode === 'delivered' ? 'Delivery marked as delivered.' : 'Delivery cancelled.', DELIVERY_RECORDS);
   };
 
   const linkDeliverySale = async (deliveryId: DeliveryDto['deliveryId'], saleEventId: Int64String) => {
     await runAndRefresh(async () => {
       if (!session) throw new Error('Sign in to link a sale.');
       await callNative('command.linkDeliverySale', { deliveryId, saleEventId }, session);
-    }, 'Sale record linked to the delivery.');
+    }, 'Sale record linked to the delivery.', DELIVERY_RECORDS);
   };
 
   const archiveDelivery = async (delivery: DeliveryDto) => {
     await runAndRefresh(async () => {
       if (!session) throw new Error('Sign in to archive a delivery.');
       await callNative('command.archiveDelivery', { deliveryId: delivery.deliveryId }, session);
-    }, 'Delivery removed from the active list.');
+    }, 'Delivery removed from the active list.', DELIVERY_RECORDS);
   };
 
   return { archiveDelivery, createDelivery, linkDeliverySale, transitionDelivery };

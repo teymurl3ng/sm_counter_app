@@ -1,10 +1,11 @@
 import type { CashCountResultDto, DailyCloseResultDto, Int64String, IsoDateString, ReconciliationArchiveDto, SessionHandle } from '../../bridge/contract.generated';
 import { callNative, rupeesToPaisa } from '../../bridge/nativeBridge';
 import type { CashCountDraft, ReopenDayDraft } from './hybridModels';
+import type { RefreshPlan, RunAndRefresh } from './authorizedDataRefresh';
 
-type Refresh = <T>(operation: () => Promise<T>, success: string) => Promise<T>;
+const RECONCILIATION_REFRESH: RefreshPlan = ['cashierSummary', 'eventHistory', 'reconciliationArchive'];
 
-export function reconciliationBridgeActions(session: SessionHandle | null, refresh: Refresh) {
+export function reconciliationBridgeActions(session: SessionHandle | null, refresh: RunAndRefresh) {
   const requireSession = (): SessionHandle => {
     if (!session) throw new Error('Sign in to count or close the cash drawer.');
     return session;
@@ -18,6 +19,7 @@ export function reconciliationBridgeActions(session: SessionHandle | null, refre
       ...(draft.notes.trim() ? { notes: draft.notes.trim() } : {}),
     }, requireSession()),
     'Cash count saved. The app has now compared it with the expected drawer cash.',
+    RECONCILIATION_REFRESH,
   );
   const closeDate = (businessDate: string, countId: Int64String, varianceReason: string): Promise<DailyCloseResultDto> => refresh(
     () => callNative('command.closeBusinessDate', {
@@ -26,11 +28,12 @@ export function reconciliationBridgeActions(session: SessionHandle | null, refre
       ...(varianceReason.trim() ? { varianceReason: varianceReason.trim() } : {}),
     }, requireSession()),
     `${businessDate} is closed. Earlier shop records are now protected.`,
+    RECONCILIATION_REFRESH,
   );
   const reopenDate = (draft: ReopenDayDraft): Promise<DailyCloseResultDto> => refresh(async () => {
     const activeSession = requireSession();
     await callNative('command.auth.reauthenticate', { passphrase: draft.passphrase }, activeSession);
     return callNative('command.reopenBusinessDate', { businessDate: draft.businessDate as IsoDateString, reason: draft.reason.trim() }, activeSession);
-  }, `${draft.businessDate} was reopened. Count the drawer again before closing it.`);
+  }, `${draft.businessDate} was reopened. Count the drawer again before closing it.`, RECONCILIATION_REFRESH);
   return { closeDate, loadArchive, recordCount, reopenDate };
 }

@@ -18,6 +18,7 @@ import { errorMessage } from './hybridModels';
 import { useAuthorizedWorkspaceData } from './useAuthorizedWorkspaceData';
 import { useHybridSession } from './useHybridSession';
 import { useUsableViewport } from './useUsableViewport';
+import type { RefreshPlan } from './authorizedDataRefresh';
 
 export function HybridAppShell() {
   useUsableViewport();
@@ -33,6 +34,7 @@ export function HybridAppShell() {
     eventHistory,
     reconciliationArchive,
     loadAuthorizedData,
+    refreshAuthorizedData,
     clearAuthorizedData,
   } = useAuthorizedWorkspaceData();
   const hybridSession = useHybridSession(loadAuthorizedData, clearAuthorizedData);
@@ -43,31 +45,14 @@ export function HybridAppShell() {
   const securityActions = useMemo(() => securityBridgeActions(session), [session]);
   const backupActions = useMemo(() => backupBridgeActions(session), [session]);
 
-  const withMasterDataRefresh = async (operation: () => Promise<void>, success: string) => {
-    if (!session || !currentUser) return;
-    setBusy(true);
-    setError(null);
-    setNotice(null);
-    try {
-      await operation();
-      await loadAuthorizedData(session, currentUser);
-      setNotice(success);
-    } catch (failure) {
-      setError(errorMessage(failure));
-      throw failure;
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const withResultRefresh = async <T,>(operation: () => Promise<T>, success: string): Promise<T> => {
+  const withRefresh = async <T,>(operation: () => Promise<T>, success: string, refresh: RefreshPlan): Promise<T> => {
     if (!session || !currentUser) throw new Error('Sign in to continue.');
     setBusy(true);
     setError(null);
     setNotice(null);
     try {
       const result = await operation();
-      await loadAuthorizedData(session, currentUser);
+      await refreshAuthorizedData(session, currentUser, refresh);
       setNotice(success);
       return result;
     } catch (failure) {
@@ -84,16 +69,16 @@ export function HybridAppShell() {
   if (stage === 'login') return <Login busy={busy} error={error} notice={notice} onSubmit={hybridSession.login} onRecover={hybridSession.recoverOwner} />;
   if (stage === 'recovery' && recoveryCode) return <RecoveryCodeScreen recoveryCode={recoveryCode} onSaved={hybridSession.acknowledgeRecoveryCode} />;
 
-  const employeeActions = employeeBridgeActions(session, withMasterDataRefresh);
-  const masterDataActions = masterDataBridgeActions(session, withMasterDataRefresh, async () => {
-    if (session && currentUser) await loadAuthorizedData(session, currentUser);
+  const employeeActions = employeeBridgeActions(session, withRefresh);
+  const masterDataActions = masterDataBridgeActions(session, withRefresh, async (refresh) => {
+    if (session && currentUser) await refreshAuthorizedData(session, currentUser, refresh);
   });
-  const settingsActions = settingsBridgeActions(session, withMasterDataRefresh);
-  const dailyOperationsActions = dailyOperationsBridgeActions(session, withResultRefresh);
-  const deliveryActions = deliveryBridgeActions(session, withResultRefresh);
+  const settingsActions = settingsBridgeActions(session, withRefresh);
+  const dailyOperationsActions = dailyOperationsBridgeActions(session, withRefresh);
+  const deliveryActions = deliveryBridgeActions(session, withRefresh);
   const ledgerActions = ledgerBridgeActions(session);
-  const historyActions = historyBridgeActions(session, withResultRefresh);
-  const reconciliationActions = reconciliationBridgeActions(session, withResultRefresh);
+  const historyActions = historyBridgeActions(session, withRefresh);
+  const reconciliationActions = reconciliationBridgeActions(session, withRefresh);
   const restoreBackup = async (ticket: Parameters<typeof backupActions.restoreBackup>[0]) => {
     const result = await backupActions.restoreBackup(ticket);
     hybridSession.finishRestore();

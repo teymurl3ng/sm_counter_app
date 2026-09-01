@@ -18,6 +18,7 @@ import type {
 export type CostingPlanningBundle = { costing: CostingManagementDto; planning: PlanningDto };
 
 export function costingPlanningBridgeActions(session: SessionHandle | null) {
+  let currentBundle: CostingPlanningBundle | null = null;
   const requireSession = (): SessionHandle => {
     if (!session) throw new Error('Sign in as the owner or administrator to continue.');
     return session;
@@ -28,15 +29,26 @@ export function costingPlanningBridgeActions(session: SessionHandle | null) {
       callNative('query.costingManagement', {}, active),
       callNative('query.planning', {}, active),
     ]);
-    return { costing, planning };
+    currentBundle = { costing, planning };
+    return currentBundle;
   };
   const reauthenticate = (passphrase: string) => callNative('command.auth.reauthenticate', { passphrase }, requireSession());
-  const mutate = async (operation: () => Promise<unknown>): Promise<CostingPlanningBundle> => {
+  const mutatePlanning = async (operation: () => Promise<unknown>): Promise<CostingPlanningBundle> => {
     await operation();
-    return load();
+    if (!currentBundle) return load();
+    const planning = await callNative('query.planning', {}, requireSession());
+    currentBundle = { ...currentBundle, planning };
+    return currentBundle;
+  };
+  const mutateCosting = async (operation: () => Promise<unknown>): Promise<CostingPlanningBundle> => {
+    await operation();
+    if (!currentBundle) return load();
+    const costing = await callNative('query.costingManagement', {}, requireSession());
+    currentBundle = { ...currentBundle, costing };
+    return currentBundle;
   };
 
-  const saveBudget = (draft: BudgetDraft) => mutate(() => callNative('command.upsertBudget', {
+  const saveBudget = (draft: BudgetDraft) => mutatePlanning(() => callNative('command.upsertBudget', {
     categoryCode: draft.categoryCode,
     periodStart: draft.periodStart as IsoDateString,
     periodEndExclusive: draft.periodEndExclusive as IsoDateString,
@@ -44,18 +56,18 @@ export function costingPlanningBridgeActions(session: SessionHandle | null) {
     plannedAmountPaisa: draft.categoryCode === 'Milk purchases' ? null : rupeesToPaisa(draft.plannedValue),
   }, requireSession()));
 
-  const copyBudget = (draft: BudgetDraft) => mutate(() => callNative('command.copyPreviousBudget', {
+  const copyBudget = (draft: BudgetDraft) => mutatePlanning(() => callNative('command.copyPreviousBudget', {
     categoryCode: draft.categoryCode,
     periodStart: draft.periodStart as IsoDateString,
     periodEndExclusive: draft.periodEndExclusive as IsoDateString,
   }, requireSession()));
 
-  const saveCollectionsTarget = (draft: CollectionsTargetDraft) => mutate(() => callNative('command.upsertCollectionsTarget', {
+  const saveCollectionsTarget = (draft: CollectionsTargetDraft) => mutatePlanning(() => callNative('command.upsertCollectionsTarget', {
     weekStart: draft.weekStart as IsoDateString,
     targetAmountPaisa: rupeesToPaisa(draft.targetRupees),
   }, requireSession()));
 
-  const saveCostingPolicy = (draft: CostingPolicyDraft, passphrase: string) => mutate(async () => {
+  const saveCostingPolicy = (draft: CostingPolicyDraft, passphrase: string) => mutateCosting(async () => {
     await reauthenticate(passphrase);
     return callNative('command.approveCostingPolicy', {
       calendarMonth: draft.calendarMonth as YearMonthString,
@@ -71,7 +83,7 @@ export function costingPlanningBridgeActions(session: SessionHandle | null) {
     }, requireSession());
   });
 
-  const saveOpeningBasis = (draft: OpeningCostBasisDraft, passphrase: string) => mutate(async () => {
+  const saveOpeningBasis = (draft: OpeningCostBasisDraft, passphrase: string) => mutateCosting(async () => {
     await reauthenticate(passphrase);
     return callNative('command.recordOpeningCostBasis', {
       openingEventId: draft.openingEventId,
@@ -84,7 +96,7 @@ export function costingPlanningBridgeActions(session: SessionHandle | null) {
     }, requireSession());
   });
 
-  const saveYieldPolicy = (draft: YieldPolicyDraft, passphrase: string) => mutate(async () => {
+  const saveYieldPolicy = (draft: YieldPolicyDraft, passphrase: string) => mutateCosting(async () => {
     if (draft.acceptedProductionEventIds.length < 30) throw new Error('Choose at least 30 representative yogurt batches.');
     await reauthenticate(passphrase);
     return callNative('command.approveYieldPolicy', {
@@ -94,7 +106,7 @@ export function costingPlanningBridgeActions(session: SessionHandle | null) {
     }, requireSession());
   });
 
-  const saveLossAssessment = (draft: LossAssessmentDraft, passphrase: string) => mutate(async () => {
+  const saveLossAssessment = (draft: LossAssessmentDraft, passphrase: string) => mutateCosting(async () => {
     await reauthenticate(passphrase);
     return callNative('command.recordProductionLossAssessment', {
       productionEventId: draft.productionEventId,

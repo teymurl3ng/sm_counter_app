@@ -1,8 +1,11 @@
 import type { CommandRecordOpeningStateRequest, ExpenseCategoryDto, Int64String, IsoDateString, SessionHandle } from '../../bridge/contract.generated';
 import { callNative, rupeesToPaisa, validateDecimalInput } from '../../bridge/nativeBridge';
 import type { BusinessRatesDraft, OpeningStateDraft, StoreIdentityDraft } from './hybridModels';
+import type { RefreshPlan, RunAndRefresh } from './authorizedDataRefresh';
 
-type RunAndRefresh = (operation: () => Promise<void>, success: string) => Promise<void>;
+const RATE_SETTINGS: RefreshPlan = ['businessSettings', 'transactionReferences'];
+const EXPENSE_CATEGORIES: RefreshPlan = ['masterData', 'businessSettings', 'transactionReferences'];
+const OPENING_STATE: RefreshPlan = ['masterData', 'businessSettings', 'dashboard', 'cashierSummary', 'financialOverview', 'eventHistory', 'reconciliationArchive'];
 
 export function settingsBridgeActions(session: SessionHandle | null, runAndRefresh: RunAndRefresh) {
   const saveStoreIdentity = (draft: StoreIdentityDraft) => runAndRefresh(async () => {
@@ -12,7 +15,7 @@ export function settingsBridgeActions(session: SessionHandle | null, runAndRefre
       phone: draft.phone.trim() || null,
       address: draft.address.trim() || null,
     }, session);
-  }, 'Shop details saved.');
+  }, 'Shop details saved.', ['businessSettings']);
 
   const updateBusinessSettings = (draft: BusinessRatesDraft) => runAndRefresh(async () => {
     if (!session) return;
@@ -24,15 +27,15 @@ export function settingsBridgeActions(session: SessionHandle | null, runAndRefre
       retailYogurtRatePaisaPerUnit: positivePaisa(draft.retailYogurtRateRupees, 'retail yogurt selling rate'),
       defaultDeliverySurchargePaisa: positivePaisa(draft.defaultDeliverySurchargeRupees, 'default delivery surcharge'),
     }, session);
-  }, 'Shop-wide rates saved.');
+  }, 'Shop-wide rates saved.', RATE_SETTINGS);
 
   const createExpenseCategory = (displayName: string) => runAndRefresh(async () => {
     if (session) await callNative('command.createExpenseCategory', { displayName }, session);
-  }, 'Expense category added.');
+  }, 'Expense category added.', EXPENSE_CATEGORIES);
 
   const setExpenseCategoryArchived = (category: ExpenseCategoryDto, archived: boolean) => runAndRefresh(async () => {
     if (session) await callNative('command.setExpenseCategoryArchived', { accountId: category.accountId, archived }, session);
-  }, archived ? `${category.displayName} moved to inactive categories.` : `${category.displayName} restored to active categories.`);
+  }, archived ? `${category.displayName} moved to inactive categories.` : `${category.displayName} restored to active categories.`, EXPENSE_CATEGORIES);
 
   const saveOpeningState = (draft: OpeningStateDraft, passphrase: string, correction: boolean) => runAndRefresh(async () => {
     if (!session) return;
@@ -52,7 +55,7 @@ export function settingsBridgeActions(session: SessionHandle | null, runAndRefre
     await callNative('command.auth.reauthenticate', { passphrase }, session);
     if (correction) await callNative('command.correctOpeningState', payload, session);
     else await callNative('command.recordOpeningState', payload, session);
-  }, correction ? 'Opening balances corrected. The earlier record remains in history.' : 'Opening balances recorded.');
+  }, correction ? 'Opening balances corrected. The earlier record remains in history.' : 'Opening balances recorded.', OPENING_STATE);
 
   return { createExpenseCategory, saveOpeningState, saveStoreIdentity, setExpenseCategoryArchived, updateBusinessSettings };
 }

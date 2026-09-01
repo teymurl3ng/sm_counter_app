@@ -7,8 +7,9 @@ import type {
 } from '../../bridge/contract.generated';
 import { callNative, paisaToRupeesInput, rupeesToPaisa } from '../../bridge/nativeBridge';
 import type { EmployeeDraft } from './hybridModels';
+import type { RefreshPlan, RunAndRefresh } from './authorizedDataRefresh';
 
-type RunAndRefresh = (operation: () => Promise<void>, success: string) => Promise<void>;
+const EMPLOYEE_RECORDS: RefreshPlan = ['masterData', 'transactionReferences'];
 
 export function employeeBridgeActions(session: SessionHandle | null, runAndRefresh: RunAndRefresh) {
   const profilePayload = (draft: EmployeeDraft, accountId: EmployeeDto['accountId']) => ({
@@ -31,7 +32,7 @@ export function employeeBridgeActions(session: SessionHandle | null, runAndRefre
         if (draft.name.trim() !== employee.name) await callNative('command.renameEmployee', { accountId, name: draft.name }, session);
       }
       await callNative('command.saveEmployeeProfile', profilePayload(draft, accountId), session);
-    }, employee ? 'Employee changes saved.' : 'Employee added successfully.');
+    }, employee ? 'Employee changes saved.' : 'Employee added successfully.', EMPLOYEE_RECORDS);
   };
 
   const setEmployeeActive = (employee: EmployeeDto, active: boolean) => runAndRefresh(async () => {
@@ -45,7 +46,7 @@ export function employeeBridgeActions(session: SessionHandle | null, runAndRefre
       joinDate: employee.joinDate ?? '',
       active,
     }, employee.accountId), session);
-  }, active ? `${employee.name} restored to active employees.` : `${employee.name} moved to inactive employees.`);
+  }, active ? `${employee.name} restored to active employees.` : `${employee.name} moved to inactive employees.`, EMPLOYEE_RECORDS);
 
   const loadAttendance = (businessDate: string): Promise<ReadonlyArray<AttendanceDto>> => {
     if (!session) return Promise.resolve([]);
@@ -65,7 +66,7 @@ export function employeeBridgeActions(session: SessionHandle | null, runAndRefre
       statusCode,
       ...(notes.trim() ? { notes: notes.trim() } : {}),
     }, session);
-  }, 'Attendance saved.');
+  }, 'Attendance saved.', []);
 
   return { loadAttendance, recordAttendance, saveEmployee, setEmployeeActive };
 }

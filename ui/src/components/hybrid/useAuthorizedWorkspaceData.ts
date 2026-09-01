@@ -15,6 +15,7 @@ import type {
   TransactionReferencesDto,
 } from '../../bridge/contract.generated';
 import { callNative } from '../../bridge/nativeBridge';
+import { ALL_AUTHORIZED_DATA, type RefreshPlan } from './authorizedDataRefresh';
 
 export function useAuthorizedWorkspaceData() {
   const [masterData, setMasterData] = useState<MasterDataDto | null>(null);
@@ -28,32 +29,31 @@ export function useAuthorizedWorkspaceData() {
   const [eventHistory, setEventHistory] = useState<ReadonlyArray<EventHistoryDto> | null>(null);
   const [reconciliationArchive, setReconciliationArchive] = useState<ReconciliationArchiveDto | null>(null);
 
-  const loadAuthorizedData = useCallback(async (session: SessionHandle, user: CurrentSessionDto) => {
+  const refreshAuthorizedData = useCallback(async (session: SessionHandle, user: CurrentSessionDto, plan: RefreshPlan) => {
     const today = localDate(0);
     const tomorrow = localDate(1);
-    const [loadedMasterData, loadedReferences, loadedSettings, loadedDashboard, loadedCashierSummary, loadedFinancialOverview, loadedSpoilageHistory, loadedDeliveries, loadedEventHistory, loadedReconciliationArchive] = await Promise.all([
-      user.effectivePermissionCodes.includes('manage_master_data') ? callNative('query.masterData', {}, session) : Promise.resolve(null),
-      user.effectivePermissionCodes.includes('view_operational') ? callNative('query.transactionReferences', {}, session) : Promise.resolve(null),
-      user.effectivePermissionCodes.includes('manage_business_settings') ? callNative('query.businessSettings', {}, session) : Promise.resolve(null),
-      user.effectivePermissionCodes.includes('view_operational') ? callNative('query.dashboard', { startDateInclusive: today, endDateExclusive: tomorrow }, session) : Promise.resolve(null),
-      user.effectivePermissionCodes.includes('sale_and_collection') ? callNative('query.cashierSummary', { startDateInclusive: today, endDateExclusive: tomorrow }, session) : Promise.resolve(null),
-      user.effectivePermissionCodes.includes('view_full_financial') ? callNative('query.financialOverview', { startDateInclusive: today, endDateExclusive: tomorrow }, session) : Promise.resolve(null),
-      user.effectivePermissionCodes.includes('production_and_spoilage') ? callNative('query.spoilageHistory', {}, session) : Promise.resolve(null),
-      user.effectivePermissionCodes.includes('delivery') ? callNative('query.deliveries', {}, session) : Promise.resolve(null),
-      user.effectivePermissionCodes.includes('view_operational') ? callNative('query.eventHistory', {}, session) : Promise.resolve(null),
-      user.effectivePermissionCodes.includes('cash_count_and_close') ? callNative('query.reconciliationArchive', {}, session) : Promise.resolve(null),
-    ]);
-    setMasterData(loadedMasterData);
-    setTransactionReferences(loadedReferences);
-    setBusinessSettings(loadedSettings);
-    setDashboard(loadedDashboard);
-    setCashierSummary(loadedCashierSummary);
-    setFinancialOverview(loadedFinancialOverview);
-    setSpoilageHistory(loadedSpoilageHistory);
-    setDeliveries(loadedDeliveries);
-    setEventHistory(loadedEventHistory);
-    setReconciliationArchive(loadedReconciliationArchive);
+    const requested = new Set(plan);
+    const permissions = new Set(user.effectivePermissionCodes);
+    const tasks: Array<Promise<unknown>> = [];
+
+    if (requested.has('masterData')) tasks.push(permissions.has('manage_master_data') ? callNative('query.masterData', {}, session).then(setMasterData) : Promise.resolve(setMasterData(null)));
+    if (requested.has('transactionReferences')) tasks.push(permissions.has('view_operational') ? callNative('query.transactionReferences', {}, session).then(setTransactionReferences) : Promise.resolve(setTransactionReferences(null)));
+    if (requested.has('businessSettings')) tasks.push(permissions.has('manage_business_settings') ? callNative('query.businessSettings', {}, session).then(setBusinessSettings) : Promise.resolve(setBusinessSettings(null)));
+    if (requested.has('dashboard')) tasks.push(permissions.has('view_operational') ? callNative('query.dashboard', { startDateInclusive: today, endDateExclusive: tomorrow }, session).then(setDashboard) : Promise.resolve(setDashboard(null)));
+    if (requested.has('cashierSummary')) tasks.push(permissions.has('sale_and_collection') ? callNative('query.cashierSummary', { startDateInclusive: today, endDateExclusive: tomorrow }, session).then(setCashierSummary) : Promise.resolve(setCashierSummary(null)));
+    if (requested.has('financialOverview')) tasks.push(permissions.has('view_full_financial') ? callNative('query.financialOverview', { startDateInclusive: today, endDateExclusive: tomorrow }, session).then(setFinancialOverview) : Promise.resolve(setFinancialOverview(null)));
+    if (requested.has('spoilageHistory')) tasks.push(permissions.has('production_and_spoilage') ? callNative('query.spoilageHistory', {}, session).then(setSpoilageHistory) : Promise.resolve(setSpoilageHistory(null)));
+    if (requested.has('deliveries')) tasks.push(permissions.has('delivery') ? callNative('query.deliveries', {}, session).then(setDeliveries) : Promise.resolve(setDeliveries(null)));
+    if (requested.has('eventHistory')) tasks.push(permissions.has('view_operational') ? callNative('query.eventHistory', {}, session).then(setEventHistory) : Promise.resolve(setEventHistory(null)));
+    if (requested.has('reconciliationArchive')) tasks.push(permissions.has('cash_count_and_close') ? callNative('query.reconciliationArchive', {}, session).then(setReconciliationArchive) : Promise.resolve(setReconciliationArchive(null)));
+
+    await Promise.all(tasks);
   }, []);
+
+  const loadAuthorizedData = useCallback(
+    (session: SessionHandle, user: CurrentSessionDto) => refreshAuthorizedData(session, user, ALL_AUTHORIZED_DATA),
+    [refreshAuthorizedData],
+  );
 
   const clearAuthorizedData = useCallback(() => {
     setMasterData(null);
@@ -80,6 +80,7 @@ export function useAuthorizedWorkspaceData() {
     eventHistory,
     reconciliationArchive,
     loadAuthorizedData,
+    refreshAuthorizedData,
     clearAuthorizedData,
   };
 }

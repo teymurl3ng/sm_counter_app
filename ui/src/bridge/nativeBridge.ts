@@ -12,6 +12,7 @@ import {
   type PaisaString,
   type SessionHandle,
 } from './contract.generated';
+import { recordBridgeRequest, recordBridgeResponse } from './bridgeMetrics';
 
 interface InjectedNativeBridge {
   postMessage(message: string): void;
@@ -25,6 +26,8 @@ declare global {
 }
 
 interface PendingRequest {
+  action: BridgeAction;
+  startedAt: number;
   resolve(value: unknown): void;
   reject(reason: unknown): void;
   timeout: number;
@@ -151,6 +154,7 @@ function receiveMessage(event: MessageEvent<string>): void {
   if (!item) return;
   pending.delete(response.requestId);
   window.clearTimeout(item.timeout);
+  recordBridgeResponse(item.action, event.data.length, item.startedAt, !response.ok);
   if (response.ok) item.resolve(response.data);
   else item.reject(new NativeBridgeError(response.error));
 }
@@ -168,21 +172,27 @@ export function callNative<A extends BridgeAction>(
     ...(sessionHandle ? { sessionHandle } : {}),
     payload,
   };
+  const serializedRequest = JSON.stringify(request);
+  const startedAt = recordBridgeRequest(action, serializedRequest.length);
   return new Promise<BridgeResponseByAction[A]>((resolve, reject) => {
     const timeout = window.setTimeout(() => {
       pending.delete(requestId);
+      recordBridgeResponse(action, 0, startedAt, true);
       reject(new Error('The app took too long to respond. Please try again.'));
     }, 30_000);
     pending.set(requestId, {
+      action,
+      startedAt,
       resolve: (value) => resolve(value as BridgeResponseByAction[A]),
       reject,
       timeout,
     });
     try {
-      bridge().postMessage(JSON.stringify(request));
+      bridge().postMessage(serializedRequest);
     } catch (error) {
       pending.delete(requestId);
       window.clearTimeout(timeout);
+      recordBridgeResponse(action, 0, startedAt, true);
       reject(error);
     }
   });

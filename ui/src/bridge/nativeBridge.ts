@@ -55,6 +55,7 @@ export const RUNTIME_ACTIONS = [
   'query.dashboard',
   'query.cashierSummary',
   'query.financialOverview',
+  'query.profitabilityReport',
   'command.recordPurchase',
   'command.recordSale',
   'command.recordProduction',

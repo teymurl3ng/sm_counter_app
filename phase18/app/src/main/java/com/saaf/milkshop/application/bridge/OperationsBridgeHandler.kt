@@ -23,6 +23,7 @@ internal class OperationsBridgeHandler(
         HybridBridgeActions.DASHBOARD -> dashboard(request)
         HybridBridgeActions.CASHIER_SUMMARY -> cashierSummary(request)
         HybridBridgeActions.FINANCIAL_OVERVIEW -> financialOverview(request)
+        HybridBridgeActions.PROFITABILITY_REPORT -> profitabilityReport(request)
         HybridBridgeActions.RECORD_PURCHASE -> recordPurchase(request)
         HybridBridgeActions.RECORD_SALE -> recordSale(request)
         HybridBridgeActions.RECORD_PRODUCTION -> recordProduction(request)
@@ -48,6 +49,20 @@ internal class OperationsBridgeHandler(
     private suspend fun financialOverview(request: BridgeRequest): JSONObject {
         val (start, end) = request.dateRange()
         return financialOverviewJson(reads.financialOverview(request.requireSession(), start, end))
+    }
+
+    private suspend fun profitabilityReport(request: BridgeRequest): JSONObject {
+        strictPayload(request.payload, setOf("startInclusive", "endExclusive"))
+        val start = request.payload.requiredDate("startInclusive")
+        val end = request.payload.requiredDate("endExclusive")
+        if (!LocalDate.parse(end).isAfter(LocalDate.parse(start))) {
+            throw BridgeProtocolFailure(
+                "invalid_request",
+                "endExclusive must be after startInclusive",
+                "endExclusive",
+            )
+        }
+        return profitabilityReportJson(reads.profitabilityReport(request.requireSession(), start, end))
     }
 
     private suspend fun spoilageHistory(request: BridgeRequest): org.json.JSONArray {

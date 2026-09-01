@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { BusinessSettingsDto, CashierSummaryDto, CurrentSessionDto, DashboardDto, DeliveryDto, EventHistoryDto, FinancialOverviewDto, IsoDateString, MasterDataDto, ReconciliationArchiveDto, SessionHandle, SpoilageDto, TransactionReferencesDto } from '../../bridge/contract.generated';
 import { callNative, NativeBridgeError, verifyNativeContract } from '../../bridge/nativeBridge';
 import { Login, OwnerSetup, RecoveryCodeScreen } from './AuthScreens';
@@ -10,6 +10,7 @@ import { deliveryBridgeActions } from './deliveryBridgeActions';
 import { ledgerBridgeActions } from './ledgerBridgeActions';
 import { historyBridgeActions } from './historyBridgeActions';
 import { reconciliationBridgeActions } from './reconciliationBridgeActions';
+import { reportBridgeActions } from './reportBridgeActions';
 import { masterDataBridgeActions } from './masterDataBridgeActions';
 import { settingsBridgeActions } from './settingsBridgeActions';
 import { errorMessage, type HybridStage } from './hybridModels';
@@ -117,6 +118,8 @@ export function Phase8HybridShell() {
     return () => document.removeEventListener('visibilitychange', resume);
   }, [clearSession, loadAuthorizedData, session]);
 
+  const reportActions = useMemo(() => reportBridgeActions(session), [session]);
+
   const withMasterDataRefresh = async (operation: () => Promise<void>, success: string) => {
     if (!session || !currentUser) return;
     setBusy(true);
@@ -210,7 +213,6 @@ export function Phase8HybridShell() {
   const ledgerActions = ledgerBridgeActions(session);
   const historyActions = historyBridgeActions(session, withResultRefresh);
   const reconciliationActions = reconciliationBridgeActions(session, withResultRefresh);
-
   return <ManagementWorkspace
     busy={busy}
     currentUser={currentUser}
@@ -244,6 +246,7 @@ export function Phase8HybridShell() {
     onRecordCashCount={reconciliationActions.recordCount}
     onCloseBusinessDate={reconciliationActions.closeDate}
     onReopenBusinessDate={reconciliationActions.reopenDate}
+    onLoadReports={reportActions.loadReports}
     onSaveProduct={masterDataActions.saveProduct}
     onSetProductArchived={masterDataActions.setProductArchived}
     onSaveCustomer={masterDataActions.saveCustomer}

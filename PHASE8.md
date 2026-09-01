@@ -32,7 +32,7 @@ The frozen logic specification, SQL blueprint, Phase 5 DTO catalog, and Phase 6 
 | Customer/supplier ledgers | account-ledger query plus collection/payment commands | **Milestone 15 complete** | Canonical balances, movements, running balances, inactive history, and contextual payments are device-proven. |
 | History and corrections | event history/detail and correction command | **Milestone 16 complete** | Append-only correction chains, native authority, actor attribution, and superseded visibility are device-proven. |
 | Cash count and daily close | reconciliation query and count/close/reopen commands | **Milestone 17 complete** | Independent physical counts, honest variances, verified close/reopen actors, and date locking are device-proven. |
-| Dashboard and reports | dashboard, cashier, financial, profitability queries | Queued | Translate coverage/costing codes into plain shop language. |
+| Dashboard and reports | dashboard, cashier, financial, profitability queries | **Milestone 18 complete** | Canonical date-range totals, role-filtered detail, and honest costing coverage are device-proven. |
 | Costing and planning controls | costing/planning queries and versioned policy/target commands | Queued | Sensitive changes require the contract's recent-authentication rule. |
 | Staff users and security audit | users/audit queries and user-administration commands | Queued | Owner controls role/status; employee linkage remains optional. |
 | Encrypted backup and restore | backup system actions | Queued | Retain picker/ticket, inspection, confirmation, and session invalidation boundaries. |
@@ -313,7 +313,24 @@ The active app now provides a permission-aware Cash Close area:
 
 The runtime now advertises fifty-five implemented actions: `query.reconciliationArchive`, `command.recordPhysicalCashCount`, `command.closeBusinessDate`, and `command.reopenBusinessDate` join the prior fifty-one. Contract version 2 remains at 78 operations with the same manifest hash. No Room schema, cash-balance formula, variance rule, date-lock rule, role bundle, or frozen business contract changed.
 
-## 20. Safety and business boundaries
+## 20. Milestone 18 — Dashboard and Reports
+
+The active app now provides a permission-aware Dashboard area:
+
+- every signed-in role with `VIEW_OPERATIONAL` can choose an inclusive From/Through period and view canonical current stock plus recorded purchase, sale, and production quantities;
+- owners, admins, managers, and cashiers with `SALE_AND_COLLECTION` can also see period sales, customer collections, and current payment-account positions;
+- only owners, admins, and managers with `VIEW_FULL_FINANCIAL` can see customer/supplier positions, purchase/expense/salary/payment totals, product cost, margins, spoilage cost, abnormal loss, and the estimated recorded result;
+- date inputs are converted once to the contract's end-exclusive range and are rejected when reversed or invalid;
+- React renders the native dashboard, cashier, financial, and profitability DTOs without summing accounts, deriving cost, calculating margin, or inventing a result;
+- the overall figure is deliberately labelled “Estimated result from recorded data,” not net profit or take-home money, and is described as separate from cash and bank balances;
+- missing opening cost, stale yogurt conversion policy, unsupported stock flow, and partial coverage are translated into plain shop language; unavailable cost and result values remain unavailable rather than becoming zero;
+- the screen discloses that the report is a management estimate using saved product costs and that the current scope is recorded cost only, with no lower-selling-price/NRV adjustment;
+- current stock and current account positions are explicitly labelled as current even when the selected activity period is historical;
+- the former synthetic prototype Reports view remains inactive and is not used as business truth.
+
+The runtime now advertises fifty-six implemented actions: `query.profitabilityReport` joins the prior fifty-five. Contract version 2 remains at 78 operations with the same manifest hash. No Room schema, costing formula, reporting basis, valuation scope, permission bundle, or frozen business contract changed.
+
+## 21. Safety and business boundaries
 
 - Archiving changes future availability; it does not delete products or rewrite transaction history.
 - Inventory quantity remains event-derived. This screen has no direct “set stock” operation.
@@ -357,10 +374,13 @@ The runtime now advertises fifty-five implemented actions: `query.reconciliation
 - Non-zero cash variance always requires an explanation before close, but the explanation does not convert the variance into income or expense.
 - Close/reopen identity comes only from the native session; reopening requires native recent authentication and cannot be authorized by React.
 - A closed business date returns `day_closed` before posting, and the database close-day trigger remains the final guard.
+- React never sums report fields, derives COGS, margin, spoilage cost, abnormal loss, or an overall result; it displays native read-model values and translates stable coverage codes only.
+- A missing report cost or result remains visibly unavailable; it is never presented as zero.
+- The estimated recorded result is a cost-based management view, not cash, bank balance, statutory net income, or owner take-home money.
 - The old prototype view model remains inactive and is not imported by the packaged app.
 - No Room schema, frozen business formula, permission bundle, or canonical bridge endpoint changed. The additive `TransactionReferencesDto.expenseCategories` field is the documented contract-v2 amendment.
 
-## 21. Structural refactor checkpoint
+## 22. Structural refactor checkpoint
 
 Before starting Supplier Profiles, the active hybrid path was reorganized without changing its public behavior:
 
@@ -370,9 +390,9 @@ Before starting Supplier Profiles, the active hybrid path was reorganized withou
 - generated contract projections and inactive inherited prototype screens were deliberately left alone;
 - future handwritten files should be reviewed for separation when they approach roughly 300–400 lines, with responsibility and cohesion taking priority over an arbitrary number.
 
-The structural checkpoint changed no Room schema, permission rule, accounting formula, or existing user workflow. The two growing Daily Operations Kotlin files remain cohesive at 343 and 342 lines, inside the 300–400-line review band. Delivery, ledger, and history/correction work remain isolated from Daily Operations. Cash-close work adds a focused native handler and command service plus separate React action, presentation, count form, close/reopen panel, archive list, and workspace files. The main workspace and shell remain below 300 lines. The focused purchase, sale, production, expense, payment, salary-payment, spoilage, delivery, ledger, History/Corrections, and Cash Count/Daily Close suites are each **4/4 PASS**. The complete suite is now **192/192 PASS**.
+The structural checkpoint changed no Room schema, permission rule, accounting formula, or existing user workflow. The two growing Daily Operations Kotlin files remain cohesive at 343 and 342 lines, inside the 300–400-line review band. Delivery, ledger, history/correction, cash-close, and reporting work remain isolated from Daily Operations. Dashboard/report work adds a focused bridge action, a report query adapter, coverage presentation helpers, and separate operational, financial, and workspace React components. The main workspace and shell remain below 300 lines. The focused purchase, sale, production, expense, payment, salary-payment, spoilage, delivery, ledger, History/Corrections, Cash Count/Daily Close, and Dashboard/Reports suites are each **4/4 PASS**. The complete suite is now **196/196 PASS**.
 
-## 22. Verification checkpoint
+## 23. Verification checkpoint
 
 Physical device: `SM-A065F`.
 
@@ -393,7 +413,8 @@ Physical device: `SM-A065F`.
 - Phase 8 focused Customer/Supplier Ledgers suite — **4/4 PASS**;
 - Phase 8 focused History/Corrections suite — **4/4 PASS**;
 - Phase 8 focused Cash Count/Daily Close suite — **4/4 PASS**;
-- complete connected-device regression — **192/192 PASS**, 0 skipped, 0 failed, 0 errors;
+- Phase 8 focused Dashboard/Reports suite — **4/4 PASS**;
+- complete connected-device regression — **196/196 PASS**, 0 skipped, 0 failed, 0 errors;
 - host-side debug unit suite — **7/7 PASS**;
 - TypeScript check and production Vite build — PASS;
 - explicit web bundle packaging and Android asset gate — PASS;
@@ -401,16 +422,16 @@ Physical device: `SM-A065F`.
 - bridge contract drift check — version 2, 78 operations, SHA-256 `AB374869603B9D773AD86B56EF801DA8C4493816C7301B05214AE596E33D0920` — PASS;
 - frozen logic-spec and SQL hashes — unchanged.
 
-The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; expense-category lifecycle; opening-state record/correction; supplier milk purchases; sales; production; expenses; supplier payments; customer collections; salary payments; spoilage; delivery lifecycle; account ledgers; History/Corrections; and Cash Count/Daily Close with Room readback and durable actor audit. Reconciliation evidence covers canonical expected cash, no balancing ledger entry, latest-count enforcement, mandatory variance explanation, broad closed-history protection, role and recent-authentication boundaries, append-only close/reopen/reclose history, a required post-reopen recount, runtime advertisement, and the complete packaged count/close/reopen flow.
+The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; expense-category lifecycle; opening-state record/correction; supplier milk purchases; sales; production; expenses; supplier payments; customer collections; salary payments; spoilage; delivery lifecycle; account ledgers; History/Corrections; Cash Count/Daily Close; and Dashboard/Reports with Room readback and durable actor audit. Reporting evidence covers exact canonical operational/financial/costing values, complete and missing-cost coverage, honest null results, invalid ranges, direct permission bypass rejection, runtime advertisement, and the packaged Dashboard workspace/date controls.
 
-## 23. Current limitations and next milestone
+## 24. Current limitations and next milestone
 
-Phase 8 is not complete. Authentication, management screens, core settings, Opening State, operational and financial summaries used by Daily Work, supplier milk purchase, sales, production, expenses, supplier payments, customer collections, salary payments, spoilage, deliveries/wholesale, customer/supplier ledgers, History/Corrections, and Cash Count/Daily Close execute through the active React product. Dedicated Dashboard/reports, costing/planning controls, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
+Phase 8 is not complete. Authentication, management screens, core settings, Opening State, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, and Dashboard/Reports execute through the active React product. Costing/planning controls, users/security administration, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
 
 Phase 8 remains device-local. Multiple named users and native role enforcement are supported on one installation. Periodic encrypted Google Drive/cloud backup is recorded for a later Phase 10 design gate and Phase 11 hardening; optional read-only owner-phone snapshot viewing will be decided there. Phase 8 must not improvise networking or present backup as live synchronization.
 
-The next milestone is **Dashboard and reports**. Continue with the already contracted dashboard, cashier, financial, and profitability queries, using canonical native totals and translating coverage/costing status into honest shop language without recreating accounting or report formulas in React.
+The next milestone is **Costing and planning controls**. Continue with the already contracted costing-management and planning queries plus their approved commands, preserving native policy versioning, cost-coverage truth, permission checks, and plain shop-facing wording without recreating costing or budget formulas in React.
 
 ## Plain English
 
-Authorized staff can now count the real cash drawer before seeing what the app expected, record an honest shortage or overage explanation, and close the business day so earlier work is protected. Counting cash never changes the app's balance to hide a mismatch. Only an owner or administrator can reopen a day, must re-enter a passphrase, and the app keeps both the original close and the reopen. Phase 8 remains open, and the dedicated Dashboard and reports are next.
+The Dashboard now lets staff review current stock and work recorded for a chosen period. Cashiers see only the sales and payment information they need; owners and approved managers also see customer/supplier positions and the cost-based result. If the app lacks dependable cost information, it explains what is missing instead of showing a fake zero or fake profit. Phase 8 remains open, and costing/planning controls are next.

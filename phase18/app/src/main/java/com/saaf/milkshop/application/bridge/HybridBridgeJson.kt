@@ -17,6 +17,7 @@ import com.saaf.milkshop.application.readmodels.ExpenseCategoryDto
 import com.saaf.milkshop.application.readmodels.FinancialOverviewDto
 import com.saaf.milkshop.application.readmodels.MasterDataDto
 import com.saaf.milkshop.application.readmodels.ProductDto
+import com.saaf.milkshop.application.readmodels.ProfitabilityReportDto
 import com.saaf.milkshop.application.readmodels.ProductReferenceDto
 import com.saaf.milkshop.application.readmodels.ReconciliationArchiveDto
 import com.saaf.milkshop.application.readmodels.TransactionReferencesDto
@@ -123,6 +124,30 @@ internal fun financialOverviewJson(value: FinancialOverviewDto): JSONObject = JS
         .put("creditCollectionsPaisa", value.totals.creditCollectionsPaisa.toString())
         .put("operatingExpensesPaisa", value.totals.operatingExpensesPaisa.toString())
         .put("salaryPaymentsPaisa", value.totals.salaryPaymentsPaisa.toString()))
+
+internal fun profitabilityReportJson(value: ProfitabilityReportDto): JSONObject = JSONObject()
+    .put("startInclusive", value.startInclusive)
+    .put("endExclusive", value.endExclusive)
+    .put("products", jsonArray(value.products) { product ->
+        JSONObject()
+            .put("productId", product.productId.toString())
+            .put("productName", product.productName)
+            .put("quantitySold", product.quantitySold)
+            .put("salesRevenuePaisa", product.salesRevenuePaisa.toString())
+            .putNullable("costOfProductsSoldPaisa", product.costOfProductsSoldPaisa?.toString())
+            .putNullable("profitBeforeShopExpensesPaisa", product.profitBeforeShopExpensesPaisa?.toString())
+            .putNullable("grossMarginPercent", product.grossMarginPercent)
+            .putNullable("spoilageCostPaisa", product.spoilageCostPaisa?.toString())
+            .putNullable("abnormalLossPaisa", product.abnormalLossPaisa?.toString())
+            .put("coverageCode", product.coverageCode)
+    })
+    .put("deliverySurchargePaisa", value.deliverySurchargePaisa.toString())
+    .put("recordedOperatingExpensesPaisa", value.recordedOperatingExpensesPaisa.toString())
+    .put("recordedSalaryPaymentsPaisa", value.recordedSalaryPaymentsPaisa.toString())
+    .putNullable("estimatedRecordedResultPaisa", value.estimatedRecordedResultPaisa?.toString())
+    .put("coverageCode", value.coverageCode)
+    .put("reportingBasisCode", value.reportingBasisCode)
+    .put("valuationScopeCode", value.valuationScopeCode)
 
 internal fun attendanceJson(values: List<AttendanceDto>): JSONArray = jsonArray(values, ::attendanceItemJson)
 

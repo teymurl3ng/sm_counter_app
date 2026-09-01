@@ -31,6 +31,7 @@ internal object HybridBridgeActions {
     const val DASHBOARD = "query.dashboard"
     const val CASHIER_SUMMARY = "query.cashierSummary"
     const val FINANCIAL_OVERVIEW = "query.financialOverview"
+    const val PROFITABILITY_REPORT = "query.profitabilityReport"
     const val RECORD_PURCHASE = "command.recordPurchase"
     const val RECORD_SALE = "command.recordSale"
     const val RECORD_PRODUCTION = "command.recordProduction"
@@ -94,6 +95,7 @@ internal object HybridBridgeActions {
         DASHBOARD,
         CASHIER_SUMMARY,
         FINANCIAL_OVERVIEW,
+        PROFITABILITY_REPORT,
         RECORD_PURCHASE,
         RECORD_SALE,
         RECORD_PRODUCTION,

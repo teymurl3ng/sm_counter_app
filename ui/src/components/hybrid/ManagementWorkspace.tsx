@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { BookOpen, ClipboardCheck, History as HistoryIcon, LogOut, PackageCheck, PackagePlus, Scale, Settings, ShoppingBasket, Truck, Users } from 'lucide-react';
+import { BookOpen, ClipboardCheck, History as HistoryIcon, LayoutDashboard, LogOut, PackageCheck, PackagePlus, Scale, Settings, ShoppingBasket, Truck, Users } from 'lucide-react';
 import type { AccountLedgerDto, AccountReferenceDto, AttendanceDto, AttendanceStatusCode, BusinessSettingsDto, CashCountResultDto, CashierSummaryDto, CustomerDto, CurrentSessionDto, DailyCloseResultDto, DashboardDto, DeliveryDto, DeliveryStatusCode, EmployeeDto, EntityMutationResultDto, EventDetailDto, EventHistoryDto, EventMutationResultDto, ExpenseCategoryDto, FinancialOverviewDto, Int64String, MasterDataDto, ProductDto, PurchaseRecordedResultDto, ReconciliationArchiveDto, SaleRecordedResultDto, SpoilageDto, TransactionReferencesDto, VendorDto } from '../../bridge/contract.generated';
 import { AccountLedgerWorkspace } from './AccountLedgerWorkspace';
 import { CustomerProfilesScreen } from './CustomerProfilesScreen';
@@ -11,9 +11,11 @@ import { EmployeeAttendanceScreen } from './EmployeeAttendanceScreen';
 import { ProductManagementScreen } from './ProductManagementScreen';
 import { SupplierProfilesScreen } from './SupplierProfilesScreen';
 import { SettingsWorkspaceScreen } from './SettingsWorkspaceScreen';
+import { DashboardReportsWorkspace } from './DashboardReportsWorkspace';
+import type { ReportBundle } from './reportBridgeActions';
 import { plainRole, type BusinessRatesDraft, type CashCountDraft, type CorrectionDraft, type CustomerDraft, type DeliveryDraft, type EmployeeDraft, type ExpenseDraft, type OpeningStateDraft, type PaymentDraft, type ProductDraft, type ProductionDraft, type PurchaseDraft, type ReopenDayDraft, type SalaryPaymentDraft, type SaleDraft, type SpoilageDraft, type StoreIdentityDraft, type SupplierDraft } from './hybridModels';
 
-type ManagementArea = 'operations' | 'deliveries' | 'accounts' | 'history' | 'cash-close' | 'products' | 'customers' | 'suppliers' | 'employees' | 'settings';
+type ManagementArea = 'dashboard' | 'operations' | 'deliveries' | 'accounts' | 'history' | 'cash-close' | 'products' | 'customers' | 'suppliers' | 'employees' | 'settings';
 
 export function ManagementWorkspace({
   busy,
@@ -48,6 +50,7 @@ export function ManagementWorkspace({
   onRecordCashCount,
   onCloseBusinessDate,
   onReopenBusinessDate,
+  onLoadReports,
   onSaveProduct,
   onSetProductArchived,
   onSaveCustomer,
@@ -96,6 +99,7 @@ export function ManagementWorkspace({
   onRecordCashCount(draft: CashCountDraft, accountId: Int64String): Promise<CashCountResultDto>;
   onCloseBusinessDate(date: string, countId: Int64String, reason: string): Promise<DailyCloseResultDto>;
   onReopenBusinessDate(draft: ReopenDayDraft): Promise<DailyCloseResultDto>;
+  onLoadReports(startDate: string, throughDate: string, canViewCashier: boolean, canViewFinancial: boolean): Promise<ReportBundle>;
   onSaveProduct(draft: ProductDraft, productId?: ProductDto['productId']): Promise<void>;
   onSetProductArchived(product: ProductDto, archived: boolean): Promise<void>;
   onSaveCustomer(draft: CustomerDraft, customer?: CustomerDto): Promise<void>;
@@ -123,13 +127,14 @@ export function ManagementWorkspace({
   const canPaySalary = currentUser?.effectivePermissionCodes.includes('salary_payment') === true;
   const canDeliver = currentUser?.effectivePermissionCodes.includes('delivery') === true;
   const canViewFinancial = currentUser?.effectivePermissionCodes.includes('view_full_financial') === true;
-  const canViewHistory = currentUser?.effectivePermissionCodes.includes('view_operational') === true;
+  const canViewOperational = currentUser?.effectivePermissionCodes.includes('view_operational') === true;
+  const canViewHistory = canViewOperational;
   const canCorrect = currentUser?.effectivePermissionCodes.includes('correction') === true;
   const canCashClose = currentUser?.effectivePermissionCodes.includes('cash_count_and_close') === true;
   const canReopen = currentUser?.effectivePermissionCodes.includes('reopen_day') === true;
   const canOperate = canPurchase || canSell || canProduce || canExpense || canPaySupplier || canPaySalary;
   const [area, setArea] = useState<ManagementArea>(canManage ? 'products' : canOperate ? 'operations' : 'employees');
-  const title = area === 'operations' ? 'Daily work' : area === 'deliveries' ? 'Deliveries' : area === 'accounts' ? 'Accounts' : area === 'history' ? 'History' : area === 'cash-close' ? 'Cash close' : area === 'products' ? 'Products' : area === 'customers' ? 'Customers' : area === 'suppliers' ? 'Suppliers' : area === 'employees' ? 'Employees' : 'Settings';
+  const title = area === 'dashboard' ? 'Dashboard' : area === 'operations' ? 'Daily work' : area === 'deliveries' ? 'Deliveries' : area === 'accounts' ? 'Accounts' : area === 'history' ? 'History' : area === 'cash-close' ? 'Cash close' : area === 'products' ? 'Products' : area === 'customers' ? 'Customers' : area === 'suppliers' ? 'Suppliers' : area === 'employees' ? 'Employees' : 'Settings';
   const attendanceEmployees = masterData?.employees.filter((employee) => employee.active).map(({ accountId, name }) => ({ accountId, name })) ?? transactionReferences?.employees ?? [];
 
   return <main className="min-h-screen bg-[#f7f6f0] pb-10 text-slate-900">
@@ -141,6 +146,7 @@ export function ManagementWorkspace({
     </header>
     <nav className="border-b border-slate-200 bg-white px-4" aria-label="Management areas">
       <div className="mx-auto flex max-w-4xl gap-2 overflow-x-auto py-2">
+        {canViewOperational && <AreaButton id="dashboard-nav" active={area === 'dashboard'} onClick={() => setArea('dashboard')}><LayoutDashboard className="h-4 w-4" />Dashboard</AreaButton>}
         {canOperate && <AreaButton id="operations-nav" active={area === 'operations'} onClick={() => setArea('operations')}><ShoppingBasket className="h-4 w-4" />Daily work</AreaButton>}
         {canDeliver && <AreaButton id="deliveries-nav" active={area === 'deliveries'} onClick={() => setArea('deliveries')}><PackageCheck className="h-4 w-4" />Deliveries</AreaButton>}
         {canViewFinancial && <AreaButton id="accounts-nav" active={area === 'accounts'} onClick={() => setArea('accounts')}><BookOpen className="h-4 w-4" />Accounts</AreaButton>}
@@ -154,7 +160,9 @@ export function ManagementWorkspace({
       </div>
     </nav>
     <div className="mx-auto max-w-4xl px-4 py-6">
-      {area === 'operations' && canOperate ? (
+      {area === 'dashboard' && canViewOperational ? (
+        <DashboardReportsWorkspace canViewCashier={canSell} canViewFinancial={canViewFinancial} onLoad={onLoadReports} />
+      ) : area === 'operations' && canOperate ? (
         <DailyOperationsWorkspace busy={busy} canCollectCustomer={canSell} canExpense={canExpense} canPaySalary={canPaySalary} canPaySupplier={canPaySupplier} canProduce={canProduce} canPurchase={canPurchase} canSell={canSell} dashboard={dashboard} cashierSummary={cashierSummary} financialOverview={financialOverview} spoilageHistory={spoilageHistory} references={transactionReferences} error={error} notice={notice} onRecordExpense={onRecordExpense} onRecordPayment={onRecordPayment} onRecordProduction={onRecordProduction} onRecordPurchase={onRecordPurchase} onRecordSalaryPayment={onRecordSalaryPayment} onRecordSale={onRecordSale} onRecordSpoilage={onRecordSpoilage} />
       ) : area === 'deliveries' && canDeliver ? (
         <DeliveryWorkspaceScreen busy={busy} deliveries={deliveries} references={transactionReferences} error={error} notice={notice} onCreate={onCreateDelivery} onTransition={onTransitionDelivery} onLinkSale={onLinkDeliverySale} onArchive={onArchiveDelivery} />

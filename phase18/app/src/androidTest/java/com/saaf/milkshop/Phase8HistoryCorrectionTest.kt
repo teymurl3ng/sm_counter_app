@@ -139,7 +139,7 @@ class Phase8HistoryCorrectionTest {
 
         val actions = dispatch("system.bridgeInfo").getJSONObject("data").getJSONArray("supportedActions")
         val names = (0 until actions.length()).map(actions::getString)
-        assertEquals(55, names.size)
+        assertEquals(56, names.size)
         assertTrue(names.containsAll(listOf("query.eventHistory", "query.eventDetail", "command.correctEvent")))
     }
 

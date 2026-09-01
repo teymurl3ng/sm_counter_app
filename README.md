@@ -1,8 +1,8 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-01 — hybrid Phases 0–7 are complete; Phase 8 screen-by-screen native-backed UI wiring is in progress, with management, core Settings, Opening State, supplier milk purchase, paid/credit sales, milk-to-yogurt production, expenses, supplier/customer payments, salary payments, spoilage, deliveries/wholesale, customer/supplier ledgers, History/Corrections, and Cash Count/Daily Close complete. Dashboard and reports are next. Substantial Phase 9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
+Status: RECONCILED 2026-09-01 — hybrid Phases 0–7 are complete; Phase 8 screen-by-screen native-backed UI wiring is in progress, with management, core Settings, Opening State, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, and Dashboard/Reports complete. Costing and planning controls are next. Substantial Phase 9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
 
-Latest physical-device checkpoint: Cash Count and Daily Close are verified, with Dashboard and reports queued next.
+Latest physical-device checkpoint: Dashboard and Reports are verified, with costing and planning controls queued next.
 
 ## What this repository contains
 
@@ -23,7 +23,7 @@ Latest physical-device checkpoint: Cash Count and Daily Close are verified, with
 - `PHASE6.md` — completed canonical bridge-contract boundary, generated projections, drift gate, verification, and Phase 7 handoff.
 - `bridge/CONTRACT.md` and `bridge/contract.json` — frozen human-readable and machine-readable bridge contract version 2.
 - `PHASE7.md` — completed packaged React/WebView/Android vertical slice, authenticated bridge proof, physical-device evidence, and Phase 8 handoff.
-- `PHASE8.md` — current screen capability ledger, completed native-backed milestones through Cash Count and Daily Close, verification, limitations, and next screen.
+- `PHASE8.md` — current screen capability ledger, completed native-backed milestones through Dashboard and Reports, verification, limitations, and next screen.
 
 ## Immutable baselines
 
@@ -37,7 +37,7 @@ SQL blueprint SHA-256:
 
 **Phase 8 — Screen-by-Screen Native UI Wiring: IN PROGRESS**
 
-The Phase 7 shell remains intact. Phase 8 now provides native-backed management screens, Attendance, editable store identity, core shop-wide rates, Expense Categories, optional Opening State setup/correction, operational/cashier/financial summaries, supplier milk purchase, paid or customer-credit sales, milk-to-yogurt production, expenses, supplier payments, customer collections, salary payments, spoilage, deliveries/wholesale, customer/supplier ledgers, History/Corrections, and Cash Count/Daily Close. Currency remains fixed to PKR. Purchase, sale, production, expense, payment, spoilage, and correction posting behavior remains native-only; delivery records reference sales without posting revenue again; account histories display native movements and running balances without React-side accounting; corrections append linked replacement events instead of editing history; physical counts never create balancing money entries. The runtime exposes 55 of the frozen contract's 78 operations. The complete connected-device regression passes 192/192. Phase 8 remains open; Dashboard and reports are next.
+The Phase 7 shell remains intact. Phase 8 now provides native-backed management screens, Attendance, editable store identity, core shop-wide rates, Expense Categories, optional Opening State setup/correction, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, and Dashboard/Reports. Currency remains fixed to PKR. Posting behavior remains native-only; deliveries never duplicate sale revenue; ledgers and reports display canonical native values without React-side accounting; corrections and close/reopen actions remain append-only; physical counts never create balancing money entries. The Dashboard provides date-range operational totals to authorized staff, cashier information only where permitted, and financial/profitability detail only to owners/admins/managers. Missing cost coverage remains visibly unavailable rather than becoming zero. The runtime exposes 56 of the frozen contract's 78 operations. The complete connected-device regression passes 196/196. Phase 8 remains open; costing and planning controls are next.
 
 The current release architecture is multi-user but device-local: named roles share one installation and one Room database. The approved next direction is periodic encrypted off-device backup, with Google Drive as the example provider and the exact cadence/retention/network rules deferred to a Phase 10 design gate. Backup protects and transfers a verified snapshot; it is not live synchronization between two writable phones. That gate will separately decide whether the owner's phone should offer a safe read-only view of the latest snapshot.
 
@@ -87,7 +87,7 @@ Phase 6 — Bridge Contract (`bridge/CONTRACT.md`) ✅
 
 Phase 7 — Hybrid Shell / Vertical Slice ✅
 
-Phase 8 — UI Wiring ◐ (management, core settings, Opening State, purchases, sales, production, expenses, supplier/customer payments, salary payments, spoilage, deliveries/wholesale, customer/supplier ledgers, History/Corrections, and Cash Count/Daily Close complete; Dashboard and reports next)
+Phase 8 — UI Wiring ◐ (management, core settings, Opening State, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, and Dashboard/Reports complete; costing/planning controls next)
 
 Phase 9 — Runtime / Navigation / Device Integration ◐ (native lifecycle credit only; WebView recreation, Back behavior, targeted refresh, keyboard/insets, and fixed application navigation remain)
 
@@ -145,8 +145,9 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 8 focused Customer/Supplier Ledgers suite: 4/4 passed on the physical device.
 - Phase 8 focused History/Corrections suite: 4/4 passed on the physical device.
 - Phase 8 focused Cash Count/Daily Close suite: 4/4 passed on the physical device.
-- Complete connected-device instrumentation regression: 192/192 passed, 0 skipped, 0 failed.
+- Phase 8 focused Dashboard/Reports suite: 4/4 passed on the physical device.
+- Complete connected-device instrumentation regression: 196/196 passed, 0 skipped, 0 failed.
 
 ## Next gate
 
-Phases 3–7 are closed and Phase 8 is active. Management, core settings, optional Opening State, supplier purchases, paid/credit sales, milk-to-yogurt production, expenses, supplier payments, customer collections, salary payments, spoilage, deliveries/wholesale, customer/supplier ledgers, History/Corrections, and Cash Count/Daily Close are native-backed and device-proven. The active React shell, native bridge handlers/services, and Phase 5 read-model façade remain split into focused modules. Next, wire Dashboard and reports from canonical native read models, translating coverage and costing status into honest shop language without React-side accounting. Every screen must continue to await native mutations, show truthful outcomes, refresh declared queries, receive a hybrid integration test, and retire its corresponding mock/local behavior. See `PHASE8.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–7 are closed and Phase 8 is active. Management, core settings, optional Opening State, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, and Dashboard/Reports are native-backed and device-proven. The active React shell, native bridge handlers/services, and Phase 5 read-model façade remain split into focused modules. Next, wire costing and planning controls from the approved native policies and read models, preserving versioned source truth, native permissions, and honest coverage states without React-side formulas. Every screen must continue to await native mutations, show truthful outcomes, refresh declared queries, receive a hybrid integration test, and retire its corresponding mock/local behavior. See `PHASE8.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.

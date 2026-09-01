@@ -1,17 +1,18 @@
 import { useState, type ReactNode } from 'react';
-import { BookOpen, ClipboardCheck, LogOut, PackageCheck, PackagePlus, Settings, ShoppingBasket, Truck, Users } from 'lucide-react';
-import type { AccountLedgerDto, AccountReferenceDto, AttendanceDto, AttendanceStatusCode, BusinessSettingsDto, CashierSummaryDto, CustomerDto, CurrentSessionDto, DashboardDto, DeliveryDto, DeliveryStatusCode, EmployeeDto, EntityMutationResultDto, EventMutationResultDto, ExpenseCategoryDto, FinancialOverviewDto, Int64String, MasterDataDto, ProductDto, PurchaseRecordedResultDto, SaleRecordedResultDto, SpoilageDto, TransactionReferencesDto, VendorDto } from '../../bridge/contract.generated';
+import { BookOpen, ClipboardCheck, History as HistoryIcon, LogOut, PackageCheck, PackagePlus, Settings, ShoppingBasket, Truck, Users } from 'lucide-react';
+import type { AccountLedgerDto, AccountReferenceDto, AttendanceDto, AttendanceStatusCode, BusinessSettingsDto, CashierSummaryDto, CustomerDto, CurrentSessionDto, DashboardDto, DeliveryDto, DeliveryStatusCode, EmployeeDto, EntityMutationResultDto, EventDetailDto, EventHistoryDto, EventMutationResultDto, ExpenseCategoryDto, FinancialOverviewDto, Int64String, MasterDataDto, ProductDto, PurchaseRecordedResultDto, SaleRecordedResultDto, SpoilageDto, TransactionReferencesDto, VendorDto } from '../../bridge/contract.generated';
 import { AccountLedgerWorkspace } from './AccountLedgerWorkspace';
 import { CustomerProfilesScreen } from './CustomerProfilesScreen';
 import { DailyOperationsWorkspace } from './DailyOperationsWorkspace';
 import { DeliveryWorkspaceScreen } from './DeliveryWorkspaceScreen';
+import { HistoryWorkspace } from './HistoryWorkspace';
 import { EmployeeAttendanceScreen } from './EmployeeAttendanceScreen';
 import { ProductManagementScreen } from './ProductManagementScreen';
 import { SupplierProfilesScreen } from './SupplierProfilesScreen';
 import { SettingsWorkspaceScreen } from './SettingsWorkspaceScreen';
-import { plainRole, type BusinessRatesDraft, type CustomerDraft, type DeliveryDraft, type EmployeeDraft, type ExpenseDraft, type OpeningStateDraft, type PaymentDraft, type ProductDraft, type ProductionDraft, type PurchaseDraft, type SalaryPaymentDraft, type SaleDraft, type SpoilageDraft, type StoreIdentityDraft, type SupplierDraft } from './hybridModels';
+import { plainRole, type BusinessRatesDraft, type CorrectionDraft, type CustomerDraft, type DeliveryDraft, type EmployeeDraft, type ExpenseDraft, type OpeningStateDraft, type PaymentDraft, type ProductDraft, type ProductionDraft, type PurchaseDraft, type SalaryPaymentDraft, type SaleDraft, type SpoilageDraft, type StoreIdentityDraft, type SupplierDraft } from './hybridModels';
 
-type ManagementArea = 'operations' | 'deliveries' | 'accounts' | 'products' | 'customers' | 'suppliers' | 'employees' | 'settings';
+type ManagementArea = 'operations' | 'deliveries' | 'accounts' | 'history' | 'products' | 'customers' | 'suppliers' | 'employees' | 'settings';
 
 export function ManagementWorkspace({
   busy,
@@ -23,6 +24,7 @@ export function ManagementWorkspace({
   financialOverview,
   spoilageHistory,
   deliveries,
+  eventHistory,
   businessSettings,
   transactionReferences,
   notice,
@@ -39,6 +41,8 @@ export function ManagementWorkspace({
   onLinkDeliverySale,
   onArchiveDelivery,
   onLoadAccountLedger,
+  onLoadEventDetail,
+  onCorrectEvent,
   onSaveProduct,
   onSetProductArchived,
   onSaveCustomer,
@@ -64,6 +68,7 @@ export function ManagementWorkspace({
   financialOverview: FinancialOverviewDto | null;
   spoilageHistory: ReadonlyArray<SpoilageDto> | null;
   deliveries: ReadonlyArray<DeliveryDto> | null;
+  eventHistory: ReadonlyArray<EventHistoryDto> | null;
   businessSettings: BusinessSettingsDto | null;
   transactionReferences: TransactionReferencesDto | null;
   notice: string | null;
@@ -80,6 +85,8 @@ export function ManagementWorkspace({
   onLinkDeliverySale(deliveryId: DeliveryDto['deliveryId'], saleEventId: Int64String): Promise<void>;
   onArchiveDelivery(delivery: DeliveryDto): Promise<void>;
   onLoadAccountLedger(accountId: Int64String): Promise<AccountLedgerDto>;
+  onLoadEventDetail(eventId: Int64String): Promise<EventDetailDto>;
+  onCorrectEvent(draft: CorrectionDraft): Promise<EventMutationResultDto>;
   onSaveProduct(draft: ProductDraft, productId?: ProductDto['productId']): Promise<void>;
   onSetProductArchived(product: ProductDto, archived: boolean): Promise<void>;
   onSaveCustomer(draft: CustomerDraft, customer?: CustomerDto): Promise<void>;
@@ -107,9 +114,11 @@ export function ManagementWorkspace({
   const canPaySalary = currentUser?.effectivePermissionCodes.includes('salary_payment') === true;
   const canDeliver = currentUser?.effectivePermissionCodes.includes('delivery') === true;
   const canViewFinancial = currentUser?.effectivePermissionCodes.includes('view_full_financial') === true;
+  const canViewHistory = currentUser?.effectivePermissionCodes.includes('view_operational') === true;
+  const canCorrect = currentUser?.effectivePermissionCodes.includes('correction') === true;
   const canOperate = canPurchase || canSell || canProduce || canExpense || canPaySupplier || canPaySalary;
   const [area, setArea] = useState<ManagementArea>(canManage ? 'products' : canOperate ? 'operations' : 'employees');
-  const title = area === 'operations' ? 'Daily work' : area === 'deliveries' ? 'Deliveries' : area === 'accounts' ? 'Accounts' : area === 'products' ? 'Products' : area === 'customers' ? 'Customers' : area === 'suppliers' ? 'Suppliers' : area === 'employees' ? 'Employees' : 'Settings';
+  const title = area === 'operations' ? 'Daily work' : area === 'deliveries' ? 'Deliveries' : area === 'accounts' ? 'Accounts' : area === 'history' ? 'History' : area === 'products' ? 'Products' : area === 'customers' ? 'Customers' : area === 'suppliers' ? 'Suppliers' : area === 'employees' ? 'Employees' : 'Settings';
   const attendanceEmployees = masterData?.employees.filter((employee) => employee.active).map(({ accountId, name }) => ({ accountId, name })) ?? transactionReferences?.employees ?? [];
 
   return <main className="min-h-screen bg-[#f7f6f0] pb-10 text-slate-900">
@@ -124,6 +133,7 @@ export function ManagementWorkspace({
         {canOperate && <AreaButton id="operations-nav" active={area === 'operations'} onClick={() => setArea('operations')}><ShoppingBasket className="h-4 w-4" />Daily work</AreaButton>}
         {canDeliver && <AreaButton id="deliveries-nav" active={area === 'deliveries'} onClick={() => setArea('deliveries')}><PackageCheck className="h-4 w-4" />Deliveries</AreaButton>}
         {canViewFinancial && <AreaButton id="accounts-nav" active={area === 'accounts'} onClick={() => setArea('accounts')}><BookOpen className="h-4 w-4" />Accounts</AreaButton>}
+        {canViewHistory && <AreaButton id="history-nav" active={area === 'history'} onClick={() => setArea('history')}><HistoryIcon className="h-4 w-4" />History</AreaButton>}
         {canManage && <AreaButton id="products-nav" active={area === 'products'} onClick={() => setArea('products')}><PackagePlus className="h-4 w-4" />Products</AreaButton>}
         {canManage && <AreaButton id="customers-nav" active={area === 'customers'} onClick={() => setArea('customers')}><Users className="h-4 w-4" />Customers</AreaButton>}
         {canManage && <AreaButton id="suppliers-nav" active={area === 'suppliers'} onClick={() => setArea('suppliers')}><Truck className="h-4 w-4" />Suppliers</AreaButton>}
@@ -138,6 +148,8 @@ export function ManagementWorkspace({
         <DeliveryWorkspaceScreen busy={busy} deliveries={deliveries} references={transactionReferences} error={error} notice={notice} onCreate={onCreateDelivery} onTransition={onTransitionDelivery} onLinkSale={onLinkDeliverySale} onArchive={onArchiveDelivery} />
       ) : area === 'accounts' && canViewFinancial ? (
         <AccountLedgerWorkspace busy={busy} overview={financialOverview} references={transactionReferences} error={error} notice={notice} onLoadLedger={onLoadAccountLedger} onRecordPayment={onRecordPayment} />
+      ) : area === 'history' && canViewHistory ? (
+        <HistoryWorkspace busy={busy} events={eventHistory} canCorrect={canCorrect} error={error} notice={notice} onLoadDetail={onLoadEventDetail} onCorrect={onCorrectEvent} />
       ) : area === 'settings' && (canManage || canManageSettings) ? (
         <SettingsWorkspaceScreen busy={busy} canManageSettings={canManageSettings} categories={masterData?.expenseCategories ?? businessSettings?.expenseCategories ?? null} masterData={masterData} references={transactionReferences} settings={businessSettings} error={error} notice={notice} onSaveStore={onSaveStoreIdentity} onSaveRates={onUpdateBusinessSettings} onSaveOpening={onSaveOpeningState} onCreateCategory={onCreateExpenseCategory} onSetCategoryArchived={onSetExpenseCategoryArchived} />
       ) : area === 'employees' && (canManage || canAttend) ? (

@@ -1,6 +1,6 @@
 # Phase 8 — Screen-by-Screen Native UI Wiring
 
-**Status: IN PROGRESS — milestones through customer/supplier ledgers complete 2026-08-31**
+**Status: IN PROGRESS — milestones through History and Corrections complete 2026-09-01**
 
 ## 1. Purpose and working rule
 
@@ -30,7 +30,7 @@ The frozen logic specification, SQL blueprint, Phase 5 DTO catalog, and Phase 6 
 | Daily operations | dashboard/reference/financial queries and purchase/sale/production/expense/payment/spoilage commands | **Milestones 7–13 complete** | No UI-side totals, stock mutation, cost rates, or accounting formulas. |
 | Deliveries / wholesale | transaction references, deliveries, sale and delivery commands | **Milestone 14 complete** | Pending/terminal history and optional sale linkage remain logistical records, not duplicate revenue. |
 | Customer/supplier ledgers | account-ledger query plus collection/payment commands | **Milestone 15 complete** | Canonical balances, movements, running balances, inactive history, and contextual payments are device-proven. |
-| History and corrections | event history/detail and correction command | Queued | Never edit or delete historical events in place. |
+| History and corrections | event history/detail and correction command | **Milestone 16 complete** | Append-only correction chains, native authority, actor attribution, and superseded visibility are device-proven. |
 | Cash count and daily close | reconciliation query and count/close/reopen commands | Queued | Keep verified native actor and closed-day enforcement. |
 | Dashboard and reports | dashboard, cashier, financial, profitability queries | Queued | Translate coverage/costing codes into plain shop language. |
 | Costing and planning controls | costing/planning queries and versioned policy/target commands | Queued | Sensitive changes require the contract's recent-authentication rule. |
@@ -279,7 +279,24 @@ The active app now provides a permission-aware Accounts area:
 
 The runtime now advertises forty-eight implemented actions: `query.accountLedger` joins the prior forty-seven. Contract version 2 remains at 78 operations with the same manifest hash. No Room schema, account direction, payment rule, permission bundle, or frozen business formula changed.
 
-## 18. Safety and business boundaries
+## 18. Milestone 16 — History and Corrections
+
+The active app now provides a permission-aware History area:
+
+- users with operational-view permission can search the canonical event history by type, ID, note, or verified staff name and open event detail on demand;
+- event detail shows native inventory movements, role-filtered money movements, verified actor attribution, correction links, and whether a record is current or replaced;
+- correction controls are available only to roles with native `CORRECTION` permission, and direct unauthorized bridge calls remain rejected by Kotlin;
+- corrections append a typed replacement event and only its native-calculated difference; no existing event, inventory movement, or money movement is edited or deleted;
+- the form requests the complete corrected truth, fixes the correction to the original business date, and warns the user not to enter only the difference;
+- purchase, production, sale, monetary, and spoilage correction families use exact contracted fields and native validation, including impossible-stock rejection;
+- only the latest event in a correction chain may be corrected, preventing competing branches while preserving every earlier version;
+- corrections on closed business dates remain blocked, and every successful bridge correction records a verified event actor plus security-audit entry;
+- internal customer, supplier, employee, expense, and salary account prefixes are removed from shop-facing movement names without changing persisted account identity;
+- awaited correction commands refresh authoritative History data, and packaged physical-device evidence covers History display, a PKR expense correction, linked replacement visibility, Room persistence, and staff attribution.
+
+The runtime now advertises fifty-one implemented actions: `query.eventHistory`, `query.eventDetail`, and `command.correctEvent` join the prior forty-eight. Contract version 2 remains at 78 operations with the same manifest hash. No Room schema, accounting formula, stock rule, correction formula, permission bundle, or frozen business contract changed.
+
+## 19. Safety and business boundaries
 
 - Archiving changes future availability; it does not delete products or rewrite transaction history.
 - Inventory quantity remains event-derived. This screen has no direct “set stock” operation.
@@ -323,7 +340,7 @@ The runtime now advertises forty-eight implemented actions: `query.accountLedger
 - The old prototype view model remains inactive and is not imported by the packaged app.
 - No Room schema, frozen business formula, permission bundle, or canonical bridge endpoint changed. The additive `TransactionReferencesDto.expenseCategories` field is the documented contract-v2 amendment.
 
-## 19. Structural refactor checkpoint
+## 20. Structural refactor checkpoint
 
 Before starting Supplier Profiles, the active hybrid path was reorganized without changing its public behavior:
 
@@ -333,9 +350,9 @@ Before starting Supplier Profiles, the active hybrid path was reorganized withou
 - generated contract projections and inactive inherited prototype screens were deliberately left alone;
 - future handwritten files should be reviewed for separation when they approach roughly 300–400 lines, with responsibility and cohesion taking priority over an arbitrary number.
 
-The structural checkpoint changed no Room schema, permission rule, accounting formula, or existing user workflow. The two growing Daily Operations Kotlin files remain cohesive at 343 and 342 lines, inside the 300–400-line review band. Delivery work is isolated in a 121-line command service and an 89-line handler. Ledger work adds a 27-line handler and focused React modules no larger than 54 lines; the main workspace and shell remain below 300 lines. The focused purchase, sale, production, expense, payment, salary-payment, spoilage, delivery, and ledger suites are each **4/4 PASS**. The complete suite is now **184/184 PASS**.
+The structural checkpoint changed no Room schema, permission rule, accounting formula, or existing user workflow. The two growing Daily Operations Kotlin files remain cohesive at 343 and 342 lines, inside the 300–400-line review band. Delivery work is isolated in a 121-line command service and an 89-line handler. Ledger work adds a 27-line handler. History/correction work is split across a focused handler, command service, action adapter, presentation helper, list, detail, form, and workspace rather than being added to the Daily Operations files. The main workspace and shell remain below 300 lines. The focused purchase, sale, production, expense, payment, salary-payment, spoilage, delivery, ledger, and History/Corrections suites are each **4/4 PASS**. The complete suite is now **188/188 PASS**.
 
-## 20. Verification checkpoint
+## 21. Verification checkpoint
 
 Physical device: `SM-A065F`.
 
@@ -354,7 +371,8 @@ Physical device: `SM-A065F`.
 - Phase 8 focused Daily Operations spoilage suite — **4/4 PASS**;
 - Phase 8 focused Deliveries/wholesale suite — **4/4 PASS**;
 - Phase 8 focused Customer/Supplier Ledgers suite — **4/4 PASS**;
-- complete connected-device regression — **184/184 PASS**, 0 skipped, 0 failed, 0 errors;
+- Phase 8 focused History/Corrections suite — **4/4 PASS**;
+- complete connected-device regression — **188/188 PASS**, 0 skipped, 0 failed, 0 errors;
 - host-side debug unit suite — **7/7 PASS**;
 - TypeScript check and production Vite build — PASS;
 - explicit web bundle packaging and Android asset gate — PASS;
@@ -362,16 +380,16 @@ Physical device: `SM-A065F`.
 - bridge contract drift check — version 2, 78 operations, SHA-256 `AB374869603B9D773AD86B56EF801DA8C4493816C7301B05214AE596E33D0920` — PASS;
 - frozen logic-spec and SQL hashes — unchanged.
 
-The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; expense-category lifecycle; opening-state record/correction; supplier milk purchases; sales; production; expenses; supplier payments; customer collections; salary payments; spoilage; delivery lifecycle; and account ledgers with Room readback and durable actor audit. Ledger evidence covers exact native movements and running balances, clean display names, inactive-history retention, permission/missing/non-party rejection, runtime advertisement, packaged account display, contextual payment posting, and post-payment history refresh.
+The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; expense-category lifecycle; opening-state record/correction; supplier milk purchases; sales; production; expenses; supplier payments; customer collections; salary payments; spoilage; delivery lifecycle; account ledgers; and History/Corrections with Room readback and durable actor audit. History evidence covers every supported correction family, exact delta posting, impossible-stock rejection, closed-day and permission enforcement, correction-chain protection, role-filtered money detail, clean display names, runtime advertisement, and a packaged expense correction with visible replacement history.
 
-## 21. Current limitations and next milestone
+## 22. Current limitations and next milestone
 
-Phase 8 is not complete. Authentication, management screens, core settings, Opening State, operational and financial summaries, supplier milk purchase, sales, production, expenses, supplier payments, customer collections, salary payments, spoilage, deliveries/wholesale, and customer/supplier ledgers execute through the active React product. History/corrections, cash close, reports, costing/planning controls, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
+Phase 8 is not complete. Authentication, management screens, core settings, Opening State, operational and financial summaries, supplier milk purchase, sales, production, expenses, supplier payments, customer collections, salary payments, spoilage, deliveries/wholesale, customer/supplier ledgers, and History/Corrections execute through the active React product. Cash close, reports, costing/planning controls, users, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
 
 Phase 8 remains device-local. Multiple named users and native role enforcement are supported on one installation. Periodic encrypted Google Drive/cloud backup is recorded for a later Phase 10 design gate and Phase 11 hardening; optional read-only owner-phone snapshot viewing will be decided there. Phase 8 must not improvise networking or present backup as live synchronization.
 
-The next milestone is **History and corrections**. Continue with the contracted event-history/detail queries and correction command, preserving append-only records, native authorization, correction links, and superseded-event visibility without editing or deleting history in React.
+The next milestone is **Cash count and daily close**. Continue with the contracted reconciliation query and cash-count/close/reopen commands, preserving native expected-cash calculation, mandatory variance explanation, verified actor authority, recent-authentication rules, and closed-day enforcement.
 
 ## Plain English
 
-The owner and financial managers can now open Accounts, see who owes the shop and what the shop owes suppliers, inspect every saved change behind a balance, and record a payment from that account. Old inactive accounts keep their history but cannot receive new payments. Phase 8 remains open, and history/corrections are next.
+The shop can now search its saved work, open any record, see who entered it, and tell whether it was later replaced. An authorized manager can correct a mistake without erasing the original: the app keeps both versions and applies only the difference needed to make stock and money right. Clerks cannot bypass this, closed days stay protected, and impossible stock changes are refused. Phase 8 remains open, and cash counting plus end-of-day closing are next.

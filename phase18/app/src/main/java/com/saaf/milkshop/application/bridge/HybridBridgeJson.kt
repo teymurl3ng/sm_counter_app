@@ -11,6 +11,8 @@ import com.saaf.milkshop.application.readmodels.DashboardDto
 import com.saaf.milkshop.application.readmodels.DeliveryDto
 import com.saaf.milkshop.application.readmodels.CustomerDto
 import com.saaf.milkshop.application.readmodels.EmployeeDto
+import com.saaf.milkshop.application.readmodels.EventDetailDto
+import com.saaf.milkshop.application.readmodels.EventHistoryDto
 import com.saaf.milkshop.application.readmodels.ExpenseCategoryDto
 import com.saaf.milkshop.application.readmodels.FinancialOverviewDto
 import com.saaf.milkshop.application.readmodels.MasterDataDto
@@ -148,6 +150,26 @@ internal fun accountLedgerJson(value: AccountLedgerDto): JSONObject = JSONObject
             .put("movementPaisa", entry.movementPaisa.toString()).put("balanceAfterPaisa", entry.balanceAfterPaisa.toString())
             .putNullable("correctsEventId", entry.correctsEventId?.toString()).put("isCorrection", entry.isCorrection)
             .put("isSuperseded", entry.isSuperseded).putNullable("notes", entry.notes)
+    })
+
+internal fun eventHistoryJson(value: EventHistoryDto): JSONObject = JSONObject()
+    .put("eventId", value.eventId.toString()).put("createdAt", value.createdAt).put("occurredAt", value.occurredAt)
+    .put("eventTypeCode", value.eventTypeCode).putNullable("channelCode", value.channelCode)
+    .putNullable("correctsEventId", value.correctsEventId?.toString()).put("isCorrection", value.isCorrection)
+    .put("isSuperseded", value.isSuperseded).putNullable("actor", value.actor?.let { actor ->
+        JSONObject().putNullable("userId", actor.userId?.toString()).putNullable("displayName", actor.displayName)
+            .putNullable("roleCode", actor.roleCode)
+    }).putNullable("notes", value.notes)
+
+internal fun eventDetailJson(value: EventDetailDto): JSONObject = JSONObject()
+    .put("event", eventHistoryJson(value.event))
+    .put("inventoryMovements", jsonArray(value.inventoryMovements) { movement ->
+        JSONObject().put("productName", movement.productName).put("quantity", movement.quantity).put("unit", movement.unit)
+    })
+    .putNullable("financialMovements", value.financialMovements?.let { movements ->
+        jsonArray(movements) { movement ->
+            JSONObject().put("accountName", movement.accountName).put("amountPaisa", movement.amountPaisa.toString())
+        }
     })
 
 private fun productReferenceJson(value: ProductReferenceDto): JSONObject = JSONObject()

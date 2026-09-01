@@ -1,4 +1,4 @@
-import type { Int64String, ProductUnitCode, SalePaymentKindCode } from '../../bridge/contract.generated';
+import type { CorrectionTypeCode, Int64String, ProductUnitCode, SalePaymentKindCode } from '../../bridge/contract.generated';
 
 export type HybridStage = 'checking' | 'setup' | 'login' | 'recovery' | 'ready' | 'blocked';
 
@@ -133,6 +133,26 @@ export type DeliveryDraft = {
   route: string;
   businessDate: string;
   saleEventId: Int64String | null;
+  notes: string;
+};
+
+export type CorrectionDraft = {
+  correctionTypeCode: CorrectionTypeCode;
+  originalEventId: Int64String;
+  occurredAt: string;
+  entryMode: 'quantity' | 'value';
+  rawLiters: string;
+  fatPercent: string;
+  lrReading: string;
+  milkLitersUsed: string;
+  yogurtKgProduced: string;
+  unitRateRupees: string;
+  quantity: string;
+  valueRupees: string;
+  surchargeRupees: string;
+  channelCode: string;
+  amountRupees: string;
+  reasonCode: string;
   notes: string;
 };
 

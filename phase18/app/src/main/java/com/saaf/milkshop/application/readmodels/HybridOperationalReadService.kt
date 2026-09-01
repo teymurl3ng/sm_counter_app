@@ -108,11 +108,19 @@ internal class HybridOperationalReadService(
         val financial = if (RolePermissions.allows(AppRole.parse(actor.role), AppPermission.VIEW_FULL_FINANCIAL)) {
             database.financialLogDao().findByEventId(eventId).map { movement ->
                 val account = database.accountDao().findById(movement.accountId)
-                FinancialMovementDto(account?.name ?: "Account #${movement.accountId}", money(movement.amount))
+                FinancialMovementDto(account?.let { cleanAccountName(it.name, it.category) } ?: "Account #${movement.accountId}", money(movement.amount))
             }
         } else null
         return EventDetailDto(event.toHistoryDto(events.mapNotNull { it.correctsEventId }.toSet()), inventory, financial)
     }
+
+    private fun cleanAccountName(name: String, category: String): String = when (category) {
+        "Customer" -> name.removePrefix("Customer: ")
+        "Vendor" -> name.removePrefix("Vendor: ")
+        "Salary" -> name.removePrefix("Employee: ").removePrefix("Salary: ")
+        "Operating Expense" -> name.removePrefix("Expense: ")
+        else -> name
+    }.trim()
 
     suspend fun deliveries(sessionHandle: String): List<DeliveryDto> {
         security.requirePermission(sessionHandle, AppPermission.DELIVERY)

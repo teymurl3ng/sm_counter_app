@@ -32,6 +32,8 @@ internal object HybridBridgeActions {
     const val CASHIER_SUMMARY = "query.cashierSummary"
     const val FINANCIAL_OVERVIEW = "query.financialOverview"
     const val PROFITABILITY_REPORT = "query.profitabilityReport"
+    const val COSTING_MANAGEMENT = "query.costingManagement"
+    const val PLANNING = "query.planning"
     const val RECORD_PURCHASE = "command.recordPurchase"
     const val RECORD_SALE = "command.recordSale"
     const val RECORD_PRODUCTION = "command.recordProduction"
@@ -66,6 +68,13 @@ internal object HybridBridgeActions {
     const val SET_EXPENSE_CATEGORY_ARCHIVED = "command.setExpenseCategoryArchived"
     const val RECORD_OPENING_STATE = "command.recordOpeningState"
     const val CORRECT_OPENING_STATE = "command.correctOpeningState"
+    const val UPSERT_BUDGET = "command.upsertBudget"
+    const val COPY_PREVIOUS_BUDGET = "command.copyPreviousBudget"
+    const val UPSERT_COLLECTIONS_TARGET = "command.upsertCollectionsTarget"
+    const val APPROVE_COSTING_POLICY = "command.approveCostingPolicy"
+    const val RECORD_OPENING_COST_BASIS = "command.recordOpeningCostBasis"
+    const val APPROVE_YIELD_POLICY = "command.approveYieldPolicy"
+    const val RECORD_PRODUCTION_LOSS_ASSESSMENT = "command.recordProductionLossAssessment"
 
     val authentication = setOf(BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN, LOGOUT, REAUTHENTICATE, CURRENT_SESSION)
     val masterData = setOf(
@@ -110,7 +119,18 @@ internal object HybridBridgeActions {
     val ledgers = setOf(ACCOUNT_LEDGER)
     val history = setOf(EVENT_HISTORY, EVENT_DETAIL, CORRECT_EVENT)
     val reconciliation = setOf(RECONCILIATION_ARCHIVE, RECORD_PHYSICAL_CASH_COUNT, CLOSE_BUSINESS_DATE, REOPEN_BUSINESS_DATE)
-    val supported = listOf(BRIDGE_INFO) + authentication + masterData + employees + settings + operations + deliveries + ledgers + history + reconciliation
+    val costingPlanning = setOf(
+        COSTING_MANAGEMENT,
+        PLANNING,
+        UPSERT_BUDGET,
+        COPY_PREVIOUS_BUDGET,
+        UPSERT_COLLECTIONS_TARGET,
+        APPROVE_COSTING_POLICY,
+        RECORD_OPENING_COST_BASIS,
+        APPROVE_YIELD_POLICY,
+        RECORD_PRODUCTION_LOSS_ASSESSMENT,
+    )
+    val supported = listOf(BRIDGE_INFO) + authentication + masterData + employees + settings + operations + deliveries + ledgers + history + reconciliation + costingPlanning
     val authByAction = supported.associateWith { action ->
         if (action in setOf(BRIDGE_INFO, BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN)) "none" else "session"
     }

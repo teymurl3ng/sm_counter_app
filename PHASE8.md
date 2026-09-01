@@ -1,6 +1,6 @@
 # Phase 8 — Screen-by-Screen Native UI Wiring
 
-**Status: IN PROGRESS — milestones through Cash Count and Daily Close complete 2026-09-01**
+**Status: IN PROGRESS — milestones through Costing and Planning Controls complete 2026-09-01**
 
 ## 1. Purpose and working rule
 
@@ -33,7 +33,7 @@ The frozen logic specification, SQL blueprint, Phase 5 DTO catalog, and Phase 6 
 | History and corrections | event history/detail and correction command | **Milestone 16 complete** | Append-only correction chains, native authority, actor attribution, and superseded visibility are device-proven. |
 | Cash count and daily close | reconciliation query and count/close/reopen commands | **Milestone 17 complete** | Independent physical counts, honest variances, verified close/reopen actors, and date locking are device-proven. |
 | Dashboard and reports | dashboard, cashier, financial, profitability queries | **Milestone 18 complete** | Canonical date-range totals, role-filtered detail, and honest costing coverage are device-proven. |
-| Costing and planning controls | costing/planning queries and versioned policy/target commands | Queued | Sensitive changes require the contract's recent-authentication rule. |
+| Costing and planning controls | costing/planning queries and versioned policy/target commands | **Milestone 19 complete** | Native versioning, recent authentication, yield calibration, and human loss review are device-proven. |
 | Staff users and security audit | users/audit queries and user-administration commands | Queued | Owner controls role/status; employee linkage remains optional. |
 | Encrypted backup and restore | backup system actions | Queued | Retain picker/ticket, inspection, confirmation, and session invalidation boundaries. |
 
@@ -330,7 +330,24 @@ The active app now provides a permission-aware Dashboard area:
 
 The runtime now advertises fifty-six implemented actions: `query.profitabilityReport` joins the prior fifty-five. Contract version 2 remains at 78 operations with the same manifest hash. No Room schema, costing formula, reporting basis, valuation scope, permission bundle, or frozen business contract changed.
 
-## 21. Safety and business boundaries
+## 21. Milestone 19 — Costing and Planning Controls
+
+The active app now provides a permission-aware Cost & Plans area with four focused workspaces:
+
+- Plans & Targets creates or revises weekly Milk purchase plans, monthly operating-cost plans, and separate weekly customer-collection targets; changing a plan archives the prior version, and copying requires a real earlier plan;
+- Milk purchase plans submit liters only. Kotlin snapshots the current supplier/retail rates and calculates planned buying amount and sales target; React neither copies those rates nor performs the multiplication;
+- monthly operating plans submit their exact PKR amount, while every saved plan explicitly states that it does not post a purchase, expense, sale, collection, or payment;
+- Yogurt Cost records the five approved conversion-cost components, normal production capacity, review reason, and optional notes; Kotlin validates component coverage, fixed-overhead capacity, material-change review reason, versioning, actor, and the final standard cost per kg;
+- Opening Stock Cost attaches documented history or an explained owner estimate to positive opening Milk/Yogurt quantities only; it never creates an artificial purchase or opening event, and corrections preserve the prior basis;
+- Yield & Loss Review requires at least 30 owner-selected representative batches, while Kotlin enforces at least 28 observed days and calculates the median/deviation alert limits;
+- a yield warning remains a warning. It never posts a loss; an owner/admin must separately review the batch and record either ordinary variation or an identified abnormal loss with quantity and reason;
+- the four cost-source commands reauthenticate the owner/admin before submission, while Kotlin remains authoritative for recent-authentication time, permission, validation, versioning, and actor attribution;
+- all seven successful commands receive durable security-audit entries, and both queries remain unavailable to roles without `MANAGE_BUSINESS_SETTINGS`;
+- the React work is split into planning, costing policy, opening basis, yield/loss, bridge-action, model, and presentation modules; no handwritten file in this milestone exceeds 115 lines.
+
+The runtime now advertises sixty-five implemented actions: `query.costingManagement`, `query.planning`, `command.upsertBudget`, `command.copyPreviousBudget`, `command.upsertCollectionsTarget`, `command.approveCostingPolicy`, `command.recordOpeningCostBasis`, `command.approveYieldPolicy`, and `command.recordProductionLossAssessment` join the prior fifty-six. Contract version 2 remains at 78 operations with the same manifest hash. No Room schema, costing formula, yield formula, budget rule, permission bundle, or frozen business contract changed.
+
+## 22. Safety and business boundaries
 
 - Archiving changes future availability; it does not delete products or rewrite transaction history.
 - Inventory quantity remains event-derived. This screen has no direct “set stock” operation.
@@ -377,10 +394,14 @@ The runtime now advertises fifty-six implemented actions: `query.profitabilityRe
 - React never sums report fields, derives COGS, margin, spoilage cost, abnormal loss, or an overall result; it displays native read-model values and translates stable coverage codes only.
 - A missing report cost or result remains visibly unavailable; it is never presented as zero.
 - The estimated recorded result is a cost-based management view, not cash, bank balance, statutory net income, or owner take-home money.
+- Plans and targets are versioned comparison records; they never post business transactions or alter actual results.
+- React never derives Milk plan cost/sales targets, Yogurt conversion cost, yield limits, or abnormal-loss value; it renders native results.
+- Opening stock cost applies only to the saved one-time opening event and never fabricates an opening or purchase record.
+- Yield alerts never create a loss assessment. Abnormal loss exists only after an authenticated human review is saved.
 - The old prototype view model remains inactive and is not imported by the packaged app.
 - No Room schema, frozen business formula, permission bundle, or canonical bridge endpoint changed. The additive `TransactionReferencesDto.expenseCategories` field is the documented contract-v2 amendment.
 
-## 22. Structural refactor checkpoint
+## 23. Structural refactor checkpoint
 
 Before starting Supplier Profiles, the active hybrid path was reorganized without changing its public behavior:
 
@@ -390,9 +411,9 @@ Before starting Supplier Profiles, the active hybrid path was reorganized withou
 - generated contract projections and inactive inherited prototype screens were deliberately left alone;
 - future handwritten files should be reviewed for separation when they approach roughly 300–400 lines, with responsibility and cohesion taking priority over an arbitrary number.
 
-The structural checkpoint changed no Room schema, permission rule, accounting formula, or existing user workflow. The two growing Daily Operations Kotlin files remain cohesive at 343 and 342 lines, inside the 300–400-line review band. Delivery, ledger, history/correction, cash-close, and reporting work remain isolated from Daily Operations. Dashboard/report work adds a focused bridge action, a report query adapter, coverage presentation helpers, and separate operational, financial, and workspace React components. The main workspace and shell remain below 300 lines. The focused purchase, sale, production, expense, payment, salary-payment, spoilage, delivery, ledger, History/Corrections, Cash Count/Daily Close, and Dashboard/Reports suites are each **4/4 PASS**. The complete suite is now **196/196 PASS**.
+The structural checkpoint changed no Room schema, permission rule, accounting formula, or existing user workflow. The two growing Daily Operations Kotlin files remain cohesive at 343 and 342 lines, inside the 300–400-line review band. Delivery, ledger, history/correction, cash-close, reporting, and costing/planning work remain isolated from Daily Operations. Costing/planning adds a focused native handler, command/audit service, JSON adapter, bridge actions, shared models/presentation helpers, a coordinating workspace, and four focused React control modules. The main workspace and shell remain below 300 lines. The focused Costing/Planning suite is **5/5 PASS**. The complete suite is now **201/201 PASS**.
 
-## 23. Verification checkpoint
+## 24. Verification checkpoint
 
 Physical device: `SM-A065F`.
 
@@ -414,7 +435,8 @@ Physical device: `SM-A065F`.
 - Phase 8 focused History/Corrections suite — **4/4 PASS**;
 - Phase 8 focused Cash Count/Daily Close suite — **4/4 PASS**;
 - Phase 8 focused Dashboard/Reports suite — **4/4 PASS**;
-- complete connected-device regression — **196/196 PASS**, 0 skipped, 0 failed, 0 errors;
+- Phase 8 focused Costing/Planning suite — **5/5 PASS**;
+- complete connected-device regression — **201/201 PASS**, 0 skipped, 0 failed, 0 errors;
 - host-side debug unit suite — **7/7 PASS**;
 - TypeScript check and production Vite build — PASS;
 - explicit web bundle packaging and Android asset gate — PASS;
@@ -422,16 +444,16 @@ Physical device: `SM-A065F`.
 - bridge contract drift check — version 2, 78 operations, SHA-256 `AB374869603B9D773AD86B56EF801DA8C4493816C7301B05214AE596E33D0920` — PASS;
 - frozen logic-spec and SQL hashes — unchanged.
 
-The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; expense-category lifecycle; opening-state record/correction; supplier milk purchases; sales; production; expenses; supplier payments; customer collections; salary payments; spoilage; delivery lifecycle; account ledgers; History/Corrections; Cash Count/Daily Close; and Dashboard/Reports with Room readback and durable actor audit. Reporting evidence covers exact canonical operational/financial/costing values, complete and missing-cost coverage, honest null results, invalid ranges, direct permission bypass rejection, runtime advertisement, and the packaged Dashboard workspace/date controls.
+The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; expense-category lifecycle; opening-state record/correction; supplier milk purchases; sales; production; expenses; supplier payments; customer collections; salary payments; spoilage; delivery lifecycle; account ledgers; History/Corrections; Cash Count/Daily Close; Dashboard/Reports; and Costing/Planning with Room readback and durable actor audit. The new evidence covers budget revision/copy, separate collection targets, approved conversion policy, opening basis, 30-batch yield calibration, non-automatic yield alerts, explicit abnormal-loss review, recent-authentication and permission rejection, all nine runtime actions, and all four packaged owner-facing workspaces.
 
-## 24. Current limitations and next milestone
+## 25. Current limitations and next milestone
 
-Phase 8 is not complete. Authentication, management screens, core settings, Opening State, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, and Dashboard/Reports execute through the active React product. Costing/planning controls, users/security administration, and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
+Phase 8 is not complete. Authentication, management screens, core settings, Opening State, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, Dashboard/Reports, and Costing/Planning execute through the active React product. Users/security administration and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
 
 Phase 8 remains device-local. Multiple named users and native role enforcement are supported on one installation. Periodic encrypted Google Drive/cloud backup is recorded for a later Phase 10 design gate and Phase 11 hardening; optional read-only owner-phone snapshot viewing will be decided there. Phase 8 must not improvise networking or present backup as live synchronization.
 
-The next milestone is **Costing and planning controls**. Continue with the already contracted costing-management and planning queries plus their approved commands, preserving native policy versioning, cost-coverage truth, permission checks, and plain shop-facing wording without recreating costing or budget formulas in React.
+The next milestone is **Staff users and security audit**. Continue with the already contracted authorized-user/audit queries and private enrollment, role/status, credential-reset, and recovery commands. Preserve the distinction between employee profiles and app logins, native-only authorization, optional employee linkage, last-owner safeguards, private credential setup, durable actor history, and plain shop-facing wording.
 
 ## Plain English
 
-The Dashboard now lets staff review current stock and work recorded for a chosen period. Cashiers see only the sales and payment information they need; owners and approved managers also see customer/supplier positions and the cost-based result. If the app lacks dependable cost information, it explains what is missing instead of showing a fake zero or fake profit. Phase 8 remains open, and costing/planning controls are next.
+The owner can now set weekly Milk and collection targets, monthly expense plans, the approved Yogurt-making cost, costs for stock that existed before the app, and a shop-specific normal yield range. Plans do not pretend money was spent or earned, warnings do not create losses, and every sensitive cost decision asks for the owner/admin passphrase and keeps its earlier version. Phase 8 remains open; staff app accounts and the security audit are next.

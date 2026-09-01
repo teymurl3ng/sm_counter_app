@@ -13,6 +13,7 @@ import { reconciliationBridgeActions } from './reconciliationBridgeActions';
 import { reportBridgeActions } from './reportBridgeActions';
 import { masterDataBridgeActions } from './masterDataBridgeActions';
 import { settingsBridgeActions } from './settingsBridgeActions';
+import { costingPlanningBridgeActions } from './costingPlanningBridgeActions';
 import { errorMessage, type HybridStage } from './hybridModels';
 
 export function Phase8HybridShell() {
@@ -119,6 +120,7 @@ export function Phase8HybridShell() {
   }, [clearSession, loadAuthorizedData, session]);
 
   const reportActions = useMemo(() => reportBridgeActions(session), [session]);
+  const costingPlanningActions = useMemo(() => costingPlanningBridgeActions(session), [session]);
 
   const withMasterDataRefresh = async (operation: () => Promise<void>, success: string) => {
     if (!session || !currentUser) return;
@@ -262,6 +264,7 @@ export function Phase8HybridShell() {
     onSaveOpeningState={settingsActions.saveOpeningState}
     onCreateExpenseCategory={settingsActions.createExpenseCategory}
     onSetExpenseCategoryArchived={settingsActions.setExpenseCategoryArchived}
+    costingPlanningActions={costingPlanningActions}
   />;
 }
 

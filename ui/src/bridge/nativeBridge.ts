@@ -56,6 +56,8 @@ export const RUNTIME_ACTIONS = [
   'query.cashierSummary',
   'query.financialOverview',
   'query.profitabilityReport',
+  'query.costingManagement',
+  'query.planning',
   'command.recordPurchase',
   'command.recordSale',
   'command.recordProduction',
@@ -90,6 +92,13 @@ export const RUNTIME_ACTIONS = [
   'command.setExpenseCategoryArchived',
   'command.recordOpeningState',
   'command.correctOpeningState',
+  'command.upsertBudget',
+  'command.copyPreviousBudget',
+  'command.upsertCollectionsTarget',
+  'command.approveCostingPolicy',
+  'command.recordOpeningCostBasis',
+  'command.approveYieldPolicy',
+  'command.recordProductionLossAssessment',
 ] as const satisfies ReadonlyArray<BridgeAction>;
 
 export class NativeBridgeError extends Error {

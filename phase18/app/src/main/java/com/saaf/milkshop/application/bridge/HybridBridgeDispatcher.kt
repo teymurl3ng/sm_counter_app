@@ -20,6 +20,7 @@ class HybridBridgeDispatcher(
     private val ledgers = LedgerBridgeHandler(reads)
     private val history = HistoryBridgeHandler(reads, HistoryBridgeCommandService(database, security))
     private val reconciliation = ReconciliationBridgeHandler(reads, ReconciliationBridgeCommandService(database, security))
+    private val costingPlanning = CostingPlanningBridgeHandler(reads, CostingPlanningBridgeCommandService(database, security))
     private val inFlightRequestIds = ConcurrentHashMap.newKeySet<String>()
 
     suspend fun dispatch(rawMessage: String): String {
@@ -60,6 +61,7 @@ class HybridBridgeDispatcher(
         in HybridBridgeActions.ledgers -> ledgers.execute(request)
         in HybridBridgeActions.history -> history.execute(request)
         in HybridBridgeActions.reconciliation -> reconciliation.execute(request)
+        in HybridBridgeActions.costingPlanning -> costingPlanning.execute(request)
         else -> throw BridgeProtocolFailure("invalid_request", "This action is not available in the current app slice")
     }
 

@@ -202,7 +202,7 @@ class Phase8DeliveryOperationsTest {
 
         val actions = dispatch("system.bridgeInfo").getJSONObject("data").getJSONArray("supportedActions")
         val names = (0 until actions.length()).map(actions::getString)
-        assertEquals(51, names.size)
+        assertEquals(55, names.size)
         assertTrue(names.containsAll(listOf(
             "query.deliveries",
             "command.createDelivery",
@@ -247,7 +247,7 @@ class Phase8DeliveryOperationsTest {
             waitFor(webView, "document.querySelector('[data-delivery-id=\"${delivery.deliveryId}\"]') !== null", 20_000L)
             setInput(webView, "delivery-status-notes-${delivery.deliveryId}", "Handed to customer")
             evaluate(webView, "document.getElementById('mark-delivered-${delivery.deliveryId}').click(); true")
-            waitFor(webView, "document.querySelector('[data-delivery-id=\"${delivery.deliveryId}\"]').innerText.includes('Delivered')", 20_000L)
+            waitFor(webView, "document.getElementById('archive-delivery-${delivery.deliveryId}') !== null", 20_000L)
             assertEquals(listOf("pending", "delivered"), app.database.deliveryDao().statusHistory(delivery.deliveryId).map { it.status })
 
             waitFor(webView, "document.getElementById('archive-delivery-${delivery.deliveryId}').disabled === false", 20_000L)

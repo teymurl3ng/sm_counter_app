@@ -18,8 +18,11 @@ import com.saaf.milkshop.application.readmodels.FinancialOverviewDto
 import com.saaf.milkshop.application.readmodels.MasterDataDto
 import com.saaf.milkshop.application.readmodels.ProductDto
 import com.saaf.milkshop.application.readmodels.ProductReferenceDto
+import com.saaf.milkshop.application.readmodels.ReconciliationArchiveDto
 import com.saaf.milkshop.application.readmodels.TransactionReferencesDto
 import com.saaf.milkshop.application.readmodels.VendorDto
+import com.saaf.milkshop.application.readmodels.money
+import com.saaf.milkshop.domain.DailyCloseRecord
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -171,6 +174,28 @@ internal fun eventDetailJson(value: EventDetailDto): JSONObject = JSONObject()
             JSONObject().put("accountName", movement.accountName).put("amountPaisa", movement.amountPaisa.toString())
         }
     })
+
+internal fun reconciliationArchiveJson(value: ReconciliationArchiveDto): JSONObject = JSONObject()
+    .put("cashCounts", jsonArray(value.cashCounts) { count ->
+        JSONObject().put("countId", count.countId.toString()).put("accountId", count.accountId.toString())
+            .put("businessDate", count.businessDate).put("countedCashPaisa", count.countedCashPaisa.toString())
+            .put("expectedCashPaisa", count.expectedCashPaisa.toString()).put("variancePaisa", count.variancePaisa.toString())
+            .put("countedAt", count.countedAt).putNullable("notes", count.notes)
+    })
+    .put("closeActions", jsonArray(value.closeActions) { action ->
+        JSONObject().put("actionId", action.actionId.toString()).put("businessDate", action.businessDate)
+            .put("actionCode", action.actionCode).putNullable("physicalCashCountId", action.physicalCashCountId?.toString())
+            .put("actor", JSONObject().putNullable("userId", action.actor.userId?.toString())
+                .putNullable("displayName", action.actor.displayName).putNullable("roleCode", action.actor.roleCode))
+            .putNullable("reason", action.reason).put("createdAt", action.createdAt)
+            .putNullable("supersedesActionId", action.supersedesActionId?.toString())
+    })
+
+internal fun dailyCloseResultJson(value: DailyCloseRecord): JSONObject = JSONObject()
+    .put("actionId", value.action.actionId.toString()).put("statusCode", value.status)
+    .putNullable("countedCashPaisa", value.countedCash?.let { money(it).toString() })
+    .putNullable("expectedCashPaisa", value.expectedCash?.let { money(it).toString() })
+    .putNullable("variancePaisa", value.variance?.let { money(it).toString() })
 
 private fun productReferenceJson(value: ProductReferenceDto): JSONObject = JSONObject()
     .put("productId", value.productId.toString()).put("name", value.name).put("unit", value.unit)

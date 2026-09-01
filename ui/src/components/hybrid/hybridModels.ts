@@ -156,6 +156,18 @@ export type CorrectionDraft = {
   notes: string;
 };
 
+export type CashCountDraft = {
+  businessDate: string;
+  countedCashRupees: string;
+  notes: string;
+};
+
+export type ReopenDayDraft = {
+  businessDate: string;
+  reason: string;
+  passphrase: string;
+};
+
 export function todayInput(): string {
   const date = new Date();
   const month = String(date.getMonth() + 1).padStart(2, '0');

@@ -49,6 +49,10 @@ internal object HybridBridgeActions {
     const val EVENT_HISTORY = "query.eventHistory"
     const val EVENT_DETAIL = "query.eventDetail"
     const val CORRECT_EVENT = "command.correctEvent"
+    const val RECONCILIATION_ARCHIVE = "query.reconciliationArchive"
+    const val RECORD_PHYSICAL_CASH_COUNT = "command.recordPhysicalCashCount"
+    const val CLOSE_BUSINESS_DATE = "command.closeBusinessDate"
+    const val REOPEN_BUSINESS_DATE = "command.reopenBusinessDate"
     const val ATTENDANCE = "query.attendance"
     const val CREATE_EMPLOYEE = "command.createEmployee"
     const val RENAME_EMPLOYEE = "command.renameEmployee"
@@ -103,7 +107,8 @@ internal object HybridBridgeActions {
     val deliveries = setOf(DELIVERIES, CREATE_DELIVERY, TRANSITION_DELIVERY, LINK_DELIVERY_SALE, ARCHIVE_DELIVERY)
     val ledgers = setOf(ACCOUNT_LEDGER)
     val history = setOf(EVENT_HISTORY, EVENT_DETAIL, CORRECT_EVENT)
-    val supported = listOf(BRIDGE_INFO) + authentication + masterData + employees + settings + operations + deliveries + ledgers + history
+    val reconciliation = setOf(RECONCILIATION_ARCHIVE, RECORD_PHYSICAL_CASH_COUNT, CLOSE_BUSINESS_DATE, REOPEN_BUSINESS_DATE)
+    val supported = listOf(BRIDGE_INFO) + authentication + masterData + employees + settings + operations + deliveries + ledgers + history + reconciliation
     val authByAction = supported.associateWith { action ->
         if (action in setOf(BRIDGE_INFO, BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN)) "none" else "session"
     }

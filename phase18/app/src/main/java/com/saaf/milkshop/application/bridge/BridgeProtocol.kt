@@ -85,6 +85,9 @@ internal object HybridBridgeActions {
     const val RECORD_OPENING_COST_BASIS = "command.recordOpeningCostBasis"
     const val APPROVE_YIELD_POLICY = "command.approveYieldPolicy"
     const val RECORD_PRODUCTION_LOSS_ASSESSMENT = "command.recordProductionLossAssessment"
+    const val EXPORT_ENCRYPTED_BACKUP = "system.exportEncryptedBackup"
+    const val INSPECT_ENCRYPTED_BACKUP = "system.inspectEncryptedBackup"
+    const val RESTORE_INSPECTED_BACKUP = "system.restoreInspectedBackup"
 
     val authentication = setOf(BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN, LOGOUT, REAUTHENTICATE, CHANGE_OWN_PASSPHRASE, RECOVER_OWNER, CURRENT_SESSION)
     val securityAdministration = setOf(
@@ -150,7 +153,8 @@ internal object HybridBridgeActions {
         APPROVE_YIELD_POLICY,
         RECORD_PRODUCTION_LOSS_ASSESSMENT,
     )
-    val supported = listOf(BRIDGE_INFO) + authentication + securityAdministration + masterData + employees + settings + operations + deliveries + ledgers + history + reconciliation + costingPlanning
+    val backup = setOf(EXPORT_ENCRYPTED_BACKUP, INSPECT_ENCRYPTED_BACKUP, RESTORE_INSPECTED_BACKUP)
+    val supported = listOf(BRIDGE_INFO) + authentication + securityAdministration + masterData + employees + settings + operations + deliveries + ledgers + history + reconciliation + costingPlanning + backup
     val authByAction = supported.associateWith { action ->
         when (action) {
             in setOf(BRIDGE_INFO, BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN, RECOVER_OWNER) -> "none"
@@ -228,6 +232,7 @@ internal fun mapBridgeFailure(error: Throwable): BridgeFailure = when (error) {
     is BridgeCommandNotFound -> BridgeFailure("not_found", error.message ?: "The requested record no longer exists")
     is BridgeCommandDayClosed -> BridgeFailure("day_closed", error.message ?: "This business day is closed")
     is BridgeCommandInsufficientStock -> BridgeFailure("insufficient_stock", error.message ?: "There is not enough stock for this operation")
+    is BackupBridgeFailure -> BridgeFailure(error.code, error.message ?: "The backup operation could not be completed", retryable = error.retryable)
     is SecurityFailure.Authentication -> BridgeFailure("authentication_failed", SecurityFailure.GENERIC_AUTH_FAILURE)
     is SecurityFailure.SessionExpired -> BridgeFailure("session_expired", "Your session expired. Sign in again.")
     is SecurityFailure.PermissionDenied -> BridgeFailure("permission_denied", "You do not have permission to perform this action.")

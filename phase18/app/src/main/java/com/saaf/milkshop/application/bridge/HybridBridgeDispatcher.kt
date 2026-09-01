@@ -9,6 +9,8 @@ class HybridBridgeDispatcher(
     database: MilkShopDatabase,
     security: com.saaf.milkshop.domain.UserSecurityService,
     onSessionChanged: (String?) -> Unit = {},
+    backupManager: com.saaf.milkshop.BackupManager? = null,
+    backupDocuments: BackupDocumentPicker? = null,
 ) {
     private val reads = HybridReadModelService(database, security)
     private val authentication = AuthenticationBridgeHandler(reads, security, onSessionChanged)
@@ -22,6 +24,7 @@ class HybridBridgeDispatcher(
     private val history = HistoryBridgeHandler(reads, HistoryBridgeCommandService(database, security))
     private val reconciliation = ReconciliationBridgeHandler(reads, ReconciliationBridgeCommandService(database, security))
     private val costingPlanning = CostingPlanningBridgeHandler(reads, CostingPlanningBridgeCommandService(database, security))
+    private val backup = if (backupManager != null && backupDocuments != null) BackupBridgeHandler(database, security, backupManager, backupDocuments, onSessionChanged) else null
     private val inFlightRequestIds = ConcurrentHashMap.newKeySet<String>()
 
     suspend fun dispatch(rawMessage: String): String {
@@ -48,6 +51,8 @@ class HybridBridgeDispatcher(
         }
     }
 
+    fun close() = backup?.close()
+
     private suspend fun execute(request: BridgeRequest): Any = when (request.action) {
         HybridBridgeActions.BRIDGE_INFO -> JSONObject()
             .put("contractVersion", BridgeContractSnapshot.VERSION)
@@ -64,6 +69,7 @@ class HybridBridgeDispatcher(
         in HybridBridgeActions.history -> history.execute(request)
         in HybridBridgeActions.reconciliation -> reconciliation.execute(request)
         in HybridBridgeActions.costingPlanning -> costingPlanning.execute(request)
+        in HybridBridgeActions.backup -> backup?.execute(request) ?: unavailableBridgeAction()
         else -> throw BridgeProtocolFailure("invalid_request", "This action is not available in the current app slice")
     }
 

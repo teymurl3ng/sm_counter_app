@@ -1,8 +1,8 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-01 — hybrid Phases 0–7 are complete; Phase 8 screen-by-screen native-backed UI wiring is in progress, with management, core Settings, Opening State, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, Dashboard/Reports, Costing/Planning, and Staff/Security complete. Encrypted backup and restore is the final Phase 8 milestone. Substantial Phase 9/11 native prerequisites were completed early and remain credited without declaring those hybrid phases complete.
+Status: RECONCILED 2026-09-01 — hybrid Phases 0–8 are complete. All 78 frozen bridge operations and every retained Phase 8 screen family are native-backed and physical-device verified, including encrypted backup and restore. Phase 9 Runtime / Navigation / Device Integration is next. Substantial Phase 9/11 native prerequisites were completed early and remain credited without declaring those later hybrid phases complete.
 
-Latest physical-device checkpoint: Staff Users and Security Audit are verified; encrypted backup and restore is queued next.
+Latest physical-device checkpoint: Encrypted Backup and Restore is verified; the complete connected-device suite passes 211/211.
 
 ## What this repository contains
 
@@ -23,7 +23,7 @@ Latest physical-device checkpoint: Staff Users and Security Audit are verified; 
 - `PHASE6.md` — completed canonical bridge-contract boundary, generated projections, drift gate, verification, and Phase 7 handoff.
 - `bridge/CONTRACT.md` and `bridge/contract.json` — frozen human-readable and machine-readable bridge contract version 2.
 - `PHASE7.md` — completed packaged React/WebView/Android vertical slice, authenticated bridge proof, physical-device evidence, and Phase 8 handoff.
-- `PHASE8.md` — current screen capability ledger, completed native-backed milestones through Staff Users and Security Audit, verification, limitations, and final queued screen.
+- `PHASE8.md` — completed screen capability ledger, all 21 native-backed milestones, verification, limitations, and Phase 9 handoff.
 
 ## Immutable baselines
 
@@ -35,9 +35,9 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 8 — Screen-by-Screen Native UI Wiring: IN PROGRESS**
+**Phase 8 — Screen-by-Screen Native UI Wiring: COMPLETE**
 
-The Phase 7 shell remains intact. Phase 8 now provides native-backed management screens, Attendance, editable store identity, core shop-wide rates, Expense Categories, optional Opening State setup/correction, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, Dashboard/Reports, Costing/Planning, and Staff/Security. Currency remains fixed to PKR. Posting behavior remains native-only; deliveries never duplicate sale revenue; ledgers and reports display canonical native values without React-side accounting; corrections and close/reopen actions remain append-only; physical counts never create balancing money entries. The Access area provides private staff enrollment/reset, role/status control, personal passphrase changes, owner recovery, and durable security history without React-side authority. The runtime exposes 75 of the frozen contract's 78 operations. The complete connected-device regression passes 206/206. Phase 8 remains open only for encrypted backup and restore wiring.
+The Phase 7 shell remains intact. Phase 8 provides native-backed management screens, Attendance, editable store identity, core shop-wide rates, Expense Categories, optional Opening State setup/correction, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, Dashboard/Reports, Costing/Planning, Staff/Security, and Encrypted Backup/Restore. Currency remains fixed to PKR. Posting behavior remains native-only; deliveries never duplicate sale revenue; ledgers and reports display canonical native values without React-side accounting; corrections and close/reopen actions remain append-only; physical counts never create balancing money entries. The Access area provides private staff enrollment/reset, role/status control, personal passphrase changes, owner recovery, and durable security history without React-side authority. The Backup area keeps file selection, encryption, inspection, and restore inside Android-owned boundaries; a successful restore replaces the active copy and invalidates every session. The runtime implements all 78 frozen operations. The complete connected-device regression passes 211/211.
 
 The current release architecture is multi-user but device-local: named roles share one installation and one Room database. The approved next direction is periodic encrypted off-device backup, with Google Drive as the example provider and the exact cadence/retention/network rules deferred to a Phase 10 design gate. Backup protects and transfers a verified snapshot; it is not live synchronization between two writable phones. That gate will separately decide whether the owner's phone should offer a safe read-only view of the latest snapshot.
 
@@ -47,7 +47,7 @@ The current release architecture is multi-user but device-local: named roles sha
 - Authentication and authorization must be native-backed. React may present login and permission-aware controls, but it must never decide or self-assert a user's role.
 - The approved model defines native users, Argon2id credentials, fixed role/permission bundles, memory-only sessions, first-owner bootstrap, deactivation, owner recovery, audit actors, and migration behavior.
 - Once any application user exists, daily close/reopen rejects typed actor claims and requires a verified native session/user ID. Schema-6 history remains explicitly legacy/unverified.
-- Portable encrypted backup format 2 is implemented with Argon2id-derived AES-256-GCM protection, security-state portability, tamper/wrong-passphrase rejection, legacy format-1 import compatibility, and post-restore session invalidation. The authenticated React shell and staff/security administration are now wired; encrypted export/inspection/restore UI remains the final Phase 8 task. The numeric quick-PIN shortcut remains deliberately deferred.
+- Portable encrypted backup format 2 is implemented with Argon2id-derived AES-256-GCM protection, security-state portability, tamper/wrong-passphrase rejection, legacy format-1 import compatibility, and post-restore session invalidation. Its authenticated export/inspection/restore UI is wired through Android-owned document pickers and short-lived one-use restore tickets. The numeric quick-PIN shortcut remains deliberately deferred.
 - Staff accounts use private enrollment/reset: an authorized owner/admin creates the identity and role, while the staff member chooses the credential. A user marked as requiring setup cannot authenticate with any previous verifier.
 - Automatic app-private snapshots now use AES-256-GCM under a non-exportable random Android Keystore key. Their authenticated payload includes security state but excludes active sessions and failed-login/lockout timing state. They are intentionally device-local; complete security restore is allowed only before owner setup on the same installation.
 
@@ -87,7 +87,7 @@ Phase 6 — Bridge Contract (`bridge/CONTRACT.md`) ✅
 
 Phase 7 — Hybrid Shell / Vertical Slice ✅
 
-Phase 8 — UI Wiring ◐ (management, core settings, Opening State, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, Dashboard/Reports, Costing/Planning, and Staff/Security complete; encrypted backup/restore next)
+Phase 8 — UI Wiring ✅ (all 21 milestones complete; all 78 bridge operations native-backed and device-proven)
 
 Phase 9 — Runtime / Navigation / Device Integration ◐ (native lifecycle credit only; WebView recreation, Back behavior, targeted refresh, keyboard/insets, and fixed application navigation remain)
 
@@ -148,8 +148,9 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 8 focused Dashboard/Reports suite: 4/4 passed on the physical device.
 - Phase 8 focused Costing/Planning suite: 5/5 passed on the physical device.
 - Phase 8 focused Staff Users/Security Audit suite: 5/5 passed on the physical device.
-- Complete connected-device instrumentation regression: 206/206 passed, 0 skipped, 0 failed.
+- Phase 8 focused Encrypted Backup/Restore suite: 5/5 passed on the physical device.
+- Complete connected-device instrumentation regression: 211/211 passed, 0 skipped, 0 failed.
 
 ## Next gate
 
-Phases 3–7 are closed and Phase 8 is active. Management, core settings, optional Opening State, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, Dashboard/Reports, Costing/Planning, and Staff/Security are native-backed and device-proven. The active React shell, native bridge handlers/services, and Phase 5 read-model façade remain split into focused modules. Next, wire the three encrypted backup/export, inspection, and restore actions through their existing picker/ticket and authorization boundaries. Explain clearly that a backup is a protected snapshot, not live multi-device synchronization, and do not improvise Google Drive scheduling inside Phase 8. See `PHASE8.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–8 are closed. Every retained Phase 8 screen family and all 78 bridge operations are native-backed and device-proven, including encrypted export, inspection, and full-replacement restore through protected Android picker/ticket boundaries. The active React shell, native bridge handlers/services, and Phase 5 read-model façade remain split into focused modules. Next, begin Phase 9 Runtime / Navigation / Device Integration: prove lifecycle/recreation behavior, protected Back/logout navigation, targeted refresh, keyboard/system-bar/inset handling, and fixed application navigation without changing business semantics. Google Drive scheduling remains deferred to the Phase 10 design gate. See `PHASE8.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.

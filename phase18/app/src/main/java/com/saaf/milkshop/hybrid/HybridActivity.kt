@@ -13,13 +13,18 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
 import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.WindowCompat
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.saaf.milkshop.BuildConfig
+import com.saaf.milkshop.BackupManager
 import com.saaf.milkshop.MilkShopApplication
+import com.saaf.milkshop.application.bridge.BackupDocumentPicker
+import com.saaf.milkshop.application.bridge.BridgeCommandConflict
 import com.saaf.milkshop.application.bridge.HybridBridgeDispatcher
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -31,6 +36,15 @@ class HybridActivity : ComponentActivity() {
     private val activityScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private lateinit var webView: WebView
     private lateinit var applicationState: MilkShopApplication
+    private lateinit var bridgeDispatcher: HybridBridgeDispatcher
+    private var pendingCreateDocument: CompletableDeferred<Uri?>? = null
+    private var pendingOpenDocument: CompletableDeferred<Uri?>? = null
+    private val createBackupDocument = registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
+        pendingCreateDocument?.complete(uri)
+    }
+    private val openBackupDocument = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        pendingOpenDocument?.complete(uri)
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,10 +64,15 @@ class HybridActivity : ComponentActivity() {
         val assetLoader = WebViewAssetLoader.Builder()
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
             .build()
-        val dispatcher = HybridBridgeDispatcher(
+        bridgeDispatcher = HybridBridgeDispatcher(
             database = applicationState.database,
             security = applicationState.userSecurity,
             onSessionChanged = { applicationState.currentSessionId = it },
+            backupManager = BackupManager(this),
+            backupDocuments = if (BuildConfig.DEBUG && backupDocumentPickerForTesting != null) requireNotNull(backupDocumentPickerForTesting) else object : BackupDocumentPicker {
+                override suspend fun createDocument(suggestedFileName: String?): Uri? = pickBackupDestination(suggestedFileName)
+                override suspend fun openDocument(): Uri? = pickBackupSource()
+            },
         )
 
         webView = WebView(this).apply {
@@ -94,7 +113,7 @@ class HybridActivity : ComponentActivity() {
             if (!isMainFrame || sourceOrigin.toString() != APP_ORIGIN) return@addWebMessageListener
             val raw = message.data ?: return@addWebMessageListener
             activityScope.launch {
-                val response = withContext(Dispatchers.IO) { dispatcher.dispatch(raw) }
+                val response = withContext(Dispatchers.IO) { bridgeDispatcher.dispatch(raw) }
                 replyProxy.postMessage(response)
             }
         }
@@ -113,6 +132,9 @@ class HybridActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
+        pendingCreateDocument?.complete(null)
+        pendingOpenDocument?.complete(null)
+        if (::bridgeDispatcher.isInitialized) bridgeDispatcher.close()
         activityScope.cancel()
         if (::webView.isInitialized) {
             webView.stopLoading()
@@ -123,6 +145,30 @@ class HybridActivity : ComponentActivity() {
     }
 
     fun webViewForTesting(): WebView = webView
+
+    private suspend fun pickBackupDestination(suggestedFileName: String?): Uri? = withContext(Dispatchers.Main.immediate) {
+        if (pendingCreateDocument != null) throw BridgeCommandConflict("A backup file picker is already open")
+        val result = CompletableDeferred<Uri?>()
+        pendingCreateDocument = result
+        try {
+            createBackupDocument.launch(suggestedFileName ?: BackupManager.displayName(this@HybridActivity))
+            result.await()
+        } finally {
+            pendingCreateDocument = null
+        }
+    }
+
+    private suspend fun pickBackupSource(): Uri? = withContext(Dispatchers.Main.immediate) {
+        if (pendingOpenDocument != null) throw BridgeCommandConflict("A backup file picker is already open")
+        val result = CompletableDeferred<Uri?>()
+        pendingOpenDocument = result
+        try {
+            openBackupDocument.launch(arrayOf("application/octet-stream", "application/json", "*/*"))
+            result.await()
+        } finally {
+            pendingOpenDocument = null
+        }
+    }
 
     private fun showFatalError(message: String) {
         setContentView(
@@ -147,5 +193,6 @@ class HybridActivity : ComponentActivity() {
         const val APP_HOST = "appassets.androidplatform.net"
         const val APP_ORIGIN = "https://$APP_HOST"
         const val HYBRID_ENTRY_URL = "$APP_ORIGIN/assets/hybrid/index.html"
+        @Volatile var backupDocumentPickerForTesting: BackupDocumentPicker? = null
     }
 }

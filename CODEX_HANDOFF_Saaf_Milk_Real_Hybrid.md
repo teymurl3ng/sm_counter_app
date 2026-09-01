@@ -16,9 +16,9 @@ Read those files before changing code.
 
 ## Current superseding checkpoint — 2026-09-01
 
-The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–7 are complete and Phase 8 is in progress. `PHASE8.md` contains the active screen ledger; management, core settings, optional Opening State, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, Dashboard/Reports, Costing/Planning, and Staff/Security are complete. Encrypted backup and restore is the final Phase 8 milestone.
+The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–8 are complete and Phase 9 is next. `PHASE8.md` contains the completed screen ledger; management, core settings, optional Opening State, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, Dashboard/Reports, Costing/Planning, Staff/Security, and Encrypted Backup/Restore are native-backed and physical-device verified.
 
-Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE8.md` for current status. Phase 8 now exposes seventy-five runtime actions, including operational/cashier/financial/profitability summaries, Daily Work commands, delivery lifecycle, account ledgers, event history/detail, typed corrections, reconciliation, versioned costing/planning controls, personal credentials, owner recovery, staff enrollment/administration, and security audit. The complete connected-device suite passes 206/206 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7. Only the three encrypted backup/restore endpoints remain unwired in React.
+Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE8.md` for current status. The runtime exposes all seventy-eight frozen actions, including operational/cashier/financial/profitability summaries, Daily Work commands, delivery lifecycle, account ledgers, event history/detail, typed corrections, reconciliation, versioned costing/planning controls, personal credentials, owner recovery, staff enrollment/administration, security audit, and encrypted export/inspection/restore. The complete connected-device suite passes 211/211 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7.
 
 Application user accounts and native role-based authorization are explicitly approved as a required cross-phase capability. Their schema-7 model, encrypted backup boundary, app-owned sessions, private staff enrollment/reset, user administration, role-aware navigation, recovery, security audit, and command-boundary authorization are implemented and now wired into React. Application users are security principals separate from employee/salary profiles, with an optional link between them. The schema-v6 daily-close actor name/role is transitional asserted metadata, not authenticated identity.
 
@@ -29,7 +29,7 @@ The two completed Phase 3 design tracks were:
 1. authenticated users, credentials, roles/permissions, sessions, recovery, audit actor IDs, migration, and backup/restore security;
 2. authoritative costing/COGS and profitability semantics.
 
-The researched recommendations for native security and costing are implemented and device-verified. Phase 8 is now active: management, core settings, optional Opening State, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, Dashboard/Reports, Costing/Planning, and Staff/Security are complete. Encrypted backup and restore is next; broad React product completion has not been claimed.
+The researched recommendations for native security and costing are implemented and device-verified. Phase 8 is complete: every retained screen family and all 78 frozen operations execute through the active native-backed React product. Phase 9 runtime/navigation/device integration is the next gate; later fidelity, cleanup, acceptance, and release phases remain open.
 
 ---
 
@@ -231,11 +231,11 @@ Canonical bridge contract version 2 is frozen in `bridge/CONTRACT.md` and `bridg
 
 ## Phase 7 — COMPLETE
 
-The packaged React/WebView/Android vertical slice is implemented and device-proven in `PHASE7.md`. `HybridActivity` is the launcher, local assets use the restricted app-assets HTTPS origin, and a separate web-build script supplies Android assets without hiding npm inside Gradle. The eight-action runtime subset covers contract negotiation, first-owner/login/logout/session resume, native product reads, and one protected product create with durable actor audit. The full connected suite passes 127/127. Phase 8 is the current continuation point.
+The packaged React/WebView/Android vertical slice is implemented and device-proven in `PHASE7.md`. `HybridActivity` is the launcher, local assets use the restricted app-assets HTTPS origin, and a separate web-build script supplies Android assets without hiding npm inside Gradle. The eight-action runtime subset covers contract negotiation, first-owner/login/logout/session resume, native product reads, and one protected product create with durable actor audit. The full connected suite passed 127/127. Phase 8 was the continuation point at that checkpoint and is now complete.
 
-## Phase 8 — IN PROGRESS
+## Phase 8 — COMPLETE
 
-The screen capability ledger is in `PHASE8.md`. Management, core settings, optional Opening State, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, Dashboard/Reports, Costing/Planning, and Staff/Security are complete with awaited native access, Kotlin permission enforcement, durable actor audit where commands apply, and packaged physical-device evidence. Daily Work, Deliveries, Accounts, History, Cash Close, Dashboard, Cost & Plans, and Access use separate focused React modules; their native handlers/services remain separated. The runtime subset is now seventy-five actions while the frozen contract remains version 2 with 78 operations. The focused Staff/Security suite passes 5/5 and the full connected suite passes 206/206. Encrypted export/inspection/restore is the current continuation point and must preserve private passphrases, native authority/integrity checks, picker/ticket boundaries, session invalidation, and plain backup-versus-synchronization wording.
+The completed screen capability ledger is in `PHASE8.md`. Management, core settings, optional Opening State, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, Dashboard/Reports, Costing/Planning, Staff/Security, and Encrypted Backup/Restore use awaited native access, Kotlin permission enforcement, durable actor audit where commands apply, and packaged physical-device evidence. Daily Work, Deliveries, Accounts, History, Cash Close, Dashboard, Cost & Plans, Access, and Backup use separate focused React modules; their native handlers/services remain separated. The runtime implements all 78 operations from frozen contract version 2. The focused Encrypted Backup/Restore suite passes 5/5 and the full connected suite passes 211/211. Phase 9 Runtime / Navigation / Device Integration is the current continuation point.
 
 ---
 
@@ -514,7 +514,7 @@ validate → await native command → explicit success/failure → refresh.
 
 No silent returns and no fake "Saved".
 
-Login/logout, personal credentials, owner recovery, authorized user administration, private enrollment/reset, and security history are wired and device-proven. Navigation and controls may be role-aware for usability, but hiding a control never replaces native permission enforcement. Continue with the three encrypted backup/restore endpoints only.
+Login/logout, personal credentials, owner recovery, authorized user administration, private enrollment/reset, security history, and encrypted backup/restore are wired and device-proven. Navigation and controls may be role-aware for usability, but hiding a control never replaces native permission enforcement. Preserve this completed boundary during Phase 9 runtime work.
 
 ## Phases 9–10
 
@@ -619,4 +619,4 @@ After opening the repo, begin with:
 
 > Read `README.md`, `PHASE0.md`, `PHASE1.md`, `PHASE2.md`, `PHASE3.md`, `POSTMORTEM.md`, and this `CODEX_HANDOFF_Saaf_Milk_Real_Hybrid.md`. Inspect the current Phase 3 native ledger implementation and the untouched Phase 18 business core. Verify the frozen logic-spec and SQL hashes and rerun the existing native Android-test Kotlin compile. Do not modify the frozen SQL/spec or invent new formulas. Report the exact repo/build status and the next safe Phase 3 implementation step. If the next step requires a schema/business-rule amendment, stop for explicit authorization before changing it.
 
-That text is historical provenance only. The current continuation point is Phase 8 screen-by-screen native-backed UI wiring from the proven Phase 7 slice, described at the top of this handoff and in `ROADMAP_RECONCILIATION_2026-08-27.md`.
+That text is historical provenance only. The current continuation point is Phase 9 Runtime / Navigation / Device Integration, described at the top of this handoff and in `ROADMAP_RECONCILIATION_2026-08-27.md`.

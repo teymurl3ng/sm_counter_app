@@ -129,7 +129,7 @@ class Phase8DashboardReportsTest {
         assertError(dispatch("query.profitabilityReport", profitabilityRange().put("extra", true), owner.session.sessionId), "invalid_request")
         val actions = dispatch("system.bridgeInfo").getJSONObject("data").getJSONArray("supportedActions")
         val names = (0 until actions.length()).map(actions::getString)
-        assertEquals(75, names.size)
+        assertEquals(78, names.size)
         assertTrue(names.contains("query.profitabilityReport"))
     }
 

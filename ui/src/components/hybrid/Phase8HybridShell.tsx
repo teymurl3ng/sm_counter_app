@@ -15,6 +15,7 @@ import { masterDataBridgeActions } from './masterDataBridgeActions';
 import { settingsBridgeActions } from './settingsBridgeActions';
 import { costingPlanningBridgeActions } from './costingPlanningBridgeActions';
 import { securityBridgeActions } from './securityBridgeActions';
+import { backupBridgeActions } from './backupBridgeActions';
 import { errorMessage, type HybridStage } from './hybridModels';
 
 export function Phase8HybridShell() {
@@ -123,6 +124,7 @@ export function Phase8HybridShell() {
   const reportActions = useMemo(() => reportBridgeActions(session), [session]);
   const costingPlanningActions = useMemo(() => costingPlanningBridgeActions(session), [session]);
   const securityActions = useMemo(() => securityBridgeActions(session), [session]);
+  const backupActions = useMemo(() => backupBridgeActions(session), [session]);
 
   const withMasterDataRefresh = async (operation: () => Promise<void>, success: string) => {
     if (!session || !currentUser) return;
@@ -248,6 +250,12 @@ export function Phase8HybridShell() {
       setBusy(false);
     }
   };
+  const restoreBackup = async (ticket: Parameters<typeof backupActions.restoreBackup>[0]) => {
+    const result = await backupActions.restoreBackup(ticket);
+    clearSession();
+    setNotice('Backup restored safely. Sign in using an owner account from that backup.');
+    return result;
+  };
   return <ManagementWorkspace
     busy={busy}
     currentUser={currentUser}
@@ -300,6 +308,8 @@ export function Phase8HybridShell() {
     costingPlanningActions={costingPlanningActions}
     securityActions={securityActions}
     onChangeOwnPassphrase={changeOwnPassphrase}
+    backupActions={backupActions}
+    onRestoreBackup={restoreBackup}
   />;
 }
 

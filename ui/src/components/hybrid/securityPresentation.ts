@@ -30,6 +30,8 @@ export function auditActionLabel(code: string): string {
     reset_credential: 'Passphrase reset started',
     change_credential: 'Own passphrase changed',
     recover_owner: 'Owner account recovered',
+    export_backup: 'Encrypted backup created',
+    restore_backup: 'Encrypted backup restored',
     permission_denied: 'Permission denied',
   };
   return labels[code] ?? plainCode(code);

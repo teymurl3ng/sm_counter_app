@@ -109,6 +109,9 @@ export const RUNTIME_ACTIONS = [
   'command.recordOpeningCostBasis',
   'command.approveYieldPolicy',
   'command.recordProductionLossAssessment',
+  'system.exportEncryptedBackup',
+  'system.inspectEncryptedBackup',
+  'system.restoreInspectedBackup',
 ] as const satisfies ReadonlyArray<BridgeAction>;
 
 export class NativeBridgeError extends Error {

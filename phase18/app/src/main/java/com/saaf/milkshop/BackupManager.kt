@@ -71,6 +71,11 @@ class BackupManager(private val context: Context) {
         val fileName: String,
     )
 
+    data class EncryptedBackupInspection(
+        val meta: BackupMeta,
+        val containsSecurityState: Boolean,
+    )
+
     data class RestoreSelection(
         val business: Boolean,
         val planning: Boolean,
@@ -172,6 +177,19 @@ class BackupManager(private val context: Context) {
             }
         }
 
+    suspend fun inspectEncryptedSnapshot(uri: Uri, passphrase: CharArray): Result<EncryptedBackupInspection> =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val json = readEncryptedAndVerify(readUri(uri), passphrase)
+                val metadata = json.getJSONObject("metadata")
+                validateCompatibility(metadata)
+                EncryptedBackupInspection(
+                    meta = backupMeta(json, uri.lastPathSegment ?: "backup"),
+                    containsSecurityState = json.getJSONObject("data").optJSONArray("app_users")?.length()?.let { it > 0 } == true,
+                )
+            }
+        }
+
 
     fun localBackups(): List<Pair<java.io.File, BackupMeta>> {
         val dir = java.io.File(context.filesDir, BACKUP_DIR)
@@ -237,12 +255,34 @@ class BackupManager(private val context: Context) {
         selection: RestoreSelection,
         passphrase: CharArray,
         sessions: NativeSessionManager,
+    ): Result<BackupMeta> = restoreEncryptedInternal(database, uri, selection, passphrase, sessions, requireEmptyInstallation = true)
+
+    /**
+     * Authenticated hybrid replacement flow. The bridge verifies a current owner,
+     * recent full authentication, the selected document, and a one-use ticket
+     * before calling this method. The pre-setup restore path remains empty-only.
+     */
+    suspend fun restoreEncryptedReplacing(
+        database: MilkShopDatabase,
+        uri: Uri,
+        selection: RestoreSelection,
+        passphrase: CharArray,
+        sessions: NativeSessionManager,
+    ): Result<BackupMeta> = restoreEncryptedInternal(database, uri, selection, passphrase, sessions, requireEmptyInstallation = false)
+
+    private suspend fun restoreEncryptedInternal(
+        database: MilkShopDatabase,
+        uri: Uri,
+        selection: RestoreSelection,
+        passphrase: CharArray,
+        sessions: NativeSessionManager,
+        requireEmptyInstallation: Boolean,
     ): Result<BackupMeta> = withContext(Dispatchers.IO) {
         runCatching {
             require(selection.business && selection.security) {
                 "Encrypted security restore requires both business and security data"
             }
-            require(database.appUserDao().count() == 0L) {
+            require(!requireEmptyInstallation || database.appUserDao().count() == 0L) {
                 "Security restore is only allowed before user setup on this installation"
             }
             val json = readEncryptedAndVerify(readUri(uri), passphrase)
@@ -307,6 +347,10 @@ class BackupManager(private val context: Context) {
             val backupDao = database.backupDataDao()
             if (selection.business) {
                 Phase3CostingMigrationSql.immutableTriggerNames.forEach { executeSQL("DROP TRIGGER IF EXISTS $it") }
+                if (includeSecurity) {
+                    executeSQL("DROP TRIGGER IF EXISTS prevent_app_user_delete")
+                    executeSQL("DROP TRIGGER IF EXISTS prevent_security_audit_delete")
+                }
                 backupDao.deleteInventoryCostMovements()
                 backupDao.deleteCostProjectionState()
                 backupDao.deleteCostingPolicyComponents()
@@ -315,6 +359,13 @@ class BackupManager(private val context: Context) {
                 backupDao.deleteInventoryCostBasisEntries()
                 backupDao.deleteCostingPolicyVersions()
                 backupDao.deleteDailyCloseActions()
+                backupDao.deleteEventActorLinks()
+                if (includeSecurity) {
+                    backupDao.deleteSecurityAuditEntries()
+                    backupDao.deleteSavedRecoveryCodes()
+                    backupDao.deleteUserCredentials()
+                    backupDao.deleteAppUsers()
+                }
                 backupDao.deleteOpeningAccountEntries()
                 backupDao.deleteOpeningInventoryEntries()
                 backupDao.deleteOpeningBatches()
@@ -393,6 +444,11 @@ class BackupManager(private val context: Context) {
                 backupDao.backfillEmployeeProfiles()
                 backupDao.backfillExpenseCategoryProfiles()
                 Phase3CostingMigrationSql.immutableTriggers.forEach { executeSQL(it) }
+                if (includeSecurity) {
+                    Phase3SecurityMigrationSql.triggerNames.zip(Phase3SecurityMigrationSql.createTriggers)
+                        .filter { (name, _) -> name in setOf("prevent_app_user_delete", "prevent_security_audit_delete") }
+                        .forEach { (_, sql) -> executeSQL(sql) }
+                }
             }
             if (selection.planning) {
                 backupDao.deleteBudgets()

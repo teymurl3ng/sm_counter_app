@@ -1,6 +1,6 @@
 # Phase 8 — Screen-by-Screen Native UI Wiring
 
-**Status: IN PROGRESS — milestones through Costing and Planning Controls complete 2026-09-01**
+**Status: IN PROGRESS — milestones through Staff Users and Security Audit complete 2026-09-01**
 
 ## 1. Purpose and working rule
 
@@ -20,7 +20,7 @@ The frozen logic specification, SQL blueprint, Phase 5 DTO catalog, and Phase 6 
 
 | Screen/workflow | Contract boundary | Status | Next work |
 |---|---|---|---|
-| Owner bootstrap, login, logout, resume | `query.bootstrapStatus`, `query.currentSession`, auth commands | **Proven in Phase 7; retained** | Recovery and own-passphrase screens remain. |
+| Owner bootstrap, login, logout, resume, recovery, own passphrase | bootstrap/session/auth commands | **Phase 7 proof retained; recovery/passphrase complete in Milestone 20** | Preserve one-time recovery-code display and post-change sign-in. |
 | Products | `query.masterData`, create/update/archive product commands | **Milestone 1 complete** | Preserve as the reference screen pattern. |
 | Customers | `query.masterData`, create/rename/save-profile customer commands | **Milestone 2 complete** | Balance remains native-read-only; inactive customers retain history. |
 | Suppliers | `query.masterData`, create/rename/save-profile vendor commands | **Milestone 3 complete** | Balance remains native-read-only; no per-supplier milk rate. |
@@ -34,7 +34,7 @@ The frozen logic specification, SQL blueprint, Phase 5 DTO catalog, and Phase 6 
 | Cash count and daily close | reconciliation query and count/close/reopen commands | **Milestone 17 complete** | Independent physical counts, honest variances, verified close/reopen actors, and date locking are device-proven. |
 | Dashboard and reports | dashboard, cashier, financial, profitability queries | **Milestone 18 complete** | Canonical date-range totals, role-filtered detail, and honest costing coverage are device-proven. |
 | Costing and planning controls | costing/planning queries and versioned policy/target commands | **Milestone 19 complete** | Native versioning, recent authentication, yield calibration, and human loss review are device-proven. |
-| Staff users and security audit | users/audit queries and user-administration commands | Queued | Owner controls role/status; employee linkage remains optional. |
+| Staff users and security audit | users/audit queries and user-administration commands | **Milestone 20 complete** | Owner/admin controls are native-authorized; employee linkage remains optional and credential setup is private. |
 | Encrypted backup and restore | backup system actions | Queued | Retain picker/ticket, inspection, confirmation, and session invalidation boundaries. |
 
 ## 3. Milestone 1 — Products
@@ -347,7 +347,23 @@ The active app now provides a permission-aware Cost & Plans area with four focus
 
 The runtime now advertises sixty-five implemented actions: `query.costingManagement`, `query.planning`, `command.upsertBudget`, `command.copyPreviousBudget`, `command.upsertCollectionsTarget`, `command.approveCostingPolicy`, `command.recordOpeningCostBasis`, `command.approveYieldPolicy`, and `command.recordProductionLossAssessment` join the prior fifty-six. Contract version 2 remains at 78 operations with the same manifest hash. No Room schema, costing formula, yield formula, budget rule, permission bundle, or frozen business contract changed.
 
-## 22. Safety and business boundaries
+## 22. Milestone 20 — Staff Users and Security Audit
+
+Completed on 2026-09-01.
+
+- the Access area is visible to every signed-in user and provides a personal passphrase-change screen;
+- owners and administrators can list app accounts, create permitted roles, optionally link one account to an existing employee profile, change roles/status, resume unfinished setup, and begin credential reset;
+- owner/admin authority remains native-enforced: only owners control owner/admin accounts, ordinary administrators control only manager/cashier/operator accounts, a current account cannot disable itself, and the final active owner cannot be disabled or demoted;
+- new enrollment and reset use a private device-handoff flow: the administrator creates the identity, then the staff member privately chooses the passphrase without the enrollment token being displayed or persisted by React;
+- owner recovery is available from sign-in, rotates the saved recovery code after success, starts a verified owner session, and displays the replacement code once;
+- Security History presents durable actor, target, outcome, reason, and non-secret details with failed/denied filters; passphrases, recovery codes, credential verifiers, and session handles remain excluded;
+- every mutation is awaited and refreshes authorized native user/audit state; React never assigns authority or accepts typed actor identity;
+- native bridge parsing is strict, duplicate login and employee-link conflicts are explicit, missing linked employees/users are explicit, and passphrase character buffers are cleared after use;
+- account/security UI, bridge actions, presentation helpers, native handler/service/JSON code, and test coverage remain split into focused modules.
+
+The runtime now advertises seventy-five implemented actions: `query.users`, `query.securityAudit`, `command.auth.changeOwnPassphrase`, `command.auth.recoverOwner`, `command.auth.beginUserEnrollment`, `command.auth.resumeUserEnrollment`, `command.auth.completeEnrollment`, `command.auth.changeUserRole`, `command.auth.setUserEnabled`, and `command.auth.beginCredentialReset` join the prior sixty-five. Contract version 2 remains at 78 operations with the same manifest hash. No Room schema, role/permission bundle, credential policy, recovery rule, accounting formula, or frozen business contract changed.
+
+## 23. Safety and business boundaries
 
 - Archiving changes future availability; it does not delete products or rewrite transaction history.
 - Inventory quantity remains event-derived. This screen has no direct “set stock” operation.
@@ -401,7 +417,7 @@ The runtime now advertises sixty-five implemented actions: `query.costingManagem
 - The old prototype view model remains inactive and is not imported by the packaged app.
 - No Room schema, frozen business formula, permission bundle, or canonical bridge endpoint changed. The additive `TransactionReferencesDto.expenseCategories` field is the documented contract-v2 amendment.
 
-## 23. Structural refactor checkpoint
+## 24. Structural refactor checkpoint
 
 Before starting Supplier Profiles, the active hybrid path was reorganized without changing its public behavior:
 
@@ -411,9 +427,9 @@ Before starting Supplier Profiles, the active hybrid path was reorganized withou
 - generated contract projections and inactive inherited prototype screens were deliberately left alone;
 - future handwritten files should be reviewed for separation when they approach roughly 300–400 lines, with responsibility and cohesion taking priority over an arbitrary number.
 
-The structural checkpoint changed no Room schema, permission rule, accounting formula, or existing user workflow. The two growing Daily Operations Kotlin files remain cohesive at 343 and 342 lines, inside the 300–400-line review band. Delivery, ledger, history/correction, cash-close, reporting, and costing/planning work remain isolated from Daily Operations. Costing/planning adds a focused native handler, command/audit service, JSON adapter, bridge actions, shared models/presentation helpers, a coordinating workspace, and four focused React control modules. The main workspace and shell remain below 300 lines. The focused Costing/Planning suite is **5/5 PASS**. The complete suite is now **201/201 PASS**.
+The structural checkpoint changed no Room schema, permission rule, accounting formula, or existing user workflow. The two growing Daily Operations Kotlin files remain cohesive at 343 and 342 lines, inside the 300–400-line review band. Delivery, ledger, history/correction, cash-close, reporting, costing/planning, and security administration remain isolated from Daily Operations. Security administration adds a focused native handler, command service, JSON adapter, bridge actions/models/presentation helpers, a coordinating workspace, and four focused React panels. New security UI files are 34–71 lines and the main workspace and shell remain below 300 lines. The focused Staff/Security suite is **5/5 PASS**. The complete suite is now **206/206 PASS**.
 
-## 24. Verification checkpoint
+## 25. Verification checkpoint
 
 Physical device: `SM-A065F`.
 
@@ -436,7 +452,8 @@ Physical device: `SM-A065F`.
 - Phase 8 focused Cash Count/Daily Close suite — **4/4 PASS**;
 - Phase 8 focused Dashboard/Reports suite — **4/4 PASS**;
 - Phase 8 focused Costing/Planning suite — **5/5 PASS**;
-- complete connected-device regression — **201/201 PASS**, 0 skipped, 0 failed, 0 errors;
+- Phase 8 focused Staff Users/Security Audit suite — **5/5 PASS**;
+- complete connected-device regression — **206/206 PASS**, 0 skipped, 0 failed, 0 errors;
 - host-side debug unit suite — **7/7 PASS**;
 - TypeScript check and production Vite build — PASS;
 - explicit web bundle packaging and Android asset gate — PASS;
@@ -444,16 +461,16 @@ Physical device: `SM-A065F`.
 - bridge contract drift check — version 2, 78 operations, SHA-256 `AB374869603B9D773AD86B56EF801DA8C4493816C7301B05214AE596E33D0920` — PASS;
 - frozen logic-spec and SQL hashes — unchanged.
 
-The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; expense-category lifecycle; opening-state record/correction; supplier milk purchases; sales; production; expenses; supplier payments; customer collections; salary payments; spoilage; delivery lifecycle; account ledgers; History/Corrections; Cash Count/Daily Close; Dashboard/Reports; and Costing/Planning with Room readback and durable actor audit. The new evidence covers budget revision/copy, separate collection targets, approved conversion policy, opening basis, 30-batch yield calibration, non-automatic yield alerts, explicit abnormal-loss review, recent-authentication and permission rejection, all nine runtime actions, and all four packaged owner-facing workspaces.
+The focused tests prove Product, Customer, Supplier, and Employee lifecycle; attendance access/revision history; editable PKR store identity; exact shop-wide rate persistence; expense-category lifecycle; opening-state record/correction; supplier milk purchases; sales; production; expenses; supplier payments; customer collections; salary payments; spoilage; delivery lifecycle; account ledgers; History/Corrections; Cash Count/Daily Close; Dashboard/Reports; Costing/Planning; and Staff/Security with Room readback and durable actor audit. The new evidence covers private enrollment, role/status/reset authority, account-session invalidation, passphrase change, owner recovery-code rotation, final-owner safeguards, least-privilege rejection, strict payloads, all ten new runtime actions, and the packaged Access/Security experience.
 
-## 25. Current limitations and next milestone
+## 26. Current limitations and next milestone
 
-Phase 8 is not complete. Authentication, management screens, core settings, Opening State, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, Dashboard/Reports, and Costing/Planning execute through the active React product. Users/security administration and backup screens are still unwired; their prototype code must not be mistaken for operational functionality.
+Phase 8 is not complete. Authentication, management screens, core settings, Opening State, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, Dashboard/Reports, Costing/Planning, and Staff/Security execute through the active React product. Encrypted backup/export, inspection, and restore screens are still unwired; their prototype code must not be mistaken for operational functionality.
 
 Phase 8 remains device-local. Multiple named users and native role enforcement are supported on one installation. Periodic encrypted Google Drive/cloud backup is recorded for a later Phase 10 design gate and Phase 11 hardening; optional read-only owner-phone snapshot viewing will be decided there. Phase 8 must not improvise networking or present backup as live synchronization.
 
-The next milestone is **Staff users and security audit**. Continue with the already contracted authorized-user/audit queries and private enrollment, role/status, credential-reset, and recovery commands. Preserve the distinction between employee profiles and app logins, native-only authorization, optional employee linkage, last-owner safeguards, private credential setup, durable actor history, and plain shop-facing wording.
+The next and final Phase 8 milestone is **Encrypted backup and restore**. Wire `system.exportEncryptedBackup`, `system.inspectEncryptedBackup`, and `system.restoreInspectedBackup` through the existing protected picker/ticket boundary. Keep backup passphrases private, explain backup versus live synchronization plainly, require inspection before restore, preserve native authority/integrity checks, and provide packaged physical-device proof without inventing Google Drive scheduling in this phase.
 
 ## Plain English
 
-The owner can now set weekly Milk and collection targets, monthly expense plans, the approved Yogurt-making cost, costs for stock that existed before the app, and a shop-specific normal yield range. Plans do not pretend money was spent or earned, warnings do not create losses, and every sensitive cost decision asks for the owner/admin passphrase and keeps its earlier version. Phase 8 remains open; staff app accounts and the security audit are next.
+You can now give each worker a separate app login, choose what kind of work that account may do, disable it when needed, and review a permanent security history. Workers choose their own passwords privately, while only the owner can control other owner/administrator accounts. The owner can recover access using the saved one-time code, which is replaced after use. Phase 8 remains open only for the encrypted backup and restore screens.

@@ -14,6 +14,7 @@ import { reportBridgeActions } from './reportBridgeActions';
 import { masterDataBridgeActions } from './masterDataBridgeActions';
 import { settingsBridgeActions } from './settingsBridgeActions';
 import { costingPlanningBridgeActions } from './costingPlanningBridgeActions';
+import { securityBridgeActions } from './securityBridgeActions';
 import { errorMessage, type HybridStage } from './hybridModels';
 
 export function Phase8HybridShell() {
@@ -121,6 +122,7 @@ export function Phase8HybridShell() {
 
   const reportActions = useMemo(() => reportBridgeActions(session), [session]);
   const costingPlanningActions = useMemo(() => costingPlanningBridgeActions(session), [session]);
+  const securityActions = useMemo(() => securityBridgeActions(session), [session]);
 
   const withMasterDataRefresh = async (operation: () => Promise<void>, success: string) => {
     if (!session || !currentUser) return;
@@ -175,15 +177,32 @@ export function Phase8HybridShell() {
       setBusy(false);
     }
   }} />;
-  if (stage === 'login') return <Login busy={busy} error={error} onSubmit={async (loginName, passphrase) => {
+  if (stage === 'login') return <Login busy={busy} error={error} notice={notice} onSubmit={async (loginName, passphrase) => {
     setBusy(true);
     setError(null);
+    setNotice(null);
     try {
       const result = await callNative('command.auth.login', { loginName, passphrase });
       setSession(result.sessionHandle);
       setCurrentUser(result.currentSession);
       await loadAuthorizedData(result.sessionHandle, result.currentSession);
       setStage('ready');
+    } catch (failure) {
+      setError(errorMessage(failure));
+    } finally {
+      setBusy(false);
+    }
+  }} onRecover={async (loginName, savedRecoveryCode, newPassphrase) => {
+    setBusy(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const result = await securityActions.recoverOwner(loginName, savedRecoveryCode, newPassphrase);
+      setSession(result.sessionHandle);
+      setCurrentUser(result.currentSession);
+      await loadAuthorizedData(result.sessionHandle, result.currentSession);
+      setRecoveryCode(result.replacementRecoveryCode);
+      setStage('recovery');
     } catch (failure) {
       setError(errorMessage(failure));
     } finally {
@@ -215,6 +234,20 @@ export function Phase8HybridShell() {
   const ledgerActions = ledgerBridgeActions(session);
   const historyActions = historyBridgeActions(session, withResultRefresh);
   const reconciliationActions = reconciliationBridgeActions(session, withResultRefresh);
+  const changeOwnPassphrase = async (currentPassphrase: string, newPassphrase: string) => {
+    setBusy(true);
+    setError(null);
+    try {
+      await securityActions.changeOwnPassphrase(currentPassphrase, newPassphrase);
+      clearSession();
+      setNotice('Passphrase changed. Sign in again with the new one.');
+    } catch (failure) {
+      setError(errorMessage(failure));
+      throw failure;
+    } finally {
+      setBusy(false);
+    }
+  };
   return <ManagementWorkspace
     busy={busy}
     currentUser={currentUser}
@@ -265,6 +298,8 @@ export function Phase8HybridShell() {
     onCreateExpenseCategory={settingsActions.createExpenseCategory}
     onSetExpenseCategoryArchived={settingsActions.setExpenseCategoryArchived}
     costingPlanningActions={costingPlanningActions}
+    securityActions={securityActions}
+    onChangeOwnPassphrase={changeOwnPassphrase}
   />;
 }
 

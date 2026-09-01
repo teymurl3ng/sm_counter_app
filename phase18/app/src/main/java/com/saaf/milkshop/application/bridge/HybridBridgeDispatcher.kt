@@ -12,6 +12,7 @@ class HybridBridgeDispatcher(
 ) {
     private val reads = HybridReadModelService(database, security)
     private val authentication = AuthenticationBridgeHandler(reads, security, onSessionChanged)
+    private val securityAdministration = SecurityAdministrationBridgeHandler(reads, SecurityAdministrationBridgeCommandService(database, security))
     private val masterData = MasterDataBridgeHandler(reads, HybridCommandService(database, security))
     private val employees = EmployeeBridgeHandler(reads, EmployeeBridgeCommandService(database, security))
     private val settings = SettingsBridgeHandler(reads, SettingsBridgeCommandService(database, security))
@@ -53,6 +54,7 @@ class HybridBridgeDispatcher(
             .put("contractSha256", BridgeContractSnapshot.CONTRACT_SHA256)
             .put("supportedActions", jsonArray(HybridBridgeActions.supported))
         in HybridBridgeActions.authentication -> authentication.execute(request)
+        in HybridBridgeActions.securityAdministration -> securityAdministration.execute(request)
         in HybridBridgeActions.masterData -> masterData.execute(request)
         in HybridBridgeActions.employees -> employees.execute(request)
         in HybridBridgeActions.settings -> settings.execute(request)

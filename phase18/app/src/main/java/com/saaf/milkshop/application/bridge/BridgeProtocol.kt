@@ -16,7 +16,17 @@ internal object HybridBridgeActions {
     const val LOGIN = "command.auth.login"
     const val LOGOUT = "command.auth.logout"
     const val REAUTHENTICATE = "command.auth.reauthenticate"
+    const val CHANGE_OWN_PASSPHRASE = "command.auth.changeOwnPassphrase"
+    const val RECOVER_OWNER = "command.auth.recoverOwner"
     const val CURRENT_SESSION = "query.currentSession"
+    const val USERS = "query.users"
+    const val SECURITY_AUDIT = "query.securityAudit"
+    const val BEGIN_USER_ENROLLMENT = "command.auth.beginUserEnrollment"
+    const val RESUME_USER_ENROLLMENT = "command.auth.resumeUserEnrollment"
+    const val COMPLETE_ENROLLMENT = "command.auth.completeEnrollment"
+    const val CHANGE_USER_ROLE = "command.auth.changeUserRole"
+    const val SET_USER_ENABLED = "command.auth.setUserEnabled"
+    const val BEGIN_CREDENTIAL_RESET = "command.auth.beginCredentialReset"
     const val MASTER_DATA = "query.masterData"
     const val CREATE_PRODUCT = "command.createProduct"
     const val UPDATE_PRODUCT = "command.updateProduct"
@@ -76,7 +86,17 @@ internal object HybridBridgeActions {
     const val APPROVE_YIELD_POLICY = "command.approveYieldPolicy"
     const val RECORD_PRODUCTION_LOSS_ASSESSMENT = "command.recordProductionLossAssessment"
 
-    val authentication = setOf(BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN, LOGOUT, REAUTHENTICATE, CURRENT_SESSION)
+    val authentication = setOf(BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN, LOGOUT, REAUTHENTICATE, CHANGE_OWN_PASSPHRASE, RECOVER_OWNER, CURRENT_SESSION)
+    val securityAdministration = setOf(
+        USERS,
+        SECURITY_AUDIT,
+        BEGIN_USER_ENROLLMENT,
+        RESUME_USER_ENROLLMENT,
+        COMPLETE_ENROLLMENT,
+        CHANGE_USER_ROLE,
+        SET_USER_ENABLED,
+        BEGIN_CREDENTIAL_RESET,
+    )
     val masterData = setOf(
         MASTER_DATA,
         CREATE_PRODUCT,
@@ -130,9 +150,13 @@ internal object HybridBridgeActions {
         APPROVE_YIELD_POLICY,
         RECORD_PRODUCTION_LOSS_ASSESSMENT,
     )
-    val supported = listOf(BRIDGE_INFO) + authentication + masterData + employees + settings + operations + deliveries + ledgers + history + reconciliation + costingPlanning
+    val supported = listOf(BRIDGE_INFO) + authentication + securityAdministration + masterData + employees + settings + operations + deliveries + ledgers + history + reconciliation + costingPlanning
     val authByAction = supported.associateWith { action ->
-        if (action in setOf(BRIDGE_INFO, BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN)) "none" else "session"
+        when (action) {
+            in setOf(BRIDGE_INFO, BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN, RECOVER_OWNER) -> "none"
+            COMPLETE_ENROLLMENT -> "enrollment"
+            else -> "session"
+        }
     }
 }
 

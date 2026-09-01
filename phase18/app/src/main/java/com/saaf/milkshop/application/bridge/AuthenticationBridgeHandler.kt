@@ -15,6 +15,8 @@ internal class AuthenticationBridgeHandler(
         HybridBridgeActions.LOGIN -> login(request)
         HybridBridgeActions.LOGOUT -> logout(request)
         HybridBridgeActions.REAUTHENTICATE -> reauthenticate(request)
+        HybridBridgeActions.CHANGE_OWN_PASSPHRASE -> changeOwnPassphrase(request)
+        HybridBridgeActions.RECOVER_OWNER -> recoverOwner(request)
         HybridBridgeActions.CURRENT_SESSION -> currentSession(request)
         else -> unavailableBridgeAction()
     }
@@ -72,5 +74,37 @@ internal class AuthenticationBridgeHandler(
     private suspend fun currentSession(request: BridgeRequest): JSONObject {
         strictPayload(request.payload, emptySet())
         return currentSessionJson(reads.currentSession(request.requireSession()))
+    }
+
+    private suspend fun changeOwnPassphrase(request: BridgeRequest): JSONObject {
+        strictPayload(request.payload, setOf("currentPassphrase", "newPassphrase"))
+        val current = request.payload.requiredString("currentPassphrase").toCharArray()
+        val replacement = request.payload.requiredString("newPassphrase").toCharArray()
+        return try {
+            security.changeOwnPassphrase(request.requireSession(), current, replacement)
+            onSessionChanged(null)
+            JSONObject()
+        } finally {
+            current.fill('\u0000')
+            replacement.fill('\u0000')
+        }
+    }
+
+    private suspend fun recoverOwner(request: BridgeRequest): JSONObject {
+        strictPayload(request.payload, setOf("loginName", "recoveryCode", "newPassphrase"))
+        val replacement = request.payload.requiredString("newPassphrase").toCharArray()
+        return try {
+            val recovered = security.recoverOwner(
+                request.payload.requiredString("loginName"),
+                request.payload.requiredString("recoveryCode"),
+                replacement,
+            )
+            onSessionChanged(recovered.first.sessionId)
+            JSONObject().put("sessionHandle", recovered.first.sessionId)
+                .put("currentSession", currentSessionJson(reads.currentSession(recovered.first.sessionId)))
+                .put("replacementRecoveryCode", recovered.second)
+        } finally {
+            replacement.fill('\u0000')
+        }
     }
 }

@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { BookOpen, Calculator, ClipboardCheck, History as HistoryIcon, LayoutDashboard, LogOut, PackageCheck, PackagePlus, Scale, Settings, ShoppingBasket, Truck, Users } from 'lucide-react';
+import { BookOpen, Calculator, ClipboardCheck, History as HistoryIcon, LayoutDashboard, LogOut, PackageCheck, PackagePlus, Scale, Settings, ShieldCheck, ShoppingBasket, Truck, Users } from 'lucide-react';
 import type { AccountLedgerDto, AccountReferenceDto, AttendanceDto, AttendanceStatusCode, BusinessSettingsDto, CashCountResultDto, CashierSummaryDto, CustomerDto, CurrentSessionDto, DailyCloseResultDto, DashboardDto, DeliveryDto, DeliveryStatusCode, EmployeeDto, EntityMutationResultDto, EventDetailDto, EventHistoryDto, EventMutationResultDto, ExpenseCategoryDto, FinancialOverviewDto, Int64String, MasterDataDto, ProductDto, PurchaseRecordedResultDto, ReconciliationArchiveDto, SaleRecordedResultDto, SpoilageDto, TransactionReferencesDto, VendorDto } from '../../bridge/contract.generated';
 import { AccountLedgerWorkspace } from './AccountLedgerWorkspace';
 import { CustomerProfilesScreen } from './CustomerProfilesScreen';
@@ -15,9 +15,11 @@ import { DashboardReportsWorkspace } from './DashboardReportsWorkspace';
 import { CostingPlanningWorkspace } from './CostingPlanningWorkspace';
 import type { CostingPlanningActions } from './costingPlanningBridgeActions';
 import type { ReportBundle } from './reportBridgeActions';
+import type { SecurityActions } from './securityBridgeActions';
+import { SecurityWorkspace } from './SecurityWorkspace';
 import { plainRole, type BusinessRatesDraft, type CashCountDraft, type CorrectionDraft, type CustomerDraft, type DeliveryDraft, type EmployeeDraft, type ExpenseDraft, type OpeningStateDraft, type PaymentDraft, type ProductDraft, type ProductionDraft, type PurchaseDraft, type ReopenDayDraft, type SalaryPaymentDraft, type SaleDraft, type SpoilageDraft, type StoreIdentityDraft, type SupplierDraft } from './hybridModels';
 
-type ManagementArea = 'dashboard' | 'operations' | 'deliveries' | 'accounts' | 'history' | 'cash-close' | 'products' | 'customers' | 'suppliers' | 'employees' | 'costing-planning' | 'settings';
+type ManagementArea = 'dashboard' | 'operations' | 'deliveries' | 'accounts' | 'history' | 'cash-close' | 'products' | 'customers' | 'suppliers' | 'employees' | 'costing-planning' | 'settings' | 'access';
 
 export function ManagementWorkspace({
   busy,
@@ -69,6 +71,8 @@ export function ManagementWorkspace({
   onCreateExpenseCategory,
   onSetExpenseCategoryArchived,
   costingPlanningActions,
+  securityActions,
+  onChangeOwnPassphrase,
 }: {
   busy: boolean;
   currentUser: CurrentSessionDto | null;
@@ -119,6 +123,8 @@ export function ManagementWorkspace({
   onCreateExpenseCategory(displayName: string): Promise<void>;
   onSetExpenseCategoryArchived(category: ExpenseCategoryDto, archived: boolean): Promise<void>;
   costingPlanningActions: CostingPlanningActions;
+  securityActions: SecurityActions;
+  onChangeOwnPassphrase(currentPassphrase: string, newPassphrase: string): Promise<void>;
 }) {
   const canManage = currentUser?.effectivePermissionCodes.includes('manage_master_data') === true;
   const canAttend = currentUser?.effectivePermissionCodes.includes('attendance') === true;
@@ -136,9 +142,11 @@ export function ManagementWorkspace({
   const canCorrect = currentUser?.effectivePermissionCodes.includes('correction') === true;
   const canCashClose = currentUser?.effectivePermissionCodes.includes('cash_count_and_close') === true;
   const canReopen = currentUser?.effectivePermissionCodes.includes('reopen_day') === true;
+  const canManageUsers = currentUser?.effectivePermissionCodes.includes('manage_staff_users') === true;
+  const canViewAudit = currentUser?.effectivePermissionCodes.includes('view_security_audit') === true;
   const canOperate = canPurchase || canSell || canProduce || canExpense || canPaySupplier || canPaySalary;
   const [area, setArea] = useState<ManagementArea>(canManage ? 'products' : canOperate ? 'operations' : 'employees');
-  const title = area === 'dashboard' ? 'Dashboard' : area === 'operations' ? 'Daily work' : area === 'deliveries' ? 'Deliveries' : area === 'accounts' ? 'Accounts' : area === 'history' ? 'History' : area === 'cash-close' ? 'Cash close' : area === 'products' ? 'Products' : area === 'customers' ? 'Customers' : area === 'suppliers' ? 'Suppliers' : area === 'employees' ? 'Employees' : area === 'costing-planning' ? 'Cost & plans' : 'Settings';
+  const title = area === 'dashboard' ? 'Dashboard' : area === 'operations' ? 'Daily work' : area === 'deliveries' ? 'Deliveries' : area === 'accounts' ? 'Accounts' : area === 'history' ? 'History' : area === 'cash-close' ? 'Cash close' : area === 'products' ? 'Products' : area === 'customers' ? 'Customers' : area === 'suppliers' ? 'Suppliers' : area === 'employees' ? 'Employees' : area === 'costing-planning' ? 'Cost & plans' : area === 'access' ? 'Access & users' : 'Settings';
   const attendanceEmployees = masterData?.employees.filter((employee) => employee.active).map(({ accountId, name }) => ({ accountId, name })) ?? transactionReferences?.employees ?? [];
 
   return <main className="min-h-screen bg-[#f7f6f0] pb-10 text-slate-900">
@@ -162,6 +170,7 @@ export function ManagementWorkspace({
         {(canManage || canAttend) && <AreaButton id="employees-nav" active={area === 'employees'} onClick={() => setArea('employees')}><ClipboardCheck className="h-4 w-4" />Employees</AreaButton>}
         {canManageSettings && <AreaButton id="costing-planning-nav" active={area === 'costing-planning'} onClick={() => setArea('costing-planning')}><Calculator className="h-4 w-4" />Cost & plans</AreaButton>}
         {(canManage || canManageSettings) && <AreaButton id="settings-nav" active={area === 'settings'} onClick={() => setArea('settings')}><Settings className="h-4 w-4" />Settings</AreaButton>}
+        <AreaButton id="access-nav" active={area === 'access'} onClick={() => setArea('access')}><ShieldCheck className="h-4 w-4" />Access</AreaButton>
       </div>
     </nav>
     <div className="mx-auto max-w-4xl px-4 py-6">
@@ -181,6 +190,8 @@ export function ManagementWorkspace({
         <SettingsWorkspaceScreen busy={busy} canManageSettings={canManageSettings} categories={masterData?.expenseCategories ?? businessSettings?.expenseCategories ?? null} masterData={masterData} references={transactionReferences} settings={businessSettings} error={error} notice={notice} onSaveStore={onSaveStoreIdentity} onSaveRates={onUpdateBusinessSettings} onSaveOpening={onSaveOpeningState} onCreateCategory={onCreateExpenseCategory} onSetCategoryArchived={onSetExpenseCategoryArchived} />
       ) : area === 'costing-planning' && canManageSettings ? (
         <CostingPlanningWorkspace actions={costingPlanningActions} settings={businessSettings} masterData={masterData} />
+      ) : area === 'access' && currentUser ? (
+        <SecurityWorkspace currentUser={currentUser} employees={masterData?.employees ?? []} actions={securityActions} canManageUsers={canManageUsers} canViewAudit={canViewAudit} onChangeOwnPassphrase={onChangeOwnPassphrase} />
       ) : area === 'employees' && (canManage || canAttend) ? (
         <EmployeeAttendanceScreen busy={busy} canManage={canManage} employees={masterData?.employees ?? null} attendanceEmployees={attendanceEmployees} error={error} notice={notice} onSaveEmployee={onSaveEmployee} onSetEmployeeActive={onSetEmployeeActive} onLoadAttendance={onLoadAttendance} onRecordAttendance={onRecordAttendance} />
       ) : !canManage ? <Unavailable /> : area === 'products' ? (

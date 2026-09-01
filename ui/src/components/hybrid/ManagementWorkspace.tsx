@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BookOpen, Calculator, ClipboardCheck, DatabaseBackup, History as HistoryIcon, LayoutDashboard, LogOut, PackageCheck, PackagePlus, Scale, Settings, ShieldCheck, ShoppingBasket, Truck, Users } from 'lucide-react';
 import type { AccountLedgerDto, AccountReferenceDto, AttendanceDto, AttendanceStatusCode, BusinessSettingsDto, CashCountResultDto, CashierSummaryDto, CustomerDto, CurrentSessionDto, DailyCloseResultDto, DashboardDto, DeliveryDto, DeliveryStatusCode, EmployeeDto, EntityMutationResultDto, EventDetailDto, EventHistoryDto, EventMutationResultDto, ExpenseCategoryDto, FinancialOverviewDto, Int64String, MasterDataDto, ProductDto, PurchaseRecordedResultDto, ReconciliationArchiveDto, SaleRecordedResultDto, SpoilageDto, TransactionReferencesDto, VendorDto } from '../../bridge/contract.generated';
 import { AccountLedgerWorkspace } from './AccountLedgerWorkspace';
@@ -20,11 +20,13 @@ import { SecurityWorkspace } from './SecurityWorkspace';
 import type { BackupActions } from './backupBridgeActions';
 import { BackupRestoreWorkspace } from './BackupRestoreWorkspace';
 import { HybridNavigation, type ManagementArea, type NavigationItem } from './HybridNavigation';
+import { publishActiveArea } from '../../bridge/lifecycleBridge';
 import { plainRole, type BusinessRatesDraft, type CashCountDraft, type CorrectionDraft, type CustomerDraft, type DeliveryDraft, type EmployeeDraft, type ExpenseDraft, type OpeningStateDraft, type PaymentDraft, type ProductDraft, type ProductionDraft, type PurchaseDraft, type ReopenDayDraft, type SalaryPaymentDraft, type SaleDraft, type SpoilageDraft, type StoreIdentityDraft, type SupplierDraft } from './hybridModels';
 
 export function ManagementWorkspace({
   busy,
   currentUser,
+  initialArea,
   error,
   masterData,
   dashboard,
@@ -79,6 +81,7 @@ export function ManagementWorkspace({
 }: {
   busy: boolean;
   currentUser: CurrentSessionDto | null;
+  initialArea: ManagementArea | null;
   error: string | null;
   masterData: MasterDataDto | null;
   dashboard: DashboardDto | null;
@@ -152,8 +155,7 @@ export function ManagementWorkspace({
   const canExportBackup = currentUser?.effectivePermissionCodes.includes('create_export_backup') === true;
   const canRestoreBackup = currentUser?.effectivePermissionCodes.includes('restore_backup') === true;
   const canOperate = canPurchase || canSell || canProduce || canExpense || canPaySupplier || canPaySalary;
-  const [area, setArea] = useState<ManagementArea>(canManage ? 'products' : canOperate ? 'operations' : 'employees');
-  const title = area === 'dashboard' ? 'Dashboard' : area === 'operations' ? 'Daily work' : area === 'deliveries' ? 'Deliveries' : area === 'accounts' ? 'Accounts' : area === 'history' ? 'History' : area === 'cash-close' ? 'Cash close' : area === 'products' ? 'Products' : area === 'customers' ? 'Customers' : area === 'suppliers' ? 'Suppliers' : area === 'employees' ? 'Employees' : area === 'costing-planning' ? 'Cost & plans' : area === 'access' ? 'Access & users' : area === 'backup' ? 'Backup & restore' : 'Settings';
+  const defaultArea: ManagementArea = canManage ? 'products' : canOperate ? 'operations' : 'employees';
   const navigationItems: NavigationItem[] = [
     canViewOperational && { area: 'dashboard', id: 'dashboard-nav', label: 'Dashboard', group: 'Everyday work', icon: LayoutDashboard },
     canOperate && { area: 'operations', id: 'operations-nav', label: 'Daily work', group: 'Everyday work', icon: ShoppingBasket },
@@ -170,6 +172,11 @@ export function ManagementWorkspace({
     { area: 'access', id: 'access-nav', label: 'Access', group: 'Shop controls', icon: ShieldCheck },
     canExportBackup && { area: 'backup', id: 'backup-nav', label: 'Backup', group: 'Shop controls', icon: DatabaseBackup },
   ].filter((item): item is NavigationItem => Boolean(item));
+  const [area, setArea] = useState<ManagementArea>(() =>
+    initialArea && navigationItems.some((item) => item.area === initialArea) ? initialArea : defaultArea,
+  );
+  const title = area === 'dashboard' ? 'Dashboard' : area === 'operations' ? 'Daily work' : area === 'deliveries' ? 'Deliveries' : area === 'accounts' ? 'Accounts' : area === 'history' ? 'History' : area === 'cash-close' ? 'Cash close' : area === 'products' ? 'Products' : area === 'customers' ? 'Customers' : area === 'suppliers' ? 'Suppliers' : area === 'employees' ? 'Employees' : area === 'costing-planning' ? 'Cost & plans' : area === 'access' ? 'Access & users' : area === 'backup' ? 'Backup & restore' : 'Settings';
+  useEffect(() => publishActiveArea(area), [area]);
   const attendanceEmployees = masterData?.employees.filter((employee) => employee.active).map(({ accountId, name }) => ({ accountId, name })) ?? transactionReferences?.employees ?? [];
 
   return <main className="min-h-screen bg-[#f7f6f0] pb-24 text-slate-900 md:pb-10">

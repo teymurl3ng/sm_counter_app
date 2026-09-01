@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { CurrentSessionDto, SessionHandle } from '../../bridge/contract.generated';
 import { callNative, NativeBridgeError, verifyNativeContract } from '../../bridge/nativeBridge';
+import { waitForNativeRestoration } from '../../bridge/lifecycleBridge';
 import { errorMessage, type HybridStage } from './hybridModels';
+import type { ManagementArea } from './HybridNavigation';
 
 type LoadAuthorizedData = (session: SessionHandle, user: CurrentSessionDto) => Promise<void>;
 
@@ -9,6 +11,7 @@ export function useHybridSession(loadAuthorizedData: LoadAuthorizedData, clearAu
   const [stage, setStage] = useState<HybridStage>('checking');
   const [session, setSession] = useState<SessionHandle | null>(null);
   const [currentUser, setCurrentUser] = useState<CurrentSessionDto | null>(null);
+  const [restoredArea, setRestoredArea] = useState<ManagementArea | null>(null);
   const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -17,6 +20,7 @@ export function useHybridSession(loadAuthorizedData: LoadAuthorizedData, clearAu
   const clearSession = useCallback(() => {
     setSession(null);
     setCurrentUser(null);
+    setRestoredArea(null);
     clearAuthorizedData();
     setRecoveryCode(null);
     setNotice(null);
@@ -28,6 +32,26 @@ export function useHybridSession(loadAuthorizedData: LoadAuthorizedData, clearAu
     void (async () => {
       try {
         await verifyNativeContract();
+        const restoration = await waitForNativeRestoration();
+        if (restoration) {
+          try {
+            const user = await callNative('query.currentSession', {}, restoration.sessionHandle);
+            if (!cancelled) {
+              setSession(restoration.sessionHandle);
+              setCurrentUser(user);
+              setRestoredArea(restoration.activeArea);
+              await loadAuthorizedData(restoration.sessionHandle, user);
+              setStage('ready');
+            }
+            return;
+          } catch (failure) {
+            if (!cancelled) {
+              setError(failure instanceof NativeBridgeError && failure.code === 'session_expired'
+                ? 'Your previous session expired. Sign in again.'
+                : errorMessage(failure));
+            }
+          }
+        }
         const status = await callNative('query.bootstrapStatus', {});
         if (!cancelled) setStage(status.needsOwnerBootstrap ? 'setup' : 'login');
       } catch (failure) {
@@ -38,7 +62,7 @@ export function useHybridSession(loadAuthorizedData: LoadAuthorizedData, clearAu
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [loadAuthorizedData]);
 
   useEffect(() => {
     const resume = () => {
@@ -157,6 +181,7 @@ export function useHybridSession(loadAuthorizedData: LoadAuthorizedData, clearAu
     stage,
     session,
     currentUser,
+    restoredArea,
     recoveryCode,
     error,
     notice,

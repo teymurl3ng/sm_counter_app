@@ -2,13 +2,14 @@ package com.saaf.milkshop.application.bridge
 
 import com.saaf.milkshop.application.readmodels.HybridReadModelService
 import com.saaf.milkshop.data.MilkShopDatabase
+import com.saaf.milkshop.domain.SecurityFailure
 import org.json.JSONObject
 import java.util.concurrent.ConcurrentHashMap
 
 class HybridBridgeDispatcher(
     database: MilkShopDatabase,
     security: com.saaf.milkshop.domain.UserSecurityService,
-    onSessionChanged: (String?) -> Unit = {},
+    private val onSessionChanged: (String?) -> Unit = {},
     backupManager: com.saaf.milkshop.BackupManager? = null,
     backupDocuments: BackupDocumentPicker? = null,
 ) {
@@ -45,6 +46,7 @@ class HybridBridgeDispatcher(
             acceptedRequestId = requestId
             successEnvelope(request, execute(request)).toString()
         } catch (error: Throwable) {
+            if (error is SecurityFailure.SessionExpired) onSessionChanged(null)
             failureEnvelope(requestId, action, mapBridgeFailure(error)).toString()
         } finally {
             acceptedRequestId?.let(inFlightRequestIds::remove)

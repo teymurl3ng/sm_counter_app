@@ -25,10 +25,12 @@ class HybridActivity : ComponentActivity() {
     private lateinit var webViewHost: SecureHybridWebViewHost
     private var ownedBackupDocumentPicker: HybridBackupDocumentPicker? = null
     private var evaluatingBackPress = false
+    private var activeArea: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applicationState = application as MilkShopApplication
+        activeArea = savedInstanceState?.getString(STATE_ACTIVE_AREA)
         configureSystemBars()
 
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
@@ -51,6 +53,12 @@ class HybridActivity : ComponentActivity() {
             scope = activityScope,
             dispatch = bridgeDispatcher::dispatch,
             onFatalError = ::showFatalError,
+            restorationState = if (savedInstanceState != null) {
+                applicationState.currentSessionId?.let { HybridRestorationState(it, activeArea) }
+            } else {
+                null
+            },
+            onActiveAreaChanged = { activeArea = it },
         )
         setContentView(webViewHost.webView)
         webViewHost.load()
@@ -75,7 +83,13 @@ class HybridActivity : ComponentActivity() {
         super.onDestroy()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        activeArea?.let { outState.putString(STATE_ACTIVE_AREA, it) }
+        super.onSaveInstanceState(outState)
+    }
+
     fun webViewForTesting(): WebView = webViewHost.webView
+    fun activeAreaForTesting(): String? = activeArea
 
     private fun installBackHandler() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -119,6 +133,7 @@ class HybridActivity : ComponentActivity() {
         const val APP_ORIGIN = SecureHybridWebViewHost.APP_ORIGIN
         const val HYBRID_ENTRY_URL = SecureHybridWebViewHost.HYBRID_ENTRY_URL
         @Volatile var backupDocumentPickerForTesting: BackupDocumentPicker? = null
+        private const val STATE_ACTIVE_AREA = "active_management_area"
 
         private const val BACK_HANDLER_SCRIPT = """
             (() => {

@@ -1,6 +1,6 @@
 # Phase 9 — Runtime, Navigation, and Device Integration
 
-**Status: IN PROGRESS — navigation, isolated QA data, Android Back, and structural-hardening milestones complete 2026-09-01**
+**Status: IN PROGRESS — navigation, isolated QA, Android Back, structural hardening, and secure Activity recreation complete 2026-09-01**
 
 ## 1. Reconciled scope
 
@@ -60,18 +60,34 @@ Implemented:
 - `HybridActivity` reduced to lifecycle/composition responsibilities, with separate secure WebView hosting and Android document-picker classes;
 - `BackupManager` reduced from 1,115 lines to a 476-line facade/coordinator, with separate cryptography, restore, and JSON codec collaborators and no backup-format or schema change.
 
-## 4. Remaining milestone order
+## 4. Milestone 3 — Secure Activity and WebView Recreation
+
+Status: **COMPLETE — physical-device verified 2026-09-01**.
+
+Implemented:
+
+- genuine Android Activity recreation may hand a still-live memory-only native session to the newly created packaged WebView;
+- React validates that handle through `query.currentSession` before setting any protected stage or loading authorized shop data;
+- the selected authorized management area is restored after recreation, while dialogs, form drafts, credentials, and session handles are not written to saved-instance state;
+- the handle is never stored in preferences, WebView storage, a URL, or Android saved-instance state; only the non-sensitive area code is saved;
+- AndroidX WebKit document-start injection is used when supported, with a packaged-origin page-finished event fallback;
+- fresh Activity launches never consume an existing native handle and continue through normal owner setup/login;
+- process death destroys `MilkShopApplication` and `NativeSessionManager`, so reopening after process death requires login;
+- invalid/expired restoration is rejected before protected navigation renders and clears the stale application-level reference;
+- each recreated Activity owns exactly one new WebView and destroys the previous Activity's WebView cleanly.
+
+## 5. Remaining milestone order
 
 1. **Complete:** responsive grouped navigation;
 2. **Complete:** isolated QA/test data, Android Back/overlay coordination, and useful Phase 8/9 file fragmentation;
-3. WebView lifecycle, recreation, and protected-session restoration;
+3. **Complete:** WebView lifecycle, Activity recreation, and protected-session restoration;
 4. keyboard, system bars, and display insets;
 5. refresh/transfer measurement and targeted-state improvements;
 6. renderer/error recovery and final Phase 9 physical-device regression.
 
 The order may combine closely related tests, but Phase 9 does not absorb the Phase 10 periodic cloud-backup design gate or the Phase 12 visual-fidelity phase.
 
-## 5. Verification baseline
+## 6. Verification baseline
 
 Inherited from completed Phase 8:
 
@@ -99,7 +115,16 @@ Phase 9 Milestone 2 verification:
 - TypeScript no-emit check, production Vite build, Android asset packaging, Kotlin compilation, Android-test compilation, bridge drift gate, and packaged-asset gate — PASS;
 - frozen logic-spec and SQL blueprint SHA-256 values — unchanged and verified.
 
-## 6. Device-test isolation requirement
+Phase 9 Milestone 3 verification:
+
+- focused valid-session and invalid-session Activity recreation suite on `SM-A065F` — **2/2 PASS**;
+- combined Phase 9 navigation, Android Back, and recreation suite — **3/3 PASS**;
+- fresh-launch compatibility regression covering the vertical slice, Accounts, Backup, and lifecycle paths — **14/14 PASS**;
+- complete isolated-QA connected-device regression — **214/214 PASS**, 0 skipped, 0 failed;
+- host-side debug unit suite — **7/7 PASS**;
+- TypeScript no-emit check, production Vite build, Android asset packaging, Kotlin compilation, Android-test compilation, bridge drift gate, and packaged-asset gate — PASS.
+
+## 7. Device-test isolation requirement
 
 Instrumentation must be run with `-Psaaf.isolatedQa=true`. That property adds the `.qa` application-ID suffix to the debug target, so the QA app has independent Android storage and may safely bootstrap its instrumentation owner. The normal `com.saaf.milkshop` debug installation is not cleared, borrowed, or authenticated by the test runner. Release code contains no authentication bypass.
 
@@ -107,4 +132,4 @@ Do not run the mutating complete instrumentation suite without the isolated-QA p
 
 ## Plain English
 
-Phase 8 made every shop screen work with real saved data. Phase 9 is making it behave like a proper phone app. The long menu is grouped, automated tests now use a separate QA installation, and the phone's Back button closes what is open before returning to Dashboard or leaving the app. The biggest mixed-purpose files were also split without changing calculations or backup compatibility. Next comes safe screen/session restoration when Android recreates the app.
+Phase 8 made every shop screen work with real saved data. Phase 9 is making it behave like a proper phone app. The long menu is grouped, tests use a separate QA installation, Back behaves normally, and the biggest mixed-purpose files are split. If Android rebuilds the screen, a still-valid login returns to the same authorized area; an expired login or a fresh app opening must show Login. No password or login token is saved to disk for this. Next comes deliberate keyboard, system-bar, and screen-inset behavior.

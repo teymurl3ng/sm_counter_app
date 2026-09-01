@@ -100,6 +100,7 @@ export function HybridAppShell() {
   return <ManagementWorkspace
     busy={busy}
     currentUser={currentUser}
+    initialArea={hybridSession.restoredArea}
     error={error}
     masterData={masterData}
     dashboard={dashboard}

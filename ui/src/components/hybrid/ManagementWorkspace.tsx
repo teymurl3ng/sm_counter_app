@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { BookOpen, Calculator, ClipboardCheck, DatabaseBackup, History as HistoryIcon, LayoutDashboard, LogOut, PackageCheck, PackagePlus, Scale, Settings, ShieldCheck, ShoppingBasket, Truck, Users } from 'lucide-react';
 import type { AccountLedgerDto, AccountReferenceDto, AttendanceDto, AttendanceStatusCode, BusinessSettingsDto, CashCountResultDto, CashierSummaryDto, CustomerDto, CurrentSessionDto, DailyCloseResultDto, DashboardDto, DeliveryDto, DeliveryStatusCode, EmployeeDto, EntityMutationResultDto, EventDetailDto, EventHistoryDto, EventMutationResultDto, ExpenseCategoryDto, FinancialOverviewDto, Int64String, MasterDataDto, ProductDto, PurchaseRecordedResultDto, ReconciliationArchiveDto, SaleRecordedResultDto, SpoilageDto, TransactionReferencesDto, VendorDto } from '../../bridge/contract.generated';
 import { AccountLedgerWorkspace } from './AccountLedgerWorkspace';
@@ -19,9 +19,8 @@ import type { SecurityActions } from './securityBridgeActions';
 import { SecurityWorkspace } from './SecurityWorkspace';
 import type { BackupActions } from './backupBridgeActions';
 import { BackupRestoreWorkspace } from './BackupRestoreWorkspace';
+import { HybridNavigation, type ManagementArea, type NavigationItem } from './HybridNavigation';
 import { plainRole, type BusinessRatesDraft, type CashCountDraft, type CorrectionDraft, type CustomerDraft, type DeliveryDraft, type EmployeeDraft, type ExpenseDraft, type OpeningStateDraft, type PaymentDraft, type ProductDraft, type ProductionDraft, type PurchaseDraft, type ReopenDayDraft, type SalaryPaymentDraft, type SaleDraft, type SpoilageDraft, type StoreIdentityDraft, type SupplierDraft } from './hybridModels';
-
-type ManagementArea = 'dashboard' | 'operations' | 'deliveries' | 'accounts' | 'history' | 'cash-close' | 'products' | 'customers' | 'suppliers' | 'employees' | 'costing-planning' | 'settings' | 'access' | 'backup';
 
 export function ManagementWorkspace({
   busy,
@@ -155,33 +154,32 @@ export function ManagementWorkspace({
   const canOperate = canPurchase || canSell || canProduce || canExpense || canPaySupplier || canPaySalary;
   const [area, setArea] = useState<ManagementArea>(canManage ? 'products' : canOperate ? 'operations' : 'employees');
   const title = area === 'dashboard' ? 'Dashboard' : area === 'operations' ? 'Daily work' : area === 'deliveries' ? 'Deliveries' : area === 'accounts' ? 'Accounts' : area === 'history' ? 'History' : area === 'cash-close' ? 'Cash close' : area === 'products' ? 'Products' : area === 'customers' ? 'Customers' : area === 'suppliers' ? 'Suppliers' : area === 'employees' ? 'Employees' : area === 'costing-planning' ? 'Cost & plans' : area === 'access' ? 'Access & users' : area === 'backup' ? 'Backup & restore' : 'Settings';
+  const navigationItems: NavigationItem[] = [
+    canViewOperational && { area: 'dashboard', id: 'dashboard-nav', label: 'Dashboard', group: 'Everyday work', icon: LayoutDashboard },
+    canOperate && { area: 'operations', id: 'operations-nav', label: 'Daily work', group: 'Everyday work', icon: ShoppingBasket },
+    canDeliver && { area: 'deliveries', id: 'deliveries-nav', label: 'Deliveries', group: 'Everyday work', icon: PackageCheck },
+    canViewFinancial && { area: 'accounts', id: 'accounts-nav', label: 'Accounts', group: 'Records & closing', icon: BookOpen },
+    canViewHistory && { area: 'history', id: 'history-nav', label: 'History', group: 'Records & closing', icon: HistoryIcon },
+    canCashClose && { area: 'cash-close', id: 'cash-close-nav', label: 'Cash close', group: 'Records & closing', icon: Scale },
+    canManage && { area: 'products', id: 'products-nav', label: 'Products', group: 'People & stock', icon: PackagePlus },
+    canManage && { area: 'customers', id: 'customers-nav', label: 'Customers', group: 'People & stock', icon: Users },
+    canManage && { area: 'suppliers', id: 'suppliers-nav', label: 'Suppliers', group: 'People & stock', icon: Truck },
+    (canManage || canAttend) && { area: 'employees', id: 'employees-nav', label: 'Employees', group: 'People & stock', icon: ClipboardCheck },
+    canManageSettings && { area: 'costing-planning', id: 'costing-planning-nav', label: 'Cost & plans', group: 'Shop controls', icon: Calculator },
+    (canManage || canManageSettings) && { area: 'settings', id: 'settings-nav', label: 'Settings', group: 'Shop controls', icon: Settings },
+    { area: 'access', id: 'access-nav', label: 'Access', group: 'Shop controls', icon: ShieldCheck },
+    canExportBackup && { area: 'backup', id: 'backup-nav', label: 'Backup', group: 'Shop controls', icon: DatabaseBackup },
+  ].filter((item): item is NavigationItem => Boolean(item));
   const attendanceEmployees = masterData?.employees.filter((employee) => employee.active).map(({ accountId, name }) => ({ accountId, name })) ?? transactionReferences?.employees ?? [];
 
-  return <main className="min-h-screen bg-[#f7f6f0] pb-10 text-slate-900">
-    <header className="bg-emerald-900 px-5 pb-7 pt-7 text-white shadow-lg">
+  return <main className="min-h-screen bg-[#f7f6f0] pb-24 text-slate-900 md:pb-10">
+    <header className="bg-emerald-900 px-5 pb-7 pt-7 text-white shadow-lg" style={{ paddingTop: 'max(1.75rem, env(safe-area-inset-top))' }}>
       <div className="mx-auto flex max-w-4xl items-center justify-between gap-4">
         <div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">Saaf Milk</p><h1 className="mt-1 text-2xl font-bold">{title}</h1><p id="signed-in-user" className="mt-1 text-sm text-emerald-100">Signed in as {currentUser?.displayName} · {plainRole(currentUser?.roleCode)}</p></div>
         <button id="logout-button" disabled={busy} onClick={onLogout} className="rounded-xl border border-emerald-600 p-3 text-emerald-50 disabled:opacity-50" aria-label="Sign out"><LogOut className="h-5 w-5" /></button>
       </div>
     </header>
-    <nav className="border-b border-slate-200 bg-white px-4" aria-label="Management areas">
-      <div className="mx-auto flex max-w-4xl gap-2 overflow-x-auto py-2">
-        {canViewOperational && <AreaButton id="dashboard-nav" active={area === 'dashboard'} onClick={() => setArea('dashboard')}><LayoutDashboard className="h-4 w-4" />Dashboard</AreaButton>}
-        {canOperate && <AreaButton id="operations-nav" active={area === 'operations'} onClick={() => setArea('operations')}><ShoppingBasket className="h-4 w-4" />Daily work</AreaButton>}
-        {canDeliver && <AreaButton id="deliveries-nav" active={area === 'deliveries'} onClick={() => setArea('deliveries')}><PackageCheck className="h-4 w-4" />Deliveries</AreaButton>}
-        {canViewFinancial && <AreaButton id="accounts-nav" active={area === 'accounts'} onClick={() => setArea('accounts')}><BookOpen className="h-4 w-4" />Accounts</AreaButton>}
-        {canViewHistory && <AreaButton id="history-nav" active={area === 'history'} onClick={() => setArea('history')}><HistoryIcon className="h-4 w-4" />History</AreaButton>}
-        {canCashClose && <AreaButton id="cash-close-nav" active={area === 'cash-close'} onClick={() => setArea('cash-close')}><Scale className="h-4 w-4" />Cash close</AreaButton>}
-        {canManage && <AreaButton id="products-nav" active={area === 'products'} onClick={() => setArea('products')}><PackagePlus className="h-4 w-4" />Products</AreaButton>}
-        {canManage && <AreaButton id="customers-nav" active={area === 'customers'} onClick={() => setArea('customers')}><Users className="h-4 w-4" />Customers</AreaButton>}
-        {canManage && <AreaButton id="suppliers-nav" active={area === 'suppliers'} onClick={() => setArea('suppliers')}><Truck className="h-4 w-4" />Suppliers</AreaButton>}
-        {(canManage || canAttend) && <AreaButton id="employees-nav" active={area === 'employees'} onClick={() => setArea('employees')}><ClipboardCheck className="h-4 w-4" />Employees</AreaButton>}
-        {canManageSettings && <AreaButton id="costing-planning-nav" active={area === 'costing-planning'} onClick={() => setArea('costing-planning')}><Calculator className="h-4 w-4" />Cost & plans</AreaButton>}
-        {(canManage || canManageSettings) && <AreaButton id="settings-nav" active={area === 'settings'} onClick={() => setArea('settings')}><Settings className="h-4 w-4" />Settings</AreaButton>}
-        <AreaButton id="access-nav" active={area === 'access'} onClick={() => setArea('access')}><ShieldCheck className="h-4 w-4" />Access</AreaButton>
-        {canExportBackup && <AreaButton id="backup-nav" active={area === 'backup'} onClick={() => setArea('backup')}><DatabaseBackup className="h-4 w-4" />Backup</AreaButton>}
-      </div>
-    </nav>
+    <HybridNavigation items={navigationItems} activeArea={area} onSelect={setArea} />
     <div className="mx-auto max-w-4xl px-4 py-6">
       {area === 'dashboard' && canViewOperational ? (
         <DashboardReportsWorkspace canViewCashier={canSell} canViewFinancial={canViewFinancial} onLoad={onLoadReports} />
@@ -214,10 +212,6 @@ export function ManagementWorkspace({
       )}
     </div>
   </main>;
-}
-
-function AreaButton({ id, active, onClick, children }: { id: string; active: boolean; onClick(): void; children: ReactNode }) {
-  return <button id={id} onClick={onClick} className={`flex min-w-max flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-bold sm:text-sm ${active ? 'bg-emerald-50 text-emerald-800' : 'text-slate-500'}`}>{children}</button>;
 }
 
 function Unavailable() {

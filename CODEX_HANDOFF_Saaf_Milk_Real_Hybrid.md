@@ -16,7 +16,7 @@ Read those files before changing code.
 
 ## Current superseding checkpoint — 2026-09-01
 
-The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–8 are complete and Phase 9 is next. `PHASE8.md` contains the completed screen ledger; management, core settings, optional Opening State, Daily Work, deliveries/wholesale, customer/supplier ledgers, History/Corrections, Cash Count/Daily Close, Dashboard/Reports, Costing/Planning, Staff/Security, and Encrypted Backup/Restore are native-backed and physical-device verified.
+The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–8 are complete and Phase 9 is in progress. `PHASE8.md` contains the completed screen ledger. `PHASE9.md` records the completed grouped-navigation milestone, the discovered device-test isolation requirement, and the next Android Back/overlay gate.
 
 Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE8.md` for current status. The runtime exposes all seventy-eight frozen actions, including operational/cashier/financial/profitability summaries, Daily Work commands, delivery lifecycle, account ledgers, event history/detail, typed corrections, reconciliation, versioned costing/planning controls, personal credentials, owner recovery, staff enrollment/administration, security audit, and encrypted export/inspection/restore. The complete connected-device suite passes 211/211 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7.
 
@@ -29,7 +29,7 @@ The two completed Phase 3 design tracks were:
 1. authenticated users, credentials, roles/permissions, sessions, recovery, audit actor IDs, migration, and backup/restore security;
 2. authoritative costing/COGS and profitability semantics.
 
-The researched recommendations for native security and costing are implemented and device-verified. Phase 8 is complete: every retained screen family and all 78 frozen operations execute through the active native-backed React product. Phase 9 runtime/navigation/device integration is the next gate; later fidelity, cleanup, acceptance, and release phases remain open.
+The researched recommendations for native security and costing are implemented and device-verified. Phase 8 is complete: every retained screen family and all 78 frozen operations execute through the active native-backed React product. Phase 9 runtime/navigation/device integration is active; grouped responsive navigation is complete and passes its focused Samsung test 1/1. Isolate automated QA data before another mutating complete regression, then continue with Android Back/overlay behavior. Later fidelity, cleanup, acceptance, and release phases remain open.
 
 ---
 

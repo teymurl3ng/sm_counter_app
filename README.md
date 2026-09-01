@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-01 — hybrid Phases 0–8 are complete. All 78 frozen bridge operations and every retained Phase 8 screen family are native-backed and physical-device verified, including encrypted backup and restore. Phase 9 Runtime / Navigation / Device Integration is next. Substantial Phase 9/11 native prerequisites were completed early and remain credited without declaring those later hybrid phases complete.
+Status: RECONCILED 2026-09-01 — hybrid Phases 0–8 are complete and Phase 9 Runtime / Navigation / Device Integration is in progress. Phase 9 Milestone 1 replaces the endless menu strip with compact grouped navigation and is physical-device verified. All 78 frozen bridge operations remain native-backed. Substantial Phase 9/11 native prerequisites completed early remain credited without declaring those later phases complete.
 
 Latest physical-device checkpoint: Encrypted Backup and Restore is verified; the complete connected-device suite passes 211/211.
 
@@ -24,6 +24,7 @@ Latest physical-device checkpoint: Encrypted Backup and Restore is verified; the
 - `bridge/CONTRACT.md` and `bridge/contract.json` — frozen human-readable and machine-readable bridge contract version 2.
 - `PHASE7.md` — completed packaged React/WebView/Android vertical slice, authenticated bridge proof, physical-device evidence, and Phase 8 handoff.
 - `PHASE8.md` — completed screen capability ledger, all 21 native-backed milestones, verification, limitations, and Phase 9 handoff.
+- `PHASE9.md` — active runtime/navigation/device-integration ledger, completed grouped-navigation milestone, device-test isolation requirement, and next gate.
 
 ## Immutable baselines
 
@@ -89,7 +90,7 @@ Phase 7 — Hybrid Shell / Vertical Slice ✅
 
 Phase 8 — UI Wiring ✅ (all 21 milestones complete; all 78 bridge operations native-backed and device-proven)
 
-Phase 9 — Runtime / Navigation / Device Integration ◐ (native lifecycle credit only; WebView recreation, Back behavior, targeted refresh, keyboard/insets, and fixed application navigation remain)
+Phase 9 — Runtime / Navigation / Device Integration ◐ (grouped responsive application navigation complete; isolated QA data, Back behavior, WebView recreation, targeted refresh, and keyboard/insets remain)
 
 Phase 10 — Functional Product Completion ⏳ (includes the periodic encrypted Google Drive/cloud-backup design gate, approved implementation, and a separate owner-phone snapshot-view decision)
 
@@ -153,4 +154,4 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 
 ## Next gate
 
-Phases 3–8 are closed. Every retained Phase 8 screen family and all 78 bridge operations are native-backed and device-proven, including encrypted export, inspection, and full-replacement restore through protected Android picker/ticket boundaries. The active React shell, native bridge handlers/services, and Phase 5 read-model façade remain split into focused modules. Next, begin Phase 9 Runtime / Navigation / Device Integration: prove lifecycle/recreation behavior, protected Back/logout navigation, targeted refresh, keyboard/system-bar/inset handling, and fixed application navigation without changing business semantics. Google Drive scheduling remains deferred to the Phase 10 design gate. See `PHASE8.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–8 are closed and Phase 9 is active. Every retained Phase 8 screen family and all 78 bridge operations remain native-backed and device-proven. Phase 9 Milestone 1 replaces the overflowing menu strip with four direct role-aware destinations and a grouped More panel while retaining one WebView and packaged URL; its focused Samsung test passes 1/1. Next, isolate QA/test application data before any mutating full regression, then implement protected Android Back/overlay navigation. Google Drive scheduling remains deferred to the Phase 10 design gate. See `PHASE9.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.

@@ -8,6 +8,7 @@ import java.time.Instant
 import java.util.Locale
 import java.util.UUID
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.sync.Mutex
 
 data class CloudBackupStatus(
     val configured: Boolean,
@@ -131,6 +132,40 @@ class CloudBackupCoordinator(
     }
 
     suspend fun runBackup(): CloudBackupRunResult {
+        val observedLastSuccess = requireState().lastSuccessAt
+        if (RUN_MUTEX.tryLock()) {
+            return try {
+                runBackupLocked()
+            } finally {
+                RUN_MUTEX.unlock()
+            }
+        }
+        RUN_MUTEX.lock()
+        return try {
+            val current = requireState()
+            val completedWhileWaiting = current.pending == null &&
+                current.lastSuccessAt != null &&
+                current.lastSuccessAt != observedLastSuccess
+            if (completedWhileWaiting) {
+                val latest = current.snapshots
+                    .filter { it.vaultId == current.vault.vaultId }
+                    .maxByOrNull { Instant.parse(it.createdAt) }
+                if (latest != null) {
+                    return CloudBackupRunResult(
+                        snapshotId = latest.snapshotId,
+                        createdAt = latest.createdAt,
+                        uploaded = false,
+                        retentionWarnings = 0,
+                    )
+                }
+            }
+            runBackupLocked()
+        } finally {
+            RUN_MUTEX.unlock()
+        }
+    }
+
+    private suspend fun runBackupLocked(): CloudBackupRunResult {
         var state = requireState()
         require(state.enabled) { "Automatic cloud backup is disabled" }
         val attemptedAt = now().toString()
@@ -138,13 +173,45 @@ class CloudBackupCoordinator(
         return try {
             requireMatchingAccount(state)
             state = settings.read() ?: throw CloudBackupFailure.NotConfigured()
-            val pending = state.pending ?: createPending(state).also { created ->
+            val recovered = if (state.pending == null) outbox.recoverFinalized(state.vault.vaultId) else null
+            recovered?.let { candidate ->
+                val recoveredBytes = outbox.read(candidate)
+                try {
+                    try {
+                        val identity = cryptography.verifyLocalSnapshot(recoveredBytes, state.vault)
+                        require(identity.snapshotId == candidate.snapshotId && identity.createdAt == candidate.createdAt) {
+                            "Pending cloud snapshot metadata failed authentication"
+                        }
+                    } catch (error: CloudBackupFailure.KeyUnavailable) {
+                        throw error
+                    } catch (error: Throwable) {
+                        throw CloudBackupFailure.KeyUnavailable(
+                            error.message ?: "Pending cloud snapshot failed authentication",
+                        )
+                    }
+                } finally {
+                    recoveredBytes.fill(0)
+                }
+            }
+            val pending = state.pending ?: recovered ?: createPending(state).also { created ->
                 state = settings.update { it.copy(pending = created) }
             }
-            val bytes = outbox.read(pending)
-            val remote = provider.findSnapshot(state.vault.vaultId, pending.snapshotId)
-                ?: provider.uploadSnapshot(pending, state.vault.vaultId, state.installationId, bytes)
-            verifyRemote(remote, pending, bytes)
+            if (state.pending == null) state = settings.update { it.copy(pending = pending) }
+            val bytes = outbox.readOrNull(pending)
+            var uploaded = false
+            val remote = try {
+                provider.findSnapshot(state.vault.vaultId, pending.snapshotId)
+                    ?: run {
+                        val uploadBytes = bytes ?: throw CloudBackupFailure.KeyUnavailable(
+                            "The pending cloud snapshot is missing before upload",
+                        )
+                        uploaded = true
+                        provider.uploadSnapshot(pending, state.vault.vaultId, state.installationId, uploadBytes)
+                    }
+            } finally {
+                bytes?.fill(0)
+            }
+            verifyRemote(remote, pending)
 
             val allSnapshots = provider.listSnapshots(null)
             val currentVaultSnapshots = allSnapshots.filter { it.vaultId == state.vault.vaultId }
@@ -161,19 +228,29 @@ class CloudBackupCoordinator(
                 }
             }
             val retained = allSnapshots.filterNot { it.remoteFileId in deletedIds }
-            outbox.remove(pending)
-            settings.write(
-                state.copy(
-                    pending = null,
-                    lastAttemptAt = attemptedAt,
-                    lastSuccessAt = attemptedAt,
-                    lastErrorCode = null,
-                    lastErrorMessage = if (cleanupWarnings == 0) null else "The backup succeeded, but $cleanupWarnings old recovery point(s) could not be removed.",
-                    snapshots = retained,
-                ),
+            val successfulState = state.copy(
+                pending = null,
+                lastAttemptAt = attemptedAt,
+                lastSuccessAt = attemptedAt,
+                lastErrorCode = null,
+                lastErrorMessage = if (cleanupWarnings == 0) null else "The backup succeeded, but $cleanupWarnings old recovery point(s) could not be removed.",
+                snapshots = retained,
             )
+            settings.write(successfulState)
+            try {
+                outbox.remove(pending)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Throwable) {
+                cleanupWarnings += 1
+                settings.write(
+                    successfulState.copy(
+                        lastErrorMessage = "The backup succeeded, but $cleanupWarnings cleanup operation(s) remain pending.",
+                    ),
+                )
+            }
             audit(state, "success", "snapshot_id=${pending.snapshotId};retention_warnings=$cleanupWarnings")
-            CloudBackupRunResult(pending.snapshotId, pending.createdAt, uploaded = true, retentionWarnings = cleanupWarnings)
+            CloudBackupRunResult(pending.snapshotId, pending.createdAt, uploaded = uploaded, retentionWarnings = cleanupWarnings)
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (error: Throwable) {
@@ -227,7 +304,6 @@ class CloudBackupCoordinator(
     private suspend fun verifyRemote(
         remote: CloudRemoteSnapshot,
         pending: CloudPendingSnapshot,
-        bytes: ByteArray,
     ) {
         require(remote.snapshotId == pending.snapshotId) { "Google Drive returned a different cloud snapshot" }
         require(remote.sizeBytes == pending.sizeBytes) { "Google Drive backup size verification failed" }
@@ -235,8 +311,12 @@ class CloudBackupCoordinator(
             require(remote.sha256.equals(pending.sha256, ignoreCase = true)) { "Google Drive backup checksum verification failed" }
         } else {
             val downloaded = provider.downloadSnapshot(remote.remoteFileId)
-            require(downloaded.size == bytes.size && sha256(downloaded) == pending.sha256) {
-                "Google Drive backup download verification failed"
+            try {
+                require(downloaded.size.toLong() == pending.sizeBytes && sha256(downloaded) == pending.sha256) {
+                    "Google Drive backup download verification failed"
+                }
+            } finally {
+                downloaded.fill(0)
             }
         }
     }
@@ -280,6 +360,7 @@ class CloudBackupCoordinator(
         private const val PROVIDER_NAME = "Google Drive"
         private const val SCHEDULE_DESCRIPTION = "Approximately every 24 hours"
         private val STALE_AFTER = Duration.ofHours(48)
+        private val RUN_MUTEX = Mutex()
 
         fun maskEmail(value: String): String {
             val trimmed = value.trim().lowercase(Locale.ROOT)

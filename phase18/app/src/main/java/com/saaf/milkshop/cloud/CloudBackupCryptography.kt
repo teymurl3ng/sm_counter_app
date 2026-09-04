@@ -47,6 +47,12 @@ data class DecryptedCloudSnapshot(
     val payload: ByteArray,
 )
 
+internal data class CloudSnapshotIdentity(
+    val snapshotId: String,
+    val vaultId: String,
+    val createdAt: String,
+)
+
 interface CloudKeyProtector {
     fun wrap(plaintext: ByteArray, authenticatedData: ByteArray): WrappedCiphertext
     fun unwrap(wrapped: WrappedCiphertext, authenticatedData: ByteArray): ByteArray
@@ -179,6 +185,80 @@ class CloudBackupCryptography(
     }
 
     fun decryptSnapshot(bytes: ByteArray, passphrase: CharArray): DecryptedCloudSnapshot {
+        val parsed = parseSnapshot(bytes)
+        val salt = Base64.getDecoder().decode(parsed.portableWrap.saltBase64)
+        val wrappingKey = deriveKey(
+            passphrase,
+            salt,
+            parsed.portableWrap.memoryKib,
+            parsed.portableWrap.iterations,
+            parsed.portableWrap.parallelism,
+        )
+        val vaultKey = try {
+            decrypt(parsed.portableWrap.wrappedKey, wrappingKey, vaultWrapAad(parsed.vaultId))
+        } catch (_: AEADBadTagException) {
+            throw CloudBackupFailure.WrongPassphraseOrTampered
+        } finally {
+            wrappingKey.fill(0)
+            salt.fill(0)
+        }
+        val payload = try {
+            decrypt(
+                parsed.snapshotCipher,
+                vaultKey,
+                snapshotAad(
+                    parsed.snapshotId,
+                    parsed.vaultId,
+                    parsed.createdAt,
+                    parsed.ciphertextLength,
+                    parsed.portableWrap,
+                ),
+            )
+        } catch (_: AEADBadTagException) {
+            throw CloudBackupFailure.WrongPassphraseOrTampered
+        } finally {
+            vaultKey.fill(0)
+        }
+        return DecryptedCloudSnapshot(parsed.snapshotId, parsed.vaultId, parsed.createdAt, payload)
+    }
+
+    internal fun verifyLocalSnapshot(
+        bytes: ByteArray,
+        configuration: CloudVaultConfiguration,
+    ): CloudSnapshotIdentity {
+        val parsed = parseSnapshot(bytes)
+        require(parsed.vaultId == configuration.vaultId) {
+            "Pending cloud snapshot belongs to a different backup vault"
+        }
+        require(parsed.portableWrap == configuration.portableWrap) {
+            "Pending cloud snapshot does not match the configured recovery key"
+        }
+        val vaultKey = localProtector.unwrap(
+            configuration.localWrap,
+            vaultWrapAad(configuration.vaultId),
+        )
+        val payload = try {
+            decrypt(
+                parsed.snapshotCipher,
+                vaultKey,
+                snapshotAad(
+                    parsed.snapshotId,
+                    parsed.vaultId,
+                    parsed.createdAt,
+                    parsed.ciphertextLength,
+                    parsed.portableWrap,
+                ),
+            )
+        } catch (_: AEADBadTagException) {
+            throw CloudBackupFailure.KeyUnavailable("Pending cloud snapshot failed authentication")
+        } finally {
+            vaultKey.fill(0)
+        }
+        payload.fill(0)
+        return CloudSnapshotIdentity(parsed.snapshotId, parsed.vaultId, parsed.createdAt)
+    }
+
+    private fun parseSnapshot(bytes: ByteArray): ParsedCloudSnapshot {
         val envelope = JSONObject(bytes.toString(Charsets.UTF_8))
         require(envelope.getInt("cloud_envelope_version") == CLOUD_ENVELOPE_VERSION) {
             "Unsupported cloud backup envelope"
@@ -197,38 +277,21 @@ class CloudBackupCryptography(
         val ciphertextLength = envelope.getInt("ciphertext_length")
         val snapshotCipher = wrappedCiphertext(envelope.getJSONObject("cipher"))
         val snapshotCiphertext = Base64.getDecoder().decode(snapshotCipher.ciphertextBase64)
-        require(ciphertextLength == snapshotCiphertext.size && ciphertextLength > TAG_BYTES) {
-            "Cloud backup ciphertext length is invalid"
-        }
-        val salt = Base64.getDecoder().decode(portableWrap.saltBase64)
-        val wrappingKey = deriveKey(
-            passphrase,
-            salt,
-            portableWrap.memoryKib,
-            portableWrap.iterations,
-            portableWrap.parallelism,
-        )
-        val vaultKey = try {
-            decrypt(portableWrap.wrappedKey, wrappingKey, vaultWrapAad(vaultId))
-        } catch (_: AEADBadTagException) {
-            throw CloudBackupFailure.WrongPassphraseOrTampered
+        try {
+            require(ciphertextLength == snapshotCiphertext.size && ciphertextLength > TAG_BYTES) {
+                "Cloud backup ciphertext length is invalid"
+            }
         } finally {
-            wrappingKey.fill(0)
-            salt.fill(0)
-        }
-        val payload = try {
-            decrypt(
-                snapshotCipher,
-                vaultKey,
-                snapshotAad(snapshotId, vaultId, createdAt, ciphertextLength, portableWrap),
-            )
-        } catch (_: AEADBadTagException) {
-            throw CloudBackupFailure.WrongPassphraseOrTampered
-        } finally {
-            vaultKey.fill(0)
             snapshotCiphertext.fill(0)
         }
-        return DecryptedCloudSnapshot(snapshotId, vaultId, createdAt, payload)
+        return ParsedCloudSnapshot(
+            snapshotId = snapshotId,
+            vaultId = vaultId,
+            createdAt = createdAt,
+            portableWrap = portableWrap,
+            ciphertextLength = ciphertextLength,
+            snapshotCipher = snapshotCipher,
+        )
     }
 
     private fun validateKdf(wrap: PortableVaultWrap) {
@@ -340,6 +403,15 @@ class CloudBackupCryptography(
 
     private fun randomBytes(size: Int) = ByteArray(size).also(random::nextBytes)
     private fun encode(value: ByteArray): String = Base64.getEncoder().encodeToString(value)
+
+    private data class ParsedCloudSnapshot(
+        val snapshotId: String,
+        val vaultId: String,
+        val createdAt: String,
+        val portableWrap: PortableVaultWrap,
+        val ciphertextLength: Int,
+        val snapshotCipher: WrappedCiphertext,
+    )
 
     companion object {
         const val CLOUD_ENVELOPE_VERSION = 1

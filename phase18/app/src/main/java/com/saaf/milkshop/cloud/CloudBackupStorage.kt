@@ -248,6 +248,47 @@ class CloudBackupOutbox(
         return bytes
     }
 
+    fun readOrNull(pending: CloudPendingSnapshot): ByteArray? {
+        validateFileName(pending)
+        if (!file(pending.fileName).exists()) return null
+        return read(pending)
+    }
+
+    fun recoverFinalized(vaultId: String): CloudPendingSnapshot? {
+        UUID.fromString(vaultId)
+        directory.listFiles()
+            ?.filter { it.isFile && it.name.endsWith("$EXTENSION.tmp") }
+            ?.forEach { it.delete() }
+        return directory.listFiles()
+            ?.filter { it.isFile && it.name.endsWith(EXTENSION) }
+            ?.map { candidate ->
+                try {
+                    val bytes = candidate.readBytes()
+                    val envelope = JSONObject(bytes.toString(Charsets.UTF_8))
+                    val snapshotId = envelope.getString("snapshot_id").also(UUID::fromString)
+                    val createdAt = envelope.getString("created_at").also(Instant::parse)
+                    require(envelope.getString("vault_id") == vaultId) {
+                        "Pending cloud snapshot belongs to a different backup vault"
+                    }
+                    require(candidate.name == "$snapshotId$EXTENSION") {
+                        "Pending cloud snapshot identity does not match its file name"
+                    }
+                    CloudPendingSnapshot(
+                        snapshotId = snapshotId,
+                        createdAt = createdAt,
+                        fileName = candidate.name,
+                        sha256 = sha256(bytes),
+                        sizeBytes = bytes.size.toLong(),
+                    )
+                } catch (error: Throwable) {
+                    throw CloudBackupFailure.KeyUnavailable(
+                        error.message ?: "A pending cloud snapshot is damaged",
+                    )
+                }
+            }
+            ?.minByOrNull { Instant.parse(it.createdAt) }
+    }
+
     fun remove(pending: CloudPendingSnapshot) {
         validateFileName(pending)
         val target = file(pending.fileName)

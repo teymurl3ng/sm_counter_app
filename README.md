@@ -1,8 +1,8 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-04 — hybrid Phases 0–9 and Phase 10 checkpoints 10.1–10.2 are complete. The capability audit confirms all 78 operations and 16 retained workflow families are genuinely native-backed; contract v3 exposes native-authoritative plan targets, actuals, and variances. The Phase 10.3 periodic encrypted cloud-backup proposal is complete and awaiting owner approval before implementation. Substantial Phase 11 prerequisites completed early remain credited without prematurely declaring that phase complete.
+Status: RECONCILED 2026-09-04 — hybrid Phases 0–10 are complete. The capability audit confirms all 16 retained workflow families are genuinely native-backed; contract v4 exposes 86 operations, including the approved periodic encrypted Google Drive backup and recovery surface. Substantial Phase 11 prerequisites completed early remain credited without prematurely declaring that phase complete.
 
-Latest physical-device checkpoint: the complete isolated-QA connected-device suite passes 219/219; host-side tests pass 7/7.
+Latest physical-device checkpoint: the complete isolated-QA connected-device suite passes 224/224; host-side tests pass 7/7.
 
 ## What this repository contains
 
@@ -21,11 +21,12 @@ Latest physical-device checkpoint: the complete isolated-QA connected-device sui
 - `PHASE5.md` — completed native read-model expansion, permission boundary, verification, and next gate.
 - `PHASE5_DTO_CATALOG.md` — frozen hybrid-facing Kotlin query/DTO catalog, representation rules, code sets, and security exclusions.
 - `PHASE6.md` — completed canonical bridge-contract boundary, generated projections, drift gate, verification, and Phase 7 handoff.
-- `bridge/CONTRACT.md` and `bridge/contract.json` — frozen human-readable and machine-readable bridge contract version 3.
+- `bridge/CONTRACT.md` and `bridge/contract.json` — frozen human-readable and machine-readable bridge contract version 4.
 - `PHASE7.md` — completed packaged React/WebView/Android vertical slice, authenticated bridge proof, physical-device evidence, and Phase 8 handoff.
 - `PHASE8.md` — completed screen capability ledger, all 21 native-backed milestones, verification, limitations, and Phase 9 handoff.
 - `PHASE9.md` — completed runtime/navigation/device-integration ledger, including grouped navigation, lifecycle, keyboard/insets, targeted refresh, renderer recovery, and physical-device evidence.
-- `PHASE10_CLOUD_BACKUP_DESIGN_PROPOSAL.md` — approval-ready periodic encrypted Google Drive backup, recovery-key, scheduling, retention, restore, and owner-phone scope proposal.
+- `PHASE10_CLOUD_BACKUP_DESIGN_PROPOSAL.md` — approved periodic encrypted Google Drive backup, recovery-key, scheduling, retention, restore, and owner-phone scope design.
+- `PHASE10_4_IMPLEMENTATION_REPORT.md` — implemented cloud-backup boundary, verification evidence, build configuration, and remaining live-provider gates.
 
 ## Immutable baselines
 
@@ -37,11 +38,11 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 9 — Runtime / Navigation / Device Integration: COMPLETE**
+**Phase 10 — Functional Product Completion: COMPLETE**
 
 Phase 8's native-backed shop screens and all 78 frozen operations remain intact. Phase 9 adds grouped role-aware navigation, predictable Android Back behavior, a separate QA installation, focused file boundaries, one non-reloading React/WebView presentation, secure Activity recreation, deliberate keyboard/system-inset behavior, targeted state refresh with bridge-transfer measurement, and native recovery from main-page or WebView-renderer failure. A recovery reload creates a fresh WebView and revalidates the memory-only session before protected information appears. The complete isolated-QA physical-device regression passes 218/218.
 
-The current release architecture is multi-user but device-local: named roles share one installation and one Room database. The approved next direction is periodic encrypted off-device backup, with Google Drive as the example provider and the exact cadence/retention/network rules deferred to a Phase 10 design gate. Backup protects and transfers a verified snapshot; it is not live synchronization between two writable phones. That gate will separately decide whether the owner's phone should offer a safe read-only view of the latest snapshot.
+The application remains offline-first and each writable installation owns one Room database. Phase 10 adds periodic encrypted off-device recovery through Google Drive `appDataFolder`: approximate daily WorkManager execution, Wi-Fi by default, a portable recovery-passphrase envelope, verified idempotent uploads, 14-daily/8-weekly/12-monthly retention, and safe full-replacement restore. Backup protects and transfers a verified snapshot; it is not live synchronization between two writable phones. A future owner-phone view is restricted to read-only latest-snapshot scope and remains deferred.
 
 ## Approved security track
 
@@ -93,9 +94,9 @@ Phase 8 — UI Wiring ✅ (all 21 milestones complete; all 78 bridge operations 
 
 Phase 9 — Runtime / Navigation / Device Integration ✅ (all six milestones complete, including secure renderer recovery; 218/218 device regression)
 
-Phase 10 — Functional Product Completion 🚧 (checkpoints 10.1–10.2 complete; checkpoint 10.3 proposal awaits approval before implementation)
+Phase 10 — Functional Product Completion ✅ (checkpoints 10.1–10.5 complete; encrypted Drive recovery implemented; 224/224 device regression)
 
-Phase 11 — Integrity / Recovery / Concurrency ◐ (security/backup credit; local concurrency, hybrid recovery, and periodic-cloud-backup integrity remain)
+Phase 11 — Integrity / Recovery / Concurrency ◐ (next gate; stress cancellation/process death, prolonged offline use, large histories, repeated recovery, and cloud edge cases)
 
 Phase 12 — UI Fidelity ⏳ (includes the deferred measured presentation-performance note; no broad optimization rewrite is approved)
 
@@ -127,7 +128,7 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Focused backup/restore suite: 8/8 passed, including portable and local confidentiality checks, wrong-passphrase rejection, tamper rejection, security round-trips, session invalidation, and transient lockout-state exclusion.
 - Phase 4 security gap-closure suite: 9/9 passed.
 - Phase 5 hybrid read-model suite: 4/4 passed.
-- Bridge contract: version 3, 78 endpoints, generated Kotlin/TypeScript projections and both pre-build drift gates pass; v3 retains all v2 requests and adds native-authoritative planning comparison response fields.
+- Bridge contract: version 4, 86 endpoints, generated Kotlin/TypeScript projections and both pre-build drift gates pass; v4 retains v3 and adds eight native-owned cloud-backup operations.
 - Host-side debug unit tests: 7/7 passed.
 - Phase 7 focused hybrid vertical-slice suite: 3/3 passed on the physical device.
 - Phase 8 focused Product Management suite: 3/3 passed on the physical device.
@@ -151,9 +152,10 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 8 focused Costing/Planning suite: 5/5 passed on the physical device.
 - Phase 8 focused Staff Users/Security Audit suite: 5/5 passed on the physical device.
 - Phase 8 focused Encrypted Backup/Restore suite: 5/5 passed on the physical device.
+- Phase 10 focused periodic encrypted cloud-backup suite: 5/5 passed on the physical device.
 - Phase 9 focused real-renderer termination and secure recovery suite: 2/2 passed on the physical device.
-- Complete isolated-QA connected-device instrumentation regression: 219/219 passed, 0 skipped, 0 failed.
+- Complete isolated-QA connected-device instrumentation regression: 224/224 passed, 0 skipped, 0 failed.
 
 ## Next gate
 
-Phases 3–9 are closed. Every retained screen family and all 78 bridge operations remain native-backed and device-proven. Phase 10.1's capability audit and Phase 10.2's native planning comparisons are complete under contract v3; the complete isolated-QA Samsung suite passes 219/219. The Phase 10.3 periodic encrypted Google Drive/cloud-backup proposal is ready for owner approval. See `PHASE10_CLOUD_BACKUP_DESIGN_PROPOSAL.md`, `PHASE10.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–10 are closed. Every retained screen family and all 86 bridge operations are native-backed; the complete isolated-QA Samsung suite passes 224/224. Phase 10's encrypted Google Drive recovery pipeline is implemented and its production OAuth client remains deliberately external to source control. Begin Phase 11 hardening, then use Phases 14–16 for live Google consent/Drive and second-device release acceptance. See `PHASE10_4_IMPLEMENTATION_REPORT.md`, `PHASE10.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.

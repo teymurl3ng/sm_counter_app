@@ -1,14 +1,14 @@
 # Saaf Milk Canonical Bridge Contract
 
-**Status: FROZEN — contract version 3 — 2026-09-01**
+**Status: FROZEN — contract version 4 — 2026-09-04**
 
-Manifest SHA-256: `2B4FA647E2BFE4F3A12EA9CC12516E93CD52EEEA6BFA3508BE48E6991A88B08B`
+Manifest SHA-256: `D22921E90040EF70CED8AFDE535C6309544B75D5EBD7B726ED1DE1273E0FA136`
 
 ## 1. Authority and scope
 
 This is the single normative bridge/API contract between the packaged React UI and Kotlin. `bridge/contract.json` is its machine-readable endpoint/schema appendix and is incorporated into this contract. `scripts/verify-bridge-contract.py` proves that appendix, the Kotlin endpoint snapshot, the TypeScript action/types projection, the frozen Phase 5 DTO names, permissions, and native read methods remain aligned.
 
-Contract version 3 retains all 78 version-2 endpoints and every request shape. It preserves version 2's role-filtered active `expenseCategories` amendment and additively extends the existing `PlanningDto` response with native-authoritative budget actuals, variances, derived sales targets, actual sales, and collection-target actuals. No new persistence or command authority is introduced; React formats these values but never calculates them.
+Contract version 4 retains all 78 version-3 endpoints and every prior request shape. It additively introduces eight owner-only native cloud-backup system operations for non-secret status, Google Drive connection, policy, immediate scheduling, recovery-point refresh, inspection, full replacement, and disconnect. Cloud bytes, cloud recovery passphrases, keys, access tokens, account identifiers, upload sessions, and filesystem paths never cross the bridge; Android-owned secure dialogs collect cloud recovery secrets. The Phase 10.2 planning response amendment remains unchanged.
 
 Authority remains:
 
@@ -30,7 +30,7 @@ JavaScript sends one UTF-8 JSON object through `saafMilkNative.postMessage(...)`
 
 ```json
 {
-  "contractVersion": 3,
+  "contractVersion": 4,
   "requestId": "2f721b62-89bf-4e83-b7a8-bbe2a122d18f",
   "action": "query.dashboard",
   "sessionHandle": "opaque-memory-only-value",
@@ -53,7 +53,7 @@ JavaScript sends one UTF-8 JSON object through `saafMilkNative.postMessage(...)`
 
 ```json
 {
-  "contractVersion": 3,
+  "contractVersion": 4,
   "requestId": "2f721b62-89bf-4e83-b7a8-bbe2a122d18f",
   "action": "query.dashboard",
   "ok": true,
@@ -150,6 +150,9 @@ Phase 7/8 implementation must route protected commands through an authenticated 
 - `system.exportEncryptedBackup` invokes an Android-owned create-document flow. Only metadata returns over the bridge.
 - `system.inspectEncryptedBackup` invokes an Android-owned open-document flow, authenticates the encrypted backup, and returns a short-lived one-use in-memory restore ticket plus non-secret metadata.
 - `system.restoreInspectedBackup` accepts only that ticket and explicit confirmation. Restore invalidates every session; success returns the UI to bootstrap/sign-in.
+- `system.cloudBackupStatus`, `system.connectCloudBackup`, `system.configureCloudBackup`, `system.runCloudBackupNow`, and `system.refreshCloudBackups` expose only owner-controlled cloud policy and non-secret recovery metadata. Cloud setup collects and confirms its recovery passphrase in an Android-owned secure dialog.
+- `system.inspectCloudBackup` collects its recovery passphrase in an Android-owned secure dialog; it and `system.restoreInspectedCloudBackup` preserve the same recent-authentication, one-use-ticket, local-safety-snapshot, full-replacement, and session-invalidation boundary as manual encrypted restore.
+- `system.disconnectCloudBackup` requires explicit revocation confirmation, removes local scheduling/key/account state, and leaves remote encrypted recovery points intact.
 
 React never supplies arbitrary filesystem paths or content URIs and never receives backup bytes.
 

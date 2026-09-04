@@ -118,7 +118,7 @@ class Phase8SpoilageOperationsTest {
 
         val actions = dispatch("system.bridgeInfo").getJSONObject("data").getJSONArray("supportedActions")
         val actionNames = (0 until actions.length()).map(actions::getString)
-        assertEquals(78, actionNames.size)
+        assertEquals(86, actionNames.size)
         assertTrue("query.spoilageHistory" in actionNames)
         assertTrue("command.recordSpoilage" in actionNames)
     }

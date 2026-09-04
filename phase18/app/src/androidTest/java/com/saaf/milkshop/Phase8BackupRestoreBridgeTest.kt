@@ -60,7 +60,7 @@ class Phase8BackupRestoreBridgeTest {
     }
 
     @Test
-    fun exportUsesNativeDocumentBoundaryAndAdvertisesAllSeventyEightActions() = runBlocking {
+    fun exportUsesNativeDocumentBoundaryAndAdvertisesAllEightySixActions() = runBlocking {
         val owner = security.bootstrapOwner("backup.owner", "Backup Owner", OWNER_PASSWORD.toCharArray())
         val response = dispatch("system.exportEncryptedBackup", JSONObject().put("passphrase", BACKUP_PASSWORD), owner.session.sessionId)
         assertTrue(response.toString(), response.getBoolean("ok"))
@@ -74,8 +74,9 @@ class Phase8BackupRestoreBridgeTest {
 
         val actions = dispatch("system.bridgeInfo").getJSONObject("data").getJSONArray("supportedActions")
         val names = (0 until actions.length()).map(actions::getString)
-        assertEquals(78, names.size)
+        assertEquals(86, names.size)
         assertTrue(names.containsAll(listOf("system.exportEncryptedBackup", "system.inspectEncryptedBackup", "system.restoreInspectedBackup")))
+        assertTrue(names.containsAll(listOf("system.cloudBackupStatus", "system.connectCloudBackup", "system.restoreInspectedCloudBackup")))
         assertError(dispatch("system.exportEncryptedBackup", JSONObject().put("passphrase", BACKUP_PASSWORD).put("extra", true), owner.session.sessionId), "invalid_request")
     }
 
@@ -163,6 +164,11 @@ class Phase8BackupRestoreBridgeTest {
             evaluate(webView, "document.getElementById('login-button').click(); true")
             waitFor(webView, "document.getElementById('backup-nav') !== null", 20_000L)
             evaluate(webView, "document.getElementById('backup-nav').click(); true")
+            waitFor(webView, "document.getElementById('encrypted-backup-form') !== null")
+            evaluate(webView, "document.getElementById('backup-cloud-tab').click(); true")
+            waitFor(webView, "document.getElementById('connect-cloud-backup-form') !== null")
+            assertEquals("true", evaluate(webView, "document.body.innerText.includes('Automatic encrypted Google Drive backup') && document.body.innerText.includes('not live synchronization')"))
+            evaluate(webView, "document.getElementById('backup-create-tab').click(); true")
             waitFor(webView, "document.getElementById('encrypted-backup-form') !== null")
             setInput(webView, "backup-account-passphrase", SaafMilkTestRunner.TEST_PASSPHRASE)
             setInput(webView, "backup-file-passphrase", UI_BACKUP_PASSWORD)

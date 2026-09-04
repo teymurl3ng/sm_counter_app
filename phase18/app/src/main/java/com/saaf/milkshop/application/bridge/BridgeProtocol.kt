@@ -88,6 +88,14 @@ internal object HybridBridgeActions {
     const val EXPORT_ENCRYPTED_BACKUP = "system.exportEncryptedBackup"
     const val INSPECT_ENCRYPTED_BACKUP = "system.inspectEncryptedBackup"
     const val RESTORE_INSPECTED_BACKUP = "system.restoreInspectedBackup"
+    const val CLOUD_BACKUP_STATUS = "system.cloudBackupStatus"
+    const val CONNECT_CLOUD_BACKUP = "system.connectCloudBackup"
+    const val CONFIGURE_CLOUD_BACKUP = "system.configureCloudBackup"
+    const val RUN_CLOUD_BACKUP_NOW = "system.runCloudBackupNow"
+    const val REFRESH_CLOUD_BACKUPS = "system.refreshCloudBackups"
+    const val INSPECT_CLOUD_BACKUP = "system.inspectCloudBackup"
+    const val RESTORE_INSPECTED_CLOUD_BACKUP = "system.restoreInspectedCloudBackup"
+    const val DISCONNECT_CLOUD_BACKUP = "system.disconnectCloudBackup"
 
     val authentication = setOf(BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN, LOGOUT, REAUTHENTICATE, CHANGE_OWN_PASSPHRASE, RECOVER_OWNER, CURRENT_SESSION)
     val securityAdministration = setOf(
@@ -154,7 +162,17 @@ internal object HybridBridgeActions {
         RECORD_PRODUCTION_LOSS_ASSESSMENT,
     )
     val backup = setOf(EXPORT_ENCRYPTED_BACKUP, INSPECT_ENCRYPTED_BACKUP, RESTORE_INSPECTED_BACKUP)
-    val supported = listOf(BRIDGE_INFO) + authentication + securityAdministration + masterData + employees + settings + operations + deliveries + ledgers + history + reconciliation + costingPlanning + backup
+    val cloudBackup = setOf(
+        CLOUD_BACKUP_STATUS,
+        CONNECT_CLOUD_BACKUP,
+        CONFIGURE_CLOUD_BACKUP,
+        RUN_CLOUD_BACKUP_NOW,
+        REFRESH_CLOUD_BACKUPS,
+        INSPECT_CLOUD_BACKUP,
+        RESTORE_INSPECTED_CLOUD_BACKUP,
+        DISCONNECT_CLOUD_BACKUP,
+    )
+    val supported = listOf(BRIDGE_INFO) + authentication + securityAdministration + masterData + employees + settings + operations + deliveries + ledgers + history + reconciliation + costingPlanning + backup + cloudBackup
     val authByAction = supported.associateWith { action ->
         when (action) {
             in setOf(BRIDGE_INFO, BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN, RECOVER_OWNER) -> "none"

@@ -43,20 +43,20 @@ The reconciliation preserves these non-negotiable contracts:
 - no migrated installation receives an artificial opening event, owner, credential, session, or privileged audit record;
 - no phase is considered complete merely because part of its work was delivered early.
 
-## Approved periodic cloud-backup direction — details deferred 2026-08-31
+## Approved periodic cloud-backup direction — implemented 2026-09-04
 
 Application users, cloud backup, and live multi-device access are separate capabilities:
 
 - the implemented schema-7 user system supports multiple named owner/admin/manager/operator/cashier identities on one installation, with native permissions and durable actor audit;
-- the current product remains offline-first and device-local: each installation owns its own Room database, there is no Internet permission or synchronization service, and encrypted backup/restore is migration and recovery rather than live sharing;
-- the approved next direction is periodic encrypted off-device backup, with Google Drive as the example provider; cadence, network/charging conditions, retention, account ownership, and recovery UX will be decided at its design gate;
+- the product remains offline-first: each writable installation owns its Room database, and encrypted backup/restore is migration and recovery rather than live sharing;
+- periodic encrypted off-device backup is implemented through Google Drive `appDataFolder`, with the approved cadence, network/charging constraints, retention, account ownership, and recovery UX;
 - the shop device must continue accepting authorized work without Internet, queue a missed backup safely, and retry without creating ambiguous or corrupt copies;
 - the encrypted backup must preserve clerk identities and actor attribution so a recovered or explicitly viewed snapshot still shows who recorded each operation;
 - periodic backup alone does not provide a live shared database. If owner-phone visibility is still desired, the later design must explicitly choose between a safe read-only view of the latest verified snapshot and true synchronization;
 - restoring successive backups into two independently writable installations is not synchronization and must not be presented as such;
 - React must not become a second accounting engine.
 
-Before implementation, Phase 10 must produce and obtain approval for a concrete periodic-cloud-backup design covering provider/account authorization, Android background scheduling, encryption before upload, backup naming/versioning, cadence, Wi-Fi/mobile-data and charging policy, retention, missed-run retry, integrity verification, owner notification, restore selection, privacy, quota/cost, and sign-out/revocation behavior. The same gate may evaluate an optional read-only owner-phone snapshot viewer, but live multi-device writing remains a separate future decision. The current local credential, bridge, and backup contracts remain authoritative until that design is approved.
+Phase 10 produced, obtained approval for, and implemented the design in `PHASE10_CLOUD_BACKUP_DESIGN_PROPOSAL.md`. Contract v4 and `PHASE10_4_IMPLEMENTATION_REPORT.md` record the native boundary and evidence. The optional read-only owner-phone snapshot viewer remains deferred, and live multi-device writing remains a separate unapproved future decision.
 
 ## Implemented product foundation
 
@@ -90,11 +90,11 @@ Portable backup format 2 uses Argon2id-derived AES-256-GCM. Automatic local snap
 | 3 — Native Expansion | **Complete** | Preserve the approved schema-4 through schema-8 native contracts; no React/bridge completion is implied. |
 | 4 — Native Automated Tests | **Complete** | Preserve the `PHASE4.md` evidence matrix and keep the complete regression green as later native/bridge capabilities are added. |
 | 5 — Native Read Models | **Complete** | Preserve `PHASE5_DTO_CATALOG.md`: integer-PKR-paisa money, canonical decimal quantities, explicit correction/coverage state, permission-aware reads, stable costing codes, and no credential/session-handle material. |
-| 6 — Bridge Contract | **Complete; additive v2 and v3 amendments recorded** | Preserve contract version 3, its manifest hash, lossless/authenticated envelopes, generated TypeScript/Kotlin projections, and mandatory pre-build drift checker. V2 added least-privilege expense references; Phase 10's v3 retains all 78 operations/requests and adds only native-authoritative planning comparison response fields. |
+| 6 — Bridge Contract | **Complete; additive v2–v4 amendments recorded** | Preserve contract version 4, its manifest hash, lossless/authenticated envelopes, generated TypeScript/Kotlin projections, and mandatory pre-build drift checker. V4 retains v3 and adds eight owner-only native cloud-backup operations, for 86 total. |
 | 7 — Hybrid Vertical Slice | **Complete** | Preserve the separately built packaged assets, restricted app-assets origin, contract handshake, memory-only session flow, protected product command/audit, and 3-test physical-device proof. |
 | 8 — Screen Wiring | **Complete** | All retained screen families and all 78 bridge operations are native-backed and device-proven, including encrypted export, inspection, and full-replacement restore through Android-owned picker/ticket boundaries. Preserve awaited native queries/commands, private credentials/passphrases, and the backup-versus-sync distinction. |
 | 9 — Runtime Integration | **Complete** | Grouped navigation, isolated `.qa` storage, Android Back, useful fragmentation, secure recreation, keyboard/insets, measured targeted refresh, and renderer/error recovery are device-proven. Preserve fresh-WebView recovery and native session revalidation before protected content. |
-| 10 — Functional Completion | **In progress — checkpoints 10.1–10.2 complete; checkpoint 10.3 proposal awaiting approval** | The audit confirms all 78 operations and 16 retained workflow families are genuinely native-backed. Contract v3 closes the two local planning-presentation gaps with native-authoritative targets, actuals, and variances; the complete isolated suite passes 219/219. `PHASE10_CLOUD_BACKUP_DESIGN_PROPOSAL.md` defines the recommended Drive, encryption, schedule, retention, restore, and read-only owner-phone direction. Approve or amend it before implementing the Phase 10.4 minimum. |
+| 10 — Functional Completion | **Complete — checkpoints 10.1–10.5** | All 16 retained workflow families remain native-backed. Contract v4 exposes 86 operations and implements the approved Drive `appDataFolder`, envelope encryption, coherent snapshot, idempotent upload, WorkManager, retention, status, and full-replacement restore boundary. The complete isolated suite passes 224/224. |
 | 11 — Integrity/Recovery/Concurrency | **Substantial security/backup early credit; still open** | Complete concurrent-write, backup-during-write, large-history, repeated recovery, and remaining session/concurrency tests. For periodic cloud backup, prove scheduling, missed-run retry, upload idempotency, encryption/integrity, retention, provider sign-out/revocation, wrong-account behavior, restore selection, actor preservation, and honest backup-versus-sync boundaries. Reassess the deliberately deferred lower-of-cost/NRV subsystem against the approved materiality and business triggers before hardening closes. |
 | 12 — UI Fidelity | **Not started for the hybrid product; presentation-performance note recorded** | Compare the packaged physical-device React UI with the approved visual target without changing business semantics, and verify that accounting precision is preserved without requiring accounting literacy. Recheck perceived startup and navigation on a profileable release-equivalent build. Preserve the already-sound single-WebView/local-asset/off-main-database architecture; only pursue measured presentation changes such as removing the unconditional restoration wait, A/B testing asynchronous WebView startup, and staging first-workspace data while eliminating duplicate dashboard reads. Do not add speculative code splitting, blanket memoization, unsafe whole-database caching, or weaker accounting/security checks. |
 | 13 — Dead/Mock/Misleading Cleanup | **Not started** | Remove localStorage business state, hardcoded business data, UI-side accounting, synthetic reports, dead controls, mock users, and misleading success paths. |
@@ -104,7 +104,7 @@ Portable backup format 2 uses Argon2id-derived AES-256-GCM. Automatic local snap
 
 ## Current verification credit
 
-The Phase 7 checkpoint passed **127/127** connected-device tests. Phase 8 brought the suite to **211/211**, and Phase 9 brought it to **218/218** through navigation, lifecycle, keyboard/inset, targeted-refresh, and renderer-recovery coverage. Phase 10.2 adds one planning-presentation test, bringing the current complete isolated-QA suite to **219/219**, with zero skipped, failed, or errored tests; the host-side debug unit suite passes **7/7**. Contract version 3 retains the same 78 operations and every v2 request while adding only native-authoritative planning comparison response fields.
+The Phase 7 checkpoint passed **127/127** connected-device tests. Phase 8 brought the suite to **211/211**, Phase 9 to **218/218**, and Phase 10.2 to **219/219**. Phase 10.4 adds five periodic encrypted cloud-backup tests, bringing the complete isolated-QA suite to **224/224**, with zero skipped, failed, or errored tests; the host-side debug unit suite passes **7/7**. Contract version 4 exposes 86 operations and passes both generated-projection drift gates.
 
 The two immutable hashes remain:
 
@@ -120,11 +120,11 @@ The two immutable hashes remain:
 5. **Completed:** prove the Phase 7 authenticated physical-device hybrid vertical slice before scaling.
 6. **Completed:** Phase 8 screen-by-screen wiring, including encrypted backup and restore; all 78 contract operations are implemented and device-proven.
 7. **Completed:** Phase 9 runtime integration, including grouped navigation, isolated QA data, Android Back/overlay coordination, structural hardening, secure Activity/WebView recreation, keyboard/system-inset behavior, measured targeted refresh, and renderer/error recovery.
-8. Complete Phase 10 local capability closure, then pass the explicit periodic encrypted cloud-backup approval gate; decide owner-phone snapshot viewing separately from live synchronization.
+8. **Completed:** Phase 10 local capability closure, explicit encrypted cloud-backup approval gate, minimum implementation, and verification; owner-phone snapshot viewing remains separate from live synchronization.
 9. Apply the early Phase 11 credit, finish local and cloud-backup integrity/recovery gates, and perform the deferred NRV trigger review before hardening closes.
 10. Complete hybrid UI fidelity and mock/dead-state cleanup in Phases 12–13.
 11. Run device, shopkeeper, and release gates in Phases 14–16, including real periodic-cloud-backup and second-device restore evidence plus owner-phone snapshot viewing if approved.
 
 ## Immediate next gate
 
-Phases 3–9 are complete and all 78 contract operations are implemented. Phase 10 checkpoints 10.1–10.2 are complete: the capability audit is recorded, contract v3 closes both local planning-presentation gaps, and the full isolated-QA Samsung regression passes 219/219. The checkpoint 10.3 proposal is complete in `PHASE10_CLOUD_BACKUP_DESIGN_PROPOSAL.md` and now requires owner approval or amendment before Phase 10.4 implementation.
+Phases 3–10 are complete and all 86 contract operations are implemented. Contract v4's encrypted Google Drive recovery pipeline and the full isolated-QA Samsung regression pass at 224/224. The immediate next gate is Phase 11 integrity/recovery/concurrency hardening; live production OAuth/Drive and second-device acceptance remain in Phases 14–16.

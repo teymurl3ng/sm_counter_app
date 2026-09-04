@@ -84,6 +84,11 @@ export function HybridAppShell() {
     hybridSession.finishRestore();
     return result;
   };
+  const restoreCloudBackup = async (ticket: Parameters<typeof backupActions.restoreCloudBackup>[0]) => {
+    const result = await backupActions.restoreCloudBackup(ticket);
+    hybridSession.finishRestore();
+    return result;
+  };
   return <ManagementWorkspace
     busy={busy}
     currentUser={currentUser}
@@ -139,5 +144,6 @@ export function HybridAppShell() {
     onChangeOwnPassphrase={hybridSession.changeOwnPassphrase}
     backupActions={backupActions}
     onRestoreBackup={restoreBackup}
+    onRestoreCloudBackup={restoreCloudBackup}
   />;
 }

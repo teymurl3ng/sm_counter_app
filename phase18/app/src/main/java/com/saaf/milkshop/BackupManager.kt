@@ -8,6 +8,7 @@ import com.saaf.milkshop.data.*
 import com.saaf.milkshop.domain.AppPasswordPolicy
 import com.saaf.milkshop.domain.Argon2idPasswordHasher
 import com.saaf.milkshop.domain.NativeSessionManager
+import androidx.room3.withReadTransaction
 import androidx.room3.withWriteTransaction
 import androidx.room3.executeSQL
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +33,10 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-class BackupManager(private val context: Context) {
+class BackupManager(
+    private val context: Context,
+    private val snapshotReadBoundaryHook: suspend () -> Unit = {},
+) {
     private val cryptography = BackupCryptography(context)
     private val restoreEngine = BackupRestoreEngine(
         createSafetySnapshot = { database -> createLocalSnapshot(database).getOrThrow() },
@@ -342,13 +346,71 @@ class BackupManager(private val context: Context) {
         }
     }
 
+    /**
+     * Builds the complete security-bearing payload from one consistent Room
+     * read snapshot. Cloud work may overlap normal shop writes, so callers must
+     * never serialize the backup tables as unrelated reads.
+     */
+    internal suspend fun buildCompleteSnapshotBytes(database: MilkShopDatabase): ByteArray =
+        buildBackupBytes(database, includeSecurity = true, formatVersion = FORMAT_VERSION)
+
+    internal fun inspectCompleteSnapshotBytes(bytes: ByteArray, fileName: String): EncryptedBackupInspection {
+        val json = readAndVerify(bytes)
+        val metadata = json.getJSONObject("metadata")
+        validateCompatibility(metadata)
+        require(metadata.getInt("format_version") == FORMAT_VERSION) { "Encrypted backup format is invalid" }
+        return EncryptedBackupInspection(
+            meta = backupMeta(json, fileName),
+            containsSecurityState = json.getJSONObject("data").optJSONArray("app_users")?.length()?.let { it > 0 } == true,
+        )
+    }
+
+    suspend fun restoreCompleteSnapshotReplacing(
+        database: MilkShopDatabase,
+        bytes: ByteArray,
+        sessions: NativeSessionManager,
+        fileName: String,
+    ): Result<BackupMeta> = withContext(Dispatchers.IO) {
+        runCatching {
+            val json = readAndVerify(bytes)
+            val metadata = json.getJSONObject("metadata")
+            validateCompatibility(metadata)
+            require(metadata.getInt("format_version") == FORMAT_VERSION) { "Encrypted backup format is invalid" }
+            require(json.getJSONObject("data").getJSONArray("app_users").length() > 0) {
+                "This encrypted backup contains no application users"
+            }
+            restoreEngine.restore(
+                database,
+                json,
+                RestoreSelection(business = true, planning = true, preferences = true, security = true),
+                includeSecurity = true,
+            )
+            sessions.invalidateAll()
+            backupMeta(json, fileName)
+        }.recoverCatching { error ->
+            throw BackupFailure(
+                reason = error.message ?: error.javaClass.simpleName,
+                recovery = "The restore was not completed. The pre-restore safety backup remains available for recovery.",
+            )
+        }
+    }
+
     private suspend fun buildBackupBytes(
         database: MilkShopDatabase,
         includeSecurity: Boolean = false,
         formatVersion: Int = LEGACY_FORMAT_VERSION,
+    ): ByteArray = database.withReadTransaction {
+        buildBackupBytesInReadTransaction(database, includeSecurity, formatVersion)
+    }
+
+    private suspend fun buildBackupBytesInReadTransaction(
+        database: MilkShopDatabase,
+        includeSecurity: Boolean,
+        formatVersion: Int,
     ): ByteArray {
         val dao = database.backupDataDao()
         val costingPolicies = dao.costingPolicyVersions()
+        snapshotReadBoundaryHook()
         val costingComponents = dao.costingPolicyComponents()
         val costBases = dao.inventoryCostBasisEntries()
         val yieldPolicies = dao.yieldPolicyVersions()

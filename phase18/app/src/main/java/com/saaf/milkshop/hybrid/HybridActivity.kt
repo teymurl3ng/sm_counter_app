@@ -7,11 +7,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.WindowCompat
 import androidx.webkit.WebViewFeature
-import com.saaf.milkshop.BackupManager
 import com.saaf.milkshop.BuildConfig
 import com.saaf.milkshop.MilkShopApplication
 import com.saaf.milkshop.application.bridge.BackupDocumentPicker
 import com.saaf.milkshop.application.bridge.HybridBridgeDispatcher
+import com.saaf.milkshop.cloud.HybridGoogleDriveAuthorization
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -45,8 +45,10 @@ class HybridActivity : ComponentActivity() {
             database = applicationState.database,
             security = applicationState.userSecurity,
             onSessionChanged = { applicationState.currentSessionId = it },
-            backupManager = BackupManager(this),
+            backupManager = applicationState.backupManager,
             backupDocuments = backupDocuments,
+            application = applicationState,
+            cloudAuthorization = HybridGoogleDriveAuthorization(this),
         )
         webViewHost = SecureHybridWebViewHost(
             activity = this,

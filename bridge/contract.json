@@ -1,5 +1,5 @@
 {
-  "contractVersion": 3,
+  "contractVersion": 4,
   "transport": {
     "requestEnvelope": ["contractVersion", "requestId", "action", "sessionHandle", "payload"],
     "responseEnvelope": ["contractVersion", "requestId", "action", "ok", "data", "error"],
@@ -110,6 +110,10 @@
     "backup_incompatible",
     "restore_ticket_expired",
     "io_failed",
+    "cloud_authorization_required",
+    "cloud_account_mismatch",
+    "cloud_quota",
+    "cloud_not_configured",
     "internal_error"
   ],
   "enums": {
@@ -219,6 +223,30 @@
     "BackupRestoreResultDto": {
       "restored": "boolean",
       "sessionsInvalidated": "boolean"
+    },
+    "CloudBackupSnapshotDto": {
+      "remoteFileId": "string",
+      "snapshotId": "string",
+      "createdAt": "instant",
+      "sizeBytes": "string"
+    },
+    "CloudBackupStatusDto": {
+      "configured": "boolean",
+      "enabled": "boolean",
+      "provider": "string",
+      "accountDisplay": {"type": "string", "nullable": true},
+      "allowMetered": "boolean",
+      "scheduleDescription": "string",
+      "lastAttemptAt": {"type": "instant", "nullable": true},
+      "lastSuccessAt": {"type": "instant", "nullable": true},
+      "lastErrorCode": {"type": "string", "nullable": true},
+      "lastErrorMessage": {"type": "string", "nullable": true},
+      "stale": "boolean",
+      "pending": "boolean",
+      "snapshots": "list:CloudBackupSnapshotDto"
+    },
+    "CloudBackupRunRequestResultDto": {
+      "scheduled": "boolean"
     }
   },
   "endpoints": [
@@ -306,6 +334,14 @@
     {"action":"system.bridgeInfo","kind":"system","auth":"none","permission":null,"request":{},"responseType":"BridgeInfoDto","errors":["internal_error"],"persistence":"none","refresh":[]},
     {"action":"system.exportEncryptedBackup","kind":"system","auth":"session","permission":"CREATE_EXPORT_BACKUP","recentAuth":true,"request":{"passphrase":"secret","suggestedFileName":{"type":"string","required":false}},"responseType":"BackupExportResultDto","errors":["validation_failed","user_cancelled","recent_authentication_required","session_expired","permission_denied","io_failed","internal_error"],"persistence":"native picker writes encrypted portable backup; database is read-only","refresh":["query.securityAudit"]},
     {"action":"system.inspectEncryptedBackup","kind":"system","auth":"session","permission":"RESTORE_BACKUP","recentAuth":true,"request":{"passphrase":"secret"},"responseType":"BackupInspectionDto","errors":["user_cancelled","backup_wrong_passphrase","backup_tampered","backup_incompatible","recent_authentication_required","session_expired","permission_denied","io_failed","internal_error"],"persistence":"native picker reads and authenticates backup then issues one-use memory-only restore ticket","refresh":[]},
-    {"action":"system.restoreInspectedBackup","kind":"system","auth":"session","permission":"RESTORE_BACKUP","recentAuth":true,"request":{"restoreTicket":"ticket","confirmRestore":"boolean"},"responseType":"BackupRestoreResultDto","errors":["validation_failed","restore_ticket_expired","backup_incompatible","conflict","recent_authentication_required","session_expired","permission_denied","io_failed","internal_error"],"persistence":"atomically replaces supported durable state, rebuilds projections, consumes ticket, and invalidates every session","refresh":["query.bootstrapStatus"]}
+    {"action":"system.restoreInspectedBackup","kind":"system","auth":"session","permission":"RESTORE_BACKUP","recentAuth":true,"request":{"restoreTicket":"ticket","confirmRestore":"boolean"},"responseType":"BackupRestoreResultDto","errors":["validation_failed","restore_ticket_expired","backup_incompatible","conflict","recent_authentication_required","session_expired","permission_denied","io_failed","internal_error"],"persistence":"atomically replaces supported durable state, rebuilds projections, consumes ticket, and invalidates every session","refresh":["query.bootstrapStatus"]},
+    {"action":"system.cloudBackupStatus","kind":"system","auth":"session","permission":"CREATE_EXPORT_BACKUP","request":{},"responseType":"CloudBackupStatusDto","errors":["session_expired","permission_denied","cloud_not_configured","internal_error"],"persistence":"none; returns only device-local non-secret cloud status and cached recovery-point metadata","refresh":[]},
+    {"action":"system.connectCloudBackup","kind":"system","auth":"session","permission":"CREATE_EXPORT_BACKUP","recentAuth":true,"request":{"allowMetered":"boolean"},"responseType":"CloudBackupStatusDto","errors":["validation_failed","user_cancelled","recent_authentication_required","session_expired","permission_denied","cloud_authorization_required","cloud_account_mismatch","cloud_quota","io_failed","conflict","internal_error"],"persistence":"uses an Android-owned recovery-passphrase prompt, selects and authorizes an owner Google account, creates wrapped cloud-vault state, schedules unique periodic work, and queues the first backup; no token or passphrase is persisted","refresh":["query.securityAudit"]},
+    {"action":"system.configureCloudBackup","kind":"system","auth":"session","permission":"CREATE_EXPORT_BACKUP","recentAuth":true,"request":{"enabled":"boolean","allowMetered":"boolean"},"responseType":"CloudBackupStatusDto","errors":["validation_failed","recent_authentication_required","session_expired","permission_denied","cloud_not_configured","internal_error"],"persistence":"updates device-local cloud schedule policy and replaces or cancels the unique periodic work request","refresh":["query.securityAudit"]},
+    {"action":"system.runCloudBackupNow","kind":"system","auth":"session","permission":"CREATE_EXPORT_BACKUP","request":{},"responseType":"CloudBackupRunRequestResultDto","errors":["conflict","session_expired","permission_denied","cloud_not_configured","internal_error"],"persistence":"queues one duplicate-safe immediate native cloud-backup worker","refresh":["query.securityAudit"]},
+    {"action":"system.refreshCloudBackups","kind":"system","auth":"session","permission":"CREATE_EXPORT_BACKUP","request":{},"responseType":"CloudBackupStatusDto","errors":["session_expired","permission_denied","cloud_authorization_required","cloud_account_mismatch","cloud_not_configured","io_failed","internal_error"],"persistence":"refreshes app-private non-secret Drive recovery-point metadata; backup bytes and access tokens never cross the bridge","refresh":[]},
+    {"action":"system.inspectCloudBackup","kind":"system","auth":"session","permission":"RESTORE_BACKUP","recentAuth":true,"request":{"remoteFileId":"string"},"responseType":"BackupInspectionDto","errors":["user_cancelled","backup_wrong_passphrase","backup_tampered","backup_incompatible","recent_authentication_required","session_expired","permission_denied","cloud_authorization_required","cloud_account_mismatch","cloud_not_configured","io_failed","internal_error"],"persistence":"uses an Android-owned recovery-passphrase prompt, downloads, authenticates, and decrypts one recognized app-private recovery point natively, then issues a one-use memory-only restore ticket","refresh":[]},
+    {"action":"system.restoreInspectedCloudBackup","kind":"system","auth":"session","permission":"RESTORE_BACKUP","recentAuth":true,"request":{"restoreTicket":"ticket","confirmRestore":"boolean"},"responseType":"BackupRestoreResultDto","errors":["validation_failed","restore_ticket_expired","backup_incompatible","conflict","recent_authentication_required","session_expired","permission_denied","cloud_authorization_required","cloud_account_mismatch","cloud_not_configured","io_failed","internal_error"],"persistence":"creates a local safety snapshot, atomically replaces all supported state, disables cloud scheduling, consumes the ticket, and invalidates every session","refresh":["query.bootstrapStatus"]},
+    {"action":"system.disconnectCloudBackup","kind":"system","auth":"session","permission":"CREATE_EXPORT_BACKUP","recentAuth":true,"request":{"confirmRevoke":"boolean"},"responseType":"BridgeUnit","errors":["validation_failed","recent_authentication_required","session_expired","permission_denied","cloud_authorization_required","cloud_account_mismatch","cloud_not_configured","io_failed","internal_error"],"persistence":"revokes Google authorization, cancels local work, and removes device-local cloud state while retaining remote recovery points","refresh":["query.securityAudit"]}
   ]
 }

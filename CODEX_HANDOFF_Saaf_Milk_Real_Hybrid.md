@@ -18,18 +18,18 @@ Read those files before changing code.
 
 The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–9 are complete. `PHASE8.md` contains the completed screen ledger. `PHASE9.md` records the completed grouped-navigation, isolated-QA, Android Back, structural-hardening, secure Activity/WebView recreation, keyboard/system-inset, targeted refresh/transfer, and renderer/error-recovery milestones.
 
-Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE10.md` for current status. The runtime exposes all seventy-eight frozen actions, including operational/cashier/financial/profitability summaries, Daily Work commands, delivery lifecycle, account ledgers, event history/detail, typed corrections, reconciliation, versioned costing/planning controls, personal credentials, owner recovery, staff enrollment/administration, security audit, and encrypted export/inspection/restore. The complete isolated-QA connected-device suite passes 219/219 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7.
+Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE10.md` for current status. The runtime exposes all 86 contract-v4 actions, including the prior operational/security surface and eight owner-only periodic encrypted cloud-backup operations. The complete isolated-QA connected-device suite passes 224/224 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7.
 
 Application user accounts and native role-based authorization are explicitly approved as a required cross-phase capability. Their schema-7 model, encrypted backup boundary, app-owned sessions, private staff enrollment/reset, user administration, role-aware navigation, recovery, security audit, and command-boundary authorization are implemented and now wired into React. Application users are security principals separate from employee/salary profiles, with an optional link between them. The schema-v6 daily-close actor name/role is transitional asserted metadata, not authenticated identity.
 
-The owner approved periodic encrypted off-device backup as the next remote-data direction on 2026-08-31, with Google Drive as the example provider. The approval-ready Phase 10.3 design is now recorded in `PHASE10_CLOUD_BACKUP_DESIGN_PROPOSAL.md`; its Drive location, account, schedule, retention, encryption, restore, and owner-phone decisions still require owner approval before implementation. This is not implemented by the current local Room/user system and must not be confused with live synchronization. `ROADMAP_RECONCILIATION_2026-08-27.md` assigns minimum implementation to Phase 10, scheduling/retry/integrity/restore hardening to Phase 11, and real provider/second-device acceptance to Phases 14–16. Multi-writer synchronization is not approved. Until the proposal is approved, the existing device-local security and business contracts remain authoritative.
+The owner approved the concrete Phase 10.3 periodic encrypted off-device backup design on 2026-09-04. Phase 10.4 implements Google Drive `appDataFolder`, owner-controlled authorization/revocation, coherent encrypted snapshots, an immutable retry outbox, unique WorkManager scheduling, verified uploads, retention, status/history, and safe full-replacement restore. This is recovery, not live synchronization. `ROADMAP_RECONCILIATION_2026-08-27.md` assigns deeper cancellation/retry/concurrency hardening to Phase 11 and real provider/second-device acceptance to Phases 14–16. Multi-writer synchronization is not approved.
 
 The two completed Phase 3 design tracks were:
 
 1. authenticated users, credentials, roles/permissions, sessions, recovery, audit actor IDs, migration, and backup/restore security;
 2. authoritative costing/COGS and profitability semantics.
 
-The researched recommendations for native security and costing are implemented and device-verified. Phase 8 and Phase 9 are complete. Phase 10 checkpoints 10.1–10.2 are also complete: `PHASE10_CAPABILITY_AUDIT.md` confirms the core capability matrix, and contract v3 closes both local planning-presentation gaps with native-authoritative targets, actuals, and variances. The full isolated Samsung suite passes 219/219. The checkpoint 10.3 periodic encrypted cloud-backup proposal is complete and awaiting owner approval before Phase 10.4 implementation. The assessment-only presentation-performance findings and approved display/receipt preferences remain deferred to Phase 12 UI Fidelity, with release compiler/profile work assigned to Phase 16.
+The researched native security and costing recommendations are implemented and device-verified. Phases 8–10 are complete: `PHASE10_CAPABILITY_AUDIT.md` confirms the core capability matrix, contract v3 closed the planning gaps, and contract v4 adds the approved cloud-recovery surface. `PHASE10_4_IMPLEMENTATION_REPORT.md` records the boundary and evidence. The full isolated Samsung suite passes 224/224. Phase 11 integrity/recovery/concurrency hardening is the continuation point. The assessment-only presentation-performance findings and approved display/receipt preferences remain deferred to Phase 12 UI Fidelity, with release compiler/profile work assigned to Phase 16.
 
 ---
 
@@ -227,7 +227,7 @@ The permission-aware hybrid-facing native query/DTO layer is implemented in `app
 
 ## Phase 6 — COMPLETE
 
-Canonical bridge contract version 3 is frozen in `bridge/CONTRACT.md` and `bridge/contract.json` with the same 78 query/command/system operations and every version-2 request unchanged. V2 added role-filtered expense references; v3 additively exposes native-authoritative planning targets, actuals, and variances through `PlanningDto`. It retains lossless scalar encoding, authenticated envelopes, native-owned authority and actor attribution, 19 stable error codes, validation, persistence, refresh, backup picker/ticket boundaries, and version/hash negotiation. Generated Kotlin and TypeScript projections compile, and Android `preBuild` plus UI `prebuild` run the drift checker.
+Canonical bridge contract version 4 is frozen in `bridge/CONTRACT.md` and `bridge/contract.json` with 86 query/command/system operations. V4 retains v3 and additively exposes eight owner-only native cloud-backup operations. It retains lossless scalar encoding, authenticated envelopes, native-owned authority and actor attribution, stable errors, validation, persistence, refresh, backup picker/ticket boundaries, and version/hash negotiation. Generated Kotlin and TypeScript projections compile, and Android `preBuild` plus UI `prebuild` run the drift checker.
 
 ## Phase 7 — COMPLETE
 
@@ -239,7 +239,11 @@ The completed screen capability ledger is in `PHASE8.md`. Management, core setti
 
 ## Phase 9 — COMPLETE
 
-The completed runtime/navigation/device-integration ledger is in `PHASE9.md`. The application has grouped role-aware navigation, isolated QA storage, predictable Android Back behavior, secure Activity recreation, deliberate keyboard/system-inset behavior, targeted measured state refresh, and native renderer/error recovery. Phase 10.2 raises the complete isolated-QA suite to 219/219. The Phase 10.3 proposal in `PHASE10_CLOUD_BACKUP_DESIGN_PROPOSAL.md` is the current approval gate.
+The completed runtime/navigation/device-integration ledger is in `PHASE9.md`. The application has grouped role-aware navigation, isolated QA storage, predictable Android Back behavior, secure Activity recreation, deliberate keyboard/system-inset behavior, targeted measured state refresh, and native renderer/error recovery. Phase 10.4 raises the complete isolated-QA suite to 224/224. Phase 11 is the current hardening gate.
+
+## Phase 10 — COMPLETE
+
+The capability audit, planning closure, approved cloud-backup design, minimum implementation, and handoff are complete. Contract v4 exposes 86 operations. `PHASE10_4_IMPLEMENTATION_REPORT.md` records the encrypted Drive boundary, verification evidence, required external OAuth build configuration, and later live-provider gates.
 
 ---
 
@@ -464,7 +468,7 @@ Do not invent UI variants such as:
 - `credit_delivery`
 - `credit_wholesale`
 
-All bridge values are now defined in contract version 3. Change them only through the documented manifest/version/drift workflow.
+All bridge values are now defined in contract version 4. Change them only through the documented manifest/version/drift workflow.
 
 ---
 
@@ -522,7 +526,7 @@ Login/logout, personal credentials, owner recovery, authorized user administrati
 
 ## Phases 9–10
 
-Prove session persistence/expiry across lifecycle and process recreation, protect the back stack after logout, retain one non-reloading React/WebView presentation path, deliberately handle keyboard/system bars/insets and fixed application navigation, and avoid broad repeated bridge/state refreshes. Wire verified user attribution and authorization across every protected capability and replace transitional caller-asserted daily-close actor metadata with the verified native user. Phase 10 must also design and obtain approval for periodic encrypted Google Drive/cloud backup and separately decide whether read-only owner-phone snapshot viewing belongs in scope.
+Completed. Session lifecycle, protected back-stack behavior, the single React/WebView presentation path, system insets, targeted refresh, verified attribution, and the approved periodic encrypted Google Drive recovery pipeline are implemented. Read-only owner-phone snapshot viewing remains deferred and distinct from synchronization.
 
 ## Phases 11–13
 
@@ -623,4 +627,4 @@ After opening the repo, begin with:
 
 > Read `README.md`, `PHASE0.md`, `PHASE1.md`, `PHASE2.md`, `PHASE3.md`, `POSTMORTEM.md`, and this `CODEX_HANDOFF_Saaf_Milk_Real_Hybrid.md`. Inspect the current Phase 3 native ledger implementation and the untouched Phase 18 business core. Verify the frozen logic-spec and SQL hashes and rerun the existing native Android-test Kotlin compile. Do not modify the frozen SQL/spec or invent new formulas. Report the exact repo/build status and the next safe Phase 3 implementation step. If the next step requires a schema/business-rule amendment, stop for explicit authorization before changing it.
 
-That text is historical provenance only. Phase 9 Runtime / Navigation / Device Integration is complete. The current continuation point is approval or amendment of the Phase 10.3 periodic encrypted cloud-backup proposal, described at the top of this handoff and in `PHASE10_CLOUD_BACKUP_DESIGN_PROPOSAL.md`.
+That text is historical provenance only. Phases 9 and 10 are complete. The current continuation point is Phase 11 integrity/recovery/concurrency hardening, using `PHASE10_4_IMPLEMENTATION_REPORT.md` as the cloud-backup handoff.

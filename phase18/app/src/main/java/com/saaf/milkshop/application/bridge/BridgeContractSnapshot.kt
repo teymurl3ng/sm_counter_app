@@ -10,8 +10,8 @@ data class BridgeEndpointContract(
 )
 
 object BridgeContractSnapshot {
-    const val VERSION = 3
-    const val CONTRACT_SHA256 = "2B4FA647E2BFE4F3A12EA9CC12516E93CD52EEEA6BFA3508BE48E6991A88B08B"
+    const val VERSION = 4
+    const val CONTRACT_SHA256 = "D22921E90040EF70CED8AFDE535C6309544B75D5EBD7B726ED1DE1273E0FA136"
     val errorCodes = setOf(
         "invalid_request",
         "validation_failed",
@@ -31,6 +31,10 @@ object BridgeContractSnapshot {
         "backup_incompatible",
         "restore_ticket_expired",
         "io_failed",
+        "cloud_authorization_required",
+        "cloud_account_mismatch",
+        "cloud_quota",
+        "cloud_not_configured",
         "internal_error",
     )
     val endpoints = listOf(
@@ -112,5 +116,13 @@ object BridgeContractSnapshot {
         BridgeEndpointContract("system.exportEncryptedBackup", "system", "session", "CREATE_EXPORT_BACKUP", "BackupExportResultDto"),
         BridgeEndpointContract("system.inspectEncryptedBackup", "system", "session", "RESTORE_BACKUP", "BackupInspectionDto"),
         BridgeEndpointContract("system.restoreInspectedBackup", "system", "session", "RESTORE_BACKUP", "BackupRestoreResultDto"),
+        BridgeEndpointContract("system.cloudBackupStatus", "system", "session", "CREATE_EXPORT_BACKUP", "CloudBackupStatusDto"),
+        BridgeEndpointContract("system.connectCloudBackup", "system", "session", "CREATE_EXPORT_BACKUP", "CloudBackupStatusDto"),
+        BridgeEndpointContract("system.configureCloudBackup", "system", "session", "CREATE_EXPORT_BACKUP", "CloudBackupStatusDto"),
+        BridgeEndpointContract("system.runCloudBackupNow", "system", "session", "CREATE_EXPORT_BACKUP", "CloudBackupRunRequestResultDto"),
+        BridgeEndpointContract("system.refreshCloudBackups", "system", "session", "CREATE_EXPORT_BACKUP", "CloudBackupStatusDto"),
+        BridgeEndpointContract("system.inspectCloudBackup", "system", "session", "RESTORE_BACKUP", "BackupInspectionDto"),
+        BridgeEndpointContract("system.restoreInspectedCloudBackup", "system", "session", "RESTORE_BACKUP", "BackupRestoreResultDto"),
+        BridgeEndpointContract("system.disconnectCloudBackup", "system", "session", "CREATE_EXPORT_BACKUP", "BridgeUnit"),
     )
 }

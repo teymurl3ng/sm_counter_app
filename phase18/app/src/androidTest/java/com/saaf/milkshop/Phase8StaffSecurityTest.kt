@@ -123,7 +123,7 @@ class Phase8StaffSecurityTest {
     }
 
     @Test
-    fun permissionsLastOwnerSafeguardsAndAllSeventyFiveActionsAreEnforced() = runBlocking {
+    fun permissionsLastOwnerSafeguardsAndAllRuntimeActionsAreEnforced() = runBlocking {
         val owner = security.bootstrapOwner("guard.owner", "Guard Owner", OWNER_PASSWORD.toCharArray())
         val session = owner.session.sessionId
         val cashier = security.beginUserEnrollment(session, CreateUserInput("guard.cashier", "Guard Cashier", "cashier"))
@@ -136,7 +136,7 @@ class Phase8StaffSecurityTest {
 
         val actions = dispatch("system.bridgeInfo").getJSONObject("data").getJSONArray("supportedActions")
         val names = (0 until actions.length()).map(actions::getString)
-        assertEquals(78, names.size)
+        assertEquals(86, names.size)
         assertTrue(names.containsAll(listOf(
             "query.users", "query.securityAudit", "command.auth.changeOwnPassphrase", "command.auth.recoverOwner",
             "command.auth.beginUserEnrollment", "command.auth.resumeUserEnrollment", "command.auth.completeEnrollment",

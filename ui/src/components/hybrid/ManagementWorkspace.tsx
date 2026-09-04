@@ -78,6 +78,7 @@ export function ManagementWorkspace({
   onChangeOwnPassphrase,
   backupActions,
   onRestoreBackup,
+  onRestoreCloudBackup,
 }: {
   busy: boolean;
   currentUser: CurrentSessionDto | null;
@@ -133,6 +134,7 @@ export function ManagementWorkspace({
   onChangeOwnPassphrase(currentPassphrase: string, newPassphrase: string): Promise<void>;
   backupActions: BackupActions;
   onRestoreBackup(ticket: Parameters<BackupActions['restoreBackup']>[0]): ReturnType<BackupActions['restoreBackup']>;
+  onRestoreCloudBackup(ticket: Parameters<BackupActions['restoreCloudBackup']>[0]): ReturnType<BackupActions['restoreCloudBackup']>;
 }) {
   const canManage = currentUser?.effectivePermissionCodes.includes('manage_master_data') === true;
   const canAttend = currentUser?.effectivePermissionCodes.includes('attendance') === true;
@@ -207,7 +209,7 @@ export function ManagementWorkspace({
       ) : area === 'access' && currentUser ? (
         <SecurityWorkspace currentUser={currentUser} employees={masterData?.employees ?? []} actions={securityActions} canManageUsers={canManageUsers} canViewAudit={canViewAudit} onChangeOwnPassphrase={onChangeOwnPassphrase} />
       ) : area === 'backup' && canExportBackup ? (
-        <BackupRestoreWorkspace actions={backupActions} canRestore={canRestoreBackup} onRestored={onRestoreBackup} />
+        <BackupRestoreWorkspace actions={backupActions} canRestore={canRestoreBackup} onRestored={onRestoreBackup} onCloudRestored={onRestoreCloudBackup} />
       ) : area === 'employees' && (canManage || canAttend) ? (
         <EmployeeAttendanceScreen busy={busy} canManage={canManage} employees={masterData?.employees ?? null} attendanceEmployees={attendanceEmployees} error={error} notice={notice} onSaveEmployee={onSaveEmployee} onSetEmployeeActive={onSetEmployeeActive} onLoadAttendance={onLoadAttendance} onRecordAttendance={onRecordAttendance} />
       ) : !canManage ? <Unavailable /> : area === 'products' ? (

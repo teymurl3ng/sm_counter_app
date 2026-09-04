@@ -115,6 +115,14 @@ export const RUNTIME_ACTIONS = [
   'system.exportEncryptedBackup',
   'system.inspectEncryptedBackup',
   'system.restoreInspectedBackup',
+  'system.cloudBackupStatus',
+  'system.connectCloudBackup',
+  'system.configureCloudBackup',
+  'system.runCloudBackupNow',
+  'system.refreshCloudBackups',
+  'system.inspectCloudBackup',
+  'system.restoreInspectedCloudBackup',
+  'system.disconnectCloudBackup',
 ] as const satisfies ReadonlyArray<BridgeAction>;
 
 export class NativeBridgeError extends Error {

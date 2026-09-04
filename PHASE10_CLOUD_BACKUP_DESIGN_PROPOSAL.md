@@ -1,6 +1,6 @@
 # Phase 10.3 — Periodic Encrypted Cloud-Backup Design Proposal
 
-**Status: PROPOSAL COMPLETE — OWNER APPROVAL REQUIRED BEFORE IMPLEMENTATION**
+**Status: APPROVED 2026-09-04 — PHASE 10.4 IMPLEMENTED AND VERIFIED**
 
 ## 1. Decision requested
 
@@ -15,7 +15,7 @@ Approve the following minimum direction for Phase 10.4:
 7. Phase 10.4 implements automatic backup, Back up now, status/history, and safe cloud restore. It does not implement live synchronization.
 8. A read-only latest-snapshot owner-phone mode is approved as the only acceptable future multi-device direction, but its UI is deferred until the backup pipeline and Phase 11 recovery/concurrency gates pass.
 
-No Internet permission, OAuth client, Drive dependency, WorkManager dependency, bridge endpoint, or production code is added until this proposal is approved.
+Approval was recorded through the owner's “Let's continue” instruction on 2026-09-04. Phase 10.4 then implemented the approved minimum. Real production OAuth/Drive acceptance remains a later device/release gate.
 
 ## 2. Existing foundation being reused
 
@@ -178,7 +178,7 @@ Retention runs only after a new snapshot is remotely verified.
 6. Delete only files carrying the expected Saaf Milk private properties and vault identity.
 7. Treat deletion failures as cleanup warnings, not backup failures.
 
-Drive permanently deletes `appDataFolder` files rather than moving them to trash. Retention selection and the minimum-three rule therefore require focused tests before implementation is accepted.
+Drive permanently deletes `appDataFolder` files rather than moving them to trash. Retention selection and the minimum-three rule therefore require focused tests; those Phase 10.4 tests pass.
 
 If quota is exhausted, keep the pending encrypted outbox file, preserve all existing remote backups, show a quota-specific recovery action, and retry only after the owner resolves storage or explicitly requests another attempt.
 
@@ -239,7 +239,7 @@ The later viewer must:
 
 True two-writer synchronization, conflict resolution, and successive restore between active phones remain unapproved.
 
-## 14. Proposed implementation boundaries after approval
+## 14. Implemented boundaries
 
 - `CloudBackupProvider` — provider-neutral native list/upload/download/delete contract.
 - `GoogleDriveCloudBackupProvider` — Drive `appDataFolder` implementation only.
@@ -251,11 +251,13 @@ True two-writer synchronization, conflict resolution, and successive restore bet
 - focused bridge handler and DTOs — status/configuration only; no token, key, passphrase, bytes, or raw path.
 - focused React Backup workspace additions — rendering and user intent only.
 
-The bridge contract would require an additive version amendment after approval. The current contract v3 and its 78 operations remain frozen until then.
+The additive bridge amendment is contract v4: eight cloud-backup operations were added, bringing the runtime to 86 operations. Android-owned secure dialogs collect cloud recovery passphrases, so those secrets never enter React or the bridge. The generated Kotlin/TypeScript projections and mandatory drift gates use SHA-256 `D22921E90040EF70CED8AFDE535C6309544B75D5EBD7B726ED1DE1273E0FA136`.
 
 ## 15. Verification gates
 
 ### Phase 10.4 minimum
+
+Implemented. Focused device tests cover self-contained encryption/recovery, unique nonces, wrong-passphrase/tamper rejection, coherent snapshots under an attempted writer, immutable exact-byte retry, uncertain-response duplicate prevention, retention's minimum-three rule, and unique periodic scheduling. Existing restore tests continue to cover the shared pre-restore safety snapshot, complete security round-trip, and session invalidation. The complete isolated-QA device suite passes 224/224.
 
 - cloud-envelope encryption, wrong-passphrase, tamper, nonce, and self-contained replacement-device recovery tests;
 - coherent snapshot proof while a business write is attempted;
@@ -301,9 +303,9 @@ The bridge contract would require an additive version amendment after approval. 
 - deleting remote backups when merely disabling the schedule;
 - claiming an exact daily execution time.
 
-## 17. Approval options
+## 17. Approval record
 
-The recommended package can be approved as written, or amended on these product choices:
+The owner approved the recommended package as written on 2026-09-04:
 
 1. hidden `appDataFolder` versus a visible app-created Drive folder;
 2. Wi-Fi-only default versus any-network default;
@@ -312,7 +314,7 @@ The recommended package can be approved as written, or amended on these product 
 5. separate cloud recovery passphrase and cloud-vault envelope;
 6. future read-only owner-phone snapshot mode versus no owner-phone mode.
 
-Implementation begins only after the owner approves these decisions.
+Implementation is complete. Any future change to these choices requires a documented amendment.
 
 ## 18. Standards and API basis
 

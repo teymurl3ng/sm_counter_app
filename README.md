@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-01 — hybrid Phases 0–9 and Phase 10 checkpoints 10.1–10.2 are complete. The capability audit confirms all 78 operations and 16 retained workflow families are genuinely native-backed; contract v3 now exposes native-authoritative plan targets, actuals, and variances. Phase 10 continues at the periodic encrypted cloud-backup design gate. Substantial Phase 11 prerequisites completed early remain credited without prematurely declaring that phase complete.
+Status: RECONCILED 2026-09-04 — hybrid Phases 0–9 and Phase 10 checkpoints 10.1–10.2 are complete. The capability audit confirms all 78 operations and 16 retained workflow families are genuinely native-backed; contract v3 exposes native-authoritative plan targets, actuals, and variances. The Phase 10.3 periodic encrypted cloud-backup proposal is complete and awaiting owner approval before implementation. Substantial Phase 11 prerequisites completed early remain credited without prematurely declaring that phase complete.
 
 Latest physical-device checkpoint: the complete isolated-QA connected-device suite passes 219/219; host-side tests pass 7/7.
 
@@ -25,6 +25,7 @@ Latest physical-device checkpoint: the complete isolated-QA connected-device sui
 - `PHASE7.md` — completed packaged React/WebView/Android vertical slice, authenticated bridge proof, physical-device evidence, and Phase 8 handoff.
 - `PHASE8.md` — completed screen capability ledger, all 21 native-backed milestones, verification, limitations, and Phase 9 handoff.
 - `PHASE9.md` — completed runtime/navigation/device-integration ledger, including grouped navigation, lifecycle, keyboard/insets, targeted refresh, renderer recovery, and physical-device evidence.
+- `PHASE10_CLOUD_BACKUP_DESIGN_PROPOSAL.md` — approval-ready periodic encrypted Google Drive backup, recovery-key, scheduling, retention, restore, and owner-phone scope proposal.
 
 ## Immutable baselines
 
@@ -92,7 +93,7 @@ Phase 8 — UI Wiring ✅ (all 21 milestones complete; all 78 bridge operations 
 
 Phase 9 — Runtime / Navigation / Device Integration ✅ (all six milestones complete, including secure renderer recovery; 218/218 device regression)
 
-Phase 10 — Functional Product Completion 🚧 (checkpoints 10.1–10.2 complete; checkpoint 10.3 is the periodic encrypted cloud-backup design gate)
+Phase 10 — Functional Product Completion 🚧 (checkpoints 10.1–10.2 complete; checkpoint 10.3 proposal awaits approval before implementation)
 
 Phase 11 — Integrity / Recovery / Concurrency ◐ (security/backup credit; local concurrency, hybrid recovery, and periodic-cloud-backup integrity remain)
 
@@ -155,4 +156,4 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 
 ## Next gate
 
-Phases 3–9 are closed. Every retained screen family and all 78 bridge operations remain native-backed and device-proven. Phase 10.1's capability audit and Phase 10.2's native planning comparisons are complete under contract v3; the complete isolated-QA Samsung suite passes 219/219. Phase 10.3 is next: the periodic encrypted Google Drive/cloud-backup design gate and separate owner-phone snapshot-view decision. See `PHASE10.md` and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–9 are closed. Every retained screen family and all 78 bridge operations remain native-backed and device-proven. Phase 10.1's capability audit and Phase 10.2's native planning comparisons are complete under contract v3; the complete isolated-QA Samsung suite passes 219/219. The Phase 10.3 periodic encrypted Google Drive/cloud-backup proposal is ready for owner approval. See `PHASE10_CLOUD_BACKUP_DESIGN_PROPOSAL.md`, `PHASE10.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.

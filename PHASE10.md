@@ -1,6 +1,6 @@
 # Phase 10 — Functional Product Completion
 
-Status: **IN PROGRESS — checkpoints 10.1–10.2 complete; checkpoint 10.3 next**
+Status: **IN PROGRESS — checkpoints 10.1–10.2 complete; checkpoint 10.3 proposal awaiting approval**
 
 ## 1. Purpose
 
@@ -43,6 +43,10 @@ Kotlin derives and rounds every money value from canonical effective events and 
 
 ### 10.3 — Periodic encrypted cloud-backup design gate
 
+**Proposal complete 2026-09-04; owner approval pending.**
+
+`PHASE10_CLOUD_BACKUP_DESIGN_PROPOSAL.md` recommends Google Drive `appDataFolder`, owner-controlled authorization, approximate daily WorkManager scheduling, a recoverable cloud-vault encryption envelope, verified idempotent uploads, 14-daily/8-weekly/12-monthly retention, full-replacement restore, and a later read-only owner-phone snapshot mode. No cloud dependency, permission, bridge amendment, or provider code has been added.
+
 Produce an approval-ready design covering provider/account ownership, authorization and revocation, encryption before upload, file naming/versioning, cadence, retention, network/charging policy, missed-run retry, idempotency, integrity verification, notification, quota/cost behavior, restore selection, privacy, and safe offline operation.
 
 The same gate must make a separate decision about owner-phone access:
@@ -67,7 +71,7 @@ The 2026-09-01 assessment found no reason for a broad performance rewrite. Its f
 
 ## 5. Current checkpoint
 
-Begin **10.3 — Periodic encrypted cloud-backup design gate**. Produce an approval-ready proposal before adding Internet permission, provider SDKs, background scheduling, cloud authorization, or owner-phone behavior. The current device-local database and encrypted manual backup remain authoritative until that proposal is approved.
+Review and approve or amend `PHASE10_CLOUD_BACKUP_DESIGN_PROPOSAL.md`. Phase 10.4 must not add Internet permission, provider SDKs, background scheduling, cloud authorization, or owner-phone behavior until the proposal decisions are approved. The current device-local database and encrypted manual backup remain authoritative.
 
 ## Plain English
 

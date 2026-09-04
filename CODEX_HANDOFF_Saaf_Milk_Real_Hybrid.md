@@ -14,7 +14,7 @@ This is not the earlier experimental hybrid project. The working source is the c
 
 Read those files before changing code.
 
-## Current superseding checkpoint — 2026-09-01
+## Current superseding checkpoint — 2026-09-04
 
 The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–9 are complete. `PHASE8.md` contains the completed screen ledger. `PHASE9.md` records the completed grouped-navigation, isolated-QA, Android Back, structural-hardening, secure Activity/WebView recreation, keyboard/system-inset, targeted refresh/transfer, and renderer/error-recovery milestones.
 
@@ -22,14 +22,14 @@ Sections below that describe the original schema-expansion approval gate are ret
 
 Application user accounts and native role-based authorization are explicitly approved as a required cross-phase capability. Their schema-7 model, encrypted backup boundary, app-owned sessions, private staff enrollment/reset, user administration, role-aware navigation, recovery, security audit, and command-boundary authorization are implemented and now wired into React. Application users are security principals separate from employee/salary profiles, with an optional link between them. The schema-v6 daily-close actor name/role is transitional asserted metadata, not authenticated identity.
 
-The owner approved periodic encrypted off-device backup as the next remote-data direction on 2026-08-31, with Google Drive as the example provider and cadence/retention/network details deliberately deferred. This is not implemented by the current local Room/user system and must not be confused with live synchronization. `ROADMAP_RECONCILIATION_2026-08-27.md` assigns the cloud-backup design gate to Phase 10, scheduling/retry/integrity/restore hardening to Phase 11, and real provider/second-device acceptance to Phases 14–16. The same Phase 10 gate will separately decide whether the owner's phone should offer a read-only latest-snapshot view; multi-writer synchronization is not currently approved. Until that design is approved, the existing device-local security and business contracts remain authoritative.
+The owner approved periodic encrypted off-device backup as the next remote-data direction on 2026-08-31, with Google Drive as the example provider. The approval-ready Phase 10.3 design is now recorded in `PHASE10_CLOUD_BACKUP_DESIGN_PROPOSAL.md`; its Drive location, account, schedule, retention, encryption, restore, and owner-phone decisions still require owner approval before implementation. This is not implemented by the current local Room/user system and must not be confused with live synchronization. `ROADMAP_RECONCILIATION_2026-08-27.md` assigns minimum implementation to Phase 10, scheduling/retry/integrity/restore hardening to Phase 11, and real provider/second-device acceptance to Phases 14–16. Multi-writer synchronization is not approved. Until the proposal is approved, the existing device-local security and business contracts remain authoritative.
 
 The two completed Phase 3 design tracks were:
 
 1. authenticated users, credentials, roles/permissions, sessions, recovery, audit actor IDs, migration, and backup/restore security;
 2. authoritative costing/COGS and profitability semantics.
 
-The researched recommendations for native security and costing are implemented and device-verified. Phase 8 and Phase 9 are complete. Phase 10 checkpoints 10.1–10.2 are also complete: `PHASE10_CAPABILITY_AUDIT.md` confirms the core capability matrix, and contract v3 closes both local planning-presentation gaps with native-authoritative targets, actuals, and variances. The full isolated Samsung suite passes 219/219. Checkpoint 10.3, the periodic encrypted cloud-backup design gate, is next. The assessment-only presentation-performance findings and approved display/receipt preferences remain deferred to Phase 12 UI Fidelity, with release compiler/profile work assigned to Phase 16.
+The researched recommendations for native security and costing are implemented and device-verified. Phase 8 and Phase 9 are complete. Phase 10 checkpoints 10.1–10.2 are also complete: `PHASE10_CAPABILITY_AUDIT.md` confirms the core capability matrix, and contract v3 closes both local planning-presentation gaps with native-authoritative targets, actuals, and variances. The full isolated Samsung suite passes 219/219. The checkpoint 10.3 periodic encrypted cloud-backup proposal is complete and awaiting owner approval before Phase 10.4 implementation. The assessment-only presentation-performance findings and approved display/receipt preferences remain deferred to Phase 12 UI Fidelity, with release compiler/profile work assigned to Phase 16.
 
 ---
 
@@ -239,7 +239,7 @@ The completed screen capability ledger is in `PHASE8.md`. Management, core setti
 
 ## Phase 9 — COMPLETE
 
-The completed runtime/navigation/device-integration ledger is in `PHASE9.md`. The application has grouped role-aware navigation, isolated QA storage, predictable Android Back behavior, secure Activity recreation, deliberate keyboard/system-inset behavior, targeted measured state refresh, and native renderer/error recovery. Phase 10.2 raises the complete isolated-QA suite to 219/219. Phase 10.3, the periodic encrypted cloud-backup design gate, is the current continuation point.
+The completed runtime/navigation/device-integration ledger is in `PHASE9.md`. The application has grouped role-aware navigation, isolated QA storage, predictable Android Back behavior, secure Activity recreation, deliberate keyboard/system-inset behavior, targeted measured state refresh, and native renderer/error recovery. Phase 10.2 raises the complete isolated-QA suite to 219/219. The Phase 10.3 proposal in `PHASE10_CLOUD_BACKUP_DESIGN_PROPOSAL.md` is the current approval gate.
 
 ---
 
@@ -623,4 +623,4 @@ After opening the repo, begin with:
 
 > Read `README.md`, `PHASE0.md`, `PHASE1.md`, `PHASE2.md`, `PHASE3.md`, `POSTMORTEM.md`, and this `CODEX_HANDOFF_Saaf_Milk_Real_Hybrid.md`. Inspect the current Phase 3 native ledger implementation and the untouched Phase 18 business core. Verify the frozen logic-spec and SQL hashes and rerun the existing native Android-test Kotlin compile. Do not modify the frozen SQL/spec or invent new formulas. Report the exact repo/build status and the next safe Phase 3 implementation step. If the next step requires a schema/business-rule amendment, stop for explicit authorization before changing it.
 
-That text is historical provenance only. Phase 9 Runtime / Navigation / Device Integration is complete. The current continuation point is Phase 10 Functional Product Completion and its periodic encrypted cloud-backup design gate, described at the top of this handoff and in `ROADMAP_RECONCILIATION_2026-08-27.md`.
+That text is historical provenance only. Phase 9 Runtime / Navigation / Device Integration is complete. The current continuation point is approval or amendment of the Phase 10.3 periodic encrypted cloud-backup proposal, described at the top of this handoff and in `PHASE10_CLOUD_BACKUP_DESIGN_PROPOSAL.md`.

@@ -48,6 +48,7 @@ data class CloudBackupState(
     val lastSuccessAt: String? = null,
     val lastErrorCode: String? = null,
     val lastErrorMessage: String? = null,
+    val lastFailureStartedAt: String? = null,
     val snapshots: List<CloudRemoteSnapshot> = emptyList(),
 )
 
@@ -107,6 +108,7 @@ class CloudBackupSettingsStore(
         put("last_success_at", state.lastSuccessAt ?: JSONObject.NULL)
         put("last_error_code", state.lastErrorCode ?: JSONObject.NULL)
         put("last_error_message", state.lastErrorMessage ?: JSONObject.NULL)
+        put("last_failure_started_at", state.lastFailureStartedAt ?: JSONObject.NULL)
         put("snapshots", JSONArray().apply { state.snapshots.take(MAX_CACHED_SNAPSHOTS).forEach { put(snapshotJson(it)) } })
     }
 
@@ -126,6 +128,7 @@ class CloudBackupSettingsStore(
         lastSuccessAt = json.optNullableString("last_success_at"),
         lastErrorCode = json.optNullableString("last_error_code"),
         lastErrorMessage = json.optNullableString("last_error_message"),
+        lastFailureStartedAt = json.optNullableString("last_failure_started_at")?.also(Instant::parse),
         snapshots = json.optJSONArray("snapshots")?.let { array ->
             List(array.length()) { index -> snapshot(array.getJSONObject(index)) }
         } ?: emptyList(),

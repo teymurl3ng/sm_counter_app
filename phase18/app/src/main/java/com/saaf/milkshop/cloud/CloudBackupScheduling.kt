@@ -66,14 +66,16 @@ class CloudBackupScheduler(context: Context) {
             workManager.cancelUniqueWork(PERIODIC_WORK_NAME)
             return
         }
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(if (allowMetered) NetworkType.CONNECTED else NetworkType.UNMETERED)
-            .setRequiresBatteryNotLow(true)
-            .setRequiresStorageNotLow(true)
-            .build()
-        val request = PeriodicWorkRequestBuilder<CloudBackupWorker>(24, TimeUnit.HOURS)
-            .setConstraints(constraints)
-            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.MINUTES)
+        val request = PeriodicWorkRequestBuilder<CloudBackupWorker>(
+            CloudBackupSchedulingPolicy.PERIODIC_INTERVAL_HOURS,
+            TimeUnit.HOURS,
+        )
+            .setConstraints(CloudBackupSchedulingPolicy.periodicConstraints(allowMetered))
+            .setBackoffCriteria(
+                BackoffPolicy.EXPONENTIAL,
+                CloudBackupSchedulingPolicy.BACKOFF_MINUTES,
+                TimeUnit.MINUTES,
+            )
             .addTag(WORK_TAG)
             .build()
         workManager.enqueueUniquePeriodicWork(PERIODIC_WORK_NAME, ExistingPeriodicWorkPolicy.UPDATE, request)
@@ -81,8 +83,12 @@ class CloudBackupScheduler(context: Context) {
 
     fun runNow() {
         val request = OneTimeWorkRequestBuilder<CloudBackupWorker>()
-            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.MINUTES)
+            .setConstraints(CloudBackupSchedulingPolicy.immediateConstraints())
+            .setBackoffCriteria(
+                BackoffPolicy.EXPONENTIAL,
+                CloudBackupSchedulingPolicy.BACKOFF_MINUTES,
+                TimeUnit.MINUTES,
+            )
             .addTag(WORK_TAG)
             .build()
         workManager.enqueueUniqueWork(IMMEDIATE_WORK_NAME, ExistingWorkPolicy.KEEP, request)
@@ -100,6 +106,21 @@ class CloudBackupScheduler(context: Context) {
     }
 }
 
+internal object CloudBackupSchedulingPolicy {
+    const val PERIODIC_INTERVAL_HOURS = 24L
+    const val BACKOFF_MINUTES = 30L
+
+    fun periodicConstraints(allowMetered: Boolean): Constraints = Constraints.Builder()
+        .setRequiredNetworkType(if (allowMetered) NetworkType.CONNECTED else NetworkType.UNMETERED)
+        .setRequiresBatteryNotLow(true)
+        .setRequiresStorageNotLow(true)
+        .build()
+
+    fun immediateConstraints(): Constraints = Constraints.Builder()
+        .setRequiredNetworkType(NetworkType.CONNECTED)
+        .build()
+}
+
 class CloudBackupWorker(
     appContext: Context,
     parameters: WorkerParameters,
@@ -113,7 +134,8 @@ class CloudBackupWorker(
             app.cloudBackupCoordinator(GoogleAuthorizationTokenSource(applicationContext)).runBackup()
             Result.success()
         } catch (_: CloudBackupFailure.Network) {
-            if (state.lastErrorCode == "network" || isStale(state)) {
+            val latest = runCatching { app.cloudBackupSettings.read() }.getOrNull() ?: state
+            if (CloudBackupWorkerPolicy.shouldNotifyNetwork(latest)) {
                 notifier.actionRequired("Cloud backup is delayed", "The encrypted backup is still waiting for a working network connection.")
             }
             Result.retry()
@@ -138,11 +160,22 @@ class CloudBackupWorker(
 
     companion object {
         private const val MAX_UNCLASSIFIED_RETRIES = 3
+    }
+}
 
-        private fun isStale(state: CloudBackupState): Boolean {
-            val protectedAt = state.lastSuccessAt ?: state.configuredAt
-            return Duration.between(Instant.parse(protectedAt), Instant.now()) > Duration.ofHours(48)
-        }
+internal object CloudBackupWorkerPolicy {
+    private val STALE_AFTER = Duration.ofHours(48)
+    private val REPEATED_NETWORK_FAILURE_AFTER = Duration.ofHours(24)
+
+    fun shouldNotifyNetwork(
+        state: CloudBackupState,
+        now: Instant = Instant.now(),
+    ): Boolean {
+        val protectedAt = state.lastSuccessAt ?: state.configuredAt
+        if (Duration.between(Instant.parse(protectedAt), now) > STALE_AFTER) return true
+        val failureStartedAt = state.lastFailureStartedAt ?: return false
+        return state.lastErrorCode == "network" &&
+            Duration.between(Instant.parse(failureStartedAt), now) >= REPEATED_NETWORK_FAILURE_AFTER
     }
 }
 

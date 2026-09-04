@@ -18,7 +18,7 @@ Read those files before changing code.
 
 The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–9 are complete. `PHASE8.md` contains the completed screen ledger. `PHASE9.md` records the completed grouped-navigation, isolated-QA, Android Back, structural-hardening, secure Activity/WebView recreation, keyboard/system-inset, targeted refresh/transfer, and renderer/error-recovery milestones.
 
-Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE11.md` for current status. The runtime exposes all 86 contract-v4 actions, including the prior operational/security surface and eight owner-only periodic encrypted cloud-backup operations. Phase 11 checkpoint 11.1 closes cloud outbox process-death and overlapping-run gaps. The complete isolated-QA connected-device suite passes 228/228 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7.
+Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE11.md` for current status. The runtime exposes all 86 contract-v4 actions. Phase 11 checkpoints 11.1–11.2 close cloud outbox process-death, overlapping-run, cancellation, offline/scheduling, account/key/quota, and retention failure gaps. The complete isolated-QA connected-device suite passes 239/239 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7.
 
 Application user accounts and native role-based authorization are explicitly approved as a required cross-phase capability. Their schema-7 model, encrypted backup boundary, app-owned sessions, private staff enrollment/reset, user administration, role-aware navigation, recovery, security audit, and command-boundary authorization are implemented and now wired into React. Application users are security principals separate from employee/salary profiles, with an optional link between them. The schema-v6 daily-close actor name/role is transitional asserted metadata, not authenticated identity.
 
@@ -29,7 +29,7 @@ The two completed Phase 3 design tracks were:
 1. authenticated users, credentials, roles/permissions, sessions, recovery, audit actor IDs, migration, and backup/restore security;
 2. authoritative costing/COGS and profitability semantics.
 
-The researched native security and costing recommendations are implemented and device-verified. Phases 8–10 are complete: `PHASE10_CAPABILITY_AUDIT.md` confirms the core capability matrix, contract v3 closed the planning gaps, and contract v4 adds the approved cloud-recovery surface. `PHASE10_4_IMPLEMENTATION_REPORT.md` records the boundary and evidence. Phase 11 is active; checkpoint 11.1 passes 4/4 focused tests and the full isolated Samsung suite passes 228/228. Checkpoint 11.2 cancellation/offline/provider/key/retention hardening is the continuation point. The assessment-only presentation-performance findings and approved display/receipt preferences remain deferred to Phase 12 UI Fidelity, with release compiler/profile work assigned to Phase 16.
+The researched native security and costing recommendations are implemented and device-verified. Phases 8–10 are complete. Phase 11 is active; checkpoints 11.1–11.2 pass 15/15 focused tests and the full isolated Samsung suite passes 239/239. Checkpoint 11.3 repeated restore/identity/session hardening is the continuation point. The assessment-only presentation-performance findings and approved display/receipt preferences remain deferred to Phase 12 UI Fidelity, with release compiler/profile work assigned to Phase 16.
 
 ---
 
@@ -247,7 +247,7 @@ The capability audit, planning closure, approved cloud-backup design, minimum im
 
 ## Phase 11 — IN PROGRESS
 
-`PHASE11.md` is the active ledger. Checkpoint 11.1 authenticates and resumes finalized outbox files after process death, completes an already-verified remote upload when the local file is missing, persists success before local cleanup, and coalesces overlapping coordinators. The focused suite passes 4/4 and the complete isolated-QA Samsung suite passes 228/228. Continue with checkpoint 11.2 cancellation, offline/missed-run, provider-account, Keystore, quota, and retention-race tests.
+`PHASE11.md` is the active ledger. Checkpoints 11.1–11.2 cover authenticated process-death recovery, overlapping coordinators, cancellation, prolonged offline/missed-run status, durable alert timing, approved scheduling constraints, provider account/revocation, Keystore, quota, and retention races. The focused suite passes 15/15 and the complete isolated-QA Samsung suite passes 239/239. Continue with checkpoint 11.3 repeated restore, actor preservation, account disablement, and concurrent-session tests.
 
 ---
 
@@ -631,4 +631,4 @@ After opening the repo, begin with:
 
 > Read `README.md`, `PHASE0.md`, `PHASE1.md`, `PHASE2.md`, `PHASE3.md`, `POSTMORTEM.md`, and this `CODEX_HANDOFF_Saaf_Milk_Real_Hybrid.md`. Inspect the current Phase 3 native ledger implementation and the untouched Phase 18 business core. Verify the frozen logic-spec and SQL hashes and rerun the existing native Android-test Kotlin compile. Do not modify the frozen SQL/spec or invent new formulas. Report the exact repo/build status and the next safe Phase 3 implementation step. If the next step requires a schema/business-rule amendment, stop for explicit authorization before changing it.
 
-That text is historical provenance only. Phases 9 and 10 are complete. Phase 11 checkpoint 11.1 is complete; checkpoint 11.2 is the current continuation point, using `PHASE11.md` as the active ledger and `PHASE10_4_IMPLEMENTATION_REPORT.md` as the cloud-backup implementation handoff.
+That text is historical provenance only. Phases 9 and 10 are complete. Phase 11 checkpoints 11.1–11.2 are complete; checkpoint 11.3 is the current continuation point, using `PHASE11.md` as the active ledger and `PHASE10_4_IMPLEMENTATION_REPORT.md` as the cloud-backup implementation handoff.

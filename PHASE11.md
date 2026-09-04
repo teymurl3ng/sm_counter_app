@@ -1,6 +1,6 @@
 # Phase 11 — Integrity / Recovery / Concurrency
 
-Status: **IN PROGRESS — checkpoint 11.1 complete**
+Status: **IN PROGRESS — checkpoints 11.1–11.2 complete**
 
 ## 1. Purpose
 
@@ -30,11 +30,20 @@ Completed 2026-09-04.
 
 Focused physical-device evidence: `Phase11CloudBackupDurabilityTest` passes 4/4 on Samsung SM-A065F.
 
-### 11.2 — Cancellation, scheduling, offline, and provider failure matrix ◐
+### 11.2 — Cancellation, scheduling, offline, and provider failure matrix ✅
 
-Next: prove cancellation and retry at snapshot, outbox, authorization, upload, verification, retention, and cleanup boundaries; prolonged offline and missed-run behavior; quota; provider sign-out/revocation; account switch; Keystore loss; and retention races.
+Completed 2026-09-04.
 
-### 11.3 — Repeated restore, identity, and session recovery ⏳
+- Cancellation during coherent snapshot reads, upload, download verification, and retention propagates cleanly without being converted into a false failure or success. Pending identity and bytes remain retryable where they exist.
+- Repeated offline failures reuse one immutable snapshot and one checksum. A durable failure-start timestamp now delays transient-network notification until the failure series reaches 24 hours, unless the last verified backup is already more than 48 hours stale.
+- The approved scheduler policy is centralized and device-tested: approximate 24-hour periodic work, 30-minute exponential backoff, unmetered/Wi-Fi by default, optional metered network, battery-not-low and storage-not-low, with no charging requirement.
+- The missed-run status boundary remains non-stale at exactly 48 hours and becomes stale after it.
+- Revoked authorization and a wrong active Google account stop before snapshot creation. Quota failure retains the pending encrypted snapshot and all existing remote recovery points. Keystore loss creates no unprotected outbox data.
+- Retention deletion failures remain warnings after a verified backup; retention cancellation leaves the verified pending identity available for idempotent retry.
+
+Focused physical-device evidence: both Phase 11 cloud classes pass 15/15 on Samsung SM-A065F.
+
+### 11.3 — Repeated restore, identity, and session recovery ◐
 
 Stress repeated wrong-passphrase attempts, repeated full replacement, safety-snapshot failure paths, restore selection, actor preservation, session invalidation, disablement, and concurrent-session boundaries.
 
@@ -56,9 +65,9 @@ Run host, bridge, UI/package, focused device, and complete isolated-device gates
 - Frozen logic specification: `45E5BDDABE8861A1B3DF7C5666AC7673078439A89FA5628061AD293A865F9DEA` (unchanged).
 - Frozen SQL blueprint: `FB701C90D2DD97A1E6D962154692C48EA0F4E77E9300F9DFAC653D4AB67BBC51` (unchanged).
 - Kotlin and Android-test Kotlin compilation: pass.
-- Phase 11 focused durability/concurrency device tests: 4/4 pass.
+- Phase 11 focused durability/provider-failure device tests: 15/15 pass.
 - Host-side debug unit tests: 7/7 pass.
-- Complete isolated-QA Samsung instrumentation regression: 228/228 pass, 0 skipped, 0 failed.
+- Complete isolated-QA Samsung instrumentation regression: 239/239 pass, 0 skipped, 0 failed.
 
 ## 5. Known external gates
 
@@ -66,8 +75,8 @@ Production OAuth consent, live Drive upload/revocation/quota testing, and replac
 
 ## 6. Current next action
 
-Continue checkpoint 11.2 with deterministic cancellation and missed-run/offline retry tests, then cover account/Keystore/retention failure races. Preserve the same pending snapshot identity and encrypted bytes until remote verification succeeds.
+Continue checkpoint 11.3 with repeated wrong-passphrase and full-replacement restore, safety-snapshot failure, restore selection, actor preservation, session invalidation, account disablement, and concurrent-session tests.
 
 ## Plain English
 
-Phase 11 has started. Its first checkpoint closes two crash windows in cloud backup and prevents overlapping workers from uploading duplicate recovery points. The next work is the broader cancellation, offline, account, key, and retention failure matrix.
+Phase 11 has completed its cloud crash, cancellation, offline, scheduling, account, key, quota, and retention hardening checkpoints. The next work repeatedly exercises destructive restore and proves identity, actor history, and active sessions remain safe across every outcome.

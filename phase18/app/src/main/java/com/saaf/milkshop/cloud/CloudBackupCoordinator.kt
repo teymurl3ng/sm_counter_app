@@ -115,6 +115,7 @@ class CloudBackupCoordinator(
             enabled = false,
             lastErrorCode = null,
             lastErrorMessage = null,
+            lastFailureStartedAt = null,
         )
     }
 
@@ -169,7 +170,7 @@ class CloudBackupCoordinator(
         var state = requireState()
         require(state.enabled) { "Automatic cloud backup is disabled" }
         val attemptedAt = now().toString()
-        settings.write(state.copy(lastAttemptAt = attemptedAt, lastErrorCode = null, lastErrorMessage = null))
+        settings.write(state.copy(lastAttemptAt = attemptedAt))
         return try {
             requireMatchingAccount(state)
             state = settings.read() ?: throw CloudBackupFailure.NotConfigured()
@@ -234,6 +235,7 @@ class CloudBackupCoordinator(
                 lastSuccessAt = attemptedAt,
                 lastErrorCode = null,
                 lastErrorMessage = if (cleanupWarnings == 0) null else "The backup succeeded, but $cleanupWarnings old recovery point(s) could not be removed.",
+                lastFailureStartedAt = null,
                 snapshots = retained,
             )
             settings.write(successfulState)
@@ -257,7 +259,13 @@ class CloudBackupCoordinator(
             val code = failureCode(error)
             runCatching {
                 settings.update {
-                    it.copy(lastAttemptAt = attemptedAt, lastErrorCode = code, lastErrorMessage = recoveryMessage(error))
+                    val sameFailure = it.lastErrorCode == code && it.lastFailureStartedAt != null
+                    it.copy(
+                        lastAttemptAt = attemptedAt,
+                        lastErrorCode = code,
+                        lastErrorMessage = recoveryMessage(error),
+                        lastFailureStartedAt = if (sameFailure) it.lastFailureStartedAt else attemptedAt,
+                    )
                 }
             }
             runCatching { audit(state, "failure", "category=$code") }

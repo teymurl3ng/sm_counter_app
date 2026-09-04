@@ -12,6 +12,7 @@ import androidx.room3.withReadTransaction
 import androidx.room3.withWriteTransaction
 import androidx.room3.executeSQL
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator
 import org.bouncycastle.crypto.params.Argon2Parameters
@@ -43,6 +44,7 @@ class BackupManager(
         buildVerifiedBytes = { database, includeSecurity, formatVersion ->
             buildBackupBytes(database, includeSecurity, formatVersion)
         },
+        capturePreferences = ::preferencesJson,
         restorePreferences = ::restorePreferences,
     )
 
@@ -103,26 +105,32 @@ class BackupManager(
 
     suspend fun createLocalSnapshot(database: MilkShopDatabase): Result<BackupMeta> =
         withContext(Dispatchers.IO) {
-            runCatching {
+            backupFailureResult(
+                recovery = "The previous valid local backup was kept unchanged. The failed snapshot was not marked usable.",
+            ) {
                 val payload = buildBackupBytes(database, includeSecurity = true, formatVersion = FORMAT_VERSION)
                 val bytes = try {
                     cryptography.encryptLocalFormat2(payload)
                 } finally {
                     payload.fill(0)
                 }
-                val dir = java.io.File(context.filesDir, BACKUP_DIR).apply { mkdirs() }
-                val destination = uniqueSnapshotDestination(dir, displayName(context))
-                val fileName = destination.name
-                val tmp = java.io.File(dir, "$fileName.tmp")
-                tmp.writeBytes(bytes)
-                val verified = cryptography.readLocalAndVerify(tmp.readBytes())
-                check(tmp.renameTo(destination)) { "Could not finalize backup file" }
-                backupMeta(verified, destination.name)
-            }.recoverCatching { error ->
-                throw BackupFailure(
-                    reason = error.message ?: error.javaClass.simpleName,
-                    recovery = "The previous valid local backup was kept unchanged. The failed snapshot was not marked usable.",
-                )
+                try {
+                    val dir = java.io.File(context.filesDir, BACKUP_DIR)
+                    check(dir.isDirectory || dir.mkdirs()) { "Could not create the local backup directory" }
+                    val destination = uniqueSnapshotDestination(dir, displayName(context))
+                    val fileName = destination.name
+                    val tmp = java.io.File(dir, "$fileName.tmp")
+                    try {
+                        tmp.writeBytes(bytes)
+                        val verified = cryptography.readLocalAndVerify(tmp.readBytes())
+                        check(tmp.renameTo(destination)) { "Could not finalize backup file" }
+                        backupMeta(verified, destination.name)
+                    } finally {
+                        if (tmp.exists()) tmp.delete()
+                    }
+                } finally {
+                    bytes.fill(0)
+                }
             }
         }
 
@@ -140,7 +148,7 @@ class BackupManager(
 
     suspend fun exportSnapshot(database: MilkShopDatabase, uri: Uri): Result<BackupMeta> =
         withContext(Dispatchers.IO) {
-            runCatching {
+            cancellationAwareResult {
                 val bytes = buildBackupBytes(database)
                 context.contentResolver.openOutputStream(uri)?.use { it.write(bytes) }
                     ?: throw IOException("The selected backup destination could not be opened")
@@ -165,7 +173,7 @@ class BackupManager(
         uri: Uri,
         passphrase: CharArray,
     ): Result<BackupMeta> = withContext(Dispatchers.IO) {
-        runCatching {
+        cancellationAwareResult {
             AppPasswordPolicy.validateBackupPassphrase(passphrase)
             val payload = buildBackupBytes(database, includeSecurity = true, formatVersion = FORMAT_VERSION)
             val encrypted = try {
@@ -182,7 +190,7 @@ class BackupManager(
 
     suspend fun readEncryptedBackupMeta(uri: Uri, passphrase: CharArray): Result<BackupMeta> =
         withContext(Dispatchers.IO) {
-            runCatching {
+            cancellationAwareResult {
                 val json = cryptography.readEncryptedAndVerify(cryptography.readUri(uri), passphrase)
                 val metadata = json.getJSONObject("metadata")
                 validateCompatibility(metadata)
@@ -192,7 +200,7 @@ class BackupManager(
 
     suspend fun inspectEncryptedSnapshot(uri: Uri, passphrase: CharArray): Result<EncryptedBackupInspection> =
         withContext(Dispatchers.IO) {
-            runCatching {
+            cancellationAwareResult {
                 val json = cryptography.readEncryptedAndVerify(cryptography.readUri(uri), passphrase)
                 val metadata = json.getJSONObject("metadata")
                 validateCompatibility(metadata)
@@ -226,7 +234,7 @@ class BackupManager(
     }
 
     suspend fun readBackupMeta(uri: Uri): Result<BackupMeta> = withContext(Dispatchers.IO) {
-        runCatching {
+        cancellationAwareResult {
             val bytes = cryptography.readUri(uri)
             val json = cryptography.readLegacyOrLocalAndVerify(bytes)
             val metadata = json.getJSONObject("metadata")
@@ -246,7 +254,9 @@ class BackupManager(
         uri: Uri,
         selection: RestoreSelection,
     ): Result<BackupMeta> = withContext(Dispatchers.IO) {
-        runCatching {
+        backupFailureResult(
+            recovery = "The restore was not completed. The pre-restore safety backup remains available for recovery.",
+        ) {
             require(!selection.security) { "Security identities can only be restored from an encrypted format-2 backup" }
             val bytes = cryptography.readUri(uri)
             val json = readAndVerify(bytes)
@@ -254,11 +264,6 @@ class BackupManager(
             validateCompatibility(metadata)
             restoreEngine.restore(database, json, selection, includeSecurity = false)
             backupMeta(json, uri.lastPathSegment ?: "backup")
-        }.recoverCatching { error ->
-            throw BackupFailure(
-                reason = error.message ?: error.javaClass.simpleName,
-                recovery = "The restore was not completed. The pre-restore safety backup remains available for recovery.",
-            )
         }
     }
 
@@ -291,7 +296,9 @@ class BackupManager(
         sessions: NativeSessionManager,
         requireEmptyInstallation: Boolean,
     ): Result<BackupMeta> = withContext(Dispatchers.IO) {
-        runCatching {
+        backupFailureResult(
+            recovery = "The restore was not completed. The pre-restore safety backup remains available for recovery.",
+        ) {
             require(selection.business && selection.security) {
                 "Encrypted security restore requires both business and security data"
             }
@@ -305,11 +312,6 @@ class BackupManager(
             restoreEngine.restore(database, json, selection, includeSecurity = true)
             sessions.invalidateAll()
             backupMeta(json, uri.lastPathSegment ?: "backup")
-        }.recoverCatching { error ->
-            throw BackupFailure(
-                reason = error.message ?: error.javaClass.simpleName,
-                recovery = "The restore was not completed. The pre-restore safety backup remains available for recovery.",
-            )
         }
     }
 
@@ -320,7 +322,9 @@ class BackupManager(
         selection: RestoreSelection,
         sessions: NativeSessionManager,
     ): Result<BackupMeta> = withContext(Dispatchers.IO) {
-        runCatching {
+        backupFailureResult(
+            recovery = "The local restore was not completed. The pre-restore safety backup remains available.",
+        ) {
             val json = cryptography.readLocalAndVerify(cryptography.readUri(uri))
             val metadata = json.getJSONObject("metadata")
             validateCompatibility(metadata)
@@ -338,11 +342,6 @@ class BackupManager(
             restoreEngine.restore(database, json, selection, includeSecurity = hasUsers)
             sessions.invalidateAll()
             backupMeta(json, uri.lastPathSegment ?: "backup")
-        }.recoverCatching { error ->
-            throw BackupFailure(
-                reason = error.message ?: error.javaClass.simpleName,
-                recovery = "The local restore was not completed. The pre-restore safety backup remains available.",
-            )
         }
     }
 
@@ -371,7 +370,9 @@ class BackupManager(
         sessions: NativeSessionManager,
         fileName: String,
     ): Result<BackupMeta> = withContext(Dispatchers.IO) {
-        runCatching {
+        backupFailureResult(
+            recovery = "The restore was not completed. The pre-restore safety backup remains available for recovery.",
+        ) {
             val json = readAndVerify(bytes)
             val metadata = json.getJSONObject("metadata")
             validateCompatibility(metadata)
@@ -387,11 +388,6 @@ class BackupManager(
             )
             sessions.invalidateAll()
             backupMeta(json, fileName)
-        }.recoverCatching { error ->
-            throw BackupFailure(
-                reason = error.message ?: error.javaClass.simpleName,
-                recovery = "The restore was not completed. The pre-restore safety backup remains available for recovery.",
-            )
         }
     }
 
@@ -530,7 +526,31 @@ class BackupManager(
                 }
             }
         }
-        editor.apply()
+        check(editor.commit()) { "Could not persist restored application preferences" }
+    }
+
+    private suspend fun <T> cancellationAwareResult(block: suspend () -> T): Result<T> = try {
+        Result.success(block())
+    } catch (cancelled: CancellationException) {
+        throw cancelled
+    } catch (error: Throwable) {
+        Result.failure(error)
+    }
+
+    private suspend fun <T> backupFailureResult(
+        recovery: String,
+        block: suspend () -> T,
+    ): Result<T> = try {
+        Result.success(block())
+    } catch (cancelled: CancellationException) {
+        throw cancelled
+    } catch (error: Throwable) {
+        Result.failure(
+            BackupFailure(
+                reason = error.message ?: error.javaClass.simpleName,
+                recovery = recovery,
+            ),
+        )
     }
 
 

@@ -1,6 +1,6 @@
 # Phase 11 — Integrity / Recovery / Concurrency
 
-Status: **IN PROGRESS — checkpoints 11.1–11.2 complete**
+Status: **IN PROGRESS — checkpoints 11.1–11.3 complete**
 
 ## 1. Purpose
 
@@ -43,9 +43,19 @@ Completed 2026-09-04.
 
 Focused physical-device evidence: both Phase 11 cloud classes pass 15/15 on Samsung SM-A065F.
 
-### 11.3 — Repeated restore, identity, and session recovery ◐
+### 11.3 — Repeated restore, identity, and session recovery ✅
 
-Stress repeated wrong-passphrase attempts, repeated full replacement, safety-snapshot failure paths, restore selection, actor preservation, session invalidation, disablement, and concurrent-session boundaries.
+Completed 2026-09-04.
+
+- Repeated full-replacement restore is device-proven across two generations: each successful restore removes post-snapshot mutations and invalidates every pre-existing in-memory session.
+- Security identities, credentials, recovery state, creator/disablement links, security audit, and authenticated daily-close actor attribution survive replacement. Disabled users remain unable to authenticate after recovery.
+- Historical actor replay now temporarily suspends only the daily-close active-actor insertion trigger inside the verified security restore transaction, allowing valid history from users who were later disabled or changed roles; the trigger is recreated before verification and commit.
+- Cancellation now propagates from backup/export/restore boundaries instead of being wrapped as an ordinary failure. Safety-snapshot failure or cancellation leaves the current database and sessions untouched, and failed local snapshot finalization removes temporary data and wipes encrypted buffers.
+- SharedPreferences restore is compensating: if Room replay or post-replay verification fails or is cancelled, the previous preference state is synchronously restored while the database transaction rolls back.
+- Restore selection is device-proven to replace only the chosen business, planning, and preference groups.
+- Three consecutive wrong cloud-recovery passphrases and an unknown recovery-point selection leave the cached recovery point unchanged and usable by a later correct passphrase.
+
+Focused physical-device evidence: `Phase11RecoveryIdentitySessionTest` passes 5/5 on Samsung SM-A065F.
 
 ### 11.4 — Concurrent writes and large-history measurement ⏳
 
@@ -65,9 +75,9 @@ Run host, bridge, UI/package, focused device, and complete isolated-device gates
 - Frozen logic specification: `45E5BDDABE8861A1B3DF7C5666AC7673078439A89FA5628061AD293A865F9DEA` (unchanged).
 - Frozen SQL blueprint: `FB701C90D2DD97A1E6D962154692C48EA0F4E77E9300F9DFAC653D4AB67BBC51` (unchanged).
 - Kotlin and Android-test Kotlin compilation: pass.
-- Phase 11 focused durability/provider-failure device tests: 15/15 pass.
+- Phase 11 focused device tests: 20/20 pass (15 cloud durability/provider-failure + 5 restore/identity/session).
 - Host-side debug unit tests: 7/7 pass.
-- Complete isolated-QA Samsung instrumentation regression: 239/239 pass, 0 skipped, 0 failed.
+- Complete isolated-QA Samsung instrumentation regression: 244/244 pass, 0 skipped, 0 failed.
 
 ## 5. Known external gates
 
@@ -75,8 +85,8 @@ Production OAuth consent, live Drive upload/revocation/quota testing, and replac
 
 ## 6. Current next action
 
-Continue checkpoint 11.3 with repeated wrong-passphrase and full-replacement restore, safety-snapshot failure, restore selection, actor preservation, session invalidation, account disablement, and concurrent-session tests.
+Continue checkpoint 11.4 with concurrent writes/corrections, large-history measurement, memory/query bounds, and repeated recovery under measured load.
 
 ## Plain English
 
-Phase 11 has completed its cloud crash, cancellation, offline, scheduling, account, key, quota, and retention hardening checkpoints. The next work repeatedly exercises destructive restore and proves identity, actor history, and active sessions remain safe across every outcome.
+Phase 11 has completed its cloud failure and destructive-restore hardening checkpoints. The next work measures backup, recovery, and read-model behavior while business writes and large histories are present.

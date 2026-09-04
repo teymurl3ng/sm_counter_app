@@ -4,10 +4,13 @@ Status: RECONCILED 2026-09-04 — hybrid Phases 0–11 are complete; Phase 12 UI
 
 Latest physical-device checkpoint: the Phase 12 baseline captured 81 screenshots across 57 named states on the Samsung SM-A065F / Android 16; its focused capture test passes 1/1. The complete isolated-QA connected-device suite remains 247/247; host-side tests remain 7/7.
 
+Product scope: Saaf Milk is the current working product identity, and Milk/Yogurt are the current validated domain—not permanent limits. The product is intended to expand carefully to other products and suitable owner-managed shop contexts without pretending to be a corporate ERP or complete statutory accounting system. See `PRODUCT_SCOPE.md`.
+
 ## What this repository contains
 
 - `phase18/` — Phase 18-derived native project. Its logic specification and SQL blueprint remain frozen; approved hybrid native extensions are implemented in the Kotlin/Room source.
 - `ui/` — the latest AI Studio UI source supplied for the new product layer.
+- `PRODUCT_SCOPE.md` — authoritative target-user, product-breadth, proportional-quality, benchmark, and expansion policy.
 - `POSTMORTEM.md` — locked fresh-start playbook.
 - `PHASE0.md` — immutable baseline record and hashes.
 - `PHASE1.md` — complete source-level capability inventory and mapping.

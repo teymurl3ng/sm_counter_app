@@ -4,7 +4,7 @@ Status: **IN PROGRESS — checkpoint 12.1 complete; checkpoint 12.2 next**
 
 ## Purpose
 
-Improve the clarity, consistency, responsiveness, accessibility, and perceived performance of the packaged React/WebView experience without changing native business, accounting, security, backup, or recovery semantics.
+Improve the clarity, consistency, responsiveness, accessibility, and perceived performance of the packaged React/WebView experience without changing native business, accounting, security, backup, or recovery semantics. Apply the proportional product and benchmark policy in `PRODUCT_SCOPE.md`: strong correctness within a deliberately small-business scope, without enterprise feature-parity pressure.
 
 ## Locked boundaries
 
@@ -13,6 +13,8 @@ Improve the clarity, consistency, responsiveness, accessibility, and perceived p
 - Bridge contract v4 and its 86 operations remain frozen unless a separately approved additive capability passes its own gate.
 - Phase 12 changes presentation and presentation-only state; it does not create a second client-side business store.
 - Performance changes require profileable release-equivalent evidence and must preserve session revalidation and data freshness.
+- Saaf Milk and Milk/Yogurt describe the current implementation and validated domain; Phase 12 must not harden them into permanent product limits or imply that unsupported future products already have authoritative formulas.
+- UI review uses applicable standards as guardrails, comparable products as references, and real owner/staff tasks as acceptance evidence. Aesthetic preference alone does not authorize a change.
 
 ## Ordered checkpoints
 
@@ -29,6 +31,7 @@ Completed with 81 renderer-synchronized screenshots covering 57 named states on 
 
 - Reconcile the approved UI target with actual Android rendering.
 - Lock typography, spacing, color, hierarchy, controls, dialog, density, theme, and language decisions.
+- Score proposed changes against the fit-for-purpose function, formula, and screen framework in `PRODUCT_SCOPE.md`; do not pursue corporate-ERP density or feature parity.
 
 ### 12.3 — Navigation and natural task flows
 

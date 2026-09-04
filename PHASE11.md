@@ -1,6 +1,6 @@
 # Phase 11 — Integrity / Recovery / Concurrency
 
-Status: **IN PROGRESS — checkpoints 11.1–11.3 complete**
+Status: **IN PROGRESS — checkpoints 11.1–11.4 complete**
 
 ## 1. Purpose
 
@@ -57,9 +57,18 @@ Completed 2026-09-04.
 
 Focused physical-device evidence: `Phase11RecoveryIdentitySessionTest` passes 5/5 on Samsung SM-A065F.
 
-### 11.4 — Concurrent writes and large-history measurement ⏳
+### 11.4 — Concurrent writes and large-history measurement ✅
 
-Exercise backup during writes and corrections, large business histories, read-model/query bounds, memory use, and repeated recovery. Optimize only measured bottlenecks without weakening the coherent Room snapshot boundary.
+Completed 2026-09-04.
+
+- A backup-held Room read transaction blocks an actual concurrent write and `CorrectionService` correction until the coherent snapshot is complete; the snapshot contains the committed pre-write generation only.
+- A backup started while a correction write transaction is paused between its event header and financial deltas never serializes a partial correction. It waits for the write boundary and observes a fully committed generation.
+- A physical-device stress history of 5,000 events (4,500 original expenses plus 500 corrections), 10,000 financial rows, and 5,000 actor links is covered by complete history, detail, analytics, account-ledger, encrypted backup, and two full replacement restores.
+- On Samsung SM-A065F, measured times were 1,093 ms seed, 164 ms complete history, 7 ms detail, 17 ms analytics, 88 ms account ledger, 1,478 ms encrypted backup, 5,243 ms first restore, and 12,945 ms second restore. The encrypted payload was 6,117,978 bytes (5.84 MiB), and measured heap growth was 23,437,264 bytes (22.35 MiB) within a 256 MiB heap.
+- Both restores preserve the 5,000-event/10,000-row/5,000-link generation, remove between-restore mutations, and invalidate supplied sessions.
+- The measured queries, memory, backup, and recovery paths remain comfortably inside the checkpoint bounds. No production query, schema, snapshot-boundary, or frozen-contract optimization is justified at this scale.
+
+Focused physical-device evidence: `Phase11ConcurrentHistoryTest` passes 3/3 on Samsung SM-A065F.
 
 ### 11.5 — Lower-of-cost/NRV trigger reassessment ⏳
 
@@ -75,9 +84,9 @@ Run host, bridge, UI/package, focused device, and complete isolated-device gates
 - Frozen logic specification: `45E5BDDABE8861A1B3DF7C5666AC7673078439A89FA5628061AD293A865F9DEA` (unchanged).
 - Frozen SQL blueprint: `FB701C90D2DD97A1E6D962154692C48EA0F4E77E9300F9DFAC653D4AB67BBC51` (unchanged).
 - Kotlin and Android-test Kotlin compilation: pass.
-- Phase 11 focused device tests: 20/20 pass (15 cloud durability/provider-failure + 5 restore/identity/session).
+- Phase 11 focused device tests: 23/23 pass (15 cloud durability/provider-failure + 5 restore/identity/session + 3 concurrent-write/large-history).
 - Host-side debug unit tests: 7/7 pass.
-- Complete isolated-QA Samsung instrumentation regression: 244/244 pass, 0 skipped, 0 failed.
+- Complete isolated-QA Samsung instrumentation regression: 247/247 pass, 0 skipped, 0 failed.
 
 ## 5. Known external gates
 
@@ -85,8 +94,8 @@ Production OAuth consent, live Drive upload/revocation/quota testing, and replac
 
 ## 6. Current next action
 
-Continue checkpoint 11.4 with concurrent writes/corrections, large-history measurement, memory/query bounds, and repeated recovery under measured load.
+Continue checkpoint 11.5 with the assessment-first lower-of-cost/NRV materiality and business-trigger reassessment. Do not add a valuation formula without explicit approval.
 
 ## Plain English
 
-Phase 11 has completed its cloud failure and destructive-restore hardening checkpoints. The next work measures backup, recovery, and read-model behavior while business writes and large histories are present.
+Phase 11 has now proven cloud failure handling, destructive recovery, coherent backup during writes/corrections, and repeated recovery of a measured 5,000-event history. The next work is a decision record on whether lower-of-cost/NRV is materially required; it does not automatically authorize new accounting behavior.

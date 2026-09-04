@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-04 — hybrid Phases 0–10 are complete and Phase 11 integrity/recovery/concurrency hardening is in progress. Contract v4 exposes 86 native-backed operations. Phase 11 checkpoints 11.1–11.4 close cloud outbox/process-death, provider-failure, cancellation, repeated-restore, identity/session, concurrent-write/correction, and measured large-history paths.
+Status: RECONCILED 2026-09-04 — hybrid Phases 0–10 are complete and Phase 11 integrity/recovery/concurrency hardening is in progress. Contract v4 exposes 86 native-backed operations. Phase 11 checkpoints 11.1–11.5 close cloud outbox/process-death, provider-failure, cancellation, repeated-restore, identity/session, concurrent-write/correction, measured large-history, and deferred-NRV decision paths.
 
 Latest physical-device checkpoint: the complete isolated-QA connected-device suite passes 247/247; host-side tests pass 7/7.
 
@@ -28,6 +28,7 @@ Latest physical-device checkpoint: the complete isolated-QA connected-device sui
 - `PHASE10_CLOUD_BACKUP_DESIGN_PROPOSAL.md` — approved periodic encrypted Google Drive backup, recovery-key, scheduling, retention, restore, and owner-phone scope design.
 - `PHASE10_4_IMPLEMENTATION_REPORT.md` — implemented cloud-backup boundary, verification evidence, build configuration, and remaining live-provider gates.
 - `PHASE11.md` — active integrity/recovery/concurrency plan, completed cloud and destructive-restore checkpoints, evidence, and remaining hardening gates.
+- `PHASE11_5_NRV_TRIGGER_REASSESSMENT.md` — completed lower-of-cost/NRV trigger decision, evidence gaps, reopen conditions, and minimum future design boundary.
 
 ## Immutable baselines
 
@@ -39,11 +40,11 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 11 — Integrity / Recovery / Concurrency: IN PROGRESS (checkpoints 11.1–11.4 complete)**
+**Phase 11 — Integrity / Recovery / Concurrency: IN PROGRESS (checkpoints 11.1–11.5 complete)**
 
 Phase 8's native-backed shop screens and all 78 frozen operations remain intact. Phase 9 adds grouped role-aware navigation, predictable Android Back behavior, a separate QA installation, focused file boundaries, one non-reloading React/WebView presentation, secure Activity recreation, deliberate keyboard/system-inset behavior, targeted state refresh with bridge-transfer measurement, and native recovery from main-page or WebView-renderer failure. A recovery reload creates a fresh WebView and revalidates the memory-only session before protected information appears. The complete isolated-QA physical-device regression passes 218/218.
 
-The application remains offline-first and each writable installation owns one Room database. Phase 10 added periodic encrypted off-device recovery through Google Drive `appDataFolder`. Phase 11 checkpoints 11.1–11.4 recover authenticated outbox files after process death, coalesce overlapping runs, preserve retry identity through cancellation/offline/quota paths, enforce the approved WorkManager constraints, harden repeated full replacement, and prove coherent backup around writes/corrections. A measured 5,000-event history remains within query, memory, backup, and repeated-restore bounds, so no speculative production optimization was introduced. Backup is still recovery—not synchronization between writable phones.
+The application remains offline-first and each writable installation owns one Room database. Phase 10 added periodic encrypted off-device recovery through Google Drive `appDataFolder`. Phase 11 checkpoints 11.1–11.5 recover authenticated outbox files after process death, coalesce overlapping runs, preserve retry identity through cancellation/offline/quota paths, harden repeated replacement, and prove coherent backup around writes/corrections. A measured 5,000-event history remains within query, memory, backup, and repeated-restore bounds. The NRV trigger reassessment found no supplied evidence authorizing a formal write-down/reversal subsystem, so honest `cost_only_no_nrv` disclosure remains and no accounting formula was invented. Backup is still recovery—not synchronization between writable phones.
 
 ## Approved security track
 
@@ -97,7 +98,7 @@ Phase 9 — Runtime / Navigation / Device Integration ✅ (all six milestones co
 
 Phase 10 — Functional Product Completion ✅ (checkpoints 10.1–10.5 complete; encrypted Drive recovery implemented; 224/224 device regression)
 
-Phase 11 — Integrity / Recovery / Concurrency ◐ (in progress; checkpoints 11.1–11.4 complete; lower-of-cost/NRV trigger reassessment is next)
+Phase 11 — Integrity / Recovery / Concurrency ◐ (in progress; checkpoints 11.1–11.5 complete; final regression and handoff are next)
 
 Phase 12 — UI Fidelity ⏳ (includes the deferred measured presentation-performance note; no broad optimization rewrite is approved)
 
@@ -157,10 +158,11 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 11 focused cloud durability/provider-failure suite: 15/15 passed on the physical device.
 - Phase 11 focused restore/identity/session suite: 5/5 passed on the physical device.
 - Phase 11 focused concurrent-write/large-history suite: 3/3 passed on the physical device.
+- Phase 11.5 reused costing/reporting boundary suite: 16/16 passed on the physical device (included in the complete-suite total).
 - Phase 9 focused real-renderer termination and secure recovery suite: 2/2 passed on the physical device.
 - Phase 10 complete isolated-QA connected-device regression: 224/224 passed, 0 skipped, 0 failed.
 - Phase 11 complete isolated-QA connected-device regression: 247/247 passed, 0 skipped, 0 failed.
 
 ## Next gate
 
-Phases 3–10 are closed and Phase 11 is active. Checkpoints 11.1–11.4 pass 23/23 focused Samsung tests and the complete isolated suite passes 247/247 with zero skipped or failed. Continue checkpoint 11.5 with the assessment-first lower-of-cost/NRV materiality and business-trigger decision record. Use Phases 14–16 for live Google consent/Drive and second-device release acceptance. See `PHASE11.md`, `PHASE10_4_IMPLEMENTATION_REPORT.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–10 are closed and Phase 11 is active. Checkpoints 11.1–11.5 are complete; 23/23 dedicated Phase 11 tests, the reused 16/16 costing/reporting boundary, and the complete 247/247 isolated Samsung suite pass with zero skipped or failed. Continue checkpoint 11.6 with final regression, limitations, and Phase 12 handoff. Use Phases 14–16 for live Google consent/Drive and second-device release acceptance. See `PHASE11.md`, `PHASE11_5_NRV_TRIGGER_REASSESSMENT.md`, `PHASE10_4_IMPLEMENTATION_REPORT.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.

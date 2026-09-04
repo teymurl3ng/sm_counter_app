@@ -1,6 +1,6 @@
 # Phase 11 — Integrity / Recovery / Concurrency
 
-Status: **IN PROGRESS — checkpoints 11.1–11.4 complete**
+Status: **IN PROGRESS — checkpoints 11.1–11.5 complete**
 
 ## 1. Purpose
 
@@ -70,9 +70,15 @@ Completed 2026-09-04.
 
 Focused physical-device evidence: `Phase11ConcurrentHistoryTest` passes 3/3 on Samsung SM-A065F.
 
-### 11.5 — Lower-of-cost/NRV trigger reassessment ⏳
+### 11.5 — Lower-of-cost/NRV trigger reassessment ✅
 
-Reassess the deliberately deferred NRV subsystem against actual materiality and business triggers. This checkpoint is a decision record first; no new accounting formula is authorized by Phase 11 alone.
+Completed 2026-09-04. See `PHASE11_5_NRV_TRIGGER_REASSESSMENT.md`.
+
+- The current official IAS 2 and IFRIC boundaries were rechecked: lower-of-cost/NRV remains a formal requirement where applicable, and necessary selling costs require entity-specific evidence and judgement.
+- No approved trigger is demonstrated by the repository or supplied business facts: no routine material shelf-life carryover, repeated evidence-based below-cost markdown, material period-end price deterioration, longer-lived/general-merchandise authoritative costing, or external reporting requirement is established.
+- Existing actual sale prices and the mutable default sale rate are insufficient to derive NRV. The model has no approved period-end expected-price, completion/selling-cost, inventory-aging, materiality, or assessment-evidence policy.
+- Formal NRV write-down/reversal support remains conditionally deferred. Reports continue to disclose `cost_based_management` / `cost_only_no_nrv` and make no statutory or IFRS-compliance claim.
+- No formula, threshold, Room schema, bridge operation, UI action, or production code changed. The decision record defines the exact reopen questions and minimum separately approved design if a trigger later appears.
 
 ### 11.6 — Full regression and handoff ⏳
 
@@ -85,6 +91,7 @@ Run host, bridge, UI/package, focused device, and complete isolated-device gates
 - Frozen SQL blueprint: `FB701C90D2DD97A1E6D962154692C48EA0F4E77E9300F9DFAC653D4AB67BBC51` (unchanged).
 - Kotlin and Android-test Kotlin compilation: pass.
 - Phase 11 focused device tests: 23/23 pass (15 cloud durability/provider-failure + 5 restore/identity/session + 3 concurrent-write/large-history).
+- Reused costing/reporting boundary device tests for checkpoint 11.5: 16/16 pass (`Phase3CostingTest`, `Phase8DashboardReportsTest`, and `Phase8CostingPlanningTest`; already included in the complete suite total).
 - Host-side debug unit tests: 7/7 pass.
 - Complete isolated-QA Samsung instrumentation regression: 247/247 pass, 0 skipped, 0 failed.
 
@@ -94,8 +101,8 @@ Production OAuth consent, live Drive upload/revocation/quota testing, and replac
 
 ## 6. Current next action
 
-Continue checkpoint 11.5 with the assessment-first lower-of-cost/NRV materiality and business-trigger reassessment. Do not add a valuation formula without explicit approval.
+Continue checkpoint 11.6 with the final host, bridge, UI/package, focused-device, complete isolated-device, immutable-hash, limitations, and Phase 12 handoff gates.
 
 ## Plain English
 
-Phase 11 has now proven cloud failure handling, destructive recovery, coherent backup during writes/corrections, and repeated recovery of a measured 5,000-event history. The next work is a decision record on whether lower-of-cost/NRV is materially required; it does not automatically authorize new accounting behavior.
+Phase 11 has proven cloud failure handling, destructive recovery, coherent backup during writes/corrections, and repeated recovery of a measured 5,000-event history. It also rechecked the advanced lower-selling-value question: the app lacks the business evidence needed to calculate it honestly, and no trigger has been supplied, so the clear “recorded cost only” warning remains instead of guessing. The final Phase 11 regression and handoff are next.

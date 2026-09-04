@@ -1,6 +1,6 @@
 # Phase 12 — UI Fidelity
 
-Status: **IN PROGRESS — checkpoint 12.1 complete; checkpoint 12.2 next**
+Status: **IN PROGRESS — checkpoints 12.1–12.2 complete; checkpoint 12.3 next**
 
 ## Purpose
 
@@ -27,11 +27,15 @@ Improve the clarity, consistency, responsiveness, accessibility, and perceived p
 
 Completed with 81 renderer-synchronized screenshots covering 57 named states on the Samsung SM-A065F / Android 16. See `PHASE12_SCREEN_AUDIT.md` and `phase12-evidence/sm-a065f-android16-render-synced/`.
 
-### 12.2 — Visual target and presentation system
+### 12.2 — Visual target and presentation system ✅
 
 - Reconcile the approved UI target with actual Android rendering.
 - Lock typography, spacing, color, hierarchy, controls, dialog, density, theme, and language decisions.
 - Score proposed changes against the fit-for-purpose function, formula, and screen framework in `PRODUCT_SCOPE.md`; do not pursue corporate-ERP density or feature parity.
+
+Completed with `DESIGN.md` as the authoritative presentation target. Its **Phase 12.2 source traceability** table records which sources were directly applied, which remain policy references, and which suggested tools or audits were not run. The packaged app now uses an exact branded header role with Android top-inset gradient protection, opaque compact navigation, immediate top-level destination changes, touch-appropriate document scrolling, visible keyboard focus, and reduced-motion handling. These are shared presentation foundations only; no native record, formula, permission, accounting, security, backup, or recovery behavior changed.
+
+The physical-device review also separated source evidence from preview behavior. PixelCopy plus WebView visual-state synchronization produced a second 81-image set in `phase12-evidence/sm-a065f-android16-phase12-2-stable/`. Apparent missing glyphs in some scaled tall-image previews are present in the PNG pixel data and in exact crops; reviewers must inspect the source file at original size or use smaller crops before recording a paint defect. Repeated normal-use navigation remains clean under a 60-transition device stress check.
 
 ### 12.3 — Navigation and natural task flows
 
@@ -56,8 +60,18 @@ Completed with 81 renderer-synchronized screenshots covering 57 named states on 
 
 ## Current next action
 
-Begin checkpoint 12.2: isolate the physical-device paint/inset findings, reconcile the approved visual target, and lock the presentation system before changing production screens.
+Begin checkpoint 12.3: improve navigation and natural task flows, starting with the seven crowded Daily work tasks and the loss of location context under the generic `More` destination. Preserve permissions and every native-backed outcome.
+
+## Checkpoint 12.2 verification
+
+- UI lint and production web build — passed; packaged Android assets refreshed.
+- Bridge contract — unchanged at v4, 86 endpoints, SHA-256 `D22921E90040EF70CED8AFDE535C6309544B75D5EBD7B726ED1DE1273E0FA136`.
+- Android/Kotlin and instrumentation compilation — passed.
+- `Phase12PresentationFoundationTest` — 4/4 passed on Samsung SM-A065F / Android 16, including 60 continuous destination changes.
+- Combined system-inset and presentation device check — 5/5 passed.
+- `Phase12VisualBaselineCaptureTest` — 1/1 passed; 81/81 PNGs are readable at 720 × 1600 and the 83-line manifest SHA-256 is `1C81401D6B8E25904A788B23B506CADDE8D052B0B0597D89894014FB86C715AC`.
+- The last complete isolated-QA regression remains the Phase 11 gate at 247/247; checkpoint 12.6 owns the next complete-suite rerun.
 
 ## Plain English
 
-The before-picture is complete: 81 screenshots cover every important screen and meaningful state on the real phone. Next we will fix the device-level drawing and status-bar problems, then agree on one consistent visual system before polishing the screens. The shop’s records, calculations, and security have not been changed.
+The app now has one agreed visual rulebook suited to a small owner-run shop, and its shared phone-level presentation is stable. We also confirmed that the alarming missing text was a tall-image preview problem, not missing pixels in the saved screenshots. Next we will simplify how people move between tasks—especially the seven Daily work options and secondary screens under `More`. The shop’s records, calculations, and security have not been changed.

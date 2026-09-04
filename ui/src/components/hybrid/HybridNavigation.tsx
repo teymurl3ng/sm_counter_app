@@ -25,11 +25,11 @@ export function HybridNavigation({ items, activeArea, onSelect }: {
   const primary = [...preferred, ...items.filter((item) => !preferred.some((candidate) => candidate.area === item.area))].slice(0, 4);
   const secondary = items.filter((item) => !primary.some((candidate) => candidate.area === item.area));
   const secondaryActive = secondary.some((item) => item.area === activeArea);
-  const select = (area: ManagementArea) => { onSelect(area); setOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const select = (area: ManagementArea) => { onSelect(area); setOpen(false); window.scrollTo({ top: 0, behavior: 'auto' }); };
   const columnCount = primary.length + (secondary.length > 0 ? 1 : 0);
 
   return <>
-    <nav id="app-navigation" className="hybrid-navigation fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-2 pt-1 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur md:sticky md:top-0 md:bottom-auto md:border-y md:px-4 md:py-2 md:shadow-sm" aria-label="Application areas">
+    <nav id="app-navigation" className="hybrid-navigation fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white px-2 pt-1 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] md:sticky md:top-0 md:bottom-auto md:border-y md:px-4 md:py-2 md:shadow-sm" aria-label="Application areas">
       <div id="primary-navigation" className="mx-auto grid max-w-4xl gap-1" style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
         {primary.map((item) => <NavigationButton key={item.area} item={item} active={item.area === activeArea} onClick={() => select(item.area)} />)}
         {secondary.length > 0 && <button id="navigation-more-button" type="button" aria-expanded={open} aria-controls="navigation-more-panel" onClick={() => setOpen(true)} className={`flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-bold md:min-h-0 md:flex-row md:gap-2 md:px-3 md:text-sm ${secondaryActive ? 'bg-emerald-50 text-emerald-800' : 'text-slate-500'}`}><Menu className="h-5 w-5 md:h-4 md:w-4" /><span className="truncate">More</span></button>}

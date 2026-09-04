@@ -5,10 +5,15 @@ import android.view.WindowManager
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.insets.GradientProtection
+import androidx.core.view.insets.ProtectionLayout
 import androidx.webkit.WebViewFeature
 import com.saaf.milkshop.BuildConfig
 import com.saaf.milkshop.MilkShopApplication
+import com.saaf.milkshop.R
 import com.saaf.milkshop.application.bridge.BackupDocumentPicker
 import com.saaf.milkshop.application.bridge.HybridBridgeDispatcher
 import com.saaf.milkshop.cloud.HybridGoogleDriveAuthorization
@@ -62,7 +67,7 @@ class HybridActivity : ComponentActivity() {
             },
             onActiveAreaChanged = { activeArea = it },
         )
-        setContentView(webViewHost.webView)
+        setContentView(createProtectedWebContent())
         webViewHost.load()
         installBackHandler()
     }
@@ -119,6 +124,19 @@ class HybridActivity : ComponentActivity() {
             isAppearanceLightNavigationBars = true
         }
     }
+
+    private fun createProtectedWebContent(): ProtectionLayout =
+        ProtectionLayout(this).apply {
+            setProtections(
+                listOf(
+                    GradientProtection(
+                        WindowInsetsCompat.Side.TOP,
+                        ContextCompat.getColor(this@HybridActivity, R.color.hybrid_brand_header),
+                    ),
+                ),
+            )
+            addView(webViewHost.webView)
+        }
 
     private fun testBackupDocumentPicker(): BackupDocumentPicker? =
         if (BuildConfig.DEBUG) backupDocumentPickerForTesting else null

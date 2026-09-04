@@ -41,9 +41,9 @@ There is no Phase 12.1 P0 finding: the review exposed no saved secret, destructi
 
 ### P1 — fix before broad visual polish
 
-1. **Intermittent WebView paint completeness on state changes.** Several captured states retain container backgrounds while omitting some text/icons, header content, or the active bottom-navigation label. The most severe examples are `028-accounts-record-payment-top.png` and `045-customers-empty-search-result-top.png`; partial instances also occur in later cost/backup states. This reproduced with both the original screenshot API and compositor capture, then remained after WebView visual-state synchronization. It must be isolated on the physical device before treating later screenshots as pixel-stable.
-2. **System-bar contrast and edge-to-edge insets.** The activity always requests light-colored status icons. They become faint on the cream authentication background, and long-page content scrolls underneath the transparent status bar while the icon mode remains suited to the green header. Bottom captures visibly clip content at the top edge.
-3. **Daily-work task tabs do not fit the phone.** Seven actions share one horizontal strip. Later labels are clipped or off-screen, a scrollbar is visible, and the current task can be difficult to identify without swiping.
+1. **Apparent WebView paint completeness on state changes — resolved as a review-preview artifact in 12.2.** Some scaled previews of tall screenshots appeared to retain containers while omitting text/icons. Original-size pixel inspection and exact crops showed the supposedly missing brand, header, navigation, and body glyphs in the saved PNGs. A second PixelCopy and visual-state-synchronized 81-image set confirms the source evidence, while a 60-transition normal-use device check shows no corresponding app failure. Reviewers must verify the source file or a crop before filing this visual symptom as a product defect.
+2. **System-bar contrast and edge-to-edge insets — resolved in 12.2.** The activity now protects the transparent top inset with the exact header color while retaining edge-to-edge behavior and readable white status icons. The physical-device system-inset and presentation checks pass together.
+3. **Daily-work task tabs do not fit the phone — assigned to 12.3.** Seven actions share one horizontal strip. Later labels are clipped or off-screen, a scrollbar is visible, and the current task can be difficult to identify without swiping.
 
 ### P2 — address while applying the Phase 12 presentation system
 
@@ -57,7 +57,7 @@ There is no Phase 12.1 P0 finding: the review exposed no saved secret, destructi
 
 - Phase 12.1 changed test/evidence infrastructure only; production UI and business behavior are untouched.
 - The findings are presentation defects or risks. Native accounting, authorization, audit, backup, and recovery semantics remain outside this phase's UI edit boundary.
-- Baseline screenshots are review evidence, not golden tests yet. Pixel-diff gating waits until the physical-device paint defect and the Phase 12.2 visual target are resolved.
+- Baseline screenshots are review evidence, not golden tests yet. The apparent paint defect was isolated to scaled previewing, and the Phase 12.2 visual target is now locked; screen-level golden-test policy can be decided after 12.4 completes the intended visual changes.
 
 ## Verification
 
@@ -68,8 +68,8 @@ There is no Phase 12.1 P0 finding: the review exposed no saved secret, destructi
 
 ## Next gate
 
-Checkpoint 12.2 will first isolate the P1 paint/inset behavior, then lock the visual target and presentation tokens before production screen-by-screen changes begin.
+Checkpoint 12.2 resolved the paint/inset questions and locked `DESIGN.md`. Checkpoint 12.3 now addresses navigation and natural task flow, beginning with Daily work and secondary destinations under `More`.
 
 ## Plain English
 
-We photographed every important app screen and state on the real Samsung phone, using realistic shop data. The app is generally clear, but we found four practical problems to solve next: some WebView content can fail to paint after changing views, the phone status bar clashes with light/scrolled screens, the daily-work tabs are overcrowded, and common forms require too much scrolling.
+We photographed every important app screen and state on the real Samsung phone, using realistic shop data. The text that seemed to disappear was actually present in the files—the tall-image preview was misleading. The phone-level status-bar foundation is now corrected. The next real usability problem is navigation, especially the overcrowded Daily work choices and secondary screens hidden under `More`; form density and accessibility follow in 12.4.

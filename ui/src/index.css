@@ -1,8 +1,27 @@
 @import "tailwindcss";
 
+:root {
+  color-scheme: light;
+  --saaf-color-brand-header: #004f3b;
+  --saaf-color-brand-action: #007a55;
+  --saaf-color-brand-soft: #ecfdf5;
+  --saaf-color-canvas: #f7f6f0;
+  --saaf-color-surface: #ffffff;
+  --saaf-color-text: #0f172a;
+  --saaf-color-text-muted: #475569;
+  --saaf-color-outline: #cbd5e1;
+  --saaf-space-1: 0.25rem;
+  --saaf-space-2: 0.5rem;
+  --saaf-space-3: 0.75rem;
+  --saaf-space-4: 1rem;
+  --saaf-space-6: 1.5rem;
+  --saaf-space-8: 2rem;
+  --saaf-radius-control: 0.75rem;
+  --saaf-radius-surface: 1rem;
+}
+
 html {
-  scrollbar-gutter: stable;
-  overflow-y: scroll;
+  overflow-y: auto;
   --saaf-system-top: env(safe-area-inset-top, 0px);
   --saaf-system-bottom: env(safe-area-inset-bottom, 0px);
   --saaf-ime-bottom: 0px;
@@ -18,7 +37,9 @@ body,
 
 @layer base {
   body {
-    @apply antialiased bg-[#f7f6f0] text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-900;
+    @apply antialiased selection:bg-emerald-500/20 selection:text-emerald-900;
+    background: var(--saaf-color-canvas);
+    color: var(--saaf-color-text);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     min-height: var(--saaf-visual-viewport-height);
     overscroll-behavior-y: none;
@@ -30,6 +51,7 @@ body,
 }
 
 .hybrid-header {
+  background: var(--saaf-color-brand-header);
   padding-top: max(1.75rem, calc(var(--saaf-system-top) + 0.75rem));
 }
 
@@ -70,6 +92,29 @@ html[data-ime-visible="true"] .hybrid-overlay {
 
 .animate-fadeIn {
   animation: fadeIn 0.18s ease-out forwards;
+}
+
+:where(button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--saaf-color-brand-action) 72%, white);
+  outline-offset: 2px;
+}
+
+@media (min-width: 48rem) and (hover: hover) and (pointer: fine) {
+  html {
+    scrollbar-gutter: stable;
+    overflow-y: scroll;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Custom subtle scrollbar */

@@ -1,6 +1,10 @@
 package com.saaf.milkshop
 
+import android.graphics.Bitmap
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
+import android.view.PixelCopy
 import android.webkit.WebView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
@@ -12,6 +16,7 @@ import org.json.JSONObject
 import org.junit.Assert.assertTrue
 
 internal class HybridWebViewTestDriver private constructor(
+    private val activity: HybridActivity,
     val webView: WebView,
 ) {
     fun ensureSignedIn(timeoutMs: Long = 20_000L) {
@@ -45,11 +50,30 @@ internal class HybridWebViewTestDriver private constructor(
         return result.get()
     }
 
+    fun captureWindow(): Bitmap {
+        val width = activity.window.decorView.width
+        val height = activity.window.decorView.height
+        assertTrue("Activity window is not laid out for capture", width > 0 && height > 0)
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val result = AtomicReference<Int>()
+        val latch = CountDownLatch(1)
+        PixelCopy.request(
+            activity.window,
+            bitmap,
+            { copyResult -> result.set(copyResult); latch.countDown() },
+            Handler(Looper.getMainLooper()),
+        )
+        assertTrue("PixelCopy timed out", latch.await(5, TimeUnit.SECONDS))
+        assertTrue("PixelCopy failed with result ${result.get()}", result.get() == PixelCopy.SUCCESS)
+        return bitmap
+    }
+
     companion object {
         fun attach(scenario: ActivityScenario<HybridActivity>): HybridWebViewTestDriver {
-            val holder = AtomicReference<WebView>()
-            scenario.onActivity { holder.set(it.webViewForTesting()) }
-            return HybridWebViewTestDriver(holder.get())
+            val activityHolder = AtomicReference<HybridActivity>()
+            scenario.onActivity { activityHolder.set(it) }
+            val activity = activityHolder.get()
+            return HybridWebViewTestDriver(activity, activity.webViewForTesting())
         }
     }
 }

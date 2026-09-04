@@ -49,6 +49,7 @@ import com.saaf.milkshop.domain.YogurtProductionInput
 import com.saaf.milkshop.domain.YogurtProductionService
 import com.saaf.milkshop.hybrid.HybridActivity
 import java.io.File
+import java.io.FileOutputStream
 import java.time.Instant
 import java.time.LocalDate
 import java.util.concurrent.CountDownLatch
@@ -93,7 +94,7 @@ class Phase12VisualBaselineCaptureTest {
 
         val scenario = ActivityScenario.launch(HybridActivity::class.java)
         try {
-            val driver = HybridWebViewTestDriver.attach(scenario)
+            var driver = HybridWebViewTestDriver.attach(scenario)
             driver.waitFor("document.getElementById('create-owner-button') !== null", 30_000L)
             capturePage(driver, "auth-owner-setup")
 
@@ -130,11 +131,19 @@ class Phase12VisualBaselineCaptureTest {
             captureHistory(driver, seeded)
             navigate(driver, "cash-close-nav", "cash-close", "document.getElementById('cash-count-form') !== null")
             capturePage(driver, "cash-close-count-and-history")
+
+            scenario.recreate()
+            driver = HybridWebViewTestDriver.attach(scenario)
+            driver.waitFor("document.getElementById('app-navigation') !== null", 30_000L)
             captureProducts(driver, seeded)
             captureCustomers(driver, seeded)
             captureSuppliers(driver, seeded)
             captureEmployees(driver, seeded)
             captureCostingAndPlanning(driver)
+
+            scenario.recreate()
+            driver = HybridWebViewTestDriver.attach(scenario)
+            driver.waitFor("document.getElementById('app-navigation') !== null", 30_000L)
             captureSettings(driver)
             captureAccess(driver)
             captureBackup(driver)
@@ -445,7 +454,19 @@ class Phase12VisualBaselineCaptureTest {
         assertTrue("WebView did not commit $state for capture", visualStateReady.await(5, TimeUnit.SECONDS))
         instrumentation.waitForIdleSync()
         SystemClock.sleep(350)
-        executeShell("screencap -p $PUBLIC_OUTPUT_DIRECTORY/$filename")
+        val bitmap = driver.captureWindow()
+        try {
+            val captureFile = File(outputDirectory, filename)
+            FileOutputStream(captureFile).use { output ->
+                assertTrue(
+                    "Could not encode $filename",
+                    bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, output),
+                )
+            }
+            executeShell("cp ${captureFile.absolutePath} $PUBLIC_OUTPUT_DIRECTORY/$filename")
+        } finally {
+            bitmap.recycle()
+        }
         manifestRows += "$filename\t$state\t$position\t${Build.MANUFACTURER} ${Build.MODEL}\t${Build.VERSION.RELEASE}"
         syncManifest()
     }

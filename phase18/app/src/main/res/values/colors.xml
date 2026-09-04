@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Packaged hybrid UI: shared with the Phase 12 WebView header and status-bar protection. -->
+    <color name="hybrid_brand_header">#004F3B</color>
+
     <!-- Phase 11A: Material-style semantic color roles.
          These are design tokens only; existing screens are migrated in later checkpoints. -->
     <color name="milk_shop_color_primary">#315B72</color>

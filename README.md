@@ -1,8 +1,8 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-04 — hybrid Phases 0–11 are complete; Phase 12 UI Fidelity is next. Contract v4 exposes 86 native-backed operations. Phase 11 closes cloud outbox/process-death, provider-failure, cancellation, repeated-restore, identity/session, concurrent-write/correction, measured large-history, deferred-NRV decision, final-regression, and handoff paths.
+Status: RECONCILED 2026-09-04 — hybrid Phases 0–11 are complete; Phase 12 UI Fidelity is active with checkpoint 12.1 complete. Contract v4 exposes 86 native-backed operations. Phase 11 closes cloud outbox/process-death, provider-failure, cancellation, repeated-restore, identity/session, concurrent-write/correction, measured large-history, deferred-NRV decision, final-regression, and handoff paths.
 
-Latest physical-device checkpoint: the complete isolated-QA connected-device suite passes 247/247; host-side tests pass 7/7.
+Latest physical-device checkpoint: the Phase 12 baseline captured 81 screenshots across 57 named states on the Samsung SM-A065F / Android 16; its focused capture test passes 1/1. The complete isolated-QA connected-device suite remains 247/247; host-side tests remain 7/7.
 
 ## What this repository contains
 
@@ -30,6 +30,8 @@ Latest physical-device checkpoint: the complete isolated-QA connected-device sui
 - `PHASE11.md` — completed integrity/recovery/concurrency ledger and final verification.
 - `PHASE11_5_NRV_TRIGGER_REASSESSMENT.md` — completed lower-of-cost/NRV trigger decision, evidence gaps, reopen conditions, and minimum future design boundary.
 - `PHASE11_6_HANDOFF.md` — final regression matrix, immutable hashes, known limitations, and guarded Phase 12 entry conditions.
+- `PHASE12.md` — active UI-fidelity checkpoints and locked presentation-only boundaries.
+- `PHASE12_SCREEN_AUDIT.md` — completed physical-device screenshot matrix, visual findings, and Phase 12.2 gate.
 
 ## Immutable baselines
 
@@ -41,7 +43,7 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 11 — Integrity / Recovery / Concurrency: COMPLETE (checkpoints 11.1–11.6)**
+**Phase 12 — UI Fidelity: IN PROGRESS (checkpoint 12.1 complete)**
 
 Phase 8's native-backed shop screens and all 78 frozen operations remain intact. Phase 9 adds grouped role-aware navigation, predictable Android Back behavior, a separate QA installation, focused file boundaries, one non-reloading React/WebView presentation, secure Activity recreation, deliberate keyboard/system-inset behavior, targeted state refresh with bridge-transfer measurement, and native recovery from main-page or WebView-renderer failure. A recovery reload creates a fresh WebView and revalidates the memory-only session before protected information appears. The complete isolated-QA physical-device regression passes 218/218.
 
@@ -101,7 +103,7 @@ Phase 10 — Functional Product Completion ✅ (checkpoints 10.1–10.5 complete
 
 Phase 11 — Integrity / Recovery / Concurrency ✅ (all six checkpoints complete; 247/247 final device regression)
 
-Phase 12 — UI Fidelity ⏳ (next; begin from `PHASE11_6_HANDOFF.md`, including the deferred measured presentation-performance note; no broad optimization rewrite is approved)
+Phase 12 — UI Fidelity ⏳ (checkpoint 12.1 complete: 81 physical-device screenshots across 57 named states; checkpoint 12.2 visual target and presentation system next)
 
 Phase 13 — Dead/Mock/Misleading UI Cleanup ⏳
 
@@ -166,4 +168,4 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 
 ## Next gate
 
-Phases 3–11 are closed. The final fresh-package gates pass: bridge v4/86, TypeScript/Vite, Android packaging and Kotlin compilation, 7/7 host tests, 23/23 dedicated Phase 11 tests, the reused 16/16 costing/reporting boundary, and 247/247 complete isolated Samsung tests with zero skipped or failed. Begin Phase 12 UI Fidelity from `PHASE11_6_HANDOFF.md`. Use Phases 14–16 for live Google consent/Drive, second-device, shopkeeper, and release acceptance. See `PHASE11.md`, `PHASE11_5_NRV_TRIGGER_REASSESSMENT.md`, `PHASE11_6_HANDOFF.md`, `PHASE10_4_IMPLEMENTATION_REPORT.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–11 are closed. Phase 12.1 now adds a complete 81-image Samsung baseline and screen audit without production behavior changes. Next, checkpoint 12.2 must isolate the recorded paint/inset issues and lock the visual target before broad UI edits. The last full fresh-package gates remain bridge v4/86, TypeScript/Vite, Android packaging and Kotlin compilation, 7/7 host tests, 23/23 dedicated Phase 11 tests, the reused 16/16 costing/reporting boundary, and 247/247 complete isolated Samsung tests with zero skipped or failed. Use Phases 14–16 for live Google consent/Drive, second-device, shopkeeper, and release acceptance. See `PHASE12.md`, `PHASE12_SCREEN_AUDIT.md`, `PHASE11_6_HANDOFF.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.

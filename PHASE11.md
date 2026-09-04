@@ -1,6 +1,6 @@
 # Phase 11 — Integrity / Recovery / Concurrency
 
-Status: **IN PROGRESS — checkpoints 11.1–11.5 complete**
+Status: **COMPLETE — checkpoints 11.1–11.6 complete**
 
 ## 1. Purpose
 
@@ -80,29 +80,38 @@ Completed 2026-09-04. See `PHASE11_5_NRV_TRIGGER_REASSESSMENT.md`.
 - Formal NRV write-down/reversal support remains conditionally deferred. Reports continue to disclose `cost_based_management` / `cost_only_no_nrv` and make no statutory or IFRS-compliance claim.
 - No formula, threshold, Room schema, bridge operation, UI action, or production code changed. The decision record defines the exact reopen questions and minimum separately approved design if a trigger later appears.
 
-### 11.6 — Full regression and handoff ⏳
+### 11.6 — Full regression and handoff ✅
 
-Run host, bridge, UI/package, focused device, and complete isolated-device gates; verify immutable hashes; record limitations; and hand off to Phase 12 only after the hardening matrix closes.
+Completed 2026-09-04. See `PHASE11_6_HANDOFF.md`.
 
-## 4. Verification at this checkpoint
+- The canonical bridge, TypeScript no-emit, Vite production build, Android asset packaging, Kotlin production/test compilation, and host-test gates pass from final source.
+- Freshly built `ui/dist` and Android packaged index/CSS/JavaScript hashes match exactly.
+- The dedicated Phase 11 physical-device suite passes 23/23, and the final complete isolated-QA suite passes 247/247 with zero skipped or failed.
+- Immutable logic and SQL hashes remain unchanged; the debug APK is recorded by SHA-256 in the handoff.
+- Remaining live-provider, second-device, real-shopkeeper, release, NRV-trigger, owner-phone, and presentation limitations are explicitly assigned to later gates.
+- Phase 12 receives guarded presentation scope and ordered entry conditions without reopening native business semantics.
+
+## 4. Final verification
 
 - Bridge drift gate: v4, 86 operations, SHA-256 `D22921E90040EF70CED8AFDE535C6309544B75D5EBD7B726ED1DE1273E0FA136`.
 - Frozen logic specification: `45E5BDDABE8861A1B3DF7C5666AC7673078439A89FA5628061AD293A865F9DEA` (unchanged).
 - Frozen SQL blueprint: `FB701C90D2DD97A1E6D962154692C48EA0F4E77E9300F9DFAC653D4AB67BBC51` (unchanged).
+- React TypeScript no-emit and Vite production build: pass; Android packaged assets exactly match the fresh production bundle.
 - Kotlin and Android-test Kotlin compilation: pass.
 - Phase 11 focused device tests: 23/23 pass (15 cloud durability/provider-failure + 5 restore/identity/session + 3 concurrent-write/large-history).
 - Reused costing/reporting boundary device tests for checkpoint 11.5: 16/16 pass (`Phase3CostingTest`, `Phase8DashboardReportsTest`, and `Phase8CostingPlanningTest`; already included in the complete suite total).
 - Host-side debug unit tests: 7/7 pass.
-- Complete isolated-QA Samsung instrumentation regression: 247/247 pass, 0 skipped, 0 failed.
+- Complete isolated-QA Samsung instrumentation regression: 247/247 pass, 0 skipped, 0 failed (final run 5m16s).
+- Final debug APK SHA-256: `68FBF7093B6CE0BDBB1AAA8A4622716B3E0A6AB1D95F29E6A0F6CEFB5BC775FD`.
 
 ## 5. Known external gates
 
-Production OAuth consent, live Drive upload/revocation/quota testing, and replacement-device recovery require a configured Google OAuth client and remain final acceptance work for Phases 14–16. The optional owner-phone viewer remains deferred and, if approved, must be read-only.
+Production OAuth consent, live Drive upload/revocation/quota testing, and replacement-device recovery require a configured Google OAuth client and remain final acceptance work for Phases 14–16. The optional owner-phone viewer remains deferred and, if approved, must be read-only. Formal NRV remains conditionally deferred under `PHASE11_5_NRV_TRIGGER_REASSESSMENT.md`. Physical-device evidence is isolated debug QA on one Samsung; shopkeeper, release, compatibility, and release-performance acceptance remain later gates. See `PHASE11_6_HANDOFF.md` for the complete limitations ledger.
 
 ## 6. Current next action
 
-Continue checkpoint 11.6 with the final host, bridge, UI/package, focused-device, complete isolated-device, immutable-hash, limitations, and Phase 12 handoff gates.
+Begin Phase 12 UI Fidelity from `PHASE11_6_HANDOFF.md`: capture the physical-device visual/task-flow baseline, agree the visual target, and preserve every native accounting, security, bridge, recovery, and backup boundary.
 
 ## Plain English
 
-Phase 11 has proven cloud failure handling, destructive recovery, coherent backup during writes/corrections, and repeated recovery of a measured 5,000-event history. It also rechecked the advanced lower-selling-value question: the app lacks the business evidence needed to calculate it honestly, and no trigger has been supplied, so the clear “recorded cost only” warning remains instead of guessing. The final Phase 11 regression and handoff are next.
+Phase 11 is finished. We tested interrupted and failed backups, repeated and failed restores, identity/session safety, writes and corrections during backup, and repeated recovery of a large history. The app kept committed records coherent, and all 247 device tests pass. The next phase may improve how the app looks and feels, but accounting and security must remain native-owned.

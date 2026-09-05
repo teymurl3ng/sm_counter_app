@@ -1,6 +1,6 @@
 # Phase 14.3 — Live Google Drive Preflight
 
-Status: **PREFLIGHT COMPLETE — live execution waiting for approved OAuth clients and an owner-controlled test account**
+Status: **LIVE EXECUTION IN PROGRESS — consent, initial encrypted upload, and recovery-point listing verified**
 
 Date: 2026-09-06  
 Primary QA device: Samsung SM-A065F / Android 16 / API 36  
@@ -10,7 +10,21 @@ QA package: `com.saaf.milkshop.qa` / `0.1.0-qa`
 
 The app-side cloud-backup implementation and physical-device prerequisites are ready for a live Google Drive run. The non-live provider, scheduling, failure, and recovery matrix passes **25/25** on the explicitly isolated QA build with zero skips or failures. The accepted QA APK remains byte-for-byte reproducible at SHA-256 `E7C8CA158B1688497C15DA77B73FAA008F8F781210650080DFADC34A7291BA6C`.
 
-Live acceptance has not yet been claimed. The generated build still contains no Google Web OAuth client ID, and no approved Google Cloud project/test account was supplied. Consent, real upload/listing/download, and revocation therefore remain deliberately unexecuted.
+Full live acceptance has not yet been claimed. Consent, initial encrypted upload, and recovery-point listing are now proven; manual upload, offline/retry and degraded-operation behavior, recovery-point inspection, and revocation remain to be exercised.
+
+## Live execution evidence — 2026-09-06
+
+- The user configured the external/testing OAuth audience, one owner-controlled test user, the narrow `drive.appdata` scope, the QA Android client, and the matching Web client in the dedicated `saaf-milk-qa` Cloud project.
+- The Web client ID was supplied only as a local Gradle command-line property. It was not written to tracked source.
+- The OAuth-enabled isolated QA APK built successfully with contract v4 / 86 endpoints and the UI cleanup gate intact. Its SHA-256 is `305BF889747164E675882213F203DD4B3FE6E2F70590057686B13080543739F8`.
+- The APK was verified as `com.saaf.milkshop.qa` / `0.1.0-qa`, installed only on the primary QA Samsung, and initialized with disposable test data.
+- Real Google consent and Drive connection completed. After reloading the Cloud area, the app reported one recovery point, `Last verified` at `2026-09-06 02:31:54`, and no cloud error.
+
+### Finding F14.3-01 — interactive connection outlives the bridge timer
+
+The first live connection displayed `The app took too long to respond. Please try again.` before the user could see completion, then reset the visible form. Retrying produced a passphrase error. Leaving and returning to Cloud loaded the successfully persisted Google account and verified recovery point.
+
+Code inspection confirms the shared web bridge deletes every pending request after 30 seconds, while native `connectCloudBackup` legitimately waits for recovery-passphrase entry, Google account selection/consent, Drive identity verification, configuration, and scheduling. The native operation is not cancelled when the web request times out, so it can complete successfully after the UI has declared failure. This is a real feedback/reconciliation defect, not a failed backup or user mistake. Preserve the successful connection during the remaining acceptance checks; fix the interactive timeout and post-resume status reconciliation before Phase 14 closes.
 
 ## Official setup requirements
 

@@ -1,6 +1,6 @@
 # Phase 14 — Final Device QA
 
-Status: **IN PROGRESS — checkpoint 14.1 complete; checkpoint 14.2 next**
+Status: **IN PROGRESS — checkpoints 14.1–14.2 complete; checkpoint 14.3 next (external OAuth/account prerequisite)**
 
 ## Purpose
 
@@ -28,12 +28,14 @@ Validate the finished hybrid application under real Android, role, accessibility
 
 Completed on Samsung SM-A065F / Android 16. The exact `com.saaf.milkshop.qa` APK rebuilt and installed after the bridge and cleanup gates passed; its SHA-256 remains `E7C8CA158B1688497C15DA77B73FAA008F8F781210650080DFADC34A7291BA6C`. The clean first-owner screen is unobscured at 720 × 1600 with system dark mode enabled and normal text size. The Phase 13.5 258/258 device and 7/7 host regression is accepted as the unchanged entry baseline. Real Drive testing still needs a build-time Google OAuth web client ID and owner-controlled test account. A second Samsung SM-S921W / Android 16 is now connected, but it already contains the ordinary `com.saaf.milkshop` package and is not an approved destructive-QA target; nothing was installed or changed on it. See `PHASE14_1_DEVICE_QA_BASELINE.md`.
 
-### 14.2 — Roles, permissions, sessions, and bypass attempts
+### 14.2 — Roles, permissions, sessions, and bypass attempts ✅
 
 - Exercise owner, admin, manager, cashier, and operator journeys through the packaged hybrid UI.
 - Verify hidden/disabled presentation states and independently attempt forbidden native bridge actions so UI hiding is never treated as authorization.
 - Cover privileged-user administration, backup/restore restrictions, recent reauthentication, account disablement/role change, logout, session expiry, lifecycle recreation, and audit evidence.
 - Add only targeted regression coverage when a real untested boundary is found.
+
+Completed on the isolated Samsung SM-A065F / Android 16. Two new tests exercise all five roles through the packaged UI and valid native-bypass probes across every bridge-contract permission, plus the separate owner-only privileged-user and cloud boundaries. The focused matrix passes 2/2, the related security/session/backup/lifecycle/recovery regression passes 36/36, and host tests pass 7/7. No production defect was found, so the app UI, functions, formulas, and business behavior are unchanged. The full device-suite inventory is now 260 tests; its complete two-part rerun remains the 14.6 closure gate. See `PHASE14_2_ROLE_PERMISSION_QA.md`.
 
 ### 14.3 — Live Google Drive and resilience
 
@@ -59,7 +61,7 @@ Completed on Samsung SM-A065F / Android 16. The exact `com.saaf.milkshop.qa` APK
 ### 14.6 — Defect closure, complete regression, and Phase 15 handoff
 
 - Resolve verified in-scope defects in bounded batches, preserving the frozen product and business boundaries.
-- Rerun affected tests, build/contract/cleanup/hash gates, 7/7 host tests, and the complete 258-test two-part physical-device regression.
+- Rerun affected tests, build/contract/cleanup/hash gates, 7/7 host tests, and the complete 260-test two-part physical-device regression.
 - Publish device/provider/recovery evidence, remaining limitations, and the guarded Phase 15 shopkeeper-QA handoff.
 
 ## Evidence policy
@@ -72,8 +74,8 @@ Completed on Samsung SM-A065F / Android 16. The exact `com.saaf.milkshop.qa` APK
 
 ## Current next action
 
-Run checkpoint 14.2 on the isolated-QA Samsung: convert the frozen role-permission contract into a focused packaged-UI and native-bypass matrix, execute the currently automatable cases, and document any genuine gap before changing source. Checkpoint 14.3 waits for its real OAuth/account prerequisite. Checkpoint 14.4 has a connected candidate phone, but installing the separate QA package or performing recovery there requires an explicit safe-use decision because its ordinary Saaf installation must remain untouched.
+Prepare checkpoint 14.3 without claiming live-provider acceptance: supply an approved Google OAuth web client ID outside source control and an owner-controlled test Google account, then run consent, upload, listing, retry/degraded-operation, and revocation tests on the isolated-QA Samsung. Checkpoint 14.4 has a connected candidate phone, but installing the separate QA package or performing recovery there requires an explicit safe-use decision because its ordinary Saaf installation must remain untouched.
 
 ## Plain English
 
-Phase 14 has started. We confirmed the safe test version installs and opens correctly on the primary Samsung, and we identified exactly what is available and what is still needed. Next we will try every user role and deliberately attempt actions those users should not be allowed to perform. Real Google Drive testing will begin when a test OAuth setup/account is available. A second phone is connected, but because it already has the ordinary Saaf app, we will not install or restore anything on it until its use as a separate QA target is confirmed.
+The safe test app works on the primary Samsung, and every user role now sees only its approved work. Direct attempts to bypass the screens were also blocked by Android/native code. No app defect was found in this checkpoint. Next is real Google Drive testing, which needs a test OAuth setup and owner-controlled Google account. The second phone still has its ordinary Saaf app and will not be changed until separate QA use is confirmed.

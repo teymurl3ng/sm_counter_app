@@ -16,9 +16,9 @@ Read those files before changing code.
 
 ## Current superseding checkpoint — 2026-09-06
 
-The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–13 are complete, and Phase 14 Final Device QA is next. Read `README.md`, `PHASE13.md`, `PHASE13_5_HANDOFF.md`, and the earlier Phase 13 checkpoint reports before changing source.
+The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–13 are complete. Phase 14 Final Device QA is active with checkpoint 14.1 complete and 14.2 next. Read `README.md`, `PHASE14.md`, `PHASE14_1_DEVICE_QA_BASELINE.md`, and `PHASE13_5_HANDOFF.md` before changing source.
 
-Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and the root phase records for current status. The runtime exposes all 86 contract-v4 actions. Phase 13 removed the unreachable browser-local prototype and unused dependencies, audited the complete active UI, removed one misleading combined opening-balance total, and added mandatory cleanup gates to npm/Vite and Android `preBuild`. Its final isolated-QA Samsung regression passes 258/258 across the authenticated 257-test and empty-identity 1-test partitions; 83 readable review screenshots / 58 states are preserved, and host-side debug unit tests pass 7/7.
+Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and the root phase records for current status. The runtime exposes all 86 contract-v4 actions. The Phase 13 final isolated-QA Samsung regression passes 258/258 across the authenticated 257-test and empty-identity 1-test partitions; 83 readable review screenshots / 58 states are preserved, and host-side debug unit tests pass 7/7. Phase 14.1 rebuilt and installed only `com.saaf.milkshop.qa` on the primary Samsung, preserved the final APK hash, and captured a clean first-run baseline. Live Drive still needs an external OAuth client/account. A second Samsung is connected, but its existing ordinary `com.saaf.milkshop` installation was left untouched and must be explicitly protected before any separate QA recovery use.
 
 Application user accounts and native role-based authorization are explicitly approved as a required cross-phase capability. Their schema-7 model, encrypted backup boundary, app-owned sessions, private staff enrollment/reset, user administration, role-aware navigation, recovery, security audit, and command-boundary authorization are implemented and now wired into React. Application users are security principals separate from employee/salary profiles, with an optional link between them. The schema-v6 daily-close actor name/role is transitional asserted metadata, not authenticated identity.
 
@@ -29,7 +29,7 @@ The two completed Phase 3 design tracks were:
 1. authenticated users, credentials, roles/permissions, sessions, recovery, audit actor IDs, migration, and backup/restore security;
 2. authoritative costing/COGS and profitability semantics.
 
-The researched native security and costing recommendations are implemented and device-verified. Phases 8–13 are complete; Phase 13 closes dead/mock/misleading cleanup with automatic negative guards, 83 screenshots / 58 retained states, and a 258/258 complete isolated-QA regression. Phase 14 real-device acceptance is the continuation point. Release compiler/profile work remains assigned to Phase 16.
+The researched native security and costing recommendations are implemented and device-verified. Phases 8–13 are complete; Phase 13 closes dead/mock/misleading cleanup with automatic negative guards, 83 screenshots / 58 retained states, and a 258/258 complete isolated-QA regression. Phase 14.2 packaged role/permission and native-bypass testing is the continuation point. Release compiler/profile work remains assigned to Phase 16.
 
 ---
 

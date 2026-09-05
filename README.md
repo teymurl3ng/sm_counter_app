@@ -1,10 +1,10 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-06 — hybrid Phases 0–13 are complete; Phase 14 Final Device QA is active with checkpoints 14.1–14.2 complete and 14.3 next. Contract v4 exposes 86 native-backed operations. The unreachable 23-file, 8,370-line browser-local prototype and six unused dependencies are removed; the 85-file production graph and its live controls/messages have been audited, and automatic web/Android build gates prevent the removed behavior from returning.
+Status: RECONCILED 2026-09-06 — hybrid Phases 0–13 are complete; Phase 14 Final Device QA is active with checkpoints 14.1–14.2 complete and the 14.3 preflight complete. Live Drive execution waits for the approved OAuth clients/account. Contract v4 exposes 86 native-backed operations. The unreachable 23-file, 8,370-line browser-local prototype and six unused dependencies are removed; the 85-file production graph and its live controls/messages have been audited, and automatic web/Android build gates prevent the removed behavior from returning.
 
 Latest complete physical-device checkpoint: Phase 13.5 passes 258/258 on Samsung SM-A065F / Android 16 across the authenticated 257-test and clean-identity 1-test visual partitions, with zero skips or failures. The final visual audit reproduces 83 readable screenshots / 58 states at 720 × 1600, and host-side tests pass 7/7.
 
-Phase 14.1 rebuilt and installed only `com.saaf.milkshop.qa` on the primary Samsung and locked the device baseline. Phase 14.2 then passed a 2/2 all-role packaged-UI/native-bypass matrix, a 36/36 related security/recovery regression, and 7/7 host tests without finding a production defect. The device-suite inventory is now 260 tests. Live Drive testing still requires a build-time Google OAuth web client ID and owner-controlled test account. A second Samsung is connected, but its existing ordinary `com.saaf.milkshop` installation was left untouched and requires explicit safe-use confirmation before a separate QA recovery test.
+Phase 14.1 locked the isolated Samsung baseline, and Phase 14.2 passed its all-role UI/native permission checks. Phase 14.3 preflight now passes the 25/25 explicit-QA cloud resilience suite and confirms the narrow Drive scope, reproducible APK, and ready phone environment. Live Drive testing still requires matching Android/Web OAuth clients and an owner-controlled test account. A second Samsung is connected, but its existing ordinary `com.saaf.milkshop` installation was left untouched and requires explicit safe-use confirmation before a separate QA recovery test.
 
 Product scope: Saaf Milk is the current working product identity, and Milk/Yogurt are the current validated domain—not permanent limits. The product is intended to expand carefully to other products and suitable owner-managed shop contexts without pretending to be a corporate ERP or complete statutory accounting system. See `PRODUCT_SCOPE.md`.
 
@@ -51,6 +51,7 @@ Product scope: Saaf Milk is the current working product identity, and Milk/Yogur
 - `PHASE14.md` — active final-device-QA checkpoints, locked boundaries, evidence policy, prerequisites, and current next action.
 - `PHASE14_1_DEVICE_QA_BASELINE.md` — connected-device inventory, clean QA installation proof, provider/second-device prerequisites, existing test credit, and evidence hashes.
 - `PHASE14_2_ROLE_PERMISSION_QA.md` — complete five-role packaged-UI matrix, native bypass probes, sensitive backup/cloud boundaries, and focused regression evidence.
+- `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md` — official two-client OAuth requirements, exact QA identity, 25-test cloud-resilience proof, safe live sequence, and remaining user input.
 
 ## Immutable baselines
 
@@ -62,7 +63,7 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 14 — Final Device QA: IN PROGRESS (checkpoints 14.1–14.2 complete; 14.3 next)**
+**Phase 14 — Final Device QA: IN PROGRESS (14.3 preflight complete; live Drive execution waiting for OAuth/account setup)**
 
 Phase 13 removed the unreachable prototype, audited all live UI controls and meanings, corrected the misleading combined opening-balance total, and made the cleanup rules mandatory in web and Android builds. Its final Samsung regression passes 258/258, host tests pass 7/7, and 83-screen evidence is preserved. Phase 14.1 established the safe `.qa` installation and honest external prerequisites. Phase 14.2 now proves all five roles' exact packaged UI and native authorization boundaries; its two new tests pass 2/2, the related regression passes 36/36, and no production defect was found.
 
@@ -128,7 +129,7 @@ Phase 12 — UI Fidelity ✅ (all six checkpoints complete; 83-screen final evid
 
 Phase 13 — Dead/Mock/Misleading UI Cleanup ✅ (all five checkpoints complete; 258/258 final device regression and Phase 14 handoff verified)
 
-Phase 14 — Final Device QA ⏳ (14.1–14.2 complete; 14.3 live Drive is next and needs external OAuth/account setup; second-device and accessibility gates remain)
+Phase 14 — Final Device QA ⏳ (14.3 preflight passes 25/25; live Drive needs matching OAuth clients/account; second-device and accessibility gates remain)
 
 Phase 15 — Final Shopkeeper QA ⏳ (includes periodic backup/recovery and owner-phone snapshot viewing if approved)
 
@@ -199,7 +200,8 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 14.1 isolated-QA build/install and clean first-run Samsung baseline pass; APK SHA-256 remains `E7C8CA158B1688497C15DA77B73FAA008F8F781210650080DFADC34A7291BA6C`.
 - Phase 14.1 confirms two connected Samsung phones and no configured Google OAuth web client ID. The primary phone holds the isolated QA app; the candidate recovery phone already holds the ordinary Saaf package and was deliberately left untouched pending safe-use confirmation.
 - Phase 14.2 adds two role/permission tests: the all-five-role packaged UI and native-bypass matrix passes 2/2; the related security/session/backup/lifecycle/recovery regression passes 36/36; host tests pass 7/7. The complete device-suite inventory is now 260 tests, with the full rerun reserved for Phase 14.6.
+- Phase 14.3 preflight explicitly rebuilds the isolated QA identity and passes 25/25 cloud provider/durability/failure/recovery tests. The accepted QA APK hash is reproduced; live OAuth/Drive remains unclaimed until its external clients/account exist.
 
 ## Next gate
 
-Phases 3–13 and Phase 14.1–14.2 are closed. The immediate next gate is Phase 14.3 live Google Drive consent, encrypted upload/listing, offline/retry behavior, and revocation on the isolated QA phone. It cannot claim acceptance until an approved build-time OAuth web client ID and owner-controlled test account are supplied outside source control. Accessibility/broader-device behavior and full replacement restore follow in checkpoints 14.4–14.5. The connected candidate recovery phone must not be changed until its existing ordinary Saaf installation is explicitly protected and separate QA use is confirmed. Use Phases 15–16 for uncoached shopkeeper and release acceptance. See `PHASE14.md`, `PHASE14_1_DEVICE_QA_BASELINE.md`, `PHASE14_2_ROLE_PERMISSION_QA.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–13 and Phase 14.1–14.2 are closed; Phase 14.3 preflight is complete. Continue live Google Drive consent, encrypted upload/listing, offline/retry behavior, and revocation after an Android OAuth client is registered for the QA package/signature, the matching Web client ID is supplied outside source control, and an owner-controlled test account is ready. Accessibility/broader-device behavior and full replacement restore follow in checkpoints 14.4–14.5. The connected candidate recovery phone must not be changed until its existing ordinary Saaf installation is explicitly protected and separate QA use is confirmed. Use Phases 15–16 for uncoached shopkeeper and release acceptance. See `PHASE14.md`, `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.

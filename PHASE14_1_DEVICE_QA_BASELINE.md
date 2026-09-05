@@ -36,12 +36,12 @@ The clean first-owner screen renders as the approved light interface even while 
 
 ## 3. Provider and recovery prerequisites
 
-The generated debug `BuildConfig` contains an empty `GOOGLE_WEB_CLIENT_ID`. This is intentional source-control behavior: the production/test Web OAuth client ID must be supplied at build time with `-Psaaf.googleWebClientId=<client-id>`.
+The generated debug `BuildConfig` contains an empty `GOOGLE_WEB_CLIENT_ID`. This is intentional source-control behavior: the production/test Web OAuth client ID must be supplied at build time with `-Psaaf.googleWebClientId=<client-id>`. Phase 14.3 preflight also confirmed Google's current Android setup requires a matching Android OAuth client registered for the QA package/signing SHA-1 in the same Cloud project; see `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md`.
 
 Therefore:
 
 - local authentication, role, lifecycle, file-backup, presentation, and current-device accessibility work can proceed immediately;
-- live Google consent/Drive tests cannot honestly start until an approved OAuth client ID and owner-controlled test Google account are available;
+- live Google consent/Drive tests cannot honestly start until approved Android and Web OAuth clients plus an owner-controlled test Google account are available;
 - the account password, tokens, recovery passphrase, and client configuration value must not be written into project evidence;
 - a second physical Android device is connected, but it already contains the ordinary Saaf package; installing the separate `.qa` package or using it for recovery requires confirmation that this is the intended test phone, and the ordinary package/data must remain untouched;
 - automated provider/failure doubles already prove many failure semantics, but Phase 14 will not relabel them as live-provider evidence.

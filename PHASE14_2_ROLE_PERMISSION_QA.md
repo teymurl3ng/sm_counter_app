@@ -46,7 +46,7 @@ UI hiding is only presentation evidence. Every denied capability is independentl
 ## Evidence limits and remaining gates
 
 - This checkpoint proves visibility with packaged DOM assertions and authorization with native responses. A screenshot alone cannot prove either permission enforcement or that a forbidden Android picker/provider action never ran, so the accepted 83-screen visual evidence was not redundantly recaptured.
-- Live Google Drive consent, upload, listing, provider failure/retry, and revocation are not claimed here. They remain Phase 14.3 and require a build-time Google OAuth web client ID plus an owner-controlled test account.
+- Live Google Drive consent, upload, listing, provider failure/retry, and revocation are not claimed here. They remain Phase 14.3 and require matching Android/Web OAuth clients plus an owner-controlled test account.
 - The second Samsung was not changed. Phase 14.4 still requires explicit confirmation that a separate QA package and destructive replacement restore may be used without affecting its existing ordinary Saaf installation.
 
 ## Plain English

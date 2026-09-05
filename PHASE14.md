@@ -1,6 +1,6 @@
 # Phase 14 — Final Device QA
 
-Status: **IN PROGRESS — checkpoints 14.1–14.2 complete; checkpoint 14.3 next (external OAuth/account prerequisite)**
+Status: **IN PROGRESS — checkpoints 14.1–14.2 complete; checkpoint 14.3 preflight complete and live execution waiting for OAuth/account setup**
 
 ## Purpose
 
@@ -44,6 +44,8 @@ Completed on the isolated Samsung SM-A065F / Android 16. Two new tests exercise 
 - Exercise offline and metered-network behavior, missed scheduling, WorkManager retry, provider expiry, wrong-account handling, and safe degraded operation without blocking shop work.
 - Keep credentials, tokens, recovery passphrases, and account-private data out of project evidence and logs.
 
+Preflight completed on the isolated Samsung SM-A065F / Android 16. The explicit `.qa` cloud resilience suite passes 25/25, Google Play services and a Google-account reference are present, the implementation correctly uses only `drive.appdata` / `appDataFolder`, and the QA APK reproduces its accepted hash. The generated Web client ID remains blank. Current Google Android guidance also requires an Android OAuth client registered for `com.saaf.milkshop.qa` plus the QA/debug signing SHA-1, alongside the Web client whose ID is injected at build time. Live consent and Drive traffic wait for those two clients and the user's owner-controlled test account. See `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md`.
+
 ### 14.4 — Second-device recovery
 
 - Restore a real encrypted cloud recovery point on a second physical Android device using dedicated QA data.
@@ -74,8 +76,8 @@ Completed on the isolated Samsung SM-A065F / Android 16. Two new tests exercise 
 
 ## Current next action
 
-Prepare checkpoint 14.3 without claiming live-provider acceptance: supply an approved Google OAuth web client ID outside source control and an owner-controlled test Google account, then run consent, upload, listing, retry/degraded-operation, and revocation tests on the isolated-QA Samsung. Checkpoint 14.4 has a connected candidate phone, but installing the separate QA package or performing recovery there requires an explicit safe-use decision because its ordinary Saaf installation must remain untouched.
+Continue checkpoint 14.3 after its external setup: register the QA Android OAuth client, supply the matching project's Web client ID outside source control, and use an owner-controlled OAuth test account to run consent, upload, listing, retry/degraded-operation, and revocation checks on the isolated-QA Samsung. Checkpoint 14.4 has a connected candidate phone, but installing the separate QA package or performing recovery there requires an explicit safe-use decision because its ordinary Saaf installation must remain untouched.
 
 ## Plain English
 
-The safe test app works on the primary Samsung, and every user role now sees only its approved work. Direct attempts to bypass the screens were also blocked by Android/native code. No app defect was found in this checkpoint. Next is real Google Drive testing, which needs a test OAuth setup and owner-controlled Google account. The second phone still has its ordinary Saaf app and will not be changed until separate QA use is confirmed.
+The safe test app works on the primary Samsung, and every user role sees only its approved work. The cloud-backup machinery has now also passed all 25 tests that do not contact a real Google account. The remaining live test needs the QA app registered with Google, a Web client ID, and an owner-controlled test account. The second phone still has its ordinary Saaf app and will not be changed until separate QA use is confirmed.

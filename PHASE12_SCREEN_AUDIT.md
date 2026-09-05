@@ -68,7 +68,7 @@ There is no Phase 12.1 P0 finding: the review exposed no saved secret, destructi
 
 ## Next gate
 
-Checkpoint 12.4 resolved the remaining density, typography, dialog, responsive, label, and contrast findings across all 58 retained states. Checkpoint 12.5 now measures presentation performance on a release-equivalent build before any optimization is accepted.
+Checkpoint 12.4 resolved the remaining density, typography, dialog, responsive, label, and contrast findings across all 58 retained states. Checkpoint 12.5 then verified release-like presentation performance without requiring optimization. Checkpoint 12.6 now owns complete regression and handoff.
 
 ## Plain English
 

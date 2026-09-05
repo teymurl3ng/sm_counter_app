@@ -182,7 +182,7 @@ Reject a visual change when it adds unsupported behavior, changes a formula or n
 
 ## Current migration boundary
 
-Checkpoint 12.2 established the target and shared Android rendering foundation. Checkpoint 12.3 applied it to navigation and task flow. Checkpoint 12.4 applied and physically verified it across all retained screens, including text size, touch targets, forms, dialogs, responsive behavior, labels, and visible-text contrast. Checkpoint 12.5 now owns measured presentation performance; 12.6 owns the complete regression and handoff gate.
+Checkpoint 12.2 established the target and shared Android rendering foundation. Checkpoint 12.3 applied it to navigation and task flow. Checkpoint 12.4 applied and physically verified it across all retained screens, including text size, touch targets, forms, dialogs, responsive behavior, labels, and visible-text contrast. Checkpoint 12.5 verified that release-like startup and navigation are already within their device budgets and rejected unnecessary optimization. Checkpoint 12.6 owns the complete regression and handoff gate.
 
 ## Plain English
 

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Login, OwnerSetup, RecoveryCodeScreen } from './AuthScreens';
 import { CenteredMessage } from './HybridUi';
 import { ManagementWorkspace } from './ManagementWorkspace';
@@ -39,6 +39,25 @@ export function HybridAppShell() {
   } = useAuthorizedWorkspaceData();
   const hybridSession = useHybridSession(loadAuthorizedData, clearAuthorizedData);
   const { stage, session, currentUser, recoveryCode, error, notice, busy, setError, setNotice, setBusy } = hybridSession;
+
+  useEffect(() => {
+    if (stage === 'checking') {
+      delete document.documentElement.dataset.saafReactReady;
+      return;
+    }
+    let paintedFrame = 0;
+    const committedFrame = window.requestAnimationFrame(() => {
+      paintedFrame = window.requestAnimationFrame(() => {
+        performance.clearMarks('saaf-react-ready');
+        performance.mark('saaf-react-ready');
+        document.documentElement.dataset.saafReactReady = stage;
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(committedFrame);
+      window.cancelAnimationFrame(paintedFrame);
+    };
+  }, [stage]);
 
   const reportActions = useMemo(() => reportBridgeActions(session), [session]);
   const costingPlanningActions = useMemo(() => costingPlanningBridgeActions(session), [session]);

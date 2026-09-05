@@ -1,8 +1,8 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-05 — hybrid Phases 0–11 are complete; Phase 12 UI Fidelity is active with checkpoints 12.1–12.4 complete. Contract v4 exposes 86 native-backed operations. Phase 11 closes cloud outbox/process-death, provider-failure, cancellation, repeated-restore, identity/session, concurrent-write/correction, measured large-history, deferred-NRV decision, final-regression, and handoff paths.
+Status: RECONCILED 2026-09-05 — hybrid Phases 0–11 are complete; Phase 12 UI Fidelity is active with checkpoints 12.1–12.5 complete. Contract v4 exposes 86 native-backed operations. Phase 11 closes cloud outbox/process-death, provider-failure, cancellation, repeated-restore, identity/session, concurrent-write/correction, measured large-history, deferred-NRV decision, final-regression, and handoff paths.
 
-Latest physical-device checkpoint: Phase 12.4 applies the approved presentation system across all 58 retained states. The final Samsung SM-A065F / Android 16 capture contains 83 screens and now gates horizontal overflow, touch size, readable text, visible labels, and WCAG-AA visible-text contrast before saving each screen. Focused responsive/navigation/inset checks pass 5/5 and the capture test passes 1/1. The complete isolated-QA connected-device suite remains 247/247; host-side tests remain 7/7.
+Latest physical-device checkpoint: Phase 12.5 measures the profileable release-like build on the Samsung SM-A065F / Android 16. Android cold-process start is 822 ms median / 871 ms p95, React ready is 327.9 ms median / 378.3 ms p95, and painted preloaded navigation is 24.0 ms median / 29.6 ms p95 with zero bridge calls. The 2/2 performance gate passes, so no speculative optimization was made. The complete isolated-QA connected-device suite remains 247/247; host-side tests remain 7/7.
 
 Product scope: Saaf Milk is the current working product identity, and Milk/Yogurt are the current validated domain—not permanent limits. The product is intended to expand carefully to other products and suitable owner-managed shop contexts without pretending to be a corporate ERP or complete statutory accounting system. See `PRODUCT_SCOPE.md`.
 
@@ -38,6 +38,7 @@ Product scope: Saaf Milk is the current working product identity, and Milk/Yogur
 - `PHASE12_SCREEN_AUDIT.md` — completed physical-device screenshot matrix, visual findings, Phase 12.2 resolutions, and next gate.
 - `PHASE12_3_NAVIGATION_REVIEW.md` — completed navigation decisions, source traceability, preference boundary, implementation, and physical-device evidence.
 - `PHASE12_4_SCREEN_REVIEW.md` — completed screen-by-screen responsive/accessibility application, executable quality gate, physical-device evidence, and limitations.
+- `PHASE12_5_PERFORMANCE_REVIEW.md` — completed release-like startup/navigation measurements, performance guardrails, evidence, and no-change optimization decision.
 
 ## Immutable baselines
 
@@ -49,7 +50,7 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 12 — UI Fidelity: IN PROGRESS (checkpoints 12.1–12.4 complete)**
+**Phase 12 — UI Fidelity: IN PROGRESS (checkpoints 12.1–12.5 complete)**
 
 Phase 8's native-backed shop screens and all 78 frozen operations remain intact. Phase 9 adds grouped role-aware navigation, predictable Android Back behavior, a separate QA installation, focused file boundaries, one non-reloading React/WebView presentation, secure Activity recreation, deliberate keyboard/system-inset behavior, targeted state refresh with bridge-transfer measurement, and native recovery from main-page or WebView-renderer failure. A recovery reload creates a fresh WebView and revalidates the memory-only session before protected information appears. The complete isolated-QA physical-device regression passes 218/218.
 
@@ -109,7 +110,7 @@ Phase 10 — Functional Product Completion ✅ (checkpoints 10.1–10.5 complete
 
 Phase 11 — Integrity / Recovery / Concurrency ✅ (all six checkpoints complete; 247/247 final device regression)
 
-Phase 12 — UI Fidelity ⏳ (checkpoints 12.1–12.4 complete: presentation foundation, navigation, and screen-level responsive/accessibility work verified across 83 screenshots/58 states; checkpoint 12.5 measured performance next)
+Phase 12 — UI Fidelity ⏳ (checkpoints 12.1–12.5 complete: presentation foundation, navigation, 83-screen responsive/accessibility evidence, and release-like performance verified; checkpoint 12.6 regression and handoff next)
 
 Phase 13 — Dead/Mock/Misleading UI Cleanup ⏳
 
@@ -173,7 +174,8 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 11 complete isolated-QA connected-device regression: 247/247 passed, 0 skipped, 0 failed.
 - Phase 12.4 responsive/accessibility, navigation-flow, and system-inset checks: 5/5 passed on the physical device.
 - Phase 12.4 screen-quality capture: 1/1 passed across 83 screenshots and 58 retained states on the physical device.
+- Phase 12.5 profileable release-like performance gate: 2/2 passed; cold start p95 871 ms, React-ready p95 378.3 ms, and painted navigation p95 29.6 ms.
 
 ## Next gate
 
-Phases 3–11 are closed. Phase 12.1 established the Samsung baseline; Phase 12.2 locked the proportional presentation system and shared Android foundation; Phase 12.3 closed the Daily work and secondary-location navigation findings; Phase 12.4 applied and physically verified the system across every retained screen without changing business behavior. Next, checkpoint 12.5 measures presentation performance before any optimization, and 12.6 owns the complete regression/handoff gate. The last full fresh-package gates remain bridge v4/86, TypeScript/Vite, Android packaging and Kotlin compilation, 7/7 host tests, 23/23 dedicated Phase 11 tests, the reused 16/16 costing/reporting boundary, and 247/247 complete isolated Samsung tests with zero skipped or failed. Use Phases 14–16 for live Google consent/Drive, second-device, shopkeeper, and release acceptance. See `DESIGN.md`, `PHASE12.md`, `PHASE12_SCREEN_AUDIT.md`, `PHASE12_3_NAVIGATION_REVIEW.md`, `PHASE12_4_SCREEN_REVIEW.md`, `PHASE11_6_HANDOFF.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–11 are closed. Phase 12.1 established the Samsung baseline; Phase 12.2 locked the proportional presentation system and shared Android foundation; Phase 12.3 closed the Daily work and secondary-location navigation findings; Phase 12.4 applied and physically verified the system across every retained screen; Phase 12.5 proved the release-like presentation is already within its startup/navigation budgets and made no speculative optimization. Next, checkpoint 12.6 owns the complete regression and Phase 13 handoff. The last full fresh-package gates remain bridge v4/86, TypeScript/Vite, Android packaging and Kotlin compilation, 7/7 host tests, 23/23 dedicated Phase 11 tests, the reused 16/16 costing/reporting boundary, and 247/247 complete isolated Samsung tests with zero skipped or failed. Use Phases 14–16 for live Google consent/Drive, second-device, shopkeeper, and release acceptance. See `DESIGN.md`, `PHASE12.md`, `PHASE12_SCREEN_AUDIT.md`, `PHASE12_3_NAVIGATION_REVIEW.md`, `PHASE12_4_SCREEN_REVIEW.md`, `PHASE12_5_PERFORMANCE_REVIEW.md`, `PHASE11_6_HANDOFF.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.

@@ -4,6 +4,7 @@ plugins {
 }
 
 val isolatedQaData = providers.gradleProperty("saaf.isolatedQa").orNull.equals("true", ignoreCase = true)
+val performanceTestBuild = providers.gradleProperty("saaf.performanceTestBuild").orNull.equals("true", ignoreCase = true)
 val googleWebClientId = providers.gradleProperty("saaf.googleWebClientId").orNull.orEmpty()
 val escapedGoogleWebClientId = googleWebClientId.replace("\\", "\\\\").replace("\"", "\\\"")
 
@@ -36,7 +37,17 @@ android {
         release {
             isMinifyEnabled = false
         }
+        create("benchmark") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            isProfileable = true
+            applicationIdSuffix = if (isolatedQaData) ".qa.benchmark" else ".benchmark"
+            versionNameSuffix = "-benchmark"
+            matchingFallbacks += listOf("release")
+        }
     }
+
+    testBuildType = if (performanceTestBuild) "benchmark" else "debug"
 
     sourceSets {
         getByName("androidTest").assets.srcDir("$projectDir/schemas")

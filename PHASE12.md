@@ -1,6 +1,6 @@
 # Phase 12 — UI Fidelity
 
-Status: **IN PROGRESS — checkpoints 12.1–12.4 complete; checkpoint 12.5 next**
+Status: **IN PROGRESS — checkpoints 12.1–12.5 complete; checkpoint 12.6 next**
 
 ## Purpose
 
@@ -54,10 +54,12 @@ Completed across all 58 retained states. Shared form controls, dialogs, notices,
 
 No retained native/bridge receipt, image-export, or PDF-export capability exists, so presentation code did not invent one. Any future output must render authoritative native records, with Android sharing acceptance retained for Phase 14.
 
-### 12.5 — Measured presentation performance
+### 12.5 — Measured presentation performance ✅
 
 - Measure first draw, React-ready time, and representative navigation on a profileable release-equivalent build.
 - Make only evidence-supported presentation optimizations that preserve security, freshness, and one-WebView architecture.
+
+Completed with a dedicated non-debuggable, shell-profileable benchmark build and a repeatable physical-device gate. On the Samsung baseline, Android cold-process start measured 822 ms median / 871 ms p95, React ready measured 327.9 ms median / 378.3 ms p95, and painted preloaded navigation measured 24.0 ms median / 29.6 ms p95 with zero native bridge calls. These results do not justify code splitting, deferred native reads, or another architectural optimization. See `PHASE12_5_PERFORMANCE_REVIEW.md` and `phase12-evidence/sm-a065f-android16-phase12-5-performance/metrics.tsv`.
 
 ### 12.6 — Regression and handoff
 
@@ -66,7 +68,7 @@ No retained native/bridge receipt, image-export, or PDF-export capability exists
 
 ## Current next action
 
-Begin checkpoint 12.5: measure first draw, React-ready time, and representative navigation on a profileable release-equivalent build, then make only evidence-supported presentation optimizations that preserve session revalidation, data freshness, and the one-WebView architecture.
+Begin checkpoint 12.6: rebuild every source/package boundary, run focused Phase 12 checks and the complete isolated-QA regression, publish final before/after evidence and limitations, and hand the verified UI to Phase 13 cleanup.
 
 ## Checkpoint 12.2 verification
 
@@ -88,6 +90,21 @@ Begin checkpoint 12.5: measure first draw, React-ready time, and representative 
 - The 85-line final manifest SHA-256 is `8E9937FC972B2EE36D8E31D5FB58C0C7C86189D4C8A8F116AFA91C727B45F1BE`.
 - The last complete isolated-QA regression remains the Phase 11 gate at 247/247; checkpoint 12.6 owns the next complete-suite rerun.
 
+## Checkpoint 12.5 verification
+
+- UI lint and production web build — passed; CSS 85.71 kB (14.11 kB gzip) and JavaScript 433.76 kB (111.18 kB gzip).
+- Normal debug and dedicated benchmark Android/instrumentation compilation — passed.
+- Benchmark manifest — release-initialized, non-debuggable, signed for local QA, and shell-profileable.
+- `Phase12PresentationPerformanceTest` — 2/2 passed on Samsung SM-A065F / Android 16.
+- Android cold-process start — 10/10 successful; 822 ms median / 871 ms p95.
+- WebView first contentful paint — 136 ms median / 204 ms p95.
+- React ready — 327.9 ms median / 378.3 ms p95.
+- Painted preloaded navigation — 24.0 ms median / 29.6 ms p95 / 30.6 ms max, with zero bridge calls.
+- Raw seven-line performance evidence SHA-256 — `A34327B3EFADEC0A476F5F60B6836082DB47AA31669534C7014E619EC7F7BAAC`.
+- Bridge contract — unchanged at v4, 86 endpoints, SHA-256 `D22921E90040EF70CED8AFDE535C6309544B75D5EBD7B726ED1DE1273E0FA136`.
+- No performance optimization was made because every measured result was comfortably within the locked guardrails.
+- The last complete isolated-QA regression remains the Phase 11 gate at 247/247; checkpoint 12.6 owns the next complete-suite rerun.
+
 ## Plain English
 
-Navigation and every retained screen are now clearer on the real phone. Controls are easier to tap, long dialogs guide users to their actions, tabs reflow, money stays together, messages have more than color alone, and the capture test checks size, labels, overflow, readable text, and contrast. Next we measure presentation performance. The shop's records, calculations, permissions, and security have not been changed.
+Navigation and every retained screen are clearer on the real phone, and the measured release-like build is already fast enough that extra optimization would add risk without useful benefit. A permanent device test now guards startup and navigation speed. Next comes the complete Phase 12 regression and handoff. The shop's records, calculations, permissions, and security have not been changed.

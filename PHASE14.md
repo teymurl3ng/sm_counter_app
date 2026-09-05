@@ -15,6 +15,7 @@ Validate the finished hybrid application under real Android, role, accessibility
 - Backup is encrypted recovery, not synchronization between writable phones.
 - Milk/Yogurt are the current validated workflows, not a permanent product limit and not evidence that unsupported products already have authoritative treatment.
 - Judge the product proportionally as an owner-managed small-business tool. Do not claim enterprise ERP parity, statutory-accounting completeness, or external accessibility certification.
+- Secure device-local Quick unlock is now mandatory. It may replace repeated long-passphrase entry on a trusted phone, but a short PIN may never become the portable cloud-backup decryption secret. See `QUICK_UNLOCK_REQUIREMENT.md`.
 - Record verified defects with severity and evidence before fixing them. A missing capability or changed product meaning requires a separate decision rather than a silent QA-phase expansion.
 
 ## Ordered checkpoints
@@ -35,7 +36,7 @@ Completed on Samsung SM-A065F / Android 16. The exact `com.saaf.milkshop.qa` APK
 - Cover privileged-user administration, backup/restore restrictions, recent reauthentication, account disablement/role change, logout, session expiry, lifecycle recreation, and audit evidence.
 - Add only targeted regression coverage when a real untested boundary is found.
 
-Completed on the isolated Samsung SM-A065F / Android 16. Two new tests exercise all five roles through the packaged UI and valid native-bypass probes across every bridge-contract permission, plus the separate owner-only privileged-user and cloud boundaries. The focused matrix passes 2/2, the related security/session/backup/lifecycle/recovery regression passes 36/36, and host tests pass 7/7. No production defect was found, so the app UI, functions, formulas, and business behavior are unchanged. The full device-suite inventory is now 260 tests; its complete two-part rerun remains the 14.6 closure gate. See `PHASE14_2_ROLE_PERMISSION_QA.md`.
+Completed on the isolated Samsung SM-A065F / Android 16. Two new tests exercise all five roles through the packaged UI and valid native-bypass probes across every bridge-contract permission, plus the separate owner-only privileged-user and cloud boundaries. The focused matrix passes 2/2, the related security/session/backup/lifecycle/recovery regression passes 36/36, and host tests pass 7/7. No production defect was found, so the app UI, functions, formulas, and business behavior are unchanged. The full device-suite inventory is now 260 tests; its expanded complete two-part rerun remains the 14.7 closure gate. See `PHASE14_2_ROLE_PERMISSION_QA.md`.
 
 ### 14.3 — Live Google Drive and resilience
 
@@ -60,10 +61,19 @@ Preflight completed on the isolated Samsung SM-A065F / Android 16 with the expli
 - Score verified findings on the 0–4 audit scale and classify issues P0 blocking, P1 major, P2 minor, or P3 polish.
 - Capture targeted evidence for findings and fixes; do not repeat all 83 screens without a material reason.
 
-### 14.6 — Defect closure, complete regression, and Phase 15 handoff
+### 14.6 — Mandatory Quick unlock implementation and device QA
+
+- Add opt-in, native, device-bound Quick unlock after one full-passphrase enrollment.
+- Prefer strong biometric or Android device credential; provide a rate-limited per-user four-digit-minimum PIN fallback, recommending six digits.
+- Use Android Keystore protection and preserve native user/role authority, shared-device actor attribution, invalidation, lockout, cancellation, and full-passphrase fallback.
+- Let routine sign-in, recent reauthentication, and existing-device cloud inspection use Quick unlock without exposing or repeatedly requesting long secrets.
+- Prove that a short PIN cannot decrypt a portable cloud recovery point on a cleared or replacement device.
+- Exercise all enrollment, unavailable, success, failure, lifecycle, accessibility, role/security-change, and recovery states defined in `QUICK_UNLOCK_REQUIREMENT.md` on physical devices.
+
+### 14.7 — Defect closure, complete regression, and Phase 15 handoff
 
 - Resolve verified in-scope defects in bounded batches, preserving the frozen product and business boundaries.
-- Rerun affected tests, build/contract/cleanup/hash gates, 7/7 host tests, and the complete 260-test two-part physical-device regression.
+- Close all Quick unlock security/usability findings and rerun affected tests, build/contract/cleanup/hash gates, 7/7 host tests, and the expanded complete physical-device regression.
 - Publish device/provider/recovery evidence, remaining limitations, and the guarded Phase 15 shopkeeper-QA handoff.
 
 ## Evidence policy
@@ -76,8 +86,8 @@ Preflight completed on the isolated Samsung SM-A065F / Android 16 with the expli
 
 ## Current next action
 
-Resume checkpoint 14.3 without clearing or disconnecting the existing QA installation. Identify whether recovery-point inspection rejects the Saaf owner passphrase before the Android dialog or the separate cloud recovery passphrase inside it; do not record either value. Then finish inspection, metered-policy, and disconnect/revocation evidence, and close the two recorded UX defects. Checkpoint 14.4 has a connected candidate phone, but installing the separate QA package or performing recovery there requires an explicit safe-use decision because its ordinary Saaf installation must remain untouched.
+Resume checkpoint 14.3 without clearing or disconnecting the existing QA installation. Identify whether recovery-point inspection rejects the Saaf owner passphrase before the Android dialog or the separate cloud recovery passphrase inside it; do not record either value. Then finish inspection, metered-policy, and disconnect/revocation evidence. Checkpoint 14.4 has a connected candidate phone, but installing the separate QA package or performing recovery there requires an explicit safe-use decision because its ordinary Saaf installation must remain untouched. After 14.5, implement and physically verify mandatory Quick unlock in 14.6, then close every recorded defect and run the expanded complete regression in 14.7.
 
 ## Plain English
 
-The safe test app works on the primary Samsung, every role sees only its approved work, and the real Google backup now creates hidden encrypted recovery points and survives an offline queue. We found two confusing error messages and paused safely when recovery-point inspection did not accept the expected private passphrase. The Google connection and three recovery points remain intact. The second phone's ordinary Saaf app was not changed.
+The safe test app works on the primary Samsung, every role sees only its approved work, and the real Google backup now creates hidden encrypted recovery points and survives an offline queue. We found two confusing error messages and paused safely when recovery-point inspection did not accept the expected private passphrase. This confirmed that fingerprint/device-credential or short-PIN Quick unlock is a must before release, while the long emergency recovery secret remains protected. The Google connection and three recovery points remain intact. The second phone's ordinary Saaf app was not changed.

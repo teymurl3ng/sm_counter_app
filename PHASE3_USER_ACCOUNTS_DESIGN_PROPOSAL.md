@@ -4,13 +4,15 @@
 
 **Prepared: 2026-08-27**
 
+**Forward supersession — 2026-09-06:** The biometrics/quick-PIN deferral below remains accurate Phase 3 history, but it is no longer the forward decision. Phase 14 live-use evidence led the owner to approve native device-bound Quick unlock as a mandatory pre-release capability. See `QUICK_UNLOCK_REQUIREMENT.md` and Phase 14.6.
+
 ## 1. Decision requested
 
 The user approved this model as the contract for the next additive native expansion, Room schema version 7.
 
 Implementation checkpoint (2026-08-27): the schema-7 native security foundation, Android backup exclusions, encrypted portable format 2, Android-Keystore local snapshots, first-owner/login/logout/recovery flow, private staff enrollment/reset, user administration, app-owned sessions, role-aware navigation, and protected native command checks are implemented and device-verified. React/bridge integration remains later work.
 
-The approval authorizes implementation and tests. It does not authorize cloud accounts, remote login, biometrics, custom roles, or a numeric quick-PIN shortcut; those remain outside this slice unless separately approved.
+The original approval authorized implementation and tests. It did not authorize cloud accounts, remote login, biometrics, custom roles, or a numeric quick-PIN shortcut; those were outside this Phase 3 slice. Cloud backup was approved later, and `QUICK_UNLOCK_REQUIREMENT.md` now separately approves the device-bound fast path for Phase 14.6 while preserving this historical boundary.
 
 ## 2. Application and threat model
 
@@ -184,7 +186,7 @@ Recent full-passphrase reauthentication (within 5 minutes) is required for:
 - any future destructive reset;
 - changes to security policy.
 
-An optional short numeric quick PIN is deliberately deferred. A standalone PIN would be a weak single-factor password, and Android device biometrics cannot identify which shop employee is acting on a shared device. A future device-bound quick-unlock design may be evaluated separately after the passphrase/session model is proven.
+At Phase 3, an optional short numeric quick PIN was deliberately deferred. A standalone PIN would be a weak single-factor password, and Android device biometrics cannot identify which shop employee is acting on a shared device. This paragraph is historical: Phase 14 evidence has now triggered the separately approved, device-bound, rate-limited design in `QUICK_UNLOCK_REQUIREMENT.md`.
 
 ## 6. Authorization model
 

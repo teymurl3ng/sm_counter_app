@@ -41,7 +41,7 @@ UI hiding is only presentation evidence. Every denied capability is independentl
 - New Phase 14.2 physical-device matrix: **2/2**, zero skipped, zero failed.
 - Related security/session/backup/lifecycle/recovery physical-device regression: **36/36**, zero skipped, zero failed.
 - Host-side debug unit suite: **7/7**, zero failed.
-- Complete-suite inventory is now **260 tests**: 259 authenticated tests plus the separate one-test empty-identity visual partition. The complete 260-test two-part rerun remains the Phase 14.6 closure gate.
+- Complete-suite inventory is now **260 tests**: 259 authenticated tests plus the separate one-test empty-identity visual partition. Phase 14.6 will add mandatory Quick unlock coverage; the resulting expanded complete two-part rerun is the Phase 14.7 closure gate.
 
 ## Evidence limits and remaining gates
 

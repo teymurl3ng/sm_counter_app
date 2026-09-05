@@ -4,7 +4,7 @@ Status: RECONCILED 2026-09-06 — hybrid Phases 0–13 are complete; Phase 14 Fi
 
 Latest complete physical-device checkpoint: Phase 13.5 passes 258/258 on Samsung SM-A065F / Android 16 across the authenticated 257-test and clean-identity 1-test visual partitions, with zero skips or failures. The final visual audit reproduces 83 readable screenshots / 58 states at 720 × 1600, and host-side tests pass 7/7.
 
-Phase 14.1 locked the isolated Samsung baseline, and Phase 14.2 passed its all-role UI/native permission checks. Phase 14.3 passes the 25/25 explicit-QA cloud resilience suite and now also proves real Google consent, initial/manual encrypted upload, hidden recovery-point listing, and offline queue/retry with three verified points. Inspection authentication, metered behavior, revocation, and two recorded UX defects remain. A second Samsung is connected, but its ordinary `com.saaf.milkshop` installation remains untouched and requires explicit safe-use confirmation before a separate QA recovery test.
+Phase 14.1 locked the isolated Samsung baseline, and Phase 14.2 passed its all-role UI/native permission checks. Phase 14.3 passes the 25/25 explicit-QA cloud resilience suite and now also proves real Google consent, initial/manual encrypted upload, hidden recovery-point listing, and offline queue/retry with three verified points. Inspection authentication, metered behavior, revocation, and two recorded UX defects remain. Live use also made secure device-local Quick unlock a mandatory Phase 14.6 and release requirement. A second Samsung is connected, but its ordinary `com.saaf.milkshop` installation remains untouched and requires explicit safe-use confirmation before a separate QA recovery test.
 
 Product scope: Saaf Milk is the current working product identity, and Milk/Yogurt are the current validated domain—not permanent limits. The product is intended to expand carefully to other products and suitable owner-managed shop contexts without pretending to be a corporate ERP or complete statutory accounting system. See `PRODUCT_SCOPE.md`.
 
@@ -14,6 +14,7 @@ Product scope: Saaf Milk is the current working product identity, and Milk/Yogur
 - `ui/` — the latest AI Studio UI source supplied for the new product layer.
 - `PRODUCT_SCOPE.md` — authoritative target-user, product-breadth, proportional-quality, benchmark, and expansion policy.
 - `DESIGN.md` — authoritative Phase 12 visual target, presentation tokens, Android priorities, accessibility rules, and proportional change gate.
+- `QUICK_UNLOCK_REQUIREMENT.md` — approved release-blocking biometric/device-credential and per-user short-PIN contract, security boundaries, phase placement, and test states.
 - `POSTMORTEM.md` — locked fresh-start playbook.
 - `PHASE0.md` — immutable baseline record and hashes.
 - `PHASE1.md` — complete source-level capability inventory and mapping.
@@ -51,7 +52,7 @@ Product scope: Saaf Milk is the current working product identity, and Milk/Yogur
 - `PHASE14.md` — active final-device-QA checkpoints, locked boundaries, evidence policy, prerequisites, and current next action.
 - `PHASE14_1_DEVICE_QA_BASELINE.md` — connected-device inventory, clean QA installation proof, provider/second-device prerequisites, existing test credit, and evidence hashes.
 - `PHASE14_2_ROLE_PERMISSION_QA.md` — complete five-role packaged-UI matrix, native bypass probes, sensitive backup/cloud boundaries, and focused regression evidence.
-- `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md` — official two-client OAuth requirements, exact QA identity, 25-test cloud-resilience proof, safe live sequence, and remaining user input.
+- `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md` — live consent/upload/hidden-listing/offline-retry evidence, exact QA identity, provider setup, verified defects, and safe resume point.
 
 ## Immutable baselines
 
@@ -77,7 +78,7 @@ The application remains offline-first and each writable installation owns one Ro
 - Authentication and authorization must be native-backed. React may present login and permission-aware controls, but it must never decide or self-assert a user's role.
 - The approved model defines native users, Argon2id credentials, fixed role/permission bundles, memory-only sessions, first-owner bootstrap, deactivation, owner recovery, audit actors, and migration behavior.
 - Once any application user exists, daily close/reopen rejects typed actor claims and requires a verified native session/user ID. Schema-6 history remains explicitly legacy/unverified.
-- Portable encrypted backup format 2 is implemented with Argon2id-derived AES-256-GCM protection, security-state portability, tamper/wrong-passphrase rejection, legacy format-1 import compatibility, and post-restore session invalidation. Its authenticated export/inspection/restore UI is wired through Android-owned document pickers and short-lived one-use restore tickets. The numeric quick-PIN shortcut remains deliberately deferred.
+- Portable encrypted backup format 2 is implemented with Argon2id-derived AES-256-GCM protection, security-state portability, tamper/wrong-passphrase rejection, legacy format-1 import compatibility, and post-restore session invalidation. Its authenticated export/inspection/restore UI is wired through Android-owned document pickers and short-lived one-use restore tickets. The earlier numeric quick-PIN deferral is now superseded for forward work: native device-bound Quick unlock is mandatory in Phase 14.6, while portable cloud recovery remains protected by a high-entropy secret.
 - Staff accounts use private enrollment/reset: an authorized owner/admin creates the identity and role, while the staff member chooses the credential. A user marked as requiring setup cannot authenticate with any previous verifier.
 - Automatic app-private snapshots now use AES-256-GCM under a non-exportable random Android Keystore key. Their authenticated payload includes security state but excludes active sessions and failed-login/lockout timing state. They are intentionally device-local; complete security restore is allowed only before owner setup on the same installation.
 
@@ -129,11 +130,11 @@ Phase 12 — UI Fidelity ✅ (all six checkpoints complete; 83-screen final evid
 
 Phase 13 — Dead/Mock/Misleading UI Cleanup ✅ (all five checkpoints complete; 258/258 final device regression and Phase 14 handoff verified)
 
-Phase 14 — Final Device QA ⏳ (14.3 live upload/offline retry proven; inspection authentication, revocation, defects, second-device, and accessibility gates remain)
+Phase 14 — Final Device QA ⏳ (14.3 live upload/offline retry proven; mandatory Quick unlock is added as 14.6, with final closure/regression shifted to 14.7)
 
-Phase 15 — Final Shopkeeper QA ⏳ (includes periodic backup/recovery and owner-phone snapshot viewing if approved)
+Phase 15 — Final Shopkeeper QA ⏳ (includes uncoached Quick unlock enrollment/use/recovery, periodic backup/recovery, and owner-phone snapshot viewing if approved)
 
-Phase 16 — Release Readiness ⏳ (includes cloud-provider authorization, privacy, quota, and recovery readiness if cloud backup ships)
+Phase 16 — Release Readiness ⏳ (secure Quick unlock and its recovery boundary are release blockers alongside cloud-provider authorization, privacy, quota, and recovery readiness)
 
 ## Rule for phase records
 
@@ -199,9 +200,9 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 13.5 visual evidence: 83/83 readable PNGs at 720 × 1600 across 58 retained states in `phase13-evidence/sm-a065f-android16-phase13-5-final/`; manifest SHA-256 `8E9937FC972B2EE36D8E31D5FB58C0C7C86189D4C8A8F116AFA91C727B45F1BE`.
 - Phase 14.1 isolated-QA build/install and clean first-run Samsung baseline pass; APK SHA-256 remains `E7C8CA158B1688497C15DA77B73FAA008F8F781210650080DFADC34A7291BA6C`.
 - Phase 14.1 confirms two connected Samsung phones and no configured Google OAuth web client ID. The primary phone holds the isolated QA app; the candidate recovery phone already holds the ordinary Saaf package and was deliberately left untouched pending safe-use confirmation.
-- Phase 14.2 adds two role/permission tests: the all-five-role packaged UI and native-bypass matrix passes 2/2; the related security/session/backup/lifecycle/recovery regression passes 36/36; host tests pass 7/7. The complete device-suite inventory is now 260 tests, with the full rerun reserved for Phase 14.6.
+- Phase 14.2 adds two role/permission tests: the all-five-role packaged UI and native-bypass matrix passes 2/2; the related security/session/backup/lifecycle/recovery regression passes 36/36; host tests pass 7/7. The complete device-suite inventory is now 260 tests; Phase 14.6 adds Quick unlock coverage before the expanded full rerun in Phase 14.7.
 - Phase 14.3 passes 25/25 automated cloud tests and the real provider now passes consent, initial/manual encrypted upload, hidden listing, and offline queue/retry with three verified recovery points. Inspection authentication remains unresolved; two live UX defects are recorded.
 
 ## Next gate
 
-Phases 3–13 and Phase 14.1–14.2 are closed; Phase 14.3 live QA is safely paused with its Google connection and three recovery points intact. Resume by isolating the owner-versus-cloud passphrase stage during recovery-point inspection, then finish metered behavior and disconnect/revocation and close the two recorded UX defects. Accessibility/broader-device behavior and full replacement restore follow in checkpoints 14.4–14.5. The connected candidate recovery phone must not be changed until its ordinary Saaf installation is explicitly protected and separate QA use is confirmed. Use Phases 15–16 for uncoached shopkeeper and release acceptance. See `PHASE14.md`, `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–13 and Phase 14.1–14.2 are closed; Phase 14.3 live QA is safely paused with its Google connection and three recovery points intact. Resume by isolating the owner-versus-cloud passphrase stage during recovery-point inspection, then finish metered behavior and disconnect/revocation. Accessibility/broader-device behavior and full replacement restore follow in checkpoints 14.4–14.5. Phase 14.6 must implement and physically prove native Quick unlock, and 14.7 closes defects and runs the expanded full regression. The connected candidate recovery phone must not be changed until its ordinary Saaf installation is explicitly protected and separate QA use is confirmed. Phases 15–16 must validate the feature with shopkeepers and block release on its security/recovery gate. See `QUICK_UNLOCK_REQUIREMENT.md`, `PHASE14.md`, `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.

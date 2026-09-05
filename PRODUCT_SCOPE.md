@@ -19,6 +19,12 @@ The product promise is:
 
 > Provide clear, offline-first operational and management records whose saved facts and displayed calculations are dependable within the explicitly supported scope.
 
+### Mandatory low-friction secure access
+
+Routine use on a trusted phone must not force owners or staff to repeatedly type long passphrases. Device-local **Quick unlock** using Android biometrics/device credential or a short per-user PIN is an approved, release-blocking requirement. The fast path must remain native, device-bound, rate-limited, revocable, and correctly attributed on shared phones.
+
+Quick unlock may release a Keystore-protected local session or cloud key on the trusted installation. It may not reduce portable encrypted-backup recovery to four digits: a cleared, lost, or replacement phone still requires the full high-entropy recovery secret. `QUICK_UNLOCK_REQUIREMENT.md` is authoritative for this boundary.
+
 The product is not currently presented as:
 
 - a complete statutory accounting system;
@@ -155,6 +161,7 @@ The product succeeds when supported users can:
 - trust that saved records, corrections, access controls, and backups behave predictably;
 - understand the basis and limits of displayed results;
 - recover from ordinary mistakes and device problems;
+- enter and resume routine protected work quickly through secure device-local quick unlock;
 - adopt future supported products without corrupting or misrepresenting earlier records.
 
 It does not need to equal the breadth of a corporate ERP or the reporting scope expected by chartered accountants and senior enterprise management.

@@ -96,6 +96,17 @@ Do not increase density to resemble large accounting products. Add information o
 - Validation appears beside the affected field; task-level failures and success notices appear close to the action.
 - Loading states preserve context and prevent duplicate submission without blanking unrelated content.
 
+## Authentication and quick unlock
+
+- Routine trusted-device access must offer **Quick unlock** after deliberate full-passphrase enrollment: strong biometric/device credential first, with a short per-user app PIN fallback.
+- Present quick unlock as a convenience bound to this phone, never as a replacement for the portable cloud-recovery secret.
+- Keep the current Saaf identity visible before approval on shared phones; Android biometrics do not identify which Saaf employee acted.
+- Explain biometric unavailable, cancelled, changed-enrollment, device-security-removed, PIN-delay/lockout, and full-passphrase fallback states in plain language.
+- Existing-device backup inspection should use the device-protected cloud key after quick authentication instead of asking for both long passphrases every time.
+- Destructive restore, revocation, credential changes, and quick-unlock enrollment/removal retain strong authentication and deliberate confirmation.
+
+The complete native security and state contract is in `QUICK_UNLOCK_REQUIREMENT.md`.
+
 ## Navigation and task changes
 
 - The bottom bar is opaque and stable on compact Android screens. It must respect the navigation inset and must not rely on blur.
@@ -182,7 +193,7 @@ Reject a visual change when it adds unsupported behavior, changes a formula or n
 
 ## Current migration boundary
 
-Checkpoint 12.2 established the target and shared Android rendering foundation. Checkpoint 12.3 applied it to navigation and task flow. Checkpoint 12.4 applied and physically verified it across all retained screens, including text size, touch targets, forms, dialogs, responsive behavior, labels, and visible-text contrast. Checkpoint 12.5 verified that release-like startup and navigation are already within their device budgets and rejected unnecessary optimization. Checkpoint 12.6 rebuilt every source/package boundary, reproduced the 83-screen evidence set, and passed the complete 258/258 device regression. Phase 13 then removed the unreachable prototype, corrected misleading presentation, added automatic cleanup gates, reproduced the 83-screen evidence, and reran 258/258. Phase 14.2 has now verified the exact role-aware presentation and independent native authorization boundary for all five roles without changing the design. Phase 14 must continue preserving this boundary while validating accessibility, Android behavior, provider integration, and recovery on physical devices.
+Checkpoint 12.2 established the target and shared Android rendering foundation. Checkpoint 12.3 applied it to navigation and task flow. Checkpoint 12.4 applied and physically verified it across all retained screens, including text size, touch targets, forms, dialogs, responsive behavior, labels, and visible-text contrast. Checkpoint 12.5 verified that release-like startup and navigation are already within their device budgets and rejected unnecessary optimization. Checkpoint 12.6 rebuilt every source/package boundary, reproduced the 83-screen evidence set, and passed the complete 258/258 device regression. Phase 13 then removed the unreachable prototype, corrected misleading presentation, added automatic cleanup gates, reproduced the 83-screen evidence, and reran 258/258. Phase 14.2 has now verified the exact role-aware presentation and independent native authorization boundary for all five roles without changing the design. Phase 14 live backup use then established repeated long-passphrase entry as unacceptable routine friction, making the secure Quick unlock journey mandatory in 14.6. Phase 14 must preserve native authorization while validating this journey, accessibility, Android behavior, provider integration, and recovery on physical devices.
 
 ## Plain English
 

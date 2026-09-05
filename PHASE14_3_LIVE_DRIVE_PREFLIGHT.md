@@ -33,13 +33,17 @@ Code inspection confirms the shared web bridge deletes every pending request aft
 
 With Airplane mode enabled, **Back up now** was queued and a subsequent refresh correctly failed to reach Google, but the UI exposed the low-level DNS message `Unable to resolve host www.googleapis.com: No address associated with hostname`. Offline operation is expected and does not imply backup corruption, but this copy is too technical and does not tell the shopkeeper that the queued backup will retry after connectivity returns. Map this failure to concise offline/retry guidance while retaining diagnostic detail outside the user-facing message.
 
+### Mandatory follow-on requirement — Quick unlock
+
+The live journey required repeated entry of a long Saaf owner passphrase plus a separate long cloud-recovery passphrase. The owner explicitly made a short trusted-device path—fingerprint/other strong biometric, Android device credential, or short per-user PIN—a release requirement. Phase 14.6 now owns implementation and physical-device proof. The short path may unlock device-bound Keystore material for routine existing-device work, but it must never reduce portable Drive-backup encryption to a four-digit secret. See `QUICK_UNLOCK_REQUIREMENT.md`.
+
 ## Safe pause checkpoint
 
 - The primary QA app remains connected to Google Drive with automatic Wi-Fi-only backup enabled and three verified encrypted recovery points.
 - No restore, disconnect, authorization revocation, package clear, or second-phone Saaf action was performed after the successful live checks.
 - The second phone's ordinary `com.saaf.milkshop` installation remains untouched; it was used only to view normal Google Drive, where no hidden recovery point appeared.
 - Resume by identifying whether inspection rejects the Saaf owner passphrase before the Android dialog or the cloud recovery passphrase inside the Android dialog. Do not record either value.
-- After inspection succeeds or the credential limitation is honestly resolved, finish metered-policy evidence and disconnect/revocation. Then fix F14.3-01 and F14.3-02 before closing Phase 14.
+- After inspection succeeds or the credential limitation is honestly resolved, finish metered-policy evidence and disconnect/revocation. Continue second-device/accessibility QA, implement mandatory Quick unlock in 14.6, then fix F14.3-01/F14.3-02 and run final closure in 14.7.
 
 ## Official setup requirements
 

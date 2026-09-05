@@ -1,6 +1,6 @@
 # Phase 13 — Dead, Mock, and Misleading UI Cleanup
 
-Status: **IN PROGRESS — checkpoint 13.1 complete; checkpoint 13.2 next**
+Status: **IN PROGRESS — checkpoints 13.1–13.2 complete; checkpoint 13.3 next**
 
 ## Purpose
 
@@ -25,11 +25,13 @@ Remove inactive prototype code, browser-local business state, unused presentatio
 
 Completed with 108 TypeScript/TSX files classified: 85 are reachable from the packaged entry and 23 are an unreachable 8,370-line prototype tree. Six production dependencies are unused by the active app. The active app has no browser-local business store; one misleading client-side opening-balance total requires correction in checkpoint 13.3. See `PHASE13_1_INVENTORY.md`.
 
-### 13.2 — Remove the unreachable prototype
+### 13.2 — Remove the unreachable prototype ✅
 
 - Delete the 23 locked unreachable files and remove their six unused production dependencies.
 - Prove the packaged entry still resolves only through the active hybrid tree.
 - Rebuild and compare JavaScript/CSS/package size without claiming speed gains that were not measured.
+
+Completed exactly against the 13.1 removal lock. The 23-file, 8,370-line prototype and six unused direct dependencies are gone; the import graph is now 85 reachable files / 85 total / zero unreachable. TypeScript, Vite, Android packaging/compilation, 7/7 host tests, and a 12/12 Samsung login/Product/navigation/responsive gate pass. Active JavaScript retains the exact Phase 12 content hash, while generated CSS falls 60.3% because dead prototype classes no longer enter Tailwind's scan. See `PHASE13_2_PROTOTYPE_REMOVAL.md`.
 
 ### 13.3 — Active control and meaning audit
 
@@ -49,8 +51,8 @@ Completed with 108 TypeScript/TSX files classified: 85 are reachable from the pa
 
 ## Current next action
 
-Run checkpoint 13.2: remove the locked 23-file prototype tree and six unused dependencies, then rebuild and verify that the active hybrid application and contract are unchanged.
+Run checkpoint 13.3: audit every active control, permission/disabled state, success message, placeholder, and presentation calculation against its native source. Resolve the misleading heterogeneous opening-balance total without adding an accounting formula to React.
 
 ## Plain English
 
-The real app uses 85 source files. Another 23 files are an old, disconnected demo that keeps fake shop records in browser storage and calculates its own reports. They cannot appear in the installed app today, but keeping them makes the project confusing and easier to misuse later. The next step removes that dead demo safely; after that we will fix the one questionable total found in the active app.
+The disconnected demo and its unused packages are now removed, while the real app still passes on the phone. This made the generated CSS much smaller without changing the active JavaScript or trusted Android logic. Next we will inspect the remaining live controls and messages, including fixing one questionable opening-balance total.

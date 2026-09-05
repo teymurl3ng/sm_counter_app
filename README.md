@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-05 — hybrid Phases 0–12 are complete; Phase 13 Dead/Mock/Misleading UI Cleanup is active with checkpoint 13.1 complete. Contract v4 exposes 86 native-backed operations. The Phase 13 import-graph inventory classifies 85 active TypeScript/TSX files and locks an unreachable 23-file, 8,370-line browser-local prototype for checkpoint 13.2 removal.
+Status: RECONCILED 2026-09-05 — hybrid Phases 0–12 are complete; Phase 13 Dead/Mock/Misleading UI Cleanup is active with checkpoints 13.1–13.2 complete. Contract v4 exposes 86 native-backed operations. The unreachable 23-file, 8,370-line browser-local prototype and six unused dependencies are removed; the production import graph is now 85 reachable files / 85 total / zero unreachable.
 
 Latest physical-device checkpoint: Phase 12.6 passes the complete 258/258 isolated-QA regression across its authenticated 257-test and empty-identity 1-test partitions on Samsung SM-A065F / Android 16, with zero skips or failures. The final visual audit reproduces 83 screenshots / 58 states at 720 × 1600. The Phase 12.5 release-like baseline remains 822 ms median / 871 ms p95 cold start, 327.9 ms median / 378.3 ms p95 React ready, and 24.0 ms median / 29.6 ms p95 painted navigation with zero bridge calls. Host-side tests pass 7/7.
 
@@ -42,6 +42,7 @@ Product scope: Saaf Milk is the current working product identity, and Milk/Yogur
 - `PHASE12_6_HANDOFF.md` — final regression matrix, before/after evidence, immutable hashes, known limitations, and guarded Phase 13 entry conditions.
 - `PHASE13.md` — active dead/mock/misleading UI cleanup checkpoints and locked boundaries.
 - `PHASE13_1_INVENTORY.md` — production import graph, locked prototype/dependency removal list, active-tree findings, and source classifications.
+- `PHASE13_2_PROTOTYPE_REMOVAL.md` — removed source/dependency surface, measured CSS/package reduction, hashes, and physical-device proof.
 
 ## Immutable baselines
 
@@ -53,7 +54,7 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 13 — Dead/Mock/Misleading UI Cleanup: IN PROGRESS (checkpoint 13.1 complete)**
+**Phase 13 — Dead/Mock/Misleading UI Cleanup: IN PROGRESS (checkpoints 13.1–13.2 complete)**
 
 Phase 8's native-backed shop screens and all 78 frozen operations remain intact. Phase 9 adds grouped role-aware navigation, predictable Android Back behavior, a separate QA installation, focused file boundaries, one non-reloading React/WebView presentation, secure Activity recreation, deliberate keyboard/system-inset behavior, targeted state refresh with bridge-transfer measurement, and native recovery from main-page or WebView-renderer failure. A recovery reload creates a fresh WebView and revalidates the memory-only session before protected information appears. The complete isolated-QA physical-device regression passes 218/218.
 
@@ -115,7 +116,7 @@ Phase 11 — Integrity / Recovery / Concurrency ✅ (all six checkpoints complet
 
 Phase 12 — UI Fidelity ✅ (all six checkpoints complete; 83-screen final evidence, release-like performance, and 258/258 device regression verified)
 
-Phase 13 — Dead/Mock/Misleading UI Cleanup ⏳ (13.1 import-graph/risk inventory complete; 13.2 unreachable prototype removal next)
+Phase 13 — Dead/Mock/Misleading UI Cleanup ⏳ (13.1 inventory and 13.2 unreachable prototype removal complete; 13.3 active semantic audit next)
 
 Phase 14 — Final Device QA ⏳ (includes real scheduled-cloud-backup, retry, and second-device restore testing)
 
@@ -184,4 +185,4 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 
 ## Next gate
 
-Phases 3–12 are closed. Phase 13.1 traced the packaged entry through all UI imports: 85 files are active and 23 files form an unreachable 8,370-line prototype containing browser-local records, UI-side calculations, synthetic reports, arbitrary JSON restore/clear-all, and obsolete export UI. Checkpoint 13.2 will remove exactly that locked tree and six unused dependencies, then rebuild to prove the active native-backed app is unchanged. The later active semantic audit will resolve one misleading heterogeneous opening-balance total without inventing a React accounting formula. Use Phases 14–16 for live Google consent/Drive, second-device, shopkeeper, and release acceptance. See `PHASE13.md`, `PHASE13_1_INVENTORY.md`, `PHASE12_6_HANDOFF.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–12 are closed. Phase 13.1 classified the complete UI graph, and Phase 13.2 removed the locked 23-file, 8,370-line browser-local prototype plus six unused dependencies. The active JavaScript content hash is unchanged, generated CSS falls from 85.71 kB to 34.03 kB, and TypeScript/Vite, Android packaging, 7/7 host tests, and 12/12 focused Samsung tests pass. Checkpoint 13.3 now audits active controls, success/disabled states, labels, and presentation calculations; it will resolve one misleading heterogeneous opening-balance total without inventing a React accounting formula. Use Phases 14–16 for live Google consent/Drive, second-device, shopkeeper, and release acceptance. See `PHASE13.md`, `PHASE13_1_INVENTORY.md`, `PHASE13_2_PROTOTYPE_REMOVAL.md`, `PHASE12_6_HANDOFF.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.

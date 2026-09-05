@@ -1,6 +1,6 @@
-# Phase 14.3 — Live Google Drive Preflight
+# Phase 14.3 — Live Google Drive QA
 
-Status: **LIVE EXECUTION IN PROGRESS — consent, initial encrypted upload, and recovery-point listing verified**
+Status: **PAUSED SAFELY — live consent, upload, hidden listing, and offline retry verified; inspection authentication unresolved**
 
 Date: 2026-09-06  
 Primary QA device: Samsung SM-A065F / Android 16 / API 36  
@@ -10,7 +10,7 @@ QA package: `com.saaf.milkshop.qa` / `0.1.0-qa`
 
 The app-side cloud-backup implementation and physical-device prerequisites are ready for a live Google Drive run. The non-live provider, scheduling, failure, and recovery matrix passes **25/25** on the explicitly isolated QA build with zero skips or failures. The accepted QA APK remains byte-for-byte reproducible at SHA-256 `E7C8CA158B1688497C15DA77B73FAA008F8F781210650080DFADC34A7291BA6C`.
 
-Full live acceptance has not yet been claimed. Consent, initial encrypted upload, and recovery-point listing are now proven; manual upload, offline/retry and degraded-operation behavior, recovery-point inspection, and revocation remain to be exercised.
+Full live acceptance has not yet been claimed. Consent, initial and manual encrypted upload, hidden recovery-point listing, and offline queue/retry are proven. Recovery-point inspection paused when the expected private passphrase was not accepted; the exact owner-versus-cloud authentication stage was not isolated before stopping. Metered-policy behavior and disconnect/revocation also remain.
 
 ## Live execution evidence — 2026-09-06
 
@@ -19,12 +19,27 @@ Full live acceptance has not yet been claimed. Consent, initial encrypted upload
 - The OAuth-enabled isolated QA APK built successfully with contract v4 / 86 endpoints and the UI cleanup gate intact. Its SHA-256 is `305BF889747164E675882213F203DD4B3FE6E2F70590057686B13080543739F8`.
 - The APK was verified as `com.saaf.milkshop.qa` / `0.1.0-qa`, installed only on the primary QA Samsung, and initialized with disposable test data.
 - Real Google consent and Drive connection completed. After reloading the Cloud area, the app reported one recovery point, `Last verified` at `2026-09-06 02:31:54`, and no cloud error.
+- The user then selected **Back up now**. After the expected short queue delay and refresh, `Last verified` advanced, the recovery-point count increased from one to two, and no error appeared.
+- In the same test account's normal Google Drive interface, neither recovery point appeared in **My Drive**, **Recent**, or a `Saaf` search. This confirms the live files use the intended hidden app-data area rather than user-visible Drive storage.
+- With Airplane mode enabled, **Back up now** remained queued and no recovery point was created while offline. After Airplane mode was disabled and Wi-Fi returned, the same queued work completed automatically: the recovery-point count increased from two to three, the verification time advanced, and the prior offline error cleared.
 
 ### Finding F14.3-01 — interactive connection outlives the bridge timer
 
 The first live connection displayed `The app took too long to respond. Please try again.` before the user could see completion, then reset the visible form. Retrying produced a passphrase error. Leaving and returning to Cloud loaded the successfully persisted Google account and verified recovery point.
 
 Code inspection confirms the shared web bridge deletes every pending request after 30 seconds, while native `connectCloudBackup` legitimately waits for recovery-passphrase entry, Google account selection/consent, Drive identity verification, configuration, and scheduling. The native operation is not cancelled when the web request times out, so it can complete successfully after the UI has declared failure. This is a real feedback/reconciliation defect, not a failed backup or user mistake. Preserve the successful connection during the remaining acceptance checks; fix the interactive timeout and post-resume status reconciliation before Phase 14 closes.
+
+### Finding F14.3-02 — offline refresh exposes a raw network exception
+
+With Airplane mode enabled, **Back up now** was queued and a subsequent refresh correctly failed to reach Google, but the UI exposed the low-level DNS message `Unable to resolve host www.googleapis.com: No address associated with hostname`. Offline operation is expected and does not imply backup corruption, but this copy is too technical and does not tell the shopkeeper that the queued backup will retry after connectivity returns. Map this failure to concise offline/retry guidance while retaining diagnostic detail outside the user-facing message.
+
+## Safe pause checkpoint
+
+- The primary QA app remains connected to Google Drive with automatic Wi-Fi-only backup enabled and three verified encrypted recovery points.
+- No restore, disconnect, authorization revocation, package clear, or second-phone Saaf action was performed after the successful live checks.
+- The second phone's ordinary `com.saaf.milkshop` installation remains untouched; it was used only to view normal Google Drive, where no hidden recovery point appeared.
+- Resume by identifying whether inspection rejects the Saaf owner passphrase before the Android dialog or the cloud recovery passphrase inside the Android dialog. Do not record either value.
+- After inspection succeeds or the credential limitation is honestly resolved, finish metered-policy evidence and disconnect/revocation. Then fix F14.3-01 and F14.3-02 before closing Phase 14.
 
 ## Official setup requirements
 
@@ -51,7 +66,7 @@ Official references:
 ## Verified local and device preflight
 
 - Repository and Phase 14.2 checkpoint were clean before starting.
-- Generated `BuildConfig.GOOGLE_WEB_CLIENT_ID` is blank; no project-level or user-level Gradle value is present.
+- Before live injection, generated `BuildConfig.GOOGLE_WEB_CLIENT_ID` was blank and no persistent project/user Gradle value existed. The later OAuth-enabled build received the Web client ID only through its local command line.
 - The code uses native Credential Manager plus `AuthorizationClient`; Google authentication is not performed inside the WebView.
 - The authorization request contains only `drive.appdata`.
 - Drive list/upload paths explicitly use `spaces=appDataFolder` / parent `appDataFolder`.
@@ -81,10 +96,10 @@ Once the two OAuth clients and test account are ready:
 
 Never record or commit the Google password, access token, client secret, recovery passphrase, recovery code, real email address, or account-private Drive metadata.
 
-## Required user input
+## Resume point
 
-To continue the live half, the user must choose or create the Google Cloud project, register the Android QA client above, create the Web client in the same project, enable Drive API, add the owner-controlled test account to the OAuth test audience if required, and provide only the **Web client ID** for the local build. Account selection and all passwords/passphrases stay private on the phone.
+The external/testing Google Cloud project, Android client, Web client, narrow scope, and test audience are configured. The OAuth-enabled QA APK remains installed on the primary phone. On resume, keep the existing connection and three recovery points, distinguish the two private passphrase stages during inspection, and never paste credentials or recovery codes into chat or project files.
 
 ## Plain English
 
-The app's cloud-backup machinery passed all 25 tests we can run without contacting a real Google account. Google requires one registration for this exact Android test app plus a Web client ID used by Google's sign-in screen. Once those are created and a safe test account is chosen, we can perform the real upload, retry, recovery-point, and disconnect checks. No Google account details or secrets have been read or saved.
+The real Google connection works. It created three encrypted recovery points, hid them from normal Drive, and automatically completed an offline-queued backup after Wi-Fi returned. Two confusing error messages were found and recorded. We stopped safely before restore or disconnect because recovery-point inspection did not accept the expected private passphrase; no secret was collected or saved.

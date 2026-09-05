@@ -1,6 +1,6 @@
 # Phase 14 — Final Device QA
 
-Status: **IN PROGRESS — checkpoints 14.1–14.2 complete; checkpoint 14.3 preflight complete and live execution waiting for OAuth/account setup**
+Status: **IN PROGRESS — checkpoints 14.1–14.2 complete; checkpoint 14.3 live QA paused after successful upload/offline-retry evidence**
 
 ## Purpose
 
@@ -44,7 +44,7 @@ Completed on the isolated Samsung SM-A065F / Android 16. Two new tests exercise 
 - Exercise offline and metered-network behavior, missed scheduling, WorkManager retry, provider expiry, wrong-account handling, and safe degraded operation without blocking shop work.
 - Keep credentials, tokens, recovery passphrases, and account-private data out of project evidence and logs.
 
-Preflight completed on the isolated Samsung SM-A065F / Android 16. The explicit `.qa` cloud resilience suite passes 25/25, Google Play services and a Google-account reference are present, the implementation correctly uses only `drive.appdata` / `appDataFolder`, and the QA APK reproduces its accepted hash. The generated Web client ID remains blank. Current Google Android guidance also requires an Android OAuth client registered for `com.saaf.milkshop.qa` plus the QA/debug signing SHA-1, alongside the Web client whose ID is injected at build time. Live consent and Drive traffic wait for those two clients and the user's owner-controlled test account. See `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md`.
+Preflight completed on the isolated Samsung SM-A065F / Android 16 with the explicit `.qa` cloud resilience suite passing 25/25. The user then configured the dedicated external/testing Google project, narrow `drive.appdata` scope, Android/Web clients, and test audience. The OAuth-enabled `.qa` build passed its contract/cleanup gates and completed real consent, initial and manual encrypted uploads, hidden app-data listing, and offline queue/retry, reaching three verified recovery points. Recovery-point inspection paused when the expected private passphrase was not accepted, before the owner-versus-cloud authentication stage was isolated. Two verified UX defects are recorded: interactive Google setup can outlive the fixed 30-second bridge timer while succeeding in the background, and offline refresh exposes a raw DNS error. The connected state and recovery points remain intact. See `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md`.
 
 ### 14.4 — Second-device recovery
 
@@ -76,8 +76,8 @@ Preflight completed on the isolated Samsung SM-A065F / Android 16. The explicit 
 
 ## Current next action
 
-Continue checkpoint 14.3 after its external setup: register the QA Android OAuth client, supply the matching project's Web client ID outside source control, and use an owner-controlled OAuth test account to run consent, upload, listing, retry/degraded-operation, and revocation checks on the isolated-QA Samsung. Checkpoint 14.4 has a connected candidate phone, but installing the separate QA package or performing recovery there requires an explicit safe-use decision because its ordinary Saaf installation must remain untouched.
+Resume checkpoint 14.3 without clearing or disconnecting the existing QA installation. Identify whether recovery-point inspection rejects the Saaf owner passphrase before the Android dialog or the separate cloud recovery passphrase inside it; do not record either value. Then finish inspection, metered-policy, and disconnect/revocation evidence, and close the two recorded UX defects. Checkpoint 14.4 has a connected candidate phone, but installing the separate QA package or performing recovery there requires an explicit safe-use decision because its ordinary Saaf installation must remain untouched.
 
 ## Plain English
 
-The safe test app works on the primary Samsung, and every user role sees only its approved work. The cloud-backup machinery has now also passed all 25 tests that do not contact a real Google account. The remaining live test needs the QA app registered with Google, a Web client ID, and an owner-controlled test account. The second phone still has its ordinary Saaf app and will not be changed until separate QA use is confirmed.
+The safe test app works on the primary Samsung, every role sees only its approved work, and the real Google backup now creates hidden encrypted recovery points and survives an offline queue. We found two confusing error messages and paused safely when recovery-point inspection did not accept the expected private passphrase. The Google connection and three recovery points remain intact. The second phone's ordinary Saaf app was not changed.

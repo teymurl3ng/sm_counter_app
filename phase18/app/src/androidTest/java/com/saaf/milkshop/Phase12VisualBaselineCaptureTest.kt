@@ -61,7 +61,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Captures the Phase 12 before-state from the real packaged UI on a physical device.
+ * Captures and audits the current Phase 12 UI on a real physical device.
  *
  * Run only against the isolated QA identity after clearing com.saaf.milkshop.qa, with
  * -Pandroid.testInstrumentationRunnerArguments.saafSkipBootstrap=true. The output is
@@ -413,6 +413,7 @@ class Phase12VisualBaselineCaptureTest {
     private fun capturePage(driver: HybridWebViewTestDriver, state: String) {
         driver.evaluate("document.activeElement?.blur(); window.scrollTo(0, 0); true")
         settle()
+        assertSurfaceQuality(driver, state, null)
         saveScreenshot(driver, state, "top")
         val tall = driver.evaluate("document.scrollingElement.scrollHeight > window.innerHeight + 120") == "true"
         if (tall) {
@@ -430,6 +431,7 @@ class Phase12VisualBaselineCaptureTest {
         driver.waitFor("document.querySelector($quoted) !== null")
         driver.evaluate("(() => { const panel = document.querySelector($quoted); document.activeElement?.blur(); panel.scrollTop = 0; return true; })()")
         settle()
+        assertSurfaceQuality(driver, state, selector)
         saveScreenshot(driver, state, "top")
         val tall = driver.evaluate("(() => { const panel = document.querySelector($quoted); return panel.scrollHeight > panel.clientHeight + 80; })()") == "true"
         if (tall) {
@@ -437,6 +439,221 @@ class Phase12VisualBaselineCaptureTest {
             settle()
             saveScreenshot(driver, state, "bottom")
         }
+    }
+
+    private fun assertSurfaceQuality(driver: HybridWebViewTestDriver, state: String, selector: String?) {
+        val root = selector?.let { "document.querySelector(${JSONObject.quote(it)})" } ?: "document.documentElement"
+        assertTrue(
+            "$state has horizontally clipped content",
+            driver.evaluate(
+                """
+                    (() => {
+                      const root = $root;
+                      return root && root.scrollWidth <= root.clientWidth + 1;
+                    })()
+                """.trimIndent(),
+            ) == "true",
+        )
+        assertTrue(
+            "$state has a visible control smaller than the 48 CSS-pixel target",
+            driver.evaluate(
+                """
+                    (() => {
+                      const root = $root;
+                      const visible = (element) => {
+                        const style = getComputedStyle(element);
+                        const bounds = element.getBoundingClientRect();
+                        return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 && bounds.width > 0 && bounds.height > 0;
+                      };
+                      const controls = Array.from(root.querySelectorAll('button, input, select, textarea, a[href], [role="button"]'))
+                        .filter((element) => element.getAttribute('tabindex') !== '-1' && element.getAttribute('type') !== 'hidden' && visible(element));
+                      return controls.every((element) => {
+                        const type = element.getAttribute('type');
+                        const target = (type === 'checkbox' || type === 'radio') ? element.closest('label') : element;
+                        if (!target) return false;
+                        const bounds = target.getBoundingClientRect();
+                        return bounds.width >= 47 && bounds.height >= 47;
+                      });
+                    })()
+                """.trimIndent(),
+            ) == "true",
+        )
+        assertTrue(
+            "$state has visible text below the 12 CSS-pixel minimum",
+            driver.evaluate(
+                """
+                    (() => {
+                      const root = $root;
+                      const visibleTextElements = Array.from(root.querySelectorAll('*')).filter((element) => {
+                        const style = getComputedStyle(element);
+                        const bounds = element.getBoundingClientRect();
+                        const hasDirectText = Array.from(element.childNodes).some((node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0);
+                        return hasDirectText && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 && bounds.width > 0 && bounds.height > 0;
+                      });
+                      return visibleTextElements.every((element) => parseFloat(getComputedStyle(element).fontSize) >= 12);
+                    })()
+                """.trimIndent(),
+            ) == "true",
+        )
+        val contrastPassed = driver.evaluate(
+                """
+                    (() => {
+                      const root = $root;
+                      const parse = (value) => {
+                        if (value === 'transparent') return [0, 0, 0, 0];
+                        const parts = value.match(/-?[\d.]+/g)?.map(Number) ?? [];
+                        if (value.startsWith('oklch')) {
+                          const segments = value.split('/');
+                          const colorParts = segments[0].match(/-?[\d.]+/g)?.map(Number) ?? [];
+                          const alphaParts = segments[1]?.match(/[\d.]+/g)?.map(Number) ?? [];
+                          const lightness = colorParts[0] > 1 ? colorParts[0] / 100 : colorParts[0];
+                          const chroma = colorParts[1] ?? 0;
+                          const hue = (colorParts[2] ?? 0) * Math.PI / 180;
+                          const alpha = alphaParts.length === 0 ? 1 : alphaParts[0] > 1 ? alphaParts[0] / 100 : alphaParts[0];
+                          const a = chroma * Math.cos(hue);
+                          const b = chroma * Math.sin(hue);
+                          const lRoot = lightness + 0.3963377774 * a + 0.2158037573 * b;
+                          const mRoot = lightness - 0.1055613458 * a - 0.0638541728 * b;
+                          const sRoot = lightness - 0.0894841775 * a - 1.291485548 * b;
+                          const l = lRoot * lRoot * lRoot;
+                          const m = mRoot * mRoot * mRoot;
+                          const s = sRoot * sRoot * sRoot;
+                          const linear = [
+                            4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+                            -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+                            -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
+                          ];
+                          const srgb = linear.map((channel) => {
+                            const encoded = channel <= 0.0031308 ? 12.92 * channel : 1.055 * Math.pow(channel, 1 / 2.4) - 0.055;
+                            return Math.min(1, Math.max(0, encoded)) * 255;
+                          });
+                          return [srgb[0], srgb[1], srgb[2], alpha];
+                        }
+                        if (value.startsWith('oklab')) {
+                          const segments = value.split('/');
+                          const colorParts = segments[0].match(/-?[\d.]+/g)?.map(Number) ?? [];
+                          const alphaParts = segments[1]?.match(/[\d.]+/g)?.map(Number) ?? [];
+                          const lightness = colorParts[0] > 1 ? colorParts[0] / 100 : colorParts[0];
+                          const a = colorParts[1] ?? 0;
+                          const b = colorParts[2] ?? 0;
+                          const alpha = alphaParts.length === 0 ? 1 : alphaParts[0] > 1 ? alphaParts[0] / 100 : alphaParts[0];
+                          const lRoot = lightness + 0.3963377774 * a + 0.2158037573 * b;
+                          const mRoot = lightness - 0.1055613458 * a - 0.0638541728 * b;
+                          const sRoot = lightness - 0.0894841775 * a - 1.291485548 * b;
+                          const l = lRoot * lRoot * lRoot;
+                          const m = mRoot * mRoot * mRoot;
+                          const s = sRoot * sRoot * sRoot;
+                          const linear = [
+                            4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+                            -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+                            -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
+                          ];
+                          const srgb = linear.map((channel) => {
+                            const encoded = channel <= 0.0031308 ? 12.92 * channel : 1.055 * Math.pow(channel, 1 / 2.4) - 0.055;
+                            return Math.min(1, Math.max(0, encoded)) * 255;
+                          });
+                          return [srgb[0], srgb[1], srgb[2], alpha];
+                        }
+                        if (value.startsWith('color(srgb')) {
+                          const segments = value.split('/');
+                          const colorParts = segments[0].match(/-?[\d.]+/g)?.map(Number) ?? [];
+                          const alphaParts = segments[1]?.match(/[\d.]+/g)?.map(Number) ?? [];
+                          const alpha = alphaParts.length === 0 ? 1 : alphaParts[0] > 1 ? alphaParts[0] / 100 : alphaParts[0];
+                          return [
+                            (colorParts[0] ?? 0) * 255,
+                            (colorParts[1] ?? 0) * 255,
+                            (colorParts[2] ?? 0) * 255,
+                            alpha,
+                          ];
+                        }
+                        return [parts[0] ?? 0, parts[1] ?? 0, parts[2] ?? 0, parts[3] ?? 1];
+                      };
+                      const blend = (front, back) => {
+                        const alpha = front[3] + back[3] * (1 - front[3]);
+                        if (alpha === 0) return [0, 0, 0, 0];
+                        return [
+                          (front[0] * front[3] + back[0] * back[3] * (1 - front[3])) / alpha,
+                          (front[1] * front[3] + back[1] * back[3] * (1 - front[3])) / alpha,
+                          (front[2] * front[3] + back[2] * back[3] * (1 - front[3])) / alpha,
+                          alpha,
+                        ];
+                      };
+                      const background = (element) => {
+                        const chain = [];
+                        for (let current = element; current; current = current.parentElement) chain.push(current);
+                        let color = [247, 246, 240, 1];
+                        chain.reverse().forEach((current) => { color = blend(parse(getComputedStyle(current).backgroundColor), color); });
+                        return color;
+                      };
+                      const backgroundSources = (element) => {
+                        const sources = [];
+                        for (let current = element; current; current = current.parentElement) {
+                          const value = getComputedStyle(current).backgroundColor;
+                          if (value !== 'transparent' && value !== 'rgba(0, 0, 0, 0)') sources.push(value);
+                        }
+                        return sources.slice(0, 3).join('>');
+                      };
+                      const luminance = (color) => {
+                        const channels = color.slice(0, 3).map((value) => {
+                          const normalized = value / 255;
+                          return normalized <= 0.04045 ? normalized / 12.92 : Math.pow((normalized + 0.055) / 1.055, 2.4);
+                        });
+                        return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+                      };
+                      const contrast = (first, second) => {
+                        const light = Math.max(luminance(first), luminance(second));
+                        const dark = Math.min(luminance(first), luminance(second));
+                        return (light + 0.05) / (dark + 0.05);
+                      };
+                      const textElements = Array.from(root.querySelectorAll('*')).filter((element) => {
+                        const style = getComputedStyle(element);
+                        const bounds = element.getBoundingClientRect();
+                        const hasDirectText = Array.from(element.childNodes).some((node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0);
+                        return hasDirectText && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 && bounds.width > 0 && bounds.height > 0;
+                      });
+                      const failures = textElements.map((element) => {
+                        if (element.matches(':disabled') || element.closest(':disabled')) return null;
+                        const style = getComputedStyle(element);
+                        const backgroundColor = background(element);
+                        const foregroundColor = blend(parse(style.color), backgroundColor);
+                        const fontSize = parseFloat(style.fontSize);
+                        const fontWeight = Number(style.fontWeight) || 400;
+                        const largeText = fontSize >= 24 || (fontSize >= 18.66 && fontWeight >= 700);
+                        const ratio = contrast(foregroundColor, backgroundColor);
+                        if (ratio >= (largeText ? 2.95 : 4.45)) return null;
+                        return element.tagName.toLowerCase() + '#' + (element.id || '-') + ' "' + element.textContent.trim().slice(0, 60) + '" ratio=' + ratio.toFixed(2) + ' fg=' + style.color + ' bg=' + backgroundColor.slice(0, 3).map(Math.round).join(',') + ' rawbg=' + backgroundSources(element);
+                      }).filter(Boolean);
+                      document.documentElement.dataset.contrastFailures = failures.slice(0, 5).join(' | ');
+                      return failures.length === 0;
+                    })()
+                """.trimIndent(),
+            )
+        val contrastFailures = if (contrastPassed == "true") "" else driver.evaluate("document.documentElement.dataset.contrastFailures")
+        assertTrue(
+            "$state has visible text below the WCAG AA contrast target: $contrastFailures",
+            contrastPassed == "true",
+        )
+        assertTrue(
+            "$state has an unlabelled visible form control or dialog",
+            driver.evaluate(
+                """
+                    (() => {
+                      const root = $root;
+                      const visible = (element) => {
+                        const style = getComputedStyle(element);
+                        const bounds = element.getBoundingClientRect();
+                        return style.display !== 'none' && style.visibility !== 'hidden' && bounds.width > 0 && bounds.height > 0;
+                      };
+                      const fields = Array.from(root.querySelectorAll('input, select, textarea'))
+                        .filter((element) => element.getAttribute('type') !== 'hidden' && visible(element));
+                      const fieldsLabelled = fields.every((element) => element.labels?.length > 0 || element.hasAttribute('aria-label') || element.hasAttribute('aria-labelledby'));
+                      const dialogs = [root, ...Array.from(root.querySelectorAll('[role="dialog"]'))].filter((element) => element?.getAttribute?.('role') === 'dialog' && visible(element));
+                      const dialogsLabelled = dialogs.every((element) => element.hasAttribute('aria-label') || (element.hasAttribute('aria-labelledby') && document.getElementById(element.getAttribute('aria-labelledby'))));
+                      return fieldsLabelled && dialogsLabelled;
+                    })()
+                """.trimIndent(),
+            ) == "true",
+        )
     }
 
     private fun saveScreenshot(driver: HybridWebViewTestDriver, state: String, position: String) {

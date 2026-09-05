@@ -47,7 +47,7 @@ export function FinancialReportSection({ overview, profitability }: {
           </article>;
         })}
       </div>}
-      <p className="mt-3 text-xs leading-5 text-slate-500">Basis: management estimate using saved product costs. Scope: recorded cost only; no lower-selling-price adjustment.</p>
+      <p className="mt-3 text-sm leading-5 text-slate-600">Basis: management estimate using saved product costs. Scope: recorded cost only; no lower-selling-price adjustment.</p>
     </section>
     <div className="grid gap-5 lg:grid-cols-2">
       <AccountList title="Customer balances now" empty="No customer balances are recorded." kind="customer" accounts={overview.customers} />
@@ -57,11 +57,11 @@ export function FinancialReportSection({ overview, profitability }: {
 }
 
 function AccountList({ title, empty, kind, accounts }: { title: string; empty: string; kind: LedgerKind; accounts: ReadonlyArray<AccountPositionDto> }) {
-  return <section><h2 className="text-lg font-bold">{title}</h2>{accounts.length === 0 ? <Empty message={empty} /> : <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white">{accounts.map((account) => { const meaning = balanceMeaning(kind, account.canonicalBalancePaisa); return <div key={account.accountId} className="flex items-center justify-between gap-4 border-b border-slate-100 px-4 py-3 last:border-b-0"><div><p className="font-semibold">{account.name}</p><p className={`text-xs ${meaning.tone}`}>{meaning.label}</p></div><span className="text-sm font-bold">{meaning.amount}</span></div>; })}</div>}</section>;
+  return <section><h2 className="text-lg font-bold">{title}</h2>{accounts.length === 0 ? <Empty message={empty} /> : <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white">{accounts.map((account) => { const meaning = balanceMeaning(kind, account.canonicalBalancePaisa); return <div key={account.accountId} className="flex items-center justify-between gap-4 border-b border-slate-100 px-4 py-3 last:border-b-0"><div><p className="font-semibold">{account.name}</p><p className={`text-xs ${meaning.tone}`}>{meaning.label}</p></div><span className="whitespace-nowrap text-sm font-bold tabular-nums">{meaning.amount}</span></div>; })}</div>}</section>;
 }
 
 function Row({ label, value }: { label: string; value: string }) {
-  return <div className="flex items-start justify-between gap-4"><dt className="text-slate-500">{label}</dt><dd className="text-right font-semibold text-slate-900">{value}</dd></div>;
+  return <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4"><dt className="text-slate-600">{label}</dt><dd className="whitespace-nowrap text-right font-semibold text-slate-900 tabular-nums">{value}</dd></div>;
 }
 
 function Empty({ message }: { message: string }) {

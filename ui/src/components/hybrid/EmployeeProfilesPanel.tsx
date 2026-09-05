@@ -59,8 +59,8 @@ function EmployeeRow({ busy, employee, onEdit, onDeactivate, onRestore }: { busy
   return <article data-employee-id={employee.accountId} className="p-4"><div className="flex items-start justify-between gap-3"><div className="min-w-0">
     <h2 className="font-bold text-slate-900">{employee.name}</h2>
     {employee.roleLabel && <p className="text-sm text-slate-600">Job: {employee.roleLabel}</p>}
-    <p className="mt-1 text-sm font-semibold text-slate-700">Salary balance: {formatPaisa(employee.canonicalBalancePaisa)}</p>
-    <p className="text-xs text-slate-400">Calculated from saved salary transactions; it cannot be edited here.</p>
+    <p className="mt-1 text-sm font-semibold text-slate-700">Salary balance: <span className="whitespace-nowrap tabular-nums">{formatPaisa(employee.canonicalBalancePaisa)}</span></p>
+    <p className="text-sm leading-5 text-slate-600">Calculated from saved salary transactions; it cannot be edited here.</p>
     {employee.phone && <p className="mt-2 text-sm text-slate-600">Phone: {employee.phone}</p>}
     {employee.referenceSalaryPaisa !== null && <p className="text-sm text-slate-600">Reference salary: {formatPaisa(employee.referenceSalaryPaisa)}{employee.salaryPeriodCode ? ` / ${employee.salaryPeriodCode.replace('_', ' ')}` : ''}</p>}
     {employee.joinDate && <p className="text-sm text-slate-600">Joined: {employee.joinDate}</p>}
@@ -82,7 +82,7 @@ function EmployeeForm({ busy, employee, onClose, onSave }: { busy: boolean; empl
     <TextInput id="employee-reference-salary" label="Reference salary in PKR (optional)" value={referenceSalaryRupees} onChange={setReferenceSalaryRupees} inputMode="decimal" required={false} />
     <label className="mb-4 block text-sm font-semibold text-slate-700">Salary period (optional)<select id="employee-salary-period" value={salaryPeriodCode} onChange={(event) => setSalaryPeriodCode(event.target.value)} className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5"><option value="">Not set</option><option value="monthly">Monthly</option><option value="weekly">Weekly</option><option value="daily">Daily</option></select></label>
     <TextInput id="employee-join-date" label="Join date (optional)" value={joinDate} onChange={setJoinDate} type="date" required={false} />
-    <p className="mb-4 rounded-xl bg-sky-50 px-3 py-2 text-xs leading-5 text-sky-800">This creates a staff record only. It does not create an app login. The owner controls app accounts and permissions separately.</p>
+    <p className="mb-4 rounded-xl bg-sky-50 px-3 py-2 text-sm leading-5 text-sky-900">This creates a staff record only. It does not create an app login. The owner controls app accounts and permissions separately.</p>
     {localError && <Notice message={localError} />}
     <button id="save-employee-button" disabled={busy} className="w-full rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white disabled:cursor-wait disabled:opacity-60">{busy ? 'Saving…' : employee ? 'Save employee' : 'Add employee'}</button>
   </form></Dialog>;

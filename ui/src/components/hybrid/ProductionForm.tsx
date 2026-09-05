@@ -34,7 +34,7 @@ export function ProductionForm({ busy, milkAvailable, onRecordProduction }: {
         <TextInput id="production-yogurt-produced" label="Yogurt produced (kg)" value={yogurtKgProduced} onChange={setYogurtKgProduced} inputMode="decimal" />
       </div>
       <label className="mb-4 block text-sm font-semibold text-slate-700">Batch notes (optional)<textarea id="production-notes" value={notes} onChange={(event) => setNotes(event.target.value)} rows={3} className="mt-1.5 w-full resize-none rounded-xl border border-slate-300 bg-white px-3 py-2.5" /></label>
-      <p className="mb-4 text-xs leading-5 text-slate-500">The app stores this batch for stock, yield, and costing review. It does not automatically declare a financial loss.</p>
+      <p className="mb-4 text-sm leading-5 text-slate-600">The app stores this batch for stock, yield, and costing review. It does not automatically declare a financial loss.</p>
       {localError && <Notice message={localError} />}
       <button id="record-production-button" disabled={busy} className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white disabled:cursor-wait disabled:opacity-60"><Factory className="h-4 w-4" />{busy ? 'Recording…' : 'Record production batch'}</button>
       {recorded && <div id="production-result" className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-950"><p className="font-bold">Production batch recorded</p><p className="mt-2 text-sm text-emerald-800">Milk stock reduced by <strong>{recorded.milkLitersUsed} liters</strong> and Yogurt stock increased by <strong>{recorded.yogurtKgProduced} kg</strong>.</p><p className="mt-2 text-xs text-emerald-700">Batch record #{recorded.eventId}</p></div>}

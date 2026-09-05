@@ -36,6 +36,7 @@ The current light theme is the approved Phase 12 theme. Do not add a partial dar
 | --- | --- | --- |
 | Brand header | `#004F3B` | Screen header and Android status-bar protection |
 | Primary action | `#007A55` | The main safe action in a task or section |
+| Warning action | `#B45309` | Correction, archive, and deactivation actions requiring caution and white-text contrast |
 | Brand soft | `#ECFDF5` | Selected and positive supporting states |
 | Canvas | `#F7F6F0` | App background |
 | Surface | `#FFFFFF` | Cards, sheets, fields, and bottom navigation |
@@ -156,10 +157,10 @@ Phase 12.2 used a deliberately small set of sources. The table distinguishes evi
 | --- | --- | --- |
 | `PRODUCT_SCOPE.md` and the established native contracts | Kept the target proportional to an owner-managed business, rejected enterprise-density and feature-parity pressure, and prohibited presentation work from changing formulas or native meaning. | Directly applied |
 | Phase 12.1 Samsung screenshots and packaged UI | Preserved the existing green/cream identity and supplied the actual compact-phone constraints from which the tokens and Android priorities were derived. | Directly applied |
-| Android core app quality | Set the Android-first quality frame, representative physical-device verification, 48 dp touch-target target, readable contrast, consistent rendering, and adaptive behavior. | Directly applied to the target; full screen-by-screen verification remains 12.4 |
+| Android core app quality | Set the Android-first quality frame, representative physical-device verification, 48 dp touch-target target, readable contrast, consistent rendering, and adaptive behavior. | Directly applied and verified screen by screen in 12.4 |
 | Android edge-to-edge and system-bar guidance | Led directly to the branded top-inset gradient protection, retained edge-to-edge layout, and explicit status/navigation icon treatment. | Directly implemented and device-tested |
-| WCAG 2.2 | Set the AA contrast, visible focus, label/error relationship, non-color-only meaning, and reduced-motion expectations. | Directly applied to the target; comprehensive accessibility audit remains 12.4 |
-| ISO 9241-11 and Nielsen usability heuristics | Support the broader effectiveness, efficiency, feedback, consistency, error-prevention, and plain-language review framework. | Policy reference only in 12.2; task-flow application begins in 12.3 |
+| WCAG 2.2 | Set the AA contrast, visible focus, label/error relationship, non-color-only meaning, and reduced-motion expectations. | Directly applied; the 12.4 physical-device gate verifies visible-text contrast, target size, readable text, and labels without claiming external certification |
+| ISO 9241-11 and Nielsen usability heuristics | Support the broader effectiveness, efficiency, feedback, consistency, error-prevention, and plain-language review framework. | Applied proportionally to navigation in 12.3 and screen consistency, feedback, forms, and dialogs in 12.4 |
 | IAS 2, IFRS for SMEs, FAO, and Codex dairy guidance | Continue to govern applicable function/formula/domain decisions through existing decision records. | Not re-evaluated in 12.2 because no business function or formula changed |
 | Impeccable, UI/UX Pro Max, and ui-check | Their suggested approach—establish a design authority, capture real screens, and report evidence—helped frame the discussion. | Not installed or executed in 12.2 |
 | axe, Lighthouse, Playwright, competitor-product reviews, and formal owner/staff usability sessions | Potential evidence for later accessibility, responsive, or task-flow work. | Not run in 12.2; no pass or conformity claim is made |
@@ -181,7 +182,7 @@ Reject a visual change when it adds unsupported behavior, changes a formula or n
 
 ## Current migration boundary
 
-Checkpoint 12.2 establishes the target and fixes the shared Android rendering foundation. Checkpoint 12.3 applies it to navigation and task flow. Checkpoint 12.4 applies it screen by screen, including text size, touch targets, forms, dialogs, responsive behavior, and accessibility. Existing nonconforming screens remain findings until those checkpoints verify them.
+Checkpoint 12.2 established the target and shared Android rendering foundation. Checkpoint 12.3 applied it to navigation and task flow. Checkpoint 12.4 applied and physically verified it across all retained screens, including text size, touch targets, forms, dialogs, responsive behavior, labels, and visible-text contrast. Checkpoint 12.5 now owns measured presentation performance; 12.6 owns the complete regression and handoff gate.
 
 ## Plain English
 

@@ -56,7 +56,7 @@ export function SecurityWorkspace({ currentUser, employees, actions, canManageUs
   const updateEnabled = async (user: UserAdministrationDto, enabled: boolean, passphrase: string) => setBundle(await run(() => actions.setEnabled(user.userId, enabled, passphrase), `${user.displayName}'s account was ${enabled ? 'enabled' : 'disabled'}.`));
 
   return <div>
-    <div className="mb-5 flex rounded-xl bg-slate-100 p-1">
+    <div className="mb-5 grid grid-flow-col auto-cols-fr rounded-xl bg-slate-100 p-1">
       <FilterButton id="security-account-tab" active={area === 'account'} onClick={() => setArea('account')}>My account</FilterButton>
       {canManageUsers && <FilterButton id="security-staff-tab" active={area === 'staff'} onClick={() => setArea('staff')}>Staff accounts</FilterButton>}
       {canViewAudit && <FilterButton id="security-audit-tab" active={area === 'audit'} onClick={() => setArea('audit')}>Security history</FilterButton>}

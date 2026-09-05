@@ -54,13 +54,13 @@ export function CostingPlanningWorkspace({ actions, settings, masterData }: {
 
   return <div id="costing-planning-workspace">
     <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-      <div className="flex flex-wrap gap-1 rounded-xl bg-slate-100 p-1">
+      <div className="grid w-full grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1 sm:w-auto sm:grid-cols-4">
         <FilterButton id="planning-tab" active={area === 'planning'} onClick={() => setArea('planning')}>Plans & targets</FilterButton>
         <FilterButton id="yogurt-cost-tab" active={area === 'yogurt-cost'} onClick={() => setArea('yogurt-cost')}>Yogurt cost</FilterButton>
         <FilterButton id="opening-cost-tab" active={area === 'opening-cost'} onClick={() => setArea('opening-cost')}>Opening stock cost</FilterButton>
         <FilterButton id="yield-review-tab" active={area === 'yield-review'} onClick={() => setArea('yield-review')}>Yield & loss review</FilterButton>
       </div>
-      <button id="refresh-costing-planning" type="button" disabled={busy} onClick={() => void load().catch(() => undefined)} className="flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-700 disabled:opacity-50"><RefreshCw className={`h-4 w-4 ${busy ? 'animate-spin' : ''}`} />Refresh</button>
+      <button id="refresh-costing-planning" type="button" disabled={busy} onClick={() => void load().catch(() => undefined)} className="flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-700 disabled:opacity-50"><RefreshCw className={`h-4 w-4 ${busy ? 'animate-spin' : ''}`} />Refresh</button>
     </div>
     {error && <Notice message={error} />}
     {notice && <Notice message={notice} success />}

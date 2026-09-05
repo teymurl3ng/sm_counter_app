@@ -47,17 +47,17 @@ There is no Phase 12.1 P0 finding: the review exposed no saved secret, destructi
 
 ### P2 — address while applying the Phase 12 presentation system
 
-1. **Forms are taller than necessary.** Large gaps and repeated full-width controls push primary actions several screens below the title, increasing work for frequent shop-floor entries.
+1. **Forms are taller than necessary — addressed in 12.4.** Shared field spacing is tighter and consistent, controls retain the required 48 px touch height, and long dialogs keep their title/close action visible while offering a direct route to the final actions. Some complete forms still require honest vertical scrolling on a compact phone rather than shrinking text or targets.
 2. **Secondary-area navigation loses context — resolved in 12.3.** The fifth bottom-navigation destination now adopts the active secondary area's real icon and label while retaining access to the grouped chooser.
-3. **Dense content wraps awkwardly.** Some monetary summaries split `PKR` from the value, compact headings wrap onto three lines, and long explanatory copy competes with the immediate action.
-4. **Long bottom sheets need stronger mobile structure.** Customer and employee entry sheets approach the full viewport and require internal scrolling; action placement and section grouping should remain obvious throughout.
-5. **Small/low-contrast supporting text needs an accessibility pass.** Phase 12.3 raised bottom-navigation labels to the 12 px presentation minimum and allowed complete labels to wrap; muted slate text, disabled controls, status-bar icons, and remaining supporting copy still require contrast and readable-size verification in checkpoint 12.4.
+3. **Dense content wraps awkwardly — resolved in 12.4.** Material money uses tabular numerals and keeps `PKR` with its value; account, report, planning, and opening-state layouts stack or reflow when the phone cannot support a stable side-by-side presentation.
+4. **Long bottom sheets need stronger mobile structure — resolved in 12.4.** Shared dialogs now have a labelled sticky header, 48 px close action, focus entry/restoration, contained Tab behavior, Escape handling, internal scrolling, and a discoverable route to the final actions.
+5. **Small/low-contrast supporting text needs an accessibility pass — resolved in 12.4.** Supporting copy was raised or darkened where required. The final physical-device capture gate enforces the 12 px visible-text floor and WCAG-AA contrast target for visible enabled text, and it found two real contrast weaknesses that were corrected before acceptance.
 
 ## Locked interpretation
 
 - Phase 12.1 changed test/evidence infrastructure only; production UI and business behavior are untouched.
 - The findings are presentation defects or risks. Native accounting, authorization, audit, backup, and recovery semantics remain outside this phase's UI edit boundary.
-- Baseline screenshots are review evidence, not golden tests yet. The apparent paint defect was isolated to scaled previewing, and the Phase 12.2 visual target is now locked; screen-level golden-test policy can be decided after 12.4 completes the intended visual changes.
+- Baseline and 12.4 screenshots remain review evidence rather than pixel-golden tests. The executable 12.4 gate checks layout/accessibility properties before capture without making harmless pixel-level rendering differences into failures.
 
 ## Verification
 
@@ -68,8 +68,8 @@ There is no Phase 12.1 P0 finding: the review exposed no saved secret, destructi
 
 ## Next gate
 
-Checkpoint 12.3 resolved the Daily work and secondary-location navigation findings. Checkpoint 12.4 now applies `DESIGN.md` screen by screen, including the remaining density, typography, dialog, responsive, and accessibility findings.
+Checkpoint 12.4 resolved the remaining density, typography, dialog, responsive, label, and contrast findings across all 58 retained states. Checkpoint 12.5 now measures presentation performance on a release-equivalent build before any optimization is accepted.
 
 ## Plain English
 
-We photographed every important app screen and state on the real Samsung phone, using realistic shop data. The misleading preview problem, phone-level status-bar foundation, crowded Daily work choices, and generic More location are now resolved. Form density, visual consistency, responsive behavior, and accessibility follow in 12.4.
+We photographed every important app screen and state on the real Samsung phone, using realistic shop data. The original navigation, inset, density, wrapping, long-dialog, label, and contrast findings are now addressed through checkpoints 12.2–12.4. The next work is measuring speed, not adding more visual features.

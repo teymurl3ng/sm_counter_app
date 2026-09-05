@@ -43,7 +43,7 @@ export function HybridNavigation({ items, activeArea, onSelect }: {
         <div className="mb-5 flex items-center justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">Saaf Milk</p><h2 id="navigation-more-title" className="mt-1 text-xl font-bold text-slate-900">More areas</h2></div><button id="close-navigation-more" type="button" data-native-back-close onClick={() => setOpen(false)} className="rounded-xl bg-white p-2.5 text-slate-500 shadow-sm" aria-label="Close"><X className="h-5 w-5" /></button></div>
         <div className="grid gap-5 sm:grid-cols-2">{groupOrder.map((group) => {
           const groupItems = secondary.filter((item) => item.group === group);
-          return groupItems.length > 0 && <div key={group}><h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">{group}</h3><div className="grid grid-cols-2 gap-2">{groupItems.map((item) => <NavigationButton key={item.area} item={item} active={item.area === activeArea} expanded onClick={() => select(item.area)} tabIndex={open ? 0 : -1} />)}</div></div>;
+          return groupItems.length > 0 && <div key={group}><h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-600">{group}</h3><div className="grid grid-cols-2 gap-2">{groupItems.map((item) => <NavigationButton key={item.area} item={item} active={item.area === activeArea} expanded onClick={() => select(item.area)} tabIndex={open ? 0 : -1} />)}</div></div>;
         })}</div>
       </section>
     </div>}

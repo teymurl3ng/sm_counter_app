@@ -48,7 +48,7 @@ export function ExpenseForm({ busy, references, onRecordExpense }: {
         <TextInput id="expense-date" label="Business date" type="date" value={occurredAt} onChange={setOccurredAt} />
       </div>
       <label className="mb-4 block text-sm font-semibold text-slate-700">Notes (optional)<textarea id="expense-notes" value={notes} onChange={(event) => setNotes(event.target.value)} rows={3} className="mt-1.5 w-full resize-none rounded-xl border border-slate-300 bg-white px-3 py-2.5" /></label>
-      <p className="mb-4 text-xs leading-5 text-slate-500">The amount is removed from the selected cash or bank balance and recorded under the chosen expense category.</p>
+      <p className="mb-4 text-sm leading-5 text-slate-600">The amount is removed from the selected cash or bank balance and recorded under the chosen expense category.</p>
       {localError && <Notice message={localError} />}
       <button id="record-expense-button" disabled={busy} className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white disabled:cursor-wait disabled:opacity-60"><ReceiptText className="h-4 w-4" />{busy ? 'Recording…' : 'Record expense'}</button>
       {recorded && <div id="expense-result" className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-950"><p className="font-bold">Expense recorded</p><p className="mt-2 text-sm text-emerald-800"><strong>PKR {recorded.amountRupees}</strong> was paid from <strong>{recorded.paymentAccountName}</strong> for <strong>{recorded.categoryName}</strong>.</p><p className="mt-2 text-xs text-emerald-700">Expense record #{recorded.eventId}</p></div>}

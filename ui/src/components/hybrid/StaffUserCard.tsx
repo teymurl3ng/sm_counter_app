@@ -36,7 +36,7 @@ export function StaffUserCard({ currentUser, user, employees, roles, busy, onRes
   return <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
     <div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="font-bold">{user.displayName}</h3><p className="font-mono text-xs text-slate-500">{user.loginName}</p></div><span className={`rounded-full px-2.5 py-1 text-xs font-bold ${active && !user.setupRequired ? 'bg-emerald-50 text-emerald-800' : user.setupRequired ? 'bg-amber-50 text-amber-800' : 'bg-slate-100 text-slate-600'}`}>{status}</span></div>
     <p className="mt-3 text-sm text-slate-600">{roleLabel(user.roleCode)}{employee ? ` · Linked to ${employee.name}` : ' · No employee link'}</p>
-    {!canControl && <p className="mt-3 rounded-xl bg-slate-50 p-3 text-xs leading-5 text-slate-600">Only an owner can change this powerful account.</p>}
+    {!canControl && <p className="mt-3 rounded-xl bg-slate-50 p-3 text-sm leading-5 text-slate-600">Only an owner can change this powerful account.</p>}
     {canControl && <div className="mt-4 flex flex-wrap gap-2">
       {active && user.setupRequired && <ActionButton id={`resume-user-${user.userId}`} onClick={() => setAction('resume')}>Finish private setup</ActionButton>}
       {active && !user.setupRequired && <ActionButton id={`reset-user-${user.userId}`} onClick={() => setAction('reset')}>Reset passphrase</ActionButton>}
@@ -53,7 +53,7 @@ export function StaffUserCard({ currentUser, user, employees, roles, busy, onRes
 }
 
 function ActionButton({ id, onClick, children }: { id: string; onClick(): void; children: string }) {
-  return <button id={id} onClick={onClick} className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-700">{children}</button>;
+  return <button id={id} onClick={onClick} className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold text-slate-700">{children}</button>;
 }
 
 function actionTitle(action: Action, name: string): string {

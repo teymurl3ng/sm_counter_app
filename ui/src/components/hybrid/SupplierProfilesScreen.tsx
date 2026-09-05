@@ -62,8 +62,8 @@ export function SupplierProfilesScreen({ busy, suppliers, error, notice, onSave,
 function SupplierRow({ busy, supplier, onEdit, onDeactivate, onRestore }: { busy: boolean; supplier: VendorDto; onEdit(): void; onDeactivate(): void; onRestore(): Promise<void> }) {
   return <article data-supplier-id={supplier.accountId} className="p-4"><div className="flex items-start justify-between gap-3"><div className="min-w-0">
     <div className="flex items-center gap-2"><Truck className="h-4 w-4 text-slate-400" /><h2 className="font-bold text-slate-900">{supplier.name}</h2></div>
-    <p className={`mt-1 text-sm font-semibold ${supplier.canonicalBalancePaisa.startsWith('-') ? 'text-emerald-700' : supplier.canonicalBalancePaisa === '0' ? 'text-slate-500' : 'text-amber-700'}`}>Current balance: {formatPaisa(supplier.canonicalBalancePaisa)}</p>
-    <p className="text-xs text-slate-400">Calculated from saved purchases and payments; it cannot be edited here.</p>
+    <p className={`mt-1 text-sm font-semibold ${supplier.canonicalBalancePaisa.startsWith('-') ? 'text-emerald-700' : supplier.canonicalBalancePaisa === '0' ? 'text-slate-600' : 'text-amber-700'}`}>Current balance: <span className="whitespace-nowrap tabular-nums">{formatPaisa(supplier.canonicalBalancePaisa)}</span></p>
+    <p className="text-sm leading-5 text-slate-600">Calculated from saved purchases and payments; it cannot be edited here.</p>
     {supplier.phone && <p className="mt-2 text-sm text-slate-600">Phone: {supplier.phone}</p>}
     {supplier.location && <p className="text-sm text-slate-600">Location: {supplier.location}</p>}
     {supplier.notes && <p className="mt-2 text-sm text-slate-500">{supplier.notes}</p>}
@@ -80,7 +80,7 @@ function SupplierForm({ busy, supplier, onClose, onSave }: { busy: boolean; supp
     <TextInput id="supplier-phone" label="Phone (optional)" value={phone} onChange={setPhone} autoComplete="tel" required={false} />
     <TextInput id="supplier-location" label="Location (optional)" value={location} onChange={setLocation} required={false} />
     <label className="mb-4 block text-sm font-semibold text-slate-700">Notes (optional)<textarea id="supplier-notes" value={notes} onChange={(event) => setNotes(event.target.value)} rows={3} className="mt-1.5 w-full resize-none rounded-xl border border-slate-300 bg-white px-3 py-2.5" /></label>
-    <p className="mb-4 rounded-xl bg-sky-50 px-3 py-2 text-xs leading-5 text-sky-800">Supplier balance comes from purchases and payments. Milk buying rates are managed for the whole shop, not separately on each supplier.</p>
+    <p className="mb-4 rounded-xl bg-sky-50 px-3 py-2 text-sm leading-5 text-sky-900">Supplier balance comes from purchases and payments. Milk buying rates are managed for the whole shop, not separately on each supplier.</p>
     <button id="save-supplier-button" disabled={busy} className="w-full rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white disabled:cursor-wait disabled:opacity-60">{busy ? 'Saving…' : supplier ? 'Save supplier' : 'Add supplier'}</button>
   </form></Dialog>;
 }

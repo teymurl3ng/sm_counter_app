@@ -93,13 +93,13 @@ function localDate() {
 }
 
 function BalanceSection({ title, hint, children }: { title: string; hint: string; children: React.ReactNode }) {
-  return <div className="mb-5 rounded-xl border border-slate-200 p-4"><h3 className="font-semibold">{title}</h3><p className="mb-3 mt-1 text-xs leading-5 text-slate-500">{hint}</p><div className="space-y-3">{children}</div></div>;
+  return <div className="mb-5 rounded-xl border border-slate-200 p-4"><h3 className="font-semibold">{title}</h3><p className="mb-3 mt-1 text-sm leading-5 text-slate-600">{hint}</p><div className="space-y-3">{children}</div></div>;
 }
 
 function AmountRow({ id, name, suffix, value, onChange }: { id: string; name: string; suffix: string; value: string; onChange(value: string): void }) {
-  return <label className="grid grid-cols-[1fr_minmax(8rem,11rem)] items-center gap-3 text-sm"><span>{name}</span><span className="relative"><input id={id} inputMode="decimal" placeholder="0" value={value} onChange={(event) => onChange(event.target.value)} className="w-full rounded-lg border border-slate-300 py-2 pl-3 pr-12 text-right" /><span className="pointer-events-none absolute right-2 top-2.5 text-xs text-slate-400">{suffix}</span></span></label>;
+  return <label className="grid gap-2 text-sm sm:grid-cols-[1fr_minmax(8rem,11rem)] sm:items-center sm:gap-3"><span>{name}</span><span className="relative"><input id={id} inputMode="decimal" placeholder="0" value={value} onChange={(event) => onChange(event.target.value)} className="w-full rounded-lg border border-slate-300 py-2 pl-3 pr-12 text-right" /><span className="pointer-events-none absolute right-2 top-3 text-xs text-slate-600">{suffix}</span></span></label>;
 }
 
 function Empty({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-slate-400">{children}</p>;
+  return <p className="text-sm text-slate-600">{children}</p>;
 }

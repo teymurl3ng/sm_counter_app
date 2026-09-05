@@ -1,6 +1,6 @@
 # Phase 12 — UI Fidelity
 
-Status: **IN PROGRESS — checkpoints 12.1–12.3 complete; checkpoint 12.4 next**
+Status: **IN PROGRESS — checkpoints 12.1–12.4 complete; checkpoint 12.5 next**
 
 ## Purpose
 
@@ -44,11 +44,15 @@ The physical-device review also separated source evidence from preview behavior.
 
 Completed with a compact current-task control and a complete permission-aware Daily work chooser, real secondary-area identity in the bottom navigation, role-appropriate opening areas, an explicit `Today` report default, and an honest decision not to expose unsupported saved presentation preferences. Android Back, existing element IDs, the one-WebView path, permissions, and native outcomes remain intact. See `PHASE12_3_NAVIGATION_REVIEW.md` and `phase12-evidence/sm-a065f-android16-phase12-3-navigation/`.
 
-### 12.4 — Screen-by-screen responsive and accessibility pass
+### 12.4 — Screen-by-screen responsive and accessibility pass ✅
 
 - Apply the approved system across every retained screen and meaningful state.
 - Verify keyboard, inset, focus, touch-target, readable-text, loading, error, and empty-state behavior.
 - Define receipt/image/PDF presentation from authoritative native records; Android sharing acceptance remains Phase 14.
+
+Completed across all 58 retained states. Shared form controls, dialogs, notices, tabs, dense figures, supporting copy, and compact layouts now follow `DESIGN.md`; two missing delivery-field labels and measured contrast weaknesses were corrected. The physical-device capture gate now rejects horizontal overflow, undersized targets, sub-12 px visible text, unlabelled visible controls/dialogs, and WCAG-AA text-contrast failures before accepting a screenshot. See `PHASE12_4_SCREEN_REVIEW.md` and `phase12-evidence/sm-a065f-android16-phase12-4-wcag-screen-pass/`.
+
+No retained native/bridge receipt, image-export, or PDF-export capability exists, so presentation code did not invent one. Any future output must render authoritative native records, with Android sharing acceptance retained for Phase 14.
 
 ### 12.5 — Measured presentation performance
 
@@ -62,7 +66,7 @@ Completed with a compact current-task control and a complete permission-aware Da
 
 ## Current next action
 
-Begin checkpoint 12.4: apply the locked presentation system screen by screen across all 58 retained meaningful states, addressing form density, typography, readable figures, controls, dialogs, empty/error/loading states, responsiveness, keyboard behavior, and accessibility without changing native meaning.
+Begin checkpoint 12.5: measure first draw, React-ready time, and representative navigation on a profileable release-equivalent build, then make only evidence-supported presentation optimizations that preserve session revalidation, data freshness, and the one-WebView architecture.
 
 ## Checkpoint 12.2 verification
 
@@ -74,6 +78,16 @@ Begin checkpoint 12.4: apply the locked presentation system screen by screen acr
 - `Phase12VisualBaselineCaptureTest` — 1/1 passed; 81/81 PNGs are readable at 720 × 1600 and the 83-line manifest SHA-256 is `1C81401D6B8E25904A788B23B506CADDE8D052B0B0597D89894014FB86C715AC`.
 - The last complete isolated-QA regression remains the Phase 11 gate at 247/247; checkpoint 12.6 owns the next complete-suite rerun.
 
+## Checkpoint 12.4 verification
+
+- UI lint and production web build — passed; packaged Android assets refreshed.
+- Bridge contract — unchanged at v4, 86 endpoints, SHA-256 `D22921E90040EF70CED8AFDE535C6309544B75D5EBD7B726ED1DE1273E0FA136`.
+- Android/Kotlin and instrumentation compilation — passed.
+- Responsive/accessibility, navigation-flow, and system-inset checks — 5/5 passed on Samsung SM-A065F / Android 16.
+- `Phase12VisualBaselineCaptureTest` — 1/1 passed after validating all 58 states; 83/83 PNGs are readable at 720 × 1600.
+- The 85-line final manifest SHA-256 is `8E9937FC972B2EE36D8E31D5FB58C0C7C86189D4C8A8F116AFA91C727B45F1BE`.
+- The last complete isolated-QA regression remains the Phase 11 gate at 247/247; checkpoint 12.6 owns the next complete-suite rerun.
+
 ## Plain English
 
-Navigation is now simpler on the real phone. Daily work shows the current task and puts all permitted choices in one clear sheet, while secondary screens identify themselves in the bottom bar instead of appearing only as More. Owners open on Dashboard and task-focused staff open on Daily work. Next we apply the visual system to every individual screen and state. The shop’s records, calculations, permissions, and security have not been changed.
+Navigation and every retained screen are now clearer on the real phone. Controls are easier to tap, long dialogs guide users to their actions, tabs reflow, money stays together, messages have more than color alone, and the capture test checks size, labels, overflow, readable text, and contrast. Next we measure presentation performance. The shop's records, calculations, permissions, and security have not been changed.

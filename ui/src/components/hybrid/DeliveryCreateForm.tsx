@@ -48,7 +48,7 @@ export function DeliveryCreateForm({ busy, references, onCreate }: {
         <TextInput id="delivery-route" label="Route or area (optional)" value={route} onChange={setRoute} required={false} />
         <TextInput id="delivery-sale-number" label="Sale record number (optional)" value={saleNumber} onChange={setSaleNumber} inputMode="decimal" required={false} />
       </div>
-      <p className="-mt-2 mb-4 text-xs leading-5 text-slate-500">If the sale was already recorded, enter the number shown on its success message. Leave this blank when the delivery is being planned before the sale.</p>
+      <p className="-mt-2 mb-4 text-sm leading-5 text-slate-600">If the sale was already recorded, enter the number shown on its success message. Leave this blank when the delivery is being planned before the sale.</p>
       <label className="mb-4 block text-sm font-semibold text-slate-700">Delivery notes (optional)<textarea id="delivery-notes" rows={3} value={notes} onChange={(event) => setNotes(event.target.value)} className="mt-1.5 w-full resize-none rounded-xl border border-slate-300 bg-white px-3 py-2.5" /></label>
       {localError && <Notice message={localError} />}
       <button id="create-delivery-button" disabled={busy || references.customers.length === 0 || references.products.length === 0} className="w-full rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white disabled:cursor-wait disabled:opacity-60">{busy ? 'Saving…' : 'Add pending delivery'}</button>

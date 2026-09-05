@@ -61,7 +61,7 @@ export function AttendancePanel({ busy, employees, error, notice, onLoad, onReco
     <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div className="border-b border-slate-100 p-4">
         <label className="block text-sm font-semibold text-slate-700">Attendance date<input id="attendance-date" type="date" value={businessDate} onChange={(event) => setBusinessDate(event.target.value)} className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 outline-none focus:border-emerald-600" /></label>
-        <p className="mt-2 text-xs leading-5 text-slate-500">Saving again for the same employee and date revises the earlier mark while preserving its history.</p>
+        <p className="mt-2 text-sm leading-5 text-slate-600">Saving again for the same employee and date revises the earlier mark while preserving its history.</p>
       </div>
       <div id="native-attendance-list" className="divide-y divide-slate-100">
         {loading && <p className="p-5 text-sm text-slate-500"><RefreshCw className="mr-2 inline h-4 w-4 animate-spin" />Loading attendance…</p>}

@@ -62,8 +62,8 @@ export function CustomerProfilesScreen({ busy, customers, error, notice, onSave,
 function CustomerRow({ busy, customer, onEdit, onDeactivate, onRestore }: { busy: boolean; customer: CustomerDto; onEdit(): void; onDeactivate(): void; onRestore(): Promise<void> }) {
   return <article data-customer-id={customer.accountId} className="p-4"><div className="flex items-start justify-between gap-3"><div className="min-w-0">
     <h2 className="font-bold text-slate-900">{customer.name}</h2>
-    <p className={`mt-1 text-sm font-semibold ${customer.canonicalBalancePaisa.startsWith('-') ? 'text-emerald-700' : customer.canonicalBalancePaisa === '0' ? 'text-slate-500' : 'text-amber-700'}`}>Current balance: {formatPaisa(customer.canonicalBalancePaisa)}</p>
-    <p className="text-xs text-slate-400">Calculated from saved transactions; it cannot be edited here.</p>
+    <p className={`mt-1 text-sm font-semibold ${customer.canonicalBalancePaisa.startsWith('-') ? 'text-emerald-700' : customer.canonicalBalancePaisa === '0' ? 'text-slate-600' : 'text-amber-700'}`}>Current balance: <span className="whitespace-nowrap tabular-nums">{formatPaisa(customer.canonicalBalancePaisa)}</span></p>
+    <p className="text-sm leading-5 text-slate-600">Calculated from saved transactions; it cannot be edited here.</p>
     {customer.phone && <p className="mt-2 text-sm text-slate-600">Phone: {customer.phone}</p>}
     {customer.areaRoute && <p className="text-sm text-slate-600">Route/area: {customer.areaRoute}</p>}
     {customer.address && <p className="text-sm text-slate-600">Address: {customer.address}</p>}
@@ -90,7 +90,7 @@ function CustomerForm({ busy, customer, onClose, onSave }: { busy: boolean; cust
     <TextInput id="customer-credit-limit" label="Credit limit in PKR (optional)" value={creditLimitRupees} onChange={setCreditLimitRupees} inputMode="decimal" required={false} />
     <TextInput id="customer-daily-quota" label="Usual daily quantity (optional)" value={dailyQuota} onChange={setDailyQuota} inputMode="decimal" required={false} />
     <label className="mb-4 block text-sm font-semibold text-slate-700">Notes (optional)<textarea id="customer-notes" value={notes} onChange={(event) => setNotes(event.target.value)} rows={3} className="mt-1.5 w-full resize-none rounded-xl border border-slate-300 bg-white px-3 py-2.5" /></label>
-    <p className="mb-4 rounded-xl bg-sky-50 px-3 py-2 text-xs leading-5 text-sky-800">Customer balance is calculated from transactions and cannot be entered or changed on this form.</p>
+    <p className="mb-4 rounded-xl bg-sky-50 px-3 py-2 text-sm leading-5 text-sky-900">Customer balance is calculated from transactions and cannot be entered or changed on this form.</p>
     {localError && <Notice message={localError} />}
     <button id="save-customer-button" disabled={busy} className="w-full rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white disabled:cursor-wait disabled:opacity-60">{busy ? 'Saving…' : customer ? 'Save customer' : 'Add customer'}</button>
   </form></Dialog>;

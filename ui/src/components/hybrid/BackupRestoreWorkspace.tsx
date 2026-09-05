@@ -40,7 +40,7 @@ export function BackupRestoreWorkspace({ actions, canRestore, onRestored, onClou
     <section className="rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-950">
       <strong>Backup is a protected snapshot, not live synchronization.</strong> It can protect this shop or move a complete copy to another installation. It does not keep two working phones continuously updated.
     </section>
-    {canRestore && <div className="flex rounded-xl bg-slate-100 p-1">
+    {canRestore && <div className="grid grid-cols-3 rounded-xl bg-slate-100 p-1">
       <FilterButton id="backup-create-tab" active={area === 'create'} onClick={() => setArea('create')}>Manual</FilterButton>
       <FilterButton id="backup-cloud-tab" active={area === 'cloud'} onClick={() => setArea('cloud')}>Cloud</FilterButton>
       <FilterButton id="backup-restore-tab" active={area === 'restore'} onClick={() => setArea('restore')}>Restore file</FilterButton>

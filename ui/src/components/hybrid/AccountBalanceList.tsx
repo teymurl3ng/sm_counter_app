@@ -21,7 +21,7 @@ export function AccountBalanceList({ kind, accounts, activeIds, search, selected
         const active = activeIds.has(account.accountId);
         return <button key={account.accountId} id={`ledger-account-${account.accountId}`} onClick={() => onSelect(account.accountId)} className={`flex w-full items-center justify-between gap-3 p-4 text-left ${selectedId === account.accountId ? 'bg-emerald-50' : 'bg-white'}`}>
           <span><strong className="block text-sm text-slate-900">{account.name}</strong><span className="mt-1 block text-xs text-slate-500">{active ? 'Active' : 'Inactive · history retained'}</span></span>
-          <span className="text-right"><span className={`block text-sm font-bold ${meaning.tone}`}>{meaning.amount}</span><span className="mt-1 block text-xs text-slate-500">{meaning.label}</span></span>
+          <span className="text-right"><span className={`block whitespace-nowrap text-sm font-bold tabular-nums ${meaning.tone}`}>{meaning.amount}</span><span className="mt-1 block text-xs text-slate-500">{meaning.label}</span></span>
         </button>;
       })}
     </div>

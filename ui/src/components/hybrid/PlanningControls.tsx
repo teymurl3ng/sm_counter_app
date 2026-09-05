@@ -70,7 +70,7 @@ export function PlanningControls({ busy, planning, onSaveBudget, onCopyBudget, o
         {activeBudgets.map((item) => <BudgetPlanCard key={`budget-${item.budgetId}`} item={item} />)}
         {activeTargets.map((item) => <CollectionsTargetCard key={`target-${item.targetId}`} item={item} />)}
       </div>
-      <p className="border-t border-slate-100 bg-slate-50 p-4 text-xs leading-5 text-slate-600">Plans are for comparison only. Saving one does not create a purchase, expense, sale, or payment.</p>
+      <p className="border-t border-slate-100 bg-slate-50 p-4 text-sm leading-5 text-slate-600">Plans are for comparison only. Saving one does not create a purchase, expense, sale, or payment.</p>
     </section>
   </div>;
 }

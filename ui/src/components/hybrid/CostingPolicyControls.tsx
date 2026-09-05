@@ -65,7 +65,7 @@ export function CostingPolicyControls({ busy, costing, onSave }: {
               <TextInput id={`cost-component-amount-${component.componentCode}`} label="Expected total cost (PKR)" value={component.sourceAmountRupees} onChange={(value) => setDraft((current) => ({ ...current, components: replaceComponent(current.components, index, { sourceAmountRupees: value }) }))} inputMode="decimal" />
               <TextInput id={`cost-component-basis-${component.componentCode}`} label="This cost covers (kg)" value={component.basisQuantityKg} onChange={(value) => setDraft((current) => ({ ...current, components: replaceComponent(current.components, index, { basisQuantityKg: value }) }))} inputMode="decimal" />
             </div>
-            {component.componentCode === 'fixed_production_overhead' && <p className="-mt-2 text-xs leading-5 text-slate-500">This must match normal monthly production. The form keeps both values together.</p>}
+            {component.componentCode === 'fixed_production_overhead' && <p className="-mt-2 text-sm leading-5 text-slate-600">This must match normal monthly production. The form keeps both values together.</p>}
           </fieldset>)}
         </div>
         <label className="mt-5 block text-sm font-semibold text-slate-700">Notes (optional)<textarea id="costing-policy-notes" rows={3} value={draft.notes} onChange={(event) => setDraft((current) => ({ ...current, notes: event.target.value }))} className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5" /></label>

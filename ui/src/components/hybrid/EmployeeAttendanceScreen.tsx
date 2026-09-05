@@ -21,7 +21,7 @@ export function EmployeeAttendanceScreen({ busy, canManage, employees, attendanc
 }) {
   const [area, setArea] = useState<EmployeeArea>(canManage ? 'profiles' : 'attendance');
   return <>
-    <div className="mb-5 flex rounded-xl bg-slate-200/70 p-1">
+    <div className="mb-5 grid grid-cols-2 rounded-xl bg-slate-200/70 p-1">
       {canManage && <FilterButton id="employee-profiles-tab" active={area === 'profiles'} onClick={() => setArea('profiles')}>Employee profiles</FilterButton>}
       <FilterButton id="attendance-tab" active={area === 'attendance'} onClick={() => setArea('attendance')}>Daily attendance</FilterButton>
     </div>

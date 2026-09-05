@@ -5,6 +5,7 @@
   --saaf-color-brand-header: #004f3b;
   --saaf-color-brand-action: #007a55;
   --saaf-color-brand-soft: #ecfdf5;
+  --saaf-color-warning-action: #b45309;
   --saaf-color-canvas: #f7f6f0;
   --saaf-color-surface: #ffffff;
   --saaf-color-text: #0f172a;
@@ -44,6 +45,13 @@ body,
     min-height: var(--saaf-visual-viewport-height);
     overscroll-behavior-y: none;
   }
+
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+  }
 }
 
 .hybrid-screen {
@@ -67,6 +75,8 @@ body,
 
 .hybrid-dialog-panel {
   max-height: calc(var(--saaf-visual-viewport-height) - var(--saaf-system-top) - var(--saaf-system-bottom));
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .hybrid-navigation-panel {
@@ -83,6 +93,54 @@ html[data-ime-visible="true"] .hybrid-management-screen {
 
 html[data-ime-visible="true"] .hybrid-overlay {
   padding-bottom: 0;
+}
+
+.hybrid-screen :where(button, input:not([type="checkbox"]):not([type="radio"]), select) {
+  min-height: 3rem;
+}
+
+.hybrid-screen button[aria-label] {
+  min-width: 3rem;
+}
+
+.hybrid-screen :where(label:has(> input[type="checkbox"]), label:has(> input[type="radio"])) {
+  min-height: 3rem;
+}
+
+.hybrid-screen :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.hybrid-screen :where(input, select, textarea)::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+.hybrid-screen :where(button, input, select, textarea):disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.hybrid-screen :where(.text-slate-400, .text-slate-500) {
+  color: var(--saaf-color-text-muted);
+}
+
+.hybrid-screen :where(.bg-amber-600) {
+  background-color: var(--saaf-color-warning-action);
+}
+
+.hybrid-screen :where(button, input, select, textarea, [tabindex]) {
+  scroll-margin-block: 5rem 7rem;
+}
+
+.hybrid-summary-value,
+.hybrid-screen :where(dd, [data-material-value]) {
+  font-variant-numeric: tabular-nums;
+}
+
+.hybrid-dialog-header {
+  box-shadow: 0 1px 0 rgb(15 23 42 / 0.04);
 }
 
 @keyframes fadeIn {

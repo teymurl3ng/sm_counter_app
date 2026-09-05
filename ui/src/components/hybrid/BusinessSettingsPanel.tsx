@@ -60,7 +60,7 @@ function RatesForm({ busy, settings, onSave }: { busy: boolean; settings: Busine
         <TextInput id="ts-standard-percent" label="Milk quality standard — total solids %" value={draft.tsStandardPercent} onChange={field('tsStandardPercent')} inputMode="decimal" />
         <TextInput id="default-delivery-surcharge" label="Default delivery surcharge — PKR" value={draft.defaultDeliverySurchargeRupees} onChange={field('defaultDeliverySurchargeRupees')} inputMode="decimal" />
       </div>
-      <p className="mb-4 rounded-xl bg-sky-50 px-3 py-2 text-xs leading-5 text-sky-800">The milk quality percentage is used by the existing native supplier-purchase calculation. This screen does not calculate purchase prices itself.</p>
+      <p className="mb-4 rounded-xl bg-sky-50 px-3 py-2 text-sm leading-5 text-sky-900">The milk quality percentage is used by the existing native supplier-purchase calculation. This screen does not calculate purchase prices itself.</p>
       {localError && <Notice message={localError} />}
       <button id="save-business-rates-button" disabled={busy} className="w-full rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white disabled:opacity-50">{busy ? 'Saving…' : 'Save shop-wide rates'}</button>
     </form>

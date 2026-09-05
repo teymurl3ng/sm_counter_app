@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",
     "verify:bridge": "python ../scripts/verify-bridge-contract.py",
-    "prebuild": "npm run verify:bridge",
+    "verify:cleanup": "python ../scripts/verify-ui-cleanup.py",
+    "verify:cleanup:source": "python ../scripts/verify-ui-cleanup.py --source-only",
+    "prebuild": "npm run verify:bridge && npm run verify:cleanup:source",
     "build": "tsc && vite build",
     "lint": "tsc --noEmit",
     "preview": "vite preview --host 0.0.0.0 --port 3000"

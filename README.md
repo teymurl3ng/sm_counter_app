@@ -1,8 +1,8 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-05 — hybrid Phases 0–12 are complete; Phase 13 Dead/Mock/Misleading UI Cleanup is active with checkpoints 13.1–13.3 complete. Contract v4 exposes 86 native-backed operations. The unreachable 23-file, 8,370-line browser-local prototype and six unused dependencies are removed; the 85-file production graph and its live controls/messages have been audited, and the misleading combined opening-balance total is gone.
+Status: RECONCILED 2026-09-06 — hybrid Phases 0–12 are complete; Phase 13 Dead/Mock/Misleading UI Cleanup is active with checkpoints 13.1–13.4 complete. Contract v4 exposes 86 native-backed operations. The unreachable 23-file, 8,370-line browser-local prototype and six unused dependencies are removed; the 85-file production graph and its live controls/messages have been audited, and automatic web/Android build gates now prevent the removed behavior from returning.
 
-Latest physical-device checkpoint: Phase 12.6 passes the complete 258/258 isolated-QA regression across its authenticated 257-test and empty-identity 1-test partitions on Samsung SM-A065F / Android 16, with zero skips or failures. The final visual audit reproduces 83 screenshots / 58 states at 720 × 1600. The Phase 12.5 release-like baseline remains 822 ms median / 871 ms p95 cold start, 327.9 ms median / 378.3 ms p95 React ready, and 24.0 ms median / 29.6 ms p95 painted navigation with zero bridge calls. Host-side tests pass 7/7.
+Latest focused physical-device checkpoint: Phase 13.4 passes 31/31 isolated-QA authentication, Product, Settings/Backup, reporting, opening-state, navigation, presentation, and responsive/accessibility tests on Samsung SM-A065F / Android 16, with zero skips or failures. The latest complete regression remains Phase 12.6 at 258/258; Phase 13.5 will rerun it. The final visual audit reproduces 83 screenshots / 58 states at 720 × 1600. Host-side tests pass 7/7.
 
 Product scope: Saaf Milk is the current working product identity, and Milk/Yogurt are the current validated domain—not permanent limits. The product is intended to expand carefully to other products and suitable owner-managed shop contexts without pretending to be a corporate ERP or complete statutory accounting system. See `PRODUCT_SCOPE.md`.
 
@@ -44,6 +44,7 @@ Product scope: Saaf Milk is the current working product identity, and Milk/Yogur
 - `PHASE13_1_INVENTORY.md` — production import graph, locked prototype/dependency removal list, active-tree findings, and source classifications.
 - `PHASE13_2_PROTOTYPE_REMOVAL.md` — removed source/dependency surface, measured CSS/package reduction, hashes, and physical-device proof.
 - `PHASE13_3_ACTIVE_UI_AUDIT.md` — active-control wiring, permission/disabled/message/calculation audit, opening-balance correction, hashes, and physical-device proof.
+- `PHASE13_4_NEGATIVE_GATE.md` — automated cleanup guard, npm/Android enforcement, focused 31-test device matrix, hashes, and next gate.
 
 ## Immutable baselines
 
@@ -55,7 +56,7 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 13 — Dead/Mock/Misleading UI Cleanup: IN PROGRESS (checkpoints 13.1–13.3 complete)**
+**Phase 13 — Dead/Mock/Misleading UI Cleanup: IN PROGRESS (checkpoints 13.1–13.4 complete)**
 
 Phase 8's native-backed shop screens and all 78 frozen operations remain intact. Phase 9 adds grouped role-aware navigation, predictable Android Back behavior, a separate QA installation, focused file boundaries, one non-reloading React/WebView presentation, secure Activity recreation, deliberate keyboard/system-inset behavior, targeted state refresh with bridge-transfer measurement, and native recovery from main-page or WebView-renderer failure. A recovery reload creates a fresh WebView and revalidates the memory-only session before protected information appears. The complete isolated-QA physical-device regression passes 218/218.
 
@@ -117,7 +118,7 @@ Phase 11 — Integrity / Recovery / Concurrency ✅ (all six checkpoints complet
 
 Phase 12 — UI Fidelity ✅ (all six checkpoints complete; 83-screen final evidence, release-like performance, and 258/258 device regression verified)
 
-Phase 13 — Dead/Mock/Misleading UI Cleanup ⏳ (13.1 inventory, 13.2 prototype removal, and 13.3 active control/meaning audit complete; 13.4 negative-source and focused device gate next)
+Phase 13 — Dead/Mock/Misleading UI Cleanup ⏳ (13.1–13.4 complete; 13.5 complete regression and Phase 14 handoff next)
 
 Phase 14 — Final Device QA ⏳ (includes real scheduled-cloud-backup, retry, and second-device restore testing)
 
@@ -183,7 +184,8 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 12.6 focused presentation/device gate: 11/11 passed, 0 skipped, 0 failed.
 - Phase 12.6 complete isolated-QA device regression: 258/258 passed across the 257-test authenticated and 1-test empty-identity visual partitions, 0 skipped, 0 failed.
 - Phase 12.6 final visual evidence: 83/83 PNGs readable at 720 × 1600 across 58 retained states; manifest SHA-256 `8E9937FC972B2EE36D8E31D5FB58C0C7C86189D4C8A8F116AFA91C727B45F1BE`.
+- Phase 13.4 cleanup guard passes from its self-test, npm, post-package, and Android `preBuild` entry points; the broader focused isolated-QA Samsung suite passes 31/31 with 0 skipped and 0 failed.
 
 ## Next gate
 
-Phases 3–12 are closed. Phase 13.1 classified the complete UI graph, Phase 13.2 removed the locked 23-file, 8,370-line browser-local prototype plus six unused dependencies, and Phase 13.3 audited every active control/message and removed the misleading combined opening-balance total without inventing a React accounting formula. TypeScript/Vite, Android compilation, 7/7 host tests, and the focused Samsung gates pass. Checkpoint 13.4 now turns the cleanup decisions into repeatable negative-source/package checks and runs the broader focused device gate. Use Phases 14–16 for live Google consent/Drive, second-device, shopkeeper, and release acceptance. See `PHASE13.md`, `PHASE13_1_INVENTORY.md`, `PHASE13_2_PROTOTYPE_REMOVAL.md`, `PHASE13_3_ACTIVE_UI_AUDIT.md`, `PHASE12_6_HANDOFF.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–12 are closed. Phase 13.1 classified the complete UI graph, Phase 13.2 removed the locked 23-file, 8,370-line browser-local prototype plus six unused dependencies, Phase 13.3 audited the active controls/messages and removed the misleading opening total, and Phase 13.4 made those cleanup rules automatic across web and Android builds. The broader focused Samsung gate passes 31/31. Checkpoint 13.5 now runs the complete 258-test isolated-QA regression and publishes the guarded Phase 14 handoff. Use Phases 14–16 for live Google consent/Drive, second-device, shopkeeper, and release acceptance. See `PHASE13.md`, `PHASE13_1_INVENTORY.md`, `PHASE13_2_PROTOTYPE_REMOVAL.md`, `PHASE13_3_ACTIVE_UI_AUDIT.md`, `PHASE13_4_NEGATIVE_GATE.md`, `PHASE12_6_HANDOFF.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.

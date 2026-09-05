@@ -14,11 +14,11 @@ This is not the earlier experimental hybrid project. The working source is the c
 
 Read those files before changing code.
 
-## Current superseding checkpoint — 2026-09-04
+## Current superseding checkpoint — 2026-09-06
 
-The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–11 are complete. `PHASE8.md` contains the completed screen ledger. `PHASE9.md` records the completed grouped-navigation, isolated-QA, Android Back, structural-hardening, secure Activity/WebView recreation, keyboard/system-inset, targeted refresh/transfer, and renderer/error-recovery milestones. `PHASE11_6_HANDOFF.md` is the guarded Phase 12 starting point.
+The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–12 are complete. Phase 13 checkpoints 13.1–13.4 are complete, and 13.5 complete regression plus the guarded Phase 14 handoff is next. Read `README.md`, `PHASE13.md`, and the Phase 13 checkpoint reports before changing source.
 
-Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and root phase records through `PHASE11_6_HANDOFF.md` for current status. The runtime exposes all 86 contract-v4 actions. Phase 11 closes cloud outbox/process-death, overlapping-run, cancellation, provider-failure, repeated-replacement, restore-selection, preference-rollback, actor/disablement, session-invalidation, concurrent-write/correction, large-history recovery, deferred-NRV decision, final-regression, and handoff gaps. The final isolated-QA connected-device suite passes 247/247 with 0 skipped and 0 failed; host-side debug unit tests pass 7/7.
+Sections below that describe the original schema-expansion approval gate are retained as implementation history and are superseded by `README.md` and the root phase records for current status. The runtime exposes all 86 contract-v4 actions. Phase 13 removed the unreachable browser-local prototype and unused dependencies, audited the complete active UI, removed one misleading combined opening-balance total, and added mandatory cleanup gates to npm/Vite and Android `preBuild`. The latest focused isolated-QA Samsung suite passes 31/31; the latest complete suite remains Phase 12.6 at 258/258 until checkpoint 13.5 reruns it. Host-side debug unit tests pass 7/7.
 
 Application user accounts and native role-based authorization are explicitly approved as a required cross-phase capability. Their schema-7 model, encrypted backup boundary, app-owned sessions, private staff enrollment/reset, user administration, role-aware navigation, recovery, security audit, and command-boundary authorization are implemented and now wired into React. Application users are security principals separate from employee/salary profiles, with an optional link between them. The schema-v6 daily-close actor name/role is transitional asserted metadata, not authenticated identity.
 
@@ -29,7 +29,7 @@ The two completed Phase 3 design tracks were:
 1. authenticated users, credentials, roles/permissions, sessions, recovery, audit actor IDs, migration, and backup/restore security;
 2. authoritative costing/COGS and profitability semantics.
 
-The researched native security and costing recommendations are implemented and device-verified. Phases 8–11 are complete; Phase 11 passes 23/23 dedicated tests, the reused 16/16 costing/reporting boundary, and the final full isolated Samsung suite at 247/247. Phase 12 UI Fidelity is the continuation point under `PHASE11_6_HANDOFF.md`. The assessment-only presentation-performance findings and approved display/receipt preferences now enter Phase 12, with release compiler/profile work still assigned to Phase 16.
+The researched native security and costing recommendations are implemented and device-verified. Phases 8–12 are complete; Phase 12 closes UI fidelity with 83 screenshots / 58 retained states and a 258/258 complete isolated-QA regression. Phase 13.5 is the continuation point. Release compiler/profile work remains assigned to Phase 16.
 
 ---
 

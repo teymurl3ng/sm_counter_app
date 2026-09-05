@@ -1,6 +1,6 @@
 # Phase 13 — Dead, Mock, and Misleading UI Cleanup
 
-Status: **IN PROGRESS — checkpoints 13.1–13.3 complete; checkpoint 13.4 next**
+Status: **IN PROGRESS — checkpoints 13.1–13.4 complete; checkpoint 13.5 next**
 
 ## Purpose
 
@@ -41,10 +41,12 @@ Completed exactly against the 13.1 removal lock. The 23-file, 8,370-line prototy
 
 Completed across all 85 active TypeScript/TSX files. A TypeScript AST audit found 120 literal buttons and zero disconnected controls; permission, disabled, placeholder, completion-message, and display-arithmetic paths remain tied to native authority or presentation-only behavior. The misleading unsigned opening-balance total was removed and replaced with an explicit explanation that cash/bank, customer, and supplier meanings remain separate. TypeScript/Vite, bridge verification, Android compilation, 7/7 host tests, and 4/4 focused Samsung opening-state tests pass. See `PHASE13_3_ACTIVE_UI_AUDIT.md`.
 
-### 13.4 — Negative-source and focused device gate
+### 13.4 — Negative-source and focused device gate ✅
 
 - Make localStorage business state, synthetic reporting, arbitrary JSON restore, obsolete shell entry, and removed dependency reintroduction fail a repeatable source/package check.
 - Run focused authentication, navigation, Products, Settings/Backup, reporting, opening-state, and Phase 12 presentation device checks.
+
+Completed with an executable cleanup gate enforced by npm/Vite, the post-package script, and Android `preBuild`. It rejects all 23 removed paths, the six removed dependencies, browser-local business storage, synthetic reports, old browser import/export/clear-all paths, the obsolete shell/store, and the misleading opening-balance total in source or packaged assets. Its self-test passes, and the isolated-QA Samsung gate passes 31/31 across authentication, Products, Settings/Backup, reporting, opening state, navigation, presentation, and responsive/accessibility behavior. See `PHASE13_4_NEGATIVE_GATE.md`.
 
 ### 13.5 — Complete regression and Phase 14 handoff
 
@@ -53,8 +55,8 @@ Completed across all 85 active TypeScript/TSX files. A TypeScript AST audit foun
 
 ## Current next action
 
-Run checkpoint 13.4: add repeatable negative-source/package checks that prevent the removed browser-local store, synthetic reports, arbitrary restore paths, obsolete shell, misleading opening-balance total, and removed dependencies from returning. Then run the focused authentication, navigation, Products, Settings/Backup, reporting, opening-state, and Phase 12 presentation device gate.
+Run checkpoint 13.5: perform the complete 258-test isolated-QA physical-device regression, rebuild and verify all hashes/contracts/assets/host tests, then publish the Phase 13 closure and guarded Phase 14 device-QA handoff.
 
 ## Plain English
 
-The disconnected demo and its unused packages are gone. Every live button and message has now been checked, and the one questionable opening-balance total was removed because it mixed unlike account meanings. Next we will turn these cleanup rules into an automatic guard and run the broader focused phone gate.
+The disconnected demo is gone, the live UI has been checked, and automatic build rules now stop the old behavior from coming back. The cleaned app passed the broader 31-test phone gate. The last Phase 13 step is the complete 258-test regression and handoff to Phase 14.

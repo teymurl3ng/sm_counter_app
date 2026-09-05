@@ -13,8 +13,19 @@ val verifyBridgeContract by tasks.registering(Exec::class) {
     commandLine(pythonCommand.get(), "scripts/verify-bridge-contract.py")
 }
 
+val verifyUiCleanup by tasks.registering(Exec::class) {
+    group = "verification"
+    description = "Rejects removed prototype, browser-state, dependency, and misleading UI behavior."
+    workingDir = rootDir.parentFile
+    val pythonCommand = providers.environmentVariable("PYTHON").orElse(
+        if (System.getProperty("os.name").startsWith("Windows", ignoreCase = true)) "python" else "python3",
+    )
+    commandLine(pythonCommand.get(), "scripts/verify-ui-cleanup.py")
+}
+
 subprojects {
     tasks.matching { it.name == "preBuild" }.configureEach {
         dependsOn(rootProject.tasks.named("verifyBridgeContract"))
+        dependsOn(rootProject.tasks.named("verifyUiCleanup"))
     }
 }

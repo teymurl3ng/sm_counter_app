@@ -44,4 +44,7 @@ New-Item -ItemType Directory -Path (Split-Path -Parent $androidAssetsRoot) -Forc
 New-Item -ItemType Directory -Path $androidAssetsRoot -Force | Out-Null
 Copy-Item -Path (Join-Path $distRoot '*') -Destination $androidAssetsRoot -Recurse -Force
 
+& python (Join-Path $workspaceRoot 'scripts\verify-ui-cleanup.py')
+if ($LASTEXITCODE -ne 0) { throw 'UI cleanup verification failed after packaging.' }
+
 Write-Output "Packaged hybrid UI: $androidAssetsRoot"

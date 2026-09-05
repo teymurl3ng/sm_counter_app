@@ -58,7 +58,7 @@ Use the Android/system sans-serif stack. Prefer plain language and sentence case
 | Supporting text | 14 / 20 px | 400–600 |
 | Metadata or navigation | 12 / 16 px minimum | 600–700 |
 
-Use tabular numerals for aligned quantities and money. Keep `PKR` with its value. Avoid uppercase except short eyebrows or compact status labels. Existing 11 px navigation labels are a recorded migration gap for checkpoint 12.4, not an approved exception.
+Use tabular numerals for aligned quantities and money. Keep `PKR` with its value. Avoid uppercase except short eyebrows or compact status labels. Bottom-navigation labels use the 12 px minimum and may wrap when an active secondary destination needs its full name.
 
 ## Spacing and shape
 
@@ -100,8 +100,8 @@ Do not increase density to resemble large accounting products. Add information o
 - The bottom bar is opaque and stable on compact Android screens. It must respect the navigation inset and must not rely on blur.
 - Top-level destination changes jump immediately to the top; they do not smooth-scroll through unrelated content.
 - The active destination must be identifiable by label, icon, and visual state.
-- Secondary destinations must retain their real location rather than appearing only as generic `More`; the structural correction belongs to checkpoint 12.3.
-- Task tabs must show the selected task and must not clip labels. The seven-item Daily work strip is a known 12.3 migration gap.
+- Secondary destinations retain their real icon and label in the fifth bottom-navigation position while that position continues to open the grouped area chooser.
+- Daily work shows the selected task in a compact control and exposes every authorized task in a non-scrolling chooser sheet. Labels must not be clipped and selection must not depend on color alone.
 
 ## System bars, scrolling, and motion
 

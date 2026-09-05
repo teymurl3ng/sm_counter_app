@@ -157,7 +157,15 @@ export function ManagementWorkspace({
   const canExportBackup = currentUser?.effectivePermissionCodes.includes('create_export_backup') === true;
   const canRestoreBackup = currentUser?.effectivePermissionCodes.includes('restore_backup') === true;
   const canOperate = canPurchase || canSell || canProduce || canExpense || canPaySupplier || canPaySalary;
-  const defaultArea: ManagementArea = canManage ? 'products' : canOperate ? 'operations' : 'employees';
+  const defaultArea: ManagementArea = canViewOperational && canViewFinancial
+    ? 'dashboard'
+    : canOperate
+      ? 'operations'
+      : canViewOperational
+        ? 'dashboard'
+        : canManage || canAttend
+          ? 'employees'
+          : 'access';
   const navigationItems: NavigationItem[] = [
     canViewOperational && { area: 'dashboard', id: 'dashboard-nav', label: 'Dashboard', group: 'Everyday work', icon: LayoutDashboard },
     canOperate && { area: 'operations', id: 'operations-nav', label: 'Daily work', group: 'Everyday work', icon: ShoppingBasket },

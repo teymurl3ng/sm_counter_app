@@ -1,6 +1,6 @@
 # Phase 12 — UI Fidelity
 
-Status: **IN PROGRESS — checkpoints 12.1–12.2 complete; checkpoint 12.3 next**
+Status: **IN PROGRESS — checkpoints 12.1–12.3 complete; checkpoint 12.4 next**
 
 ## Purpose
 
@@ -37,10 +37,12 @@ Completed with `DESIGN.md` as the authoritative presentation target. Its **Phase
 
 The physical-device review also separated source evidence from preview behavior. PixelCopy plus WebView visual-state synchronization produced a second 81-image set in `phase12-evidence/sm-a065f-android16-phase12-2-stable/`. Apparent missing glyphs in some scaled tall-image previews are present in the PNG pixel data and in exact crops; reviewers must inspect the source file at original size or use smaller crops before recording a paint defect. Repeated normal-use navigation remains clean under a 60-transition device stress check.
 
-### 12.3 — Navigation and natural task flows
+### 12.3 — Navigation and natural task flows ✅
 
 - Improve discoverability and common task sequences while preserving permissions and native-backed outcomes.
 - Reconcile default opening area, report period, and presentation preferences.
+
+Completed with a compact current-task control and a complete permission-aware Daily work chooser, real secondary-area identity in the bottom navigation, role-appropriate opening areas, an explicit `Today` report default, and an honest decision not to expose unsupported saved presentation preferences. Android Back, existing element IDs, the one-WebView path, permissions, and native outcomes remain intact. See `PHASE12_3_NAVIGATION_REVIEW.md` and `phase12-evidence/sm-a065f-android16-phase12-3-navigation/`.
 
 ### 12.4 — Screen-by-screen responsive and accessibility pass
 
@@ -60,7 +62,7 @@ The physical-device review also separated source evidence from preview behavior.
 
 ## Current next action
 
-Begin checkpoint 12.3: improve navigation and natural task flows, starting with the seven crowded Daily work tasks and the loss of location context under the generic `More` destination. Preserve permissions and every native-backed outcome.
+Begin checkpoint 12.4: apply the locked presentation system screen by screen across all 58 retained meaningful states, addressing form density, typography, readable figures, controls, dialogs, empty/error/loading states, responsiveness, keyboard behavior, and accessibility without changing native meaning.
 
 ## Checkpoint 12.2 verification
 
@@ -74,4 +76,4 @@ Begin checkpoint 12.3: improve navigation and natural task flows, starting with 
 
 ## Plain English
 
-The app now has one agreed visual rulebook suited to a small owner-run shop, and its shared phone-level presentation is stable. We also confirmed that the alarming missing text was a tall-image preview problem, not missing pixels in the saved screenshots. Next we will simplify how people move between tasks—especially the seven Daily work options and secondary screens under `More`. The shop’s records, calculations, and security have not been changed.
+Navigation is now simpler on the real phone. Daily work shows the current task and puts all permitted choices in one clear sheet, while secondary screens identify themselves in the bottom bar instead of appearing only as More. Owners open on Dashboard and task-focused staff open on Daily work. Next we apply the visual system to every individual screen and state. The shop’s records, calculations, permissions, and security have not been changed.

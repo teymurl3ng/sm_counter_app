@@ -24,7 +24,9 @@ export function HybridNavigation({ items, activeArea, onSelect }: {
   const preferred = preferredPrimaryAreas.map((area) => items.find((item) => item.area === area)).filter((item): item is NavigationItem => Boolean(item));
   const primary = [...preferred, ...items.filter((item) => !preferred.some((candidate) => candidate.area === item.area))].slice(0, 4);
   const secondary = items.filter((item) => !primary.some((candidate) => candidate.area === item.area));
-  const secondaryActive = secondary.some((item) => item.area === activeArea);
+  const activeSecondary = secondary.find((item) => item.area === activeArea);
+  const OverflowIcon = activeSecondary?.icon ?? Menu;
+  const overflowLabel = activeSecondary?.label ?? 'More';
   const select = (area: ManagementArea) => { onSelect(area); setOpen(false); window.scrollTo({ top: 0, behavior: 'auto' }); };
   const columnCount = primary.length + (secondary.length > 0 ? 1 : 0);
 
@@ -32,7 +34,7 @@ export function HybridNavigation({ items, activeArea, onSelect }: {
     <nav id="app-navigation" className="hybrid-navigation fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white px-2 pt-1 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] md:sticky md:top-0 md:bottom-auto md:border-y md:px-4 md:py-2 md:shadow-sm" aria-label="Application areas">
       <div id="primary-navigation" className="mx-auto grid max-w-4xl gap-1" style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}>
         {primary.map((item) => <NavigationButton key={item.area} item={item} active={item.area === activeArea} onClick={() => select(item.area)} />)}
-        {secondary.length > 0 && <button id="navigation-more-button" type="button" aria-expanded={open} aria-controls="navigation-more-panel" onClick={() => setOpen(true)} className={`flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-bold md:min-h-0 md:flex-row md:gap-2 md:px-3 md:text-sm ${secondaryActive ? 'bg-emerald-50 text-emerald-800' : 'text-slate-500'}`}><Menu className="h-5 w-5 md:h-4 md:w-4" /><span className="truncate">More</span></button>}
+        {secondary.length > 0 && <button id="navigation-more-button" type="button" data-active-secondary-area={activeSecondary?.area} aria-expanded={open} aria-controls="navigation-more-panel" aria-label={activeSecondary ? `${activeSecondary.label}, current area. Open other areas` : 'Open more areas'} onClick={() => setOpen(true)} className={`flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-xs font-bold leading-4 md:min-h-0 md:flex-row md:gap-2 md:px-3 md:text-sm ${activeSecondary ? 'bg-emerald-50 text-emerald-800' : 'text-slate-500'}`}><OverflowIcon className="h-5 w-5 md:h-4 md:w-4" /><span className="max-w-full text-center">{overflowLabel}</span></button>}
       </div>
     </nav>
     {secondary.length > 0 && <div id="navigation-more-layer" className={`hybrid-overlay fixed inset-0 z-50 flex items-end bg-slate-950/45 transition-opacity md:items-center md:justify-center md:p-5 ${open ? 'visible opacity-100' : 'pointer-events-none invisible opacity-0'}`} aria-hidden={!open}>
@@ -56,5 +58,5 @@ function NavigationButton({ item, active, expanded = false, onClick, tabIndex }:
   tabIndex?: number;
 }) {
   const Icon = item.icon;
-  return <button id={item.id} type="button" data-app-area={item.area} data-app-area-active={active ? 'true' : 'false'} onClick={onClick} tabIndex={tabIndex} aria-current={active ? 'page' : undefined} className={`flex min-w-0 items-center justify-center rounded-xl font-bold transition-colors ${expanded ? 'min-h-20 flex-col gap-2 border px-2 py-3 text-xs' : 'min-h-14 flex-col gap-1 px-1 py-2 text-[11px] md:min-h-0 md:flex-row md:gap-2 md:px-3 md:text-sm'} ${active ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : expanded ? 'border-slate-200 bg-white text-slate-600' : 'text-slate-500'}`}><Icon className={expanded ? 'h-5 w-5' : 'h-5 w-5 md:h-4 md:w-4'} /><span className="max-w-full truncate">{item.label}</span></button>;
+  return <button id={item.id} type="button" data-app-area={item.area} data-app-area-active={active ? 'true' : 'false'} onClick={onClick} tabIndex={tabIndex} aria-current={active ? 'page' : undefined} className={`flex min-w-0 items-center justify-center rounded-xl font-bold transition-colors ${expanded ? 'min-h-20 flex-col gap-2 border px-2 py-3 text-xs' : 'min-h-14 flex-col gap-1 px-1 py-2 text-xs leading-4 md:min-h-0 md:flex-row md:gap-2 md:px-3 md:text-sm'} ${active ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : expanded ? 'border-slate-200 bg-white text-slate-600' : 'text-slate-500'}`}><Icon className={expanded ? 'h-5 w-5' : 'h-5 w-5 md:h-4 md:w-4'} /><span className="max-w-full text-center">{item.label}</span></button>;
 }

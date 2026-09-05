@@ -108,7 +108,7 @@ class Phase12VisualBaselineCaptureTest {
 
             val seeded = seedRepresentativeShop(app)
             click(driver, "recovery-saved", "document.getElementById('app-navigation') !== null", 30_000L)
-            driver.waitFor("document.getElementById('native-product-list') !== null", 30_000L)
+            driver.waitFor("document.getElementById('run-report-button') !== null", 30_000L)
 
             click(driver, "logout-button", "document.getElementById('login-button') !== null", 20_000L)
             capturePage(driver, "auth-login")
@@ -165,6 +165,9 @@ class Phase12VisualBaselineCaptureTest {
 
     private fun captureDailyWork(driver: HybridWebViewTestDriver) {
         navigate(driver, "operations-nav", "operations", "document.getElementById('purchase-work-tab') !== null")
+        click(driver, "daily-task-picker", "document.getElementById('daily-task-navigation-layer').getAttribute('aria-hidden') === 'false'")
+        capturePanel(driver, "daily-work-task-picker", "#daily-task-navigation-panel")
+        click(driver, "close-daily-task-navigation", "document.getElementById('daily-task-navigation-layer').getAttribute('aria-hidden') === 'true'")
         val states = listOf(
             Triple("purchase-work-tab", "daily-work-receive-milk", "record-purchase-button"),
             Triple("sale-work-tab", "daily-work-record-sale", "record-sale-button"),

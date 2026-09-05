@@ -43,15 +43,15 @@ There is no Phase 12.1 P0 finding: the review exposed no saved secret, destructi
 
 1. **Apparent WebView paint completeness on state changes — resolved as a review-preview artifact in 12.2.** Some scaled previews of tall screenshots appeared to retain containers while omitting text/icons. Original-size pixel inspection and exact crops showed the supposedly missing brand, header, navigation, and body glyphs in the saved PNGs. A second PixelCopy and visual-state-synchronized 81-image set confirms the source evidence, while a 60-transition normal-use device check shows no corresponding app failure. Reviewers must verify the source file or a crop before filing this visual symptom as a product defect.
 2. **System-bar contrast and edge-to-edge insets — resolved in 12.2.** The activity now protects the transparent top inset with the exact header color while retaining edge-to-edge behavior and readable white status icons. The physical-device system-inset and presentation checks pass together.
-3. **Daily-work task tabs do not fit the phone — assigned to 12.3.** Seven actions share one horizontal strip. Later labels are clipped or off-screen, a scrollbar is visible, and the current task can be difficult to identify without swiping.
+3. **Daily-work task tabs do not fit the phone — resolved in 12.3.** The screen now shows one compact current-task control and a permission-aware two-column chooser sheet. All seven owner tasks fit without horizontal scrolling, keep their complete labels, expose selection semantically, and retain the existing native-backed form paths.
 
 ### P2 — address while applying the Phase 12 presentation system
 
 1. **Forms are taller than necessary.** Large gaps and repeated full-width controls push primary actions several screens below the title, increasing work for frequent shop-floor entries.
-2. **Secondary-area navigation loses context.** Products, customers, settings, backup, and other secondary areas all activate the generic `More` destination in the fixed bar. The screen header carries the real location, but it disappears during long-page scrolling.
+2. **Secondary-area navigation loses context — resolved in 12.3.** The fifth bottom-navigation destination now adopts the active secondary area's real icon and label while retaining access to the grouped chooser.
 3. **Dense content wraps awkwardly.** Some monetary summaries split `PKR` from the value, compact headings wrap onto three lines, and long explanatory copy competes with the immediate action.
 4. **Long bottom sheets need stronger mobile structure.** Customer and employee entry sheets approach the full viewport and require internal scrolling; action placement and section grouping should remain obvious throughout.
-5. **Small/low-contrast supporting text needs an accessibility pass.** The 11 px navigation labels, muted slate text, disabled controls, and status-bar icons require contrast and readable-size verification in checkpoint 12.4.
+5. **Small/low-contrast supporting text needs an accessibility pass.** Phase 12.3 raised bottom-navigation labels to the 12 px presentation minimum and allowed complete labels to wrap; muted slate text, disabled controls, status-bar icons, and remaining supporting copy still require contrast and readable-size verification in checkpoint 12.4.
 
 ## Locked interpretation
 
@@ -68,8 +68,8 @@ There is no Phase 12.1 P0 finding: the review exposed no saved secret, destructi
 
 ## Next gate
 
-Checkpoint 12.2 resolved the paint/inset questions and locked `DESIGN.md`. Checkpoint 12.3 now addresses navigation and natural task flow, beginning with Daily work and secondary destinations under `More`.
+Checkpoint 12.3 resolved the Daily work and secondary-location navigation findings. Checkpoint 12.4 now applies `DESIGN.md` screen by screen, including the remaining density, typography, dialog, responsive, and accessibility findings.
 
 ## Plain English
 
-We photographed every important app screen and state on the real Samsung phone, using realistic shop data. The text that seemed to disappear was actually present in the files—the tall-image preview was misleading. The phone-level status-bar foundation is now corrected. The next real usability problem is navigation, especially the overcrowded Daily work choices and secondary screens hidden under `More`; form density and accessibility follow in 12.4.
+We photographed every important app screen and state on the real Samsung phone, using realistic shop data. The misleading preview problem, phone-level status-bar foundation, crowded Daily work choices, and generic More location are now resolved. Form density, visual consistency, responsive behavior, and accessibility follow in 12.4.

@@ -94,7 +94,7 @@ The code is unreachable in the installed app, so this is removal of misleading s
 - Input placeholders are examples only and do not seed records.
 - `sampleStartDate` / `sampleEndDate` are native yield-calibration interval fields, not sample data.
 - Text such as “does not create a fake purchase/balancing entry” is an honest restriction, not a fake implementation.
-- A JSX button inventory found 122 active buttons. The only three without an inline click handler are the owner-setup, recovery, and login submit buttons; each submits through the shared `AuthCard` form and reaches the native authentication actions.
+- A later TypeScript AST audit refined the earlier text-based button estimate to 120 literal active buttons: 83 direct-click controls, 34 local form-submit controls, and three authentication buttons that submit through the shared `AuthCard` form. All 120 reach a handler; see `PHASE13_3_ACTIVE_UI_AUDIT.md`.
 - Current disabled states reviewed in this pass are tied to busy state, missing prerequisites, selection/calibration thresholds, closed dates, or permission-aware availability. Native permission enforcement remains authoritative.
 - File-size conversion, currency formatting, sign labels, date defaults, and display-only status mapping do not create business truth.
 

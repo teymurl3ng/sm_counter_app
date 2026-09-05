@@ -166,6 +166,10 @@ class Phase8OpeningStateTest {
             waitFor(webView, "document.getElementById('opening-state-tab') !== null")
             evaluate(webView, "document.getElementById('opening-state-tab').click(); true")
             waitFor(webView, "document.getElementById('review-opening-state-button') !== null || document.getElementById('correct-opening-state-button') !== null", 15_000L)
+            assertFalse(evaluate(webView, "document.body.innerText.includes('Recorded money total')") == "true")
+            if (evaluate(webView, "document.getElementById('opening-account-balance-explanation') !== null") == "true") {
+                assertTrue(evaluate(webView, "document.getElementById('opening-account-balance-explanation').innerText.includes('not combined into one total')") == "true")
+            }
             if (evaluate(webView, "document.getElementById('correct-opening-state-button') !== null") == "true") {
                 evaluate(webView, "document.getElementById('correct-opening-state-button').click(); true")
                 waitFor(webView, "document.getElementById('review-opening-state-button') !== null")

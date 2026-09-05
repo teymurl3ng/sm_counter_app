@@ -1,6 +1,6 @@
 # Phase 13 — Dead, Mock, and Misleading UI Cleanup
 
-Status: **IN PROGRESS — checkpoints 13.1–13.2 complete; checkpoint 13.3 next**
+Status: **IN PROGRESS — checkpoints 13.1–13.3 complete; checkpoint 13.4 next**
 
 ## Purpose
 
@@ -33,11 +33,13 @@ Completed with 108 TypeScript/TSX files classified: 85 are reachable from the pa
 
 Completed exactly against the 13.1 removal lock. The 23-file, 8,370-line prototype and six unused direct dependencies are gone; the import graph is now 85 reachable files / 85 total / zero unreachable. TypeScript, Vite, Android packaging/compilation, 7/7 host tests, and a 12/12 Samsung login/Product/navigation/responsive gate pass. Active JavaScript retains the exact Phase 12 content hash, while generated CSS falls 60.3% because dead prototype classes no longer enter Tailwind's scan. See `PHASE13_2_PROTOTYPE_REMOVAL.md`.
 
-### 13.3 — Active control and meaning audit
+### 13.3 — Active control and meaning audit ✅
 
 - Audit active buttons, disabled/permission states, success messages, presentation calculations, placeholders, and labels against their native source.
 - Remove or correct any active no-op, duplicated, self-authorized, or misleading presentation.
 - Resolve the heterogeneous opening-balance total without adding a new accounting formula.
+
+Completed across all 85 active TypeScript/TSX files. A TypeScript AST audit found 120 literal buttons and zero disconnected controls; permission, disabled, placeholder, completion-message, and display-arithmetic paths remain tied to native authority or presentation-only behavior. The misleading unsigned opening-balance total was removed and replaced with an explicit explanation that cash/bank, customer, and supplier meanings remain separate. TypeScript/Vite, bridge verification, Android compilation, 7/7 host tests, and 4/4 focused Samsung opening-state tests pass. See `PHASE13_3_ACTIVE_UI_AUDIT.md`.
 
 ### 13.4 — Negative-source and focused device gate
 
@@ -51,8 +53,8 @@ Completed exactly against the 13.1 removal lock. The 23-file, 8,370-line prototy
 
 ## Current next action
 
-Run checkpoint 13.3: audit every active control, permission/disabled state, success message, placeholder, and presentation calculation against its native source. Resolve the misleading heterogeneous opening-balance total without adding an accounting formula to React.
+Run checkpoint 13.4: add repeatable negative-source/package checks that prevent the removed browser-local store, synthetic reports, arbitrary restore paths, obsolete shell, misleading opening-balance total, and removed dependencies from returning. Then run the focused authentication, navigation, Products, Settings/Backup, reporting, opening-state, and Phase 12 presentation device gate.
 
 ## Plain English
 
-The disconnected demo and its unused packages are now removed, while the real app still passes on the phone. This made the generated CSS much smaller without changing the active JavaScript or trusted Android logic. Next we will inspect the remaining live controls and messages, including fixing one questionable opening-balance total.
+The disconnected demo and its unused packages are gone. Every live button and message has now been checked, and the one questionable opening-balance total was removed because it mixed unlike account meanings. Next we will turn these cleanup rules into an automatic guard and run the broader focused phone gate.

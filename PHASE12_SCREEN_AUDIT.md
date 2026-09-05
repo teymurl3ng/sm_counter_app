@@ -68,8 +68,8 @@ There is no Phase 12.1 P0 finding: the review exposed no saved secret, destructi
 
 ## Next gate
 
-Checkpoint 12.4 resolved the remaining density, typography, dialog, responsive, label, and contrast findings across all 58 retained states. Checkpoint 12.5 then verified release-like presentation performance without requiring optimization. Checkpoint 12.6 now owns complete regression and handoff.
+Checkpoint 12.4 resolved the remaining density, typography, dialog, responsive, label, and contrast findings across all 58 retained states. Checkpoint 12.5 verified release-like presentation performance without requiring optimization. Checkpoint 12.6 reproduced all 83 accepted screenshots and passed the complete 258/258 device regression. Phase 12 is closed; Phase 13 now owns source-traced dead/mock/duplicated/misleading UI cleanup.
 
 ## Plain English
 
-We photographed every important app screen and state on the real Samsung phone, using realistic shop data. The original navigation, inset, density, wrapping, long-dialog, label, and contrast findings are now addressed through checkpoints 12.2–12.4. The next work is measuring speed, not adding more visual features.
+We photographed every important app screen and state on the real Samsung phone, using realistic shop data. The original navigation, inset, density, wrapping, long-dialog, label, and contrast findings are addressed, the app is within its speed budgets, and the complete Phase 12 regression passes. Next we will remove anything dead, fake, duplicated, or misleading without changing the trusted records or calculations.

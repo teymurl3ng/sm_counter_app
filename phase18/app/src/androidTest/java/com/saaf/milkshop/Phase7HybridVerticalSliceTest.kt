@@ -141,6 +141,10 @@ class Phase7HybridVerticalSliceTest {
             evaluate(webView, "document.getElementById('login-button').click(); true")
             waitFor(webView, "document.getElementById('signed-in-user')?.innerText.includes('Instrumentation Owner') === true", 20_000L)
 
+            evaluate(webView, "document.getElementById('navigation-more-button').click(); true")
+            waitFor(webView, "document.getElementById('navigation-more-layer').getAttribute('aria-hidden') === 'false'")
+            evaluate(webView, "document.getElementById('products-nav').click(); true")
+            waitFor(webView, "document.getElementById('add-product-button') !== null")
             evaluate(webView, "document.getElementById('add-product-button').click(); true")
             waitFor(webView, "document.getElementById('product-name') !== null")
             setInput(webView, "product-name", productName)

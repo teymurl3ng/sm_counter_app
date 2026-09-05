@@ -1,6 +1,6 @@
 # Phase 12 — UI Fidelity
 
-Status: **IN PROGRESS — checkpoints 12.1–12.5 complete; checkpoint 12.6 next**
+Status: **COMPLETE — checkpoints 12.1–12.6**
 
 ## Purpose
 
@@ -61,14 +61,16 @@ No retained native/bridge receipt, image-export, or PDF-export capability exists
 
 Completed with a dedicated non-debuggable, shell-profileable benchmark build and a repeatable physical-device gate. On the Samsung baseline, Android cold-process start measured 822 ms median / 871 ms p95, React ready measured 327.9 ms median / 378.3 ms p95, and painted preloaded navigation measured 24.0 ms median / 29.6 ms p95 with zero native bridge calls. These results do not justify code splitting, deferred native reads, or another architectural optimization. See `PHASE12_5_PERFORMANCE_REVIEW.md` and `phase12-evidence/sm-a065f-android16-phase12-5-performance/metrics.tsv`.
 
-### 12.6 — Regression and handoff
+### 12.6 — Regression and handoff ✅
 
 - Rebuild and verify TypeScript, Vite assets, Android packaging, bridge drift, focused UI/device checks, and the complete regression suite.
 - Publish final before/after evidence, limitations, and guarded Phase 13 handoff.
 
+Completed from a fresh production web build and Android package. Bridge v4/86, TypeScript, Vite, packaged-asset parity, Android compilation/packaging, 7/7 host tests, 11/11 focused Phase 12 device tests, and the complete 258/258 Samsung regression all pass with no skips or failures. The final clean-state visual partition reproduced 83 screenshots across 58 states at 720 × 1600. Two legacy Products UI tests were updated to follow the approved Dashboard-first **More → Products** flow; production behavior did not change. See `PHASE12_6_HANDOFF.md` and `phase12-evidence/sm-a065f-android16-phase12-6-final/`.
+
 ## Current next action
 
-Begin checkpoint 12.6: rebuild every source/package boundary, run focused Phase 12 checks and the complete isolated-QA regression, publish final before/after evidence and limitations, and hand the verified UI to Phase 13 cleanup.
+Begin Phase 13 with a source-traced inventory of dead, mock, duplicated, and misleading UI. Remove unsupported presentation paths without adding local business state, UI-side formulas, synthetic reports, or false success messages.
 
 ## Checkpoint 12.2 verification
 
@@ -78,7 +80,7 @@ Begin checkpoint 12.6: rebuild every source/package boundary, run focused Phase 
 - `Phase12PresentationFoundationTest` — 4/4 passed on Samsung SM-A065F / Android 16, including 60 continuous destination changes.
 - Combined system-inset and presentation device check — 5/5 passed.
 - `Phase12VisualBaselineCaptureTest` — 1/1 passed; 81/81 PNGs are readable at 720 × 1600 and the 83-line manifest SHA-256 is `1C81401D6B8E25904A788B23B506CADDE8D052B0B0597D89894014FB86C715AC`.
-- The last complete isolated-QA regression remains the Phase 11 gate at 247/247; checkpoint 12.6 owns the next complete-suite rerun.
+- At checkpoint 12.2, the last complete isolated-QA regression was the Phase 11 gate at 247/247; the final Phase 12.6 result is recorded below.
 
 ## Checkpoint 12.4 verification
 
@@ -88,7 +90,7 @@ Begin checkpoint 12.6: rebuild every source/package boundary, run focused Phase 
 - Responsive/accessibility, navigation-flow, and system-inset checks — 5/5 passed on Samsung SM-A065F / Android 16.
 - `Phase12VisualBaselineCaptureTest` — 1/1 passed after validating all 58 states; 83/83 PNGs are readable at 720 × 1600.
 - The 85-line final manifest SHA-256 is `8E9937FC972B2EE36D8E31D5FB58C0C7C86189D4C8A8F116AFA91C727B45F1BE`.
-- The last complete isolated-QA regression remains the Phase 11 gate at 247/247; checkpoint 12.6 owns the next complete-suite rerun.
+- At checkpoint 12.4, the last complete isolated-QA regression was the Phase 11 gate at 247/247; the final Phase 12.6 result is recorded below.
 
 ## Checkpoint 12.5 verification
 
@@ -103,8 +105,22 @@ Begin checkpoint 12.6: rebuild every source/package boundary, run focused Phase 
 - Raw seven-line performance evidence SHA-256 — `A34327B3EFADEC0A476F5F60B6836082DB47AA31669534C7014E619EC7F7BAAC`.
 - Bridge contract — unchanged at v4, 86 endpoints, SHA-256 `D22921E90040EF70CED8AFDE535C6309544B75D5EBD7B726ED1DE1273E0FA136`.
 - No performance optimization was made because every measured result was comfortably within the locked guardrails.
-- The last complete isolated-QA regression remains the Phase 11 gate at 247/247; checkpoint 12.6 owns the next complete-suite rerun.
+- At checkpoint 12.5, the last complete isolated-QA regression was the Phase 11 gate at 247/247; the final Phase 12.6 result is recorded below.
+
+## Checkpoint 12.6 verification
+
+- UI type check and production build — passed; Vite transformed 1,897 modules and reproduced the accepted 433.76 kB JavaScript / 85.71 kB CSS bundle.
+- Packaged asset parity, Android debug packaging, production Kotlin compilation, and Android-test Kotlin compilation — passed.
+- Bridge contract — unchanged at v4, 86 endpoints, SHA-256 `D22921E90040EF70CED8AFDE535C6309544B75D5EBD7B726ED1DE1273E0FA136`.
+- Immutable logic specification and SQL blueprint hashes — unchanged.
+- Host debug unit tests — 7/7 passed, 0 skipped, 0 failed.
+- Focused Phase 12 device gate — 11/11 passed, 0 skipped, 0 failed.
+- Main isolated-QA Samsung partition — 257/257 passed, 0 skipped, 0 failed.
+- Empty-identity visual/accessibility Samsung partition — 1/1 passed, 0 skipped, 0 failed; 83 screenshots / 58 states.
+- Complete Phase 12 device regression — 258/258 across the two required clean-state partitions.
+- Final evidence manifest — 85 lines, SHA-256 `8E9937FC972B2EE36D8E31D5FB58C0C7C86189D4C8A8F116AFA91C727B45F1BE`.
+- Debug APK SHA-256 — `55CB0EF5ED76795AEE207A465C0A5C40CA1FD2FE74A168DC3843A21C6AE03091`.
 
 ## Plain English
 
-Navigation and every retained screen are clearer on the real phone, and the measured release-like build is already fast enough that extra optimization would add risk without useful benefit. A permanent device test now guards startup and navigation speed. Next comes the complete Phase 12 regression and handoff. The shop's records, calculations, permissions, and security have not been changed.
+Phase 12 is finished. Navigation and every retained screen are clearer on the real phone, the release-like build is comfortably within its speed budgets, and all 258 phone tests pass. The only regression fix taught two old tests to follow the new Products route; the shop's records, calculations, permissions, and security were not changed. Phase 13 is next and will remove dead, mock, duplicated, or misleading UI.

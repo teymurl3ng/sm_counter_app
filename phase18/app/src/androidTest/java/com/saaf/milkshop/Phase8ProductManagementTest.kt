@@ -157,6 +157,10 @@ class Phase8ProductManagementTest {
             setInput(webView, "login-name", SaafMilkTestRunner.TEST_LOGIN)
             setInput(webView, "login-passphrase", SaafMilkTestRunner.TEST_PASSPHRASE)
             evaluate(webView, "document.getElementById('login-button').click(); true")
+            waitFor(webView, "document.getElementById('signed-in-user')?.innerText.includes('Instrumentation Owner') === true", 20_000L)
+            evaluate(webView, "document.getElementById('navigation-more-button').click(); true")
+            waitFor(webView, "document.getElementById('navigation-more-layer').getAttribute('aria-hidden') === 'false'")
+            evaluate(webView, "document.getElementById('products-nav').click(); true")
             waitFor(webView, "document.getElementById('add-product-button') !== null", 20_000L)
 
             evaluate(webView, "document.getElementById('add-product-button').click(); true")

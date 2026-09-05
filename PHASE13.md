@@ -1,6 +1,6 @@
 # Phase 13 — Dead, Mock, and Misleading UI Cleanup
 
-Status: **IN PROGRESS — checkpoints 13.1–13.4 complete; checkpoint 13.5 next**
+Status: **COMPLETE — checkpoints 13.1–13.5 complete**
 
 ## Purpose
 
@@ -48,15 +48,17 @@ Completed across all 85 active TypeScript/TSX files. A TypeScript AST audit foun
 
 Completed with an executable cleanup gate enforced by npm/Vite, the post-package script, and Android `preBuild`. It rejects all 23 removed paths, the six removed dependencies, browser-local business storage, synthetic reports, old browser import/export/clear-all paths, the obsolete shell/store, and the misleading opening-balance total in source or packaged assets. Its self-test passes, and the isolated-QA Samsung gate passes 31/31 across authentication, Products, Settings/Backup, reporting, opening state, navigation, presentation, and responsive/accessibility behavior. See `PHASE13_4_NEGATIVE_GATE.md`.
 
-### 13.5 — Complete regression and Phase 14 handoff
+### 13.5 — Complete regression and Phase 14 handoff ✅
 
 - Rebuild and verify TypeScript, Vite assets, Android packaging, bridge drift, immutable hashes, host tests, and the complete physical-device suite.
 - Publish removed-surface evidence, retained restrictions, known limitations, and the guarded Phase 14 device-QA handoff.
 
+Completed against freshly rebuilt final assets. The cleanup guard self-test and source/package scans pass; bridge v4 remains at 86 operations; TypeScript/Vite, packaged-asset parity, Android packaging, Kotlin production/instrumentation compilation, immutable hashes, and 7/7 host tests pass. The Samsung SM-A065F / Android 16 complete suite passes 258/258 across the authenticated 257-test and empty-identity 1-test visual partitions, with zero skips or failures. The visual partition preserved 83 readable 720 × 1600 screenshots / 58 states. See `PHASE13_5_HANDOFF.md`.
+
 ## Current next action
 
-Run checkpoint 13.5: perform the complete 258-test isolated-QA physical-device regression, rebuild and verify all hashes/contracts/assets/host tests, then publish the Phase 13 closure and guarded Phase 14 device-QA handoff.
+Begin Phase 14 final device QA from `PHASE13_5_HANDOFF.md`: validate the complete role/permission bypass matrix, real Google Drive backup and retry behavior, accessibility and broader-device behavior, and safe full replacement restore on a second physical device without changing the frozen business boundaries.
 
 ## Plain English
 
-The disconnected demo is gone, the live UI has been checked, and automatic build rules now stop the old behavior from coming back. The cleaned app passed the broader 31-test phone gate. The last Phase 13 step is the complete 258-test regression and handoff to Phase 14.
+Phase 13 is finished. The disconnected demo is gone, every live control has been checked, the misleading opening total is corrected, and automatic build rules stop the old behavior from returning. The final app passed all 258 phone tests plus 7 computer-side tests, and all 83 review screenshots were captured and validated. Next is real-device acceptance in Phase 14.

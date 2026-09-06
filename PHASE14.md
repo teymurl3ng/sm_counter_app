@@ -1,6 +1,6 @@
 # Phase 14 — Final Device QA
 
-Status: **IN PROGRESS — checkpoints 14.1–14.2 complete; checkpoint 14.3 live QA paused after successful upload/offline-retry evidence**
+Status: **IN PROGRESS — checkpoints 14.1–14.3 complete; checkpoint 14.4 second-device recovery is next**
 
 ## Purpose
 
@@ -38,14 +38,14 @@ Completed on Samsung SM-A065F / Android 16. The exact `com.saaf.milkshop.qa` APK
 
 Completed on the isolated Samsung SM-A065F / Android 16. Two new tests exercise all five roles through the packaged UI and valid native-bypass probes across every bridge-contract permission, plus the separate owner-only privileged-user and cloud boundaries. The focused matrix passes 2/2, the related security/session/backup/lifecycle/recovery regression passes 36/36, and host tests pass 7/7. No production defect was found, so the app UI, functions, formulas, and business behavior are unchanged. The full device-suite inventory is now 260 tests; its expanded complete two-part rerun remains the 14.7 closure gate. See `PHASE14_2_ROLE_PERMISSION_QA.md`.
 
-### 14.3 — Live Google Drive and resilience
+### 14.3 — Live Google Drive and resilience ✅
 
 - Build the isolated QA application with an approved Google OAuth web client ID supplied outside source control.
 - Use an owner-controlled test Google account to prove consent, `drive.appdata` authorization, initial and manual encrypted upload, listing, inspection, retention, and disconnect/revocation.
 - Exercise offline and metered-network behavior, missed scheduling, WorkManager retry, provider expiry, wrong-account handling, and safe degraded operation without blocking shop work.
 - Keep credentials, tokens, recovery passphrases, and account-private data out of project evidence and logs.
 
-Preflight completed on the isolated Samsung SM-A065F / Android 16 with the explicit `.qa` cloud resilience suite passing 25/25. The user then configured the dedicated external/testing Google project, narrow `drive.appdata` scope, Android/Web clients, and test audience. The OAuth-enabled `.qa` build passed its contract/cleanup gates and completed real consent, initial and manual encrypted uploads, hidden app-data listing, and offline queue/retry, reaching three verified recovery points. Recovery-point inspection paused when the expected private passphrase was not accepted, before the owner-versus-cloud authentication stage was isolated. Two verified UX defects are recorded: interactive Google setup can outlive the fixed 30-second bridge timer while succeeding in the background, and offline refresh exposes a raw DNS error. The connected state and recovery points remain intact. See `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md`.
+Completed across the isolated Samsung SM-A065F and replacement Samsung SM-S921W, both on Android 16. The explicit `.qa` cloud resilience suite passes 25/25, including metered constraints, retention, wrong-account, authorization-required, retry, and recovery boundaries. The real provider passes consent, initial/manual encrypted upload, hidden app-data listing, offline queue/retry, successful no-restore inspection, account revocation, retained remote ciphertext, and fresh-consent reconnect. The replacement QA installation remains connected with six verified recovery points and no cloud error. Three UX defects are recorded for 14.7: interactive connect/disconnect can outlive the fixed bridge timer while succeeding, offline refresh exposes a raw DNS error, and credential/new-vault reconnect wording is ambiguous. See `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md`.
 
 ### 14.4 — Second-device recovery
 
@@ -86,8 +86,8 @@ Preflight completed on the isolated Samsung SM-A065F / Android 16 with the expli
 
 ## Current next action
 
-Resume checkpoint 14.3 without clearing or disconnecting the existing QA installation. Identify whether recovery-point inspection rejects the Saaf owner passphrase before the Android dialog or the separate cloud recovery passphrase inside it; do not record either value. Then finish inspection, metered-policy, and disconnect/revocation evidence. Checkpoint 14.4 has a connected candidate phone, but installing the separate QA package or performing recovery there requires an explicit safe-use decision because its ordinary Saaf installation must remain untouched. After 14.5, implement and physically verify mandatory Quick unlock in 14.6, then close every recorded defect and run the expanded complete regression in 14.7.
+Begin checkpoint 14.4 on the replacement Samsung SM-S921W using only its disposable `com.saaf.milkshop.qa` owner-profile installation. Inspect and deliberately restore a real encrypted recovery point, then verify restored users/data/security state and destructive-failure protections. The phone's ordinary Saaf installation/profile must remain untouched. After 14.5, implement and physically verify mandatory Quick unlock in 14.6, then close every recorded defect and run the expanded complete regression in 14.7.
 
 ## Plain English
 
-The safe test app works on the primary Samsung, every role sees only its approved work, and the real Google backup now creates hidden encrypted recovery points and survives an offline queue. We found two confusing error messages and paused safely when recovery-point inspection did not accept the expected private passphrase. This confirmed that fingerprint/device-credential or short-PIN Quick unlock is a must before release, while the long emergency recovery secret remains protected. The Google connection and three recovery points remain intact. The second phone's ordinary Saaf app was not changed.
+The safe test app works across both Samsungs, every role sees only its approved work, and real Google backup now passes upload, hidden storage, offline retry, decryption inspection, revocation, and fresh-consent reconnect with six verified recovery points. We found three usability problems to fix later, including misleading timeouts and unclear passphrase wording. The ordinary Saaf installation remains untouched. Next we will prove that one of these encrypted points can fully replace only the disposable QA installation, then verify the restored data.

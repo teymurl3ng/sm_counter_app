@@ -1,49 +1,60 @@
 # Phase 14.3 — Live Google Drive QA
 
-Status: **PAUSED SAFELY — live consent, upload, hidden listing, and offline retry verified; inspection authentication unresolved**
+Status: **COMPLETE — live consent, encrypted upload, hidden listing, offline retry, inspection, revocation, and fresh-consent reconnect verified**
 
-Date: 2026-09-06  
-Primary QA device: Samsung SM-A065F / Android 16 / API 36  
-QA package: `com.saaf.milkshop.qa` / `0.1.0-qa`
+- Date: 2026-09-06
+- Initial QA device: Samsung SM-A065F / Android 16 / API 36
+- Completion QA device: Samsung SM-S921W / Android 16 / API 36
+- QA package: `com.saaf.milkshop.qa` / `0.1.0-qa`
 
 ## Outcome
 
-The app-side cloud-backup implementation and physical-device prerequisites are ready for a live Google Drive run. The non-live provider, scheduling, failure, and recovery matrix passes **25/25** on the explicitly isolated QA build with zero skips or failures. The accepted QA APK remains byte-for-byte reproducible at SHA-256 `E7C8CA158B1688497C15DA77B73FAA008F8F781210650080DFADC34A7291BA6C`.
+The app-side cloud-backup implementation completed its live Google Drive acceptance checkpoint. The provider, scheduling, metered-policy, retention, failure, wrong-account, authorization-required, and recovery matrix passes **25/25** on the explicitly isolated QA build with zero skips or failures. The accepted baseline QA APK remains byte-for-byte reproducible at SHA-256 `E7C8CA158B1688497C15DA77B73FAA008F8F781210650080DFADC34A7291BA6C`; the OAuth-enabled live-test APK is recorded separately below.
 
-Full live acceptance has not yet been claimed. Consent, initial and manual encrypted upload, hidden recovery-point listing, and offline queue/retry are proven. Recovery-point inspection paused when the expected private passphrase was not accepted; the exact owner-versus-cloud authentication stage was not isolated before stopping. Metered-policy behavior and disconnect/revocation also remain.
+Physical-device evidence proves real consent, initial and manual encrypted upload, hidden recovery-point listing, offline queue/retry, successful no-restore inspection, revocation, retained remote points, and fresh-consent reconnect. Live carrier-data use was deliberately avoided; the explicit device suite supplies the metered-network constraint evidence without creating an unnecessary data-cost risk.
 
 ## Live execution evidence — 2026-09-06
 
 - The user configured the external/testing OAuth audience, one owner-controlled test user, the narrow `drive.appdata` scope, the QA Android client, and the matching Web client in the dedicated `saaf-milk-qa` Cloud project.
 - The Web client ID was supplied only as a local Gradle command-line property. It was not written to tracked source.
 - The OAuth-enabled isolated QA APK built successfully with contract v4 / 86 endpoints and the UI cleanup gate intact. Its SHA-256 is `305BF889747164E675882213F203DD4B3FE6E2F70590057686B13080543739F8`.
-- The APK was verified as `com.saaf.milkshop.qa` / `0.1.0-qa`, installed only on the primary QA Samsung, and initialized with disposable test data.
+- The APK was verified as `com.saaf.milkshop.qa` / `0.1.0-qa`, initially installed on the primary QA Samsung, and initialized with disposable test data.
 - Real Google consent and Drive connection completed. After reloading the Cloud area, the app reported one recovery point, `Last verified` at `2026-09-06 02:31:54`, and no cloud error.
 - The user then selected **Back up now**. After the expected short queue delay and refresh, `Last verified` advanced, the recovery-point count increased from one to two, and no error appeared.
 - In the same test account's normal Google Drive interface, neither recovery point appeared in **My Drive**, **Recent**, or a `Saaf` search. This confirms the live files use the intended hidden app-data area rather than user-visible Drive storage.
 - With Airplane mode enabled, **Back up now** remained queued and no recovery point was created while offline. After Airplane mode was disabled and Wi-Fi returned, the same queued work completed automatically: the recovery-point count increased from two to three, the verification time advanced, and the prior offline error cleared.
+- The user moved the completion run to the faster Samsung SM-S921W. A byte-identical OAuth-enabled QA APK was installed with `--user 0`; the ordinary `com.saaf.milkshop` installation/profile was not modified. The fresh QA installation connected to the same owner-controlled Google test account and immediately discovered all three existing remote recovery points with no error.
+- Connection queued an automatic recovery point and the user's **Back up now** action queued another. Both verified successfully, increasing the remote total from three to five without overwriting the earlier vault.
+- The newest recovery point accepted the current Saaf owner passphrase at the page boundary and the separate cloud-recovery passphrase in the native Android dialog. Inspection reached the expected full-replacement warning, proving download, integrity/authenticity checks, decryption, and backup inspection. Restore was deliberately not confirmed because full replacement belongs to Phase 14.4.
+- **Revoke access and disconnect** required reselecting the same Google account, then revoked access and returned the app to its disconnected form. The interactive bridge timed out before showing completion, but leaving and returning to Cloud reconciled the persisted disconnected state.
+- Reconnecting required Google account selection, permission/consent approval, and the expected unverified-testing-app warning again. All five earlier points remained visible and a newly verified point increased the total to six, with no cloud error. This proves retained remote ciphertext and fresh authorization after revocation.
 
-### Finding F14.3-01 — interactive connection outlives the bridge timer
+### Finding F14.3-01 — interactive cloud operations outlive the bridge timer
 
 The first live connection displayed `The app took too long to respond. Please try again.` before the user could see completion, then reset the visible form. Retrying produced a passphrase error. Leaving and returning to Cloud loaded the successfully persisted Google account and verified recovery point.
 
-Code inspection confirms the shared web bridge deletes every pending request after 30 seconds, while native `connectCloudBackup` legitimately waits for recovery-passphrase entry, Google account selection/consent, Drive identity verification, configuration, and scheduling. The native operation is not cancelled when the web request times out, so it can complete successfully after the UI has declared failure. This is a real feedback/reconciliation defect, not a failed backup or user mistake. Preserve the successful connection during the remaining acceptance checks; fix the interactive timeout and post-resume status reconciliation before Phase 14 closes.
+Code inspection confirms the shared web bridge deletes every pending request after 30 seconds, while native `connectCloudBackup` legitimately waits for recovery-passphrase entry, Google account selection/consent, Drive identity verification, configuration, and scheduling. The completion run also reproduced the same false timeout during `disconnectCloudBackup`, whose native work waits for account selection, identity verification, revocation, and credential-state clearing. In both cases native work can succeed after the UI declares failure because the timeout does not cancel it. This is a real feedback/reconciliation defect, not a failed backup or user mistake. Fix the interactive timeout and post-resume status reconciliation before Phase 14 closes.
 
 ### Finding F14.3-02 — offline refresh exposes a raw network exception
 
 With Airplane mode enabled, **Back up now** was queued and a subsequent refresh correctly failed to reach Google, but the UI exposed the low-level DNS message `Unable to resolve host www.googleapis.com: No address associated with hostname`. Offline operation is expected and does not imply backup corruption, but this copy is too technical and does not tell the shopkeeper that the queued backup will retry after connectivity returns. Map this failure to concise offline/retry guidance while retaining diagnostic detail outside the user-facing message.
 
+### Finding F14.3-03 — credential and reconnect language is ambiguous
+
+The live flow uses three distinct authentication concepts: the current Saaf owner passphrase, Google-owned account authentication, and a separate cloud-recovery passphrase. The connection form does not explain this distinction clearly enough. After revocation, reconnect also asks the user to create a `new` recovery passphrase even though existing recovery points remain, because the implementation creates a new device vault; the same prior recovery passphrase may be reused but is not automatically retained. Revocation launches a Google account chooser to verify the exact account without explaining why. Clarify these boundaries and new-vault behavior without ever asking for or storing the Google password.
+
 ### Mandatory follow-on requirement — Quick unlock
 
 The live journey required repeated entry of a long Saaf owner passphrase plus a separate long cloud-recovery passphrase. The owner explicitly made a short trusted-device path—fingerprint/other strong biometric, Android device credential, or short per-user PIN—a release requirement. Phase 14.6 now owns implementation and physical-device proof. The short path may unlock device-bound Keystore material for routine existing-device work, but it must never reduce portable Drive-backup encryption to a four-digit secret. See `QUICK_UNLOCK_REQUIREMENT.md`.
 
-## Safe pause checkpoint
+## Completion state and handoff
 
-- The primary QA app remains connected to Google Drive with automatic Wi-Fi-only backup enabled and three verified encrypted recovery points.
-- No restore, disconnect, authorization revocation, package clear, or second-phone Saaf action was performed after the successful live checks.
-- The second phone's ordinary `com.saaf.milkshop` installation remains untouched; it was used only to view normal Google Drive, where no hidden recovery point appeared.
-- Resume by identifying whether inspection rejects the Saaf owner passphrase before the Android dialog or the cloud recovery passphrase inside the Android dialog. Do not record either value.
-- After inspection succeeds or the credential limitation is honestly resolved, finish metered-policy evidence and disconnect/revocation. Continue second-device/accessibility QA, implement mandatory Quick unlock in 14.6, then fix F14.3-01/F14.3-02 and run final closure in 14.7.
+- The replacement QA installation on Samsung SM-S921W remains connected to Google Drive with automatic Wi-Fi-only backup enabled and six verified encrypted recovery points visible.
+- No cloud restore was confirmed. Phase 14.4 owns the deliberate full-replacement recovery test on this disposable `com.saaf.milkshop.qa` installation.
+- The ordinary `com.saaf.milkshop` installation/profile on that phone remains untouched; the isolated QA package was installed only for owner profile 0.
+- The original Samsung SM-A065F was not cleared or modified during the completion run.
+- No Google password, access token, client secret, Saaf passphrase, cloud-recovery passphrase, recovery code, or real account identifier was added to project evidence.
+- Continue with second-device full replacement in 14.4, accessibility/device behavior in 14.5, mandatory Quick unlock in 14.6, then fix F14.3-01/F14.3-02/F14.3-03 and run final closure in 14.7.
 
 ## Official setup requirements
 
@@ -100,10 +111,10 @@ Once the two OAuth clients and test account are ready:
 
 Never record or commit the Google password, access token, client secret, recovery passphrase, recovery code, real email address, or account-private Drive metadata.
 
-## Resume point
+## Phase 14.4 handoff
 
-The external/testing Google Cloud project, Android client, Web client, narrow scope, and test audience are configured. The OAuth-enabled QA APK remains installed on the primary phone. On resume, keep the existing connection and three recovery points, distinguish the two private passphrase stages during inspection, and never paste credentials or recovery codes into chat or project files.
+The external/testing Google Cloud project, Android client, Web client, narrow scope, and test audience remain configured. The OAuth-enabled QA APK is connected on the Samsung SM-S921W and lists six verified recovery points. The next checkpoint may deliberately restore one inspected point into this disposable QA package, but it must not touch the phone's ordinary Saaf installation/profile or record private credentials.
 
 ## Plain English
 
-The real Google connection works. It created three encrypted recovery points, hid them from normal Drive, and automatically completed an offline-queued backup after Wi-Fi returned. Two confusing error messages were found and recorded. We stopped safely before restore or disconnect because recovery-point inspection did not accept the expected private passphrase; no secret was collected or saved.
+Real Google backup works across a disconnect and reconnect. Six encrypted recovery points are safely hidden in Drive; offline work retried automatically, a real point decrypted and passed inspection, revocation retained the remote copies, and reconnect required fresh Google permission. Three usability defects were recorded for later closure: misleading interactive timeouts, a raw offline DNS error, and unclear wording around the three credentials and new-vault reconnect behavior. No secret was collected or saved.

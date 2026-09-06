@@ -1,6 +1,6 @@
 # Phase 14 — Final Device QA
 
-Status: **IN PROGRESS — checkpoints 14.1–14.3 complete; checkpoint 14.4 second-device recovery is next**
+Status: **IN PROGRESS — checkpoints 14.1–14.3 complete; checkpoint 14.4 replacement recovery is safely in progress**
 
 ## Purpose
 
@@ -54,6 +54,8 @@ Completed across the isolated Samsung SM-A065F and replacement Samsung SM-S921W,
 - Prove wrong-passphrase, damaged-backup, incompatible-backup, expired-ticket, repeated-attempt, and cancellation paths preserve the target installation.
 - Confirm that two restored writable installations are not presented or operated as synchronized copies.
 
+Live replacement now passes on the isolated Samsung SM-S921W: a remote point whose local vault key had been removed by revocation passed inspection, fully replaced the QA installation, forced logout, restored the owner account, retained six remote listings, and left Google Drive correctly paused. Wrong owner and cloud-recovery secrets were rejected without invoking restore. The original phone's three points remain encrypted because their original private recovery passphrase was unavailable, so honest cross-device source/data-rich proof and final post-failure continuity checks remain. One new copy defect is recorded for 14.7. See `PHASE14_4_SECOND_DEVICE_RECOVERY.md`.
+
 ### 14.5 — Accessibility, adaptivity, and Android behavior
 
 - Perform the native technical audit across accessibility, performance, appearance/theming, platform conformance, and adaptivity.
@@ -86,8 +88,8 @@ Completed across the isolated Samsung SM-A065F and replacement Samsung SM-S921W,
 
 ## Current next action
 
-Begin checkpoint 14.4 on the replacement Samsung SM-S921W using only its disposable `com.saaf.milkshop.qa` owner-profile installation. Inspect and deliberately restore a real encrypted recovery point, then verify restored users/data/security state and destructive-failure protections. The phone's ordinary Saaf installation/profile must remain untouched. After 14.5, implement and physically verify mandatory Quick unlock in 14.6, then close every recorded defect and run the expanded complete regression in 14.7.
+Resume checkpoint 14.4 by confirming the failed wrong-cloud-passphrase inspection left the restored QA installation signed in with Google Drive paused. Then finish the remaining preservation checks and honest two-device/data-rich recovery evidence without touching either ordinary Saaf installation or weakening the forgotten-secret boundary. After 14.5, implement and physically verify mandatory Quick unlock in 14.6, then close every recorded defect and run the expanded complete regression in 14.7.
 
 ## Plain English
 
-The safe test app works across both Samsungs, every role sees only its approved work, and real Google backup now passes upload, hidden storage, offline retry, decryption inspection, revocation, and fresh-consent reconnect with six verified recovery points. We found three usability problems to fix later, including misleading timeouts and unclear passphrase wording. The ordinary Saaf installation remains untouched. Next we will prove that one of these encrypted points can fully replace only the disposable QA installation, then verify the restored data.
+The real cloud restore fully replaced only the test app, logged the user out, restored the owner account, retained six encrypted points, and paused future backups. Wrong secrets were rejected, and another unclear error message was recorded for later repair. The oldest three backups remain securely unreadable without their forgotten original recovery secret. We paused safely before completing the remaining cross-device/data-rich proof.

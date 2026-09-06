@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-06 — hybrid Phases 0–13 are complete; Phase 14 Final Device QA is active with checkpoints 14.1–14.3 complete and 14.4 second-device recovery next. Contract v4 exposes 86 native-backed operations. The unreachable 23-file, 8,370-line browser-local prototype and six unused dependencies are removed; the 85-file production graph and its live controls/messages have been audited, and automatic web/Android build gates prevent the removed behavior from returning.
+Status: RECONCILED 2026-09-06 — hybrid Phases 0–13 and Phase 14.1–14.3 are complete; Phase 14.4 replacement recovery is safely in progress after a successful live full replacement. Contract v4 exposes 86 native-backed operations. The unreachable 23-file, 8,370-line browser-local prototype and six unused dependencies are removed; the 85-file production graph and its live controls/messages have been audited, and automatic web/Android build gates prevent the removed behavior from returning.
 
 Latest complete physical-device checkpoint: Phase 13.5 passes 258/258 on Samsung SM-A065F / Android 16 across the authenticated 257-test and clean-identity 1-test visual partitions, with zero skips or failures. The final visual audit reproduces 83 readable screenshots / 58 states at 720 × 1600, and host-side tests pass 7/7.
 
@@ -52,7 +52,8 @@ Product scope: Saaf Milk is the current working product identity, and Milk/Yogur
 - `PHASE14.md` — active final-device-QA checkpoints, locked boundaries, evidence policy, prerequisites, and current next action.
 - `PHASE14_1_DEVICE_QA_BASELINE.md` — connected-device inventory, clean QA installation proof, provider/second-device prerequisites, existing test credit, and evidence hashes.
 - `PHASE14_2_ROLE_PERMISSION_QA.md` — complete five-role packaged-UI matrix, native bypass probes, sensitive backup/cloud boundaries, and focused regression evidence.
-- `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md` — live consent/upload/hidden-listing/offline-retry evidence, exact QA identity, provider setup, verified defects, and safe resume point.
+- `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md` — completed live consent/upload/hidden-listing/offline-retry/inspection/revocation/reconnect evidence and verified defects.
+- `PHASE14_4_SECOND_DEVICE_RECOVERY.md` — active live replacement evidence, forgotten-secret boundary, failure-path checkpoint, and safe resume point.
 
 ## Immutable baselines
 
@@ -64,7 +65,7 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 14 — Final Device QA: IN PROGRESS (14.1–14.3 complete; 14.4 second-device recovery next)**
+**Phase 14 — Final Device QA: IN PROGRESS (14.1–14.3 complete; 14.4 replacement recovery safely in progress)**
 
 Phase 13 removed the unreachable prototype, audited all live UI controls and meanings, corrected the misleading combined opening-balance total, and made the cleanup rules mandatory in web and Android builds. Its final Samsung regression passes 258/258, host tests pass 7/7, and 83-screen evidence is preserved. Phase 14.1 established the safe `.qa` installation and honest external prerequisites. Phase 14.2 now proves all five roles' exact packaged UI and native authorization boundaries; its two new tests pass 2/2, the related regression passes 36/36, and no production defect was found.
 
@@ -130,7 +131,7 @@ Phase 12 — UI Fidelity ✅ (all six checkpoints complete; 83-screen final evid
 
 Phase 13 — Dead/Mock/Misleading UI Cleanup ✅ (all five checkpoints complete; 258/258 final device regression and Phase 14 handoff verified)
 
-Phase 14 — Final Device QA ⏳ (14.3 live Drive acceptance complete; 14.4 second-device recovery next; mandatory Quick unlock is 14.6 and final closure/regression is 14.7)
+Phase 14 — Final Device QA ⏳ (14.3 live Drive acceptance complete; 14.4 live replacement passed with cross-device/data-rich proof still pending; mandatory Quick unlock is 14.6 and final closure/regression is 14.7)
 
 Phase 15 — Final Shopkeeper QA ⏳ (includes uncoached Quick unlock enrollment/use/recovery, periodic backup/recovery, and owner-phone snapshot viewing if approved)
 
@@ -202,7 +203,8 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 14.1 confirms two connected Samsung phones and no configured Google OAuth web client ID. The primary phone holds the isolated QA app; the candidate recovery phone already holds the ordinary Saaf package and was deliberately left untouched pending safe-use confirmation.
 - Phase 14.2 adds two role/permission tests: the all-five-role packaged UI and native-bypass matrix passes 2/2; the related security/session/backup/lifecycle/recovery regression passes 36/36; host tests pass 7/7. The complete device-suite inventory is now 260 tests; Phase 14.6 adds Quick unlock coverage before the expanded full rerun in Phase 14.7.
 - Phase 14.3 passes 25/25 automated cloud tests and the real provider passes consent, encrypted upload, hidden listing, offline queue/retry, successful no-restore inspection, revocation, retained remote points, and fresh-consent reconnect. Six verified recovery points are visible; three live UX defects are recorded for Phase 14.7.
+- Phase 14.4 now passes a real full replacement from a point whose local vault key was previously revoked: inspection, restore, forced logout, restored-owner login, retained remote listings, and post-restore cloud pause all work. Wrong owner/cloud secrets are rejected. Cross-device source/data-rich proof and final post-failure continuity remain; one context-specific credential-copy defect is recorded.
 
 ## Next gate
 
-Phases 3–13 and Phase 14.1–14.3 are closed. Phase 14.4 now performs a deliberate full replacement restore on the Samsung SM-S921W using only its isolated `com.saaf.milkshop.qa` owner-profile installation, then verifies restored data/security state and failure safety. Accessibility/broader-device behavior follows in 14.5. Phase 14.6 must implement and physically prove native Quick unlock, and 14.7 closes the three live Drive UX defects plus any later findings before the expanded full regression. The phone's ordinary Saaf installation/profile must remain untouched. Phases 15–16 must validate the feature with shopkeepers and block release on its security/recovery gate. See `QUICK_UNLOCK_REQUIREMENT.md`, `PHASE14.md`, `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–13 and Phase 14.1–14.3 are closed. Phase 14.4 resumes by confirming the failed wrong-cloud-passphrase attempt preserved the restored installation, then completing honest cross-device/data-rich recovery evidence. Accessibility/broader-device behavior follows in 14.5. Phase 14.6 must implement and physically prove native Quick unlock, and 14.7 closes the four live UX findings plus any later defects before the expanded full regression. Ordinary Saaf installations/profiles must remain untouched. Phases 15–16 must validate the feature with shopkeepers and block release on its security/recovery gate. See `QUICK_UNLOCK_REQUIREMENT.md`, `PHASE14.md`, `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md`, `PHASE14_4_SECOND_DEVICE_RECOVERY.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.

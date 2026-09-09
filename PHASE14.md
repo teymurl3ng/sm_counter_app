@@ -1,6 +1,6 @@
 # Phase 14 — Final Device QA
 
-Status: **IN PROGRESS — checkpoints 14.1–14.3 complete; checkpoint 14.4 replacement recovery is safely in progress**
+Status: **IN PROGRESS — checkpoints 14.1–14.4 complete; checkpoint 14.5 accessibility and Android behavior is next**
 
 ## Purpose
 
@@ -47,14 +47,14 @@ Completed on the isolated Samsung SM-A065F / Android 16. Two new tests exercise 
 
 Completed across the isolated Samsung SM-A065F and replacement Samsung SM-S921W, both on Android 16. The explicit `.qa` cloud resilience suite passes 25/25, including metered constraints, retention, wrong-account, authorization-required, retry, and recovery boundaries. The real provider passes consent, initial/manual encrypted upload, hidden app-data listing, offline queue/retry, successful no-restore inspection, account revocation, retained remote ciphertext, and fresh-consent reconnect. The replacement QA installation remains connected with six verified recovery points and no cloud error. Three UX defects are recorded for 14.7: interactive connect/disconnect can outlive the fixed bridge timer while succeeding, offline refresh exposes a raw DNS error, and credential/new-vault reconnect wording is ambiguous. See `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md`.
 
-### 14.4 — Second-device recovery
+### 14.4 — Second-device recovery ✅
 
 - Restore a real encrypted cloud recovery point on a second physical Android device using dedicated QA data.
 - Verify users, roles, actor history, records, corrections, balances, stock, costing coverage, and post-restore session invalidation.
 - Prove wrong-passphrase, damaged-backup, incompatible-backup, expired-ticket, repeated-attempt, and cancellation paths preserve the target installation.
 - Confirm that two restored writable installations are not presented or operated as synchronized copies.
 
-Live replacement now passes on the isolated Samsung SM-S921W: a remote point whose local vault key had been removed by revocation passed inspection, fully replaced the QA installation, forced logout, restored the owner account, retained six remote listings, and left Google Drive correctly paused. Wrong owner and cloud-recovery secrets were rejected without invoking restore. The original phone's three points remain encrypted because their original private recovery passphrase was unavailable, so honest cross-device source/data-rich proof remains. Two new UX defects are recorded for 14.7, including a P1 correction form that hides the original values. See `PHASE14_4_SECOND_DEVICE_RECOVERY.md`.
+Completed from Samsung SM-S921W source to a freshly reset isolated Samsung SM-A065F target. The exact 20:14 data-rich point passed inspection and full replacement; restore forced logout, recovered the source owner, retained ten remote listings, restored the fake product/supplier/customer/purchase/sale/correction plus expected stock and balances, preserved correction linkage and actor attribution, and left target Drive correctly paused. Wrong owner/cloud secrets preserved the installation, while the automated matrix retains damaged/incompatible/ticket/cancellation/repeated-attempt coverage. Two UX defects are recorded for 14.7, including a P1 correction form that hides the original values. See `PHASE14_4_SECOND_DEVICE_RECOVERY.md`.
 
 ### 14.5 — Accessibility, adaptivity, and Android behavior
 
@@ -88,8 +88,8 @@ Live replacement now passes on the isolated Samsung SM-S921W: a remote point who
 
 ## Current next action
 
-Resume checkpoint 14.4 by confirming the failed wrong-cloud-passphrase inspection left the restored QA installation signed in with Google Drive paused. Then finish the remaining preservation checks and honest two-device/data-rich recovery evidence without touching either ordinary Saaf installation or weakening the forgotten-secret boundary. After 14.5, implement and physically verify mandatory Quick unlock in 14.6, then close every recorded defect and run the expanded complete regression in 14.7.
+Begin checkpoint 14.5 with focused physical-device accessibility, adaptivity, and Android behavior checks across the A06 and S24. Keep evidence proportional and targeted rather than repeating every Phase 12 screenshot. Then implement and physically verify mandatory Quick unlock in 14.6, close all five recorded defects, and run the expanded complete regression in 14.7.
 
 ## Plain English
 
-The real cloud restore fully replaced only the test app, logged the user out, restored the owner account, retained six encrypted points, and paused future backups. Wrong secrets were rejected, and another unclear error message was recorded for later repair. The oldest three backups remain securely unreadable without their forgotten original recovery secret. We paused safely before completing the remaining cross-device/data-rich proof.
+The real cloud restore moved a complete recognizable test dataset from the S24 to a freshly reset A06. The owner, records, correction trail, stock, and balances matched; restore logged everyone out and paused the target instead of pretending both phones were synchronized. Wrong secrets changed nothing. Next we test accessibility, screen/device adaptation, and normal Android behavior.

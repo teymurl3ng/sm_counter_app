@@ -1,5 +1,7 @@
 package com.saaf.milkshop.application.bridge
 
+import android.util.Log
+import com.saaf.milkshop.BuildConfig
 import com.saaf.milkshop.application.readmodels.HybridReadModelService
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.SecurityFailure
@@ -66,7 +68,11 @@ class HybridBridgeDispatcher(
             successEnvelope(request, execute(request)).toString()
         } catch (error: Throwable) {
             if (error is SecurityFailure.SessionExpired) onSessionChanged(null)
-            failureEnvelope(requestId, action, mapBridgeFailure(error)).toString()
+            val failure = mapBridgeFailure(error)
+            if (BuildConfig.DEBUG && failure.code == "internal_error") {
+                Log.e(LOG_TAG, "Bridge action '$action' failed", error)
+            }
+            failureEnvelope(requestId, action, failure).toString()
         } finally {
             acceptedRequestId?.let(inFlightRequestIds::remove)
         }
@@ -101,6 +107,7 @@ class HybridBridgeDispatcher(
     }
 
     companion object {
+        private const val LOG_TAG = "SaafBridge"
         const val MAX_MESSAGE_BYTES = 1024 * 1024
         val SUPPORTED_ACTIONS: List<String> get() = HybridBridgeActions.supported
     }

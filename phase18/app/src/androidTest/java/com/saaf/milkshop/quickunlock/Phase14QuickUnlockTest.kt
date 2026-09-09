@@ -1,6 +1,7 @@
 package com.saaf.milkshop.quickunlock
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.core.app.ApplicationProvider
 import com.saaf.milkshop.application.bridge.mapBridgeFailure
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.NativeSessionManager
@@ -49,6 +50,35 @@ class Phase14QuickUnlockTest {
         assertEquals("quick_unlock_invalidated", mapBridgeFailure(QuickUnlockFailure.Invalidated()).code)
         assertEquals("rate_limited", mapBridgeFailure(QuickUnlockFailure.RateLimited()).code)
         assertEquals("authentication_failed", mapBridgeFailure(QuickUnlockFailure.Authentication()).code)
+    }
+
+    @Test
+    fun androidEncryptedRecordStoreRoundTripsOnThisPhone() {
+        val suffix = System.nanoTime().toString()
+        val store = AndroidQuickUnlockRecordStore(
+            context = ApplicationProvider.getApplicationContext(),
+            protector = AndroidQuickUnlockRecordProtector("saaf_milk_quick_unlock_test_$suffix"),
+            directoryName = "quick_unlock_test_$suffix",
+        )
+        val record = QuickUnlockRecord(
+            userId = 42L,
+            loginName = "storage.test",
+            displayName = "Storage Test",
+            securityBindingBase64 = "binding",
+            deviceKeyId = null,
+            deviceNonceBase64 = null,
+            deviceCiphertextBase64 = null,
+            deviceTokenHashBase64 = null,
+            biometricCanaryCreated = false,
+            pinSaltBase64 = "salt",
+            pinVerifierBase64 = "verifier",
+        )
+        try {
+            store.write(listOf(record))
+            assertEquals(record, store.read().single())
+        } finally {
+            store.clear()
+        }
     }
 
     @Test

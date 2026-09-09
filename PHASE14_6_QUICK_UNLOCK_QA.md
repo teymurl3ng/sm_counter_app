@@ -1,6 +1,6 @@
 # Phase 14.6 — Native Quick Unlock
 
-Status: **IMPLEMENTED — build and static gates pass; focused physical-device run and hands-on acceptance remain**
+Status: **IMPLEMENTED — focused S24 automated and hands-on smoke pass; extended physical acceptance remains**
 
 Date: 2026-09-09
 
@@ -29,15 +29,16 @@ Routine backup approval and cloud recovery-point inspection can also use Quick u
 - Destructive restore, Google connection, and Google revocation hide the PIN option and are independently rejected by the native strong-authentication gate.
 - Interactive Quick unlock calls use a two-minute bridge window so the native phone-security prompt does not falsely report the old 30-second timeout.
 
-## Automated evidence prepared
+## Automated evidence
 
-The focused `Phase14QuickUnlockTest` contains five tests covering:
+The focused `Phase14QuickUnlockTest` contains six tests covering:
 
 1. device-local persistence and second-phone separation;
 2. strong Android authentication versus non-strong PIN sessions;
 3. increasing PIN delay, bounded lockout, and full-passphrase reset;
 4. passphrase, phone-security, restore-style clearing, and Keystore invalidation paths;
 5. exact bridge error meanings for cancellation, unavailable, invalidated, rate-limited, and failed authentication.
+6. real Android Keystore-encrypted enrollment-record save/read behavior on the physical phone.
 
 The existing cloud cryptography test now also proves trusted-device local-key decryption alongside replacement-device portable-passphrase recovery.
 
@@ -48,18 +49,24 @@ Completed host/build gates:
 - source and packaged cleanup gates;
 - Kotlin production and Android-test compilation;
 - 7/7 host unit tests;
-- isolated `com.saaf.milkshop.qa` app and Android-test APK assembly with the configured OAuth client identifier. The current QA app APK SHA-256 is `860DCA2CA78E73310E63108641032EB67667858966595A397BE908D2DBFE44D1`.
+- isolated `com.saaf.milkshop.qa` app and Android-test APK assembly with the configured OAuth client identifier. The current QA app APK SHA-256 is `B9D86930157A8DDEAB942DBC91EFA4DFD3B522D9E935E11F4D0F285938AF33EF`.
 
-The full physical-device inventory is now 265 tests. It has not been claimed as passing in this checkpoint: no Android device was connected when the APKs were assembled.
+The six focused tests pass 6/6 on the isolated S24 QA installation. The full physical-device inventory is now 266 tests; the complete suite is intentionally deferred to Phase 14.7 rather than claimed here.
+
+## Focused S24 acceptance
+
+- Combined phone-security and six-digit Quick PIN enrollment succeeds.
+- Logout followed by Quick PIN login opens the correct Saaf account.
+- Logout followed by fingerprint/phone-security login opens the correct Saaf account.
+- Physical testing exposed and fixed two blocking native integration defects: `BiometricPrompt` was invoked off the Fragment host's main thread, and AES-GCM additional authenticated data was supplied before Samsung Keystore completed user authentication.
+- The ordinary `com.saaf.milkshop` installation was not installed over, cleared, or otherwise modified.
 
 ## Remaining physical acceptance
 
-- Install only `com.saaf.milkshop.qa` on the chosen QA phone.
-- Run the five focused automated tests.
-- Manually prove setup, phone-security login, PIN login, cancellation, wrong-PIN delay/fallback, routine backup reauthentication, removal, reboot/process restart, and clear shared-account identity.
+- Manually prove cancellation, wrong-PIN delay/fallback, routine backup reauthentication, removal, reboot/process restart, and clear shared-account identity.
 - Verify secure-lock/biometric-change invalidation and that a cleared or second QA phone cannot use the Quick PIN to open a cloud recovery point.
-- Check the new states with TalkBack and increased text before closing 14.6.
+- Check the new states with TalkBack and increased text. These extended checks remain part of the Phase 14.6 acceptance boundary and may be completed alongside the Phase 14.7 defect/regression pass.
 
 ## Plain English
 
-The fast sign-in system is built. A fingerprint/phone lock or personal short PIN can now replace repeated long-passphrase typing on the same protected phone, but that PIN cannot unlock a stolen cloud backup or approve a destructive restore. We still need to run it on a connected QA phone before calling Phase 14.6 complete.
+The fast sign-in system now works on the S24: setup, short-PIN login, and fingerprint/phone-lock login all passed, and its six dedicated tests pass. The remaining misuse, recovery, lifecycle, and accessibility checks are still required before final closure.

@@ -12,7 +12,9 @@ import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -271,7 +273,6 @@ class AndroidQuickUnlockDeviceGate(
         val key = createMainKey(keyId)
         val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION).apply {
             init(Cipher.ENCRYPT_MODE, key)
-            updateAAD(aad(keyId, userId))
         }
         val canary = createCanaryIfAvailable(keyId)
         return try {
@@ -281,6 +282,7 @@ class AndroidQuickUnlockDeviceGate(
                 cipher = cipher,
             )
             val authenticatedCipher = authenticated.cryptoObject?.cipher ?: throw QuickUnlockFailure.Unavailable()
+            authenticatedCipher.updateAAD(aad(keyId, userId))
             DeviceProtectedQuickToken(
                 nonceBase64 = encode(authenticatedCipher.iv),
                 ciphertextBase64 = encode(authenticatedCipher.doFinal(plaintext)),
@@ -306,7 +308,6 @@ class AndroidQuickUnlockDeviceGate(
         return try {
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION).apply {
                 init(Cipher.DECRYPT_MODE, mainKey(keyId), GCMParameterSpec(TAG_BITS, nonce))
-                updateAAD(aad(keyId, userId))
             }
             val authenticated = authenticate(
                 title = "Quick unlock Saaf Milk",
@@ -314,6 +315,7 @@ class AndroidQuickUnlockDeviceGate(
                 cipher = cipher,
             )
             val authenticatedCipher = authenticated.cryptoObject?.cipher ?: throw QuickUnlockFailure.Unavailable()
+            authenticatedCipher.updateAAD(aad(keyId, userId))
             authenticatedCipher.doFinal(decode(protected.ciphertextBase64))
         } catch (_: KeyPermanentlyInvalidatedException) {
             throw QuickUnlockFailure.Invalidated()
@@ -356,7 +358,8 @@ class AndroidQuickUnlockDeviceGate(
     }
 
     private suspend fun authenticate(title: String, subtitle: String, cipher: Cipher): BiometricPrompt.AuthenticationResult =
-        suspendCancellableCoroutine { continuation ->
+        withContext(Dispatchers.Main.immediate) {
+            suspendCancellableCoroutine { continuation ->
             synchronized(this) {
                 if (pending != null) {
                     continuation.resumeWithException(QuickUnlockFailure.Unavailable("Another phone-security check is already open"))
@@ -368,7 +371,7 @@ class AndroidQuickUnlockDeviceGate(
                 synchronized(this) {
                     if (pending === continuation) pending = null
                 }
-                prompt.cancelAuthentication()
+                executor.execute(prompt::cancelAuthentication)
             }
             prompt.authenticate(
                 BiometricPrompt.PromptInfo.Builder()
@@ -380,6 +383,7 @@ class AndroidQuickUnlockDeviceGate(
                 BiometricPrompt.CryptoObject(cipher),
             )
         }
+    }
 
     @Synchronized
     private fun takePending(): CancellableContinuation<BiometricPrompt.AuthenticationResult>? = pending.also { pending = null }

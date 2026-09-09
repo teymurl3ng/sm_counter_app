@@ -1,6 +1,6 @@
 # Phase 14 — Final Device QA
 
-Status: **IN PROGRESS — checkpoints 14.1–14.5 complete; 14.6 is implemented and awaiting focused physical-device proof**
+Status: **IN PROGRESS — checkpoints 14.1–14.5 complete; 14.6 focused S24 proof passes and extended acceptance remains**
 
 ## Purpose
 
@@ -74,7 +74,7 @@ Completed on the isolated A06 and S24 QA installations. The targeted native audi
 - Prove that a short PIN cannot decrypt a portable cloud recovery point on a cleared or replacement device.
 - Exercise all enrollment, unavailable, success, failure, lifecycle, accessibility, role/security-change, and recovery states defined in `QUICK_UNLOCK_REQUIREMENT.md` on physical devices.
 
-Implementation completed on 2026-09-09. The native device/Keystore boundary, per-user rate-limited PIN, shared-phone identity choice, strong-versus-PIN authorization split, existing-device cloud-key path, React presentation, bridge v5/91 projections, focused five-test class, production UI build, packaged cleanup, Kotlin compilation, and debug APK assembly pass their host/build gates. No phone was connected for the focused test run, so 14.6 remains open until physical-device and TalkBack/large-text acceptance completes. See `PHASE14_6_QUICK_UNLOCK_QA.md`.
+Implementation completed on 2026-09-09. The native device/Keystore boundary, per-user rate-limited PIN, shared-phone identity choice, strong-versus-PIN authorization split, existing-device cloud-key path, React presentation, bridge v5/91 projections, production UI build, packaged cleanup, Kotlin compilation, and debug APK assembly pass their host/build gates. The six focused tests pass 6/6 on the isolated S24, and combined enrollment plus separate Quick PIN and fingerprint/phone-security logins pass. Two blocking Android-thread/Keystore-order defects found during that smoke run were fixed. Extended misuse, recovery, lifecycle, and accessibility acceptance remains open. See `PHASE14_6_QUICK_UNLOCK_QA.md`.
 
 ### 14.7 — Defect closure, complete regression, and Phase 15 handoff
 
@@ -92,8 +92,8 @@ Implementation completed on 2026-09-09. The native device/Keystore boundary, per
 
 ## Current next action
 
-Connect the isolated QA phone, run the five focused Quick unlock tests, and complete the short hands-on security/accessibility matrix in `PHASE14_6_QUICK_UNLOCK_QA.md`. Then close all eleven recorded live defects—five from cloud/recovery and six from the Android audit—and run the expanded complete regression in 14.7.
+Complete the remaining Quick unlock misuse, recovery, lifecycle, and accessibility checks in `PHASE14_6_QUICK_UNLOCK_QA.md`. Then close the eleven earlier live defects—five from cloud/recovery and six from the Android audit—and run the expanded 266-test regression in 14.7.
 
 ## Plain English
 
-The fast, secure Quick unlock feature is built and passes code/build checks. Connect the QA phone to prove it with real phone security, PIN, cancellation, invalidation, shared accounts, and accessibility; then Phase 14.7 fixes the recorded live defects and runs the complete regression.
+The fast, secure Quick unlock feature now passes its dedicated tests and basic S24 setup/login check. Its tougher failure, recovery, lifecycle, and accessibility checks remain; Phase 14.7 then fixes the earlier recorded defects and runs the complete regression.

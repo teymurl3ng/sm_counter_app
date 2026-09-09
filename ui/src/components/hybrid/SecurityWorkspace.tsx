@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { AppRoleCode, CurrentSessionDto, EmployeeDto, UserAdministrationDto } from '../../bridge/contract.generated';
+import type { AppRoleCode, CurrentSessionDto, EmployeeDto, QuickUnlockStatusDto, UserAdministrationDto } from '../../bridge/contract.generated';
 import { FilterButton, Notice } from './HybridUi';
 import { MyAccountPanel } from './MyAccountPanel';
 import { PrivateCredentialSetup } from './PrivateCredentialSetup';
@@ -9,13 +9,16 @@ import type { NewUserDraft, PrivateSetup, SecurityArea, SecurityBundle } from '.
 import { StaffAccountsPanel } from './StaffAccountsPanel';
 import { errorMessage } from './hybridModels';
 
-export function SecurityWorkspace({ currentUser, employees, actions, canManageUsers, canViewAudit, onChangeOwnPassphrase }: {
+export function SecurityWorkspace({ currentUser, employees, actions, quickUnlockStatus, canManageUsers, canViewAudit, onChangeOwnPassphrase, onEnrollQuickUnlock, onRemoveQuickUnlock }: {
   currentUser: CurrentSessionDto;
   employees: ReadonlyArray<EmployeeDto>;
   actions: SecurityActions;
+  quickUnlockStatus: QuickUnlockStatusDto | null;
   canManageUsers: boolean;
   canViewAudit: boolean;
   onChangeOwnPassphrase(currentPassphrase: string, newPassphrase: string): Promise<void>;
+  onEnrollQuickUnlock(currentPassphrase: string, enableDeviceAuthentication: boolean, pin: string | null): Promise<void>;
+  onRemoveQuickUnlock(currentPassphrase: string): Promise<void>;
 }) {
   const [area, setArea] = useState<SecurityArea>(canManageUsers ? 'staff' : 'account');
   const [bundle, setBundle] = useState<SecurityBundle | null>(null);
@@ -54,6 +57,14 @@ export function SecurityWorkspace({ currentUser, employees, actions, canManageUs
   };
   const updateRole = async (user: UserAdministrationDto, role: AppRoleCode, passphrase: string) => setBundle(await run(() => actions.changeRole(user.userId, role, passphrase), `${user.displayName}'s role was changed.`));
   const updateEnabled = async (user: UserAdministrationDto, enabled: boolean, passphrase: string) => setBundle(await run(() => actions.setEnabled(user.userId, enabled, passphrase), `${user.displayName}'s account was ${enabled ? 'enabled' : 'disabled'}.`));
+  const enrollQuickUnlock = (passphrase: string, enableDeviceAuthentication: boolean, pin: string | null) => run(
+    () => onEnrollQuickUnlock(passphrase, enableDeviceAuthentication, pin),
+    'Quick unlock is ready on this phone.',
+  );
+  const removeQuickUnlock = (passphrase: string) => run(
+    () => onRemoveQuickUnlock(passphrase),
+    'Quick unlock was removed from this phone.',
+  );
 
   return <div>
     <div className="mb-5 grid grid-flow-col auto-cols-fr rounded-xl bg-slate-100 p-1">
@@ -62,7 +73,7 @@ export function SecurityWorkspace({ currentUser, employees, actions, canManageUs
       {canViewAudit && <FilterButton id="security-audit-tab" active={area === 'audit'} onClick={() => setArea('audit')}>Security history</FilterButton>}
     </div>
     {notice && <Notice message={notice} success />}
-    {area === 'account' ? <MyAccountPanel currentUser={currentUser} busy={busy} error={error} onChange={onChangeOwnPassphrase} />
+    {area === 'account' ? <MyAccountPanel currentUser={currentUser} quickUnlockStatus={quickUnlockStatus} busy={busy} error={error} onChange={onChangeOwnPassphrase} onEnrollQuickUnlock={enrollQuickUnlock} onRemoveQuickUnlock={removeQuickUnlock} />
       : !bundle ? <p className="rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-500">{busy ? 'Loading protected account records…' : error ?? 'Account records are unavailable.'}</p>
       : area === 'staff' && canManageUsers ? <StaffAccountsPanel currentUser={currentUser} users={bundle.users} employees={employees} busy={busy} error={error} onCreate={begin} onResume={resume} onRole={updateRole} onEnabled={updateEnabled} onReset={reset} />
       : <SecurityAuditPanel entries={bundle.audit} users={bundle.users} />}

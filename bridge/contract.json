@@ -1,5 +1,5 @@
 {
-  "contractVersion": 4,
+  "contractVersion": 5,
   "transport": {
     "requestEnvelope": ["contractVersion", "requestId", "action", "sessionHandle", "payload"],
     "responseEnvelope": ["contractVersion", "requestId", "action", "ok", "data", "error"],
@@ -100,6 +100,8 @@
     "permission_denied",
     "recent_authentication_required",
     "rate_limited",
+    "quick_unlock_unavailable",
+    "quick_unlock_invalidated",
     "not_found",
     "conflict",
     "day_closed",
@@ -127,7 +129,8 @@
     "CostComponentCode": ["culture", "packaging", "variable_energy", "direct_labor", "fixed_production_overhead"],
     "OpeningBasisKindCode": ["documented_historical", "owner_estimate"],
     "LossClassificationCode": ["ordinary", "abnormal"],
-    "LossReasonCode": ["spill", "contamination", "power_failure", "equipment_failure", "measurement_correction", "other"]
+    "LossReasonCode": ["spill", "contamination", "power_failure", "equipment_failure", "measurement_correction", "other"],
+    "QuickUnlockMethod": ["device", "pin"]
   },
   "types": {
     "BridgeInfoDto": {
@@ -148,6 +151,17 @@
       "sessionHandle": "session",
       "currentSession": "CurrentSessionDto",
       "replacementRecoveryCode": "secret"
+    },
+    "QuickUnlockAccountDto": {
+      "loginName": "string",
+      "displayName": "string",
+      "deviceAuthenticationEnabled": "boolean",
+      "pinEnabled": "boolean"
+    },
+    "QuickUnlockStatusDto": {
+      "deviceAuthenticationAvailable": "boolean",
+      "deviceAuthenticationLabel": "string",
+      "accounts": "list:QuickUnlockAccountDto"
     },
     "EnrollmentChallengeDto": {
       "targetUserId": "id",
@@ -252,6 +266,7 @@
   "endpoints": [
     {"action":"query.bootstrapStatus","kind":"query","auth":"none","permission":null,"nativeMethod":"bootstrapStatus","request":{},"responseType":"BootstrapStatusDto","errors":["internal_error"],"persistence":"none","refresh":[]},
     {"action":"query.currentSession","kind":"query","auth":"session","permission":"VIEW_OPERATIONAL","nativeMethod":"currentSession","request":{},"responseType":"CurrentSessionDto","errors":["unauthenticated","session_expired","internal_error"],"persistence":"none","refresh":[]},
+    {"action":"system.quickUnlockStatus","kind":"system","auth":"none","permission":null,"request":{},"responseType":"QuickUnlockStatusDto","errors":["internal_error"],"persistence":"none; returns only device-local enrolled account labels and available Quick unlock methods","refresh":[]},
     {"action":"query.dashboard","kind":"query","auth":"session","permission":"VIEW_OPERATIONAL","nativeMethod":"dashboard","request":{"startDateInclusive":"date","endDateExclusive":"date"},"responseType":"DashboardDto","errors":["invalid_request","session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
     {"action":"query.cashierSummary","kind":"query","auth":"session","permission":"SALE_AND_COLLECTION","nativeMethod":"cashierSummary","request":{"startDateInclusive":"date","endDateExclusive":"date"},"responseType":"CashierSummaryDto","errors":["invalid_request","session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
     {"action":"query.financialOverview","kind":"query","auth":"session","permission":"VIEW_FULL_FINANCIAL","nativeMethod":"financialOverview","request":{"startDateInclusive":"date","endDateExclusive":"date"},"responseType":"FinancialOverviewDto","errors":["invalid_request","session_expired","permission_denied","internal_error"],"persistence":"none","refresh":[]},
@@ -277,6 +292,10 @@
     {"action":"command.auth.reauthenticate","kind":"command","auth":"session","permission":null,"request":{"passphrase":"secret"},"responseType":"BridgeUnit","errors":["authentication_failed","session_expired","rate_limited","internal_error"],"persistence":"updates memory-only recent-authentication time and writes audit entry","refresh":[]},
     {"action":"command.auth.changeOwnPassphrase","kind":"command","auth":"session","permission":null,"request":{"currentPassphrase":"secret","newPassphrase":"secret"},"responseType":"BridgeUnit","errors":["validation_failed","authentication_failed","session_expired","internal_error"],"persistence":"replaces current user's verifier, invalidates other sessions, and writes audit entry","refresh":["query.currentSession"]},
     {"action":"command.auth.recoverOwner","kind":"command","auth":"none","permission":null,"request":{"loginName":"string","recoveryCode":"secret","newPassphrase":"secret"},"responseType":"OwnerRecoveryResultDto","errors":["validation_failed","authentication_failed","rate_limited","internal_error"],"persistence":"rotates owner credential and recovery verifier, invalidates sessions, writes audit, and creates new session","refresh":["query.bootstrapStatus","query.currentSession"]},
+    {"action":"command.auth.enrollQuickUnlock","kind":"command","auth":"session","permission":null,"request":{"currentPassphrase":"secret","enableDeviceAuthentication":"boolean","pin":{"type":"secret","required":true,"nullable":true}},"responseType":"QuickUnlockStatusDto","errors":["validation_failed","authentication_failed","session_expired","user_cancelled","quick_unlock_unavailable","quick_unlock_invalidated","internal_error"],"persistence":"after full-passphrase and optional Android strong-authentication approval, stores only Keystore-protected device-local enrollment material and a rate-limited native PIN verifier; no passphrase or PIN is retained","refresh":["query.securityAudit"]},
+    {"action":"command.auth.removeQuickUnlock","kind":"command","auth":"session","permission":null,"request":{"currentPassphrase":"secret"},"responseType":"QuickUnlockStatusDto","errors":["authentication_failed","session_expired","internal_error"],"persistence":"after full-passphrase verification, deletes the current user's device-local Quick unlock record and Keystore entries and writes audit evidence","refresh":["query.securityAudit"]},
+    {"action":"command.auth.quickLogin","kind":"command","auth":"none","permission":null,"request":{"loginName":"string","method":"enum:QuickUnlockMethod","pin":{"type":"secret","required":true,"nullable":true}},"responseType":"SessionGrantDto","errors":["validation_failed","authentication_failed","rate_limited","user_cancelled","quick_unlock_unavailable","quick_unlock_invalidated","internal_error"],"persistence":"verifies a device-bound Android authentication result or rate-limited per-user PIN natively, writes audit state, and creates a memory-only session with its actual authentication strength","refresh":["query.currentSession"]},
+    {"action":"command.auth.quickReauthenticate","kind":"command","auth":"session","permission":null,"request":{"method":"enum:QuickUnlockMethod","pin":{"type":"secret","required":true,"nullable":true}},"responseType":"BridgeUnit","errors":["validation_failed","authentication_failed","rate_limited","user_cancelled","quick_unlock_unavailable","quick_unlock_invalidated","session_expired","internal_error"],"persistence":"verifies device-bound Android authentication or the rate-limited current-user PIN natively and updates only the memory-only session authentication time and audit state","refresh":["query.securityAudit"]},
     {"action":"command.auth.beginUserEnrollment","kind":"command","auth":"session","permission":"MANAGE_STAFF_USERS","recentAuth":false,"request":{"loginName":"string","displayName":"string","roleCode":"enum:AppRoleCode","employeeAccountId":{"type":"id","required":true,"nullable":true}},"responseType":"EnrollmentChallengeDto","errors":["validation_failed","conflict","session_expired","permission_denied","recent_authentication_required","internal_error"],"persistence":"creates setup-required user and audit entry; privileged roles also require recent authentication","refresh":["query.users","query.securityAudit"]},
     {"action":"command.auth.resumeUserEnrollment","kind":"command","auth":"session","permission":"MANAGE_STAFF_USERS","recentAuth":true,"request":{"targetUserId":"id"},"responseType":"EnrollmentChallengeDto","errors":["validation_failed","not_found","session_expired","permission_denied","recent_authentication_required","internal_error"],"persistence":"creates memory-only enrollment challenge only","refresh":[]},
     {"action":"command.auth.completeEnrollment","kind":"command","auth":"enrollment","permission":null,"request":{"enrollmentToken":"secret","passphrase":"secret"},"responseType":"UserAdministrationDto","errors":["validation_failed","authentication_failed","conflict","internal_error"],"persistence":"stores verifier, clears setup-required state, consumes challenge, and writes audit entry","refresh":["query.users","query.securityAudit"]},

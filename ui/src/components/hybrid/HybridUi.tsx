@@ -72,7 +72,7 @@ export function TextInput({ id, label, value, onChange, type = 'text', autoCompl
   onChange(value: string): void;
   type?: string;
   autoComplete?: string;
-  inputMode?: 'decimal';
+  inputMode?: 'decimal' | 'numeric';
   required?: boolean;
 }) {
   return (

@@ -240,7 +240,8 @@ data class NativeSession(
     val userId: Long,
     val issuedAtEpochMs: Long,
     val lastActivityEpochMs: Long,
-    val lastFullAuthenticationEpochMs: Long,
+    val lastFullAuthenticationEpochMs: Long?,
+    val lastQuickAuthenticationEpochMs: Long,
 )
 
 class NativeSessionManager(
@@ -249,9 +250,16 @@ class NativeSessionManager(
     private val sessions = ConcurrentHashMap<String, NativeSession>()
     @Volatile private var backgroundedAtEpochMs: Long? = null
 
-    fun start(userId: Long): NativeSession {
+    fun start(userId: Long, strongAuthentication: Boolean = true): NativeSession {
         val now = nowEpochMs()
-        val session = NativeSession(UUID.randomUUID().toString(), userId, now, now, now)
+        val session = NativeSession(
+            sessionId = UUID.randomUUID().toString(),
+            userId = userId,
+            issuedAtEpochMs = now,
+            lastActivityEpochMs = now,
+            lastFullAuthenticationEpochMs = now.takeIf { strongAuthentication },
+            lastQuickAuthenticationEpochMs = now,
+        )
         sessions[session.sessionId] = session
         return session
     }
@@ -273,12 +281,31 @@ class NativeSessionManager(
     fun markFullAuthentication(sessionId: String) {
         val current = require(sessionId, touch = false)
         val now = nowEpochMs()
-        sessions[sessionId] = current.copy(lastActivityEpochMs = now, lastFullAuthenticationEpochMs = now)
+        sessions[sessionId] = current.copy(
+            lastActivityEpochMs = now,
+            lastFullAuthenticationEpochMs = now,
+            lastQuickAuthenticationEpochMs = now,
+        )
     }
 
-    fun requireRecentAuthentication(sessionId: String) {
+    fun markQuickAuthentication(sessionId: String, strongAuthentication: Boolean) {
+        val current = require(sessionId, touch = false)
+        val now = nowEpochMs()
+        sessions[sessionId] = current.copy(
+            lastActivityEpochMs = now,
+            lastFullAuthenticationEpochMs = if (strongAuthentication) now else current.lastFullAuthenticationEpochMs,
+            lastQuickAuthenticationEpochMs = now,
+        )
+    }
+
+    fun requireRecentAuthentication(sessionId: String, allowQuickPin: Boolean = false) {
         val session = require(sessionId)
-        if (nowEpochMs() - session.lastFullAuthenticationEpochMs >= RECENT_AUTH_TIMEOUT_MS) {
+        val authenticatedAt = if (allowQuickPin) {
+            maxOf(session.lastQuickAuthenticationEpochMs, session.lastFullAuthenticationEpochMs ?: Long.MIN_VALUE)
+        } else {
+            session.lastFullAuthenticationEpochMs
+        }
+        if (authenticatedAt == null || nowEpochMs() - authenticatedAt >= RECENT_AUTH_TIMEOUT_MS) {
             throw SecurityFailure.RecentAuthenticationRequired()
         }
     }

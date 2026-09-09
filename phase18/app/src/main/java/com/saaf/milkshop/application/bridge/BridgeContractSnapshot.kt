@@ -10,8 +10,8 @@ data class BridgeEndpointContract(
 )
 
 object BridgeContractSnapshot {
-    const val VERSION = 4
-    const val CONTRACT_SHA256 = "D22921E90040EF70CED8AFDE535C6309544B75D5EBD7B726ED1DE1273E0FA136"
+    const val VERSION = 5
+    const val CONTRACT_SHA256 = "8201D04A58100E3EDE185009D684F0079CE934D8EFF897367F8F0A6513A0C65A"
     val errorCodes = setOf(
         "invalid_request",
         "validation_failed",
@@ -21,6 +21,8 @@ object BridgeContractSnapshot {
         "permission_denied",
         "recent_authentication_required",
         "rate_limited",
+        "quick_unlock_unavailable",
+        "quick_unlock_invalidated",
         "not_found",
         "conflict",
         "day_closed",
@@ -40,6 +42,7 @@ object BridgeContractSnapshot {
     val endpoints = listOf(
         BridgeEndpointContract("query.bootstrapStatus", "query", "none", null, "BootstrapStatusDto"),
         BridgeEndpointContract("query.currentSession", "query", "session", "VIEW_OPERATIONAL", "CurrentSessionDto"),
+        BridgeEndpointContract("system.quickUnlockStatus", "system", "none", null, "QuickUnlockStatusDto"),
         BridgeEndpointContract("query.dashboard", "query", "session", "VIEW_OPERATIONAL", "DashboardDto"),
         BridgeEndpointContract("query.cashierSummary", "query", "session", "SALE_AND_COLLECTION", "CashierSummaryDto"),
         BridgeEndpointContract("query.financialOverview", "query", "session", "VIEW_FULL_FINANCIAL", "FinancialOverviewDto"),
@@ -64,6 +67,10 @@ object BridgeContractSnapshot {
         BridgeEndpointContract("command.auth.reauthenticate", "command", "session", null, "BridgeUnit"),
         BridgeEndpointContract("command.auth.changeOwnPassphrase", "command", "session", null, "BridgeUnit"),
         BridgeEndpointContract("command.auth.recoverOwner", "command", "none", null, "OwnerRecoveryResultDto"),
+        BridgeEndpointContract("command.auth.enrollQuickUnlock", "command", "session", null, "QuickUnlockStatusDto"),
+        BridgeEndpointContract("command.auth.removeQuickUnlock", "command", "session", null, "QuickUnlockStatusDto"),
+        BridgeEndpointContract("command.auth.quickLogin", "command", "none", null, "SessionGrantDto"),
+        BridgeEndpointContract("command.auth.quickReauthenticate", "command", "session", null, "BridgeUnit"),
         BridgeEndpointContract("command.auth.beginUserEnrollment", "command", "session", "MANAGE_STAFF_USERS", "EnrollmentChallengeDto"),
         BridgeEndpointContract("command.auth.resumeUserEnrollment", "command", "session", "MANAGE_STAFF_USERS", "EnrollmentChallengeDto"),
         BridgeEndpointContract("command.auth.completeEnrollment", "command", "enrollment", null, "UserAdministrationDto"),

@@ -98,6 +98,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core")
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.bouncycastle.provider)
+    implementation(libs.androidx.biometric)
     implementation(libs.androidx.work.runtime)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)

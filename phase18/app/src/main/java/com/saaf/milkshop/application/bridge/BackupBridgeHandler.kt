@@ -30,6 +30,7 @@ internal class BackupBridgeHandler(
     private val documents: BackupDocumentPicker,
     private val onSessionChanged: (String?) -> Unit,
     private val nowEpochMs: () -> Long = System::currentTimeMillis,
+    private val onRestoreCompleted: suspend () -> Unit = {},
 ) : AutoCloseable {
     private data class RestoreTicket(
         val token: String,
@@ -54,12 +55,12 @@ internal class BackupBridgeHandler(
     private suspend fun export(request: BridgeRequest): JSONObject {
         strictObject(request.payload, required = setOf("passphrase"), allowed = setOf("passphrase", "suggestedFileName"))
         val session = request.requireSession()
-        val actor = authorize(session, AppPermission.CREATE_EXPORT_BACKUP)
+        val actor = authorize(session, AppPermission.CREATE_EXPORT_BACKUP, allowQuickPin = true)
         val passphrase = request.payload.requiredString("passphrase").toCharArray()
         return try {
             val suggested = request.payload.optionalString("suggestedFileName")?.trim()?.takeIf(String::isNotEmpty)?.also(::validateFileName)
             val uri = documents.createDocument(suggested) ?: throw BackupBridgeFailure("user_cancelled", "Backup creation was cancelled")
-            authorize(session, AppPermission.CREATE_EXPORT_BACKUP)
+            authorize(session, AppPermission.CREATE_EXPORT_BACKUP, allowQuickPin = true)
             val meta = manager.exportEncryptedSnapshot(database, uri, passphrase).getOrElse(::throwBackupFailure)
             audit(ACTION_EXPORT_BACKUP, actor.userId, actor.displayName, actor.role, "format_version=${meta.formatVersion}")
             backupExportJson(meta)
@@ -71,12 +72,12 @@ internal class BackupBridgeHandler(
     private suspend fun inspect(request: BridgeRequest): JSONObject {
         strictPayload(request.payload, setOf("passphrase"))
         val session = request.requireSession()
-        authorize(session, AppPermission.RESTORE_BACKUP)
+        authorize(session, AppPermission.RESTORE_BACKUP, allowQuickPin = true)
         val passphrase = request.payload.requiredString("passphrase").toCharArray()
         var retained = false
         return try {
             val uri = documents.openDocument() ?: throw BackupBridgeFailure("user_cancelled", "Backup selection was cancelled")
-            val actor = authorize(session, AppPermission.RESTORE_BACKUP)
+            val actor = authorize(session, AppPermission.RESTORE_BACKUP, allowQuickPin = true)
             val inspection = manager.inspectEncryptedSnapshot(uri, passphrase).getOrElse(::throwBackupFailure)
             if (!inspection.containsSecurityState) throw BackupBridgeFailure("backup_incompatible", "This encrypted backup contains no application users")
             clearExpiredTickets()
@@ -120,6 +121,7 @@ internal class BackupBridgeHandler(
                 ticket.passphrase,
                 security.sessionManager(),
             ).getOrElse(::throwRestoreFailure)
+            onRestoreCompleted()
             auditRestore(actor.displayName, actor.role, ticket.inspection.meta.formatVersion)
             tickets.values.forEach { it.passphrase.fill('\u0000') }
             tickets.clear()
@@ -130,8 +132,10 @@ internal class BackupBridgeHandler(
         }
     }
 
-    private suspend fun authorize(session: String, permission: AppPermission) =
-        security.requirePermission(session, permission).also { security.sessionManager().requireRecentAuthentication(session) }
+    private suspend fun authorize(session: String, permission: AppPermission, allowQuickPin: Boolean = false) =
+        security.requirePermission(session, permission).also {
+            security.sessionManager().requireRecentAuthentication(session, allowQuickPin = allowQuickPin)
+        }
 
     private suspend fun audit(action: String, actorId: Long, actorName: String, actorRole: String, details: String) {
         database.securityAuditDao().insert(SecurityAuditEntryEntity(

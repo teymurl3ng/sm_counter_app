@@ -19,6 +19,11 @@ internal object HybridBridgeActions {
     const val CHANGE_OWN_PASSPHRASE = "command.auth.changeOwnPassphrase"
     const val RECOVER_OWNER = "command.auth.recoverOwner"
     const val CURRENT_SESSION = "query.currentSession"
+    const val QUICK_UNLOCK_STATUS = "system.quickUnlockStatus"
+    const val ENROLL_QUICK_UNLOCK = "command.auth.enrollQuickUnlock"
+    const val REMOVE_QUICK_UNLOCK = "command.auth.removeQuickUnlock"
+    const val QUICK_LOGIN = "command.auth.quickLogin"
+    const val QUICK_REAUTHENTICATE = "command.auth.quickReauthenticate"
     const val USERS = "query.users"
     const val SECURITY_AUDIT = "query.securityAudit"
     const val BEGIN_USER_ENROLLMENT = "command.auth.beginUserEnrollment"
@@ -98,6 +103,7 @@ internal object HybridBridgeActions {
     const val DISCONNECT_CLOUD_BACKUP = "system.disconnectCloudBackup"
 
     val authentication = setOf(BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN, LOGOUT, REAUTHENTICATE, CHANGE_OWN_PASSPHRASE, RECOVER_OWNER, CURRENT_SESSION)
+    val quickUnlock = setOf(QUICK_UNLOCK_STATUS, ENROLL_QUICK_UNLOCK, REMOVE_QUICK_UNLOCK, QUICK_LOGIN, QUICK_REAUTHENTICATE)
     val securityAdministration = setOf(
         USERS,
         SECURITY_AUDIT,
@@ -172,10 +178,10 @@ internal object HybridBridgeActions {
         RESTORE_INSPECTED_CLOUD_BACKUP,
         DISCONNECT_CLOUD_BACKUP,
     )
-    val supported = listOf(BRIDGE_INFO) + authentication + securityAdministration + masterData + employees + settings + operations + deliveries + ledgers + history + reconciliation + costingPlanning + backup + cloudBackup
+    val supported = listOf(BRIDGE_INFO) + authentication + quickUnlock + securityAdministration + masterData + employees + settings + operations + deliveries + ledgers + history + reconciliation + costingPlanning + backup + cloudBackup
     val authByAction = supported.associateWith { action ->
         when (action) {
-            in setOf(BRIDGE_INFO, BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN, RECOVER_OWNER) -> "none"
+            in setOf(BRIDGE_INFO, BOOTSTRAP_STATUS, BOOTSTRAP_OWNER, LOGIN, RECOVER_OWNER, QUICK_UNLOCK_STATUS, QUICK_LOGIN) -> "none"
             COMPLETE_ENROLLMENT -> "enrollment"
             else -> "session"
         }

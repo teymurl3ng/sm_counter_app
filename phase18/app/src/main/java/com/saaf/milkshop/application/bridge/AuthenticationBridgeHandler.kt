@@ -2,12 +2,14 @@ package com.saaf.milkshop.application.bridge
 
 import com.saaf.milkshop.application.readmodels.HybridReadModelService
 import com.saaf.milkshop.domain.UserSecurityService
+import com.saaf.milkshop.quickunlock.QuickUnlockService
 import org.json.JSONObject
 
 internal class AuthenticationBridgeHandler(
     private val reads: HybridReadModelService,
     private val security: UserSecurityService,
     private val onSessionChanged: (String?) -> Unit,
+    private val quickUnlock: QuickUnlockService? = null,
 ) {
     suspend fun execute(request: BridgeRequest): JSONObject = when (request.action) {
         HybridBridgeActions.BOOTSTRAP_STATUS -> bootstrapStatusJson(reads.bootstrapStatus())
@@ -24,6 +26,7 @@ internal class AuthenticationBridgeHandler(
     private suspend fun bootstrapOwner(request: BridgeRequest): JSONObject {
         strictPayload(request.payload, setOf("loginName", "displayName", "passphrase"))
         if (!security.needsOwnerBootstrap()) throw BridgeCommandConflict("Owner setup has already been completed")
+        quickUnlock?.clearAll()
         val passphrase = request.payload.requiredString("passphrase").toCharArray()
         return try {
             val result = security.bootstrapOwner(
@@ -45,6 +48,7 @@ internal class AuthenticationBridgeHandler(
         val passphrase = request.payload.requiredString("passphrase").toCharArray()
         return try {
             val session = security.login(request.payload.requiredString("loginName"), passphrase)
+            quickUnlock?.fullPassphraseAccepted(session.userId)
             onSessionChanged(session.sessionId)
             JSONObject().put("sessionHandle", session.sessionId)
                 .put("currentSession", currentSessionJson(reads.currentSession(session.sessionId)))
@@ -65,6 +69,8 @@ internal class AuthenticationBridgeHandler(
         val passphrase = request.payload.requiredString("passphrase").toCharArray()
         return try {
             security.reauthenticate(request.requireSession(), passphrase)
+            val userId = security.sessionManager().require(request.requireSession(), touch = false).userId
+            quickUnlock?.fullPassphraseAccepted(userId)
             JSONObject()
         } finally {
             passphrase.fill('\u0000')
@@ -78,10 +84,12 @@ internal class AuthenticationBridgeHandler(
 
     private suspend fun changeOwnPassphrase(request: BridgeRequest): JSONObject {
         strictPayload(request.payload, setOf("currentPassphrase", "newPassphrase"))
+        val userId = security.sessionManager().require(request.requireSession(), touch = false).userId
         val current = request.payload.requiredString("currentPassphrase").toCharArray()
         val replacement = request.payload.requiredString("newPassphrase").toCharArray()
         return try {
             security.changeOwnPassphrase(request.requireSession(), current, replacement)
+            quickUnlock?.invalidateUser(userId)
             onSessionChanged(null)
             JSONObject()
         } finally {
@@ -99,6 +107,7 @@ internal class AuthenticationBridgeHandler(
                 request.payload.requiredString("recoveryCode"),
                 replacement,
             )
+            quickUnlock?.invalidateUser(recovered.first.userId)
             onSessionChanged(recovered.first.sessionId)
             JSONObject().put("sessionHandle", recovered.first.sessionId)
                 .put("currentSession", currentSessionJson(reads.currentSession(recovered.first.sessionId)))

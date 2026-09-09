@@ -1,14 +1,14 @@
 # Saaf Milk Canonical Bridge Contract
 
-**Status: FROZEN — contract version 4 — 2026-09-04**
+**Status: FROZEN — contract version 5 — 2026-09-09**
 
-Manifest SHA-256: `D22921E90040EF70CED8AFDE535C6309544B75D5EBD7B726ED1DE1273E0FA136`
+Manifest SHA-256: `8201D04A58100E3EDE185009D684F0079CE934D8EFF897367F8F0A6513A0C65A`
 
 ## 1. Authority and scope
 
 This is the single normative bridge/API contract between the packaged React UI and Kotlin. `bridge/contract.json` is its machine-readable endpoint/schema appendix and is incorporated into this contract. `scripts/verify-bridge-contract.py` proves that appendix, the Kotlin endpoint snapshot, the TypeScript action/types projection, the frozen Phase 5 DTO names, permissions, and native read methods remain aligned.
 
-Contract version 4 retains all 78 version-3 endpoints and every prior request shape. It additively introduces eight owner-only native cloud-backup system operations for non-secret status, Google Drive connection, policy, immediate scheduling, recovery-point refresh, inspection, full replacement, and disconnect. Cloud bytes, cloud recovery passphrases, keys, access tokens, account identifiers, upload sessions, and filesystem paths never cross the bridge; Android-owned secure dialogs collect cloud recovery secrets. The Phase 10.2 planning response amendment remains unchanged.
+Contract version 5 retains all 86 version-4 endpoints and every prior request shape. It additively introduces five native Quick unlock operations for status, enrollment, removal, login, and reauthentication. Version 4's eight owner-only cloud-backup operations remain unchanged. Quick PINs, Android authentication results, Keystore material, cloud bytes, cloud recovery passphrases, keys, access tokens, account identifiers, upload sessions, and filesystem paths remain native-only or secret inputs; none are returned to React. The Phase 10.2 planning response amendment remains unchanged.
 
 Authority remains:
 
@@ -30,7 +30,7 @@ JavaScript sends one UTF-8 JSON object through `saafMilkNative.postMessage(...)`
 
 ```json
 {
-  "contractVersion": 4,
+  "contractVersion": 5,
   "requestId": "2f721b62-89bf-4e83-b7a8-bbe2a122d18f",
   "action": "query.dashboard",
   "sessionHandle": "opaque-memory-only-value",
@@ -53,7 +53,7 @@ JavaScript sends one UTF-8 JSON object through `saafMilkNative.postMessage(...)`
 
 ```json
 {
-  "contractVersion": 4,
+  "contractVersion": 5,
   "requestId": "2f721b62-89bf-4e83-b7a8-bbe2a122d18f",
   "action": "query.dashboard",
   "ok": true,
@@ -67,7 +67,7 @@ JavaScript sends one UTF-8 JSON object through `saafMilkNative.postMessage(...)`
 
 ```json
 {
-  "contractVersion": 3,
+  "contractVersion": 5,
   "requestId": "2f721b62-89bf-4e83-b7a8-bbe2a122d18f",
   "action": "query.dashboard",
   "ok": false,
@@ -108,6 +108,10 @@ Money never travels as a JSON number. Kotlin converts paisa to the existing doma
 - Recent authentication is enforced in Kotlin for every endpoint marked `recentAuth`; React cannot assert freshness.
 - Passphrases, recovery codes, enrollment tokens, restore tickets, and session handles are redacted from logs and crash reports. Kotlin uses mutable character buffers where supported and clears them after use.
 - A one-time recovery code is returned only by successful bootstrap/recovery. The UI must require deliberate acknowledgement and must never retain it after leaving that flow.
+- Quick unlock is device-local convenience. React may submit a short PIN as a secret input or request the Android-owned fingerprint/phone-lock prompt, but Kotlin alone verifies the result and creates or strengthens a session.
+- A PIN-authenticated session does not satisfy strong recent authentication for destructive restore, authorization revocation, credential changes, user administration, or Quick unlock enrollment/removal. Android strong biometric/device credential or the full Saaf passphrase does.
+- Quick unlock enrollment is bound to the current native user, credential verifier, role/security state, and this installation's Keystore. Credential recovery/change, account disablement or role change, restored app data, changed biometric enrollment, removed device security, or missing/invalidated keys makes the enrollment unusable.
+- The short Quick PIN never derives or unwraps a portable backup key. A cleared or replacement phone still requires the high-entropy cloud recovery passphrase.
 
 The bridge never accepts a caller-supplied actor name, actor role, actor user ID, effective permission set, or authoritative current-user ID. Target role/status fields in authorized user-administration commands describe the target change; they do not grant authority to the caller.
 
@@ -146,13 +150,21 @@ Phase 7/8 implementation must route protected commands through an authenticated 
 
 ### System operations
 
-- `system.bridgeInfo` is the only unauthenticated system read. React uses it before any other action and refuses a version/hash mismatch.
+- `system.bridgeInfo` is the contract-negotiation read. React uses it before any other action and refuses a version/hash mismatch; `system.quickUnlockStatus` is the only other unauthenticated system read.
+- `system.quickUnlockStatus` returns only this installation's device-authentication availability and minimal labels for accounts that deliberately enrolled Quick unlock.
 - `system.exportEncryptedBackup` invokes an Android-owned create-document flow. Only metadata returns over the bridge.
 - `system.inspectEncryptedBackup` invokes an Android-owned open-document flow, authenticates the encrypted backup, and returns a short-lived one-use in-memory restore ticket plus non-secret metadata.
 - `system.restoreInspectedBackup` accepts only that ticket and explicit confirmation. Restore invalidates every session; success returns the UI to bootstrap/sign-in.
 - `system.cloudBackupStatus`, `system.connectCloudBackup`, `system.configureCloudBackup`, `system.runCloudBackupNow`, and `system.refreshCloudBackups` expose only owner-controlled cloud policy and non-secret recovery metadata. Cloud setup collects and confirms its recovery passphrase in an Android-owned secure dialog.
 - `system.inspectCloudBackup` collects its recovery passphrase in an Android-owned secure dialog; it and `system.restoreInspectedCloudBackup` preserve the same recent-authentication, one-use-ticket, local-safety-snapshot, full-replacement, and session-invalidation boundary as manual encrypted restore.
 - `system.disconnectCloudBackup` requires explicit revocation confirmation, removes local scheduling/key/account state, and leaves remote encrypted recovery points intact.
+
+Quick unlock commands are native-owned:
+
+- `command.auth.enrollQuickUnlock` requires the current full passphrase and, when enabled, the Android-owned strong biometric/device-credential prompt. At least one of device authentication or a 4–12 digit per-user PIN is required; six digits are recommended.
+- `command.auth.quickLogin` and `command.auth.quickReauthenticate` accept an identity/method choice and an optional secret PIN. React never receives a verifier, key, failure counter, or authoritative authentication result.
+- `command.auth.removeQuickUnlock` requires the current full passphrase and deletes device-local records and associated Keystore entries.
+- PIN failures receive increasing delays and require the full passphrase after the bounded threshold. They never erase shop data.
 
 React never supplies arbitrary filesystem paths or content URIs and never receives backup bytes.
 
@@ -187,6 +199,8 @@ Stable error codes are:
 | `permission_denied` | Valid user lacks native permission. Refresh current session/visibility; do not retry. |
 | `recent_authentication_required` | Prompt for current passphrase, then explicitly repeat the user-approved action. |
 | `rate_limited` | Authentication/recovery throttled. Do not expose exact lockout state. |
+| `quick_unlock_unavailable` | The selected device/PIN method is not available. Offer another enrolled method or the full passphrase. |
+| `quick_unlock_invalidated` | Device or account security changed. Remove the stale local enrollment and require full-passphrase sign-in before setup again. |
 | `not_found` | Referenced native record does not exist. Refresh relevant query. |
 | `conflict` | Current state no longer permits action or expected active version changed. Refresh before retry. |
 | `day_closed` | Posting date is closed. Authorized owner/admin may use the explicit reopen flow. |

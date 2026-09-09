@@ -43,6 +43,11 @@ export const RUNTIME_ACTIONS = [
   'command.auth.login',
   'command.auth.logout',
   'command.auth.reauthenticate',
+  'system.quickUnlockStatus',
+  'command.auth.enrollQuickUnlock',
+  'command.auth.removeQuickUnlock',
+  'command.auth.quickLogin',
+  'command.auth.quickReauthenticate',
   'query.currentSession',
   'query.masterData',
   'command.createProduct',
@@ -187,7 +192,9 @@ export function callNative<A extends BridgeAction>(
       pending.delete(requestId);
       recordBridgeResponse(action, 0, startedAt, true);
       reject(new Error('The app took too long to respond. Please try again.'));
-    }, 30_000);
+    }, action === 'command.auth.enrollQuickUnlock' || action === 'command.auth.quickLogin' || action === 'command.auth.quickReauthenticate'
+      ? 120_000
+      : 30_000);
     pending.set(requestId, {
       action,
       startedAt,

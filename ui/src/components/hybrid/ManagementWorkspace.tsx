@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BookOpen, Calculator, ClipboardCheck, DatabaseBackup, History as HistoryIcon, LayoutDashboard, LogOut, PackageCheck, PackagePlus, Scale, Settings, ShieldCheck, ShoppingBasket, Truck, Users } from 'lucide-react';
-import type { AccountLedgerDto, AccountReferenceDto, AttendanceDto, AttendanceStatusCode, BusinessSettingsDto, CashCountResultDto, CashierSummaryDto, CustomerDto, CurrentSessionDto, DailyCloseResultDto, DashboardDto, DeliveryDto, DeliveryStatusCode, EmployeeDto, EntityMutationResultDto, EventDetailDto, EventHistoryDto, EventMutationResultDto, ExpenseCategoryDto, FinancialOverviewDto, Int64String, MasterDataDto, ProductDto, PurchaseRecordedResultDto, ReconciliationArchiveDto, SaleRecordedResultDto, SpoilageDto, TransactionReferencesDto, VendorDto } from '../../bridge/contract.generated';
+import type { AccountLedgerDto, AccountReferenceDto, AttendanceDto, AttendanceStatusCode, BusinessSettingsDto, CashCountResultDto, CashierSummaryDto, CustomerDto, CurrentSessionDto, DailyCloseResultDto, DashboardDto, DeliveryDto, DeliveryStatusCode, EmployeeDto, EntityMutationResultDto, EventDetailDto, EventHistoryDto, EventMutationResultDto, ExpenseCategoryDto, FinancialOverviewDto, Int64String, MasterDataDto, ProductDto, PurchaseRecordedResultDto, QuickUnlockStatusDto, ReconciliationArchiveDto, SaleRecordedResultDto, SpoilageDto, TransactionReferencesDto, VendorDto } from '../../bridge/contract.generated';
 import { AccountLedgerWorkspace } from './AccountLedgerWorkspace';
 import { CustomerProfilesScreen } from './CustomerProfilesScreen';
 import { DailyOperationsWorkspace } from './DailyOperationsWorkspace';
@@ -75,7 +75,10 @@ export function ManagementWorkspace({
   onSetExpenseCategoryArchived,
   costingPlanningActions,
   securityActions,
+  quickUnlockStatus,
   onChangeOwnPassphrase,
+  onEnrollQuickUnlock,
+  onRemoveQuickUnlock,
   backupActions,
   onRestoreBackup,
   onRestoreCloudBackup,
@@ -131,10 +134,13 @@ export function ManagementWorkspace({
   onSetExpenseCategoryArchived(category: ExpenseCategoryDto, archived: boolean): Promise<void>;
   costingPlanningActions: CostingPlanningActions;
   securityActions: SecurityActions;
+  quickUnlockStatus: QuickUnlockStatusDto | null;
   onChangeOwnPassphrase(currentPassphrase: string, newPassphrase: string): Promise<void>;
+  onEnrollQuickUnlock(currentPassphrase: string, enableDeviceAuthentication: boolean, pin: string | null): Promise<void>;
+  onRemoveQuickUnlock(currentPassphrase: string): Promise<void>;
   backupActions: BackupActions;
-  onRestoreBackup(ticket: Parameters<BackupActions['restoreBackup']>[0]): ReturnType<BackupActions['restoreBackup']>;
-  onRestoreCloudBackup(ticket: Parameters<BackupActions['restoreCloudBackup']>[0]): ReturnType<BackupActions['restoreCloudBackup']>;
+  onRestoreBackup(ticket: Parameters<BackupActions['restoreBackup']>[0], proof: Parameters<BackupActions['restoreBackup']>[1]): ReturnType<BackupActions['restoreBackup']>;
+  onRestoreCloudBackup(ticket: Parameters<BackupActions['restoreCloudBackup']>[0], proof: Parameters<BackupActions['restoreCloudBackup']>[1]): ReturnType<BackupActions['restoreCloudBackup']>;
 }) {
   const canManage = currentUser?.effectivePermissionCodes.includes('manage_master_data') === true;
   const canAttend = currentUser?.effectivePermissionCodes.includes('attendance') === true;
@@ -215,9 +221,9 @@ export function ManagementWorkspace({
       ) : area === 'costing-planning' && canManageSettings ? (
         <CostingPlanningWorkspace actions={costingPlanningActions} settings={businessSettings} masterData={masterData} />
       ) : area === 'access' && currentUser ? (
-        <SecurityWorkspace currentUser={currentUser} employees={masterData?.employees ?? []} actions={securityActions} canManageUsers={canManageUsers} canViewAudit={canViewAudit} onChangeOwnPassphrase={onChangeOwnPassphrase} />
+        <SecurityWorkspace currentUser={currentUser} employees={masterData?.employees ?? []} actions={securityActions} quickUnlockStatus={quickUnlockStatus} canManageUsers={canManageUsers} canViewAudit={canViewAudit} onChangeOwnPassphrase={onChangeOwnPassphrase} onEnrollQuickUnlock={onEnrollQuickUnlock} onRemoveQuickUnlock={onRemoveQuickUnlock} />
       ) : area === 'backup' && canExportBackup ? (
-        <BackupRestoreWorkspace actions={backupActions} canRestore={canRestoreBackup} onRestored={onRestoreBackup} onCloudRestored={onRestoreCloudBackup} />
+        <BackupRestoreWorkspace actions={backupActions} currentUser={currentUser} quickUnlockStatus={quickUnlockStatus} canRestore={canRestoreBackup} onRestored={onRestoreBackup} onCloudRestored={onRestoreCloudBackup} />
       ) : area === 'employees' && (canManage || canAttend) ? (
         <EmployeeAttendanceScreen busy={busy} canManage={canManage} employees={masterData?.employees ?? null} attendanceEmployees={attendanceEmployees} error={error} notice={notice} onSaveEmployee={onSaveEmployee} onSetEmployeeActive={onSetEmployeeActive} onLoadAttendance={onLoadAttendance} onRecordAttendance={onRecordAttendance} />
       ) : !canManage ? <Unavailable /> : area === 'products' ? (

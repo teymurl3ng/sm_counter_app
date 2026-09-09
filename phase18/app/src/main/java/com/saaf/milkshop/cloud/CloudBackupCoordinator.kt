@@ -274,18 +274,57 @@ class CloudBackupCoordinator(
     }
 
     suspend fun downloadAndDecrypt(remoteFileId: String, recoveryPassphrase: CharArray): DecryptedCloudSnapshot {
+        val downloaded = downloadVerified(remoteFileId)
+        val decrypted = try {
+            cryptography.decryptSnapshot(downloaded.bytes, recoveryPassphrase)
+        } finally {
+            downloaded.bytes.fill(0)
+        }
+        require(decrypted.snapshotId == downloaded.expected.snapshotId && decrypted.vaultId == downloaded.expected.vaultId) {
+            "The cloud backup identity does not match its Drive record"
+        }
+        return decrypted
+    }
+
+    suspend fun downloadAndDecryptWithLocalKey(remoteFileId: String): DecryptedCloudSnapshot {
         val state = requireState()
+        val downloaded = downloadVerified(remoteFileId, state)
+        val decrypted = try {
+            cryptography.decryptSnapshotWithLocalKey(downloaded.bytes, state.vault)
+        } finally {
+            downloaded.bytes.fill(0)
+        }
+        require(decrypted.snapshotId == downloaded.expected.snapshotId && decrypted.vaultId == downloaded.expected.vaultId) {
+            "The cloud backup identity does not match its Drive record"
+        }
+        return decrypted
+    }
+
+    private data class DownloadedSnapshot(
+        val expected: CloudRemoteSnapshot,
+        val bytes: ByteArray,
+    )
+
+    private suspend fun downloadVerified(
+        remoteFileId: String,
+        state: CloudBackupState = requireState(),
+    ): DownloadedSnapshot {
         requireMatchingAccount(state)
         val expected = state.snapshots.singleOrNull { it.remoteFileId == remoteFileId }
             ?: throw CloudBackupFailure.Remote("Refresh cloud recovery points and choose the backup again")
         val bytes = provider.downloadSnapshot(remoteFileId)
-        require(bytes.size.toLong() == expected.sizeBytes) { "Downloaded cloud backup size does not match Google Drive" }
-        expected.sha256?.let { require(sha256(bytes).equals(it, ignoreCase = true)) { "Downloaded cloud backup checksum does not match Google Drive" } }
-        val decrypted = cryptography.decryptSnapshot(bytes, recoveryPassphrase)
-        require(decrypted.snapshotId == expected.snapshotId && decrypted.vaultId == expected.vaultId) {
-            "The cloud backup identity does not match its Drive record"
+        try {
+            require(bytes.size.toLong() == expected.sizeBytes) { "Downloaded cloud backup size does not match Google Drive" }
+            expected.sha256?.let {
+                require(sha256(bytes).equals(it, ignoreCase = true)) {
+                    "Downloaded cloud backup checksum does not match Google Drive"
+                }
+            }
+            return DownloadedSnapshot(expected, bytes)
+        } catch (error: Throwable) {
+            bytes.fill(0)
+            throw error
         }
-        return decrypted
     }
 
     private suspend fun createPending(state: CloudBackupState): CloudPendingSnapshot {

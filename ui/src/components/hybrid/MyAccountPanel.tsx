@@ -1,14 +1,18 @@
 import { useState, type FormEvent } from 'react';
 import { KeyRound } from 'lucide-react';
-import type { CurrentSessionDto } from '../../bridge/contract.generated';
+import type { CurrentSessionDto, QuickUnlockStatusDto } from '../../bridge/contract.generated';
 import { Notice, TextInput } from './HybridUi';
+import { QuickUnlockControls } from './QuickUnlockControls';
 import { roleExplanation, roleLabel } from './securityPresentation';
 
-export function MyAccountPanel({ currentUser, busy, error, onChange }: {
+export function MyAccountPanel({ currentUser, quickUnlockStatus, busy, error, onChange, onEnrollQuickUnlock, onRemoveQuickUnlock }: {
   currentUser: CurrentSessionDto;
+  quickUnlockStatus: QuickUnlockStatusDto | null;
   busy: boolean;
   error: string | null;
   onChange(currentPassphrase: string, newPassphrase: string): Promise<void>;
+  onEnrollQuickUnlock(currentPassphrase: string, enableDeviceAuthentication: boolean, pin: string | null): Promise<void>;
+  onRemoveQuickUnlock(currentPassphrase: string): Promise<void>;
 }) {
   const [current, setCurrent] = useState('');
   const [next, setNext] = useState('');
@@ -35,5 +39,6 @@ export function MyAccountPanel({ currentUser, busy, error, onChange }: {
       <TextInput id="confirm-new-passphrase" label="Repeat new passphrase" value={confirm} onChange={setConfirm} type="password" autoComplete="new-password" />
       <button id="change-own-passphrase-button" disabled={busy} className="w-full rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white disabled:opacity-60">{busy ? 'Changing…' : 'Change passphrase'}</button>
     </form>
+    <QuickUnlockControls currentUser={currentUser} status={quickUnlockStatus} busy={busy} error={error} onEnroll={onEnrollQuickUnlock} onRemove={onRemoveQuickUnlock} />
   </div>;
 }

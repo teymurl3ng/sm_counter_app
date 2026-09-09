@@ -85,7 +85,7 @@ export function HybridAppShell() {
   if (stage === 'checking') return <CenteredMessage title="Opening Saaf Milk" message="Checking the secure app connection…" />;
   if (stage === 'blocked') return <CenteredMessage title="Saaf Milk cannot open" message={error ?? 'The secure app connection is unavailable.'} />;
   if (stage === 'setup') return <OwnerSetup busy={busy} error={error} onSubmit={hybridSession.bootstrapOwner} />;
-  if (stage === 'login') return <Login busy={busy} error={error} notice={notice} onSubmit={hybridSession.login} onRecover={hybridSession.recoverOwner} />;
+  if (stage === 'login') return <Login busy={busy} error={error} notice={notice} quickUnlockStatus={hybridSession.quickUnlockStatus} onSubmit={hybridSession.login} onQuickSubmit={hybridSession.quickLogin} onRecover={hybridSession.recoverOwner} />;
   if (stage === 'recovery' && recoveryCode) return <RecoveryCodeScreen recoveryCode={recoveryCode} onSaved={hybridSession.acknowledgeRecoveryCode} />;
 
   const employeeActions = employeeBridgeActions(session, withRefresh);
@@ -98,13 +98,13 @@ export function HybridAppShell() {
   const ledgerActions = ledgerBridgeActions(session);
   const historyActions = historyBridgeActions(session, withRefresh);
   const reconciliationActions = reconciliationBridgeActions(session, withRefresh);
-  const restoreBackup = async (ticket: Parameters<typeof backupActions.restoreBackup>[0]) => {
-    const result = await backupActions.restoreBackup(ticket);
+  const restoreBackup = async (ticket: Parameters<typeof backupActions.restoreBackup>[0], proof: Parameters<typeof backupActions.restoreBackup>[1]) => {
+    const result = await backupActions.restoreBackup(ticket, proof);
     hybridSession.finishRestore();
     return result;
   };
-  const restoreCloudBackup = async (ticket: Parameters<typeof backupActions.restoreCloudBackup>[0]) => {
-    const result = await backupActions.restoreCloudBackup(ticket);
+  const restoreCloudBackup = async (ticket: Parameters<typeof backupActions.restoreCloudBackup>[0], proof: Parameters<typeof backupActions.restoreCloudBackup>[1]) => {
+    const result = await backupActions.restoreCloudBackup(ticket, proof);
     hybridSession.finishRestore();
     return result;
   };
@@ -160,7 +160,10 @@ export function HybridAppShell() {
     onSetExpenseCategoryArchived={settingsActions.setExpenseCategoryArchived}
     costingPlanningActions={costingPlanningActions}
     securityActions={securityActions}
+    quickUnlockStatus={hybridSession.quickUnlockStatus}
     onChangeOwnPassphrase={hybridSession.changeOwnPassphrase}
+    onEnrollQuickUnlock={hybridSession.enrollQuickUnlock}
+    onRemoveQuickUnlock={hybridSession.removeQuickUnlock}
     backupActions={backupActions}
     onRestoreBackup={restoreBackup}
     onRestoreCloudBackup={restoreCloudBackup}

@@ -91,8 +91,8 @@ def validate_fields(fields: dict, enums: dict, named_types: set[str], context: s
 
 
 def validate(contract: dict, dtos: dict[str, list[tuple[str, str]]], read_source: str, permissions: set[str]) -> None:
-    if contract.get("contractVersion") != 4:
-        raise ContractError("contractVersion must be 4")
+    if contract.get("contractVersion") != 5:
+        raise ContractError("contractVersion must be 5")
     endpoints = contract.get("endpoints")
     if not isinstance(endpoints, list) or not endpoints:
         raise ContractError("endpoints must be a non-empty list")
@@ -147,7 +147,12 @@ def validate(contract: dict, dtos: dict[str, list[tuple[str, str]]], read_source
         if permission is not None and permission not in permissions:
             raise ContractError(f"{action}: unknown permission {permission}")
         if endpoint.get("auth") == "session" and permission is None and action not in {
-            "command.auth.logout", "command.auth.reauthenticate", "command.auth.changeOwnPassphrase"
+            "command.auth.logout",
+            "command.auth.reauthenticate",
+            "command.auth.changeOwnPassphrase",
+            "command.auth.enrollQuickUnlock",
+            "command.auth.removeQuickUnlock",
+            "command.auth.quickReauthenticate",
         }:
             raise ContractError(f"{action}: protected endpoint must declare its permission")
         request = endpoint.get("request")

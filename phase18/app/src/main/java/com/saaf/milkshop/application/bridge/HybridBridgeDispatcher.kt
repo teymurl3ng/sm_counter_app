@@ -14,9 +14,11 @@ class HybridBridgeDispatcher(
     backupDocuments: BackupDocumentPicker? = null,
     application: com.saaf.milkshop.MilkShopApplication? = null,
     cloudAuthorization: com.saaf.milkshop.cloud.InteractiveCloudAuthorization? = null,
+    private val quickUnlockService: com.saaf.milkshop.quickunlock.QuickUnlockService? = null,
 ) {
     private val reads = HybridReadModelService(database, security)
-    private val authentication = AuthenticationBridgeHandler(reads, security, onSessionChanged)
+    private val authentication = AuthenticationBridgeHandler(reads, security, onSessionChanged, quickUnlockService)
+    private val quickUnlock = quickUnlockService?.let { QuickUnlockBridgeHandler(reads, it, onSessionChanged) }
     private val securityAdministration = SecurityAdministrationBridgeHandler(reads, SecurityAdministrationBridgeCommandService(database, security))
     private val masterData = MasterDataBridgeHandler(reads, HybridCommandService(database, security))
     private val employees = EmployeeBridgeHandler(reads, EmployeeBridgeCommandService(database, security))
@@ -27,9 +29,21 @@ class HybridBridgeDispatcher(
     private val history = HistoryBridgeHandler(reads, HistoryBridgeCommandService(database, security))
     private val reconciliation = ReconciliationBridgeHandler(reads, ReconciliationBridgeCommandService(database, security))
     private val costingPlanning = CostingPlanningBridgeHandler(reads, CostingPlanningBridgeCommandService(database, security))
-    private val backup = if (backupManager != null && backupDocuments != null) BackupBridgeHandler(database, security, backupManager, backupDocuments, onSessionChanged) else null
+    private val backup = if (backupManager != null && backupDocuments != null) BackupBridgeHandler(
+        database,
+        security,
+        backupManager,
+        backupDocuments,
+        onSessionChanged,
+        onRestoreCompleted = { quickUnlockService?.clearAll() },
+    ) else null
     private val cloudBackup = if (application != null && cloudAuthorization != null) {
-        CloudBackupBridgeHandler(application, cloudAuthorization, onSessionChanged)
+        CloudBackupBridgeHandler(
+            application,
+            cloudAuthorization,
+            onSessionChanged,
+            onRestoreCompleted = { quickUnlockService?.clearAll() },
+        )
     } else null
     private val inFlightRequestIds = ConcurrentHashMap.newKeySet<String>()
 
@@ -61,6 +75,7 @@ class HybridBridgeDispatcher(
     fun close() {
         backup?.close()
         cloudBackup?.close()
+        quickUnlockService?.close()
     }
 
     private suspend fun execute(request: BridgeRequest): Any = when (request.action) {
@@ -69,6 +84,7 @@ class HybridBridgeDispatcher(
             .put("contractSha256", BridgeContractSnapshot.CONTRACT_SHA256)
             .put("supportedActions", jsonArray(HybridBridgeActions.supported))
         in HybridBridgeActions.authentication -> authentication.execute(request)
+        in HybridBridgeActions.quickUnlock -> quickUnlock?.execute(request) ?: unavailableBridgeAction()
         in HybridBridgeActions.securityAdministration -> securityAdministration.execute(request)
         in HybridBridgeActions.masterData -> masterData.execute(request)
         in HybridBridgeActions.employees -> employees.execute(request)

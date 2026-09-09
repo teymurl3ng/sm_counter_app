@@ -222,6 +222,41 @@ class CloudBackupCryptography(
         return DecryptedCloudSnapshot(parsed.snapshotId, parsed.vaultId, parsed.createdAt, payload)
     }
 
+    fun decryptSnapshotWithLocalKey(
+        bytes: ByteArray,
+        configuration: CloudVaultConfiguration,
+    ): DecryptedCloudSnapshot {
+        val parsed = parseSnapshot(bytes)
+        require(parsed.vaultId == configuration.vaultId) {
+            "The cloud backup belongs to a different backup vault"
+        }
+        require(parsed.portableWrap == configuration.portableWrap) {
+            "The cloud backup does not match the configured recovery key"
+        }
+        val vaultKey = localProtector.unwrap(
+            configuration.localWrap,
+            vaultWrapAad(configuration.vaultId),
+        )
+        val payload = try {
+            decrypt(
+                parsed.snapshotCipher,
+                vaultKey,
+                snapshotAad(
+                    parsed.snapshotId,
+                    parsed.vaultId,
+                    parsed.createdAt,
+                    parsed.ciphertextLength,
+                    parsed.portableWrap,
+                ),
+            )
+        } catch (_: AEADBadTagException) {
+            throw CloudBackupFailure.KeyUnavailable("The device cloud-backup key could not authenticate this snapshot")
+        } finally {
+            vaultKey.fill(0)
+        }
+        return DecryptedCloudSnapshot(parsed.snapshotId, parsed.vaultId, parsed.createdAt, payload)
+    }
+
     internal fun verifyLocalSnapshot(
         bytes: ByteArray,
         configuration: CloudVaultConfiguration,

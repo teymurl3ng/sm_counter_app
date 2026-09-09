@@ -1,0 +1,201 @@
+package com.saaf.milkshop.quickunlock
+
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.saaf.milkshop.data.MilkShopDatabase
+import com.saaf.milkshop.domain.NativeSessionManager
+import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.domain.UserSecurityService
+import java.util.Base64
+import kotlinx.coroutines.runBlocking
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+
+@RunWith(AndroidJUnit4::class)
+class Phase14QuickUnlockTest {
+    private lateinit var database: MilkShopDatabase
+    private lateinit var sessions: NativeSessionManager
+    private lateinit var security: UserSecurityService
+    private lateinit var store: MemoryQuickUnlockStore
+    private lateinit var gate: FakeQuickUnlockDeviceGate
+    private lateinit var quickUnlock: QuickUnlockService
+    private var now = 1_800_000_000_000L
+
+    @Before
+    fun setUp() {
+        database = MilkShopDatabase.createInMemory()
+        sessions = NativeSessionManager { now }
+        security = UserSecurityService(database, sessions = sessions, nowEpochMs = { now })
+        store = MemoryQuickUnlockStore()
+        gate = FakeQuickUnlockDeviceGate()
+        quickUnlock = QuickUnlockService(database, security, store, gate, nowEpochMs = { now })
+    }
+
+    @After
+    fun tearDown() {
+        quickUnlock.close()
+        database.close()
+    }
+
+    @Test
+    fun pinEnrollmentSurvivesServiceRecreationButNotASeparatePhone() = runBlocking {
+        val owner = owner()
+        quickUnlock.enroll(owner.session.sessionId, PASSPHRASE.toCharArray(), false, PIN.toCharArray())
+        sessions.logout(owner.session.sessionId)
+
+        val recreated = QuickUnlockService(database, security, store, gate, nowEpochMs = { now })
+        val quickSession = recreated.login(owner.user.loginName, QuickUnlockMethod.PIN, PIN.toCharArray())
+        assertEquals(owner.user.userId, quickSession.userId)
+        assertEquals(owner.user.loginName, recreated.status().accounts.single().loginName)
+
+        val separatePhone = QuickUnlockService(database, security, MemoryQuickUnlockStore(), FakeQuickUnlockDeviceGate(), nowEpochMs = { now })
+        assertFailure<QuickUnlockFailure.Invalidated> {
+            separatePhone.login(owner.user.loginName, QuickUnlockMethod.PIN, PIN.toCharArray())
+        }
+        separatePhone.close()
+        recreated.close()
+    }
+
+    @Test
+    fun deviceAuthenticationIsStrongButPinCannotApproveDestructiveWork() = runBlocking {
+        val owner = owner()
+        quickUnlock.enroll(owner.session.sessionId, PASSPHRASE.toCharArray(), true, PIN.toCharArray())
+        sessions.logout(owner.session.sessionId)
+
+        val pinSession = quickUnlock.login(owner.user.loginName, QuickUnlockMethod.PIN, PIN.toCharArray())
+        sessions.requireRecentAuthentication(pinSession.sessionId, allowQuickPin = true)
+        assertFailure<SecurityFailure.RecentAuthenticationRequired> {
+            sessions.requireRecentAuthentication(pinSession.sessionId)
+        }
+
+        val deviceSession = quickUnlock.login(owner.user.loginName, QuickUnlockMethod.DEVICE, null)
+        sessions.requireRecentAuthentication(deviceSession.sessionId)
+        assertNotEquals(pinSession.sessionId, deviceSession.sessionId)
+    }
+
+    @Test
+    fun pinFailuresDelayThenRequireAFullPassphraseToReset() = runBlocking {
+        val owner = owner()
+        quickUnlock.enroll(owner.session.sessionId, PASSPHRASE.toCharArray(), false, PIN.toCharArray())
+        sessions.logout(owner.session.sessionId)
+
+        repeat(2) {
+            assertFailure<QuickUnlockFailure.Authentication> {
+                quickUnlock.login(owner.user.loginName, QuickUnlockMethod.PIN, WRONG_PIN.toCharArray())
+            }
+        }
+        assertFailure<QuickUnlockFailure.RateLimited> {
+            quickUnlock.login(owner.user.loginName, QuickUnlockMethod.PIN, WRONG_PIN.toCharArray())
+        }
+        now += 30_001
+        assertFailure<QuickUnlockFailure.RateLimited> {
+            quickUnlock.login(owner.user.loginName, QuickUnlockMethod.PIN, WRONG_PIN.toCharArray())
+        }
+        now += 120_001
+        assertFailure<QuickUnlockFailure.RateLimited> {
+            quickUnlock.login(owner.user.loginName, QuickUnlockMethod.PIN, WRONG_PIN.toCharArray())
+        }
+        assertFailure<QuickUnlockFailure.RateLimited> {
+            quickUnlock.login(owner.user.loginName, QuickUnlockMethod.PIN, PIN.toCharArray())
+        }
+
+        security.login(owner.user.loginName, PASSPHRASE.toCharArray())
+        quickUnlock.fullPassphraseAccepted(owner.user.userId)
+        assertEquals(owner.user.userId, quickUnlock.login(owner.user.loginName, QuickUnlockMethod.PIN, PIN.toCharArray()).userId)
+    }
+
+    @Test
+    fun credentialChangeRestoreAndPhoneSecurityChangeInvalidateEnrollment() = runBlocking {
+        val owner = owner()
+        quickUnlock.enroll(owner.session.sessionId, PASSPHRASE.toCharArray(), true, PIN.toCharArray())
+        security.changeOwnPassphrase(owner.session.sessionId, PASSPHRASE.toCharArray(), NEW_PASSPHRASE.toCharArray())
+        assertTrue(quickUnlock.status().accounts.isEmpty())
+
+        val newSession = security.login(owner.user.loginName, NEW_PASSPHRASE.toCharArray())
+        quickUnlock.enroll(newSession.sessionId, NEW_PASSPHRASE.toCharArray(), true, null)
+        gate.valid = false
+        assertTrue(quickUnlock.status().accounts.isEmpty())
+        assertTrue(gate.deletedKeys.isNotEmpty())
+
+        gate.valid = true
+        quickUnlock.enroll(newSession.sessionId, NEW_PASSPHRASE.toCharArray(), false, PIN.toCharArray())
+        quickUnlock.clearAll()
+        assertTrue(quickUnlock.status().accounts.isEmpty())
+        assertTrue(store.cleared)
+    }
+
+    private suspend fun owner() = security.bootstrapOwner("quick.owner", "Quick Owner", PASSPHRASE.toCharArray())
+
+    private suspend inline fun <reified T : Throwable> assertFailure(crossinline block: suspend () -> Unit) {
+        var caught: Throwable? = null
+        try {
+            block()
+        } catch (error: Throwable) {
+            caught = error
+        }
+        assertTrue("Expected ${T::class.java.simpleName}, got ${caught?.javaClass?.simpleName}", caught is T)
+    }
+
+    companion object {
+        private const val PASSPHRASE = "Quick unlock owner passphrase 2026"
+        private const val NEW_PASSPHRASE = "Changed quick unlock passphrase 2026"
+        private const val PIN = "642913"
+        private const val WRONG_PIN = "111111"
+    }
+}
+
+private class MemoryQuickUnlockStore : QuickUnlockRecordStore {
+    private var records: List<QuickUnlockRecord> = emptyList()
+    var cleared = false
+        private set
+
+    override fun read(): List<QuickUnlockRecord> = records.toList()
+
+    override fun write(records: List<QuickUnlockRecord>) {
+        this.records = records.toList()
+    }
+
+    override fun clear() {
+        records = emptyList()
+        cleared = true
+    }
+}
+
+private class FakeQuickUnlockDeviceGate : QuickUnlockDeviceGate {
+    private val keys = mutableSetOf<String>()
+    val deletedKeys = mutableSetOf<String>()
+    var valid = true
+
+    override fun status() = DeviceAuthenticationStatus(available = true, label = "Test phone lock")
+
+    override suspend fun protect(keyId: String, userId: Long, displayName: String, plaintext: ByteArray): DeviceProtectedQuickToken {
+        keys += keyId
+        return DeviceProtectedQuickToken(
+            nonceBase64 = "test-nonce",
+            ciphertextBase64 = Base64.getEncoder().encodeToString(plaintext),
+            biometricCanaryCreated = false,
+        )
+    }
+
+    override suspend fun release(keyId: String, userId: Long, displayName: String, protected: DeviceProtectedQuickToken): ByteArray {
+        if (keyId !in keys || !valid) throw QuickUnlockFailure.Invalidated()
+        return Base64.getDecoder().decode(protected.ciphertextBase64)
+    }
+
+    override fun enrollmentStillValid(keyId: String, biometricCanaryCreated: Boolean): Boolean = valid && keyId in keys
+
+    override fun delete(keyId: String) {
+        keys -= keyId
+        deletedKeys += keyId
+    }
+
+    override fun clearAll() {
+        deletedKeys += keys
+        keys.clear()
+    }
+}

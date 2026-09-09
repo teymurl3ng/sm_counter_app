@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { CurrentSessionDto, SessionHandle } from '../../bridge/contract.generated';
+import type { CurrentSessionDto, QuickUnlockMethod, QuickUnlockStatusDto, SessionHandle } from '../../bridge/contract.generated';
 import { callNative, NativeBridgeError, verifyNativeContract } from '../../bridge/nativeBridge';
 import { waitForNativeRestoration } from '../../bridge/lifecycleBridge';
 import { errorMessage, type HybridStage } from './hybridModels';
@@ -16,6 +16,13 @@ export function useHybridSession(loadAuthorizedData: LoadAuthorizedData, clearAu
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [quickUnlockStatus, setQuickUnlockStatus] = useState<QuickUnlockStatusDto | null>(null);
+
+  const refreshQuickUnlockStatus = useCallback(async () => {
+    const status = await callNative('system.quickUnlockStatus', {});
+    setQuickUnlockStatus(status);
+    return status;
+  }, []);
 
   const clearSession = useCallback(() => {
     setSession(null);
@@ -32,6 +39,11 @@ export function useHybridSession(loadAuthorizedData: LoadAuthorizedData, clearAu
     void (async () => {
       try {
         await verifyNativeContract();
+        try {
+          await refreshQuickUnlockStatus();
+        } catch {
+          if (!cancelled) setQuickUnlockStatus(null);
+        }
         const restoration = await waitForNativeRestoration();
         if (restoration) {
           try {
@@ -62,7 +74,7 @@ export function useHybridSession(loadAuthorizedData: LoadAuthorizedData, clearAu
       }
     })();
     return () => { cancelled = true; };
-  }, [loadAuthorizedData]);
+  }, [loadAuthorizedData, refreshQuickUnlockStatus]);
 
   useEffect(() => {
     const resume = () => {
@@ -120,6 +132,27 @@ export function useHybridSession(loadAuthorizedData: LoadAuthorizedData, clearAu
     }
   };
 
+  const quickLogin = async (loginName: string, method: QuickUnlockMethod, pin: string | null) => {
+    setBusy(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const result = await callNative('command.auth.quickLogin', { loginName, method, pin });
+      setSession(result.sessionHandle);
+      setCurrentUser(result.currentSession);
+      await loadAuthorizedData(result.sessionHandle, result.currentSession);
+      setStage('ready');
+    } catch (failure) {
+      if (failure instanceof NativeBridgeError && failure.code === 'user_cancelled') return;
+      if (failure instanceof NativeBridgeError && failure.code === 'quick_unlock_invalidated') {
+        await refreshQuickUnlockStatus().catch(() => undefined);
+      }
+      setError(errorMessage(failure));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const recoverOwner = async (loginName: string, savedRecoveryCode: string, newPassphrase: string) => {
     setBusy(true);
     setError(null);
@@ -130,6 +163,7 @@ export function useHybridSession(loadAuthorizedData: LoadAuthorizedData, clearAu
       setCurrentUser(result.currentSession);
       await loadAuthorizedData(result.sessionHandle, result.currentSession);
       setRecoveryCode(result.replacementRecoveryCode);
+      await refreshQuickUnlockStatus().catch(() => undefined);
       setStage('recovery');
     } catch (failure) {
       setError(errorMessage(failure));
@@ -157,6 +191,7 @@ export function useHybridSession(loadAuthorizedData: LoadAuthorizedData, clearAu
     setError(null);
     try {
       await callNative('command.auth.changeOwnPassphrase', { currentPassphrase, newPassphrase }, session);
+      await refreshQuickUnlockStatus().catch(() => undefined);
       clearSession();
       setNotice('Passphrase changed. Sign in again with the new one.');
     } catch (failure) {
@@ -174,7 +209,20 @@ export function useHybridSession(loadAuthorizedData: LoadAuthorizedData, clearAu
 
   const finishRestore = () => {
     clearSession();
+    setQuickUnlockStatus((current) => current ? { ...current, accounts: [] } : null);
     setNotice('Backup restored safely. Sign in using an owner account from that backup.');
+  };
+
+  const enrollQuickUnlock = async (currentPassphrase: string, enableDeviceAuthentication: boolean, pin: string | null) => {
+    if (!session) throw new Error('Sign in to continue.');
+    const status = await callNative('command.auth.enrollQuickUnlock', { currentPassphrase, enableDeviceAuthentication, pin }, session);
+    setQuickUnlockStatus(status);
+  };
+
+  const removeQuickUnlock = async (currentPassphrase: string) => {
+    if (!session) throw new Error('Sign in to continue.');
+    const status = await callNative('command.auth.removeQuickUnlock', { currentPassphrase }, session);
+    setQuickUnlockStatus(status);
   };
 
   return {
@@ -186,14 +234,18 @@ export function useHybridSession(loadAuthorizedData: LoadAuthorizedData, clearAu
     error,
     notice,
     busy,
+    quickUnlockStatus,
     setError,
     setNotice,
     setBusy,
     bootstrapOwner,
     login,
+    quickLogin,
     recoverOwner,
     logout,
     changeOwnPassphrase,
+    enrollQuickUnlock,
+    removeQuickUnlock,
     acknowledgeRecoveryCode,
     finishRestore,
   };

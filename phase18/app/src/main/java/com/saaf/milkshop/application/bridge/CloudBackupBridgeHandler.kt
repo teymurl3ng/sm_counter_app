@@ -28,13 +28,14 @@ internal class CloudBackupBridgeHandler(
     private val authorization: InteractiveCloudAuthorization,
     private val onSessionChanged: (String?) -> Unit,
     private val nowEpochMs: () -> Long = System::currentTimeMillis,
+    private val onRestoreCompleted: suspend () -> Unit = {},
 ) : AutoCloseable {
     private data class RestoreTicket(
         val token: String,
         val sessionId: String,
         val actorUserId: Long,
         val remoteFileId: String,
-        val passphrase: CharArray,
+        val passphrase: CharArray?,
         val inspection: BackupManager.EncryptedBackupInspection,
         val expiresAtEpochMs: Long,
     )
@@ -96,7 +97,12 @@ internal class CloudBackupBridgeHandler(
 
     private suspend fun configure(request: BridgeRequest): JSONObject {
         strictPayload(request.payload, setOf("enabled", "allowMetered"))
-        val actor = authorizeOwner(request.requireSession(), AppPermission.CREATE_EXPORT_BACKUP, recent = true)
+        val actor = authorizeOwner(
+            request.requireSession(),
+            AppPermission.CREATE_EXPORT_BACKUP,
+            recent = true,
+            allowQuickPin = true,
+        )
         return try {
             val state = localCoordinator().updatePolicy(
                 enabled = request.payload.requiredBoolean("enabled"),
@@ -135,13 +141,23 @@ internal class CloudBackupBridgeHandler(
     private suspend fun inspect(request: BridgeRequest): JSONObject {
         strictPayload(request.payload, setOf("remoteFileId"))
         val session = request.requireSession()
-        val actor = authorizeOwner(session, AppPermission.RESTORE_BACKUP, recent = true)
+        val actor = authorizeOwner(
+            session,
+            AppPermission.RESTORE_BACKUP,
+            recent = true,
+            allowQuickPin = true,
+        )
         val remoteFileId = request.payload.requiredString("remoteFileId")
         var passphrase: CharArray? = null
         var retained = false
         return try {
-            val recoveryPassphrase = authorization.requestRecoveryPassphrase().also { passphrase = it }
-            val decrypted = coordinator(GoogleAuthorizationTokenSource(app)).downloadAndDecrypt(remoteFileId, recoveryPassphrase)
+            val cloud = coordinator(GoogleAuthorizationTokenSource(app))
+            val decrypted = try {
+                cloud.downloadAndDecryptWithLocalKey(remoteFileId)
+            } catch (_: CloudBackupFailure.KeyUnavailable) {
+                val recoveryPassphrase = authorization.requestRecoveryPassphrase().also { passphrase = it }
+                cloud.downloadAndDecrypt(remoteFileId, recoveryPassphrase)
+            }
             val inspection = try {
                 app.backupManager.inspectCompleteSnapshotBytes(decrypted.payload, "Google Drive cloud backup")
             } finally {
@@ -151,7 +167,7 @@ internal class CloudBackupBridgeHandler(
             clearExpiredTickets()
             tickets.entries.removeIf { entry ->
                 val remove = entry.value.sessionId == session
-                if (remove) entry.value.passphrase.fill('\u0000')
+                if (remove) entry.value.passphrase?.fill('\u0000')
                 remove
             }
             val token = UUID.randomUUID().toString()
@@ -160,7 +176,7 @@ internal class CloudBackupBridgeHandler(
                 sessionId = session,
                 actorUserId = actor.userId,
                 remoteFileId = remoteFileId,
-                passphrase = recoveryPassphrase,
+                passphrase = passphrase,
                 inspection = inspection,
                 expiresAtEpochMs = nowEpochMs() + TICKET_LIFETIME_MS,
             )
@@ -194,7 +210,9 @@ internal class CloudBackupBridgeHandler(
             if (actor.userId != ticket.actorUserId) {
                 throw BackupBridgeFailure("restore_ticket_expired", "Inspect the cloud backup again before restoring")
             }
-            val decrypted = coordinator(GoogleAuthorizationTokenSource(app)).downloadAndDecrypt(ticket.remoteFileId, ticket.passphrase)
+            val cloud = coordinator(GoogleAuthorizationTokenSource(app))
+            val decrypted = ticket.passphrase?.let { cloud.downloadAndDecrypt(ticket.remoteFileId, it) }
+                ?: cloud.downloadAndDecryptWithLocalKey(ticket.remoteFileId)
             try {
                 app.backupManager.restoreCompleteSnapshotReplacing(
                     database = app.database,
@@ -207,15 +225,16 @@ internal class CloudBackupBridgeHandler(
             }
             localCoordinator().disableAfterRestore()
             app.cloudBackupScheduler.cancelAll()
+            onRestoreCompleted()
             audit("restore_cloud_backup", null, actor.displayName, actor.role, "sessions_invalidated=true")
-            tickets.values.forEach { it.passphrase.fill('\u0000') }
+            tickets.values.forEach { it.passphrase?.fill('\u0000') }
             tickets.clear()
             onSessionChanged(null)
             JSONObject().put("restored", true).put("sessionsInvalidated", true)
         } catch (error: Throwable) {
             throwCloudFailure(error)
         } finally {
-            ticket.passphrase.fill('\u0000')
+            ticket.passphrase?.fill('\u0000')
         }
     }
 
@@ -246,10 +265,18 @@ internal class CloudBackupBridgeHandler(
     private suspend fun coordinatorAccount(token: String): com.saaf.milkshop.cloud.CloudAccountIdentity =
         com.saaf.milkshop.cloud.GoogleDriveCloudBackupProvider(FixedCloudAccessTokenSource(token)).accountIdentity()
 
-    private suspend fun authorizeOwner(session: String, permission: AppPermission, recent: Boolean) =
+    private suspend fun authorizeOwner(
+        session: String,
+        permission: AppPermission,
+        recent: Boolean,
+        allowQuickPin: Boolean = false,
+    ) =
         app.userSecurity.requirePermission(session, permission).also { actor ->
             if (actor.role != "owner") throw SecurityFailure.PermissionDenied()
-            if (recent) app.nativeSessions.requireRecentAuthentication(session)
+            if (recent) app.nativeSessions.requireRecentAuthentication(
+                session,
+                allowQuickPin = allowQuickPin,
+            )
         }
 
     private suspend fun audit(
@@ -308,7 +335,7 @@ internal class CloudBackupBridgeHandler(
         val now = nowEpochMs()
         tickets.entries.removeIf { entry ->
             val expired = entry.value.expiresAtEpochMs <= now
-            if (expired) entry.value.passphrase.fill('\u0000')
+            if (expired) entry.value.passphrase?.fill('\u0000')
             expired
         }
     }
@@ -342,7 +369,7 @@ internal class CloudBackupBridgeHandler(
     }
 
     override fun close() {
-        tickets.values.forEach { it.passphrase.fill('\u0000') }
+        tickets.values.forEach { it.passphrase?.fill('\u0000') }
         tickets.clear()
         expiryScope.cancel()
         (authorization as? AutoCloseable)?.close()

@@ -3,7 +3,6 @@ package com.saaf.milkshop.hybrid
 import android.os.Bundle
 import android.view.WindowManager
 import android.webkit.WebView
-import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
@@ -11,18 +10,22 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.insets.GradientProtection
 import androidx.core.view.insets.ProtectionLayout
 import androidx.webkit.WebViewFeature
+import androidx.fragment.app.FragmentActivity
 import com.saaf.milkshop.BuildConfig
 import com.saaf.milkshop.MilkShopApplication
 import com.saaf.milkshop.R
 import com.saaf.milkshop.application.bridge.BackupDocumentPicker
 import com.saaf.milkshop.application.bridge.HybridBridgeDispatcher
 import com.saaf.milkshop.cloud.HybridGoogleDriveAuthorization
+import com.saaf.milkshop.quickunlock.AndroidQuickUnlockDeviceGate
+import com.saaf.milkshop.quickunlock.AndroidQuickUnlockRecordStore
+import com.saaf.milkshop.quickunlock.QuickUnlockService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 
-class HybridActivity : ComponentActivity() {
+class HybridActivity : FragmentActivity() {
     private val activityScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private lateinit var applicationState: MilkShopApplication
     private lateinit var bridgeDispatcher: HybridBridgeDispatcher
@@ -46,6 +49,12 @@ class HybridActivity : ComponentActivity() {
         val backupDocuments = testBackupDocumentPicker() ?: HybridBackupDocumentPicker(this).also {
             ownedBackupDocumentPicker = it
         }
+        val quickUnlock = QuickUnlockService(
+            database = applicationState.database,
+            security = applicationState.userSecurity,
+            store = AndroidQuickUnlockRecordStore(applicationContext),
+            deviceGate = AndroidQuickUnlockDeviceGate(this),
+        )
         bridgeDispatcher = HybridBridgeDispatcher(
             database = applicationState.database,
             security = applicationState.userSecurity,
@@ -54,6 +63,7 @@ class HybridActivity : ComponentActivity() {
             backupDocuments = backupDocuments,
             application = applicationState,
             cloudAuthorization = HybridGoogleDriveAuthorization(this),
+            quickUnlockService = quickUnlock,
         )
         webViewHost = SecureHybridWebViewHost(
             activity = this,

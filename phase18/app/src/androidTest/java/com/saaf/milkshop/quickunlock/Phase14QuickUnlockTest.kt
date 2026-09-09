@@ -1,6 +1,7 @@
 package com.saaf.milkshop.quickunlock
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.saaf.milkshop.application.bridge.mapBridgeFailure
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.NativeSessionManager
 import com.saaf.milkshop.domain.SecurityFailure
@@ -9,7 +10,6 @@ import java.util.Base64
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -40,6 +40,15 @@ class Phase14QuickUnlockTest {
     fun tearDown() {
         quickUnlock.close()
         database.close()
+    }
+
+    @Test
+    fun bridgePreservesQuickUnlockFailureMeanings() {
+        assertEquals("user_cancelled", mapBridgeFailure(QuickUnlockFailure.Cancelled()).code)
+        assertEquals("quick_unlock_unavailable", mapBridgeFailure(QuickUnlockFailure.Unavailable()).code)
+        assertEquals("quick_unlock_invalidated", mapBridgeFailure(QuickUnlockFailure.Invalidated()).code)
+        assertEquals("rate_limited", mapBridgeFailure(QuickUnlockFailure.RateLimited()).code)
+        assertEquals("authentication_failed", mapBridgeFailure(QuickUnlockFailure.Authentication()).code)
     }
 
     @Test
@@ -124,6 +133,11 @@ class Phase14QuickUnlockTest {
 
         gate.valid = true
         quickUnlock.enroll(newSession.sessionId, NEW_PASSPHRASE.toCharArray(), false, PIN.toCharArray())
+        gate.available = false
+        assertTrue(quickUnlock.status().accounts.isEmpty())
+
+        gate.available = true
+        quickUnlock.enroll(newSession.sessionId, NEW_PASSPHRASE.toCharArray(), false, PIN.toCharArray())
         quickUnlock.clearAll()
         assertTrue(quickUnlock.status().accounts.isEmpty())
         assertTrue(store.cleared)
@@ -170,8 +184,9 @@ private class FakeQuickUnlockDeviceGate : QuickUnlockDeviceGate {
     private val keys = mutableSetOf<String>()
     val deletedKeys = mutableSetOf<String>()
     var valid = true
+    var available = true
 
-    override fun status() = DeviceAuthenticationStatus(available = true, label = "Test phone lock")
+    override fun status() = DeviceAuthenticationStatus(available = available, label = "Test phone lock")
 
     override suspend fun protect(keyId: String, userId: Long, displayName: String, plaintext: ByteArray): DeviceProtectedQuickToken {
         keys += keyId

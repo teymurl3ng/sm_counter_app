@@ -177,7 +177,10 @@ export function useHybridSession(loadAuthorizedData: LoadAuthorizedData, clearAu
     setBusy(true);
     setError(null);
     void callNative('command.auth.logout', {}, session)
-      .then(clearSession)
+      .then(async () => {
+        await refreshQuickUnlockStatus().catch(() => undefined);
+        clearSession();
+      })
       .catch((failure) => {
         if (failure instanceof NativeBridgeError && failure.code === 'session_expired') clearSession();
         else setError(errorMessage(failure));

@@ -2,6 +2,7 @@ package com.saaf.milkshop.application.bridge
 
 import com.saaf.milkshop.domain.ProductCatalogInput
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.quickunlock.QuickUnlockFailure
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -257,6 +258,11 @@ internal fun mapBridgeFailure(error: Throwable): BridgeFailure = when (error) {
     is BridgeCommandDayClosed -> BridgeFailure("day_closed", error.message ?: "This business day is closed")
     is BridgeCommandInsufficientStock -> BridgeFailure("insufficient_stock", error.message ?: "There is not enough stock for this operation")
     is BackupBridgeFailure -> BridgeFailure(error.code, error.message ?: "The backup operation could not be completed", retryable = error.retryable)
+    is QuickUnlockFailure.Cancelled -> BridgeFailure("user_cancelled", "Quick unlock was cancelled")
+    is QuickUnlockFailure.Unavailable -> BridgeFailure("quick_unlock_unavailable", error.message ?: "Phone security is unavailable")
+    is QuickUnlockFailure.Invalidated -> BridgeFailure("quick_unlock_invalidated", error.message ?: "Set up Quick unlock again")
+    is QuickUnlockFailure.RateLimited -> BridgeFailure("rate_limited", error.message ?: "Quick unlock is temporarily paused")
+    is QuickUnlockFailure.Authentication -> BridgeFailure("authentication_failed", "Quick unlock could not verify this account")
     is SecurityFailure.Authentication -> BridgeFailure("authentication_failed", SecurityFailure.GENERIC_AUTH_FAILURE)
     is SecurityFailure.SessionExpired -> BridgeFailure("session_expired", "Your session expired. Sign in again.")
     is SecurityFailure.PermissionDenied -> BridgeFailure("permission_denied", "You do not have permission to perform this action.")

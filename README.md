@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-09 — hybrid Phases 0–13 and Phase 14.1–14.5 are complete; Phase 14.6 mandatory Quick unlock is next. Contract v4 exposes 86 native-backed operations. The unreachable 23-file, 8,370-line browser-local prototype and six unused dependencies are removed; the 85-file production graph and its live controls/messages have been audited, and automatic web/Android build gates prevent the removed behavior from returning.
+Status: RECONCILED 2026-09-09 — hybrid Phases 0–13 and Phase 14.1–14.5 are complete; Phase 14.6 mandatory Quick unlock is implemented and awaiting focused physical-device proof. Contract v5 exposes 91 native-backed operations. The unreachable 23-file, 8,370-line browser-local prototype and six unused dependencies are removed; the 88-file production graph and its live controls/messages have been audited, and automatic web/Android build gates prevent the removed behavior from returning.
 
 Latest complete full physical-device regression: Phase 13.5 passes 258/258 on Samsung SM-A065F / Android 16 across the authenticated 257-test and clean-identity 1-test visual partitions, with zero skips or failures. The final visual audit reproduces 83 readable screenshots / 58 states at 720 × 1600, and host-side tests pass 7/7. Later Phase 14 checkpoints add focused live acceptance evidence rather than repeating that entire suite before 14.7.
 
@@ -28,7 +28,7 @@ Product scope: Saaf Milk is the current working product identity, and Milk/Yogur
 - `PHASE5.md` — completed native read-model expansion, permission boundary, verification, and next gate.
 - `PHASE5_DTO_CATALOG.md` — frozen hybrid-facing Kotlin query/DTO catalog, representation rules, code sets, and security exclusions.
 - `PHASE6.md` — completed canonical bridge-contract boundary, generated projections, drift gate, verification, and Phase 7 handoff.
-- `bridge/CONTRACT.md` and `bridge/contract.json` — frozen human-readable and machine-readable bridge contract version 4.
+- `bridge/CONTRACT.md` and `bridge/contract.json` — frozen human-readable and machine-readable bridge contract version 5.
 - `PHASE7.md` — completed packaged React/WebView/Android vertical slice, authenticated bridge proof, physical-device evidence, and Phase 8 handoff.
 - `PHASE8.md` — completed screen capability ledger, all 21 native-backed milestones, verification, limitations, and Phase 9 handoff.
 - `PHASE9.md` — completed runtime/navigation/device-integration ledger, including grouped navigation, lifecycle, keyboard/insets, targeted refresh, renderer recovery, and physical-device evidence.
@@ -66,7 +66,7 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 14 — Final Device QA: IN PROGRESS (14.1–14.5 complete; 14.6 mandatory Quick unlock next)**
+**Phase 14 — Final Device QA: IN PROGRESS (14.1–14.5 complete; 14.6 Quick unlock implemented, physical proof pending)**
 
 Phase 13 removed the unreachable prototype, audited all live UI controls and meanings, corrected the misleading combined opening-balance total, and made the cleanup rules mandatory in web and Android builds. Its final Samsung regression passes 258/258, host tests pass 7/7, and 83-screen evidence is preserved. Phase 14.1 established the safe `.qa` installation and honest external prerequisites. Phase 14.2 now proves all five roles' exact packaged UI and native authorization boundaries; its two new tests pass 2/2, the related regression passes 36/36, and no production defect was found.
 
@@ -132,7 +132,7 @@ Phase 12 — UI Fidelity ✅ (all six checkpoints complete; 83-screen final evid
 
 Phase 13 — Dead/Mock/Misleading UI Cleanup ✅ (all five checkpoints complete; 258/258 final device regression and Phase 14 handoff verified)
 
-Phase 14 — Final Device QA ⏳ (14.3 live Drive, 14.4 S24-to-A06 recovery, and 14.5 Android audit complete; mandatory Quick unlock is 14.6 and final closure/regression is 14.7)
+Phase 14 — Final Device QA ⏳ (14.1–14.5 complete; 14.6 Quick unlock implemented with physical proof pending; final closure/regression is 14.7)
 
 Phase 15 — Final Shopkeeper QA ⏳ (includes uncoached Quick unlock enrollment/use/recovery, periodic backup/recovery, and owner-phone snapshot viewing if approved)
 
@@ -158,7 +158,7 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Focused backup/restore suite: 8/8 passed, including portable and local confidentiality checks, wrong-passphrase rejection, tamper rejection, security round-trips, session invalidation, and transient lockout-state exclusion.
 - Phase 4 security gap-closure suite: 9/9 passed.
 - Phase 5 hybrid read-model suite: 4/4 passed.
-- Bridge contract: version 4, 86 endpoints, generated Kotlin/TypeScript projections and both pre-build drift gates pass; v4 retains v3 and adds eight native-owned cloud-backup operations.
+- Bridge contract: version 5, 91 endpoints, generated Kotlin/TypeScript projections and both pre-build drift gates pass; v5 retains v4 and adds five native-owned Quick unlock operations.
 - Host-side debug unit tests: 7/7 passed.
 - Phase 7 focused hybrid vertical-slice suite: 3/3 passed on the physical device.
 - Phase 8 focused Product Management suite: 3/3 passed on the physical device.
@@ -206,7 +206,8 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 14.3 passes 25/25 automated cloud tests and the real provider passes consent, encrypted upload, hidden listing, offline queue/retry, successful no-restore inspection, revocation, retained remote points, and fresh-consent reconnect. Six verified recovery points are visible; three live UX defects are recorded for Phase 14.7.
 - Phase 14.4 passes real S24-to-A06 recovery of a recognizable product/supplier/customer/purchase/sale/correction dataset with matching stock and balances, correction lineage, actor identity, forced logout, retained remote points, and target cloud pause. Wrong secrets preserve the installation; two UX defects are recorded, including a P1 correction form that hides original values.
 - Phase 14.5 completes the targeted A06/S24 Android audit at 11/20. Five P1 issues cover large-text reflow, keyboard obstruction, unsafe Back/draft loss, TalkBack dialog closing, and rotation draft loss; one P2 covers landscape refinement. TalkBack announcements, switch/lock lifecycle, S24 split-screen, light-theme stability, and document-picker cancellation pass.
+- Phase 14.6 implements device-bound Android phone-security/PIN Quick unlock, Keystore protection and invalidation, PIN delay/full-passphrase recovery, shared-phone identity selection, routine backup reauthentication, trusted-device cloud-key inspection, and the v5/91 bridge. Five focused tests bring the physical-device inventory to 265; build/static gates pass and the connected-device run remains open.
 
 ## Next gate
 
-Phases 3–13 and Phase 14.1–14.5 are closed. Phase 14.6 must implement and physically prove native Quick unlock. Phase 14.7 then closes all eleven live UX/runtime findings and runs the expanded full regression. Ordinary Saaf installations/profiles must remain untouched. Phases 15–16 must validate the feature with shopkeepers and block release on its security/recovery gate. See `QUICK_UNLOCK_REQUIREMENT.md`, `PHASE14.md`, `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md`, `PHASE14_4_SECOND_DEVICE_RECOVERY.md`, `PHASE14_5_ACCESSIBILITY_ANDROID_QA.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Phases 3–13 and Phase 14.1–14.5 are closed. Phase 14.6 Quick unlock is implemented but still needs its focused physical-device proof. Phase 14.7 then closes all eleven live UX/runtime findings and runs the expanded full regression. Ordinary Saaf installations/profiles must remain untouched. Phases 15–16 must validate the feature with shopkeepers and block release on its security/recovery gate. See `QUICK_UNLOCK_REQUIREMENT.md`, `PHASE14.md`, `PHASE14_6_QUICK_UNLOCK_QA.md`, `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md`, `PHASE14_4_SECOND_DEVICE_RECOVERY.md`, `PHASE14_5_ACCESSIBILITY_ANDROID_QA.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.

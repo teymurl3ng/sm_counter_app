@@ -8,6 +8,7 @@ import com.saaf.milkshop.domain.Argon2idPasswordHasher
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator
 import org.bouncycastle.crypto.params.Argon2Parameters
 import org.json.JSONObject
+import java.security.GeneralSecurityException
 import java.security.KeyStore
 import java.security.SecureRandom
 import java.text.Normalizer
@@ -81,6 +82,10 @@ class AndroidCloudKeyProtector(
             cipher.doFinal(Base64.getDecoder().decode(wrapped.ciphertextBase64))
         } catch (_: AEADBadTagException) {
             throw CloudBackupFailure.KeyUnavailable("The device cloud-backup key is unavailable or invalid")
+        } catch (_: GeneralSecurityException) {
+            throw CloudBackupFailure.KeyUnavailable("The device cloud-backup key is unavailable or invalid")
+        } finally {
+            nonce.fill(0)
         }
     }
 

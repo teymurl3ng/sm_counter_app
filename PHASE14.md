@@ -1,6 +1,6 @@
 # Phase 14 — Final Device QA
 
-Status: **IN PROGRESS — checkpoints 14.1–14.5 complete; checkpoint 14.6 Quick unlock is next**
+Status: **IN PROGRESS — checkpoints 14.1–14.5 complete; 14.6 is implemented and awaiting focused physical-device proof**
 
 ## Purpose
 
@@ -11,7 +11,7 @@ Validate the finished hybrid application under real Android, role, accessibility
 - Use the isolated `com.saaf.milkshop.qa` installation and dedicated QA records for destructive or failure-path testing. Do not overwrite an ordinary shop installation.
 - Room and Kotlin remain the only business, validation, authorization, accounting, encryption, audit, backup, and recovery authority.
 - React remains presentation-only and may not gain browser-local business state, duplicate formulas, synthetic reports, fake users, or self-authorized actions.
-- Preserve bridge contract v4 and its 86 native-backed operations unless a separately approved additive capability passes its own design and regression gate.
+- Preserve bridge contract v5 and its 91 native-backed operations. V5 is the approved additive Quick unlock capability; later changes must pass the same manifest, generation, and regression gate.
 - Backup is encrypted recovery, not synchronization between writable phones.
 - Milk/Yogurt are the current validated workflows, not a permanent product limit and not evidence that unsupported products already have authoritative treatment.
 - Judge the product proportionally as an owner-managed small-business tool. Do not claim enterprise ERP parity, statutory-accounting completeness, or external accessibility certification.
@@ -74,6 +74,8 @@ Completed on the isolated A06 and S24 QA installations. The targeted native audi
 - Prove that a short PIN cannot decrypt a portable cloud recovery point on a cleared or replacement device.
 - Exercise all enrollment, unavailable, success, failure, lifecycle, accessibility, role/security-change, and recovery states defined in `QUICK_UNLOCK_REQUIREMENT.md` on physical devices.
 
+Implementation completed on 2026-09-09. The native device/Keystore boundary, per-user rate-limited PIN, shared-phone identity choice, strong-versus-PIN authorization split, existing-device cloud-key path, React presentation, bridge v5/91 projections, focused five-test class, production UI build, packaged cleanup, Kotlin compilation, and debug APK assembly pass their host/build gates. No phone was connected for the focused test run, so 14.6 remains open until physical-device and TalkBack/large-text acceptance completes. See `PHASE14_6_QUICK_UNLOCK_QA.md`.
+
 ### 14.7 — Defect closure, complete regression, and Phase 15 handoff
 
 - Resolve verified in-scope defects in bounded batches, preserving the frozen product and business boundaries.
@@ -90,8 +92,8 @@ Completed on the isolated A06 and S24 QA installations. The targeted native audi
 
 ## Current next action
 
-Begin checkpoint 14.6: implement and physically verify mandatory native device-bound Quick unlock. Then close all eleven recorded live defects—five from cloud/recovery and six from the Android audit—and run the expanded complete regression in 14.7.
+Connect the isolated QA phone, run the five focused Quick unlock tests, and complete the short hands-on security/accessibility matrix in `PHASE14_6_QUICK_UNLOCK_QA.md`. Then close all eleven recorded live defects—five from cloud/recovery and six from the Android audit—and run the expanded complete regression in 14.7.
 
 ## Plain English
 
-The Android audit is complete. Normal TalkBack labels, app switching, locking, split-screen, and file-picker cancellation worked, but large text, keyboard handling, Back, TalkBack dialog closing, and rotation revealed serious issues. They are recorded for the final fix phase. Next we build the required fast, secure Quick unlock feature.
+The fast, secure Quick unlock feature is built and passes code/build checks. Connect the QA phone to prove it with real phone security, PIN, cancellation, invalidation, shared accounts, and accessibility; then Phase 14.7 fixes the recorded live defects and runs the complete regression.

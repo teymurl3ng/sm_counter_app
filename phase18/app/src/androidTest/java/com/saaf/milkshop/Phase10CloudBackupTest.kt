@@ -60,7 +60,9 @@ class Phase10CloudBackupTest {
 
         val replacementDevice = CloudBackupCryptography(FailingProtector())
         val decrypted = replacementDevice.decryptSnapshot(first, passphrase)
+        val locallyDecrypted = creator.decryptSnapshotWithLocalKey(first, vault)
         assertArrayEquals(payload, decrypted.payload)
+        assertArrayEquals(payload, locallyDecrypted.payload)
         assertNotEquals(
             JSONObject(first.toString(Charsets.UTF_8)).getJSONObject("cipher").getString("nonce"),
             JSONObject(second.toString(Charsets.UTF_8)).getJSONObject("cipher").getString("nonce"),
@@ -83,6 +85,7 @@ class Phase10CloudBackupTest {
         passphrase.fill('\u0000')
         wrong.fill('\u0000')
         decrypted.payload.fill(0)
+        locallyDecrypted.payload.fill(0)
     }
 
     @Test

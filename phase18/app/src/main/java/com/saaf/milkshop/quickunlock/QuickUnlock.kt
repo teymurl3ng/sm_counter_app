@@ -140,7 +140,9 @@ class QuickUnlockService internal constructor(
         security.reauthenticate(sessionId, currentPassphrase)
         val initialIdentity = identityForSession(sessionId)
         val deviceStatus = deviceGate.status()
-        if (enableDeviceAuthentication && !deviceStatus.available) throw QuickUnlockFailure.Unavailable()
+        if (!deviceStatus.available) {
+            throw QuickUnlockFailure.Unavailable("Set up a secure phone lock before enabling Quick unlock")
+        }
 
         val oldRecord = mutex.withLock { validatedRecords().singleOrNull { it.userId == initialIdentity.user.userId } }
         val deviceKeyId = if (enableDeviceAuthentication) UUID.randomUUID().toString() else null
@@ -214,9 +216,14 @@ class QuickUnlockService internal constructor(
             invalidateUser(record.userId)
             throw QuickUnlockFailure.Invalidated()
         }
-        val strong = when (method) {
-            QuickUnlockMethod.DEVICE -> authenticateDevice(record, identity)
-            QuickUnlockMethod.PIN -> authenticatePin(record, identity, pin)
+        val strong = try {
+            when (method) {
+                QuickUnlockMethod.DEVICE -> authenticateDevice(record, identity)
+                QuickUnlockMethod.PIN -> authenticatePin(record, pin)
+            }
+        } catch (error: Throwable) {
+            auditFailure(identity.user, ACTION_LOGIN, method, error)
+            throw error
         }
         val session = security.sessionManager().start(identity.user.userId, strongAuthentication = strong)
         audit(identity.user, ACTION_LOGIN, RESULT_SUCCESS, "method=${method.wireValue}")
@@ -228,9 +235,14 @@ class QuickUnlockService internal constructor(
         val record = mutex.withLock {
             validatedRecords().singleOrNull { it.userId == identity.user.userId }
         } ?: throw QuickUnlockFailure.Invalidated()
-        val strong = when (method) {
-            QuickUnlockMethod.DEVICE -> authenticateDevice(record, identity)
-            QuickUnlockMethod.PIN -> authenticatePin(record, identity, pin)
+        val strong = try {
+            when (method) {
+                QuickUnlockMethod.DEVICE -> authenticateDevice(record, identity)
+                QuickUnlockMethod.PIN -> authenticatePin(record, pin)
+            }
+        } catch (error: Throwable) {
+            auditFailure(identity.user, ACTION_REAUTHENTICATE, method, error)
+            throw error
         }
         security.sessionManager().markQuickAuthentication(sessionId, strongAuthentication = strong)
         audit(identity.user, ACTION_REAUTHENTICATE, RESULT_SUCCESS, "method=${method.wireValue};strong=$strong")
@@ -294,7 +306,7 @@ class QuickUnlockService internal constructor(
         }
     }
 
-    private suspend fun authenticatePin(record: QuickUnlockRecord, identity: Identity, pin: CharArray?): Boolean {
+    private suspend fun authenticatePin(record: QuickUnlockRecord, pin: CharArray?): Boolean {
         val entered = pin ?: throw SecurityFailure.Validation("Enter your Quick PIN")
         pinHasher.validate(entered)
         if (record.pinVerifierBase64 == null || record.pinSaltBase64 == null) {
@@ -330,7 +342,6 @@ class QuickUnlockService internal constructor(
                     ) else it
                 })
             }
-            audit(identity.user, ACTION_LOGIN, RESULT_FAILURE, "method=pin")
             if (blocked || delay != null) throw QuickUnlockFailure.RateLimited()
             throw QuickUnlockFailure.Authentication()
         }
@@ -364,6 +375,7 @@ class QuickUnlockService internal constructor(
 
     private suspend fun validatedRecords(): List<QuickUnlockRecord> {
         val existing = store.read()
+        val phoneSecurityAvailable = deviceGate.status().available
         val valid = mutableListOf<QuickUnlockRecord>()
         existing.forEach { record ->
             val identity = activeIdentity(record.userId)
@@ -371,7 +383,7 @@ class QuickUnlockService internal constructor(
                 record.deviceKeyId,
                 record.biometricCanaryCreated,
             )
-            if (identity != null && identity.bindingBase64 == record.securityBindingBase64 && deviceValid) {
+            if (phoneSecurityAvailable && identity != null && identity.bindingBase64 == record.securityBindingBase64 && deviceValid) {
                 valid += record
             } else {
                 record.deviceKeyId?.let(deviceGate::delete)
@@ -418,6 +430,17 @@ class QuickUnlockService internal constructor(
                 details = details,
             ),
         )
+    }
+
+    private suspend fun auditFailure(user: AppUserEntity, action: String, method: QuickUnlockMethod, error: Throwable) {
+        val reason = when (error) {
+            is QuickUnlockFailure.Cancelled -> "cancelled"
+            is QuickUnlockFailure.Unavailable -> "unavailable"
+            is QuickUnlockFailure.Invalidated -> "invalidated"
+            is QuickUnlockFailure.RateLimited -> "rate_limited"
+            else -> "authentication_failed"
+        }
+        runCatching { audit(user, action, RESULT_FAILURE, "method=${method.wireValue};reason=$reason") }
     }
 
     private fun sha256(value: ByteArray): ByteArray = MessageDigest.getInstance("SHA-256").digest(value)

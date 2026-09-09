@@ -1,6 +1,6 @@
 # Phase 14 — Final Device QA
 
-Status: **IN PROGRESS — checkpoints 14.1–14.4 complete; checkpoint 14.5 accessibility and Android behavior is next**
+Status: **IN PROGRESS — checkpoints 14.1–14.5 complete; checkpoint 14.6 Quick unlock is next**
 
 ## Purpose
 
@@ -56,12 +56,14 @@ Completed across the isolated Samsung SM-A065F and replacement Samsung SM-S921W,
 
 Completed from Samsung SM-S921W source to a freshly reset isolated Samsung SM-A065F target. The exact 20:14 data-rich point passed inspection and full replacement; restore forced logout, recovered the source owner, retained ten remote listings, restored the fake product/supplier/customer/purchase/sale/correction plus expected stock and balances, preserved correction linkage and actor attribution, and left target Drive correctly paused. Wrong owner/cloud secrets preserved the installation, while the automated matrix retains damaged/incompatible/ticket/cancellation/repeated-attempt coverage. Two UX defects are recorded for 14.7, including a P1 correction form that hides the original values. See `PHASE14_4_SECOND_DEVICE_RECOVERY.md`.
 
-### 14.5 — Accessibility, adaptivity, and Android behavior
+### 14.5 — Accessibility, adaptivity, and Android behavior ✅
 
 - Perform the native technical audit across accessibility, performance, appearance/theming, platform conformance, and adaptivity.
 - Exercise TalkBack reading/focus order, labels, live feedback, error recovery, increased text, keyboard/IME, landscape, system bars, Android Back, lifecycle recreation, document pickers/sharing, and at least one additional device class where available.
 - Score verified findings on the 0–4 audit scale and classify issues P0 blocking, P1 major, P2 minor, or P3 polish.
 - Capture targeted evidence for findings and fixes; do not repeat all 83 screens without a material reason.
+
+Completed on the isolated A06 and S24 QA installations. The targeted native audit scores 11/20: no P0 findings, five P1 findings, and one P2 finding. TalkBack generally announces controls clearly; app switching/locking retains drafts; S24 split-screen is usable; and Android document-picker cancellation returns safely, reports that no file changed, and clears passphrase fields. Major failures remain in large-text reflow, keyboard avoidance, safe Android Back/draft handling, TalkBack dialog-close activation, and rotation draft retention. A06 landscape is usable but needs broad refinement. The locked light theme remains intentionally unchanged when system dark mode changes. See `PHASE14_5_ACCESSIBILITY_ANDROID_QA.md`.
 
 ### 14.6 — Mandatory Quick unlock implementation and device QA
 
@@ -88,8 +90,8 @@ Completed from Samsung SM-S921W source to a freshly reset isolated Samsung SM-A0
 
 ## Current next action
 
-Begin checkpoint 14.5 with focused physical-device accessibility, adaptivity, and Android behavior checks across the A06 and S24. Keep evidence proportional and targeted rather than repeating every Phase 12 screenshot. Then implement and physically verify mandatory Quick unlock in 14.6, close all five recorded defects, and run the expanded complete regression in 14.7.
+Begin checkpoint 14.6: implement and physically verify mandatory native device-bound Quick unlock. Then close all eleven recorded live defects—five from cloud/recovery and six from the Android audit—and run the expanded complete regression in 14.7.
 
 ## Plain English
 
-The real cloud restore moved a complete recognizable test dataset from the S24 to a freshly reset A06. The owner, records, correction trail, stock, and balances matched; restore logged everyone out and paused the target instead of pretending both phones were synchronized. Wrong secrets changed nothing. Next we test accessibility, screen/device adaptation, and normal Android behavior.
+The Android audit is complete. Normal TalkBack labels, app switching, locking, split-screen, and file-picker cancellation worked, but large text, keyboard handling, Back, TalkBack dialog closing, and rotation revealed serious issues. They are recorded for the final fix phase. Next we build the required fast, secure Quick unlock feature.

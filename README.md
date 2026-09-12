@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-12 — hybrid Phases 0–14 are complete and Phase 15 uncoached shopkeeper QA is next. Contract v5 exposes 91 native-backed operations. Quick unlock, live Drive, cross-device recovery, Android behavior, accessibility closure, and every recorded Phase 14 defect pass their final gates. The unreachable 23-file, 8,370-line browser-local prototype and six unused dependencies remain removed; automatic web/Android build gates prevent that behavior from returning.
+Status: RECONCILED 2026-09-12 — hybrid Phases 0–14 are complete; Phase 14.8 native UI redesign and migration is active before Phase 15 uncoached shopkeeper QA. Contract v5 exposes 91 native-backed operations. Quick unlock, live Drive, cross-device recovery, Android behavior, accessibility closure, and every recorded Phase 14 defect pass their final gates. The verified hybrid application is retained as the behavioral baseline and temporary fallback while the final presentation moves to Jetpack Compose.
 
 Latest complete physical-device regression: Phase 14.7 passes 273/273 ordinary tests in the isolated `com.saaf.milkshop.qa.tests` instrumentation package and the separately configured 1/1 blank-install visual audit, with zero skips or failures. Host-side tests pass 7/7. The final OAuth-enabled user-facing `.qa` APK is 16,174,564 bytes with SHA-256 `5581218C0761ED3C33CA9D09877D19E4D2654B5B6DF5AC2790C80B364F223A24`.
 
@@ -57,6 +57,8 @@ Product scope: Saaf Milk is the current working product identity, and Milk/Yogur
 - `PHASE14_5_ACCESSIBILITY_ANDROID_QA.md` — completed large-text, landscape, keyboard, Back, TalkBack, lifecycle, split-screen, theme, and document-picker audit with scored findings.
 - `PHASE14_6_QUICK_UNLOCK_QA.md` — completed device-bound Quick unlock implementation, security regression, shared-phone isolation, and physical acceptance.
 - `PHASE14_7_DEFECT_CLOSURE.md` — completed Phase 14 defect closure, final regression, APK record, replacement-phone recovery proof, and Phase 15 handoff.
+- `PHASE14_8.md` — active native UI redesign/migration plan, protected architecture, incremental coexistence strategy, checkpoints, and retirement gate.
+- `PHASE14_8_1_NATIVE_MIGRATION_INVENTORY.md` — complete source-derived map of authentication states, fourteen application areas, 91 bridge actions, native owners, parity gates, and fallback boundaries.
 
 ## Immutable baselines
 
@@ -68,9 +70,9 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 15 — Final Shopkeeper QA: NEXT (Phase 14.1–14.7 complete)**
+**Phase 14.8 — Native UI Redesign and Migration: ACTIVE (14.8.1 complete)**
 
-Phase 14 completed the safe `.qa` device baseline, all-five-role authorization matrix, live Drive and real cross-device recovery, Android/accessibility audit, device-bound Quick unlock, defect closure, and complete regression. The final result is 273/273 ordinary Android tests, the 1/1 visual audit, and 7/7 host tests. Phase 15 now tests whether real shop users can complete the work and understand recovery without coaching.
+Phase 14 completed the safe `.qa` device baseline, all-five-role authorization matrix, live Drive and real cross-device recovery, Android/accessibility audit, device-bound Quick unlock, defect closure, and complete regression. The final result remains 273/273 ordinary Android tests, the 1/1 visual audit, and 7/7 host tests. The owner then rejected the hybrid interface as the release UX and confirmed native UI as the intended destination. Phase 14.8 redesigns and incrementally migrates the presentation to Compose while retaining the working hybrid build as a behavioral oracle and fallback. Phase 15 will test the native release candidate without coaching.
 
 Earlier native-backed shop screens remain intact. Phase 9's grouped role-aware navigation, separate QA installation, one non-reloading React/WebView presentation, secure Activity recreation, targeted state refresh, and renderer recovery remain protected. A recovery reload creates a fresh WebView and revalidates the memory-only session before protected information appears. The keyboard/inset, Back/draft, rotation, large-text, landscape, and TalkBack findings recorded in Phase 14.5 are closed by Phase 14.7.
 
@@ -136,7 +138,9 @@ Phase 13 — Dead/Mock/Misleading UI Cleanup ✅ (all five checkpoints complete;
 
 Phase 14 — Final Device QA ✅ (all seven checkpoints complete; 273/273 ordinary Android tests, 1/1 visual audit, 7/7 host tests)
 
-Phase 15 — Final Shopkeeper QA ⏳ (includes uncoached Quick unlock enrollment/use/recovery, periodic backup/recovery, and owner-phone snapshot viewing if approved)
+Phase 14.8 — Native UI Redesign and Migration 🚧 (14.8.1 surface/dependency inventory complete; journey direction next)
+
+Phase 15 — Final Shopkeeper QA ⏳ (starts after the native migration/regression gate; includes uncoached Quick unlock enrollment/use/recovery and periodic backup/recovery)
 
 Phase 16 — Release Readiness ⏳ (secure Quick unlock and its recovery boundary are release blockers alongside cloud-provider authorization, privacy, quota, and recovery readiness)
 

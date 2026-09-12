@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { AppRoleCode, CurrentSessionDto, EmployeeDto, QuickUnlockStatusDto, UserAdministrationDto } from '../../bridge/contract.generated';
 import { FilterButton, Notice } from './HybridUi';
 import { MyAccountPanel } from './MyAccountPanel';
@@ -26,6 +26,7 @@ export function SecurityWorkspace({ currentUser, employees, actions, quickUnlock
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const noticeRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!canManageUsers && !canViewAudit) return;
     let cancelled = false;
@@ -33,6 +34,13 @@ export function SecurityWorkspace({ currentUser, employees, actions, quickUnlock
     void actions.load().then((loaded) => { if (!cancelled) setBundle(loaded); }).catch((failure) => { if (!cancelled) setError(errorMessage(failure)); }).finally(() => { if (!cancelled) setBusy(false); });
     return () => { cancelled = true; };
   }, [actions, canManageUsers, canViewAudit]);
+  useEffect(() => {
+    if (!notice) return;
+    const frame = window.requestAnimationFrame(() => {
+      noticeRef.current?.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [notice]);
 
   const run = async <T,>(operation: () => Promise<T>, success: string): Promise<T> => {
     setBusy(true); setError(null); setNotice(null);
@@ -72,7 +80,7 @@ export function SecurityWorkspace({ currentUser, employees, actions, quickUnlock
       {canManageUsers && <FilterButton id="security-staff-tab" active={area === 'staff'} onClick={() => setArea('staff')}>Staff accounts</FilterButton>}
       {canViewAudit && <FilterButton id="security-audit-tab" active={area === 'audit'} onClick={() => setArea('audit')}>Security history</FilterButton>}
     </div>
-    {notice && <Notice message={notice} success />}
+    {notice && <div ref={noticeRef} data-action-feedback><Notice message={notice} success /></div>}
     {area === 'account' ? <MyAccountPanel currentUser={currentUser} quickUnlockStatus={quickUnlockStatus} busy={busy} error={error} onChange={onChangeOwnPassphrase} onEnrollQuickUnlock={enrollQuickUnlock} onRemoveQuickUnlock={removeQuickUnlock} />
       : !bundle ? <p className="rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-500">{busy ? 'Loading protected account records…' : error ?? 'Account records are unavailable.'}</p>
       : area === 'staff' && canManageUsers ? <StaffAccountsPanel currentUser={currentUser} users={bundle.users} employees={employees} busy={busy} error={error} onCreate={begin} onResume={resume} onRole={updateRole} onEnabled={updateEnabled} onReset={reset} />

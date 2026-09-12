@@ -52,7 +52,7 @@ Completed host/build gates:
 - source and packaged cleanup gates;
 - Kotlin production and Android-test compilation;
 - 7/7 host unit tests;
-- isolated `com.saaf.milkshop.qa` app and Android-test APK assembly with the configured OAuth client identifier. The 2026-09-12 QA app APK SHA-256 is `504445744C469EDCB22FAE86B157A9038FEBDBB056DC05B09170B8CDB8A99A4F`.
+- isolated `com.saaf.milkshop.qa` app and Android-test APK assembly with the configured OAuth client identifier. After the Access-action feedback fix, the 2026-09-12 QA app APK SHA-256 is `2CD17B2276898399C70DC3B9EE5A9D649AD3541248AE23116AA7AB8D4F516531`.
 
 The nine focused tests pass 9/9 on the isolated S24 QA installation. The combined Quick unlock, Phase 3/4 native security, and selected cloud cryptography regression passes 26/26. The full physical-device inventory is now 269 tests; the complete suite remains the Phase 14.7 gate.
 
@@ -85,9 +85,13 @@ Verification: `quick-unlock-after.txt` records **26/26 passing, zero failures/sk
 
 Following instructions to restart the phone, unlock Android normally, and open Saaf QA using its Quick PIN, the user confirmed "it opens". Post-reboot Quick PIN login passes by user report. Wireless ADB was initially disconnected; the user then connected USB and ADB reported the S24 authorized. `19-post-reboot-usb-dashboard.png` independently captures the resulting `test · Owner` dashboard; the authentication method remains established by the user's report.
 
+The controlled physical PIN-failure sequence also passes. Attempts one and two show the generic verification failure (`20`–`21`). Attempt three enters the first pause (`22`). After more than 30 seconds, attempt four enters the longer pause (`23`), and the user's correct Quick PIN was still refused during that window (`24`, captured at 17:06:24 after the fourth-attempt capture at 17:04:47). After more than two minutes, attempt five was processed and required full-passphrase recovery (`25`); the correct Quick PIN remained blocked (`26`). A full-passphrase login restored the dashboard (`27`), and after sign-out the user confirmed that the correct Quick PIN opened the dashboard again (`28`). The screenshots do not expose either credential.
+
+Removal and re-enrollment pass, and the hands-on flow exposed **F14.6-03 — Access action success was outside the retained viewport**. After removal completed at the bottom of My account, the user had to scroll to the top to discover “Quick unlock was removed from this phone,” leaving the action without visible confirmation. `SecurityWorkspace` now reveals its accessible success notice after an Access mutation completes. The UI-only change does not alter authentication or account state. TypeScript validation, Vite production packaging, cleanup gates, and QA APK assembly pass. The fixed APK was installed with data preserved; the user signed in with the full passphrase, re-enrolled phone security plus Quick PIN, and confirmed the updated flow worked. `29-quick-unlock-reenrolled-after-feedback-fix.png` confirms both methods are active again. After a fresh sign-out, the user confirmed that the re-enrolled Quick PIN opened the dashboard; `30-quick-pin-login-after-reenrollment.png` records the resulting state. Immediate feedback behavior is established by the user's live confirmation.
+
 ## Remaining physical acceptance
 
-- Complete a controlled wrong-PIN delay/threshold sequence, other routine backup actions, removal/re-enrollment, and shared-account switching. Prompt cancellation, enrollment visibility after process restart, full-passphrase fallback, explicit Quick PIN login after the observed pause, explicit post-update fingerprint login, Quick PIN cloud inspection, and the strong-only final restore warning with safe Back cancellation pass. Post-reboot Quick PIN login passes by user report.
+- Complete other routine backup actions and shared-account switching. Prompt cancellation, enrollment visibility after process restart, full-passphrase fallback, the controlled wrong-PIN delay/threshold sequence, explicit Quick PIN login after reset, explicit post-update fingerprint login, Quick PIN cloud inspection, removal/re-enrollment, and the strong-only final restore warning with safe Back cancellation pass. Post-reboot Quick PIN login passes by user report.
 - Verify secure-lock/biometric-change invalidation and that a cleared or second QA phone cannot use the Quick PIN to open a cloud recovery point.
 - Check the new states with TalkBack and increased text. These extended checks remain part of the Phase 14.6 acceptance boundary and may be completed alongside the Phase 14.7 defect/regression pass.
 

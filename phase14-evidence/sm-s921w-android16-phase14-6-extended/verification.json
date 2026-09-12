@@ -39,7 +39,7 @@
       "errors": 0
     }
   ],
-  "appApkSha256": "504445744C469EDCB22FAE86B157A9038FEBDBB056DC05B09170B8CDB8A99A4F",
+  "appApkSha256": "2CD17B2276898399C70DC3B9EE5A9D649AD3541248AE23116AA7AB8D4F516531",
   "testApkSha256": "AC9160C2876D52CE1EE33F28E2D9945388F699186BA16E09E27B13F91A869A7D",
   "logicSha256": "45E5BDDABE8861A1B3DF7C5666AC7673078439A89FA5628061AD293A865F9DEA",
   "sqlSha256": "FB701C90D2DD97A1E6D962154692C48EA0F4E77E9300F9DFAC653D4AB67BBC51",
@@ -54,7 +54,10 @@
     "finalRestoreWarningBackCancellation": "pass: Android Back closes warning and retains inspection result in 18-final-restore-cancelled.png",
     "initialRestoreWarningTap": "unexplained page-top jump in 16-final-restore-approval.png; subsequent observed button tap opened warning correctly; not a reproduced defect",
     "deviceReboot": "pass: user confirmed Quick PIN login after reboot; after USB reconnection, 19-post-reboot-usb-dashboard.png independently captures the test / Owner dashboard; authentication method established by user report",
-    "observedQuickUnlockPause": "Full-passphrase fallback followed by explicit successful Quick PIN login: pause reset passes; controlled failure threshold sequence remains pending",
+    "controlledPinFailureThreshold": "pass: attempts 1-2 generic failure; attempt 3 first pause; attempt 4 after more than 30 seconds longer pause; correct PIN refused within that window; attempt 5 after more than two minutes required full passphrase; correct PIN remained blocked; full-passphrase login reset state and correct Quick PIN then opened dashboard; evidence 20-28",
+    "quickUnlockRemovalAndReenrollment": "pass: removal confirmed by user; full-passphrase sign-in followed by phone-security plus Quick PIN re-enrollment; both methods active in evidence 29; fresh sign-out and Quick PIN login confirmed by user with resulting dashboard in evidence 30",
+    "accessActionFeedback": "pass after F14.6-03 UI fix: initial removal success was above the retained viewport; SecurityWorkspace now reveals its success notice after completion; user confirmed the updated re-enrollment flow worked",
+    "observedQuickUnlockPause": "pass: controlled five-failure sequence and full-passphrase reset completed",
     "fullPassphraseFallback": "pass: user confirmed full-passphrase sign-in after pause; screenshot shows test / Owner dashboard"
   }
 }

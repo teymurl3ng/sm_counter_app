@@ -60,7 +60,8 @@ Product scope: Saaf Milk is the current working product identity, and Milk/Yogur
 - `PHASE14_8.md` — active native UI redesign/migration plan, protected architecture, incremental coexistence strategy, checkpoints, and retirement gate.
 - `PHASE14_8_1_NATIVE_MIGRATION_INVENTORY.md` — complete source-derived map of authentication states, fourteen application areas, 91 bridge actions, native owners, parity gates, and fallback boundaries.
 - `PHASE14_8_2_JOURNEY_DIRECTIONS.md` — current UI audit, external pattern evidence, three native information-architecture directions, and the recommended `Today / Work / Records / More` structure.
-- `PHASE14_8_2_ROLE_CALIBRATION.md` — revised five-role native shell proposal: data-driven owner experience and work-driven admin, manager, cashier, and operator experiences.
+- `PHASE14_8_2_ROLE_CALIBRATION.md` — earlier five-role shell comparison, now superseded for review until the role policy is accepted.
+- `PHASE14_8_2_ROLE_ARCHITECTURE_RESEARCH.md` — researched role definitions, necessity decision, complete screen/action access policy, current permission gaps, and the future scoped-permission model.
 
 ## Immutable baselines
 
@@ -72,7 +73,7 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 14.8 — Native UI Redesign and Migration: ACTIVE (role-calibrated 14.8.2 direction under review)**
+**Phase 14.8 — Native UI Redesign and Migration: ACTIVE (role architecture and access policy under review)**
 
 Phase 14 completed the safe `.qa` device baseline, all-five-role authorization matrix, live Drive and real cross-device recovery, Android/accessibility audit, device-bound Quick unlock, defect closure, and complete regression. The final result remains 273/273 ordinary Android tests, the 1/1 visual audit, and 7/7 host tests. The owner then rejected the hybrid interface as the release UX and confirmed native UI as the intended destination. Phase 14.8 redesigns and incrementally migrates the presentation to Compose while retaining the working hybrid build as a behavioral oracle and fallback. Phase 15 will test the native release candidate without coaching.
 
@@ -84,7 +85,7 @@ The application remains offline-first and each writable installation owns one Ro
 
 - Application users are security principals and are distinct from employee/salary profiles. A user may optionally link to one employee, but an employee record does not grant application access.
 - Authentication and authorization must be native-backed. React may present login and permission-aware controls, but it must never decide or self-assert a user's role.
-- The approved model defines native users, Argon2id credentials, fixed role/permission bundles, memory-only sessions, first-owner bootstrap, deactivation, owner recovery, audit actors, and migration behavior.
+- The implemented security baseline defines native users, Argon2id credentials, fixed role/permission bundles, memory-only sessions, first-owner bootstrap, deactivation, owner recovery, audit actors, and migration behavior. Phase 14.8 is reviewing a finer permission model before native screen implementation; any accepted change must preserve native deny-by-default enforcement and migration safety.
 - Once any application user exists, daily close/reopen rejects typed actor claims and requires a verified native session/user ID. Schema-6 history remains explicitly legacy/unverified.
 - Portable encrypted backup format 2 is implemented with Argon2id-derived AES-256-GCM protection, security-state portability, tamper/wrong-passphrase rejection, legacy format-1 import compatibility, and post-restore session invalidation. Its authenticated export/inspection/restore UI is wired through Android-owned document pickers and short-lived one-use restore tickets. The earlier numeric quick-PIN deferral is now superseded for forward work: native device-bound Quick unlock is mandatory in Phase 14.6, while portable cloud recovery remains protected by a high-entropy secret.
 - Staff accounts use private enrollment/reset: an authorized owner/admin creates the identity and role, while the staff member chooses the credential. A user marked as requiring setup cannot authenticate with any previous verifier.

@@ -1,8 +1,10 @@
 # Phase 14.8.2 — Role-calibrated native experience proposal
 
-Status: **REVIEW PENDING — owner direction incorporated; role shells shown before implementation**
+Status: **SUPERSEDED FOR REVIEW BY THE ROLE-ARCHITECTURE RESEARCH — shell design will be revised after role policy is accepted**
 
 Date: 2026-09-12
+
+The visual shell proposal in this file was useful for proving that roles need different experiences, but it assumed the existing five permission bundles were already the correct product roles. `PHASE14_8_2_ROLE_ARCHITECTURE_RESEARCH.md` now reopens that assumption, defines the jobs, identifies over-broad permissions, and controls the next review checkpoint.
 
 ## Governing principle
 

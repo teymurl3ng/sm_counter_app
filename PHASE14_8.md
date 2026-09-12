@@ -1,6 +1,6 @@
 # Phase 14.8 — Native UI redesign and migration
 
-Status: **ACTIVE — checkpoint 14.8.1 complete; role-calibrated 14.8.2 direction under review**
+Status: **ACTIVE — checkpoint 14.8.1 complete; role architecture and access policy under review before further screen design**
 
 Date started: 2026-09-12
 
@@ -93,7 +93,7 @@ See `PHASE14_8_1_NATIVE_MIGRATION_INVENTORY.md`.
 
 Checkpoint output: an approved native information architecture, complete representative journeys, and a design specification that can be implemented directly in Compose.
 
-The current audit first compared three universal structures. Owner review established a stronger requirement: each role needs its own calibrated default, menu, density, action order, and feedback while preserving shared concepts and native permission truth. See `PHASE14_8_2_JOURNEY_DIRECTIONS.md` and `PHASE14_8_2_ROLE_CALIBRATION.md`. Detailed journeys and production Compose work wait for review of the five role shells.
+The current audit first compared three universal structures. Owner review established a stronger requirement: each role needs its own calibrated default, menu, density, action order, and feedback while preserving shared concepts and native permission truth. The next review then reopened whether the five existing bundles describe the right jobs. `PHASE14_8_2_ROLE_ARCHITECTURE_RESEARCH.md` now defines the proposed Owner, Administrator, Store manager, Cashier, and Operations-staff meanings; maps every screen/action; and identifies permission bundles that must be split or scoped. Detailed journeys and production Compose work wait for acceptance of that role policy.
 
 ### 14.8.3 — Compose foundation
 
@@ -137,4 +137,4 @@ This baseline is a comparison point, not a visual target.
 
 ## Current next gate
 
-Checkpoint 14.8.2 starts with journey evidence and information architecture. Production Compose screens do not begin until the representative journeys and direction are coherent enough to avoid rebuilding the same confusion in native code.
+Checkpoint 14.8.2 is currently at role-policy review. Production Compose screens do not begin until the role definitions, screen/action boundaries, and representative journeys are coherent enough to avoid rebuilding the same confusion in native code.

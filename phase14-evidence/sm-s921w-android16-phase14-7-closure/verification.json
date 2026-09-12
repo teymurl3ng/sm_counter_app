@@ -24,8 +24,8 @@
     "oauthConfigured": true,
     "bytes": 16174564,
     "sha256": "5581218C0761ED3C33CA9D09877D19E4D2654B5B6DF5AC2790C80B364F223A24",
-    "install": "pass as data-preserving update on S24 and A06",
-    "launch": "pass on A06 during corrected Quick unlock acceptance",
+    "install": "pass as data-preserving S24 update; installed SHA-256 matches the final artifact",
+    "a06AcceptanceBuild": "preceding core-fix build passed method-choice, capability-label, PIN-only login, and Phone-security-only login checks; final post-removal checkbox reset is covered by the S24 regression",
     "originalClosureState": "clean first-owner setup",
     "oauthCorrectionInstalledWithDataPreserved": true,
     "liveDriveAuthorizationAfterCorrection": "pass"

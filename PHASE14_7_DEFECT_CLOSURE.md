@@ -45,7 +45,7 @@ Instrumentation now has its own `.qa.tests` application identity. Gradle may ins
 - APK: `phase18/app/build/outputs/apk/debug/app-debug.apk`
 - Size: 16,174,564 bytes
 - SHA-256: `5581218C0761ED3C33CA9D09877D19E4D2654B5B6DF5AC2790C80B364F223A24`
-- Install/launch: pass as a data-preserving update on the S24 and A06; the corrected Quick unlock flow was exercised on the A06.
+- Install/launch: the final artifact was installed as a data-preserving S24 update and its installed hash was verified byte-for-byte. The corrected method choice, capability label, and both single-method login paths were exercised on the A06 using the immediately preceding core-fix build; the final post-removal checkbox reset is covered by the 273/273 S24 regression.
 - Final screen: clean first-owner setup, recorded as `phase14-evidence/sm-s921w-android16-phase14-7-closure/01-final-qa-first-owner.png`.
 
 The earlier connected-test route installed over and then removed the disposable `.qa` target before the dedicated test identity existed. That clean first-owner state is preserved in the evidence, but subsequent acceptance intentionally created QA data and restored the S24 recovery point on the A06. Later connected tests use `.qa.tests` and did not clear either user-facing `.qa` database. Remote encrypted Drive recovery points were not removed. The ordinary `com.saaf.milkshop` identity was not targeted.

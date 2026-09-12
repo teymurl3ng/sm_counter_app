@@ -1,6 +1,6 @@
 # Phase 14.8 — Native UI redesign and migration
 
-Status: **ACTIVE — checkpoint 14.8.1 complete; checkpoint 14.8.2 direction decision pending**
+Status: **ACTIVE — checkpoint 14.8.1 complete; role-calibrated 14.8.2 direction under review**
 
 Date started: 2026-09-12
 
@@ -93,7 +93,7 @@ See `PHASE14_8_1_NATIVE_MIGRATION_INVENTORY.md`.
 
 Checkpoint output: an approved native information architecture, complete representative journeys, and a design specification that can be implemented directly in Compose.
 
-The current audit compares three structures and recommends stable `Today / Work / Records / More` navigation. See `PHASE14_8_2_JOURNEY_DIRECTIONS.md`. Detailed journeys and production Compose work wait for the direction decision.
+The current audit first compared three universal structures. Owner review established a stronger requirement: each role needs its own calibrated default, menu, density, action order, and feedback while preserving shared concepts and native permission truth. See `PHASE14_8_2_JOURNEY_DIRECTIONS.md` and `PHASE14_8_2_ROLE_CALIBRATION.md`. Detailed journeys and production Compose work wait for review of the five role shells.
 
 ### 14.8.3 — Compose foundation
 

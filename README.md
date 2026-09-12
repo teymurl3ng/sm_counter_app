@@ -60,6 +60,7 @@ Product scope: Saaf Milk is the current working product identity, and Milk/Yogur
 - `PHASE14_8.md` — active native UI redesign/migration plan, protected architecture, incremental coexistence strategy, checkpoints, and retirement gate.
 - `PHASE14_8_1_NATIVE_MIGRATION_INVENTORY.md` — complete source-derived map of authentication states, fourteen application areas, 91 bridge actions, native owners, parity gates, and fallback boundaries.
 - `PHASE14_8_2_JOURNEY_DIRECTIONS.md` — current UI audit, external pattern evidence, three native information-architecture directions, and the recommended `Today / Work / Records / More` structure.
+- `PHASE14_8_2_ROLE_CALIBRATION.md` — revised five-role native shell proposal: data-driven owner experience and work-driven admin, manager, cashier, and operator experiences.
 
 ## Immutable baselines
 
@@ -71,7 +72,7 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 14.8 — Native UI Redesign and Migration: ACTIVE (14.8.2 direction decision pending)**
+**Phase 14.8 — Native UI Redesign and Migration: ACTIVE (role-calibrated 14.8.2 direction under review)**
 
 Phase 14 completed the safe `.qa` device baseline, all-five-role authorization matrix, live Drive and real cross-device recovery, Android/accessibility audit, device-bound Quick unlock, defect closure, and complete regression. The final result remains 273/273 ordinary Android tests, the 1/1 visual audit, and 7/7 host tests. The owner then rejected the hybrid interface as the release UX and confirmed native UI as the intended destination. Phase 14.8 redesigns and incrementally migrates the presentation to Compose while retaining the working hybrid build as a behavioral oracle and fallback. Phase 15 will test the native release candidate without coaching.
 

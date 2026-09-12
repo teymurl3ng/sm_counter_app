@@ -1,6 +1,6 @@
 # Phase 14.8.2 — Native journey audit and directions
 
-Status: **DIRECTION DECISION PENDING — Direction A recommended**
+Status: **REVISED FOR REVIEW — Direction A becomes role-calibrated rather than universal**
 
 Date: 2026-09-12
 
@@ -221,4 +221,4 @@ Many real actions cross domains. A credit sale changes stock, customer debt, rev
 
 ## Direction decision
 
-Approve Direction A to make `Today / Work / Records / More` the stable native structure. Approval authorizes detailed journey wireframes and the Compose foundation; it does not authorize changing business rules, database schema, security behavior, backup formats, or cloud scope.
+The owner required different layouts and priorities for each authenticated role. The useful separation in Direction A remains, but `Today / Work / Records / More` is no longer imposed on every account. The role-calibrated proposal in `PHASE14_8_2_ROLE_CALIBRATION.md` now controls the decision: owner is data-driven; admin, manager, cashier, and operator are work-driven with distinct defaults and menus.

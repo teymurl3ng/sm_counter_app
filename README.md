@@ -63,7 +63,8 @@ Product scope: Saaf Milk is the current working product identity, and Milk/Yogur
 - `PHASE14_8_2_ROLE_CALIBRATION.md` — earlier five-role shell comparison, now superseded for review until the role policy is accepted.
 - `PHASE14_8_2_ROLE_ARCHITECTURE_RESEARCH.md` — researched role definitions, necessity decision, complete screen/action access policy, current permission gaps, and the future scoped-permission model.
 - `PHASE14_8_2_CASHIER_VISUAL_DIRECTIONS.md` — three high-fidelity Cashier worlds and the recorded Counter Ledger selection.
-- `PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md` — selected visual contract plus the complete Cashier and Operations screen/state proposal and review gate.
+- `PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md` — accepted Counter Ledger Cashier and Operations implementation blueprint.
+- `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md` — Owner, Store manager, and Administrator screen/state blueprint and final five-role design gate.
 
 ## Immutable baselines
 
@@ -75,7 +76,7 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 14.8 — Native UI Redesign and Migration: ACTIVE (Counter Ledger selected; complete Cashier and Operations proposal under review)**
+**Phase 14.8 — Native UI Redesign and Migration: ACTIVE (Counter Ledger worker blueprint accepted; leadership roles under review)**
 
 Phase 14 completed the safe `.qa` device baseline, all-five-role authorization matrix, live Drive and real cross-device recovery, Android/accessibility audit, device-bound Quick unlock, defect closure, and complete regression. The final result remains 273/273 ordinary Android tests, the 1/1 visual audit, and 7/7 host tests. The owner then rejected the hybrid interface as the release UX and confirmed native UI as the intended destination. Phase 14.8 redesigns and incrementally migrates the presentation to Compose while retaining the working hybrid build as a behavioral oracle and fallback. Phase 15 will test the native release candidate without coaching.
 
@@ -143,7 +144,7 @@ Phase 13 — Dead/Mock/Misleading UI Cleanup ✅ (all five checkpoints complete;
 
 Phase 14 — Final Device QA ✅ (all seven checkpoints complete; 273/273 ordinary Android tests, 1/1 visual audit, 7/7 host tests)
 
-Phase 14.8 — Native UI Redesign and Migration 🚧 (14.8.1 inventory complete; role policy accepted; Counter Ledger selected; complete Cashier and Operations material-state proposal ready for review)
+Phase 14.8 — Native UI Redesign and Migration 🚧 (14.8.1 inventory complete; role policy accepted; Counter Ledger Cashier/Operations blueprint accepted; Owner/Manager/Administrator blueprint ready for review)
 
 Phase 15 — Final Shopkeeper QA ⏳ (starts after the native migration/regression gate; includes uncoached Quick unlock enrollment/use/recovery and periodic backup/recovery)
 
@@ -222,4 +223,4 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 
 ## Next gate
 
-Review the complete Counter Ledger Cashier and Operations proposal in `PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md`. If accepted, continue Phase 14.8.2 by designing Owner, Store manager, and Administrator in the same visual system. Compose foundation and production screen work remain behind the complete five-role visual-proposal gate. Phase 15 then runs uncoached shopkeeper QA on the native release candidate. Ordinary Saaf installations/profiles must remain untouched. See `PHASE14_8.md`, `PHASE14_8_2_CASHIER_VISUAL_DIRECTIONS.md`, `PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Review the Counter Ledger Owner, Store manager, and Administrator blueprint in `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md`. Acceptance closes the five-role visual-proposal gate and allows Phase 14.8.3 to establish the Compose foundation and first native vertical slice. Phase 15 then runs uncoached shopkeeper QA on the native release candidate. Ordinary Saaf installations/profiles must remain untouched. See `PHASE14_8.md`, `PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md`, `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.

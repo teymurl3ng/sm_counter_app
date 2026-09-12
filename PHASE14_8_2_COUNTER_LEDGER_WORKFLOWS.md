@@ -1,6 +1,6 @@
 # Phase 14.8.2 — Counter Ledger worker workflows
 
-Status: **VISUAL DIRECTION SELECTED — complete Cashier and Operations proposal awaiting owner review; no Compose implementation authorized**
+Status: **ACCEPTED AS AN IMPLEMENTATION BLUEPRINT — minor native polish deferred; no Compose implementation authorized yet**
 
 Date: 2026-09-12
 
@@ -83,3 +83,9 @@ The owner should now review whether Counter Ledger remains clear across the full
 7. comfortable density at Android large-text settings.
 
 Acceptance of this checkpoint authorizes design work for Owner, Store manager, and Administrator in the same visual system. Compose foundation work remains behind the complete five-role visual-proposal gate.
+
+## Acceptance record
+
+The owner accepted this worker-role proposal as a sufficient blueprint on 2026-09-13. Small adjustments may be made during native implementation and device review without reopening the visual direction, provided they preserve the role boundaries, field order, immediate result feedback, stable navigation, and Counter Ledger contract above.
+
+The active design checkpoint moves to `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md` for Owner, Store manager, and Administrator.

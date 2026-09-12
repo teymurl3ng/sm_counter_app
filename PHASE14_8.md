@@ -1,6 +1,6 @@
 # Phase 14.8 — Native UI redesign and migration
 
-Status: **ACTIVE — Counter Ledger selected; complete Cashier and Operations visual proposal awaiting review**
+Status: **ACTIVE — Counter Ledger worker blueprint accepted; Owner, Store manager, and Administrator blueprint awaiting review**
 
 Date started: 2026-09-12
 
@@ -139,4 +139,4 @@ This baseline is a comparison point, not a visual target.
 
 ## Current next gate
 
-Checkpoint 14.8.2 is now at the complete worker-role visual review. The owner selected Counter Ledger from `PHASE14_8_2_CASHIER_VISUAL_DIRECTIONS.md`; `PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md` carries it across every proposed Cashier and Operations screen and material state. The next decision is whether that system scales cleanly across rapid counter and physical work. If accepted, design proceeds to Owner, Store manager, and Administrator. Production Compose implementation still waits behind the complete five-role visual-proposal gate.
+Checkpoint 14.8.2 is now at the leadership-role visual review. The owner selected Counter Ledger and accepted `PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md` as the Cashier and Operations implementation blueprint, with minor native polish deferred. `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md` now applies the same system to Owner, Store manager, and Administrator. Acceptance of those three role experiences closes the complete five-role visual-proposal gate. Production Compose implementation still waits behind that decision.

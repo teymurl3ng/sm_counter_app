@@ -1,8 +1,12 @@
 # Phase 14.8.2 — Cashier native visual directions
 
-Status: **HIGH-FIDELITY PROPOSAL FOR OWNER CHOICE — no Compose implementation authorized**
+Status: **DIRECTION SELECTED — Counter Ledger accepted; complete worker-role application awaiting review; no Compose implementation authorized**
 
 Date: 2026-09-12
+
+## Owner selection
+
+The owner selected **Counter Ledger**. `PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md` carries that visual system across the complete Cashier and Operations proposal and records the next review gate. Fresh Utility and Market Book remain unselected alternatives rather than parallel implementation targets.
 
 ## Why this replaces the first preview
 
@@ -123,9 +127,9 @@ Brick red is culturally easy to read as warning or destructive. It would require
 
 The prototype uses one restrained 200 ms fade/vertical settle when its state changes and a 240 ms success-symbol settle. These timings are **design judgment**, not benchmark measurement or device proof. The eventual Compose implementation should use standard Material shared-axis/fade-through behavior where it preserves continuity, disable nonessential translation under Android's Remove animations setting, and prove interruption and performance on the physical Samsung targets.
 
-## Review gate
+## Selection outcome and next gate
 
-The owner is choosing the reusable visual world, not approving the final Cashier journey or Compose code yet. The review should answer:
+Counter Ledger is the reusable visual world. The selection established hierarchy, density, character, and action treatment; it did not approve the complete Cashier and Operations journey or Compose code. The full worker-role review should answer:
 
 - Which direction feels trustworthy and pleasant enough for all-day use?
 - Is the selected product unmistakable?
@@ -134,4 +138,4 @@ The owner is choosing the reusable visual world, not approving the final Cashier
 - Does the success state feel conclusive without becoming celebratory or slow?
 - Can the chosen world become both simpler for workers and denser for Owner/Manager screens?
 
-After one direction is selected, apply that world to the complete Cashier and Operations material-state journeys. Only then ask for the visual-proposal approval that unlocks the later Owner/Manager/Administrator design work. Compose remains behind the complete five-role design gate.
+`PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md` now applies Counter Ledger to the complete Cashier and Operations material-state journeys. Owner approval of that application unlocks the later Owner, Store manager, and Administrator design work. Compose remains behind the complete five-role design gate.

@@ -1,0 +1,269 @@
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stream=
+com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest:
+INSTRUMENTATION_STATUS: test=deviceAuthenticationIsStrongButPinCannotApproveDestructiveWork
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=deviceAuthenticationIsStrongButPinCannotApproveDestructiveWork
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=overlappingLoginAndReauthenticationAttemptsShareThePinLimit
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Only the first two failures may proceed without a delay expected:<2> but was:<8>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest$overlappingLoginAndReauthenticationAttemptsShareThePinLimit$1.invokeSuspend(Phase14QuickUnlockTest.kt:174)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest.overlappingLoginAndReauthenticationAttemptsShareThePinLimit(Phase14QuickUnlockTest.kt:156)
+
+INSTRUMENTATION_STATUS: stream=
+Error in overlappingLoginAndReauthenticationAttemptsShareThePinLimit(com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest):
+java.lang.AssertionError: Only the first two failures may proceed without a delay expected:<2> but was:<8>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest$overlappingLoginAndReauthenticationAttemptsShareThePinLimit$1.invokeSuspend(Phase14QuickUnlockTest.kt:174)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest.overlappingLoginAndReauthenticationAttemptsShareThePinLimit(Phase14QuickUnlockTest.kt:156)
+
+INSTRUMENTATION_STATUS: test=overlappingLoginAndReauthenticationAttemptsShareThePinLimit
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=credentialChangeRestoreAndPhoneSecurityChangeInvalidateEnrollment
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=credentialChangeRestoreAndPhoneSecurityChangeInvalidateEnrollment
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=removalWhilePhonePromptIsOpenCannotReauthenticate
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Expected Invalidated, got null
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest$removalWhilePhonePromptIsOpenCannotReauthenticate$1.invokeSuspend(Phase14QuickUnlockTest.kt:312)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest.removalWhilePhonePromptIsOpenCannotReauthenticate(Phase14QuickUnlockTest.kt:197)
+
+INSTRUMENTATION_STATUS: stream=
+Error in removalWhilePhonePromptIsOpenCannotReauthenticate(com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest):
+java.lang.AssertionError: Expected Invalidated, got null
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest$removalWhilePhonePromptIsOpenCannotReauthenticate$1.invokeSuspend(Phase14QuickUnlockTest.kt:312)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest.removalWhilePhonePromptIsOpenCannotReauthenticate(Phase14QuickUnlockTest.kt:197)
+
+INSTRUMENTATION_STATUS: test=removalWhilePhonePromptIsOpenCannotReauthenticate
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=pinFailuresDelayThenRequireAFullPassphraseToReset
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=pinFailuresDelayThenRequireAFullPassphraseToReset
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=bridgePreservesQuickUnlockFailureMeanings
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=bridgePreservesQuickUnlockFailureMeanings
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=androidEncryptedRecordStoreRoundTripsOnThisPhone
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=androidEncryptedRecordStoreRoundTripsOnThisPhone
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=pinEnrollmentSurvivesServiceRecreationButNotASeparatePhone
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=pinEnrollmentSurvivesServiceRecreationButNotASeparatePhone
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=passphraseChangeWhilePhonePromptIsOpenCannotGrantANewSession
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=9
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Expected Invalidated, got null
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest$passphraseChangeWhilePhonePromptIsOpenCannotGrantANewSession$1.invokeSuspend(Phase14QuickUnlockTest.kt:312)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest.passphraseChangeWhilePhonePromptIsOpenCannotGrantANewSession(Phase14QuickUnlockTest.kt:184)
+
+INSTRUMENTATION_STATUS: stream=
+Error in passphraseChangeWhilePhonePromptIsOpenCannotGrantANewSession(com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest):
+java.lang.AssertionError: Expected Invalidated, got null
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest$passphraseChangeWhilePhonePromptIsOpenCannotGrantANewSession$1.invokeSuspend(Phase14QuickUnlockTest.kt:312)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest.passphraseChangeWhilePhonePromptIsOpenCannotGrantANewSession(Phase14QuickUnlockTest.kt:184)
+
+INSTRUMENTATION_STATUS: test=passphraseChangeWhilePhonePromptIsOpenCannotGrantANewSession
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 9.78
+There were 3 failures:
+1) overlappingLoginAndReauthenticationAttemptsShareThePinLimit(com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest)
+java.lang.AssertionError: Only the first two failures may proceed without a delay expected:<2> but was:<8>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest$overlappingLoginAndReauthenticationAttemptsShareThePinLimit$1.invokeSuspend(Phase14QuickUnlockTest.kt:174)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest.overlappingLoginAndReauthenticationAttemptsShareThePinLimit(Phase14QuickUnlockTest.kt:156)
+2) removalWhilePhonePromptIsOpenCannotReauthenticate(com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest)
+java.lang.AssertionError: Expected Invalidated, got null
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest$removalWhilePhonePromptIsOpenCannotReauthenticate$1.invokeSuspend(Phase14QuickUnlockTest.kt:312)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest.removalWhilePhonePromptIsOpenCannotReauthenticate(Phase14QuickUnlockTest.kt:197)
+3) passphraseChangeWhilePhonePromptIsOpenCannotGrantANewSession(com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest)
+java.lang.AssertionError: Expected Invalidated, got null
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest$passphraseChangeWhilePhonePromptIsOpenCannotGrantANewSession$1.invokeSuspend(Phase14QuickUnlockTest.kt:312)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-4e063c231d927790c66f8a0840df93804a214a03:1)
+	at com.saaf.milkshop.quickunlock.Phase14QuickUnlockTest.passphraseChangeWhilePhonePromptIsOpenCannotGrantANewSession(Phase14QuickUnlockTest.kt:184)
+
+FAILURES!!!
+Tests run: 9,  Failures: 3
+
+
+INSTRUMENTATION_CODE: -1

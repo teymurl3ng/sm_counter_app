@@ -1,0 +1,56 @@
+{
+  "date": "2026-09-12",
+  "device": "Samsung SM-S921W",
+  "androidVersion": "16",
+  "transport": "wireless ADB",
+  "package": "com.saaf.milkshop.qa",
+  "display": {
+    "width": 1080,
+    "height": 2340,
+    "density": 480,
+    "fontScale": 1.0
+  },
+  "before": {
+    "passed": 6,
+    "failed": 3
+  },
+  "after": {
+    "passed": 26,
+    "failed": 0,
+    "skipped": 0
+  },
+  "hostSuites": [
+    {
+      "suite": "com.saaf.milkshop.presentation.SettingsAndBackupViewModelTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "com.saaf.milkshop.presentation.transactions.PurchaseViewModelTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "com.saaf.milkshop.presentation.ViewModelStateTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "appApkSha256": "504445744C469EDCB22FAE86B157A9038FEBDBB056DC05B09170B8CDB8A99A4F",
+  "testApkSha256": "AC9160C2876D52CE1EE33F28E2D9945388F699186BA16E09E27B13F91A869A7D",
+  "logicSha256": "45E5BDDABE8861A1B3DF7C5666AC7673078439A89FA5628061AD293A865F9DEA",
+  "sqlSha256": "FB701C90D2DD97A1E6D962154692C48EA0F4E77E9300F9DFAC653D4AB67BBC51",
+  "remainingPhysicalAcceptance": true,
+  "physicalChecks": {
+    "phonePromptCancellation": "pass: observed",
+    "enrollmentAfterProcessRestart": "pass: observed",
+    "quickPinAfterUpdateAndColdLaunch": "pass after full-passphrase fallback: user explicitly confirmed Saaf Quick PIN login; initial cold-launch method was ambiguous",
+    "fingerprintAfterUpdate": "pending",
+    "deviceReboot": "pending",
+    "observedQuickUnlockPause": "Full-passphrase fallback followed by explicit successful Quick PIN login: pause reset passes; controlled failure threshold sequence remains pending",
+    "fullPassphraseFallback": "pass: user confirmed full-passphrase sign-in after pause; screenshot shows test / Owner dashboard"
+  }
+}

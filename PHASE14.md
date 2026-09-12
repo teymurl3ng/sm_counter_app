@@ -92,7 +92,9 @@ Implementation completed on 2026-09-09. The native device/Keystore boundary, per
 
 ## Current next action
 
-Complete the remaining Quick unlock misuse, recovery, lifecycle, and accessibility checks in `PHASE14_6_QUICK_UNLOCK_QA.md`. Then close the eleven earlier live defects—five from cloud/recovery and six from the Android audit—and run the expanded 266-test regression in 14.7.
+The 2026-09-12 extended audit fixed F14.6-01 (overlapping PIN attempts weakening lockout) and F14.6-02 (pending phone authentication surviving enrollment/security invalidation). The updated S24 QA app passes 9/9 Quick unlock tests, 26/26 related device tests, and 7/7 host tests. Cancellation and enrollment visibility after process restart are verified; the remaining hands-on checks are listed in `PHASE14_6_QUICK_UNLOCK_QA.md`.
+
+Complete those Quick unlock misuse, recovery, lifecycle, and accessibility checks. Then close the eleven earlier live defects—five from cloud/recovery and six from the Android audit—and run the expanded 269-test regression in 14.7.
 
 ## Plain English
 

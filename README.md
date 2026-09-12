@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-09 — hybrid Phases 0–13 and Phase 14.1–14.5 are complete; Phase 14.6 mandatory Quick unlock passes focused S24 automation and setup/login smoke testing, with extended acceptance remaining. Contract v5 exposes 91 native-backed operations. The unreachable 23-file, 8,370-line browser-local prototype and six unused dependencies are removed; the 88-file production graph and its live controls/messages have been audited, and automatic web/Android build gates prevent the removed behavior from returning.
+Status: RECONCILED 2026-09-12 — hybrid Phases 0–13 and Phase 14.1–14.5 are complete; Phase 14.6 mandatory Quick unlock passes 9/9 focused tests and 26/26 related S24 checks after two verified security-race fixes, with hands-on acceptance remaining. Contract v5 exposes 91 native-backed operations. The unreachable 23-file, 8,370-line browser-local prototype and six unused dependencies are removed; the 88-file production graph and its live controls/messages have been audited, and automatic web/Android build gates prevent the removed behavior from returning.
 
 Latest complete full physical-device regression: Phase 13.5 passes 258/258 on Samsung SM-A065F / Android 16 across the authenticated 257-test and clean-identity 1-test visual partitions, with zero skips or failures. The final visual audit reproduces 83 readable screenshots / 58 states at 720 × 1600, and host-side tests pass 7/7. Later Phase 14 checkpoints add focused live acceptance evidence rather than repeating that entire suite before 14.7.
 

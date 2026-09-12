@@ -216,16 +216,19 @@ class QuickUnlockService internal constructor(
             invalidateUser(record.userId)
             throw QuickUnlockFailure.Invalidated()
         }
-        val strong = try {
-            when (method) {
+        val session = try {
+            val strong = when (method) {
                 QuickUnlockMethod.DEVICE -> authenticateDevice(record, identity)
                 QuickUnlockMethod.PIN -> authenticatePin(record, pin)
+            }
+            mutex.withLock {
+                requireCurrentEnrollment(record)
+                security.sessionManager().start(identity.user.userId, strongAuthentication = strong)
             }
         } catch (error: Throwable) {
             auditFailure(identity.user, ACTION_LOGIN, method, error)
             throw error
         }
-        val session = security.sessionManager().start(identity.user.userId, strongAuthentication = strong)
         audit(identity.user, ACTION_LOGIN, RESULT_SUCCESS, "method=${method.wireValue}")
         return session
     }
@@ -236,15 +239,19 @@ class QuickUnlockService internal constructor(
             validatedRecords().singleOrNull { it.userId == identity.user.userId }
         } ?: throw QuickUnlockFailure.Invalidated()
         val strong = try {
-            when (method) {
+            val authenticatedStrongly = when (method) {
                 QuickUnlockMethod.DEVICE -> authenticateDevice(record, identity)
                 QuickUnlockMethod.PIN -> authenticatePin(record, pin)
             }
+            mutex.withLock {
+                requireCurrentEnrollment(record)
+                security.sessionManager().markQuickAuthentication(sessionId, strongAuthentication = authenticatedStrongly)
+            }
+            authenticatedStrongly
         } catch (error: Throwable) {
             auditFailure(identity.user, ACTION_REAUTHENTICATE, method, error)
             throw error
         }
-        security.sessionManager().markQuickAuthentication(sessionId, strongAuthentication = strong)
         audit(identity.user, ACTION_REAUTHENTICATE, RESULT_SUCCESS, "method=${method.wireValue};strong=$strong")
     }
 
@@ -306,7 +313,9 @@ class QuickUnlockService internal constructor(
         }
     }
 
-    private suspend fun authenticatePin(record: QuickUnlockRecord, pin: CharArray?): Boolean {
+    private suspend fun authenticatePin(expectedRecord: QuickUnlockRecord, pin: CharArray?): Boolean = mutex.withLock {
+        // Login and reauthentication share one atomic check/update of the latest attempt state.
+        val record = requireCurrentEnrollment(expectedRecord)
         val entered = pin ?: throw SecurityFailure.Validation("Enter your Quick PIN")
         pinHasher.validate(entered)
         if (record.pinVerifierBase64 == null || record.pinSaltBase64 == null) {
@@ -332,30 +341,41 @@ class QuickUnlockService internal constructor(
                 4 -> 2 * 60_000L
                 else -> null
             }
-            mutex.withLock {
-                val records = validatedRecords()
-                store.write(records.map {
-                    if (it.userId == record.userId) it.copy(
-                        pinFailedAttemptCount = count,
-                        pinLockedUntilEpochMs = delay?.let { duration -> now + duration },
-                        pinRequiresFullPassphrase = blocked,
-                    ) else it
-                })
-            }
-            if (blocked || delay != null) throw QuickUnlockFailure.RateLimited()
-            throw QuickUnlockFailure.Authentication()
-        }
-        mutex.withLock {
             val records = validatedRecords()
             store.write(records.map {
                 if (it.userId == record.userId) it.copy(
-                    pinFailedAttemptCount = 0,
-                    pinLockedUntilEpochMs = null,
-                    pinRequiresFullPassphrase = false,
+                    pinFailedAttemptCount = count,
+                    pinLockedUntilEpochMs = delay?.let { duration -> now + duration },
+                    pinRequiresFullPassphrase = blocked,
                 ) else it
             })
+            if (blocked || delay != null) throw QuickUnlockFailure.RateLimited()
+            throw QuickUnlockFailure.Authentication()
         }
-        return false
+        val records = validatedRecords()
+        store.write(records.map {
+            if (it.userId == record.userId) it.copy(
+                pinFailedAttemptCount = 0,
+                pinLockedUntilEpochMs = null,
+                pinRequiresFullPassphrase = false,
+            ) else it
+        })
+        false
+    }
+
+    /** Called under [mutex], including after any interactive authentication has completed. */
+    private suspend fun requireCurrentEnrollment(expected: QuickUnlockRecord): QuickUnlockRecord {
+        val current = validatedRecords().singleOrNull { it.userId == expected.userId }
+            ?: throw QuickUnlockFailure.Invalidated()
+        if (current.copy(
+                pinFailedAttemptCount = expected.pinFailedAttemptCount,
+                pinLockedUntilEpochMs = expected.pinLockedUntilEpochMs,
+                pinRequiresFullPassphrase = expected.pinRequiresFullPassphrase,
+            ) != expected
+        ) {
+            throw QuickUnlockFailure.Invalidated()
+        }
+        return current
     }
 
     private suspend fun identityForSession(sessionId: String): Identity {

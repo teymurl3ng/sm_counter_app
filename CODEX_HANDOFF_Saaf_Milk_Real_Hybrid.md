@@ -14,7 +14,9 @@ This is not the earlier experimental hybrid project. The working source is the c
 
 Read those files before changing code.
 
-## Current superseding checkpoint — 2026-09-09
+## Current superseding checkpoint — 2026-09-12
+
+The S24 wireless-QA continuation reproduced and fixed two native Quick unlock races: overlapping PIN attempts weakened the shared delay, and an in-flight phone-security result could survive a passphrase change or enrollment removal. All 9 focused Quick unlock tests, the combined 26-test native security/cloud cryptography matrix, and 7 host tests pass. Cancellation and enrollment visibility after process restart pass; hands-on post-update authentication, recovery, and accessibility acceptance remains. The updated `.qa` APK preserves the existing data and OAuth configuration. See `PHASE14_6_QUICK_UNLOCK_QA.md` and its 2026-09-12 evidence. The complete Phase 14.7 inventory is now 269 tests; that full run is still pending.
 
 The authoritative current phase ledger is `ROADMAP_RECONCILIATION_2026-08-27.md`. Root Phases 3–13 and Phase 14.1–14.5 are complete; native device-bound Quick unlock passes focused S24 automation and setup/login smoke testing in Phase 14.6, extended acceptance remains, and final closure/regression is 14.7. Read `README.md`, `PHASE14.md`, `QUICK_UNLOCK_REQUIREMENT.md`, `PHASE14_6_QUICK_UNLOCK_QA.md`, `PHASE14_3_LIVE_DRIVE_PREFLIGHT.md`, `PHASE14_4_SECOND_DEVICE_RECOVERY.md`, `PHASE14_5_ACCESSIBILITY_ANDROID_QA.md`, and `PHASE13_5_HANDOFF.md` before changing source.
 

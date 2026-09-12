@@ -8,6 +8,10 @@ import com.saaf.milkshop.domain.NativeSessionManager
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.domain.UserSecurityService
 import java.util.Base64
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -149,6 +153,58 @@ class Phase14QuickUnlockTest {
     }
 
     @Test
+    fun overlappingLoginAndReauthenticationAttemptsShareThePinLimit() = runBlocking {
+        val owner = owner()
+        quickUnlock.enroll(owner.session.sessionId, PASSPHRASE.toCharArray(), false, PIN.toCharArray())
+        val start = CompletableDeferred<Unit>()
+        val attempts = (0 until 8).map { index ->
+            async(Dispatchers.Default) {
+                start.await()
+                runCatching {
+                    if (index % 2 == 0) {
+                        quickUnlock.login(owner.user.loginName, QuickUnlockMethod.PIN, WRONG_PIN.toCharArray())
+                    } else {
+                        quickUnlock.reauthenticate(owner.session.sessionId, QuickUnlockMethod.PIN, WRONG_PIN.toCharArray())
+                    }
+                }.exceptionOrNull()
+            }
+        }
+        start.complete(Unit)
+        val failures = attempts.awaitAll()
+        assertEquals("Only the first two failures may proceed without a delay", 2,
+            failures.count { it is QuickUnlockFailure.Authentication })
+        assertEquals("Every later overlapping attempt must observe the same pause", 6,
+            failures.count { it is QuickUnlockFailure.RateLimited })
+        assertFailure<QuickUnlockFailure.RateLimited> {
+            quickUnlock.login(owner.user.loginName, QuickUnlockMethod.PIN, PIN.toCharArray())
+        }
+    }
+
+    @Test
+    fun passphraseChangeWhilePhonePromptIsOpenCannotGrantANewSession() = runBlocking {
+        val owner = owner()
+        quickUnlock.enroll(owner.session.sessionId, PASSPHRASE.toCharArray(), true, null)
+        gate.onRelease = {
+            security.changeOwnPassphrase(owner.session.sessionId, PASSPHRASE.toCharArray(), NEW_PASSPHRASE.toCharArray())
+        }
+        assertFailure<QuickUnlockFailure.Invalidated> {
+            quickUnlock.login(owner.user.loginName, QuickUnlockMethod.DEVICE, null)
+        }
+        assertTrue(quickUnlock.status().accounts.isEmpty())
+    }
+
+    @Test
+    fun removalWhilePhonePromptIsOpenCannotReauthenticate() = runBlocking {
+        val owner = owner()
+        quickUnlock.enroll(owner.session.sessionId, PASSPHRASE.toCharArray(), true, null)
+        gate.onRelease = { quickUnlock.remove(owner.session.sessionId, PASSPHRASE.toCharArray()) }
+        assertFailure<QuickUnlockFailure.Invalidated> {
+            quickUnlock.reauthenticate(owner.session.sessionId, QuickUnlockMethod.DEVICE, null)
+        }
+        assertTrue(quickUnlock.status().accounts.isEmpty())
+    }
+
+    @Test
     fun credentialChangeRestoreAndPhoneSecurityChangeInvalidateEnrollment() = runBlocking {
         val owner = owner()
         quickUnlock.enroll(owner.session.sessionId, PASSPHRASE.toCharArray(), true, PIN.toCharArray())
@@ -215,6 +271,7 @@ private class FakeQuickUnlockDeviceGate : QuickUnlockDeviceGate {
     val deletedKeys = mutableSetOf<String>()
     var valid = true
     var available = true
+    var onRelease: (suspend () -> Unit)? = null
 
     override fun status() = DeviceAuthenticationStatus(available = available, label = "Test phone lock")
 
@@ -229,6 +286,7 @@ private class FakeQuickUnlockDeviceGate : QuickUnlockDeviceGate {
 
     override suspend fun release(keyId: String, userId: Long, displayName: String, protected: DeviceProtectedQuickToken): ByteArray {
         if (keyId !in keys || !valid) throw QuickUnlockFailure.Invalidated()
+        onRelease?.invoke()
         return Base64.getDecoder().decode(protected.ciphertextBase64)
     }
 

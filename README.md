@@ -64,7 +64,8 @@ Product scope: Saaf Milk is the current working product identity, and Milk/Yogur
 - `PHASE14_8_2_ROLE_ARCHITECTURE_RESEARCH.md` — researched role definitions, necessity decision, complete screen/action access policy, current permission gaps, and the future scoped-permission model.
 - `PHASE14_8_2_CASHIER_VISUAL_DIRECTIONS.md` — three high-fidelity Cashier worlds and the recorded Counter Ledger selection.
 - `PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md` — accepted Counter Ledger Cashier and Operations implementation blueprint.
-- `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md` — Owner, Store manager, and Administrator screen/state blueprint and final five-role design gate.
+- `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md` — accepted Owner, Store manager, and Administrator screen/state blueprint.
+- `PHASE14_8_2_COUNTER_LEDGER_ACCESS.md` — accepted branded welcome, account selection, authentication, first-Owner, staff-enrollment, and Quick-unlock blueprint.
 
 ## Immutable baselines
 
@@ -76,7 +77,7 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 14.8 — Native UI Redesign and Migration: ACTIVE (Counter Ledger worker blueprint accepted; leadership roles under review)**
+**Phase 14.8 — Native UI Redesign and Migration: ACTIVE (14.8.2 design gate complete; Compose foundation next)**
 
 Phase 14 completed the safe `.qa` device baseline, all-five-role authorization matrix, live Drive and real cross-device recovery, Android/accessibility audit, device-bound Quick unlock, defect closure, and complete regression. The final result remains 273/273 ordinary Android tests, the 1/1 visual audit, and 7/7 host tests. The owner then rejected the hybrid interface as the release UX and confirmed native UI as the intended destination. Phase 14.8 redesigns and incrementally migrates the presentation to Compose while retaining the working hybrid build as a behavioral oracle and fallback. Phase 15 will test the native release candidate without coaching.
 
@@ -144,7 +145,7 @@ Phase 13 — Dead/Mock/Misleading UI Cleanup ✅ (all five checkpoints complete;
 
 Phase 14 — Final Device QA ✅ (all seven checkpoints complete; 273/273 ordinary Android tests, 1/1 visual audit, 7/7 host tests)
 
-Phase 14.8 — Native UI Redesign and Migration 🚧 (14.8.1 inventory complete; role policy accepted; Counter Ledger Cashier/Operations blueprint accepted; Owner/Manager/Administrator blueprint ready for review)
+Phase 14.8 — Native UI Redesign and Migration 🚧 (14.8.1 inventory complete; 14.8.2 Counter Ledger five-role and access blueprints accepted; Compose foundation next)
 
 Phase 15 — Final Shopkeeper QA ⏳ (starts after the native migration/regression gate; includes uncoached Quick unlock enrollment/use/recovery and periodic backup/recovery)
 
@@ -223,4 +224,4 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 
 ## Next gate
 
-Review the Counter Ledger Owner, Store manager, and Administrator blueprint in `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md`. Acceptance closes the five-role visual-proposal gate and allows Phase 14.8.3 to establish the Compose foundation and first native vertical slice. Phase 15 then runs uncoached shopkeeper QA on the native release candidate. Ordinary Saaf installations/profiles must remain untouched. See `PHASE14_8.md`, `PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md`, `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+Begin Phase 14.8.3 by adding the Compose foundation beside the working hybrid fallback, encoding the accepted Counter Ledger system, and preparing the first native authentication-to-sale vertical slice. Phase 15 then runs uncoached shopkeeper QA on the native release candidate. Ordinary Saaf installations/profiles must remain untouched. See `PHASE14_8.md`, `PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md`, `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md`, `PHASE14_8_2_COUNTER_LEDGER_ACCESS.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.

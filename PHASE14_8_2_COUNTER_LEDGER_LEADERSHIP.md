@@ -1,6 +1,6 @@
 # Phase 14.8.2 — Counter Ledger leadership roles
 
-Status: **HIGH-FIDELITY BLUEPRINT FOR OWNER REVIEW — no Compose implementation authorized**
+Status: **ACCEPTED AS AN IMPLEMENTATION BLUEPRINT — minor native polish deferred**
 
 Date: 2026-09-13
 
@@ -81,3 +81,9 @@ The owner should now decide whether these three role blueprints express the inte
 4. All five roles still feel like one product despite different defaults and density.
 
 Acceptance closes the Phase 14.8.2 visual-proposal gate. The next checkpoint is Phase 14.8.3: establish the Compose foundation and implement one reviewable native vertical slice while preserving the hybrid fallback.
+
+## Acceptance record
+
+The owner accepted the Owner, Store manager, and Administrator proposal as solid on 2026-09-13. Minor visual adjustments may be made during native implementation and device review if they preserve the role hierarchy, authority boundaries, default priorities, and Counter Ledger visual contract.
+
+The remaining Phase 14.8.2 access blueprint is recorded in `PHASE14_8_2_COUNTER_LEDGER_ACCESS.md` and is also accepted.

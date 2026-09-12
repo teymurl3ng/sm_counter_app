@@ -1,8 +1,8 @@
 # Saaf Milk Presentation System
 
-Status: **AUTHORITATIVE PHASE 12 TARGET — 2026-09-04**
+Status: **HISTORICAL AUTHORITY FOR THE RUNNABLE PHASE 12 HYBRID FALLBACK — superseded for native implementation by the accepted Phase 14.8.2 Counter Ledger specifications**
 
-This document governs the packaged React/WebView interface. It derives a coherent target from the real Samsung rendering rather than introducing a new visual identity. `PRODUCT_SCOPE.md` remains authoritative for product, function, formula, and reporting boundaries.
+This document continues to govern the packaged React/WebView fallback while native migration is incomplete. The accepted native implementation authority is `PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md`, `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md`, and `PHASE14_8_2_COUNTER_LEDGER_ACCESS.md`. `PRODUCT_SCOPE.md` remains authoritative for product, function, formula, and reporting boundaries.
 
 ## Product character
 

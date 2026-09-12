@@ -1,6 +1,6 @@
 # Phase 14.8 — Native UI redesign and migration
 
-Status: **ACTIVE — Counter Ledger worker blueprint accepted; Owner, Store manager, and Administrator blueprint awaiting review**
+Status: **ACTIVE — checkpoint 14.8.2 design gate complete; Compose foundation is next**
 
 Date started: 2026-09-12
 
@@ -139,4 +139,6 @@ This baseline is a comparison point, not a visual target.
 
 ## Current next gate
 
-Checkpoint 14.8.2 is now at the leadership-role visual review. The owner selected Counter Ledger and accepted `PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md` as the Cashier and Operations implementation blueprint, with minor native polish deferred. `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md` now applies the same system to Owner, Store manager, and Administrator. Acceptance of those three role experiences closes the complete five-role visual-proposal gate. Production Compose implementation still waits behind that decision.
+Checkpoint 14.8.2 is complete. The owner selected Counter Ledger and accepted the Cashier/Operations blueprint, Owner/Store manager/Administrator blueprint, and dedicated welcome/access blueprint, with minor native polish deferred. `PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md`, `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md`, and `PHASE14_8_2_COUNTER_LEDGER_ACCESS.md` now form the implementation design authority.
+
+The next gate is Phase 14.8.3: add the Compose foundation alongside the working hybrid application, encode the Counter Ledger tokens and role shell, and prepare the first native authentication-to-sale vertical slice. No WebView or bridge retirement begins until native callers replace every retained capability and their parity gates pass.

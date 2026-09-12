@@ -15,19 +15,18 @@
     "sha256": "50CBB9E0DD21B703EBEB400DBF415BFD259A3A14DC1C0A5EF73D9EC056ECCBBA"
   },
   "tests": {
-    "focusedAndroid": { "passed": 11, "failed": 0, "skipped": 0 },
-    "ordinaryAndroid": { "passed": 272, "failed": 0, "skipped": 0 },
+    "focusedAndroid": { "passed": 12, "failed": 0, "skipped": 0 },
+    "ordinaryAndroid": { "passed": 273, "failed": 0, "skipped": 0 },
     "visualCaptureAudit": { "passed": 1, "failed": 0, "skipped": 0 },
     "host": { "passed": 7, "failed": 0, "skipped": 0 }
   },
   "finalQaApk": {
     "oauthConfigured": true,
-    "bytes": 16174596,
-    "sha256": "9600CC68D5CB6E950DA137B51F7D53AB3FFF552ABAB55071AA9B8F330A8EA4DC",
-    "install": "pass",
-    "coldLaunch": "pass",
-    "coldLaunchMilliseconds": 1740,
-    "initialState": "clean first-owner setup",
+    "bytes": 16174564,
+    "sha256": "5581218C0761ED3C33CA9D09877D19E4D2654B5B6DF5AC2790C80B364F223A24",
+    "install": "pass as data-preserving update on S24 and A06",
+    "launch": "pass on A06 during corrected Quick unlock acceptance",
+    "originalClosureState": "clean first-owner setup",
     "oauthCorrectionInstalledWithDataPreserved": true,
     "liveDriveAuthorizationAfterCorrection": "pass"
   },
@@ -39,9 +38,13 @@
     "sharedAccountQuickUnlock": "pass by user confirmation",
     "crossAccountPinRejection": "pass by user confirmation",
     "cleanA06HasNoS24QuickUnlock": "pass by user confirmation and captured clean replacement state",
-    "crossVaultPortableRecoveryInspection": "pass by user confirmation; no restore performed",
-    "secureLockOrBiometricMutation": "not performed on personal phone; automated Keystore invalidation coverage accepted"
+    "crossVaultPortableRecoveryInspection": "pass by user confirmation",
+    "a06S24RecoveryPointRestore": "pass by user confirmation for the S24 7:05 point",
+    "quickUnlockExplicitChoice": "pass by user confirmation and focused regression",
+    "quickPinOnlySetupAndLogin": "pass by user confirmation",
+    "phoneSecurityOnlySetupAndLogin": "pass by user confirmation; A06 had no enrolled fingerprint",
+    "secureLockOrBiometricMutation": "A06 screen PIN added before enrollment; post-enrollment lock removal/change and biometric change not performed; automated Keystore invalidation coverage accepted"
   },
   "remainingPhysicalAcceptance": false,
-  "acceptedPhysicalLimitation": "Secure-lock or biometric enrollment was not mutated on a personal phone. Automated invalidation coverage passes."
+  "acceptedPhysicalLimitation": "Removing or changing phone security after Quick unlock enrollment and changing biometric enrollment were not performed. Automated invalidation coverage passes."
 }

@@ -108,7 +108,7 @@ Phase 14.7 implemented all six findings. The user completed the physical TalkBac
 | F14.5-05 | Dialogs use a visible semantic Close button with predictable focus and a full 48 CSS-pixel target. | The visible form dialog exposes the button, label, minimum size, and working dismissal; physical TalkBack swipe focus and double-tap dismissal pass by user confirmation. |
 | F14.5-06 | Orientation and screen-size changes no longer destroy the Activity/WebView. | Rotation keeps the exact WebView, Settings area, and unfinished value; explicit lifecycle recreation remains separately covered. |
 
-The focused closure matrix passes **11/11**. The final complete ordinary suite passes **272/272**, the separately configured visual audit passes **1/1**, host tests pass **7/7**, and the physical TalkBack action check passes.
+The focused accessibility/Android closure matrix passes **11/11**. After the later Quick unlock choice regression was added, the final complete ordinary suite passes **273/273**, the separately configured visual audit passes **1/1**, host tests pass **7/7**, and the physical TalkBack action check passes.
 
 ## Plain English
 

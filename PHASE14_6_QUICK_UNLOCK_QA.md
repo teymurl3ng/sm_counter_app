@@ -54,7 +54,7 @@ Completed host/build gates:
 - 7/7 host unit tests;
 - isolated `com.saaf.milkshop.qa` app and Android-test APK assembly with the configured OAuth client identifier. After the Access-action feedback fix, the 2026-09-12 QA app APK SHA-256 is `2CD17B2276898399C70DC3B9EE5A9D649AD3541248AE23116AA7AB8D4F516531`.
 
-The nine focused tests pass 9/9 on the isolated S24 QA installation. The combined Quick unlock, Phase 3/4 native security, and selected cloud cryptography regression passes 26/26. Phase 14.7 closes with 273 Android checks: 272/272 ordinary tests pass in `com.saaf.milkshop.qa.tests`, and the blank-install visual audit passes 1/1. Host tests pass 7/7.
+The nine focused tests pass 9/9 on the isolated S24 QA installation. The combined Quick unlock, Phase 3/4 native security, and selected cloud cryptography regression passes 26/26. With the later explicit-choice regression, Phase 14.7 closes with 274 Android checks: 273/273 ordinary tests pass in `com.saaf.milkshop.qa.tests`, and the blank-install visual audit passes 1/1. Host tests pass 7/7.
 
 ## Focused S24 acceptance
 
@@ -93,15 +93,17 @@ The final shared-phone identity check passes. The user enrolled two Saaf identit
 
 Phase 14.7 rebuilt the final OAuth-enabled QA APK after the complete regression. A first packaging attempt selected a different historical OAuth client and produced a generic Drive authorization failure; the corrected data-preserving build uses the exact historical Web client property. The user confirmed that Drive works and re-enrolled Quick unlock. The earlier instrumentation path had removed the disposable user-facing QA package before the dedicated test identity existed. Future connected tests use `com.saaf.milkshop.qa.tests` and cannot install over the user-facing `.qa` identity.
 
-The cleared A06 replacement check then exposed a separate cloud recovery defect: selecting an S24 point stopped with `The cloud backup belongs to a different backup vault`. A local-vault mismatch now raises the typed missing-key result, so the bridge requests the portable cloud recovery passphrase. The new regression passes in the 6/6 cloud-cryptography suite, the complete ordinary device suite passes 272/272, and the final installed APK is 16,174,596 bytes with SHA-256 `9600CC68D5CB6E950DA137B51F7D53AB3FFF552ABAB55071AA9B8F330A8EA4DC`.
+The cleared A06 replacement check then exposed a separate cloud recovery defect: selecting an S24 point stopped with `The cloud backup belongs to a different backup vault`. A local-vault mismatch now raises the typed missing-key result, so the bridge requests the portable cloud recovery passphrase. The new regression passes in the 6/6 cloud-cryptography suite. The user subsequently passed that security check and restored the S24 7:05 recovery point on the A06.
+
+The restored account correctly had no transferred Quick unlock enrollment. After the user added an Android screen PIN, hands-on setup exposed **F14.7-02 — phone security was preselected and described as fingerprint-capable on a phone with no enrolled fingerprint**. Enrollment now starts with both methods off, resets both choices after removal, and labels the actual A06 capability `Phone security`. The user separately confirmed Quick PIN-only setup/login and Phone-security-only setup/login. The expanded focused behavior matrix passes 12/12, the complete ordinary device suite passes 273/273, and the final installed APK is 16,174,564 bytes with SHA-256 `5581218C0761ED3C33CA9D09877D19E4D2654B5B6DF5AC2790C80B364F223A24`.
 
 ## Physical acceptance closure
 
 - Shared-account selection, each account's own PIN, cross-account PIN rejection, cancellation, process restart, full-passphrase fallback, the controlled wrong-PIN delays, fingerprint/phone-security login, Quick PIN cloud inspection, removal/re-enrollment, post-reboot login, and the strong-only final restore warning all pass.
 - TalkBack can focus and activate the corrected visible Close button.
-- A clean A06 installation showed no S24 Quick unlock identity or method. It could inspect the S24 recovery point only through the portable cloud recovery passphrase, and the security check passed without performing a restore.
-- Secure-lock/biometric enrollment mutation was not performed on a personal phone. Automated tests cover the Keystore invalidation paths; this documented non-invasive limitation is accepted for Phase 14.
+- A clean A06 installation showed no S24 Quick unlock identity or method. It could inspect the S24 recovery point only through the portable cloud recovery passphrase, and the S24 7:05 point was then restored successfully.
+- The A06 received a secure Android screen PIN before the final Quick unlock checks; no fingerprint was enrolled. Removing/changing that lock after enrollment and changing biometric enrollment were not performed. Automated tests cover those Keystore invalidation paths; this documented non-invasive limitation is accepted for Phase 14.
 
 ## Plain English
 
-Quick unlock now passes the full Phase 14 boundary on real phones. Each local PIN opens only its own Saaf account, the clean A06 did not inherit any S24 Quick unlock option, and the A06 required the separate cloud recovery passphrase to inspect the S24 backup. The discovered replacement-vault error is fixed. All 272 ordinary Android tests, the visual audit, and seven host tests pass.
+Quick unlock now passes the full Phase 14 boundary on real phones. Each local PIN opens only its own Saaf account, the clean A06 did not inherit any S24 Quick unlock option, and the A06 required the separate cloud recovery passphrase before restoring the S24 backup. Setup no longer silently selects phone security or suggests that a nonexistent fingerprint is enrolled. All 273 ordinary Android tests, the visual audit, and seven host tests pass.

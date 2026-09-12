@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Fingerprint, LockKeyhole } from 'lucide-react';
+import { LockKeyhole, ShieldCheck } from 'lucide-react';
 import type { CurrentSessionDto, QuickUnlockStatusDto } from '../../bridge/contract.generated';
 import { Notice, TextInput } from './HybridUi';
 
@@ -12,12 +12,15 @@ export function QuickUnlockControls({ currentUser, status, busy, error, onEnroll
   onRemove(currentPassphrase: string): Promise<void>;
 }) {
   const enrolled = status?.accounts.find((account) => account.loginName === currentUser.loginName) ?? null;
-  const [useDevice, setUseDevice] = useState(status?.deviceAuthenticationAvailable ?? false);
+  const [useDevice, setUseDevice] = useState(false);
   const [usePin, setUsePin] = useState(false);
   const [pin, setPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
   const [passphrase, setPassphrase] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
+  const enabledMethods = enrolled
+    ? [enrolled.deviceAuthenticationEnabled ? status?.deviceAuthenticationLabel ?? 'Phone security' : '', enrolled.pinEnabled ? 'Quick PIN' : ''].filter(Boolean)
+    : [];
 
   const clearSecrets = () => { setPin(''); setConfirmPin(''); setPassphrase(''); };
   const enroll = (event: FormEvent) => {
@@ -31,19 +34,24 @@ export function QuickUnlockControls({ currentUser, status, busy, error, onEnroll
   const remove = (event: FormEvent) => {
     event.preventDefault();
     setLocalError(null);
-    void onRemove(passphrase).catch(() => undefined).finally(clearSecrets);
+    void onRemove(passphrase).catch(() => undefined).finally(() => {
+      clearSecrets();
+      setUseDevice(false);
+      setUsePin(false);
+    });
   };
 
   return <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:col-span-2">
-    <div className="mb-4 flex items-start gap-3"><Fingerprint className="mt-0.5 h-6 w-6 shrink-0 text-emerald-700" aria-hidden="true" /><div><h2 className="font-bold">Quick unlock on this phone</h2><p className="mt-1 text-sm leading-6 text-slate-600">Open your Saaf account with phone security or a short PIN. This setup stays on this phone and cannot open a backup on another phone.</p></div></div>
+    <div className="mb-4 flex items-start gap-3"><ShieldCheck className="mt-0.5 h-6 w-6 shrink-0 text-emerald-700" aria-hidden="true" /><div><h2 className="font-bold">Quick unlock on this phone</h2><p className="mt-1 text-sm leading-6 text-slate-600">Open your Saaf account with Android phone security or a personal Quick PIN. This setup stays on this phone and cannot open a backup on another phone.</p></div></div>
     {(localError ?? error) && <Notice message={localError ?? error ?? ''} />}
     {!status ? <p className="text-sm text-slate-600">Checking phone security…</p> : enrolled ? <form id="remove-quick-unlock-form" onSubmit={remove}>
-      <div className="mb-4 rounded-xl bg-emerald-50 p-4 text-sm leading-6 text-emerald-950"><strong>Quick unlock is on for {enrolled.displayName}.</strong><br />{[enrolled.deviceAuthenticationEnabled ? status.deviceAuthenticationLabel : '', enrolled.pinEnabled ? 'Quick PIN' : ''].filter(Boolean).join(' and ')}</div>
+      <div className="mb-4 rounded-xl bg-emerald-50 p-4 text-sm leading-6 text-emerald-950"><strong>Quick unlock is on for {enrolled.displayName}.</strong><br />Enabled {enabledMethods.length === 1 ? 'method' : 'methods'}: {enabledMethods.join(', ')}.</div>
       <p className="mb-4 text-sm leading-6 text-slate-600">To change the enabled methods, remove this setup and create it again. Your full passphrase always remains available.</p>
       <TextInput id="remove-quick-unlock-passphrase" label="Current full passphrase" value={passphrase} onChange={setPassphrase} type="password" autoComplete="current-password" />
       <button id="remove-quick-unlock-button" disabled={busy || !passphrase} className="w-full rounded-xl border border-rose-300 px-4 py-3 font-semibold text-rose-800 disabled:opacity-50">{busy ? 'Removing…' : 'Remove Quick unlock from this phone'}</button>
     </form> : <form id="enroll-quick-unlock-form" onSubmit={enroll}>
-      <label className="mb-3 flex min-h-12 items-start gap-3 rounded-xl bg-slate-50 p-3 text-sm"><input id="quick-unlock-use-device" type="checkbox" checked={useDevice} disabled={!status.deviceAuthenticationAvailable} onChange={(event) => setUseDevice(event.target.checked)} className="mt-1 h-4 w-4" /><span><strong>{status.deviceAuthenticationLabel}</strong><br /><span className="text-slate-600">{status.deviceAuthenticationAvailable ? 'Uses this phone’s protected security screen.' : 'Set up a secure phone lock to make this available.'}</span></span></label>
+      <p className="mb-3 text-sm leading-6 text-slate-600">Choose one or both methods. Nothing is enabled until you select it and finish setup.</p>
+      <label className="mb-3 flex min-h-12 items-start gap-3 rounded-xl bg-slate-50 p-3 text-sm"><input id="quick-unlock-use-device" type="checkbox" checked={useDevice} disabled={!status.deviceAuthenticationAvailable} onChange={(event) => setUseDevice(event.target.checked)} className="mt-1 h-4 w-4" /><span><strong>{status.deviceAuthenticationLabel}</strong><br /><span className="text-slate-600">{status.deviceAuthenticationAvailable ? 'Uses Android’s protected security prompt. Saaf never saves biometric data or the phone’s screen-lock secret.' : 'Set up a secure phone lock to make this available.'}</span></span></label>
       <label className="mb-4 flex min-h-12 items-start gap-3 rounded-xl bg-slate-50 p-3 text-sm"><input id="quick-unlock-use-pin" type="checkbox" checked={usePin} disabled={!status.deviceAuthenticationAvailable} onChange={(event) => setUsePin(event.target.checked)} className="mt-1 h-4 w-4" /><span><strong>Quick PIN</strong><br /><span className="text-slate-600">{status.deviceAuthenticationAvailable ? 'Choose 4–12 digits. Six digits are recommended.' : 'Set up a secure phone lock before using a Quick PIN.'}</span></span></label>
       {usePin && <div className="grid gap-0 sm:grid-cols-2 sm:gap-3"><TextInput id="quick-unlock-pin" label="New Quick PIN" value={pin} onChange={(value) => setPin(value.replace(/\D/g, '').slice(0, 12))} type="password" inputMode="numeric" autoComplete="new-password" /><TextInput id="quick-unlock-pin-confirm" label="Repeat Quick PIN" value={confirmPin} onChange={(value) => setConfirmPin(value.replace(/\D/g, '').slice(0, 12))} type="password" inputMode="numeric" autoComplete="new-password" /></div>}
       <TextInput id="enroll-quick-unlock-passphrase" label="Current full passphrase" value={passphrase} onChange={setPassphrase} type="password" autoComplete="current-password" />

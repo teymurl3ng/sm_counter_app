@@ -2,9 +2,9 @@
 
 Status: RECONCILED 2026-09-12 — hybrid Phases 0–14 are complete and Phase 15 uncoached shopkeeper QA is next. Contract v5 exposes 91 native-backed operations. Quick unlock, live Drive, cross-device recovery, Android behavior, accessibility closure, and every recorded Phase 14 defect pass their final gates. The unreachable 23-file, 8,370-line browser-local prototype and six unused dependencies remain removed; automatic web/Android build gates prevent that behavior from returning.
 
-Latest complete physical-device regression: Phase 14.7 passes 272/272 ordinary tests in the isolated `com.saaf.milkshop.qa.tests` instrumentation package and the separately configured 1/1 blank-install visual audit, with zero skips or failures. Host-side tests pass 7/7. The final OAuth-enabled user-facing `.qa` APK is 16,174,596 bytes with SHA-256 `9600CC68D5CB6E950DA137B51F7D53AB3FFF552ABAB55071AA9B8F330A8EA4DC`.
+Latest complete physical-device regression: Phase 14.7 passes 273/273 ordinary tests in the isolated `com.saaf.milkshop.qa.tests` instrumentation package and the separately configured 1/1 blank-install visual audit, with zero skips or failures. Host-side tests pass 7/7. The final OAuth-enabled user-facing `.qa` APK is 16,174,564 bytes with SHA-256 `5581218C0761ED3C33CA9D09877D19E4D2654B5B6DF5AC2790C80B364F223A24`.
 
-Phase 14.1–14.5 established the isolated Samsung baseline, all-role UI/native permission checks, live Drive acceptance, data-rich S24-to-A06 restore, and the Android/accessibility audit. Phase 14.6 added secure device-local Quick unlock and closed its security and usability findings. Phase 14.7 fixed every recorded finding and the replacement-vault fallback found during final A06 inspection. Shared-phone PIN isolation, TalkBack Close activation, and clean-device portable recovery pass physically. Ordinary `com.saaf.milkshop` installations/profiles remain untouched.
+Phase 14.1–14.5 established the isolated Samsung baseline, all-role UI/native permission checks, live Drive acceptance, data-rich S24-to-A06 restore, and the Android/accessibility audit. Phase 14.6 added secure device-local Quick unlock and closed its security and usability findings. Phase 14.7 fixed every recorded finding, including the replacement-vault fallback and misleading Quick unlock method selection found on the A06. Shared-phone PIN isolation, TalkBack Close activation, portable recovery/restore, and explicit PIN-only and Phone-security-only setup/login pass physically. Ordinary `com.saaf.milkshop` installations/profiles remain untouched.
 
 Product scope: Saaf Milk is the current working product identity, and Milk/Yogurt are the current validated domain—not permanent limits. The product is intended to expand carefully to other products and suitable owner-managed shop contexts without pretending to be a corporate ERP or complete statutory accounting system. See `PRODUCT_SCOPE.md`.
 
@@ -70,7 +70,7 @@ SQL blueprint SHA-256:
 
 **Phase 15 — Final Shopkeeper QA: NEXT (Phase 14.1–14.7 complete)**
 
-Phase 14 completed the safe `.qa` device baseline, all-five-role authorization matrix, live Drive and real cross-device recovery, Android/accessibility audit, device-bound Quick unlock, defect closure, and complete regression. The final result is 272/272 ordinary Android tests, the 1/1 visual audit, and 7/7 host tests. Phase 15 now tests whether real shop users can complete the work and understand recovery without coaching.
+Phase 14 completed the safe `.qa` device baseline, all-five-role authorization matrix, live Drive and real cross-device recovery, Android/accessibility audit, device-bound Quick unlock, defect closure, and complete regression. The final result is 273/273 ordinary Android tests, the 1/1 visual audit, and 7/7 host tests. Phase 15 now tests whether real shop users can complete the work and understand recovery without coaching.
 
 Earlier native-backed shop screens remain intact. Phase 9's grouped role-aware navigation, separate QA installation, one non-reloading React/WebView presentation, secure Activity recreation, targeted state refresh, and renderer recovery remain protected. A recovery reload creates a fresh WebView and revalidates the memory-only session before protected information appears. The keyboard/inset, Back/draft, rotation, large-text, landscape, and TalkBack findings recorded in Phase 14.5 are closed by Phase 14.7.
 
@@ -134,7 +134,7 @@ Phase 12 — UI Fidelity ✅ (all six checkpoints complete; 83-screen final evid
 
 Phase 13 — Dead/Mock/Misleading UI Cleanup ✅ (all five checkpoints complete; 258/258 final device regression and Phase 14 handoff verified)
 
-Phase 14 — Final Device QA ✅ (all seven checkpoints complete; 272/272 ordinary Android tests, 1/1 visual audit, 7/7 host tests)
+Phase 14 — Final Device QA ✅ (all seven checkpoints complete; 273/273 ordinary Android tests, 1/1 visual audit, 7/7 host tests)
 
 Phase 15 — Final Shopkeeper QA ⏳ (includes uncoached Quick unlock enrollment/use/recovery, periodic backup/recovery, and owner-phone snapshot viewing if approved)
 
@@ -209,7 +209,7 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 - Phase 14.4 passes real S24-to-A06 recovery of a recognizable product/supplier/customer/purchase/sale/correction dataset with matching stock and balances, correction lineage, actor identity, forced logout, retained remote points, and target cloud pause. Wrong secrets preserve the installation; two UX defects are recorded, including a P1 correction form that hides original values.
 - Phase 14.5 completes the targeted A06/S24 Android audit at 11/20. Five P1 issues cover large-text reflow, keyboard obstruction, unsafe Back/draft loss, TalkBack dialog closing, and rotation draft loss; one P2 covers landscape refinement. TalkBack announcements, switch/lock lifecycle, S24 split-screen, light-theme stability, and document-picker cancellation pass.
 - Phase 14.6 implements device-bound Android phone-security/PIN Quick unlock, Keystore protection and invalidation, PIN delay/full-passphrase recovery, shared-phone identity selection, routine backup reauthentication, trusted-device cloud-key inspection, and the v5/91 bridge. Nine focused tests pass 9/9 after closing two native security races. Physical S24 checks cover both fast sign-in methods, delays, restart, removal/re-enrollment, shared accounts, cross-account rejection, cloud inspection, and TalkBack.
-- Phase 14.7 closes every recorded Phase 14 finding. A clean A06 offered no S24 Quick unlock method and required the portable recovery passphrase to inspect an S24 point. That live check found and closed the different-local-vault fallback defect. The final regression passes 272/272 ordinary Android tests, 1/1 visual audit, and 7/7 host tests.
+- Phase 14.7 closes every recorded Phase 14 finding. A clean A06 offered no S24 Quick unlock method, required the portable recovery passphrase, and restored the S24 7:05 point. The same phone then exposed and verified the fix for automatic Phone security selection and false fingerprint wording. PIN-only and Phone-security-only setup/login pass separately. The final regression passes 273/273 ordinary Android tests, 1/1 visual audit, and 7/7 host tests.
 
 ## Next gate
 

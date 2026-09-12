@@ -115,6 +115,76 @@ class Phase14DefectClosureTest {
         }
     }
 
+    @Test
+    fun quickUnlockEnrollmentStartsWithExplicitTruthfulMethodChoices() {
+        val scenario = ActivityScenario.launch(HybridActivity::class.java)
+        try {
+            val driver = HybridWebViewTestDriver.attach(scenario)
+            driver.ensureSignedIn()
+            driver.waitFor("document.getElementById('app-navigation') !== null", 20_000L)
+            driver.evaluate("document.getElementById('access-nav').click(); true")
+            driver.waitFor("document.getElementById('security-account-tab') !== null", 20_000L)
+            driver.evaluate("document.getElementById('security-account-tab').click(); true")
+            driver.waitFor("document.getElementById('enroll-quick-unlock-form') !== null", 20_000L)
+
+            assertEquals(
+                "true",
+                driver.evaluate(
+                    """
+                        (() => {
+                          const form = document.getElementById('enroll-quick-unlock-form');
+                          const device = document.getElementById('quick-unlock-use-device');
+                          const pin = document.getElementById('quick-unlock-use-pin');
+                          const submit = document.getElementById('enroll-quick-unlock-button');
+                          return device.checked === false &&
+                            pin.checked === false &&
+                            submit.disabled === true &&
+                            form.textContent.includes('Choose one or both methods') &&
+                            !form.textContent.toLowerCase().includes('fingerprint');
+                        })()
+                    """.trimIndent(),
+                ),
+            )
+
+            driver.evaluate("document.getElementById('quick-unlock-use-pin').click(); true")
+            driver.waitFor("document.getElementById('quick-unlock-pin') !== null")
+            driver.setInput("quick-unlock-pin", "246810")
+            driver.setInput("quick-unlock-pin-confirm", "246810")
+            driver.setInput("enroll-quick-unlock-passphrase", SaafMilkTestRunner.TEST_PASSPHRASE)
+            driver.evaluate("document.getElementById('enroll-quick-unlock-button').click(); true")
+            driver.waitFor("document.getElementById('remove-quick-unlock-form') !== null", 30_000L)
+            assertEquals(
+                "true",
+                driver.evaluate(
+                    """
+                        (() => {
+                          const status = document.getElementById('remove-quick-unlock-form').textContent;
+                          return status.includes('Enabled method: Quick PIN.') &&
+                            !status.includes('Enabled methods:') &&
+                            !status.includes('Phone security');
+                        })()
+                    """.trimIndent(),
+                ),
+            )
+
+            driver.setInput("remove-quick-unlock-passphrase", SaafMilkTestRunner.TEST_PASSPHRASE)
+            driver.evaluate("document.getElementById('remove-quick-unlock-button').click(); true")
+            driver.waitFor("document.getElementById('enroll-quick-unlock-form') !== null", 30_000L)
+            assertEquals(
+                "true",
+                driver.evaluate(
+                    """
+                        document.getElementById('quick-unlock-use-device').checked === false &&
+                          document.getElementById('quick-unlock-use-pin').checked === false &&
+                          document.getElementById('enroll-quick-unlock-button').disabled === true
+                    """.trimIndent(),
+                ),
+            )
+        } finally {
+            scenario.close()
+        }
+    }
+
     private fun openSettings(driver: HybridWebViewTestDriver) {
         driver.evaluate("document.getElementById('settings-nav').click(); true")
         driver.waitFor(

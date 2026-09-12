@@ -257,8 +257,15 @@ class AndroidQuickUnlockDeviceGate(
 
     override fun status(): DeviceAuthenticationStatus {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return DeviceAuthenticationStatus(false)
-        val available = BiometricManager.from(activity).canAuthenticate(ALLOWED_AUTHENTICATORS) == BiometricManager.BIOMETRIC_SUCCESS
-        return DeviceAuthenticationStatus(available)
+        val biometrics = BiometricManager.from(activity)
+        val available = biometrics.canAuthenticate(ALLOWED_AUTHENTICATORS) == BiometricManager.BIOMETRIC_SUCCESS
+        val strongBiometricAvailable = biometrics.canAuthenticate(
+            BiometricManager.Authenticators.BIOMETRIC_STRONG,
+        ) == BiometricManager.BIOMETRIC_SUCCESS
+        return DeviceAuthenticationStatus(
+            available = available,
+            label = if (strongBiometricAvailable) "Biometric or phone security" else "Phone security",
+        )
     }
 
     override suspend fun protect(

@@ -43,7 +43,7 @@ data class QuickUnlockStatus(
 
 data class DeviceAuthenticationStatus(
     val available: Boolean,
-    val label: String = "Fingerprint or phone lock",
+    val label: String = "Phone security",
 )
 
 data class DeviceProtectedQuickToken(

@@ -1,4 +1,4 @@
-import { Fingerprint, KeyRound, ShieldCheck } from 'lucide-react';
+import { KeyRound, ShieldCheck, Smartphone } from 'lucide-react';
 import type { QuickUnlockAccountDto, QuickUnlockStatusDto } from '../../bridge/contract.generated';
 import { TextInput } from './HybridUi';
 import type { ReauthenticationProof } from './quickUnlockBridgeActions';
@@ -19,7 +19,7 @@ export function ReauthenticationFields({ idPrefix, label, proof, onChange, accou
     <p className="mb-2 text-sm font-semibold text-slate-700">{label}</p>
     {hasQuickChoice && <div role="group" aria-label={label} className="mb-3 grid gap-2 sm:grid-cols-3">
       <MethodButton id={`${idPrefix}-passphrase-method`} active={proof.method === 'passphrase'} onClick={() => onChange({ method: 'passphrase', secret: '' })} icon={<ShieldCheck className="h-4 w-4" aria-hidden="true" />}>Passphrase</MethodButton>
-      {deviceAvailable && <MethodButton id={`${idPrefix}-device-method`} active={proof.method === 'device'} onClick={() => onChange({ method: 'device', secret: '' })} icon={<Fingerprint className="h-4 w-4" aria-hidden="true" />}>Phone security</MethodButton>}
+      {deviceAvailable && <MethodButton id={`${idPrefix}-device-method`} active={proof.method === 'device'} onClick={() => onChange({ method: 'device', secret: '' })} icon={<Smartphone className="h-4 w-4" aria-hidden="true" />}>Phone security</MethodButton>}
       {pinAvailable && <MethodButton id={`${idPrefix}-pin-method`} active={proof.method === 'pin'} onClick={() => onChange({ method: 'pin', secret: '' })} icon={<KeyRound className="h-4 w-4" aria-hidden="true" />}>Quick PIN</MethodButton>}
     </div>}
     {proof.method === 'passphrase' ? <TextInput id={`${idPrefix}-passphrase`} label="Current account passphrase" value={proof.secret} onChange={(secret) => onChange({ method: 'passphrase', secret })} type="password" autoComplete="current-password" />

@@ -1,6 +1,6 @@
 # Phase 14.8 — Native UI redesign and migration
 
-Status: **ACTIVE — checkpoint 14.8.1 complete; journey directions are next**
+Status: **ACTIVE — checkpoint 14.8.1 complete; checkpoint 14.8.2 direction decision pending**
 
 Date started: 2026-09-12
 
@@ -79,6 +79,8 @@ See `PHASE14_8_1_NATIVE_MIGRATION_INVENTORY.md`.
 - select one coherent direction before production screen implementation.
 
 Checkpoint output: an approved native information architecture, complete representative journeys, and a design specification that can be implemented directly in Compose.
+
+The current audit compares three structures and recommends stable `Today / Work / Records / More` navigation. See `PHASE14_8_2_JOURNEY_DIRECTIONS.md`. Detailed journeys and production Compose work wait for the direction decision.
 
 ### 14.8.3 — Compose foundation
 

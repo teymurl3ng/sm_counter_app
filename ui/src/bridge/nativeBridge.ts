@@ -36,6 +36,22 @@ interface PendingRequest {
 const pending = new Map<string, PendingRequest>();
 let installedBridge: InjectedNativeBridge | null = null;
 
+const LONG_INTERACTIVE_ACTIONS = new Set<BridgeAction>([
+  'system.exportEncryptedBackup',
+  'system.inspectEncryptedBackup',
+  'system.restoreInspectedBackup',
+  'system.connectCloudBackup',
+  'system.inspectCloudBackup',
+  'system.restoreInspectedCloudBackup',
+  'system.disconnectCloudBackup',
+]);
+
+function responseTimeoutMs(action: BridgeAction): number {
+  if (LONG_INTERACTIVE_ACTIONS.has(action)) return 300_000;
+  if (action === 'command.auth.enrollQuickUnlock' || action === 'command.auth.quickLogin' || action === 'command.auth.quickReauthenticate') return 120_000;
+  return 30_000;
+}
+
 export const RUNTIME_ACTIONS = [
   'system.bridgeInfo',
   'query.bootstrapStatus',
@@ -192,9 +208,7 @@ export function callNative<A extends BridgeAction>(
       pending.delete(requestId);
       recordBridgeResponse(action, 0, startedAt, true);
       reject(new Error('The app took too long to respond. Please try again.'));
-    }, action === 'command.auth.enrollQuickUnlock' || action === 'command.auth.quickLogin' || action === 'command.auth.quickReauthenticate'
-      ? 120_000
-      : 30_000);
+    }, responseTimeoutMs(action));
     pending.set(requestId, {
       action,
       startedAt,

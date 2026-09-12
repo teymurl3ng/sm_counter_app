@@ -1,6 +1,6 @@
 # Phase 14.6 — Native Quick Unlock
 
-Status: **IMPLEMENTED — two extended-QA security defects fixed; 9/9 Quick unlock and 26/26 related tests pass; hands-on acceptance remains**
+Status: **IMPLEMENTED — three extended-QA defects fixed; complete 272-check Android regression passes; limited hands-on acceptance remains**
 
 Date: 2026-09-12 (extends the 2026-09-09 checkpoint)
 
@@ -54,7 +54,7 @@ Completed host/build gates:
 - 7/7 host unit tests;
 - isolated `com.saaf.milkshop.qa` app and Android-test APK assembly with the configured OAuth client identifier. After the Access-action feedback fix, the 2026-09-12 QA app APK SHA-256 is `2CD17B2276898399C70DC3B9EE5A9D649AD3541248AE23116AA7AB8D4F516531`.
 
-The nine focused tests pass 9/9 on the isolated S24 QA installation. The combined Quick unlock, Phase 3/4 native security, and selected cloud cryptography regression passes 26/26. The full physical-device inventory is now 269 tests; the complete suite remains the Phase 14.7 gate.
+The nine focused tests pass 9/9 on the isolated S24 QA installation. The combined Quick unlock, Phase 3/4 native security, and selected cloud cryptography regression passes 26/26. Phase 14.7 expands the device inventory to 272 checks: 271/271 ordinary tests pass in `com.saaf.milkshop.qa.tests`, and the blank-install visual audit passes 1/1. Host tests pass 7/7.
 
 ## Focused S24 acceptance
 
@@ -88,6 +88,8 @@ Following instructions to restart the phone, unlock Android normally, and open S
 The controlled physical PIN-failure sequence also passes. Attempts one and two show the generic verification failure (`20`–`21`). Attempt three enters the first pause (`22`). After more than 30 seconds, attempt four enters the longer pause (`23`), and the user's correct Quick PIN was still refused during that window (`24`, captured at 17:06:24 after the fourth-attempt capture at 17:04:47). After more than two minutes, attempt five was processed and required full-passphrase recovery (`25`); the correct Quick PIN remained blocked (`26`). A full-passphrase login restored the dashboard (`27`), and after sign-out the user confirmed that the correct Quick PIN opened the dashboard again (`28`). The screenshots do not expose either credential.
 
 Removal and re-enrollment pass, and the hands-on flow exposed **F14.6-03 — Access action success was outside the retained viewport**. After removal completed at the bottom of My account, the user had to scroll to the top to discover “Quick unlock was removed from this phone,” leaving the action without visible confirmation. `SecurityWorkspace` now reveals its accessible success notice after an Access mutation completes. The UI-only change does not alter authentication or account state. TypeScript validation, Vite production packaging, cleanup gates, and QA APK assembly pass. The fixed APK was installed with data preserved; the user signed in with the full passphrase, re-enrolled phone security plus Quick PIN, and confirmed the updated flow worked. `29-quick-unlock-reenrolled-after-feedback-fix.png` confirms both methods are active again. After a fresh sign-out, the user confirmed that the re-enrolled Quick PIN opened the dashboard; `30-quick-pin-login-after-reenrollment.png` records the resulting state. Immediate feedback behavior is established by the user's live confirmation.
+
+Phase 14.7 rebuilt the final OAuth-enabled QA APK after the complete regression. Its SHA-256 is `4BEAD85632975B253E870463E271D781944FC6BE1BDE05F64C2BF26F5915E491`. The earlier instrumentation path had removed the disposable user-facing QA package; the final install therefore opens on first-owner setup and has no prior device-local Quick unlock enrollment. Future connected tests use `com.saaf.milkshop.qa.tests` and cannot install over the user-facing `.qa` identity.
 
 ## Remaining physical acceptance
 

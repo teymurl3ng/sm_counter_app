@@ -43,10 +43,33 @@ class Phase9WindowInsetsTest {
 
             tapElement(driver, "product-notes")
             driver.waitFor("document.activeElement?.id === 'product-notes' && document.documentElement.dataset.imeVisible === 'true'", 15_000L)
-            driver.waitFor("(() => { const field = document.getElementById('product-notes').getBoundingClientRect(); const viewport = window.visualViewport; return field.bottom <= viewport.offsetTop + viewport.height + 2; })()")
+            driver.waitFor(
+                """
+                    (() => {
+                      const field = document.getElementById('product-notes').getBoundingClientRect();
+                      const viewport = window.visualViewport;
+                      const nativeImeBottom = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--saaf-ime-bottom')) || 0;
+                      const usableBottom = Math.min(viewport.offsetTop + viewport.height, window.innerHeight - nativeImeBottom);
+                      return field.top >= viewport.offsetTop - 2 && field.bottom <= usableBottom + 2;
+                    })()
+                """.trimIndent(),
+            )
 
             assertEquals("true", driver.evaluate("getComputedStyle(document.getElementById('app-navigation')).display === 'none'"))
-            assertEquals("true", driver.evaluate("document.querySelector('.hybrid-dialog-panel').getBoundingClientRect().height <= window.visualViewport.height + 2"))
+            assertEquals(
+                "true",
+                driver.evaluate(
+                    """
+                        (() => {
+                          const root = document.documentElement;
+                          const declared = parseFloat(getComputedStyle(root).getPropertyValue('--saaf-visual-viewport-height'));
+                          const nativeImeBottom = parseFloat(getComputedStyle(root).getPropertyValue('--saaf-ime-bottom')) || 0;
+                          const expected = Math.min(window.visualViewport.height, window.innerHeight - nativeImeBottom);
+                          return Math.abs(declared - expected) <= 2 && document.querySelector('.hybrid-dialog-panel').getBoundingClientRect().height <= declared + 2;
+                        })()
+                    """.trimIndent(),
+                ),
+            )
             assertTrue(driver.evaluate("parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--saaf-ime-bottom')) > 0") == "true")
 
             instrumentation.uiAutomation.executeShellCommand("input keyevent KEYCODE_BACK").close()

@@ -70,6 +70,27 @@ class Phase8HistoryCorrectionTest {
         val sale = SaleService(database).record(SaleInput(milkId, BUSINESS_DATE, "retail", 200.0, quantity = 5.0, payment = SalePayment.Account(cashId)))
         val spoilage = SpoilageService(database).record(SpoilageInput(milkId, 2.0, BUSINESS_DATE, "spill"))
 
+        val purchaseOriginal = dispatch("query.eventDetail", detailPayload(purchase.eventId), owner.session.sessionId)
+            .getJSONObject("data").getJSONObject("originalValues")
+        assertEquals("100", purchaseOriginal.getString("rawLiters"))
+        assertEquals("4", purchaseOriginal.getString("fatPercent"))
+        assertEquals("28", purchaseOriginal.getString("lrReading"))
+        val productionOriginal = dispatch("query.eventDetail", detailPayload(production.eventId), owner.session.sessionId)
+            .getJSONObject("data").getJSONObject("originalValues")
+        assertEquals("10", productionOriginal.getString("milkLitersUsed"))
+        assertEquals("8", productionOriginal.getString("yogurtKgProduced"))
+        val saleOriginal = dispatch("query.eventDetail", detailPayload(sale.eventId), owner.session.sessionId)
+            .getJSONObject("data").getJSONObject("originalValues")
+        assertEquals("20000", saleOriginal.getString("unitRatePaisa"))
+        assertEquals("5", saleOriginal.getString("quantity"))
+        assertEquals("100000", saleOriginal.getString("valuePaisa"))
+        assertEquals("0", saleOriginal.getString("surchargePaisa"))
+        assertEquals("retail", saleOriginal.getString("channelCode"))
+        val spoilageOriginal = dispatch("query.eventDetail", detailPayload(spoilage.eventId), owner.session.sessionId)
+            .getJSONObject("data").getJSONObject("originalValues")
+        assertEquals("2", spoilageOriginal.getString("quantity"))
+        assertEquals("spill", spoilageOriginal.getString("reasonCode"))
+
         val purchaseCorrection = correctedEvent(dispatch("command.correctEvent", purchasePayload(purchase.eventId), owner.session.sessionId))
         val productionCorrection = correctedEvent(dispatch("command.correctEvent", productionPayload(production.eventId), owner.session.sessionId))
         assertError(dispatch("command.correctEvent", salePayload(sale.eventId).put("quantity", "1000"), owner.session.sessionId), "insufficient_stock")
@@ -105,9 +126,11 @@ class Phase8HistoryCorrectionTest {
         assertEquals("History Owner", item.getJSONObject("actor").getString("displayName"))
         val cashierDetail = dispatch("query.eventDetail", detailPayload(eventId), cashier.sessionId).getJSONObject("data")
         assertTrue(cashierDetail.isNull("financialMovements"))
+        assertTrue(cashierDetail.isNull("originalValues"))
         assertEquals("10", cashierDetail.getJSONArray("inventoryMovements").getJSONObject(0).getString("quantity"))
         val ownerDetail = dispatch("query.eventDetail", detailPayload(eventId), owner.session.sessionId).getJSONObject("data")
         assertEquals("History Dairy", ownerDetail.getJSONArray("financialMovements").getJSONObject(0).getString("accountName"))
+        assertEquals("10", ownerDetail.getJSONObject("originalValues").getString("rawLiters"))
     }
 
     @Test
@@ -139,7 +162,7 @@ class Phase8HistoryCorrectionTest {
 
         val actions = dispatch("system.bridgeInfo").getJSONObject("data").getJSONArray("supportedActions")
         val names = (0 until actions.length()).map(actions::getString)
-        assertEquals(86, names.size)
+        assertEquals(91, names.size)
         assertTrue(names.containsAll(listOf("query.eventHistory", "query.eventDetail", "command.correctEvent")))
     }
 
@@ -172,6 +195,8 @@ class Phase8HistoryCorrectionTest {
             assertTrue(evaluate(webView, "document.getElementById('history-detail').innerText.includes('PKR 100.00')") == "true")
             evaluate(webView, "document.getElementById('correct-event-${original.eventId}').click(); true")
             waitFor(webView, "document.getElementById('correction-form') !== null")
+            assertTrue(evaluate(webView, "document.getElementById('correction-amount').value === '100.00'") == "true")
+            assertTrue(evaluate(webView, "document.getElementById('correction-original-values').innerText.includes('PKR 100.00')") == "true")
             setInput(webView, "correction-amount", "75.00")
             setTextArea(webView, "correction-notes", correctionMarker)
             evaluate(webView, "document.getElementById('save-correction-button').click(); true")

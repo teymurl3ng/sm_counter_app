@@ -75,7 +75,7 @@ export function SecurityWorkspace({ currentUser, employees, actions, quickUnlock
   );
 
   return <div>
-    <div className="mb-5 grid grid-flow-col auto-cols-fr rounded-xl bg-slate-100 p-1">
+    <div className="hybrid-segmented-tabs mb-5 grid grid-flow-col auto-cols-fr rounded-xl bg-slate-100 p-1">
       <FilterButton id="security-account-tab" active={area === 'account'} onClick={() => setArea('account')}>My account</FilterButton>
       {canManageUsers && <FilterButton id="security-staff-tab" active={area === 'staff'} onClick={() => setArea('staff')}>Staff accounts</FilterButton>}
       {canViewAudit && <FilterButton id="security-audit-tab" active={area === 'audit'} onClick={() => setArea('audit')}>Security history</FilterButton>}

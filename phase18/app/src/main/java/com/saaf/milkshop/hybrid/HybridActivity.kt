@@ -1,5 +1,6 @@
 package com.saaf.milkshop.hybrid
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.WindowManager
 import android.webkit.WebView
@@ -34,6 +35,7 @@ class HybridActivity : FragmentActivity() {
     private var evaluatingBackPress = false
     private var activeArea: String? = null
     private var rendererRecoveryVisible = false
+    private var discardDraftDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,12 +89,25 @@ class HybridActivity : FragmentActivity() {
         if (::applicationState.isInitialized) applicationState.nativeSessions.onForeground()
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::webViewHost.isInitialized) {
+            webViewHost.webView.post {
+                webViewHost.webView.evaluateJavascript(
+                    "window.dispatchEvent(new Event('saafMilkAppResumed'));",
+                    null,
+                )
+            }
+        }
+    }
+
     override fun onStop() {
         if (::applicationState.isInitialized) applicationState.nativeSessions.onBackground()
         super.onStop()
     }
 
     override fun onDestroy() {
+        discardDraftDialog?.dismiss()
         ownedBackupDocumentPicker?.close()
         if (::bridgeDispatcher.isInitialized) bridgeDispatcher.close()
         activityScope.cancel()
@@ -108,6 +123,11 @@ class HybridActivity : FragmentActivity() {
     fun webViewForTesting(): WebView = webViewHost.webView
     fun activeAreaForTesting(): String? = activeArea
     fun rendererRecoveryVisibleForTesting(): Boolean = rendererRecoveryVisible
+    fun discardDraftDialogVisibleForTesting(): Boolean = discardDraftDialog?.isShowing == true
+    fun keepDraftForTesting(): Boolean =
+        discardDraftDialog?.getButton(AlertDialog.BUTTON_NEGATIVE)?.performClick() ?: false
+    fun discardDraftForTesting(): Boolean =
+        discardDraftDialog?.getButton(AlertDialog.BUTTON_POSITIVE)?.performClick() ?: false
 
     private fun installBackHandler() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -120,10 +140,36 @@ class HybridActivity : FragmentActivity() {
                 evaluatingBackPress = true
                 webViewHost.webView.evaluateJavascript(BACK_HANDLER_SCRIPT) { result ->
                     evaluatingBackPress = false
-                    if (result == "\"root\"") moveTaskToBack(true)
+                    when (result) {
+                        "\"root\"" -> moveTaskToBack(true)
+                        "\"confirm_discard\"" -> confirmDiscardDraft()
+                    }
                 }
             }
         })
+    }
+
+    private fun confirmDiscardDraft() {
+        if (discardDraftDialog?.isShowing == true || isFinishing || isDestroyed) return
+        discardDraftDialog = AlertDialog.Builder(this)
+            .setTitle("Discard unfinished changes?")
+            .setMessage("The entries on this form have not been saved.")
+            .setNegativeButton("Keep editing") { _, _ -> clearPendingDiscard() }
+            .setPositiveButton("Discard") { _, _ ->
+                webViewHost.webView.evaluateJavascript(
+                    "window.__saafMilkPendingDiscard?.(); delete window.__saafMilkPendingDiscard;",
+                    null,
+                )
+            }
+            .setOnCancelListener { clearPendingDiscard() }
+            .create()
+            .also { it.show() }
+    }
+
+    private fun clearPendingDiscard() {
+        if (::webViewHost.isInitialized) {
+            webViewHost.webView.evaluateJavascript("delete window.__saafMilkPendingDiscard;", null)
+        }
     }
 
     private fun configureSystemBars() {
@@ -196,22 +242,32 @@ class HybridActivity : FragmentActivity() {
 
         private const val BACK_HANDLER_SCRIPT = """
             (() => {
-              const visibleClosers = Array.from(document.querySelectorAll('[data-native-back-close]')).filter((element) => {
+              const visible = (element) => {
                 const style = window.getComputedStyle(element);
                 return style.display !== 'none' && style.visibility !== 'hidden' && element.getClientRects().length > 0;
-              });
+              };
+              const visibleClosers = Array.from(document.querySelectorAll('[data-native-back-close]')).filter(visible);
               const closer = visibleClosers.at(-1);
-              if (closer) {
-                closer.click();
-                return 'handled';
+              const scope = closer?.closest('[role="dialog"]') ?? document;
+              const dirty = Array.from(scope.querySelectorAll('form[data-saaf-dirty="true"]')).some(visible);
+              const state = window.history.state;
+              const canReturnToPriorArea = typeof state?.saafAreaDepth === 'number' && state.saafAreaDepth > 0;
+              const performBack = () => {
+                if (closer) {
+                  closer.click();
+                  return true;
+                }
+                if (canReturnToPriorArea) {
+                  window.history.back();
+                  return true;
+                }
+                return false;
+              };
+              if (dirty && (closer || canReturnToPriorArea)) {
+                window.__saafMilkPendingDiscard = performBack;
+                return 'confirm_discard';
               }
-              const activeArea = document.querySelector('[data-app-area-active="true"]');
-              const firstPrimaryArea = document.querySelector('#primary-navigation [data-app-area]');
-              if (activeArea && firstPrimaryArea && activeArea !== firstPrimaryArea) {
-                firstPrimaryArea.click();
-                return 'handled';
-              }
-              return 'root';
+              return performBack() ? 'handled' : 'root';
             })()
         """
     }

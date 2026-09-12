@@ -356,7 +356,11 @@ internal class CloudBackupBridgeHandler(
         is CloudBackupFailure.NotConfigured ->
             throw BackupBridgeFailure("cloud_not_configured", error.message ?: "Cloud backup is not configured")
         is CloudBackupFailure.Network ->
-            throw BackupBridgeFailure("io_failed", error.message ?: "Google Drive could not be reached", retryable = true)
+            throw BackupBridgeFailure(
+                "io_failed",
+                "Google Drive could not be reached. Check your connection and try again; any queued encrypted backup will retry automatically.",
+                retryable = true,
+            )
         is CloudBackupFailure.KeyUnavailable ->
             throw BackupBridgeFailure("conflict", error.message ?: "The cloud-backup device key is unavailable")
         is CloudBackupFailure.Remote ->

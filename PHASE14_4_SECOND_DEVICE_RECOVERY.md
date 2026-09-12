@@ -37,6 +37,12 @@ The Cloud inspection form asks only for `Your current owner passphrase`. When th
 
 Severity: **P1 major**. The correction dialog says to enter the complete corrected transaction, but every material editable value starts blank and the original record is no longer visible inside the dialog. This forces the user to remember or re-copy multiple figures and increases the risk of changing a correct field accidentally. Show a compact read-only `Original values` summary and prefill each corrected field from the authoritative original transaction so the user changes only what is wrong while still submitting a complete replacement. If the current history DTO does not expose the required raw inputs, add them through the native read model rather than reconstructing them from display totals.
 
+## Phase 14.7 closure — 2026-09-12
+
+- **F14.4-01 closed:** passphrase reauthentication maps only its native `authentication_failed` result to `Your Saaf owner passphrase is incorrect.` The login screen keeps its generic credential message.
+- **F14.4-02 closed:** the permission-filtered native event-detail model returns authoritative original transaction inputs only to correction-authorized users. The dialog shows a compact read-only summary and prefills the complete replacement fields in their correct units and PKR representation.
+- Purchase, production, sale, and spoilage values, unauthorized omission, monetary prefilling, and WebView summary rendering pass focused coverage and the complete ordinary regression.
+
 ## Safety state
 
 - The A06 isolated QA installation remains restored and signed in with cloud backup paused.

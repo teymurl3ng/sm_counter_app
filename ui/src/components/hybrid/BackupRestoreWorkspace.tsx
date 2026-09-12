@@ -38,7 +38,25 @@ export function BackupRestoreWorkspace({ actions, currentUser, quickUnlockStatus
 
   useEffect(() => {
     if (!canRestore) return;
-    void actions.cloudStatus().then(setCloudStatus).catch((failure) => setError(errorMessage(failure)));
+    let cancelled = false;
+    const refreshStatus = () => {
+      void actions.cloudStatus()
+        .then((status) => { if (!cancelled) setCloudStatus(status); })
+        .catch((failure) => { if (!cancelled) setError(errorMessage(failure)); });
+    };
+    const reconcileAfterNativeUi = () => {
+      if (document.visibilityState === 'visible') refreshStatus();
+    };
+    refreshStatus();
+    window.addEventListener('focus', reconcileAfterNativeUi);
+    window.addEventListener('saafMilkAppResumed', reconcileAfterNativeUi);
+    document.addEventListener('visibilitychange', reconcileAfterNativeUi);
+    return () => {
+      cancelled = true;
+      window.removeEventListener('focus', reconcileAfterNativeUi);
+      window.removeEventListener('saafMilkAppResumed', reconcileAfterNativeUi);
+      document.removeEventListener('visibilitychange', reconcileAfterNativeUi);
+    };
   }, [actions, canRestore]);
 
   return <div className="space-y-4">
@@ -89,10 +107,10 @@ function CloudBackupPanel({ actions, quickUnlockAccount, quickUnlockStatus, busy
   if (!status) return <section className="rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-600">Loading cloud-backup status…</section>;
 
   if (!status.configured) return <form id="connect-cloud-backup-form" onSubmit={connect} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-    <div className="mb-4 flex gap-3"><Cloud className="h-7 w-7 shrink-0 text-emerald-700" /><div><h2 className="font-bold">Automatic encrypted Google Drive backup</h2><p className="mt-1 text-sm leading-6 text-slate-600">Choose an owner-controlled Google account. Backups use its hidden app-data space and run approximately once a day.</p></div></div>
+    <div className="mb-4 flex gap-3"><Cloud className="h-7 w-7 shrink-0 text-emerald-700" /><div><h2 className="font-bold">Automatic encrypted Google Drive backup</h2><p className="mt-1 text-sm leading-6 text-slate-600">First confirm your current Saaf owner passphrase here. Android then asks Google to authenticate an owner-controlled account; Saaf never asks for or stores your Google password.</p></div></div>
     {localError && <Notice message={localError} />}
-    <ReauthenticationFields idPrefix="cloud-connect-account" label="Approve connecting a Google account" proof={accountProof} onChange={setAccountProof} account={quickUnlockAccount} status={quickUnlockStatus} allowPin={false} />
-    <p className="mb-4 rounded-xl bg-amber-50 p-3 text-sm leading-6 text-amber-950"><strong>Android will ask for a separate cloud recovery passphrase.</strong> Keep it outside the phone: a lost phone and forgotten passphrase make the cloud copies permanently unreadable.</p>
+    <ReauthenticationFields idPrefix="cloud-connect-account" label="Your current Saaf owner passphrase" proof={accountProof} onChange={setAccountProof} account={quickUnlockAccount} status={quickUnlockStatus} allowPin={false} />
+    <p className="mb-4 rounded-xl bg-amber-50 p-3 text-sm leading-6 text-amber-950"><strong>Android will also ask for a separate cloud recovery passphrase.</strong> It encrypts portable recovery points and is never your Google password. Each connection creates a new device vault. If you are reconnecting, earlier recovery points stay in Drive; you may reuse the same recovery passphrase, but Saaf has not retained it.</p>
     <label className="mb-4 flex items-start gap-3 rounded-xl bg-slate-50 p-3 text-sm"><input id="cloud-allow-metered" type="checkbox" checked={allowMetered} onChange={(event) => setAllowMetered(event.target.checked)} className="mt-1 h-4 w-4" /><span>Allow automatic backup on mobile or metered data. Leave off for Wi-Fi only.</span></label>
     <button id="connect-cloud-backup-button" disabled={busy || !reauthenticationReady(accountProof)} className="w-full rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white disabled:opacity-60">{busy ? 'Connecting securely…' : 'Choose Google account and connect'}</button>
   </form>;
@@ -140,7 +158,7 @@ function CloudBackupPanel({ actions, quickUnlockAccount, quickUnlockStatus, busy
       </form>}
     </section>
 
-    <section className="rounded-2xl border border-rose-200 bg-white p-5 shadow-sm"><h3 className="font-bold text-rose-900">Disconnect Google Drive</h3><p className="mt-2 text-sm leading-6 text-slate-600">This revokes all Google scopes granted to Saaf Milk and removes local scheduling and key state. Existing encrypted recovery points remain in Drive.</p><div className="mt-4"><ReauthenticationFields idPrefix="cloud-disconnect-account" label="Strong approval required" proof={disconnectProof} onChange={setDisconnectProof} account={quickUnlockAccount} status={quickUnlockStatus} allowPin={false} /></div><button id="disconnect-cloud-backup-button" disabled={busy || !reauthenticationReady(disconnectProof)} onClick={disconnect} className="w-full rounded-xl border border-rose-300 px-4 py-3 font-semibold text-rose-800 disabled:opacity-50">Revoke access and disconnect</button></section>
+    <section className="rounded-2xl border border-rose-200 bg-white p-5 shadow-sm"><h3 className="font-bold text-rose-900">Disconnect Google Drive</h3><p className="mt-2 text-sm leading-6 text-slate-600">After your Saaf owner passphrase, Google opens an account chooser so you can select the exact connected account before access is revoked. This removes local scheduling and key state. Existing encrypted recovery points remain in Drive, and Saaf never asks for your Google password.</p><div className="mt-4"><ReauthenticationFields idPrefix="cloud-disconnect-account" label="Your current Saaf owner passphrase" proof={disconnectProof} onChange={setDisconnectProof} account={quickUnlockAccount} status={quickUnlockStatus} allowPin={false} /></div><button id="disconnect-cloud-backup-button" disabled={busy || !reauthenticationReady(disconnectProof)} onClick={disconnect} className="w-full rounded-xl border border-rose-300 px-4 py-3 font-semibold text-rose-800 disabled:opacity-50">Choose connected account and revoke access</button></section>
     {localError && <Notice message={localError} />}
     {confirmingRestore && cloudInspection && <RestoreConfirmation busy={busy} quickUnlockAccount={quickUnlockAccount} quickUnlockStatus={quickUnlockStatus} onCancel={() => setConfirmingRestore(false)} onConfirm={async (proof) => { const result = await run(() => onCloudRestored(cloudInspection.restoreTicket, proof)); if (!result) setConfirmingRestore(false); }} />}
   </div>;

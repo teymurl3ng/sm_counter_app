@@ -1,6 +1,6 @@
 # Phase 14 — Final Device QA
 
-Status: **IN PROGRESS — checkpoints 14.1–14.5 complete; 14.6 focused S24 proof passes and extended acceptance remains**
+Status: **IN PROGRESS — checkpoints 14.1–14.6 complete; 14.7 defect code and complete regression pass, with final hands-on confirmation remaining**
 
 ## Purpose
 
@@ -82,6 +82,8 @@ Implementation completed on 2026-09-09. The native device/Keystore boundary, per
 - Close all Quick unlock security/usability findings and rerun affected tests, build/contract/cleanup/hash gates, 7/7 host tests, and the expanded complete physical-device regression.
 - Publish device/provider/recovery evidence, remaining limitations, and the guarded Phase 15 shopkeeper-QA handoff.
 
+Implementation and automated regression completed on 2026-09-12. The eleven Phase 14.3–14.5 findings and the later F14.6-03 feedback finding have bounded fixes. The S24 passes 11/11 focused Android behavior tests, 271/271 ordinary instrumentation tests in the new `com.saaf.milkshop.qa.tests` sandbox, the separately configured 1/1 visual-capture audit, and 7/7 host tests. Contract v5/91, TypeScript, production Vite packaging, cleanup, Kotlin compilation, package identity, and OAuth-presence gates pass. The installed OAuth-enabled `com.saaf.milkshop.qa` APK is SHA-256 `4BEAD85632975B253E870463E271D781944FC6BE1BDE05F64C2BF26F5915E491`. See `PHASE14_7_DEFECT_CLOSURE.md`.
+
 ## Evidence policy
 
 - Record device model, Android version, dimensions, configuration, exact action, expected result, observed result, severity, and artifact path.
@@ -92,10 +94,8 @@ Implementation completed on 2026-09-09. The native device/Keystore boundary, per
 
 ## Current next action
 
-The 2026-09-12 extended audit fixed F14.6-01 (overlapping PIN attempts weakening lockout) and F14.6-02 (pending phone authentication surviving enrollment/security invalidation). The updated S24 QA app passes 9/9 Quick unlock tests, 26/26 related device tests, and 7/7 host tests. Cancellation and enrollment visibility after process restart are verified; the remaining hands-on checks are listed in `PHASE14_6_QUICK_UNLOCK_QA.md`.
-
-Complete those Quick unlock misuse, recovery, lifecycle, and accessibility checks. Then close the eleven earlier live defects—five from cloud/recovery and six from the Android audit—and run the expanded 269-test regression in 14.7.
+The final S24 QA APK is installed and opens on a clean first-owner screen. Initialize only this disposable `.qa` identity with private credentials, save its recovery code, then perform the remaining physical TalkBack close-action check and any explicitly approved phone-security invalidation check. The new instrumentation target is `com.saaf.milkshop.qa.tests`, so future connected regressions no longer install over or remove the user-facing QA package.
 
 ## Plain English
 
-The fast, secure Quick unlock feature now passes its dedicated tests and basic S24 setup/login check. Its tougher failure, recovery, lifecycle, and accessibility checks remain; Phase 14.7 then fixes the earlier recorded defects and runs the complete regression.
+The recorded cloud, recovery, Android behavior, and Quick unlock feedback defects are fixed, and all 272 Android checks plus seven host tests pass. The final QA build is installed on the S24. It is a fresh disposable QA database, so the next step is private first-owner setup followed by the last physical accessibility/security confirmations.

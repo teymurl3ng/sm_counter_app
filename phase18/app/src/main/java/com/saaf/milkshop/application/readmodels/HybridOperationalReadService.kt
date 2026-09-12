@@ -111,7 +111,29 @@ internal class HybridOperationalReadService(
                 FinancialMovementDto(account?.let { cleanAccountName(it.name, it.category) } ?: "Account #${movement.accountId}", money(movement.amount))
             }
         } else null
-        return EventDetailDto(event.toHistoryDto(events.mapNotNull { it.correctsEventId }.toSet()), inventory, financial)
+        val originalValues = if (RolePermissions.allows(AppRole.parse(actor.role), AppPermission.CORRECTION)) {
+            val spoilage = database.spoilageDao().findByEventId(eventId)
+            OriginalEventValuesDto(
+                rawLiters = event.rawLiters?.let(::decimal),
+                fatPercent = event.fatPercentage?.let(::decimal),
+                lrReading = event.lrReading?.let(::decimal),
+                milkLitersUsed = event.milkLitersUsed?.let(::decimal),
+                yogurtKgProduced = event.yogurtKgProduced?.let(::decimal),
+                unitRatePaisa = event.unitRate?.let(::money),
+                quantity = event.saleQuantity?.let(::decimal) ?: spoilage?.quantity?.let(::decimal),
+                valuePaisa = event.saleValue?.let(::money),
+                surchargePaisa = event.takeIf { it.saleValue != null }?.let { money(it.surchargeApplied) },
+                channelCode = event.channel,
+                amountPaisa = event.amount?.let(::money),
+                reasonCode = spoilage?.reason,
+            )
+        } else null
+        return EventDetailDto(
+            event = event.toHistoryDto(events.mapNotNull { it.correctsEventId }.toSet()),
+            inventoryMovements = inventory,
+            financialMovements = financial,
+            originalValues = originalValues,
+        )
     }
 
     private fun cleanAccountName(name: String, category: String): String = when (category) {

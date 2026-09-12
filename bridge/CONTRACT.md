@@ -2,7 +2,7 @@
 
 **Status: FROZEN — contract version 5 — 2026-09-09**
 
-Manifest SHA-256: `8201D04A58100E3EDE185009D684F0079CE934D8EFF897367F8F0A6513A0C65A`
+Manifest SHA-256: `50CBB9E0DD21B703EBEB400DBF415BFD259A3A14DC1C0A5EF73D9EC056ECCBBA`
 
 ## 1. Authority and scope
 
@@ -174,6 +174,7 @@ The manifest defines structural required/nullable fields. Kotlin additionally en
 
 - Sale: exactly one of `quantity` or `valuePaisa`; `account` payment requires only `paymentAccountId`; `credit` requires only `customerAccountId`; disabled surcharge requires null/zero surcharge according to the native adapter.
 - Corrections: `correctionTypeCode` selects the allowed field family. Unrelated correction fields must be absent. Sale correction requires exactly one of quantity/value. Monetary corrections accept amount only. Spoilage corrections require quantity and physical reason.
+- Event detail exposes an `originalValues` correction read model only to roles that can correct records. It contains the native event and spoilage-detail values needed to prefill a complete replacement; React must not reconstruct these inputs from displayed ledger movements.
 - Opening state: product/account IDs are unique; values are non-negative; initial state is permitted only before the first business event and never created by migration.
 - Profiles: required nullable fields are intentional replacement values—null clears the stored optional value. Omitted optional fields on event commands mean “not supplied,” not “clear.”
 - Budgets: milk plans use liters and a Monday-to-Monday week; operating categories use amount and a calendar month. Closed periods cannot be revised.

@@ -43,6 +43,13 @@ With Airplane mode enabled, **Back up now** was queued and a subsequent refresh 
 
 The live flow uses three distinct authentication concepts: the current Saaf owner passphrase, Google-owned account authentication, and a separate cloud-recovery passphrase. The connection form does not explain this distinction clearly enough. After revocation, reconnect also asks the user to create a `new` recovery passphrase even though existing recovery points remain, because the implementation creates a new device vault; the same prior recovery passphrase may be reused but is not automatically retained. Revocation launches a Google account chooser to verify the exact account without explaining why. Clarify these boundaries and new-vault behavior without ever asking for or storing the Google password.
 
+## Phase 14.7 closure — 2026-09-12
+
+- **F14.3-01 closed:** manual picker/restore and interactive cloud connect, inspect, restore, and disconnect calls now use a five-minute bridge window. Cloud status refreshes after window focus, visibility return, and the native Activity resume event.
+- **F14.3-02 closed:** native cloud network failures now map to concise connection/retry guidance. Raw DNS and transport exceptions remain internal.
+- **F14.3-03 closed:** connect and disconnect copy now distinguishes the current Saaf owner passphrase, Google-owned authentication, and the separate cloud recovery passphrase. It explains reconnect/new-vault behavior, retained recovery points, and exact-account revocation.
+- The complete isolated Android regression passes 271/271, with the visual audit passing separately 1/1. Existing cloud-provider-double coverage remains green within that inventory.
+
 ### Mandatory follow-on requirement — Quick unlock
 
 The live journey required repeated entry of a long Saaf owner passphrase plus a separate long cloud-recovery passphrase. The owner explicitly made a short trusted-device path—fingerprint/other strong biometric, Android device credential, or short per-user PIN—a release requirement. Phase 14.6 now owns implementation and physical-device proof. The short path may unlock device-bound Keystore material for routine existing-device work, but it must never reduce portable Drive-backup encryption to a four-digit secret. See `QUICK_UNLOCK_REQUIREMENT.md`.

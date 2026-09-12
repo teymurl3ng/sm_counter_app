@@ -23,7 +23,11 @@ class Phase12ResponsiveAccessibilityTest {
             val driver = HybridWebViewTestDriver.attach(scenario)
             driver.ensureSignedIn()
             driver.waitFor("document.getElementById('app-navigation') !== null", 20_000L)
-            driver.evaluate("document.documentElement.style.fontSize = '125%'; true")
+            scenario.onActivity { it.webViewForTesting().settings.textZoom = 200 }
+            driver.waitFor(
+                "parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--saaf-navigation-height')) >= document.getElementById('app-navigation').getBoundingClientRect().height - 1",
+                10_000L,
+            )
 
             val destinations = listOf(
                 Triple("dashboard-nav", "Dashboard", "run-report-button"),
@@ -43,7 +47,16 @@ class Phase12ResponsiveAccessibilityTest {
                 assertEquals(
                     "true",
                     driver.evaluate(
-                        "Array.from(document.querySelectorAll('#app-navigation button')).every((button) => button.scrollWidth <= button.clientWidth + 1 || getComputedStyle(button).whiteSpace === 'normal')",
+                        """
+                            (() => {
+                              const navigation = document.getElementById('app-navigation');
+                              const visibleButtons = Array.from(navigation.querySelectorAll('button')).filter((button) => getComputedStyle(button).visibility !== 'hidden');
+                              return visibleButtons.every((button) =>
+                                button.scrollWidth <= button.clientWidth + 1 &&
+                                button.scrollHeight <= button.clientHeight + 1
+                              ) && parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--saaf-navigation-height')) >= navigation.getBoundingClientRect().height - 1;
+                            })()
+                        """.trimIndent(),
                     ),
                 )
             }
@@ -52,10 +65,18 @@ class Phase12ResponsiveAccessibilityTest {
             driver.waitFor("document.getElementById('business-settings-tab') !== null", 20_000L)
             assertEquals(
                 "true",
-                driver.evaluate("Array.from(document.querySelectorAll('#business-settings-tab, #opening-state-tab, #expense-categories-tab')).every((button) => button.scrollWidth <= button.clientWidth + 1)"),
+                driver.evaluate(
+                    """
+                        (() => {
+                          const buttons = Array.from(document.querySelectorAll('#business-settings-tab, #opening-state-tab, #expense-categories-tab'));
+                          return buttons.every((button) => button.scrollWidth <= button.clientWidth + 1 && button.scrollHeight <= button.clientHeight + 1) &&
+                            buttons.every((button, index) => index === 0 || buttons[index - 1].getBoundingClientRect().bottom <= button.getBoundingClientRect().top + 1);
+                        })()
+                    """.trimIndent(),
+                ),
             )
-            driver.evaluate("document.documentElement.style.fontSize = ''; true")
         } finally {
+            scenario.onActivity { it.webViewForTesting().settings.textZoom = 100 }
             scenario.close()
         }
     }

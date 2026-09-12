@@ -197,8 +197,8 @@ export function ManagementWorkspace({
 
   return <main className="hybrid-screen hybrid-management-screen bg-[#f7f6f0] pb-24 text-slate-900 md:pb-10">
     <header className="hybrid-header px-4 pb-5 pt-6 text-white shadow-lg sm:px-5 sm:pb-7 sm:pt-7">
-      <div className="mx-auto flex max-w-4xl items-center justify-between gap-4">
-        <div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">Saaf Milk</p><h1 className="mt-1 text-2xl font-bold">{title}</h1><p id="signed-in-user" className="mt-1 text-sm text-emerald-100">Signed in as {currentUser?.displayName} · {plainRole(currentUser?.roleCode)}</p></div>
+      <div className="mx-auto flex max-w-4xl flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0 flex-1"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">Saaf Milk</p><h1 className="mt-1 break-words text-2xl font-bold">{title}</h1><p id="signed-in-user" className="mt-1 break-words text-sm text-emerald-100">Signed in as {currentUser?.displayName} · {plainRole(currentUser?.roleCode)}</p></div>
         <button id="logout-button" disabled={busy} onClick={onLogout} className="rounded-xl border border-emerald-600 p-3 text-emerald-50 disabled:opacity-50" aria-label="Sign out"><LogOut className="h-5 w-5" /></button>
       </div>
     </header>

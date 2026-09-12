@@ -56,7 +56,7 @@ export function Dialog({ title, onClose, children }: { title: string; onClose():
       <section ref={panelRef} role="dialog" aria-modal="true" aria-labelledby={titleId} onKeyDown={handleKeyDown} className="hybrid-dialog-panel w-full overflow-y-auto rounded-t-3xl bg-white shadow-2xl sm:max-w-lg sm:rounded-3xl">
         <div className="hybrid-dialog-header sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-slate-100 bg-white px-5 py-4">
           <h2 id={titleId} className="text-xl font-bold text-slate-900">{title}</h2>
-          <button ref={closeRef} type="button" data-native-back-close onClick={onClose} className="flex min-h-12 min-w-12 items-center justify-center rounded-xl text-slate-600" aria-label={`Close ${title}`}><X className="h-5 w-5" /></button>
+          <button ref={closeRef} type="button" data-native-back-close onClick={onClose} className="flex min-h-12 items-center justify-center gap-1.5 rounded-xl px-3 font-semibold text-slate-700" aria-label={`Close ${title}`}><X className="h-5 w-5 shrink-0" aria-hidden="true" /><span>Close</span></button>
         </div>
         <div ref={contentRef} className="px-5 pb-5 pt-4">{children}</div>
         {hasMoreContent && <button type="button" onClick={() => panelRef.current?.scrollTo({ top: panelRef.current.scrollHeight, behavior: 'auto' })} className="hybrid-dialog-continue sticky bottom-3 z-10 mx-5 mb-3 flex min-h-12 w-[calc(100%-2.5rem)] items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-emerald-800 shadow-lg">Continue to form actions<ChevronDown className="h-4 w-4" /></button>}

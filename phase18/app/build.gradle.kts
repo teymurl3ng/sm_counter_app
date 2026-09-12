@@ -4,6 +4,7 @@ plugins {
 }
 
 val isolatedQaData = providers.gradleProperty("saaf.isolatedQa").orNull.equals("true", ignoreCase = true)
+val instrumentationSandbox = providers.gradleProperty("saaf.instrumentationSandbox").orNull.equals("true", ignoreCase = true)
 val performanceTestBuild = providers.gradleProperty("saaf.performanceTestBuild").orNull.equals("true", ignoreCase = true)
 val googleWebClientId = providers.gradleProperty("saaf.googleWebClientId").orNull.orEmpty()
 val escapedGoogleWebClientId = googleWebClientId.replace("\\", "\\\\").replace("\"", "\\\"")
@@ -29,7 +30,10 @@ android {
 
     buildTypes {
         debug {
-            if (isolatedQaData) {
+            if (instrumentationSandbox) {
+                applicationIdSuffix = ".qa.tests"
+                versionNameSuffix = "-qa-tests"
+            } else if (isolatedQaData) {
                 applicationIdSuffix = ".qa"
                 versionNameSuffix = "-qa"
             }
@@ -77,6 +81,14 @@ val verifyHybridWebAssets by tasks.registering {
 
 tasks.matching { it.name == "preBuild" }.configureEach {
     dependsOn(verifyHybridWebAssets)
+}
+
+tasks.matching { it.name == "connectedDebugAndroidTest" }.configureEach {
+    doFirst {
+        check(instrumentationSandbox) {
+            "Connected debug tests require -Psaaf.instrumentationSandbox=true so instrumentation cannot replace a user-facing app identity."
+        }
+    }
 }
 
 ksp {

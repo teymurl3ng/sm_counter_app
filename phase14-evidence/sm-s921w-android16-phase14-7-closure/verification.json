@@ -1,0 +1,33 @@
+{
+  "date": "2026-09-12",
+  "device": "Samsung SM-S921W",
+  "androidVersion": "16",
+  "apiLevel": 36,
+  "transport": "authorized wired ADB",
+  "display": { "width": 1080, "height": 2340, "density": 480 },
+  "packages": {
+    "userFacingQa": "com.saaf.milkshop.qa",
+    "instrumentationSandbox": "com.saaf.milkshop.qa.tests"
+  },
+  "bridge": {
+    "version": 5,
+    "endpoints": 91,
+    "sha256": "50CBB9E0DD21B703EBEB400DBF415BFD259A3A14DC1C0A5EF73D9EC056ECCBBA"
+  },
+  "tests": {
+    "focusedAndroid": { "passed": 11, "failed": 0, "skipped": 0 },
+    "ordinaryAndroid": { "passed": 271, "failed": 0, "skipped": 0 },
+    "visualCaptureAudit": { "passed": 1, "failed": 0, "skipped": 0 },
+    "host": { "passed": 7, "failed": 0, "skipped": 0 }
+  },
+  "finalQaApk": {
+    "oauthConfigured": true,
+    "bytes": 16174596,
+    "sha256": "4BEAD85632975B253E870463E271D781944FC6BE1BDE05F64C2BF26F5915E491",
+    "install": "pass",
+    "coldLaunch": "pass",
+    "coldLaunchMilliseconds": 1740,
+    "initialState": "clean first-owner setup"
+  },
+  "remainingPhysicalAcceptance": true
+}

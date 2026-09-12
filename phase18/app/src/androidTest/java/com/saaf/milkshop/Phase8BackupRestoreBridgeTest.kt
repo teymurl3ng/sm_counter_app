@@ -60,7 +60,7 @@ class Phase8BackupRestoreBridgeTest {
     }
 
     @Test
-    fun exportUsesNativeDocumentBoundaryAndAdvertisesAllEightySixActions() = runBlocking {
+    fun exportUsesNativeDocumentBoundaryAndAdvertisesAllNinetyOneActions() = runBlocking {
         val owner = security.bootstrapOwner("backup.owner", "Backup Owner", OWNER_PASSWORD.toCharArray())
         val response = dispatch("system.exportEncryptedBackup", JSONObject().put("passphrase", BACKUP_PASSWORD), owner.session.sessionId)
         assertTrue(response.toString(), response.getBoolean("ok"))
@@ -74,7 +74,7 @@ class Phase8BackupRestoreBridgeTest {
 
         val actions = dispatch("system.bridgeInfo").getJSONObject("data").getJSONArray("supportedActions")
         val names = (0 until actions.length()).map(actions::getString)
-        assertEquals(86, names.size)
+        assertEquals(91, names.size)
         assertTrue(names.containsAll(listOf("system.exportEncryptedBackup", "system.inspectEncryptedBackup", "system.restoreInspectedBackup")))
         assertTrue(names.containsAll(listOf("system.cloudBackupStatus", "system.connectCloudBackup", "system.restoreInspectedCloudBackup")))
         assertError(dispatch("system.exportEncryptedBackup", JSONObject().put("passphrase", BACKUP_PASSWORD).put("extra", true), owner.session.sessionId), "invalid_request")
@@ -189,6 +189,8 @@ class Phase8BackupRestoreBridgeTest {
             waitFor(webView, "document.getElementById('confirm-restore-checkbox') !== null")
             assertEquals("true", evaluate(webView, "document.body.innerText.includes('This is not a merge')"))
             evaluate(webView, "document.getElementById('confirm-restore-checkbox').click(); true")
+            setInput(webView, "final-restore-passphrase", SaafMilkTestRunner.TEST_PASSPHRASE)
+            waitFor(webView, "document.getElementById('restore-inspected-backup-button').disabled === false")
             evaluate(webView, "document.getElementById('restore-inspected-backup-button').click(); true")
             waitFor(webView, "document.getElementById('login-button') !== null && document.body.innerText.includes('Backup restored safely')", 30_000L)
             assertTrue(app.database.securityAuditDao().all().any { it.action == BackupBridgeHandler.ACTION_RESTORE_BACKUP })

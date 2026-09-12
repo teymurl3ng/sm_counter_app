@@ -1,5 +1,5 @@
 import type { QuickUnlockMethod, SessionHandle } from '../../bridge/contract.generated';
-import { callNative } from '../../bridge/nativeBridge';
+import { callNative, NativeBridgeError } from '../../bridge/nativeBridge';
 
 export type ReauthenticationProof =
   | { method: 'passphrase'; secret: string }
@@ -12,7 +12,14 @@ export async function reauthenticateWith(
   proof: ReauthenticationProof,
 ): Promise<void> {
   if (proof.method === 'passphrase') {
-    await callNative('command.auth.reauthenticate', { passphrase: proof.secret }, session);
+    try {
+      await callNative('command.auth.reauthenticate', { passphrase: proof.secret }, session);
+    } catch (failure) {
+      if (failure instanceof NativeBridgeError && failure.code === 'authentication_failed') {
+        throw new Error('Your Saaf owner passphrase is incorrect.');
+      }
+      throw failure;
+    }
     return;
   }
   await callNative('command.auth.quickReauthenticate', {

@@ -25,7 +25,7 @@ export function SettingsWorkspaceScreen({ busy, canManageSettings, categories, m
 }) {
   const [area, setArea] = useState<SettingsArea>(canManageSettings ? 'business' : 'expenses');
   return <>
-    <div className="mb-5 grid grid-flow-col auto-cols-fr rounded-xl bg-slate-200/70 p-1">
+    <div className="hybrid-segmented-tabs mb-5 grid grid-flow-col auto-cols-fr rounded-xl bg-slate-200/70 p-1">
       {canManageSettings && <FilterButton id="business-settings-tab" active={area === 'business'} onClick={() => setArea('business')}>Shop details & rates</FilterButton>}
       {canManageSettings && <FilterButton id="opening-state-tab" active={area === 'opening'} onClick={() => setArea('opening')}>Opening balances</FilterButton>}
       <FilterButton id="expense-categories-tab" active={area === 'expenses'} onClick={() => setArea('expenses')}>Expense categories</FilterButton>

@@ -136,7 +136,7 @@ class Phase8StaffSecurityTest {
 
         val actions = dispatch("system.bridgeInfo").getJSONObject("data").getJSONArray("supportedActions")
         val names = (0 until actions.length()).map(actions::getString)
-        assertEquals(86, names.size)
+        assertEquals(91, names.size)
         assertTrue(names.containsAll(listOf(
             "query.users", "query.securityAudit", "command.auth.changeOwnPassphrase", "command.auth.recoverOwner",
             "command.auth.beginUserEnrollment", "command.auth.resumeUserEnrollment", "command.auth.completeEnrollment",

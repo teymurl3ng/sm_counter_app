@@ -199,6 +199,21 @@ internal fun eventDetailJson(value: EventDetailDto): JSONObject = JSONObject()
             JSONObject().put("accountName", movement.accountName).put("amountPaisa", movement.amountPaisa.toString())
         }
     })
+    .putNullable("originalValues", value.originalValues?.let { original ->
+        JSONObject()
+            .putNullable("rawLiters", original.rawLiters)
+            .putNullable("fatPercent", original.fatPercent)
+            .putNullable("lrReading", original.lrReading)
+            .putNullable("milkLitersUsed", original.milkLitersUsed)
+            .putNullable("yogurtKgProduced", original.yogurtKgProduced)
+            .putNullable("unitRatePaisa", original.unitRatePaisa?.toString())
+            .putNullable("quantity", original.quantity)
+            .putNullable("valuePaisa", original.valuePaisa?.toString())
+            .putNullable("surchargePaisa", original.surchargePaisa?.toString())
+            .putNullable("channelCode", original.channelCode)
+            .putNullable("amountPaisa", original.amountPaisa?.toString())
+            .putNullable("reasonCode", original.reasonCode)
+    })
 
 internal fun reconciliationArchiveJson(value: ReconciliationArchiveDto): JSONObject = JSONObject()
     .put("cashCounts", jsonArray(value.cashCounts) { count ->

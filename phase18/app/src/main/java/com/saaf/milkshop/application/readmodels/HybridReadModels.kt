@@ -226,10 +226,26 @@ data class FinancialMovementDto(
     val amountPaisa: Long,
 )
 
+data class OriginalEventValuesDto(
+    val rawLiters: String?,
+    val fatPercent: String?,
+    val lrReading: String?,
+    val milkLitersUsed: String?,
+    val yogurtKgProduced: String?,
+    val unitRatePaisa: Long?,
+    val quantity: String?,
+    val valuePaisa: Long?,
+    val surchargePaisa: Long?,
+    val channelCode: String?,
+    val amountPaisa: Long?,
+    val reasonCode: String?,
+)
+
 data class EventDetailDto(
     val event: EventHistoryDto,
     val inventoryMovements: List<InventoryMovementDto>,
     val financialMovements: List<FinancialMovementDto>?,
+    val originalValues: OriginalEventValuesDto?,
 )
 
 data class AccountLedgerEntryDto(

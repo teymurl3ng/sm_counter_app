@@ -27,6 +27,7 @@ html {
   --saaf-system-bottom: env(safe-area-inset-bottom, 0px);
   --saaf-ime-bottom: 0px;
   --saaf-visual-viewport-height: 100dvh;
+  --saaf-navigation-height: 0px;
 }
 
 html,
@@ -76,6 +77,7 @@ body,
 .hybrid-dialog-panel {
   max-height: calc(var(--saaf-visual-viewport-height) - var(--saaf-system-top) - var(--saaf-system-bottom));
   overscroll-behavior: contain;
+  scroll-padding-block: 5rem 7rem;
   scrollbar-gutter: stable;
 }
 
@@ -97,6 +99,11 @@ html[data-ime-visible="true"] .hybrid-overlay {
 
 .hybrid-screen :where(button, input:not([type="checkbox"]):not([type="radio"]), select) {
   min-height: 3rem;
+}
+
+.hybrid-screen button {
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .hybrid-screen button[aria-label] {
@@ -140,7 +147,47 @@ html[data-ime-visible="true"] .hybrid-overlay {
 }
 
 .hybrid-dialog-header {
+  align-items: flex-start;
   box-shadow: 0 1px 0 rgb(15 23 42 / 0.04);
+}
+
+@media (max-width: 47.999rem) {
+  .hybrid-management-screen {
+    padding-bottom: calc(var(--saaf-navigation-height) + 1rem) !important;
+  }
+}
+
+@media (max-width: 30rem) {
+  .hybrid-management-screen :where(.grid-cols-2, .grid-cols-3) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hybrid-segmented-tabs {
+    grid-auto-flow: row;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hybrid-dialog-header,
+  .hybrid-dialog-panel > :where(div) {
+    min-width: 0;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 32rem) {
+  .hybrid-header {
+    padding-top: max(0.75rem, calc(var(--saaf-system-top) + 0.375rem));
+    padding-bottom: 0.75rem;
+  }
+
+  .hybrid-management-screen > div.mx-auto {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .hybrid-navigation {
+    padding-top: 0.25rem;
+    padding-bottom: max(0.25rem, var(--saaf-system-bottom));
+  }
 }
 
 @keyframes fadeIn {

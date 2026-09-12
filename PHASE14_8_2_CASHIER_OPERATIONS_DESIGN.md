@@ -1,16 +1,18 @@
 # Phase 14.8.2 — Cashier and Operations staff daily-work design
 
-Status: **PROPOSED FOR OWNER REVIEW — complete interaction direction, no Compose implementation yet**
+Status: **INTERACTION WIREFRAME ONLY — functional assumptions retained; visual treatment explicitly rejected**
 
 Date: 2026-09-12
 
 ## What this checkpoint decides
 
-This checkpoint turns the accepted role policy into the first two complete native work experiences. It starts with Cashier and Operations staff because these accounts perform the most repeated entries and are expected to need the least training.
+This checkpoint turns the accepted role policy into the first two interaction wireframes. It starts with Cashier and Operations staff because these accounts perform the most repeated entries and are expected to need the least training.
 
 The design is based on the real Saaf commands and saved results. It does not add receipt printing, delivery assignment, online sync, or any other capability that the current product does not have. It does identify a small number of authorization and read-model changes that must precede native ownership of these screens.
 
-No production Compose code is authorized by this document. The next checkpoint is owner review of the interactive flows, including the normal, success, error, empty, and supervisor-approval states.
+The first preview established useful functional assumptions, but the owner explicitly rejected its rough visual fidelity as an implementation blueprint. Its spacing, typography, colors, component styling, app chrome, and overall finish are not approved and must not be copied into Compose.
+
+No production Compose code is authorized by this document. The next checkpoint is a high-fidelity visual-direction review of the core Cashier sale surface using the same product facts and workflow.
 
 ## Shared daily-work rules
 

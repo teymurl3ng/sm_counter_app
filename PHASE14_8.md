@@ -1,6 +1,6 @@
 # Phase 14.8 — Native UI redesign and migration
 
-Status: **ACTIVE — checkpoint 14.8.1 complete; Cashier and Operations journey review in progress**
+Status: **ACTIVE — checkpoint 14.8.1 complete; high-fidelity Cashier visual directions ready for review**
 
 Date started: 2026-09-12
 
@@ -95,7 +95,7 @@ Checkpoint output: an approved native information architecture, complete represe
 
 The current audit first compared three universal structures. Owner review established a stronger requirement: each role needs its own calibrated default, menu, density, action order, and feedback while preserving shared concepts and native permission truth. The role review then defined Owner, Administrator, Store manager, Cashier, and Operations staff; mapped every screen/action; and identified permission bundles that must be split or scoped. That policy is now accepted as the design foundation.
 
-`PHASE14_8_2_CASHIER_OPERATIONS_DESIGN.md` turns the foundation into the first complete daily-work proposal. It begins with the least-technical, highest-frequency roles and specifies their exact navigation, field order, safe defaults, save feedback, error recovery, Back behavior, empty states, and supervisor approval boundary. Production Compose work still waits for review of these complete flows and the later Owner/Manager/Administrator flows.
+`PHASE14_8_2_CASHIER_OPERATIONS_DESIGN.md` records the first Cashier and Operations interaction wireframes. They specify navigation, field order, safe defaults, save feedback, error recovery, Back behavior, empty states, and supervisor approval boundaries. The owner explicitly rejected their rough presentation as an implementation blueprint. A high-fidelity Cashier sale direction must now establish the native visual world before the remaining journeys or production Compose work continue.
 
 ### 14.8.3 — Compose foundation
 
@@ -139,4 +139,4 @@ This baseline is a comparison point, not a visual target.
 
 ## Current next gate
 
-Checkpoint 14.8.2 is currently at Cashier and Operations daily-work review. The review must establish whether a first-time worker can complete normal and exceptional tasks quickly and confidently. After acceptance, Owner, Store manager, and Administrator journeys will be designed against the same components and policy. Production Compose screens begin only when all five role experiences are coherent.
+Checkpoint 14.8.2 is now at native visual-direction review. `PHASE14_8_2_CASHIER_VISUAL_DIRECTIONS.md` compares three polished Cashier sale worlds using the same real content and workflow across Ready, Credit, Stock error, Approval, Saving, and Success. After the owner selects one, it will be carried across the complete Cashier and Operations journeys. The remaining roles and production Compose implementation wait behind those approvals.

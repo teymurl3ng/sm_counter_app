@@ -2,7 +2,7 @@
   "date": "2026-09-12",
   "device": "Samsung SM-S921W",
   "androidVersion": "16",
-  "transport": "wireless ADB",
+  "transport": "wireless ADB initially; authorized USB ADB after reboot",
   "package": "com.saaf.milkshop.qa",
   "display": {
     "width": 1080,
@@ -48,8 +48,12 @@
     "phonePromptCancellation": "pass: observed",
     "enrollmentAfterProcessRestart": "pass: observed",
     "quickPinAfterUpdateAndColdLaunch": "pass after full-passphrase fallback: user explicitly confirmed Saaf Quick PIN login; initial cold-launch method was ambiguous",
-    "fingerprintAfterUpdate": "pending",
-    "deviceReboot": "pending",
+    "fingerprintAfterUpdate": "pass: user explicitly confirmed fingerprint sign-in after a fresh sign-out; dashboard captured in 11-fingerprint-login.png",
+    "cloudInspectionWithQuickPin": "pass: Quick PIN selected before user inspection; green security-check result captured in 15-cloud-inspection-passed.png",
+    "finalRestoreStrongOnlyWarning": "pass: only Passphrase and Phone security offered; acknowledgment unchecked and restore disabled in 17-final-restore-strong-only.png; no restore performed",
+    "finalRestoreWarningBackCancellation": "pass: Android Back closes warning and retains inspection result in 18-final-restore-cancelled.png",
+    "initialRestoreWarningTap": "unexplained page-top jump in 16-final-restore-approval.png; subsequent observed button tap opened warning correctly; not a reproduced defect",
+    "deviceReboot": "pass: user confirmed Quick PIN login after reboot; after USB reconnection, 19-post-reboot-usb-dashboard.png independently captures the test / Owner dashboard; authentication method established by user report",
     "observedQuickUnlockPause": "Full-passphrase fallback followed by explicit successful Quick PIN login: pause reset passes; controlled failure threshold sequence remains pending",
     "fullPassphraseFallback": "pass: user confirmed full-passphrase sign-in after pause; screenshot shows test / Owner dashboard"
   }

@@ -1,6 +1,6 @@
 # Phase 14.5 — Accessibility, Adaptivity, and Android Behavior QA
 
-Status: **DEFECT CLOSURE IMPLEMENTED — all six automated S24 regressions pass; physical TalkBack confirmation remains**
+Status: **COMPLETE — all six automated S24 regressions and the physical TalkBack Close check pass**
 
 Date: 2026-09-09
 
@@ -95,7 +95,7 @@ Platform-conformance verdict: **FAIL for final release acceptance**. The applica
 
 ## Handoff
 
-Phase 14.7 implemented all six findings. The remaining acceptance item is a physical TalkBack swipe-focus and double-tap check of the corrected Close button.
+Phase 14.7 implemented all six findings. The user completed the physical TalkBack swipe-focus and double-tap check of the corrected Close button on the S24 and confirmed normal dismissal.
 
 ## Phase 14.7 closure — 2026-09-12
 
@@ -105,11 +105,11 @@ Phase 14.7 implemented all six findings. The remaining acceptance item is a phys
 | F14.5-02 | Compact landscape reduces header, content, and navigation spacing while preserving scroll boundaries. | Landscape navigation and daily task forms remain within the viewport. |
 | F14.5-03 | The shell combines visual-viewport and native IME insets, repeats focus correction during keyboard animation, and synchronizes on native inset events. | The active field and dialog stay inside the computed usable viewport; navigation hides only while the IME is visible. |
 | F14.5-04 | Web history records area navigation. Native Back closes the top layer, returns to the prior area, and confirms before leaving a dirty form. | Keep editing retains the draft; Discard returns through history to Dashboard. |
-| F14.5-05 | Dialogs use a visible semantic Close button with predictable focus and a full 48 CSS-pixel target. | The visible form dialog exposes the button, label, minimum size, and working dismissal. Physical TalkBack confirmation remains. |
+| F14.5-05 | Dialogs use a visible semantic Close button with predictable focus and a full 48 CSS-pixel target. | The visible form dialog exposes the button, label, minimum size, and working dismissal; physical TalkBack swipe focus and double-tap dismissal pass by user confirmation. |
 | F14.5-06 | Orientation and screen-size changes no longer destroy the Activity/WebView. | Rotation keeps the exact WebView, Settings area, and unfinished value; explicit lifecycle recreation remains separately covered. |
 
-The focused closure matrix passes **11/11**. The complete ordinary suite passes **271/271**, the separately configured visual audit passes **1/1**, and host tests pass **7/7**. The audit will be rescored after the remaining physical TalkBack action check.
+The focused closure matrix passes **11/11**. The final complete ordinary suite passes **272/272**, the separately configured visual audit passes **1/1**, host tests pass **7/7**, and the physical TalkBack action check passes.
 
 ## Plain English
 
-The six recorded layout and Android-behavior problems now have fixes and passing S24 regressions. Large text, landscape, keyboard use, Back with a draft, dialog close semantics, and rotation all pass automated checks. One hands-on TalkBack double-tap confirmation is still needed.
+The six recorded layout and Android-behavior problems now have fixes and passing S24 regressions. Large text, landscape, keyboard use, Back with a draft, dialog close semantics, and rotation pass automated checks, and the visible Close button also works with TalkBack on the physical phone.

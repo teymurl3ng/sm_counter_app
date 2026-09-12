@@ -45,9 +45,9 @@ Severity: **P1 major**. The correction dialog says to enter the complete correct
 
 ## Safety state
 
-- The A06 isolated QA installation remains restored and signed in with cloud backup paused.
-- Ten encrypted recovery points remain listed; none was deleted.
-- The S24 source QA installation remains separate. The app did not merge or synchronize later writes between devices.
+- Phase 14.7 later cleared only the A06 isolated `.qa` package for the clean replacement-phone boundary check. The historical restored state and its evidence remain valid.
+- The A06 now has an independent QA owner. It connected to the same test Drive account, listed the S24 recovery point, and passed portable-passphrase security inspection without restoring it.
+- The S24 source QA installation remains separate. The app did not merge or synchronize writes between devices, and no remote recovery point was deleted during the final boundary check.
 - Ordinary `com.saaf.milkshop` installations/profiles remain untouched.
 - No passphrase, recovery code, Google password, account identifier, token, or OAuth secret was added to project evidence.
 

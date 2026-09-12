@@ -16,18 +16,32 @@
   },
   "tests": {
     "focusedAndroid": { "passed": 11, "failed": 0, "skipped": 0 },
-    "ordinaryAndroid": { "passed": 271, "failed": 0, "skipped": 0 },
+    "ordinaryAndroid": { "passed": 272, "failed": 0, "skipped": 0 },
     "visualCaptureAudit": { "passed": 1, "failed": 0, "skipped": 0 },
     "host": { "passed": 7, "failed": 0, "skipped": 0 }
   },
   "finalQaApk": {
     "oauthConfigured": true,
     "bytes": 16174596,
-    "sha256": "4BEAD85632975B253E870463E271D781944FC6BE1BDE05F64C2BF26F5915E491",
+    "sha256": "9600CC68D5CB6E950DA137B51F7D53AB3FFF552ABAB55071AA9B8F330A8EA4DC",
     "install": "pass",
     "coldLaunch": "pass",
     "coldLaunchMilliseconds": 1740,
-    "initialState": "clean first-owner setup"
+    "initialState": "clean first-owner setup",
+    "oauthCorrectionInstalledWithDataPreserved": true,
+    "liveDriveAuthorizationAfterCorrection": "pass"
   },
-  "remainingPhysicalAcceptance": true
+  "handsOnAcceptance": {
+    "firstOwnerAndRecoveryCode": "pass by user confirmation",
+    "testDataPath": "pass by user confirmation",
+    "quickUnlockReenrollment": "pass by user confirmation",
+    "talkBackDialogClose": "pass by user confirmation",
+    "sharedAccountQuickUnlock": "pass by user confirmation",
+    "crossAccountPinRejection": "pass by user confirmation",
+    "cleanA06HasNoS24QuickUnlock": "pass by user confirmation and captured clean replacement state",
+    "crossVaultPortableRecoveryInspection": "pass by user confirmation; no restore performed",
+    "secureLockOrBiometricMutation": "not performed on personal phone; automated Keystore invalidation coverage accepted"
+  },
+  "remainingPhysicalAcceptance": false,
+  "acceptedPhysicalLimitation": "Secure-lock or biometric enrollment was not mutated on a personal phone. Automated invalidation coverage passes."
 }

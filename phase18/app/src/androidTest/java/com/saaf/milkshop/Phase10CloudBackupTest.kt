@@ -89,6 +89,34 @@ class Phase10CloudBackupTest {
     }
 
     @Test
+    fun differentLocalVault_requiresPortableRecoveryPassphrase() {
+        val sourcePassphrase = "source cloud recovery phrase 2026".toCharArray()
+        val replacementPassphrase = "replacement cloud recovery phrase 2026".toCharArray()
+        val payload = "portable replacement-phone payload".toByteArray()
+        val sourceCryptography = CloudBackupCryptography(TestProtector())
+        val sourceVault = sourceCryptography.createVault(sourcePassphrase)
+        val encrypted = sourceCryptography.encryptSnapshot(
+            payload = payload,
+            configuration = sourceVault,
+            snapshotId = "84545e81-4938-4092-93de-fafb95cc879f",
+            createdAt = "2026-09-12T19:05:30Z",
+        )
+        val replacementCryptography = CloudBackupCryptography(TestProtector())
+        val replacementVault = replacementCryptography.createVault(replacementPassphrase)
+
+        assertNotEquals(sourceVault.vaultId, replacementVault.vaultId)
+        assertThrows(CloudBackupFailure.KeyUnavailable::class.java) {
+            replacementCryptography.decryptSnapshotWithLocalKey(encrypted, replacementVault)
+        }
+        val recovered = replacementCryptography.decryptSnapshot(encrypted, sourcePassphrase)
+        assertArrayEquals(payload, recovered.payload)
+
+        sourcePassphrase.fill('\u0000')
+        replacementPassphrase.fill('\u0000')
+        recovered.payload.fill(0)
+    }
+
+    @Test
     fun outbox_reusesExactBytes_andRetentionNeverDropsThreeNewest() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val outbox = CloudBackupOutbox(context)

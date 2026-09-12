@@ -232,8 +232,10 @@ class CloudBackupCryptography(
         configuration: CloudVaultConfiguration,
     ): DecryptedCloudSnapshot {
         val parsed = parseSnapshot(bytes)
-        require(parsed.vaultId == configuration.vaultId) {
-            "The cloud backup belongs to a different backup vault"
+        if (parsed.vaultId != configuration.vaultId) {
+            throw CloudBackupFailure.KeyUnavailable(
+                "This phone does not hold the local key for this backup vault",
+            )
         }
         require(parsed.portableWrap == configuration.portableWrap) {
             "The cloud backup does not match the configured recovery key"

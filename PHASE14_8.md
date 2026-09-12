@@ -57,6 +57,19 @@ Migration is incremental:
 
 There is one business database and one native security authority throughout. No second data model, business engine, credential store, or sync mechanism may be introduced by the migration.
 
+## Standing show-before-build rule
+
+For every major native screen family:
+
+1. show two or more concrete structure/interaction directions when the choice is material;
+2. recommend one direction and explain the tradeoff in plain language;
+3. obtain the owner's direction decision from a reviewable visual;
+4. show the accepted journey's normal and material edge states before production implementation;
+5. implement only the accepted direction;
+6. show the running result and device evidence before declaring the family native-owned.
+
+This is the default workflow for the rest of Phase 14.8. It prevents avoidable implementation churn and keeps the owner involved at decisions that materially change how the product feels, without reopening settled native business or security behavior.
+
 ## Checkpoints
 
 ### 14.8.1 — Native surface and dependency inventory: COMPLETE

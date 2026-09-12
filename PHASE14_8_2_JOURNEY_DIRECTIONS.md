@@ -16,6 +16,10 @@ An owner or staff member should open Saaf Milk and immediately understand:
 
 The design must work for people who run a shop and do not think in software modules or accounting-system terminology.
 
+## Owner workflow preference
+
+The owner explicitly selected a show-before-build process for this and future major UI decisions: review concrete visual directions first, choose the experience, preview its material states, and only then implement it. Phase 14.8 uses that sequence for the shell and for every later screen family.
+
 ## Evidence used
 
 - the final Phase 12/13 screenshot set covering 83 material application states;

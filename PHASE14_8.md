@@ -1,6 +1,6 @@
 # Phase 14.8 — Native UI redesign and migration
 
-Status: **ACTIVE — checkpoint 14.8.1 complete; role architecture and access policy under review before further screen design**
+Status: **ACTIVE — checkpoint 14.8.1 complete; Cashier and Operations journey review in progress**
 
 Date started: 2026-09-12
 
@@ -93,7 +93,9 @@ See `PHASE14_8_1_NATIVE_MIGRATION_INVENTORY.md`.
 
 Checkpoint output: an approved native information architecture, complete representative journeys, and a design specification that can be implemented directly in Compose.
 
-The current audit first compared three universal structures. Owner review established a stronger requirement: each role needs its own calibrated default, menu, density, action order, and feedback while preserving shared concepts and native permission truth. The next review then reopened whether the five existing bundles describe the right jobs. `PHASE14_8_2_ROLE_ARCHITECTURE_RESEARCH.md` now defines the proposed Owner, Administrator, Store manager, Cashier, and Operations-staff meanings; maps every screen/action; and identifies permission bundles that must be split or scoped. Detailed journeys and production Compose work wait for acceptance of that role policy.
+The current audit first compared three universal structures. Owner review established a stronger requirement: each role needs its own calibrated default, menu, density, action order, and feedback while preserving shared concepts and native permission truth. The role review then defined Owner, Administrator, Store manager, Cashier, and Operations staff; mapped every screen/action; and identified permission bundles that must be split or scoped. That policy is now accepted as the design foundation.
+
+`PHASE14_8_2_CASHIER_OPERATIONS_DESIGN.md` turns the foundation into the first complete daily-work proposal. It begins with the least-technical, highest-frequency roles and specifies their exact navigation, field order, safe defaults, save feedback, error recovery, Back behavior, empty states, and supervisor approval boundary. Production Compose work still waits for review of these complete flows and the later Owner/Manager/Administrator flows.
 
 ### 14.8.3 — Compose foundation
 
@@ -137,4 +139,4 @@ This baseline is a comparison point, not a visual target.
 
 ## Current next gate
 
-Checkpoint 14.8.2 is currently at role-policy review. Production Compose screens do not begin until the role definitions, screen/action boundaries, and representative journeys are coherent enough to avoid rebuilding the same confusion in native code.
+Checkpoint 14.8.2 is currently at Cashier and Operations daily-work review. The review must establish whether a first-time worker can complete normal and exceptional tasks quickly and confidently. After acceptance, Owner, Store manager, and Administrator journeys will be designed against the same components and policy. Production Compose screens begin only when all five role experiences are coherent.

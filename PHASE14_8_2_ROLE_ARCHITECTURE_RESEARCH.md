@@ -1,6 +1,6 @@
 # Phase 14.8.2 — Role architecture research and Saaf proposal
 
-Status: **PROPOSED FOR OWNER REVIEW — no UI implementation authorized by this document**
+Status: **ACCEPTED AS THE DESIGN FOUNDATION — implementation still gated by journey review**
 
 Date: 2026-09-12
 

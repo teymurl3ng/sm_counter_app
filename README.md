@@ -141,7 +141,7 @@ Phase 13 — Dead/Mock/Misleading UI Cleanup ✅ (all five checkpoints complete;
 
 Phase 14 — Final Device QA ✅ (all seven checkpoints complete; 273/273 ordinary Android tests, 1/1 visual audit, 7/7 host tests)
 
-Phase 14.8 — Native UI Redesign and Migration 🚧 (14.8.1 surface/dependency inventory complete; journey direction next)
+Phase 14.8 — Native UI Redesign and Migration 🚧 (14.8.1 inventory complete; role policy accepted; Cashier and Operations daily-work design under review)
 
 Phase 15 — Final Shopkeeper QA ⏳ (starts after the native migration/regression gate; includes uncoached Quick unlock enrollment/use/recovery and periodic backup/recovery)
 

@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -41,6 +42,7 @@ import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.launch
 
 class NativePreviewActivity : FragmentActivity() {
+    private lateinit var applicationState: MilkShopApplication
     private lateinit var authenticationFacade: NativeAuthenticationFacade
     private lateinit var quickUnlockService: QuickUnlockService
     private lateinit var quickUnlockFacade: NativeQuickUnlockFacade
@@ -65,6 +67,7 @@ class NativePreviewActivity : FragmentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         val app = application as MilkShopApplication
+        applicationState = app
         authenticationFacade = NativeAuthenticationFacade(app.database, app.userSecurity)
         quickUnlockService = QuickUnlockService(
             database = app.database,
@@ -76,7 +79,7 @@ class NativePreviewActivity : FragmentActivity() {
         saleFacade = NativeSaleFacade(app.database, app.userSecurity)
         authenticationViewModel.attachQuickUnlock(quickUnlockFacade)
         setContent {
-            SaafTheme(darkTheme = false) {
+            SaafTheme {
                 val authenticationState by authenticationViewModel.state.collectAsState()
                 val saleState by saleViewModel.state.collectAsState()
                 NativeFoundationPreview(
@@ -87,6 +90,19 @@ class NativePreviewActivity : FragmentActivity() {
                 )
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (::applicationState.isInitialized) {
+            applicationState.nativeSessions.onForeground()
+            authenticationViewModel.validateAuthenticatedSession()
+        }
+    }
+
+    override fun onStop() {
+        if (::applicationState.isInitialized) applicationState.nativeSessions.onBackground()
+        super.onStop()
     }
 
     override fun onDestroy() {
@@ -126,7 +142,9 @@ private fun NativeFoundationPreview(
     val showingCashier = destination == PreviewDestination.Access &&
         authenticationState is NativeAuthenticationState.Authenticated
 
-    SystemBarAppearance(useDarkIcons = destination != PreviewDestination.Welcome)
+    SystemBarAppearance(
+        useDarkIcons = destination != PreviewDestination.Welcome && !isSystemInDarkTheme(),
+    )
 
     when (destination) {
         PreviewDestination.Welcome -> WelcomeScreen(

@@ -18,11 +18,14 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
@@ -67,12 +70,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -81,6 +91,7 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.sale.NativeSaleAccount
 import com.saaf.milkshop.application.sale.NativeSaleEntryMode
 import com.saaf.milkshop.application.sale.NativeSalePaymentKind
+import com.saaf.milkshop.application.sale.NativeSaleProduct
 import com.saaf.milkshop.application.sale.NativeSaleRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.theme.SaafInk
@@ -154,6 +165,7 @@ private fun CashierSaleContent(
     var draftTouched by rememberSaveable { mutableStateOf(false) }
     var showDiscardConfirmation by rememberSaveable { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
+    val useStackedLayout = LocalDensity.current.fontScale >= 1.3f
 
     val product = context.products.firstOrNull { it.productId == selectedProductId }
         ?: context.products.firstOrNull()
@@ -172,7 +184,7 @@ private fun CashierSaleContent(
     val quantityText = formatQuantity(quantity)
     val totalText = formatAmount(total)
     val paymentSummary = when (payment) {
-        PaymentChoice.PaidNow -> paymentAccount?.name ?: stringResource(R.string.native_cash)
+        PaymentChoice.PaidNow -> paymentAccount?.name ?: "Payment unavailable"
         PaymentChoice.CustomerAccount -> selectedCustomer?.name
             ?: stringResource(R.string.native_customer_account)
     }
@@ -220,35 +232,34 @@ private fun CashierSaleContent(
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp, vertical = 12.dp),
             ) {
+                if (!context.postingOpen) {
+                    StatusMessage(
+                        message = "${formatBusinessDate(context.businessDate)} is closed. Reopen the day before recording a sale.",
+                        error = true,
+                        tag = NativeUiTags.CashierPostingClosed,
+                    )
+                    Spacer(Modifier.height(10.dp))
+                }
                 SectionHeading(
                     title = stringResource(R.string.native_product),
                     supporting = stringResource(R.string.native_switch_product),
+                    stacked = useStackedLayout,
                 )
-                Row(
-                    modifier = Modifier.fillMaxWidth().selectableGroup(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    context.products.forEach { option ->
-                        ProductCard(
-                            title = option.name,
-                            rate = "PKR ${formatAmount(option.ratePaisaPerUnit / 100.0)} / ${option.unit.toDisplayUnit()} · ${option.quantityOnHand} in stock",
-                            selected = product?.productId == option.productId,
-                            onClick = {
-                                selectedProductId = option.productId
-                                draftTouched = true
-                                onClearFeedback()
-                            },
-                            modifier = Modifier
-                                .weight(1f)
-                                .testTag(NativeUiTags.cashierProduct(option.name)),
-                        )
-                    }
-                }
+                ProductSelector(
+                    products = context.products,
+                    selectedProductId = product?.productId,
+                    stacked = useStackedLayout,
+                    onSelected = { option ->
+                        selectedProductId = option.productId
+                        draftTouched = true
+                        onClearFeedback()
+                    },
+                )
                 if (context.products.isEmpty()) {
                     StatusMessage(
                         message = "No active sale product has a retail rate. Ask an owner or manager to configure one.",
                         error = true,
-                        tag = NativeUiTags.CashierSaleError,
+                        tag = NativeUiTags.CashierProductUnavailable,
                     )
                 }
 
@@ -271,65 +282,51 @@ private fun CashierSaleContent(
                     },
                 )
                 Spacer(Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    QuantityEditor(
-                        value = entryValue,
-                        unit = if (entryMode == EntryMode.Quantity) {
-                            quantityUnit
-                        } else {
-                            stringResource(R.string.native_currency_unit)
-                        },
-                        onValueChange = { next ->
-                            if (isValidDecimalInput(next)) {
-                                entryValue = next
-                                draftTouched = true
-                                onClearFeedback()
-                            }
-                        },
-                        tag = NativeUiTags.CashierEntryInput,
-                        modifier = Modifier.weight(1f),
-                    )
-                    StepButton(
-                        icon = Icons.Outlined.Remove,
-                        tag = NativeUiTags.CashierDecrease,
-                        description = if (entryMode == EntryMode.Quantity) {
-                            stringResource(R.string.native_decrease_quantity)
-                        } else {
-                            stringResource(R.string.native_decrease_amount)
-                        },
-                        onClick = {
-                            entryValue = stepEntryValue(
-                                value = entryValue,
-                                delta = if (entryMode == EntryMode.Quantity) -0.5 else -50.0,
-                                mode = entryMode,
-                            )
+                SaleEntryEditor(
+                    value = entryValue,
+                    unit = if (entryMode == EntryMode.Quantity) {
+                        quantityUnit
+                    } else {
+                        stringResource(R.string.native_currency_unit)
+                    },
+                    inputDescription = if (entryMode == EntryMode.Quantity) "Sale quantity" else "Sale amount",
+                    decreaseDescription = if (entryMode == EntryMode.Quantity) {
+                        stringResource(R.string.native_decrease_quantity)
+                    } else {
+                        stringResource(R.string.native_decrease_amount)
+                    },
+                    increaseDescription = if (entryMode == EntryMode.Quantity) {
+                        stringResource(R.string.native_increase_quantity)
+                    } else {
+                        stringResource(R.string.native_increase_amount)
+                    },
+                    stacked = useStackedLayout,
+                    onValueChange = { next ->
+                        if (isValidDecimalInput(next)) {
+                            entryValue = next
                             draftTouched = true
                             onClearFeedback()
-                        },
-                    )
-                    StepButton(
-                        icon = Icons.Outlined.Add,
-                        tag = NativeUiTags.CashierIncrease,
-                        description = if (entryMode == EntryMode.Quantity) {
-                            stringResource(R.string.native_increase_quantity)
-                        } else {
-                            stringResource(R.string.native_increase_amount)
-                        },
-                        onClick = {
-                            entryValue = stepEntryValue(
-                                value = entryValue,
-                                delta = if (entryMode == EntryMode.Quantity) 0.5 else 50.0,
-                                mode = entryMode,
-                            )
-                            draftTouched = true
-                            onClearFeedback()
-                        },
-                    )
-                }
+                        }
+                    },
+                    onDecrease = {
+                        entryValue = stepEntryValue(
+                            value = entryValue,
+                            delta = if (entryMode == EntryMode.Quantity) -0.5 else -50.0,
+                            mode = entryMode,
+                        )
+                        draftTouched = true
+                        onClearFeedback()
+                    },
+                    onIncrease = {
+                        entryValue = stepEntryValue(
+                            value = entryValue,
+                            delta = if (entryMode == EntryMode.Quantity) 0.5 else 50.0,
+                            mode = entryMode,
+                        )
+                        draftTouched = true
+                        onClearFeedback()
+                    },
+                )
                 Spacer(Modifier.height(6.dp))
                 EntryCalculationRow(
                     rate = stringResource(
@@ -346,39 +343,34 @@ private fun CashierSaleContent(
                             quantityUnit,
                         )
                     },
+                    stacked = useStackedLayout,
                 )
 
                 SectionDivider()
                 SectionHeading(title = stringResource(R.string.native_payment_destination))
-                Row(
-                    modifier = Modifier.fillMaxWidth().selectableGroup(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    PaymentCard(
-                        title = stringResource(R.string.native_paid_now),
-                        detail = paymentAccount?.name ?: stringResource(R.string.native_cash),
-                        selected = payment == PaymentChoice.PaidNow,
-                        onClick = {
-                            focusManager.clearFocus()
-                            payment = PaymentChoice.PaidNow
-                            draftTouched = true
-                            onClearFeedback()
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .testTag(NativeUiTags.CashierPaymentPaidNow),
-                    )
-                    PaymentCard(
-                        title = stringResource(R.string.native_customer_account),
-                        detail = null,
-                        selected = payment == PaymentChoice.CustomerAccount,
-                        onClick = {
-                            focusManager.clearFocus()
-                            showCustomerPicker = true
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .testTag(NativeUiTags.CashierPaymentCustomer),
+                PaymentSelector(
+                    paidNowTitle = stringResource(R.string.native_paid_now),
+                    paidNowDetail = paymentAccount?.name ?: "Unavailable",
+                    customerTitle = stringResource(R.string.native_customer_account),
+                    selected = payment,
+                    stacked = useStackedLayout,
+                    onPaidNow = {
+                        focusManager.clearFocus()
+                        payment = PaymentChoice.PaidNow
+                        draftTouched = true
+                        onClearFeedback()
+                    },
+                    onCustomer = {
+                        focusManager.clearFocus()
+                        showCustomerPicker = true
+                    },
+                )
+                if (context.paymentAccounts.isEmpty()) {
+                    Spacer(Modifier.height(8.dp))
+                    StatusMessage(
+                        message = "No active Cash/Bank account is available. Ask an owner or manager to configure one.",
+                        error = true,
+                        tag = NativeUiTags.CashierPaymentUnavailable,
                     )
                 }
                 if (payment == PaymentChoice.CustomerAccount) {
@@ -429,6 +421,7 @@ private fun CashierSaleContent(
                     } else {
                         stringResource(R.string.native_customer_effect_format, totalText)
                     },
+                    stacked = useStackedLayout,
                     enabled = canRecord,
                     saving = state.saving,
                     buttonTag = NativeUiTags.CashierRecordSale,
@@ -550,7 +543,10 @@ private fun StatusMessage(message: String, error: Boolean, tag: String) {
         color = if (error) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.primaryContainer,
         contentColor = if (error) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onPrimaryContainer,
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.fillMaxWidth().testTag(tag),
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics { liveRegion = LiveRegionMode.Polite }
+            .testTag(tag),
     ) {
         Text(message, modifier = Modifier.padding(12.dp), style = MaterialTheme.typography.bodyMedium)
     }
@@ -631,8 +627,21 @@ private fun formatBusinessDate(value: String): String = runCatching {
 }.getOrDefault(value)
 
 @Composable
-private fun SectionHeading(title: String, supporting: String? = null) {
-    Row(
+private fun SectionHeading(title: String, supporting: String? = null, stacked: Boolean = false) {
+    if (stacked && supporting != null) {
+        Column(modifier = Modifier.fillMaxWidth().padding(bottom = 7.dp)) {
+            Text(
+                text = title.uppercase(),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = supporting,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    } else Row(
         modifier = Modifier.fillMaxWidth().padding(bottom = 7.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -648,6 +657,46 @@ private fun SectionHeading(title: String, supporting: String? = null) {
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+    }
+}
+
+@Composable
+private fun ProductSelector(
+    products: List<NativeSaleProduct>,
+    selectedProductId: Long?,
+    stacked: Boolean,
+    onSelected: (NativeSaleProduct) -> Unit,
+) {
+    if (stacked) {
+        Column(
+            modifier = Modifier.fillMaxWidth().selectableGroup(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            products.forEach { option ->
+                ProductCard(
+                    title = option.name,
+                    rate = "PKR ${formatAmount(option.ratePaisaPerUnit / 100.0)} / ${option.unit.toDisplayUnit()} · ${option.quantityOnHand} in stock",
+                    selected = selectedProductId == option.productId,
+                    onClick = { onSelected(option) },
+                    modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.cashierProduct(option.name)),
+                )
+            }
+        }
+    } else {
+        Row(
+            modifier = Modifier.fillMaxWidth().selectableGroup(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            products.forEach { option ->
+                ProductCard(
+                    title = option.name,
+                    rate = "PKR ${formatAmount(option.ratePaisaPerUnit / 100.0)} / ${option.unit.toDisplayUnit()} · ${option.quantityOnHand} in stock",
+                    selected = selectedProductId == option.productId,
+                    onClick = { onSelected(option) },
+                    modifier = Modifier.weight(1f).testTag(NativeUiTags.cashierProduct(option.name)),
+                )
+            }
         }
     }
 }
@@ -700,7 +749,7 @@ private fun EntryModeSelector(selected: EntryMode, onSelected: (EntryMode) -> Un
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(52.dp)
+            .heightIn(min = 52.dp)
             .clip(RoundedCornerShape(13.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(4.dp)
@@ -726,6 +775,62 @@ private fun EntryModeSelector(selected: EntryMode, onSelected: (EntryMode) -> Un
 }
 
 @Composable
+private fun SaleEntryEditor(
+    value: String,
+    unit: String,
+    inputDescription: String,
+    decreaseDescription: String,
+    increaseDescription: String,
+    stacked: Boolean,
+    onValueChange: (String) -> Unit,
+    onDecrease: () -> Unit,
+    onIncrease: () -> Unit,
+) {
+    val editor: @Composable (Modifier) -> Unit = { modifier ->
+        QuantityEditor(
+            value = value,
+            unit = unit,
+            inputDescription = inputDescription,
+            onValueChange = onValueChange,
+            tag = NativeUiTags.CashierEntryInput,
+            modifier = modifier,
+        )
+    }
+    val controls: @Composable () -> Unit = {
+        StepButton(
+            icon = Icons.Outlined.Remove,
+            tag = NativeUiTags.CashierDecrease,
+            description = decreaseDescription,
+            onClick = onDecrease,
+        )
+        StepButton(
+            icon = Icons.Outlined.Add,
+            tag = NativeUiTags.CashierIncrease,
+            description = increaseDescription,
+            onClick = onIncrease,
+        )
+    }
+    if (stacked) {
+        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            editor(Modifier.fillMaxWidth())
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+            ) { controls() }
+        }
+    } else {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            editor(Modifier.weight(1f))
+            controls()
+        }
+    }
+}
+
+@Composable
 private fun Segment(text: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Box(
         contentAlignment = Alignment.Center,
@@ -747,15 +852,17 @@ private fun Segment(text: String, selected: Boolean, onClick: () -> Unit, modifi
 private fun QuantityEditor(
     value: String,
     unit: String,
+    inputDescription: String,
     onValueChange: (String) -> Unit,
     tag: String,
     modifier: Modifier = Modifier,
 ) {
+    val focusManager = LocalFocusManager.current
     Surface(
         color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(13.dp),
         border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
-        modifier = modifier.height(64.dp),
+        modifier = modifier.heightIn(min = 64.dp),
     ) {
         Box(
             contentAlignment = Alignment.CenterStart,
@@ -768,6 +875,7 @@ private fun QuantityEditor(
                     modifier = Modifier
                         .weight(1f)
                         .alignByBaseline()
+                        .semantics { contentDescription = inputDescription }
                         .testTag(tag),
                     textStyle = TextStyle(
                         color = MaterialTheme.colorScheme.onSurface,
@@ -775,7 +883,11 @@ private fun QuantityEditor(
                         fontWeight = FontWeight.ExtraBold,
                         lineHeight = 36.sp,
                     ),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                     singleLine = true,
                 )
                 Text(
@@ -793,7 +905,23 @@ private fun QuantityEditor(
 private fun EntryCalculationRow(
     rate: String,
     result: String,
+    stacked: Boolean,
 ) {
+    if (stacked) {
+        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)) {
+            Text(
+                text = rate,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = result,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+        return
+    }
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -809,6 +937,53 @@ private fun EntryCalculationRow(
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary,
         )
+    }
+}
+
+@Composable
+private fun PaymentSelector(
+    paidNowTitle: String,
+    paidNowDetail: String,
+    customerTitle: String,
+    selected: PaymentChoice,
+    stacked: Boolean,
+    onPaidNow: () -> Unit,
+    onCustomer: () -> Unit,
+) {
+    val paidNow: @Composable (Modifier) -> Unit = { modifier ->
+        PaymentCard(
+            title = paidNowTitle,
+            detail = paidNowDetail,
+            selected = selected == PaymentChoice.PaidNow,
+            onClick = onPaidNow,
+            modifier = modifier.testTag(NativeUiTags.CashierPaymentPaidNow),
+        )
+    }
+    val customer: @Composable (Modifier) -> Unit = { modifier ->
+        PaymentCard(
+            title = customerTitle,
+            detail = null,
+            selected = selected == PaymentChoice.CustomerAccount,
+            onClick = onCustomer,
+            modifier = modifier.testTag(NativeUiTags.CashierPaymentCustomer),
+        )
+    }
+    if (stacked) {
+        Column(
+            modifier = Modifier.fillMaxWidth().selectableGroup(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            paidNow(Modifier.fillMaxWidth())
+            customer(Modifier.fillMaxWidth())
+        }
+    } else {
+        Row(
+            modifier = Modifier.fillMaxWidth().selectableGroup(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            paidNow(Modifier.weight(1f))
+            customer(Modifier.weight(1f))
+        }
     }
 }
 
@@ -842,11 +1017,11 @@ private fun PaymentCard(
         shape = RoundedCornerShape(13.dp),
         border = if (selected) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
         modifier = modifier
-            .height(56.dp)
+            .heightIn(min = 56.dp)
             .selectable(selected = selected, onClick = onClick, role = Role.RadioButton),
     ) {
         Row(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             RadioButton(
@@ -860,7 +1035,7 @@ private fun PaymentCard(
             Text(
                 text = title,
                 style = MaterialTheme.typography.labelLarge,
-                maxLines = 1,
+                modifier = Modifier.weight(1f),
             )
             if (detail != null) {
                 Spacer(Modifier.width(5.dp))
@@ -868,6 +1043,7 @@ private fun PaymentCard(
                     text = detail,
                     style = MaterialTheme.typography.labelMedium,
                     color = if (selected) MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.78f) else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f),
                 )
             }
         }
@@ -887,7 +1063,7 @@ private fun CustomerSelectionRow(
             .fillMaxWidth()
             .heightIn(min = 52.dp)
             .testTag(NativeUiTags.CashierCustomerSelector)
-            .clickable(onClick = onClick),
+            .clickable(role = Role.Button, onClick = onClick),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
@@ -933,14 +1109,18 @@ private fun CustomerAccountDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.native_choose_customer_account)) },
         text = {
-            Column(
-                modifier = Modifier.fillMaxWidth().selectableGroup(),
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 360.dp)
+                    .testTag(NativeUiTags.CashierCustomerList)
+                    .selectableGroup(),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 if (customers.isEmpty()) {
-                    Text("No active customer accounts are available.")
+                    item { Text("No active customer accounts are available.") }
                 }
-                customers.forEach { customer ->
+                items(customers, key = { it.accountId }) { customer ->
                     Surface(
                         color = if (selectedCustomerId == customer.accountId) {
                             MaterialTheme.colorScheme.surfaceVariant
@@ -997,12 +1177,13 @@ private fun SecondaryDetails(
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp)
+                .heightIn(min = 48.dp)
                 .testTag(NativeUiTags.CashierSecondaryDetails)
-                .clickable(onClick = onToggle),
+                .semantics { stateDescription = if (expanded) "Expanded" else "Collapsed" }
+                .clickable(role = Role.Button, onClick = onToggle),
         ) {
             Row(
-                modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(Icons.Outlined.Tune, contentDescription = null, modifier = Modifier.size(20.dp))
@@ -1066,6 +1247,7 @@ private fun ReviewDock(
     total: String,
     stockEffect: String,
     moneyEffect: String,
+    stacked: Boolean,
     enabled: Boolean,
     saving: Boolean,
     buttonTag: String,
@@ -1078,7 +1260,17 @@ private fun ReviewDock(
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(modifier = Modifier.padding(11.dp)) {
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            if (stacked) {
+                Text(
+                    text = summary,
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    text = total,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            } else Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = summary,
                     style = MaterialTheme.typography.titleMedium,
@@ -1091,7 +1283,18 @@ private fun ReviewDock(
                 )
             }
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant)
-            Row(modifier = Modifier.fillMaxWidth()) {
+            if (stacked) {
+                Text(
+                    text = stockEffect,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    text = moneyEffect,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            } else Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = stockEffect,
                     style = MaterialTheme.typography.labelMedium,
@@ -1110,7 +1313,7 @@ private fun ReviewDock(
                 enabled = enabled,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(54.dp)
+                    .heightIn(min = 54.dp)
                     .testTag(buttonTag),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -1178,7 +1381,7 @@ private fun androidx.compose.foundation.layout.RowScope.CashierNavigationItem(
         onClick = onClick,
         modifier = Modifier.testTag(tag),
         icon = { Icon(icon, contentDescription = null) },
-        label = { Text(label, maxLines = 1) },
+        label = { Text(label, maxLines = 2) },
         colors = NavigationBarItemDefaults.colors(
             selectedIconColor = MaterialTheme.colorScheme.onPrimary,
             selectedTextColor = MaterialTheme.colorScheme.primary,

@@ -1,6 +1,6 @@
 # Phase 14.8.3 — Compose foundation
 
-Status: **IN PROGRESS — native authentication and the authoritative native Sale vertical slice are verified on A06**
+Status: **IN PROGRESS — native authentication and the hardened authoritative Sale vertical slice are verified on A06**
 
 Date started: 2026-09-19
 
@@ -31,6 +31,11 @@ The owner accepted the refined Counter Ledger preview after the final quantity-u
 - added account-specific native method selection backed by the existing encrypted Quick unlock records, with Quick PIN, Android phone security, and the always-available full-passphrase route shown only when applicable;
 - connected Quick PIN to the real per-account security service, including cross-account rejection, immediate corrected-PIN retry, delay/full-passphrase recovery, and full-passphrase reset behavior;
 - connected Android phone security through the Activity-scoped `BiometricPrompt` device gate, using `Phone security` unless a strong biometric is actually available and never claiming a fingerprint that Android has not enrolled;
+- connected the native Activity to the shared background/foreground session clock and revalidated authenticated sessions before protected Sale content can return;
+- preserved edited Sale mode, value, customer, and expanded details through Activity recreation while process death still returns through memory-only authentication;
+- replaced fixed-height Sale controls with minimum-height/adaptive layouts, reflowing product, entry, payment, calculation, and review groups at large font scales;
+- added IME Done behavior, TalkBack input/state/live-region semantics, a bounded lazy customer picker, system dark-theme support, and matching system-bar contrast;
+- added explicit closed-business-day, missing-product/rate, and missing-Cash/Bank explanations while keeping Record disabled;
 - left `HybridActivity` as the only launcher and reused the existing database, security, permission, audit, and business rules unchanged.
 
 ## Compatibility decision
@@ -49,6 +54,8 @@ The current stable Activity 1.13/Lifecycle 2.11 Compose path requires Android AP
 - `Phase14QuickUnlockTest` — 10/10 passed, including encrypted persistence, immediate corrected-PIN retry, PIN delay/full-passphrase reset, phone-security strength, invalidation, and concurrent-attempt/removal races;
 - combined native authentication checkpoint on the wired A06 — **28/28 passed, 0 failed, 0 skipped**;
 - authoritative native Sale checkpoint on the wired A06 — **21/21 passed, 0 failed, 0 skipped** across the native screen, Sale load-state contract, and existing Sale service regressions;
+- hardened native Sale checkpoint on the wired A06 — **28/28 passed, 0 failed, 0 skipped** across `NativeFoundationUiTest` (20), `NativeSaleHardeningContractTest` (4), and `Phase8SaleOperationsTest` (4); the separate authoritative load-retry contract remains **1/1 passed**;
+- hardening coverage includes foreground session invalidation, Activity recreation with a complete edited draft, IME Done/focus, landscape scrolling, 150% text reflow, dark-theme composition, TalkBack descriptions/live feedback, a 30-account customer list, closed-day explanation, and missing product/payment references;
 - manual native Phone security on the A06 — existing Owner enrollment appeared as `Owner · Phone security, full passphrase`; device-PIN approval opened `New sale`; cancelling a second prompt retained the selected Owner and showed `Quick unlock was cancelled`;
 - isolated package installed as `com.saaf.milkshop.qa`; ordinary Saaf package was not touched;
 - real-device Welcome evidence: `phase14-evidence/saaf-native-welcome-a06.png`;
@@ -57,12 +64,8 @@ The current stable Activity 1.13/Lifecycle 2.11 Compose path requires Android AP
 
 ## Current boundary
 
-This is a service-connected authentication and Sale slice inside the debug-native harness, not a completed application migration. Account discovery, first-Owner creation, full-passphrase verification, recovery acknowledgment, Quick PIN, Android phone-security invocation, session boundaries, Sale reference reads, and Sale writes use the real native security and Room authority. Quick PIN is automated on the A06, and the actual Android phone-security prompt has passed both approval and cancellation on the native screen. Record sale now writes one permission-checked, actor-attributed transaction and refreshes the native screen. Secondary sale details and the Collect, Activity, and More destinations still expose their explicit preview contracts. The native activity is not reachable from the production launcher.
+This is a service-connected authentication and hardened Sale slice inside the debug-native harness, not a completed application migration. Account discovery, first-Owner creation, full-passphrase verification, recovery acknowledgment, Quick PIN, Android phone-security invocation, session boundaries, Sale reference reads, and Sale writes use the real native security and Room authority. Quick PIN is automated on the A06, and the actual Android phone-security prompt has passed both approval and cancellation on the native screen. Record sale writes one permission-checked, actor-attributed transaction and refreshes the native screen. Secondary sale details and the Collect, Activity, and More destinations still expose their explicit preview contracts. The native activity is not reachable from the production launcher.
 
 ## Next checkpoint
 
-Close the remaining foundation risks in this order:
-
-1. prove Sale restoration and session-expiry behavior during process/lifecycle recreation;
-2. run large-text, IME, TalkBack, dark-theme, and rotation checks on the now-authoritative Sale screen;
-3. choose and implement the next role-specific native destination before changing launcher ownership.
+Choose and implement the next role-specific native destination under the same interaction contract. Keep launcher ownership unchanged until the retained native screen families and full regression satisfy the migration gate.

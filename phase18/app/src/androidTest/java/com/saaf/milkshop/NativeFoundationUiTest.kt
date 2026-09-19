@@ -1,20 +1,28 @@
 package com.saaf.milkshop
 
+import android.content.pm.ActivityInfo
+import android.os.SystemClock
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.printToString
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.lifecycle.Lifecycle
 import com.saaf.milkshop.nativeui.NativePreviewActivity
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.domain.SettingKeys
@@ -230,6 +238,76 @@ class NativeFoundationUiTest {
     }
 
     @Test
+    fun saleEntryDoneActionClearsKeyboardFocus() {
+        openCashier()
+
+        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput)
+            .performClick()
+            .performImeAction()
+        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).assertIsNotFocused()
+    }
+
+    @Test
+    fun editedSaleDraftSurvivesActivityRecreation() {
+        openCashier()
+        val ahmedId = customerId("Ahmed Store")
+
+        composeRule.onNodeWithTag(NativeUiTags.CashierPaymentCustomer).performScrollTo().performClick()
+        selectCustomer(ahmedId)
+        composeRule.onNodeWithTag(NativeUiTags.CashierModeAmount).performScrollTo().performClick()
+        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).performTextReplacement("725")
+        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).performImeAction()
+        composeRule.onNodeWithTag(NativeUiTags.CashierSecondaryDetails).performScrollTo().performClick()
+
+        composeRule.activityRule.scenario.recreate()
+        waitForText("New sale")
+
+        composeRule.onNodeWithTag(NativeUiTags.CashierModeAmount).assertIsSelected()
+        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).assertTextEquals("725")
+        composeRule.onNodeWithTag(NativeUiTags.CashierPaymentCustomer).performScrollTo().assertIsSelected()
+        composeRule.onNodeWithText("Ahmed Store").assertIsDisplayed()
+        composeRule.onNodeWithText("Counter pickup").assertIsDisplayed()
+    }
+
+    @Test
+    fun foregroundValidationRemovesAnInvalidatedSessionBeforeSaleReturns() {
+        openCashier()
+        val application = composeRule.activity.application as MilkShopApplication
+
+        composeRule.activityRule.scenario.moveToState(Lifecycle.State.CREATED)
+        application.nativeSessions.invalidateAll()
+        composeRule.activityRule.scenario.moveToState(Lifecycle.State.RESUMED)
+
+        waitForText("Who is using Saaf?")
+        composeRule.onNodeWithText("Your session expired. Sign in again.").assertIsDisplayed()
+        composeRule.onNodeWithText("New sale").assertDoesNotExist()
+        assertNull(application.currentSessionId)
+    }
+
+    @Test
+    fun nativeSaleRemainsUsableInLandscape() {
+        openCashier()
+        try {
+            composeRule.activityRule.scenario.onActivity {
+                it.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            }
+            SystemClock.sleep(1_000)
+            waitForText("New sale")
+            composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput)
+                .performScrollTo()
+                .assertIsDisplayed()
+            composeRule.onNodeWithTag(NativeUiTags.CashierRecordSale)
+                .performScrollTo()
+                .assertIsDisplayed()
+        } finally {
+            composeRule.activityRule.scenario.onActivity {
+                it.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            }
+            SystemClock.sleep(500)
+        }
+    }
+
+    @Test
     fun recordSaleRequiresAPositiveEntry() {
         openCashier()
         composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).performTextReplacement("")
@@ -245,7 +323,7 @@ class NativeFoundationUiTest {
         val total = formatAmount(retailRate(SettingKeys.RETAIL_RATE_MILK) * 2)
 
         composeRule.onNodeWithTag(NativeUiTags.CashierPaymentCustomer).performScrollTo().performClick()
-        composeRule.onNodeWithTag(NativeUiTags.cashierCustomer(ahmedId)).performClick()
+        selectCustomer(ahmedId)
 
         composeRule.onNodeWithTag(NativeUiTags.CashierPaymentCustomer).assertIsSelected()
         composeRule.onNodeWithTag(NativeUiTags.CashierCustomerSelector).assertIsDisplayed()
@@ -268,11 +346,11 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithTag(NativeUiTags.CashierPaymentCustomer).assertIsNotSelected()
 
         composeRule.onNodeWithTag(NativeUiTags.CashierPaymentCustomer).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.cashierCustomer(bilalId)).performClick()
+        selectCustomer(bilalId)
         composeRule.onNodeWithText("Bilal Dairy Point").assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.CashierCustomerSelector).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.cashierCustomer(ahmedId)).performClick()
+        selectCustomer(ahmedId)
         composeRule.onNodeWithText("Ahmed Store").assertIsDisplayed()
     }
 
@@ -353,7 +431,7 @@ class NativeFoundationUiTest {
         openCashier()
 
         composeRule.onNodeWithTag(NativeUiTags.CashierPaymentCustomer).performScrollTo().performClick()
-        composeRule.onNodeWithTag(NativeUiTags.cashierCustomer(customerId)).performClick()
+        selectCustomer(customerId)
         composeRule.onNodeWithTag(NativeUiTags.CashierRecordSale).performScrollTo().performClick()
         composeRule.waitUntil(15_000) {
             runCatching { composeRule.onNodeWithTag(NativeUiTags.CashierSaleSuccess).fetchSemanticsNode() }.isSuccess
@@ -439,6 +517,17 @@ class NativeFoundationUiTest {
         app().database.accountDao().findByCategory("Customer").single {
             it.name.removePrefix("Customer: ").trim() == name
         }.accountId
+    }
+
+    private fun selectCustomer(accountId: Long) {
+        val tag = NativeUiTags.cashierCustomer(accountId)
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule.onAllNodesWithTag(NativeUiTags.CashierCustomerList)
+                .fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onNodeWithTag(NativeUiTags.CashierCustomerList)
+            .performScrollToNode(hasTestTag(tag))
+        composeRule.onNodeWithTag(tag).performClick()
     }
 
     private fun formatAmount(value: Double): String = when {

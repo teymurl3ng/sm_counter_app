@@ -274,6 +274,37 @@ class NativeAuthenticationViewModel(
         }
     }
 
+    fun validateAuthenticatedSession() {
+        val current = _state.value as? NativeAuthenticationState.Authenticated ?: return
+        val sessionHandle = activeSessionHandle ?: return
+        scope.launch {
+            try {
+                val restored = withContext(Dispatchers.IO) { facade.restoreSession(sessionHandle) }
+                if (activeSessionHandle == sessionHandle && _state.value == current) {
+                    _state.value = NativeAuthenticationState.Authenticated(
+                        identity = restored.identity,
+                        sessionHandle = restored.sessionHandle,
+                    )
+                }
+            } catch (_: SecurityFailure) {
+                if (activeSessionHandle != sessionHandle) return@launch
+                activeSessionHandle = null
+                onSessionChanged(null)
+                _state.value = NativeAuthenticationState.Loading
+                _state.value = try {
+                    when (val startup = loadStartupState()) {
+                        is NativeAuthenticationState.AccountPicker -> startup.copy(
+                            error = "Your session expired. Sign in again.",
+                        )
+                        else -> startup
+                    }
+                } catch (error: Throwable) {
+                    NativeAuthenticationState.StartupFailure(publicMessage(error))
+                }
+            }
+        }
+    }
+
     override fun onCleared() {
         scope.cancel()
         super.onCleared()

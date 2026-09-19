@@ -1,6 +1,6 @@
 # Phase 14.8 — Native UI redesign and migration
 
-Status: **ACTIVE — checkpoint 14.8.3 Compose foundation started; hybrid launcher retained**
+Status: **ACTIVE — checkpoint 14.8.3 Compose authentication and hardened authoritative Sale verified; hybrid launcher retained**
 
 Date started: 2026-09-12
 
@@ -147,6 +147,6 @@ Owner decision 2026-09-19: neither generated treatment is a sufficiently large i
 
 The owner accepted the [refined original Welcome, Cashier New sale, and Owner Overview previews](design/refined-counter-ledger/index.html) on 2026-09-19 after requesting a compact paid-now selector, a corrected quantity-unit baseline, and `Amount` in place of `PKR value`. The accepted role rules, native/security architecture, and blueprint authority remain in force. Historical `DESIGN.md` is unchanged, and the generated proposals do not replace the design system.
 
-Phase 14.8.3 is now underway. The Compose compiler, compatible stable dependencies, accepted theme tokens, bundled Manrope weights, debug-only native entry activity, Welcome screen, and Cashier normal state are implemented beside the working hybrid application. The isolated QA APK builds, runs on A06, and passes its focused Compose UI test. See `PHASE14_8_3_COMPOSE_FOUNDATION.md` and `phase14-evidence/saaf-native-*-a06.png`.
+Phase 14.8.3 now has a device-verified authentication-to-Sale vertical slice. The Compose compiler, compatible stable dependencies, accepted theme tokens, bundled Manrope weights, debug-only native entry activity, Welcome/access flows, authoritative Sale reads/writes, lifecycle session revalidation, draft recreation, large-text reflow, IME behavior, TalkBack semantics, dark theme, landscape, long customer lists, and explicit blocked states are implemented beside the working hybrid application. The isolated QA APK builds and runs on A06; the hardened Sale checkpoint passes 28/28, with the separate Sale load-retry contract passing 1/1. See `PHASE14_8_3_COMPOSE_FOUNDATION.md` and `phase14-evidence/saaf-native-*-a06.png`.
 
-The current gate is the service-bound authentication-to-sale vertical slice: native bootstrap/account/method selection, memory-only session handoff, authoritative Sale reference/preview state, real Room write, immediate success/error feedback, refresh, Back/draft restoration, accessibility, and device proof. `HybridActivity` remains the launcher. No WebView or bridge retirement begins until native callers replace every retained capability and their parity gates pass.
+The current gate is selection and implementation of the next role-specific native destination under `NATIVE_INTERACTION_CONTRACT.md`. `HybridActivity` remains the launcher. No WebView or bridge retirement begins until native callers replace every retained capability and their parity gates pass.

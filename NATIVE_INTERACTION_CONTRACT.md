@@ -86,6 +86,8 @@ Before accepting a screen:
 
 The whole Sale surface must also retain its core input, payment, details, review, and Record controls at 150% text in both color schemes, expose meaningful input/state/live-region semantics to TalkBack, and keep the work form reachable in landscape. `largeTextDarkThemeKeepsCoreActionsAndTalkBackStateAvailable` and `nativeSaleRemainsUsableInLandscape` enforce that cross-control contract.
 
+Welcome and authentication retain the approved light branded palette even when Android is using dark mode; system dark mode begins with the authenticated work area. `darkSystemHostKeepsTheBrandedAccountPickerContrast` captures the rendered account picker and verifies light text on its green header plus dark labels on its ivory body.
+
 ## Current evidence
 
 - Device UI classes: `NativeOwnerBootstrapUiTest`, `NativeAuthenticationScreenContractTest`, and `NativeFoundationUiTest`
@@ -96,3 +98,4 @@ The whole Sale surface must also retain its core input, payment, details, review
 - Manual Android prompt result on 2026-09-19: existing Owner Phone security enrollment was detected without re-enrollment; successful device-PIN approval opened native `New sale`; Android Back ended the session; prompt cancellation returned to the same Owner method picker with `Quick unlock was cancelled` visible.
 - Authoritative Sale result on 2026-09-19: `NativeFoundationUiTest` **16/16 passed** after replacing its preview write with paid/customer/error/draft workflows; `NativeSaleScreenContractTest` **1/1 passed** for load retry; existing `Phase8SaleOperationsTest` **4/4 passed**. The first Sale checkpoint was therefore **21/21 passed, 0 failed, 0 skipped** on the wired A06.
 - Hardened Sale result on 2026-09-20: `NativeFoundationUiTest` **20/20**, `NativeSaleHardeningContractTest` **4/4**, and `Phase8SaleOperationsTest` **4/4** passed together on the wired A06 — **28/28 passed, 0 failed, 0 skipped**. The separate current-code Sale load-retry contract remains **1/1 passed**. Coverage adds foreground expiry, Activity recreation, IME, landscape, 150% text, dark theme, TalkBack semantics/live feedback, long customer lists, closed day, and missing references.
+- Access-color regression result on 2026-09-20: after physical A06 review exposed dark-theme tokens on the fixed light account-picker surfaces, authentication was given an explicit light-theme boundary and access system-bar icons were corrected. `NativeAuthenticationScreenContractTest` (4) plus `NativeFoundationUiTest` (20) pass together — **24/24 passed, 0 failed, 0 skipped** — including a rendered-pixel contrast assertion under a dark system host.

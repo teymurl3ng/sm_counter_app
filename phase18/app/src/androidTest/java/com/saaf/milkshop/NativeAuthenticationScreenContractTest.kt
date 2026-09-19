@@ -5,11 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.compose.ui.graphics.toPixelMap
 import com.saaf.milkshop.application.authentication.NativeAccountSummary
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.nativeui.NativeUiTags
@@ -17,6 +19,7 @@ import com.saaf.milkshop.nativeui.auth.NativeAuthenticationHost
 import com.saaf.milkshop.nativeui.auth.NativeAuthenticationState
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Rule
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -24,6 +27,69 @@ import org.junit.runner.RunWith
 class NativeAuthenticationScreenContractTest {
     @get:Rule
     val composeRule = createComposeRule()
+
+    @Test
+    fun darkSystemHostKeepsTheBrandedAccountPickerContrast() {
+        val account = NativeAccountSummary(
+            userId = 9L,
+            loginName = "contrast.owner",
+            displayName = "Contrast Owner",
+            role = AppRole.OWNER,
+        )
+        composeRule.setContent {
+            SaafTheme(darkTheme = true) {
+                NativeAuthenticationHost(
+                    state = NativeAuthenticationState.AccountPicker(listOf(account)),
+                    onRetry = {},
+                    onBackToWelcome = {},
+                    onSelectAccount = {},
+                    onChooseAnotherAccount = {},
+                    onBackFromPassphrase = {},
+                    onUseQuickPin = {},
+                    onUsePhoneSecurity = {},
+                    onUseFullPassphrase = {},
+                    onBackFromQuickPin = {},
+                    onQuickPinSignIn = { it.fill('\u0000') },
+                    onSignIn = { it.fill('\u0000') },
+                    onBootstrapOwner = { _, _, first, second ->
+                        first.fill('\u0000')
+                        second.fill('\u0000')
+                    },
+                    onAcknowledgeRecoveryCode = {},
+                )
+            }
+        }
+
+        val titlePixels = composeRule.onNodeWithText("Who is using Saaf?")
+            .captureToImage()
+            .toPixelMap()
+        var brightestTitlePixel = 0f
+        for (y in 0 until titlePixels.height) {
+            for (x in 0 until titlePixels.width) {
+                val color = titlePixels[x, y]
+                brightestTitlePixel = maxOf(brightestTitlePixel, color.red + color.green + color.blue)
+            }
+        }
+        assertTrue(
+            "The green access header must retain its light title in a dark system host.",
+            brightestTitlePixel > 2.2f,
+        )
+
+        val labelPixels = composeRule.onNodeWithText("ACCOUNTS ON THIS PHONE")
+            .captureToImage()
+            .toPixelMap()
+        var darkestLabelPixel = 3f
+        for (y in 0 until labelPixels.height) {
+            for (x in 0 until labelPixels.width) {
+                val color = labelPixels[x, y]
+                darkestLabelPixel = minOf(darkestLabelPixel, color.red + color.green + color.blue)
+            }
+        }
+        assertTrue(
+            "The ivory access body must retain a dark readable label in a dark system host.",
+            darkestLabelPixel < 1.8f,
+        )
+    }
 
     @Test
     fun startupFailureRetryChangesToTheRequestedVisibleState() {

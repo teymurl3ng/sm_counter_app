@@ -62,6 +62,7 @@ import com.saaf.milkshop.nativeui.theme.SaafGreen
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafIvory
 import com.saaf.milkshop.nativeui.theme.SaafYellow
+import com.saaf.milkshop.nativeui.theme.SaafTheme
 
 @Composable
 fun NativeAuthenticationHost(
@@ -81,71 +82,73 @@ fun NativeAuthenticationHost(
     onAcknowledgeRecoveryCode: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
-        NativeAuthenticationState.Loading -> AccessMessageScreen(
-            title = "Loading accounts",
-            message = "Checking this phone’s Saaf access…",
-            loading = true,
-            modifier = modifier,
-        )
-        is NativeAuthenticationState.StartupFailure -> AccessMessageScreen(
-            title = "Accounts could not open",
-            message = state.message,
-            actionLabel = "Try again",
-            actionTag = NativeUiTags.AuthStartupRetry,
-            onAction = onRetry,
-            modifier = modifier,
-        )
-        is NativeAuthenticationState.OwnerSetup -> OwnerSetupScreen(
-            busy = state.busy,
-            error = state.error,
-            onBack = onBackToWelcome,
-            onCreateOwner = onBootstrapOwner,
-            modifier = modifier,
-        )
-        is NativeAuthenticationState.AccountPicker -> AccountPickerScreen(
-            accounts = state.accounts,
-            error = state.error,
-            onBack = onBackToWelcome,
-            onSelectAccount = onSelectAccount,
-            modifier = modifier,
-        )
-        is NativeAuthenticationState.Passphrase -> PassphraseSignInScreen(
-            account = state.account,
-            busy = state.busy,
-            error = state.error,
-            onBack = onBackFromPassphrase,
-            onChooseAnotherAccount = onChooseAnotherAccount,
-            onSignIn = onSignIn,
-            modifier = modifier,
-        )
-        is NativeAuthenticationState.MethodPicker -> MethodPickerScreen(
-            account = state.account,
-            busy = state.busy,
-            error = state.error,
-            onBack = onChooseAnotherAccount,
-            onUseQuickPin = onUseQuickPin,
-            onUsePhoneSecurity = onUsePhoneSecurity,
-            onUseFullPassphrase = onUseFullPassphrase,
-            onChooseAnotherAccount = onChooseAnotherAccount,
-            modifier = modifier,
-        )
-        is NativeAuthenticationState.QuickPin -> QuickPinSignInScreen(
-            account = state.account,
-            busy = state.busy,
-            error = state.error,
-            onBack = onBackFromQuickPin,
-            onUseFullPassphrase = onUseFullPassphrase,
-            onSignIn = onQuickPinSignIn,
-            modifier = modifier,
-        )
-        is NativeAuthenticationState.RecoveryCode -> RecoveryCodeScreen(
-            displayName = state.identity.displayName,
-            code = state.code,
-            onAcknowledge = onAcknowledgeRecoveryCode,
-            modifier = modifier,
-        )
-        is NativeAuthenticationState.Authenticated -> Unit
+    SaafTheme(darkTheme = false) {
+        when (state) {
+            NativeAuthenticationState.Loading -> AccessMessageScreen(
+                title = "Loading accounts",
+                message = "Checking this phone’s Saaf access…",
+                loading = true,
+                modifier = modifier,
+            )
+            is NativeAuthenticationState.StartupFailure -> AccessMessageScreen(
+                title = "Accounts could not open",
+                message = state.message,
+                actionLabel = "Try again",
+                actionTag = NativeUiTags.AuthStartupRetry,
+                onAction = onRetry,
+                modifier = modifier,
+            )
+            is NativeAuthenticationState.OwnerSetup -> OwnerSetupScreen(
+                busy = state.busy,
+                error = state.error,
+                onBack = onBackToWelcome,
+                onCreateOwner = onBootstrapOwner,
+                modifier = modifier,
+            )
+            is NativeAuthenticationState.AccountPicker -> AccountPickerScreen(
+                accounts = state.accounts,
+                error = state.error,
+                onBack = onBackToWelcome,
+                onSelectAccount = onSelectAccount,
+                modifier = modifier,
+            )
+            is NativeAuthenticationState.Passphrase -> PassphraseSignInScreen(
+                account = state.account,
+                busy = state.busy,
+                error = state.error,
+                onBack = onBackFromPassphrase,
+                onChooseAnotherAccount = onChooseAnotherAccount,
+                onSignIn = onSignIn,
+                modifier = modifier,
+            )
+            is NativeAuthenticationState.MethodPicker -> MethodPickerScreen(
+                account = state.account,
+                busy = state.busy,
+                error = state.error,
+                onBack = onChooseAnotherAccount,
+                onUseQuickPin = onUseQuickPin,
+                onUsePhoneSecurity = onUsePhoneSecurity,
+                onUseFullPassphrase = onUseFullPassphrase,
+                onChooseAnotherAccount = onChooseAnotherAccount,
+                modifier = modifier,
+            )
+            is NativeAuthenticationState.QuickPin -> QuickPinSignInScreen(
+                account = state.account,
+                busy = state.busy,
+                error = state.error,
+                onBack = onBackFromQuickPin,
+                onUseFullPassphrase = onUseFullPassphrase,
+                onSignIn = onQuickPinSignIn,
+                modifier = modifier,
+            )
+            is NativeAuthenticationState.RecoveryCode -> RecoveryCodeScreen(
+                displayName = state.identity.displayName,
+                code = state.code,
+                onAcknowledge = onAcknowledgeRecoveryCode,
+                modifier = modifier,
+            )
+            is NativeAuthenticationState.Authenticated -> Unit
+        }
     }
 }
 

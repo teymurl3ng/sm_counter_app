@@ -143,7 +143,11 @@ private fun NativeFoundationPreview(
         authenticationState is NativeAuthenticationState.Authenticated
 
     SystemBarAppearance(
-        useDarkIcons = destination != PreviewDestination.Welcome && !isSystemInDarkTheme(),
+        useDarkIcons = when {
+            destination == PreviewDestination.Welcome -> false
+            !showingCashier -> true
+            else -> !isSystemInDarkTheme()
+        },
     )
 
     when (destination) {

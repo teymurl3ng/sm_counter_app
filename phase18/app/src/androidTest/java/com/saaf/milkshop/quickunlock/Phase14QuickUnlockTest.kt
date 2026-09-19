@@ -153,6 +153,20 @@ class Phase14QuickUnlockTest {
     }
 
     @Test
+    fun correctPinCanRetryImmediatelyAfterOneWrongPin() = runBlocking {
+        val owner = owner()
+        quickUnlock.enroll(owner.session.sessionId, PASSPHRASE.toCharArray(), false, PIN.toCharArray())
+        sessions.logout(owner.session.sessionId)
+
+        assertFailure<QuickUnlockFailure.Authentication> {
+            quickUnlock.login(owner.user.loginName, QuickUnlockMethod.PIN, WRONG_PIN.toCharArray())
+        }
+
+        val quickSession = quickUnlock.login(owner.user.loginName, QuickUnlockMethod.PIN, PIN.toCharArray())
+        assertEquals(owner.user.userId, quickSession.userId)
+    }
+
+    @Test
     fun overlappingLoginAndReauthenticationAttemptsShareThePinLimit() = runBlocking {
         val owner = owner()
         quickUnlock.enroll(owner.session.sessionId, PASSPHRASE.toCharArray(), false, PIN.toCharArray())

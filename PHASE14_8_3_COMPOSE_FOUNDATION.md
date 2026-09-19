@@ -1,6 +1,6 @@
 # Phase 14.8.3 — Compose foundation
 
-Status: **STARTED — native visual foundation runs on A06; service-bound vertical slice is next**
+Status: **IN PROGRESS — native authentication including Quick PIN runs on A06; phone-security prompt review and service-bound Sale are next**
 
 Date started: 2026-09-19
 
@@ -21,6 +21,13 @@ The owner accepted the refined Counter Ledger preview after the final quantity-u
 - adopted `NATIVE_INTERACTION_CONTRACT.md` as a required gate: every visible control needs a described workflow, stable test tag, real action, state assertion, and visible-result assertion;
 - removed remaining silent preview taps: secondary details now expands/collapses, customer selection has defined Cancel/change behavior, and unfinished navigation destinations show explicit temporary notices;
 - implemented Android Back from the Cashier preview to Welcome and a clear non-writing snackbar when the preview Record action is pressed;
+- added a presentation-neutral typed authentication facade over Room and `UserSecurityService`; Compose does not call the JSON bridge;
+- added native startup loading/retry, returning-account selection, selected-identity passphrase sign-in, first-Owner creation, one-time recovery-code acknowledgment, and explicit validation/error states;
+- kept passphrases out of navigation and saved state, cleared field state on submission, zeroed submitted `CharArray` values, and carried only a memory-only session handle into the authenticated preview;
+- made system Back and visible Back behavior explicit at every access stage; leaving Cashier invalidates the native session before returning to Welcome;
+- added account-specific native method selection backed by the existing encrypted Quick unlock records, with Quick PIN, Android phone security, and the always-available full-passphrase route shown only when applicable;
+- connected Quick PIN to the real per-account security service, including cross-account rejection, immediate corrected-PIN retry, delay/full-passphrase recovery, and full-passphrase reset behavior;
+- connected Android phone security through the Activity-scoped `BiometricPrompt` device gate, using `Phone security` unless a strong biometric is actually available and never claiming a fingerprint that Android has not enrolled;
 - left `HybridActivity` as the only launcher and left all database, security, bridge, and business behavior unchanged.
 
 ## Compatibility decision
@@ -31,7 +38,11 @@ The current stable Activity 1.13/Lifecycle 2.11 Compose path requires Android AP
 
 - `:app:compileDebugKotlin :app:compileDebugAndroidTestKotlin -Psaaf.instrumentationSandbox=true` — passed;
 - `:app:assembleDebug -Psaaf.isolatedQa=true` — passed;
-- `NativeFoundationUiTest` on wired A06 `SM-A065F` — 8/8 passed, covering every current Welcome/Cashier button, selection, input, dialog action, disclosure, commit action, and navigation destination;
+- `NativeOwnerBootstrapUiTest` on wired A06 `SM-A065F` — 1/1 passed on a fresh isolated installation, including disabled submit, visible/system Back, mismatch rejection, Owner creation, recovery-code retention, acknowledgment, and entry to Cashier;
+- `NativeFoundationUiTest` on wired A06 `SM-A065F` — 12/12 passed, covering Welcome, account and method selection, blank/invalid/retried/valid passphrase and Quick PIN states, cross-account PIN rejection, every Back route, session invalidation, and every current Cashier interaction;
+- `NativeAuthenticationFacadeTest` and `NativeAuthenticationScreenContractTest` — 5/5 passed, covering typed sessions, secret zeroing, active-account filtering, startup retry, enrolled-method visibility, phone-security cancellation, and rate-limited full-passphrase recovery;
+- `Phase14QuickUnlockTest` — 10/10 passed, including encrypted persistence, immediate corrected-PIN retry, PIN delay/full-passphrase reset, phone-security strength, invalidation, and concurrent-attempt/removal races;
+- combined native authentication checkpoint on the wired A06 — **28/28 passed, 0 failed, 0 skipped**;
 - isolated package installed as `com.saaf.milkshop.qa`; ordinary Saaf package was not touched;
 - real-device Welcome evidence: `phase14-evidence/saaf-native-welcome-a06.png`;
 - real-device Cashier evidence: `phase14-evidence/saaf-native-cashier-a06.png`;
@@ -39,15 +50,13 @@ The current stable Activity 1.13/Lifecycle 2.11 Compose path requires Android AP
 
 ## Current boundary
 
-This is a native implementation checkpoint, not a completed vertical slice. Sample identity, date, products, rates, customer accounts, and effects are presentation fixtures. The preview controls now form a coherent local state loop, but they do not read reference data or write a sale. Continue goes directly from Welcome to Cashier in the debug harness. Record sale deliberately writes nothing. The native activity is not reachable from the production launcher.
+This is a service-connected authentication slice inside the debug-native harness, not a completed application migration. Account discovery, first-Owner creation, full-passphrase verification, recovery acknowledgment, Quick PIN, Android phone-security invocation, and session boundaries use the real native security and Room authority. Quick PIN is automated on the A06; the actual Android phone-security prompt still needs one manual native-screen review. Date, products, rates, customer accounts, and sale effects remain presentation fixtures; Record sale deliberately writes nothing. The native activity is not reachable from the production launcher.
 
 ## Next checkpoint
 
-Build the service-bound authentication-to-sale slice in this order:
+Continue the authentication-to-sale slice in this order:
 
-1. expose a presentation-neutral typed authentication facade around `UserSecurityService` and the existing Quick unlock service;
-2. add startup/bootstrap state, account selection, enrolled-method selection, and full-passphrase/Quick-unlock screens;
-3. carry the memory-only native session into a role-calibrated native shell without placing secrets in saved state or navigation arguments;
-4. bind Cashier reference data and Sale commands through the existing typed application/domain boundary;
-5. replace fixture totals and effects with authoritative preview state, then implement saving, success, error, refresh, Back/draft, and restoration behavior;
-6. prove the Room event, stock/cash effect, audit actor, session expiry, large text, IME, TalkBack, and process recreation before changing launcher ownership.
+1. manually review the real Android phone-security prompt, cancellation, successful return, and selected-account identity in the isolated native QA activity;
+2. bind Cashier reference data and Sale commands through the existing typed application/domain boundary;
+3. replace fixture totals and effects with authoritative preview state, then implement saving, success, error, refresh, Back/draft, and restoration behavior;
+4. prove the Room event, stock/cash effect, audit actor, session expiry, large text, IME, TalkBack, and process recreation before changing launcher ownership.

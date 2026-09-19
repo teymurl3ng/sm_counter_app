@@ -2,14 +2,15 @@ package com.saaf.milkshop.nativeui
 
 import android.app.Activity
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,29 +20,74 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
+import com.saaf.milkshop.MilkShopApplication
 import com.saaf.milkshop.R
+import com.saaf.milkshop.application.authentication.NativeAuthenticationFacade
+import com.saaf.milkshop.application.authentication.NativeQuickUnlockFacade
+import com.saaf.milkshop.nativeui.auth.NativeAuthenticationHost
+import com.saaf.milkshop.nativeui.auth.NativeAuthenticationState
+import com.saaf.milkshop.nativeui.auth.NativeAuthenticationViewModel
 import com.saaf.milkshop.nativeui.sale.CashierSaleScreen
 import com.saaf.milkshop.nativeui.sale.CashierSection
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import com.saaf.milkshop.nativeui.welcome.WelcomeScreen
+import com.saaf.milkshop.quickunlock.AndroidQuickUnlockDeviceGate
+import com.saaf.milkshop.quickunlock.AndroidQuickUnlockRecordStore
+import com.saaf.milkshop.quickunlock.QuickUnlockService
+import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.launch
 
-class NativePreviewActivity : ComponentActivity() {
+class NativePreviewActivity : FragmentActivity() {
+    private lateinit var authenticationFacade: NativeAuthenticationFacade
+    private lateinit var quickUnlockService: QuickUnlockService
+    private lateinit var quickUnlockFacade: NativeQuickUnlockFacade
+
+    private val authenticationViewModel by viewModels<NativeAuthenticationViewModel> {
+        val app = application as MilkShopApplication
+        NativeAuthenticationViewModel.Factory(
+            facade = authenticationFacade,
+            onSessionChanged = { app.currentSessionId = it },
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        val app = application as MilkShopApplication
+        authenticationFacade = NativeAuthenticationFacade(app.database, app.userSecurity)
+        quickUnlockService = QuickUnlockService(
+            database = app.database,
+            security = app.userSecurity,
+            store = AndroidQuickUnlockRecordStore(applicationContext),
+            deviceGate = AndroidQuickUnlockDeviceGate(this),
+        )
+        quickUnlockFacade = NativeQuickUnlockFacade(quickUnlockService, authenticationFacade)
+        authenticationViewModel.attachQuickUnlock(quickUnlockFacade)
         setContent {
             SaafTheme(darkTheme = false) {
-                NativeFoundationPreview()
+                val authenticationState by authenticationViewModel.state.collectAsState()
+                NativeFoundationPreview(
+                    authenticationState = authenticationState,
+                    authenticationViewModel = authenticationViewModel,
+                )
             }
         }
     }
+
+    override fun onDestroy() {
+        if (::quickUnlockFacade.isInitialized) authenticationViewModel.detachQuickUnlock(quickUnlockFacade)
+        if (::quickUnlockService.isInitialized) quickUnlockService.close()
+        super.onDestroy()
+    }
 }
 
-private enum class PreviewDestination { Welcome, CashierSale }
+private enum class PreviewDestination { Welcome, Access }
 
 @Composable
-private fun NativeFoundationPreview() {
+private fun NativeFoundationPreview(
+    authenticationState: NativeAuthenticationState,
+    authenticationViewModel: NativeAuthenticationViewModel,
+) {
     var destination by rememberSaveable { mutableStateOf(PreviewDestination.Welcome) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -61,28 +107,66 @@ private fun NativeFoundationPreview() {
         }
     }
 
+    val showingCashier = destination == PreviewDestination.Access &&
+        authenticationState is NativeAuthenticationState.Authenticated
+
     SystemBarAppearance(useDarkIcons = destination != PreviewDestination.Welcome)
 
     when (destination) {
         PreviewDestination.Welcome -> WelcomeScreen(
-            onContinue = { destination = PreviewDestination.CashierSale },
+            onContinue = { destination = PreviewDestination.Access },
         )
-        PreviewDestination.CashierSale -> {
-            BackHandler { destination = PreviewDestination.Welcome }
-            CashierSaleScreen(
-                snackbarHostState = snackbarHostState,
-                onRecordSale = { showPreviewNotice(previewNotice) },
-                onNavigate = { section ->
-                    showPreviewNotice(
-                        when (section) {
-                            CashierSection.Sell -> sellNotice
-                            CashierSection.Collect -> collectNotice
-                            CashierSection.Activity -> activityNotice
-                            CashierSection.More -> moreNotice
-                        },
-                    )
-                },
-            )
+        PreviewDestination.Access -> {
+            if (showingCashier) {
+                BackHandler {
+                    authenticationViewModel.leaveAuthenticatedArea()
+                    destination = PreviewDestination.Welcome
+                }
+                CashierSaleScreen(
+                    snackbarHostState = snackbarHostState,
+                    onRecordSale = { showPreviewNotice(previewNotice) },
+                    onNavigate = { section ->
+                        showPreviewNotice(
+                            when (section) {
+                                CashierSection.Sell -> sellNotice
+                                CashierSection.Collect -> collectNotice
+                                CashierSection.Activity -> activityNotice
+                                CashierSection.More -> moreNotice
+                            },
+                        )
+                    },
+                )
+            } else {
+                when (authenticationState) {
+                    is NativeAuthenticationState.MethodPicker -> BackHandler {
+                        authenticationViewModel.chooseAnotherAccount()
+                    }
+                    is NativeAuthenticationState.QuickPin -> BackHandler {
+                        authenticationViewModel.backFromQuickPin()
+                    }
+                    is NativeAuthenticationState.Passphrase -> BackHandler {
+                        authenticationViewModel.backFromPassphrase()
+                    }
+                    is NativeAuthenticationState.RecoveryCode -> BackHandler(enabled = true) {}
+                    else -> BackHandler { destination = PreviewDestination.Welcome }
+                }
+                NativeAuthenticationHost(
+                    state = authenticationState,
+                    onRetry = authenticationViewModel::refreshStartup,
+                    onBackToWelcome = { destination = PreviewDestination.Welcome },
+                    onSelectAccount = authenticationViewModel::selectAccount,
+                    onChooseAnotherAccount = authenticationViewModel::chooseAnotherAccount,
+                    onBackFromPassphrase = authenticationViewModel::backFromPassphrase,
+                    onUseQuickPin = authenticationViewModel::useQuickPin,
+                    onUsePhoneSecurity = authenticationViewModel::signInWithPhoneSecurity,
+                    onUseFullPassphrase = authenticationViewModel::useFullPassphrase,
+                    onBackFromQuickPin = authenticationViewModel::backFromQuickPin,
+                    onQuickPinSignIn = authenticationViewModel::signInWithQuickPin,
+                    onSignIn = authenticationViewModel::signIn,
+                    onBootstrapOwner = authenticationViewModel::bootstrapOwner,
+                    onAcknowledgeRecoveryCode = authenticationViewModel::acknowledgeRecoveryCode,
+                )
+            }
         }
     }
 }

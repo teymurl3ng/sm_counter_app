@@ -1,6 +1,6 @@
 # Phase 14.8 — Native UI redesign and migration
 
-Status: **ACTIVE — checkpoint 14.8.2 design gate complete; Compose foundation is next**
+Status: **ACTIVE — checkpoint 14.8.3 Compose foundation started; hybrid launcher retained**
 
 Date started: 2026-09-12
 
@@ -141,4 +141,12 @@ This baseline is a comparison point, not a visual target.
 
 Checkpoint 14.8.2 is complete. The owner selected Counter Ledger and accepted the Cashier/Operations blueprint, Owner/Store manager/Administrator blueprint, and dedicated welcome/access blueprint, with minor native polish deferred. `PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md`, `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md`, and `PHASE14_8_2_COUNTER_LEDGER_ACCESS.md` now form the implementation design authority.
 
-The next gate is Phase 14.8.3: add the Compose foundation alongside the working hybrid application, encode the Counter Ledger tokens and role shell, and prepare the first native authentication-to-sale vertical slice. No WebView or bridge retirement begins until native callers replace every retained capability and their parity gates pass.
+Update 2026-09-19: the official Stitch MCP connection is working, the owner approved the six-screen brief, and two treatments of returning-user Welcome, Cashier New sale, and Owner Overview have been generated in private project `17568665013202933334`. Review [the comparison gallery](design/stitch/comparison.html), [findings and limitations](design/stitch/REVIEW.md), and [the Stitch canvas](https://stitch.withgoogle.com/projects/17568665013202933334). Exact prompts and results are preserved under `design/stitch/generation/`; `STITCH_DESIGN_PREPARATION.md` records the checkpoint and source boundaries. The API credential was not read or exposed.
+
+Owner decision 2026-09-19: neither generated treatment is a sufficiently large improvement to replace the original Counter Ledger designs. The type weight and readability are materially better and will be carried into a remake of the original representative previews, along with stronger contrast, touch targets, and result/action visibility. `PHASE14_8_2_COUNTER_LEDGER_REFINEMENT.md` is the refinement contract. Stitch screenshots and HTML remain reference evidence; the approved design must still be recreated and verified in Jetpack Compose.
+
+The owner accepted the [refined original Welcome, Cashier New sale, and Owner Overview previews](design/refined-counter-ledger/index.html) on 2026-09-19 after requesting a compact paid-now selector, a corrected quantity-unit baseline, and `Amount` in place of `PKR value`. The accepted role rules, native/security architecture, and blueprint authority remain in force. Historical `DESIGN.md` is unchanged, and the generated proposals do not replace the design system.
+
+Phase 14.8.3 is now underway. The Compose compiler, compatible stable dependencies, accepted theme tokens, bundled Manrope weights, debug-only native entry activity, Welcome screen, and Cashier normal state are implemented beside the working hybrid application. The isolated QA APK builds, runs on A06, and passes its focused Compose UI test. See `PHASE14_8_3_COMPOSE_FOUNDATION.md` and `phase14-evidence/saaf-native-*-a06.png`.
+
+The current gate is the service-bound authentication-to-sale vertical slice: native bootstrap/account/method selection, memory-only session handoff, authoritative Sale reference/preview state, real Room write, immediate success/error feedback, refresh, Back/draft restoration, accessibility, and device proof. `HybridActivity` remains the launcher. No WebView or bridge retirement begins until native callers replace every retained capability and their parity gates pass.

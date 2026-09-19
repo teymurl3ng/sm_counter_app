@@ -13,7 +13,7 @@ Product scope: Saaf Milk is the current working product identity, and Milk/Yogur
 - `phase18/` — Phase 18-derived native project. Its logic specification and SQL blueprint remain frozen; approved hybrid native extensions are implemented in the Kotlin/Room source.
 - `ui/` — the latest AI Studio UI source supplied for the new product layer.
 - `PRODUCT_SCOPE.md` — authoritative target-user, product-breadth, proportional-quality, benchmark, and expansion policy.
-- `DESIGN.md` — authoritative Phase 12 visual target, presentation tokens, Android priorities, accessibility rules, and proportional change gate.
+- `DESIGN.md` — historical Phase 12 visual authority for the runnable hybrid fallback; the accepted Counter Ledger blueprints govern the native redesign.
 - `QUICK_UNLOCK_REQUIREMENT.md` — approved release-blocking biometric/device-credential and per-user short-PIN contract, security boundaries, phase placement, and test states.
 - `POSTMORTEM.md` — locked fresh-start playbook.
 - `PHASE0.md` — immutable baseline record and hashes.
@@ -66,6 +66,12 @@ Product scope: Saaf Milk is the current working product identity, and Milk/Yogur
 - `PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md` — accepted Counter Ledger Cashier and Operations implementation blueprint.
 - `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md` — accepted Owner, Store manager, and Administrator screen/state blueprint.
 - `PHASE14_8_2_COUNTER_LEDGER_ACCESS.md` — accepted branded welcome, account selection, authentication, first-Owner, staff-enrollment, and Quick-unlock blueprint.
+- `PHASE14_8_2_COUNTER_LEDGER_REFINEMENT.md` — owner decision to retain the original layouts and apply the typography/readability lessons from the Stitch study.
+- `PHASE14_8_3_COMPOSE_FOUNDATION.md` — active Compose foundation, compatibility boundary, real-device evidence, and next service-bound vertical-slice gate.
+- `NATIVE_INTERACTION_CONTRACT.md` — required workflow description, stable-tag, and device-test gate for every visible native control.
+- `design/refined-counter-ledger/index.html` — accepted refined original Welcome, Cashier sale, and Owner overview visual reference.
+- `STITCH_DESIGN_PREPARATION.md` — verified Stitch connection, approved brief, six-screen comparison evidence, and recorded owner review.
+- `design/stitch/comparison.html` and `design/stitch/REVIEW.md` — generated A/B Welcome, Cashier New sale, and Owner Overview proposals retained as comparative evidence; neither treatment is selected wholesale.
 
 ## Immutable baselines
 
@@ -77,7 +83,7 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 14.8 — Native UI Redesign and Migration: ACTIVE (14.8.2 design gate complete; Compose foundation next)**
+**Phase 14.8 — Native UI Redesign and Migration: ACTIVE (14.8.3 Compose foundation runs on A06; hybrid launcher retained)**
 
 Phase 14 completed the safe `.qa` device baseline, all-five-role authorization matrix, live Drive and real cross-device recovery, Android/accessibility audit, device-bound Quick unlock, defect closure, and complete regression. The final result remains 273/273 ordinary Android tests, the 1/1 visual audit, and 7/7 host tests. The owner then rejected the hybrid interface as the release UX and confirmed native UI as the intended destination. Phase 14.8 redesigns and incrementally migrates the presentation to Compose while retaining the working hybrid build as a behavioral oracle and fallback. Phase 15 will test the native release candidate without coaching.
 
@@ -145,7 +151,7 @@ Phase 13 — Dead/Mock/Misleading UI Cleanup ✅ (all five checkpoints complete;
 
 Phase 14 — Final Device QA ✅ (all seven checkpoints complete; 273/273 ordinary Android tests, 1/1 visual audit, 7/7 host tests)
 
-Phase 14.8 — Native UI Redesign and Migration 🚧 (14.8.1 inventory complete; 14.8.2 Counter Ledger five-role and access blueprints accepted; Compose foundation next)
+Phase 14.8 — Native UI Redesign and Migration 🚧 (14.8.1 inventory complete; 14.8.2 Counter Ledger five-role and access blueprints accepted; Stitch lessons recorded; original previews to be refined before connected-state review and Compose)
 
 Phase 15 — Final Shopkeeper QA ⏳ (starts after the native migration/regression gate; includes uncoached Quick unlock enrollment/use/recovery and periodic backup/recovery)
 
@@ -224,4 +230,6 @@ Every completed or active hybrid-rebuild phase gets a root `PHASEN.md` file with
 
 ## Next gate
 
-Begin Phase 14.8.3 by adding the Compose foundation beside the working hybrid fallback, encoding the accepted Counter Ledger system, and preparing the first native authentication-to-sale vertical slice. Phase 15 then runs uncoached shopkeeper QA on the native release candidate. Ordinary Saaf installations/profiles must remain untouched. See `PHASE14_8.md`, `PHASE14_8_2_COUNTER_LEDGER_WORKFLOWS.md`, `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md`, `PHASE14_8_2_COUNTER_LEDGER_ACCESS.md`, and `ROADMAP_RECONCILIATION_2026-08-27.md`.
+The owner accepted the [refined original Counter Ledger preview](design/refined-counter-ledger/index.html), including the final compact payment selector, quantity-unit alignment, and `Amount` entry label. Neither generated treatment is selected wholesale. The [comparison](design/stitch/comparison.html), [review](design/stitch/REVIEW.md), [private Stitch canvas](https://stitch.withgoogle.com/projects/17568665013202933334), and `design/stitch/generation/` remain evidence.
+
+Phase 14.8.3 has begun. The Compose foundation, accepted theme, bundled Manrope weights, debug-only native activity, Welcome screen, and Cashier normal state now build and run in the isolated QA package. The complete current interaction contract passes 8/8 device tests on A06. Every new visible native control now requires a described workflow, stable test tag, and device test for its state and visible result. The current gate is to connect the existing native authentication/session and Sale services into one authoritative end-to-end slice before changing launcher ownership. Phase 15 runs uncoached shopkeeper QA on the native release candidate. Ordinary Saaf installations/profiles must remain untouched. See `NATIVE_INTERACTION_CONTRACT.md`, `PHASE14_8_3_COMPOSE_FOUNDATION.md`, `PHASE14_8.md`, the four `PHASE14_8_2_COUNTER_LEDGER_*` documents, and `ROADMAP_RECONCILIATION_2026-08-27.md`.

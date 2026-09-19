@@ -1,6 +1,6 @@
 # Phase 14.8.2 — Counter Ledger worker workflows
 
-Status: **ACCEPTED AS AN IMPLEMENTATION BLUEPRINT — minor native polish deferred; no Compose implementation authorized yet**
+Status: **ACCEPTED AS AN IMPLEMENTATION BLUEPRINT — Compose foundation authorized and started**
 
 Date: 2026-09-12
 

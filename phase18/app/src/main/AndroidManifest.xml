@@ -11,6 +11,11 @@
         android:label="Milk Shop"
         android:supportsRtl="true">
         <activity
+            android:name=".nativeui.NativePreviewActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SaafMilk.Native"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".MainActivity"
             android:exported="false" />
         <activity

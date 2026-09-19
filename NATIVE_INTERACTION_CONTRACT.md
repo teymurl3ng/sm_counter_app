@@ -81,3 +81,4 @@ Before accepting a screen:
 - Stable tag registry: `phase18/app/src/main/java/com/saaf/milkshop/nativeui/NativeUiTags.kt`
 - Device: Samsung A06, `SM-A065F`, wired serial `R8VXA02SNKH`
 - Result on 2026-09-19: **28/28 passed, 0 failed, 0 skipped** across the fresh-install Owner partition (1), Welcome/authentication/Cashier UI partition (12), typed authentication and screen-state partition (5), and core Quick unlock security partition (10).
+- Manual Android prompt result on 2026-09-19: existing Owner Phone security enrollment was detected without re-enrollment; successful device-PIN approval opened native `New sale`; Android Back ended the session; prompt cancellation returned to the same Owner method picker with `Quick unlock was cancelled` visible.

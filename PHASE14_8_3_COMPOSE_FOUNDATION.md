@@ -1,6 +1,6 @@
 # Phase 14.8.3 — Compose foundation
 
-Status: **IN PROGRESS — native authentication including Quick PIN runs on A06; phone-security prompt review and service-bound Sale are next**
+Status: **IN PROGRESS — native authentication including Quick PIN and Android phone security is verified on A06; service-bound Sale is next**
 
 Date started: 2026-09-19
 
@@ -43,6 +43,7 @@ The current stable Activity 1.13/Lifecycle 2.11 Compose path requires Android AP
 - `NativeAuthenticationFacadeTest` and `NativeAuthenticationScreenContractTest` — 5/5 passed, covering typed sessions, secret zeroing, active-account filtering, startup retry, enrolled-method visibility, phone-security cancellation, and rate-limited full-passphrase recovery;
 - `Phase14QuickUnlockTest` — 10/10 passed, including encrypted persistence, immediate corrected-PIN retry, PIN delay/full-passphrase reset, phone-security strength, invalidation, and concurrent-attempt/removal races;
 - combined native authentication checkpoint on the wired A06 — **28/28 passed, 0 failed, 0 skipped**;
+- manual native Phone security on the A06 — existing Owner enrollment appeared as `Owner · Phone security, full passphrase`; device-PIN approval opened `New sale`; cancelling a second prompt retained the selected Owner and showed `Quick unlock was cancelled`;
 - isolated package installed as `com.saaf.milkshop.qa`; ordinary Saaf package was not touched;
 - real-device Welcome evidence: `phase14-evidence/saaf-native-welcome-a06.png`;
 - real-device Cashier evidence: `phase14-evidence/saaf-native-cashier-a06.png`;
@@ -50,13 +51,12 @@ The current stable Activity 1.13/Lifecycle 2.11 Compose path requires Android AP
 
 ## Current boundary
 
-This is a service-connected authentication slice inside the debug-native harness, not a completed application migration. Account discovery, first-Owner creation, full-passphrase verification, recovery acknowledgment, Quick PIN, Android phone-security invocation, and session boundaries use the real native security and Room authority. Quick PIN is automated on the A06; the actual Android phone-security prompt still needs one manual native-screen review. Date, products, rates, customer accounts, and sale effects remain presentation fixtures; Record sale deliberately writes nothing. The native activity is not reachable from the production launcher.
+This is a service-connected authentication slice inside the debug-native harness, not a completed application migration. Account discovery, first-Owner creation, full-passphrase verification, recovery acknowledgment, Quick PIN, Android phone-security invocation, and session boundaries use the real native security and Room authority. Quick PIN is automated on the A06, and the actual Android phone-security prompt has passed both approval and cancellation on the native screen. Date, products, rates, customer accounts, and sale effects remain presentation fixtures; Record sale deliberately writes nothing. The native activity is not reachable from the production launcher.
 
 ## Next checkpoint
 
 Continue the authentication-to-sale slice in this order:
 
-1. manually review the real Android phone-security prompt, cancellation, successful return, and selected-account identity in the isolated native QA activity;
-2. bind Cashier reference data and Sale commands through the existing typed application/domain boundary;
-3. replace fixture totals and effects with authoritative preview state, then implement saving, success, error, refresh, Back/draft, and restoration behavior;
-4. prove the Room event, stock/cash effect, audit actor, session expiry, large text, IME, TalkBack, and process recreation before changing launcher ownership.
+1. bind Cashier reference data and Sale commands through the existing typed application/domain boundary;
+2. replace fixture totals and effects with authoritative preview state, then implement saving, success, error, refresh, Back/draft, and restoration behavior;
+3. prove the Room event, stock/cash effect, audit actor, session expiry, large text, IME, TalkBack, and process recreation before changing launcher ownership.

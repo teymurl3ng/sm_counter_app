@@ -35,6 +35,7 @@ class NativeFoundationUiTest {
     @Test
     fun accessBackAccountChangeAndAuthenticationErrorFollowTheirVisibleContracts() {
         openAccountPicker()
+        composeRule.onNodeWithText("Owner · Quick PIN, full passphrase").assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.AuthBackToWelcome).performClick()
         composeRule.onNodeWithText("Saaf Milk").assertIsDisplayed()

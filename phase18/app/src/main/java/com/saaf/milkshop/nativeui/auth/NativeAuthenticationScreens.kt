@@ -213,7 +213,7 @@ private fun AccountRow(account: NativeAccountSummary, onClick: () -> Unit) {
         Column(modifier = Modifier.weight(1f)) {
             Text(account.displayName, style = MaterialTheme.typography.titleMedium)
             Text(
-                text = "${account.role.label()} · Full passphrase",
+                text = "${account.role.label()} · ${account.availableMethodSummary()}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -221,6 +221,12 @@ private fun AccountRow(account: NativeAccountSummary, onClick: () -> Unit) {
         Icon(Icons.Outlined.ChevronRight, contentDescription = null)
     }
 }
+
+private fun NativeAccountSummary.availableMethodSummary(): String = buildList {
+    if (quickPinEnabled) add("Quick PIN")
+    if (phoneSecurityEnabled) add(phoneSecurityLabel)
+    add("full passphrase")
+}.joinToString(", ")
 
 @Composable
 private fun PassphraseSignInScreen(

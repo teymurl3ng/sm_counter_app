@@ -27,6 +27,7 @@ import com.saaf.milkshop.nativeui.NativePreviewActivity
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.domain.SettingKeys
 import com.saaf.milkshop.domain.AnalyticsService
+import com.saaf.milkshop.domain.CustomerManagementService
 import com.saaf.milkshop.domain.VendorManagementService
 import com.saaf.milkshop.domain.VendorPurchaseInput
 import com.saaf.milkshop.domain.VendorPurchaseService
@@ -375,13 +376,65 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithText("Sell is already open.").assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.CashierNavCollect).performClick()
-        composeRule.onNodeWithText("Collect is not connected in this native preview yet.").assertIsDisplayed()
+        waitForText("Collect payment")
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavCollect).assertIsSelected()
+
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavCollect).performClick()
+        composeRule.onNodeWithText("Collect is already open.").assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.CashierNavActivity).performClick()
         composeRule.onNodeWithText("Activity is not connected in this native preview yet.").assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).performClick()
         composeRule.onNodeWithText("More is not connected in this native preview yet.").assertIsDisplayed()
+
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavSell).performClick()
+        waitForText("New sale")
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavSell).assertIsSelected()
+    }
+
+    @Test
+    fun collectPaymentWritesRoomShowsReceiptAndOffersTheNextVisibleActions() = runBlocking {
+        val app = app()
+        val customerName = "Native Collect ${System.nanoTime()}"
+        val customerId = CustomerManagementService(app.database).create(customerName)
+        val cash = app.database.accountDao().findByCategory("Cash/Bank").single { it.name == "Cash" }
+        val cashBefore = app.database.readModelDao().accountBalance(cash.accountId)!!.balance
+        val eventIdBefore = app.database.eventDao().findAllDescending().maxOfOrNull { it.eventId } ?: 0L
+        openCashier()
+
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavCollect).performClick()
+        waitForText("Collect payment")
+        composeRule.onNodeWithTag(NativeUiTags.CollectCustomerSelector).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.CollectCustomerSearch).performTextReplacement(customerName)
+        composeRule.onNodeWithTag(NativeUiTags.collectCustomer(customerId)).performClick()
+        waitForText(customerName)
+        composeRule.onNodeWithTag(NativeUiTags.CollectAmountInput).performTextReplacement("125")
+        composeRule.onNodeWithTag(NativeUiTags.CollectRecord).performScrollTo().performClick()
+        composeRule.onNodeWithTag(NativeUiTags.CollectConfirmAdvance).performClick()
+        composeRule.waitUntil(15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.CollectSuccess).fetchSemanticsNode()
+            }.isSuccess
+        }
+
+        val collection = app.database.eventDao().findAllDescending().single {
+            it.eventId > eventIdBefore && it.eventType == "CREDIT_COLLECTION"
+        }
+        val movements = app.database.financialLogDao().findByEventId(collection.eventId)
+        assertEquals(-125.0, movements.single { it.accountId == customerId }.amount, 0.000001)
+        assertEquals(125.0, movements.single { it.accountId == cash.accountId }.amount, 0.000001)
+        assertEquals(cashBefore + 125.0, app.database.readModelDao().accountBalance(cash.accountId)!!.balance, 0.000001)
+        composeRule.onNodeWithText("Has PKR 125.00 advance").assertIsDisplayed()
+
+        composeRule.onNodeWithTag(NativeUiTags.CollectViewRecord).performClick()
+        composeRule.onNodeWithText(
+            "Activity will open this record when the native Activity screen is connected.",
+        ).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CollectAnother).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.CollectCustomerSelector).assertIsDisplayed()
+        composeRule.onNodeWithText("Choose customer").assertIsDisplayed()
+        Unit
     }
 
     @Test

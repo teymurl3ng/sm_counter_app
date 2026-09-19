@@ -115,6 +115,9 @@ interface ReadModelDao {
     @Query("SELECT * FROM account_balances ORDER BY account_id")
     suspend fun accountBalances(): List<AccountBalanceView>
 
+    @Query("SELECT * FROM account_balances WHERE account_id = :accountId LIMIT 1")
+    suspend fun accountBalance(accountId: Long): AccountBalanceView?
+
     @Query("SELECT * FROM purchase_calculation_audit WHERE event_id = :eventId LIMIT 1")
     suspend fun purchaseAudit(eventId: Long): PurchaseCalculationAuditView?
 

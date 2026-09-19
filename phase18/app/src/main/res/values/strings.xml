@@ -491,6 +491,7 @@ Schema version: %3$d</string>
     <string name="native_nav_collect_notice">Collect is not connected in this native preview yet.</string>
     <string name="native_nav_activity_notice">Activity is not connected in this native preview yet.</string>
     <string name="native_nav_more_notice">More is not connected in this native preview yet.</string>
+    <string name="native_collection_view_record_notice">Activity will open this record when the native Activity screen is connected.</string>
     <string name="native_brand_mark">Saaf Milk mark</string>
 
 </resources>

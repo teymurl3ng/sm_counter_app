@@ -57,6 +57,30 @@ object NativeUiTags {
     const val CashierNavActivity = "cashier_nav_activity"
     const val CashierNavMore = "cashier_nav_more"
 
+    const val CollectRetryLoad = "collect_retry_load"
+    const val CollectPostingClosed = "collect_posting_closed"
+    const val CollectCustomerSelector = "collect_customer_selector"
+    const val CollectCustomerDialog = "collect_customer_dialog"
+    const val CollectCustomerSearch = "collect_customer_search"
+    const val CollectCustomerCancel = "collect_customer_cancel"
+    const val CollectAmountInput = "collect_amount_input"
+    const val CollectQuick1000 = "collect_quick_1000"
+    const val CollectPayFull = "collect_pay_full"
+    const val CollectPaymentSelector = "collect_payment_selector"
+    const val CollectPaymentCancel = "collect_payment_cancel"
+    const val CollectNoteToggle = "collect_note_toggle"
+    const val CollectNoteInput = "collect_note_input"
+    const val CollectRecord = "collect_record"
+    const val CollectReviewAdvance = "collect_review_advance"
+    const val CollectConfirmAdvance = "collect_confirm_advance"
+    const val CollectCancelAdvance = "collect_cancel_advance"
+    const val CollectSuccess = "collect_success"
+    const val CollectError = "collect_error"
+    const val CollectAnother = "collect_another"
+    const val CollectViewRecord = "collect_view_record"
+    const val CollectDiscardDraft = "collect_discard_draft"
+    const val CollectKeepDraft = "collect_keep_draft"
+
     fun cashierProduct(name: String): String = when (name.trim().lowercase()) {
         "milk" -> CashierProductMilk
         "yogurt" -> CashierProductYogurt
@@ -64,4 +88,8 @@ object NativeUiTags {
     }
 
     fun cashierCustomer(accountId: Long): String = "cashier_customer_$accountId"
+
+    fun collectCustomer(accountId: Long): String = "collect_customer_$accountId"
+
+    fun collectPaymentAccount(accountId: Long): String = "collect_payment_account_$accountId"
 }

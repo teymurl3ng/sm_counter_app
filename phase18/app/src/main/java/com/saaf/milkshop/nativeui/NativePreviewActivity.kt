@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -25,10 +24,14 @@ import com.saaf.milkshop.MilkShopApplication
 import com.saaf.milkshop.R
 import com.saaf.milkshop.application.authentication.NativeAuthenticationFacade
 import com.saaf.milkshop.application.authentication.NativeQuickUnlockFacade
+import com.saaf.milkshop.application.collection.NativeCollectionFacade
 import com.saaf.milkshop.application.sale.NativeSaleFacade
 import com.saaf.milkshop.nativeui.auth.NativeAuthenticationHost
 import com.saaf.milkshop.nativeui.auth.NativeAuthenticationState
 import com.saaf.milkshop.nativeui.auth.NativeAuthenticationViewModel
+import com.saaf.milkshop.nativeui.collection.CashierCollectionScreen
+import com.saaf.milkshop.nativeui.collection.NativeCollectionState
+import com.saaf.milkshop.nativeui.collection.NativeCollectionViewModel
 import com.saaf.milkshop.nativeui.sale.CashierSaleScreen
 import com.saaf.milkshop.nativeui.sale.CashierSection
 import com.saaf.milkshop.nativeui.sale.NativeSaleState
@@ -47,6 +50,7 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var quickUnlockService: QuickUnlockService
     private lateinit var quickUnlockFacade: NativeQuickUnlockFacade
     private lateinit var saleFacade: NativeSaleFacade
+    private lateinit var collectionFacade: NativeCollectionFacade
 
     private val authenticationViewModel by viewModels<NativeAuthenticationViewModel> {
         val app = application as MilkShopApplication
@@ -59,6 +63,13 @@ class NativePreviewActivity : FragmentActivity() {
     private val saleViewModel by viewModels<NativeSaleViewModel> {
         NativeSaleViewModel.Factory(
             facade = saleFacade,
+            onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
+        )
+    }
+
+    private val collectionViewModel by viewModels<NativeCollectionViewModel> {
+        NativeCollectionViewModel.Factory(
+            facade = collectionFacade,
             onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
         )
     }
@@ -77,16 +88,20 @@ class NativePreviewActivity : FragmentActivity() {
         )
         quickUnlockFacade = NativeQuickUnlockFacade(quickUnlockService, authenticationFacade)
         saleFacade = NativeSaleFacade(app.database, app.userSecurity)
+        collectionFacade = NativeCollectionFacade(app.database, app.userSecurity)
         authenticationViewModel.attachQuickUnlock(quickUnlockFacade)
         setContent {
             SaafTheme {
                 val authenticationState by authenticationViewModel.state.collectAsState()
                 val saleState by saleViewModel.state.collectAsState()
+                val collectionState by collectionViewModel.state.collectAsState()
                 NativeFoundationPreview(
                     authenticationState = authenticationState,
                     authenticationViewModel = authenticationViewModel,
                     saleState = saleState,
                     saleViewModel = saleViewModel,
+                    collectionState = collectionState,
+                    collectionViewModel = collectionViewModel,
                 )
             }
         }
@@ -120,14 +135,17 @@ private fun NativeFoundationPreview(
     authenticationViewModel: NativeAuthenticationViewModel,
     saleState: NativeSaleState,
     saleViewModel: NativeSaleViewModel,
+    collectionState: NativeCollectionState,
+    collectionViewModel: NativeCollectionViewModel,
 ) {
     var destination by rememberSaveable { mutableStateOf(PreviewDestination.Welcome) }
+    var cashierSection by rememberSaveable { mutableStateOf(CashierSection.Sell) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val sellNotice = stringResource(R.string.native_nav_sell_notice)
-    val collectNotice = stringResource(R.string.native_nav_collect_notice)
     val activityNotice = stringResource(R.string.native_nav_activity_notice)
     val moreNotice = stringResource(R.string.native_nav_more_notice)
+    val viewRecordNotice = stringResource(R.string.native_collection_view_record_notice)
 
     fun showPreviewNotice(message: String) {
         coroutineScope.launch {
@@ -142,11 +160,18 @@ private fun NativeFoundationPreview(
     val showingCashier = destination == PreviewDestination.Access &&
         authenticationState is NativeAuthenticationState.Authenticated
 
+    androidx.compose.runtime.LaunchedEffect(showingCashier) {
+        if (!showingCashier) {
+            cashierSection = CashierSection.Sell
+            saleViewModel.close()
+            collectionViewModel.close()
+        }
+    }
+
     SystemBarAppearance(
         useDarkIcons = when {
             destination == PreviewDestination.Welcome -> false
-            !showingCashier -> true
-            else -> !isSystemInDarkTheme()
+            else -> true
         },
     )
 
@@ -157,37 +182,79 @@ private fun NativeFoundationPreview(
         PreviewDestination.Access -> {
             if (showingCashier) {
                 val authenticated = authenticationState as NativeAuthenticationState.Authenticated
-                androidx.compose.runtime.LaunchedEffect(authenticated.sessionHandle) {
-                    saleViewModel.open(authenticated.sessionHandle)
-                }
-                BackHandler {
-                    saleViewModel.close()
-                    authenticationViewModel.leaveAuthenticatedArea()
-                    destination = PreviewDestination.Welcome
-                }
-                CashierSaleScreen(
-                    snackbarHostState = snackbarHostState,
-                    identity = authenticated.identity,
-                    state = saleState,
-                    onRetry = saleViewModel::refresh,
-                    onClearFeedback = saleViewModel::clearFeedback,
-                    onRecordSale = saleViewModel::record,
-                    onLeaveConfirmed = {
-                        saleViewModel.close()
-                        authenticationViewModel.leaveAuthenticatedArea()
-                        destination = PreviewDestination.Welcome
-                    },
-                    onNavigate = { section ->
-                        showPreviewNotice(
-                            when (section) {
-                                CashierSection.Sell -> sellNotice
-                                CashierSection.Collect -> collectNotice
-                                CashierSection.Activity -> activityNotice
-                                CashierSection.More -> moreNotice
+                // Counter Ledger Cashier surfaces stay on the approved light palette,
+                // matching authentication and the Collect blueprint. System dark mode
+                // must not invert Sell/Collect into a Material night theme.
+                SaafTheme(darkTheme = false) {
+                    androidx.compose.runtime.LaunchedEffect(authenticated.sessionHandle, cashierSection) {
+                        when (cashierSection) {
+                            CashierSection.Sell -> saleViewModel.open(authenticated.sessionHandle)
+                            CashierSection.Collect -> collectionViewModel.open(authenticated.sessionHandle)
+                            CashierSection.Activity,
+                            CashierSection.More,
+                            -> Unit
+                        }
+                    }
+                    BackHandler {
+                        if (cashierSection == CashierSection.Collect) {
+                            cashierSection = CashierSection.Sell
+                        } else {
+                            saleViewModel.close()
+                            collectionViewModel.close()
+                            authenticationViewModel.leaveAuthenticatedArea()
+                            destination = PreviewDestination.Welcome
+                        }
+                    }
+                    val navigateCashier: (CashierSection) -> Unit = { section ->
+                        when (section) {
+                            CashierSection.Sell -> {
+                                if (cashierSection == CashierSection.Sell) showPreviewNotice(sellNotice)
+                                else cashierSection = CashierSection.Sell
+                            }
+                            CashierSection.Collect -> {
+                                if (cashierSection == CashierSection.Collect) {
+                                    showPreviewNotice("Collect is already open.")
+                                } else {
+                                    cashierSection = CashierSection.Collect
+                                }
+                            }
+                            CashierSection.Activity -> showPreviewNotice(activityNotice)
+                            CashierSection.More -> showPreviewNotice(moreNotice)
+                        }
+                    }
+                    when (cashierSection) {
+                        CashierSection.Sell -> CashierSaleScreen(
+                            snackbarHostState = snackbarHostState,
+                            identity = authenticated.identity,
+                            state = saleState,
+                            onRetry = saleViewModel::refresh,
+                            onClearFeedback = saleViewModel::clearFeedback,
+                            onRecordSale = saleViewModel::record,
+                            onLeaveConfirmed = {
+                                saleViewModel.close()
+                                collectionViewModel.close()
+                                authenticationViewModel.leaveAuthenticatedArea()
+                                destination = PreviewDestination.Welcome
                             },
+                            onNavigate = navigateCashier,
                         )
-                    },
-                )
+                        CashierSection.Collect -> CashierCollectionScreen(
+                            snackbarHostState = snackbarHostState,
+                            identity = authenticated.identity,
+                            state = collectionState,
+                            onRetry = collectionViewModel::refresh,
+                            onSelectCustomer = collectionViewModel::selectCustomer,
+                            onRecordCollection = collectionViewModel::record,
+                            onCollectAnother = collectionViewModel::collectAnother,
+                            onViewRecord = { showPreviewNotice(viewRecordNotice) },
+                            onLeaveConfirmed = { cashierSection = CashierSection.Sell },
+                            onNavigate = navigateCashier,
+                        )
+                        CashierSection.Activity,
+                        CashierSection.More,
+                        -> Unit
+                    }
+                }
             } else {
                 when (authenticationState) {
                     is NativeAuthenticationState.MethodPicker -> BackHandler {

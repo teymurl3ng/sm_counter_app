@@ -3,12 +3,14 @@ package com.saaf.milkshop.nativeui.sale
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,8 +44,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -212,7 +212,9 @@ private fun CashierSaleContent(
         modifier = modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = { CashierNavigation(onNavigate = onNavigate) },
+        bottomBar = {
+            CashierNavigation(selected = CashierSection.Sell, onNavigate = onNavigate)
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -498,7 +500,9 @@ private fun CashierLoadingScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = { CashierNavigation(onNavigate) },
+        bottomBar = {
+            CashierNavigation(selected = CashierSection.Sell, onNavigate = onNavigate)
+        },
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -521,7 +525,9 @@ private fun CashierLoadFailureScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = { CashierNavigation(onNavigate) },
+        bottomBar = {
+            CashierNavigation(selected = CashierSection.Sell, onNavigate = onNavigate)
+        },
     ) { padding ->
         Column(
             Modifier.fillMaxSize().padding(padding).padding(24.dp),
@@ -749,10 +755,11 @@ private fun EntryModeSelector(selected: EntryMode, onSelected: (EntryMode) -> Un
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 52.dp)
-            .clip(RoundedCornerShape(13.dp))
+            .heightIn(min = 54.dp)
+            .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(4.dp)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp))
+            .padding(3.dp)
             .selectableGroup(),
     ) {
         Segment(
@@ -761,6 +768,8 @@ private fun EntryModeSelector(selected: EntryMode, onSelected: (EntryMode) -> Un
             onClick = { onSelected(EntryMode.Quantity) },
             modifier = Modifier
                 .weight(1f)
+                .fillMaxHeight()
+                .heightIn(min = 48.dp)
                 .testTag(NativeUiTags.CashierModeQuantity),
         )
         Segment(
@@ -769,6 +778,8 @@ private fun EntryModeSelector(selected: EntryMode, onSelected: (EntryMode) -> Un
             onClick = { onSelected(EntryMode.Amount) },
             modifier = Modifier
                 .weight(1f)
+                .fillMaxHeight()
+                .heightIn(min = 48.dp)
                 .testTag(NativeUiTags.CashierModeAmount),
         )
     }
@@ -835,14 +846,15 @@ private fun Segment(text: String, selected: Boolean, onClick: () -> Unit, modifi
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .fillMaxSize()
-            .clip(RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(9.dp))
             .background(if (selected) MaterialTheme.colorScheme.primary else Color.Transparent)
-            .selectable(selected = selected, onClick = onClick, role = Role.RadioButton),
+            .selectable(selected = selected, onClick = onClick, role = Role.RadioButton)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
         Text(
             text = text,
             style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Bold,
             color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
@@ -994,12 +1006,19 @@ private fun StepButton(
     tag: String,
     onClick: () -> Unit,
 ) {
-    IconButton(
+    Surface(
         onClick = onClick,
-        modifier = Modifier.size(52.dp).testTag(tag),
-        colors = IconButtonDefaults.outlinedIconButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.primary,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        modifier = Modifier
+            .size(48.dp)
+            .testTag(tag),
     ) {
-        Icon(imageVector = icon, contentDescription = description)
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+            Icon(imageVector = icon, contentDescription = description)
+        }
     }
 }
 
@@ -1331,7 +1350,10 @@ private fun ReviewDock(
 }
 
 @Composable
-private fun CashierNavigation(onNavigate: (CashierSection) -> Unit) {
+internal fun CashierNavigation(
+    selected: CashierSection,
+    onNavigate: (CashierSection) -> Unit,
+) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 0.dp,
@@ -1340,28 +1362,28 @@ private fun CashierNavigation(onNavigate: (CashierSection) -> Unit) {
         CashierNavigationItem(
             icon = Icons.Outlined.PointOfSale,
             label = stringResource(R.string.native_sell),
-            selected = true,
+            selected = selected == CashierSection.Sell,
             tag = NativeUiTags.CashierNavSell,
             onClick = { onNavigate(CashierSection.Sell) },
         )
         CashierNavigationItem(
             icon = Icons.Outlined.Payments,
             label = stringResource(R.string.native_collect),
-            selected = false,
+            selected = selected == CashierSection.Collect,
             tag = NativeUiTags.CashierNavCollect,
             onClick = { onNavigate(CashierSection.Collect) },
         )
         CashierNavigationItem(
             icon = Icons.Outlined.History,
             label = stringResource(R.string.native_activity),
-            selected = false,
+            selected = selected == CashierSection.Activity,
             tag = NativeUiTags.CashierNavActivity,
             onClick = { onNavigate(CashierSection.Activity) },
         )
         CashierNavigationItem(
             icon = Icons.Outlined.MoreHoriz,
             label = stringResource(R.string.native_more),
-            selected = false,
+            selected = selected == CashierSection.More,
             tag = NativeUiTags.CashierNavMore,
             onClick = { onNavigate(CashierSection.More) },
         )

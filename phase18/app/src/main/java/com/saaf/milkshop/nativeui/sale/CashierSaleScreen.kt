@@ -1,5 +1,6 @@
 package com.saaf.milkshop.nativeui.sale
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -52,7 +53,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,12 +77,18 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saaf.milkshop.R
+import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
+import com.saaf.milkshop.application.sale.NativeSaleAccount
+import com.saaf.milkshop.application.sale.NativeSaleEntryMode
+import com.saaf.milkshop.application.sale.NativeSalePaymentKind
+import com.saaf.milkshop.application.sale.NativeSaleRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import java.util.Locale
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
-private enum class ProductChoice { Milk, Yogurt }
 private enum class EntryMode { Quantity, Amount }
 private enum class PaymentChoice { PaidNow, CustomerAccount }
 enum class CashierSection { Sell, Collect, Activity, More }
@@ -87,43 +96,105 @@ enum class CashierSection { Sell, Collect, Activity, More }
 @Composable
 fun CashierSaleScreen(
     snackbarHostState: SnackbarHostState,
-    onRecordSale: () -> Unit,
+    identity: NativeSignedInIdentity,
+    state: NativeSaleState,
+    onRetry: () -> Unit,
+    onClearFeedback: () -> Unit,
+    onRecordSale: (NativeSaleRequest) -> Unit,
+    onLeaveConfirmed: () -> Unit,
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var product by rememberSaveable { mutableStateOf(ProductChoice.Milk) }
+    when (state) {
+        NativeSaleState.Idle,
+        NativeSaleState.Loading -> CashierLoadingScreen(
+            snackbarHostState = snackbarHostState,
+            onNavigate = onNavigate,
+            modifier = modifier,
+        )
+        is NativeSaleState.LoadFailure -> CashierLoadFailureScreen(
+            snackbarHostState = snackbarHostState,
+            message = state.message,
+            onRetry = onRetry,
+            onNavigate = onNavigate,
+            modifier = modifier,
+        )
+        is NativeSaleState.Ready -> CashierSaleContent(
+            snackbarHostState = snackbarHostState,
+            identity = identity,
+            state = state,
+            onClearFeedback = onClearFeedback,
+            onRecordSale = onRecordSale,
+            onLeaveConfirmed = onLeaveConfirmed,
+            onNavigate = onNavigate,
+            modifier = modifier,
+        )
+    }
+}
+
+@Composable
+private fun CashierSaleContent(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    state: NativeSaleState.Ready,
+    onClearFeedback: () -> Unit,
+    onRecordSale: (NativeSaleRequest) -> Unit,
+    onLeaveConfirmed: () -> Unit,
+    onNavigate: (CashierSection) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val context = state.context
+    var selectedProductId by rememberSaveable { mutableStateOf<Long?>(null) }
     var entryMode by rememberSaveable { mutableStateOf(EntryMode.Quantity) }
     var payment by rememberSaveable { mutableStateOf(PaymentChoice.PaidNow) }
     var entryValue by rememberSaveable { mutableStateOf("2.0") }
-    var selectedCustomer by rememberSaveable { mutableStateOf<String?>(null) }
+    var selectedCustomerId by rememberSaveable { mutableStateOf<Long?>(null) }
     var showCustomerPicker by rememberSaveable { mutableStateOf(false) }
     var secondaryDetailsExpanded by rememberSaveable { mutableStateOf(false) }
+    var draftTouched by rememberSaveable { mutableStateOf(false) }
+    var showDiscardConfirmation by rememberSaveable { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
-    val rate = when (product) {
-        ProductChoice.Milk -> 300.0
-        ProductChoice.Yogurt -> 400.0
+    val product = context.products.firstOrNull { it.productId == selectedProductId }
+        ?: context.products.firstOrNull()
+    val selectedCustomer = context.customers.firstOrNull { it.accountId == selectedCustomerId }
+    val paymentAccount = context.paymentAccounts.firstOrNull {
+        it.accountId == context.defaultPaymentAccountId
     }
-    val productName = when (product) {
-        ProductChoice.Milk -> stringResource(R.string.native_milk)
-        ProductChoice.Yogurt -> stringResource(R.string.native_yogurt)
-    }
-    val quantityUnit = when (product) {
-        ProductChoice.Milk -> stringResource(R.string.native_liter_unit)
-        ProductChoice.Yogurt -> stringResource(R.string.native_kilogram_unit)
-    }
+    val rate = (product?.ratePaisaPerUnit ?: 0L) / 100.0
+    val productName = product?.name.orEmpty()
+    val quantityUnit = product?.unit?.toDisplayUnit().orEmpty()
     val enteredNumber = entryValue.toDoubleOrNull()?.coerceAtLeast(0.0) ?: 0.0
-    val quantity = if (entryMode == EntryMode.Quantity) enteredNumber else enteredNumber / rate
+    val quantity = if (entryMode == EntryMode.Quantity) enteredNumber else {
+        if (rate > 0.0) enteredNumber / rate else 0.0
+    }
     val total = if (entryMode == EntryMode.Amount) enteredNumber else enteredNumber * rate
     val quantityText = formatQuantity(quantity)
     val totalText = formatAmount(total)
     val paymentSummary = when (payment) {
-        PaymentChoice.PaidNow -> stringResource(R.string.native_cash)
-        PaymentChoice.CustomerAccount -> selectedCustomer
+        PaymentChoice.PaidNow -> paymentAccount?.name ?: stringResource(R.string.native_cash)
+        PaymentChoice.CustomerAccount -> selectedCustomer?.name
             ?: stringResource(R.string.native_customer_account)
     }
-    val canRecord = quantity > 0.0 &&
-        (payment == PaymentChoice.PaidNow || selectedCustomer != null)
+    val canRecord = context.postingOpen && product != null && quantity > 0.0 && !state.saving &&
+        when (payment) {
+            PaymentChoice.PaidNow -> paymentAccount != null
+            PaymentChoice.CustomerAccount -> selectedCustomer != null
+        }
+
+    BackHandler(enabled = draftTouched && !state.saving) { showDiscardConfirmation = true }
+
+    LaunchedEffect(state.receipt?.eventId) {
+        if (state.receipt != null) {
+            selectedProductId = context.products.firstOrNull()?.productId
+            entryMode = EntryMode.Quantity
+            payment = PaymentChoice.PaidNow
+            entryValue = "2.0"
+            selectedCustomerId = null
+            secondaryDetailsExpanded = false
+            draftTouched = false
+        }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -137,7 +208,12 @@ fun CashierSaleScreen(
                 .padding(innerPadding)
                 .imePadding(),
         ) {
-            CashierHeader()
+            CashierHeader(
+                displayName = identity.displayName,
+                role = identity.role.wireValue.replaceFirstChar { it.titlecase(Locale.US) },
+                businessDate = context.businessDate,
+                postingOpen = context.postingOpen,
+            )
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -152,23 +228,27 @@ fun CashierSaleScreen(
                     modifier = Modifier.fillMaxWidth().selectableGroup(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    ProductCard(
-                        title = stringResource(R.string.native_milk),
-                        rate = stringResource(R.string.native_milk_rate),
-                        selected = product == ProductChoice.Milk,
-                        onClick = { product = ProductChoice.Milk },
-                        modifier = Modifier
-                            .weight(1f)
-                            .testTag(NativeUiTags.CashierProductMilk),
-                    )
-                    ProductCard(
-                        title = stringResource(R.string.native_yogurt),
-                        rate = stringResource(R.string.native_yogurt_rate),
-                        selected = product == ProductChoice.Yogurt,
-                        onClick = { product = ProductChoice.Yogurt },
-                        modifier = Modifier
-                            .weight(1f)
-                            .testTag(NativeUiTags.CashierProductYogurt),
+                    context.products.forEach { option ->
+                        ProductCard(
+                            title = option.name,
+                            rate = "PKR ${formatAmount(option.ratePaisaPerUnit / 100.0)} / ${option.unit.toDisplayUnit()} · ${option.quantityOnHand} in stock",
+                            selected = product?.productId == option.productId,
+                            onClick = {
+                                selectedProductId = option.productId
+                                draftTouched = true
+                                onClearFeedback()
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .testTag(NativeUiTags.cashierProduct(option.name)),
+                        )
+                    }
+                }
+                if (context.products.isEmpty()) {
+                    StatusMessage(
+                        message = "No active sale product has a retail rate. Ask an owner or manager to configure one.",
+                        error = true,
+                        tag = NativeUiTags.CashierSaleError,
                     )
                 }
 
@@ -185,6 +265,8 @@ fun CashierSaleScreen(
                                 rate = rate,
                             )
                             entryMode = nextMode
+                            draftTouched = true
+                            onClearFeedback()
                         }
                     },
                 )
@@ -202,7 +284,11 @@ fun CashierSaleScreen(
                             stringResource(R.string.native_currency_unit)
                         },
                         onValueChange = { next ->
-                            if (isValidDecimalInput(next)) entryValue = next
+                            if (isValidDecimalInput(next)) {
+                                entryValue = next
+                                draftTouched = true
+                                onClearFeedback()
+                            }
                         },
                         tag = NativeUiTags.CashierEntryInput,
                         modifier = Modifier.weight(1f),
@@ -221,6 +307,8 @@ fun CashierSaleScreen(
                                 delta = if (entryMode == EntryMode.Quantity) -0.5 else -50.0,
                                 mode = entryMode,
                             )
+                            draftTouched = true
+                            onClearFeedback()
                         },
                     )
                     StepButton(
@@ -237,6 +325,8 @@ fun CashierSaleScreen(
                                 delta = if (entryMode == EntryMode.Quantity) 0.5 else 50.0,
                                 mode = entryMode,
                             )
+                            draftTouched = true
+                            onClearFeedback()
                         },
                     )
                 }
@@ -266,11 +356,13 @@ fun CashierSaleScreen(
                 ) {
                     PaymentCard(
                         title = stringResource(R.string.native_paid_now),
-                        detail = stringResource(R.string.native_cash),
+                        detail = paymentAccount?.name ?: stringResource(R.string.native_cash),
                         selected = payment == PaymentChoice.PaidNow,
                         onClick = {
                             focusManager.clearFocus()
                             payment = PaymentChoice.PaidNow
+                            draftTouched = true
+                            onClearFeedback()
                         },
                         modifier = Modifier
                             .weight(1f)
@@ -292,7 +384,7 @@ fun CashierSaleScreen(
                 if (payment == PaymentChoice.CustomerAccount) {
                     Spacer(Modifier.height(8.dp))
                     CustomerSelectionRow(
-                        selectedCustomer = selectedCustomer,
+                    selectedCustomer = selectedCustomer?.name,
                         onClick = { showCustomerPicker = true },
                     )
                 }
@@ -302,6 +394,22 @@ fun CashierSaleScreen(
                     onToggle = { secondaryDetailsExpanded = !secondaryDetailsExpanded },
                 )
                 Spacer(Modifier.height(10.dp))
+                state.receipt?.let { receipt ->
+                    StatusMessage(
+                        message = "Sale #${receipt.eventId} recorded · ${formatQuantity(receipt.quantity)} $quantityUnit · PKR ${formatAmount(receipt.totalPaisa / 100.0)}",
+                        error = false,
+                        tag = NativeUiTags.CashierSaleSuccess,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                }
+                state.error?.let { error ->
+                    StatusMessage(
+                        message = error,
+                        error = true,
+                        tag = NativeUiTags.CashierSaleError,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                }
                 ReviewDock(
                     summary = stringResource(
                         R.string.native_sale_summary_format,
@@ -322,10 +430,29 @@ fun CashierSaleScreen(
                         stringResource(R.string.native_customer_effect_format, totalText)
                     },
                     enabled = canRecord,
+                    saving = state.saving,
                     buttonTag = NativeUiTags.CashierRecordSale,
                     onRecordSale = {
                         focusManager.clearFocus()
-                        onRecordSale()
+                        val selectedProduct = product ?: return@ReviewDock
+                        onRecordSale(
+                            NativeSaleRequest(
+                                productId = selectedProduct.productId,
+                                entryMode = if (entryMode == EntryMode.Quantity) {
+                                    NativeSaleEntryMode.QUANTITY
+                                } else {
+                                    NativeSaleEntryMode.AMOUNT
+                                },
+                                enteredValue = enteredNumber,
+                                paymentKind = if (payment == PaymentChoice.PaidNow) {
+                                    NativeSalePaymentKind.PAID_NOW
+                                } else {
+                                    NativeSalePaymentKind.CUSTOMER_ACCOUNT
+                                },
+                                paymentAccountId = paymentAccount?.accountId,
+                                customerAccountId = selectedCustomer?.accountId,
+                            ),
+                        )
                     },
                 )
                 Spacer(Modifier.height(12.dp))
@@ -335,15 +462,104 @@ fun CashierSaleScreen(
 
     if (showCustomerPicker) {
         CustomerAccountDialog(
-            selectedCustomer = selectedCustomer,
+            customers = context.customers,
+            selectedCustomerId = selectedCustomerId,
             onSelect = { customer ->
-                selectedCustomer = customer
+                selectedCustomerId = customer.accountId
                 payment = PaymentChoice.CustomerAccount
                 showCustomerPicker = false
+                draftTouched = true
+                onClearFeedback()
             },
             onDismiss = { showCustomerPicker = false },
         )
     }
+
+    if (showDiscardConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showDiscardConfirmation = false },
+            title = { Text("Discard this sale draft?") },
+            text = { Text("Your unsaved sale entry will be cleared before leaving.") },
+            confirmButton = {
+                TextButton(
+                    onClick = onLeaveConfirmed,
+                    modifier = Modifier.testTag(NativeUiTags.CashierDiscardDraft),
+                ) { Text("Discard and leave") }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDiscardConfirmation = false },
+                    modifier = Modifier.testTag(NativeUiTags.CashierKeepDraft),
+                ) { Text("Keep editing") }
+            },
+        )
+    }
+}
+
+@Composable
+private fun CashierLoadingScreen(
+    snackbarHostState: SnackbarHostState,
+    onNavigate: (CashierSection) -> Unit,
+    modifier: Modifier,
+) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        bottomBar = { CashierNavigation(onNavigate) },
+    ) { padding ->
+        Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                CircularProgressIndicator()
+                Spacer(Modifier.height(12.dp))
+                Text("Loading today’s sale details…")
+            }
+        }
+    }
+}
+
+@Composable
+private fun CashierLoadFailureScreen(
+    snackbarHostState: SnackbarHostState,
+    message: String,
+    onRetry: () -> Unit,
+    onNavigate: (CashierSection) -> Unit,
+    modifier: Modifier,
+) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        bottomBar = { CashierNavigation(onNavigate) },
+    ) { padding ->
+        Column(
+            Modifier.fillMaxSize().padding(padding).padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(message, style = MaterialTheme.typography.bodyLarge)
+            Spacer(Modifier.height(16.dp))
+            Button(onClick = onRetry, modifier = Modifier.testTag(NativeUiTags.CashierRetryLoad)) {
+                Text("Try again")
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatusMessage(message: String, error: Boolean, tag: String) {
+    Surface(
+        color = if (error) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.primaryContainer,
+        contentColor = if (error) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onPrimaryContainer,
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth().testTag(tag),
+    ) {
+        Text(message, modifier = Modifier.padding(12.dp), style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+private fun String.toDisplayUnit(): String = when (trim().lowercase()) {
+    "liters", "liter", "litres", "litre", "l" -> "L"
+    "kilograms", "kilogram", "kg" -> "kg"
+    else -> this
 }
 
 private fun stepEntryValue(value: String, delta: Double, mode: EntryMode): String {
@@ -388,7 +604,12 @@ private fun formatAmountInput(value: Double): String = when {
 }
 
 @Composable
-private fun CashierHeader() {
+private fun CashierHeader(
+    displayName: String,
+    role: String,
+    businessDate: String,
+    postingOpen: Boolean,
+) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
     ) {
@@ -397,13 +618,17 @@ private fun CashierHeader() {
             style = MaterialTheme.typography.headlineMedium,
         )
         Text(
-            text = stringResource(R.string.native_cashier_context),
+            text = "$displayName · $role · ${formatBusinessDate(businessDate)} · ${if (postingOpen) "Open" else "Closed"}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 }
+
+private fun formatBusinessDate(value: String): String = runCatching {
+    LocalDate.parse(value).format(DateTimeFormatter.ofPattern("d MMM uuuu", Locale.getDefault()))
+}.getOrDefault(value)
 
 @Composable
 private fun SectionHeading(title: String, supporting: String? = null) {
@@ -699,14 +924,11 @@ private fun CustomerSelectionRow(
 
 @Composable
 private fun CustomerAccountDialog(
-    selectedCustomer: String?,
-    onSelect: (String) -> Unit,
+    customers: List<NativeSaleAccount>,
+    selectedCustomerId: Long?,
+    onSelect: (NativeSaleAccount) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val customers = listOf(
-        stringResource(R.string.native_customer_ahmed_store),
-        stringResource(R.string.native_customer_bilal_dairy_point),
-    )
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.native_choose_customer_account)) },
@@ -715,9 +937,12 @@ private fun CustomerAccountDialog(
                 modifier = Modifier.fillMaxWidth().selectableGroup(),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                customers.forEachIndexed { index, customer ->
+                if (customers.isEmpty()) {
+                    Text("No active customer accounts are available.")
+                }
+                customers.forEach { customer ->
                     Surface(
-                        color = if (selectedCustomer == customer) {
+                        color = if (selectedCustomerId == customer.accountId) {
                             MaterialTheme.colorScheme.surfaceVariant
                         } else {
                             Color.Transparent
@@ -726,15 +951,9 @@ private fun CustomerAccountDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 52.dp)
-                            .testTag(
-                                if (index == 0) {
-                                    NativeUiTags.CashierCustomerAhmed
-                                } else {
-                                    NativeUiTags.CashierCustomerBilal
-                                },
-                            )
+                            .testTag(NativeUiTags.cashierCustomer(customer.accountId))
                             .selectable(
-                                selected = selectedCustomer == customer,
+                                selected = selectedCustomerId == customer.accountId,
                                 onClick = { onSelect(customer) },
                                 role = Role.RadioButton,
                             ),
@@ -744,11 +963,11 @@ private fun CustomerAccountDialog(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             RadioButton(
-                                selected = selectedCustomer == customer,
+                                selected = selectedCustomerId == customer.accountId,
                                 onClick = null,
                             )
                             Spacer(Modifier.width(8.dp))
-                            Text(customer, style = MaterialTheme.typography.titleMedium)
+                            Text(customer.name, style = MaterialTheme.typography.titleMedium)
                         }
                     }
                 }
@@ -848,6 +1067,7 @@ private fun ReviewDock(
     stockEffect: String,
     moneyEffect: String,
     enabled: Boolean,
+    saving: Boolean,
     buttonTag: String,
     onRecordSale: () -> Unit,
 ) {
@@ -898,7 +1118,10 @@ private fun ReviewDock(
                     contentColor = SaafInk,
                 ),
             ) {
-                Text(text = stringResource(R.string.native_record_sale), style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = if (saving) "Recording…" else stringResource(R.string.native_record_sale),
+                    style = MaterialTheme.typography.titleMedium,
+                )
             }
         }
     }

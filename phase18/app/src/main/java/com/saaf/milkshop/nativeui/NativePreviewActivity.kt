@@ -24,11 +24,14 @@ import com.saaf.milkshop.MilkShopApplication
 import com.saaf.milkshop.R
 import com.saaf.milkshop.application.authentication.NativeAuthenticationFacade
 import com.saaf.milkshop.application.authentication.NativeQuickUnlockFacade
+import com.saaf.milkshop.application.sale.NativeSaleFacade
 import com.saaf.milkshop.nativeui.auth.NativeAuthenticationHost
 import com.saaf.milkshop.nativeui.auth.NativeAuthenticationState
 import com.saaf.milkshop.nativeui.auth.NativeAuthenticationViewModel
 import com.saaf.milkshop.nativeui.sale.CashierSaleScreen
 import com.saaf.milkshop.nativeui.sale.CashierSection
+import com.saaf.milkshop.nativeui.sale.NativeSaleState
+import com.saaf.milkshop.nativeui.sale.NativeSaleViewModel
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import com.saaf.milkshop.nativeui.welcome.WelcomeScreen
 import com.saaf.milkshop.quickunlock.AndroidQuickUnlockDeviceGate
@@ -41,12 +44,20 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var authenticationFacade: NativeAuthenticationFacade
     private lateinit var quickUnlockService: QuickUnlockService
     private lateinit var quickUnlockFacade: NativeQuickUnlockFacade
+    private lateinit var saleFacade: NativeSaleFacade
 
     private val authenticationViewModel by viewModels<NativeAuthenticationViewModel> {
         val app = application as MilkShopApplication
         NativeAuthenticationViewModel.Factory(
             facade = authenticationFacade,
             onSessionChanged = { app.currentSessionId = it },
+        )
+    }
+
+    private val saleViewModel by viewModels<NativeSaleViewModel> {
+        NativeSaleViewModel.Factory(
+            facade = saleFacade,
+            onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
         )
     }
 
@@ -62,13 +73,17 @@ class NativePreviewActivity : FragmentActivity() {
             deviceGate = AndroidQuickUnlockDeviceGate(this),
         )
         quickUnlockFacade = NativeQuickUnlockFacade(quickUnlockService, authenticationFacade)
+        saleFacade = NativeSaleFacade(app.database, app.userSecurity)
         authenticationViewModel.attachQuickUnlock(quickUnlockFacade)
         setContent {
             SaafTheme(darkTheme = false) {
                 val authenticationState by authenticationViewModel.state.collectAsState()
+                val saleState by saleViewModel.state.collectAsState()
                 NativeFoundationPreview(
                     authenticationState = authenticationState,
                     authenticationViewModel = authenticationViewModel,
+                    saleState = saleState,
+                    saleViewModel = saleViewModel,
                 )
             }
         }
@@ -87,11 +102,12 @@ private enum class PreviewDestination { Welcome, Access }
 private fun NativeFoundationPreview(
     authenticationState: NativeAuthenticationState,
     authenticationViewModel: NativeAuthenticationViewModel,
+    saleState: NativeSaleState,
+    saleViewModel: NativeSaleViewModel,
 ) {
     var destination by rememberSaveable { mutableStateOf(PreviewDestination.Welcome) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-    val previewNotice = stringResource(R.string.native_preview_notice)
     val sellNotice = stringResource(R.string.native_nav_sell_notice)
     val collectNotice = stringResource(R.string.native_nav_collect_notice)
     val activityNotice = stringResource(R.string.native_nav_activity_notice)
@@ -118,13 +134,27 @@ private fun NativeFoundationPreview(
         )
         PreviewDestination.Access -> {
             if (showingCashier) {
+                val authenticated = authenticationState as NativeAuthenticationState.Authenticated
+                androidx.compose.runtime.LaunchedEffect(authenticated.sessionHandle) {
+                    saleViewModel.open(authenticated.sessionHandle)
+                }
                 BackHandler {
+                    saleViewModel.close()
                     authenticationViewModel.leaveAuthenticatedArea()
                     destination = PreviewDestination.Welcome
                 }
                 CashierSaleScreen(
                     snackbarHostState = snackbarHostState,
-                    onRecordSale = { showPreviewNotice(previewNotice) },
+                    identity = authenticated.identity,
+                    state = saleState,
+                    onRetry = saleViewModel::refresh,
+                    onClearFeedback = saleViewModel::clearFeedback,
+                    onRecordSale = saleViewModel::record,
+                    onLeaveConfirmed = {
+                        saleViewModel.close()
+                        authenticationViewModel.leaveAuthenticatedArea()
+                        destination = PreviewDestination.Welcome
+                    },
                     onNavigate = { section ->
                         showPreviewNotice(
                             when (section) {

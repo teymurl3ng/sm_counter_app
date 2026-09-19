@@ -43,8 +43,21 @@ object NativeUiTags {
     const val CashierCustomerCancel = "cashier_customer_cancel"
     const val CashierSecondaryDetails = "cashier_secondary_details"
     const val CashierRecordSale = "cashier_record_sale"
+    const val CashierSaleSuccess = "cashier_sale_success"
+    const val CashierSaleError = "cashier_sale_error"
+    const val CashierRetryLoad = "cashier_retry_load"
+    const val CashierDiscardDraft = "cashier_discard_draft"
+    const val CashierKeepDraft = "cashier_keep_draft"
     const val CashierNavSell = "cashier_nav_sell"
     const val CashierNavCollect = "cashier_nav_collect"
     const val CashierNavActivity = "cashier_nav_activity"
     const val CashierNavMore = "cashier_nav_more"
+
+    fun cashierProduct(name: String): String = when (name.trim().lowercase()) {
+        "milk" -> CashierProductMilk
+        "yogurt" -> CashierProductYogurt
+        else -> "cashier_product_${name.trim().lowercase().replace(Regex("[^a-z0-9]+"), "_")}"
+    }
+
+    fun cashierCustomer(accountId: Long): String = "cashier_customer_$accountId"
 }

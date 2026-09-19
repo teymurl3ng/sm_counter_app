@@ -46,7 +46,10 @@ sealed interface NativeAuthenticationState {
         val identity: NativeSignedInIdentity,
         val code: String,
     ) : NativeAuthenticationState
-    data class Authenticated(val identity: NativeSignedInIdentity) : NativeAuthenticationState
+    data class Authenticated(
+        val identity: NativeSignedInIdentity,
+        val sessionHandle: String,
+    ) : NativeAuthenticationState
 }
 
 class NativeAuthenticationViewModel(
@@ -252,7 +255,8 @@ class NativeAuthenticationViewModel(
 
     fun acknowledgeRecoveryCode() {
         val current = _state.value as? NativeAuthenticationState.RecoveryCode ?: return
-        _state.value = NativeAuthenticationState.Authenticated(current.identity)
+        val sessionHandle = activeSessionHandle ?: return
+        _state.value = NativeAuthenticationState.Authenticated(current.identity, sessionHandle)
     }
 
     fun leaveAuthenticatedArea() {
@@ -290,7 +294,7 @@ class NativeAuthenticationViewModel(
     private fun acceptSession(session: com.saaf.milkshop.application.authentication.NativeAuthenticatedSession) {
         activeSessionHandle = session.sessionHandle
         onSessionChanged(session.sessionHandle)
-        _state.value = NativeAuthenticationState.Authenticated(session.identity)
+        _state.value = NativeAuthenticationState.Authenticated(session.identity, session.sessionHandle)
     }
 
     private fun publicMessage(error: Throwable, account: NativeAccountSummary? = null): String = when (error) {

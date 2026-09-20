@@ -398,6 +398,109 @@ class NativeFoundationUiTest {
     }
 
     @Test
+    fun operationsRecordSpoilageOpensConnectedEntry() {
+        openOperationsWork()
+        composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilage).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilageForm).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilageReview).assertIsDisplayed()
+        composeRule.onNodeWithText("No money", substring = true).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsWorkBack).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).fetchSemanticsNode()
+            }.isSuccess
+        }
+    }
+
+    @Test
+    fun operationsRecordSpoilageRecordsPhysicalLoss() {
+        openOperationsWork()
+        // Seed milk stock via receive milk first.
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilk).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkSupplier).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkSupplier).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkSupplierPicker).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.waitUntil(10_000) {
+            composeRule.onAllNodesWithText("Dawn", substring = true).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onAllNodesWithText("Dawn", substring = true)[0].performClick()
+        enterReceiveMilkMeasurement(NativeUiTags.OpsReceiveMilkLiters, "30")
+        enterReceiveMilkMeasurement(NativeUiTags.OpsReceiveMilkFat, "4")
+        enterReceiveMilkMeasurement(NativeUiTags.OpsReceiveMilkLr, "28")
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkRecord).performScrollTo()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkRecord).assertIsEnabled()
+                true
+            }.getOrDefault(false)
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkRecord).performClick()
+        composeRule.waitUntil(15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkSuccess).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsWorkBack).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).fetchSemanticsNode()
+            }.isSuccess
+        }
+
+        composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilage).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilageProduct).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilageProduct).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilageProductPicker).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.waitUntil(10_000) {
+            composeRule.onAllNodesWithText("Milk", substring = false).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onAllNodesWithText("Milk", substring = false)[0].performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilageReason).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilageReasonPicker).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithText("Spill", substring = false).performClick()
+        enterReceiveMilkMeasurement(NativeUiTags.OpsRecordSpoilageQuantity, "2")
+        composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilageRecord).performScrollTo()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilageRecord).assertIsEnabled()
+                true
+            }.getOrDefault(false)
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilageRecord).performClick()
+        composeRule.waitUntil(15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilageSuccess).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithText("Spoilage recorded").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilageAnother).assertIsDisplayed()
+    }
+
+    @Test
     fun operationsWorkHardwareBackEndsSessionLikeSell() {
         openOperationsWork()
 

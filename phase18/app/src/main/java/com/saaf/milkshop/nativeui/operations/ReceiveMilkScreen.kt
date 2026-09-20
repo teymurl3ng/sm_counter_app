@@ -19,17 +19,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.ChevronRight
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.LocalShipping
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -213,16 +210,6 @@ private fun ReceiveMilkReady(
 
     BackHandler(onBack = ::requestLeave)
 
-    if (state.selectingVendor) {
-        VendorPickerSheet(
-            vendors = state.context.vendors,
-            onSelect = onSelectVendor,
-            onClose = onCloseVendorPicker,
-            modifier = modifier,
-        )
-        return
-    }
-
     WorkScaffold(snackbarHostState, OperationsSection.Work, onNavigate, modifier) { padding ->
         Column(
             Modifier
@@ -355,6 +342,14 @@ private fun ReceiveMilkReady(
                 }
             }
         }
+    }
+
+    if (state.selectingVendor) {
+        VendorPickerDialog(
+            vendors = state.context.vendors,
+            onSelect = onSelectVendor,
+            onDismiss = onCloseVendorPicker,
+        )
     }
 
     if (discardOpen) {
@@ -505,54 +500,51 @@ private fun SuccessCard(
 }
 
 @Composable
-private fun VendorPickerSheet(
+private fun VendorPickerDialog(
     vendors: List<NativeReceiveMilkVendor>,
     onSelect: (Long) -> Unit,
-    onClose: () -> Unit,
-    modifier: Modifier,
+    onDismiss: () -> Unit,
 ) {
-    BackHandler(onBack = onClose)
-    Scaffold(
-        modifier = modifier.testTag(NativeUiTags.OpsReceiveMilkSupplierPicker),
-        topBar = {
-            Row(
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = Modifier.testTag(NativeUiTags.OpsReceiveMilkSupplierPicker),
+        title = { Text("Choose supplier") },
+        text = {
+            Column(
                 Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                    .heightIn(max = 360.dp)
+                    .verticalScroll(rememberScrollState()),
             ) {
-                TextButton(onClick = onClose) {
-                    Icon(Icons.Outlined.Close, contentDescription = "Close")
-                    Text("Close")
+                if (vendors.isEmpty()) {
+                    Text("No active supplier is available.")
                 }
-                Text("Choose supplier", style = MaterialTheme.typography.titleMedium)
+                vendors.forEach { vendor ->
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 56.dp)
+                            .clickable { onSelect(vendor.accountId) }
+                            .padding(vertical = 12.dp)
+                            .testTag(NativeUiTags.opsReceiveMilkVendor(vendor.accountId)),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            vendor.name,
+                            Modifier.weight(1f),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Icon(Icons.Outlined.ChevronRight, contentDescription = null)
+                    }
+                }
             }
         },
-    ) { padding ->
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState()),
-        ) {
-            vendors.forEachIndexed { index, vendor ->
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 56.dp)
-                        .clickable { onSelect(vendor.accountId) }
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
-                        .testTag(NativeUiTags.opsReceiveMilkVendor(vendor.accountId)),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(vendor.name, style = MaterialTheme.typography.titleMedium)
-                }
-                if (index != vendors.lastIndex) {
-                    HorizontalDivider()
-                }
-            }
-        }
-    }
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancel") }
+        },
+    )
 }
 
 private fun String.filterDecimalInput(): String {

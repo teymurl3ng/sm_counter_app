@@ -190,6 +190,7 @@ private fun ReadyWork(
         }
         NativeOperationsWorkDestination.ReceiveMilk,
         NativeOperationsWorkDestination.MakeYogurt,
+        NativeOperationsWorkDestination.RecordSpoilage,
         -> {
             // Hosted by NativePreviewActivity via dedicated entry screens.
             BackHandler(onBack = onBackToHome)
@@ -205,26 +206,15 @@ private fun ReadyWork(
                     CircularProgressIndicator()
                     Spacer(Modifier.height(12.dp))
                     Text(
-                        if (state.destination == NativeOperationsWorkDestination.MakeYogurt) {
-                            "Opening make yogurt…"
-                        } else {
-                            "Opening receive milk…"
+                        when (state.destination) {
+                            NativeOperationsWorkDestination.MakeYogurt -> "Opening make yogurt…"
+                            NativeOperationsWorkDestination.RecordSpoilage -> "Opening record spoilage…"
+                            else -> "Opening receive milk…"
                         },
                     )
                 }
             }
         }
-        NativeOperationsWorkDestination.RecordSpoilagePreview -> TaskPreview(
-            snackbarHostState = snackbarHostState,
-            identity = identity,
-            context = state.context,
-            title = "Record spoilage",
-            message = "Record spoilage entry is next in this Operations family.",
-            tag = NativeUiTags.OpsRecordSpoilagePreview,
-            onBack = onBackToHome,
-            onNavigate = onNavigate,
-            modifier = modifier,
-        )
     }
 }
 

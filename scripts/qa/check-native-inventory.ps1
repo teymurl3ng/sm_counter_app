@@ -58,7 +58,9 @@ $dynamicPrefixes = @(
     "cashier_customer_",
     "collect_customer_",
     "collect_payment_account_",
-    "ops_receive_milk_vendor_"
+    "ops_receive_milk_vendor_",
+    "ops_record_spoilage_product_",
+    "ops_record_spoilage_reason_"
 )
 
 $orphanTags = @()

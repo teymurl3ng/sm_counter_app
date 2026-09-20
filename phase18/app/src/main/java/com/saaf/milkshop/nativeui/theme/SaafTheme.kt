@@ -1,11 +1,17 @@
 package com.saaf.milkshop.nativeui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -137,3 +143,19 @@ fun SaafTheme(
         content = content,
     )
 }
+
+/**
+ * Shared edge-to-edge safe spacing for native screens.
+ *
+ * Green identity headers already pad their own title band under the status bar —
+ * do not also wrap those screens in [nativeSafeTop]. Use these for full-screen
+ * pickers / sheets without the green header.
+ */
+fun Modifier.nativeSafeTop(): Modifier = statusBarsPadding()
+
+fun Modifier.nativeSafeBottom(): Modifier = navigationBarsPadding()
+
+fun Modifier.nativeSafeDrawing(): Modifier = safeDrawingPadding()
+
+val NativeScaffoldContentInsets: WindowInsets
+    @Composable get() = WindowInsets.safeDrawing

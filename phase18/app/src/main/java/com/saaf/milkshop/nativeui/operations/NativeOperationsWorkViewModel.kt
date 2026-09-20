@@ -21,7 +21,7 @@ enum class NativeOperationsWorkDestination {
     Home,
     ReceiveMilk,
     MakeYogurt,
-    RecordSpoilagePreview,
+    RecordSpoilage,
 }
 
 sealed interface NativeOperationsWorkState {
@@ -80,7 +80,7 @@ class NativeOperationsWorkViewModel(
 
     fun openReceiveMilk() = openDestination(NativeOperationsWorkDestination.ReceiveMilk)
     fun openMakeYogurt() = openDestination(NativeOperationsWorkDestination.MakeYogurt)
-    fun openRecordSpoilagePreview() = openDestination(NativeOperationsWorkDestination.RecordSpoilagePreview)
+    fun openRecordSpoilage() = openDestination(NativeOperationsWorkDestination.RecordSpoilage)
 
     fun backToHome() {
         val current = _state.value as? NativeOperationsWorkState.Ready ?: return

@@ -15,7 +15,6 @@ import com.saaf.milkshop.application.operations.NativeOperationsWorkContext
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
-import com.saaf.milkshop.nativeui.operations.NativeOperationsWorkDestination
 import com.saaf.milkshop.nativeui.operations.NativeOperationsWorkState
 import com.saaf.milkshop.nativeui.operations.OperationsSection
 import com.saaf.milkshop.nativeui.operations.OperationsWorkScreen
@@ -66,17 +65,14 @@ class NativeOperationsWorkScreenContractTest {
     }
 
     @Test
-    fun spoilagePreviewShowsNextFamilyNotice() {
+    fun recordSpoilageOpensConnectedEntry() {
+        var opened = false
         setScreen(
-            NativeOperationsWorkState.Ready(
-                context = openContext(),
-                destination = NativeOperationsWorkDestination.RecordSpoilagePreview,
-            ),
+            NativeOperationsWorkState.Ready(context = openContext()),
+            onOpenRecordSpoilage = { opened = true },
         )
-        composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilagePreview).assertIsDisplayed()
-        composeRule.onNodeWithText(
-            "Record spoilage entry is next in this Operations family.",
-        ).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilage).performClick()
+        assertTrue(opened)
     }
 
     @Test
@@ -146,6 +142,7 @@ class NativeOperationsWorkScreenContractTest {
         onRetry: () -> Unit = {},
         onOpenReceiveMilk: () -> Unit = {},
         onOpenMakeYogurt: () -> Unit = {},
+        onOpenRecordSpoilage: () -> Unit = {},
         onNavigate: (OperationsSection) -> Unit = {},
     ) {
         composeRule.setContent {
@@ -158,7 +155,7 @@ class NativeOperationsWorkScreenContractTest {
                     onRetry = onRetry,
                     onOpenReceiveMilk = onOpenReceiveMilk,
                     onOpenMakeYogurt = onOpenMakeYogurt,
-                    onOpenRecordSpoilage = {},
+                    onOpenRecordSpoilage = onOpenRecordSpoilage,
                     onBackToHome = {},
                     onLeaveConfirmed = {},
                     onNavigate = onNavigate,

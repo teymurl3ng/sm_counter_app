@@ -61,6 +61,12 @@ val screenClassMap = mapOf(
         "com.saaf.milkshop.NativeFoundationUiTest#collectPaymentWritesRoomShowsReceiptAndOffersTheNextVisibleActions",
         "com.saaf.milkshop.qa.NativeGoldenLedgerRegressionTest",
     ),
+    "activity" to listOf(
+        "com.saaf.milkshop.NativeActivityFacadeTest",
+        "com.saaf.milkshop.NativeActivityScreenContractTest",
+        "com.saaf.milkshop.NativeFoundationUiTest#everyBottomDestinationProvidesItsDefinedPreviewResponse",
+        "com.saaf.milkshop.NativeFoundationUiTest#collectPaymentWritesRoomShowsReceiptAndOffersTheNextVisibleActions",
+    ),
 )
 
 // Apply connected-test filter/sandbox via rootProject.extra (setProjectProperties is not
@@ -70,11 +76,12 @@ val wantsQaScreen = requestedTasks.any { it.equals("qaScreen", ignoreCase = true
 val wantsQaCheckpoint = requestedTasks.any { it.equals("qaCheckpoint", ignoreCase = true) }
 if (wantsQaScreen || wantsQaCheckpoint) {
     val classes = if (wantsQaCheckpoint) {
-        (screenClassMap.getValue("auth") + screenClassMap.getValue("sale") + screenClassMap.getValue("collect"))
+        (screenClassMap.getValue("auth") + screenClassMap.getValue("sale") +
+            screenClassMap.getValue("collect") + screenClassMap.getValue("activity"))
             .distinct()
     } else {
         val screen = qaScreenName.lowercase()
-        require(screen.isNotEmpty()) { "qaScreen requires -Pqa.screen=auth|sale|collect" }
+        require(screen.isNotEmpty()) { "qaScreen requires -Pqa.screen=auth|sale|collect|activity" }
         require(screenClassMap.containsKey(screen)) {
             "Unknown qa.screen='$qaScreenName'. Valid: ${screenClassMap.keys.sorted()}"
         }
@@ -169,13 +176,13 @@ val qaFast by tasks.registering {
 
 val qaScreen by tasks.registering {
     group = "qa"
-    description = "Device acceptance for one native screen: -Pqa.screen=auth|sale|collect (no nested Gradle)."
+    description = "Device acceptance for one native screen: -Pqa.screen=auth|sale|collect|activity (no nested Gradle)."
     dependsOn(checkUiOnly, checkNativeInventory, devicePreflight, ":app:connectedDebugAndroidTest")
     doFirst {
         val screen = qaScreenName.lowercase()
         if (screen.isEmpty()) {
             println("QA_SCREEN[]: FAIL")
-            throw GradleException("qaScreen requires -Pqa.screen=auth|sale|collect")
+            throw GradleException("qaScreen requires -Pqa.screen=auth|sale|collect|activity")
         }
         if (!screenClassMap.containsKey(screen)) {
             println("QA_SCREEN[$screen]: FAIL")
@@ -193,9 +200,16 @@ val qaScreen by tasks.registering {
 
 val qaCheckpointPullEvidence by tasks.registering(Exec::class) {
     group = "qa"
-    description = "Pull native evidence PNGs after checkpoint connected tests."
+    description = "Pull native evidence PNGs for the current checkpoint run only."
     mustRunAfter(":app:connectedDebugAndroidTest")
     powershellFile("scripts/qa/pull-native-evidence.ps1")
+}
+
+val qaCheckpointCheckEvidence by tasks.registering(Exec::class) {
+    group = "qa"
+    description = "Fail when current-run evidence is missing review sidecars or still UNREVIEWED/FAIL."
+    mustRunAfter(qaCheckpointPullEvidence)
+    powershellFile("scripts/qa/check-evidence-review.ps1", listOf("-RequireReviewed"))
 }
 
 val qaCheckpoint by tasks.registering {
@@ -210,28 +224,30 @@ val qaCheckpoint by tasks.registering {
         ":app:testDebugUnitTest",
         ":app:connectedDebugAndroidTest",
         qaCheckpointPullEvidence,
+        qaCheckpointCheckEvidence,
     )
     doLast {
-        val evidenceRoot = repoRoot.resolve("phase14-evidence")
-        val pngCount = if (evidenceRoot.isDirectory) {
-            evidenceRoot.walkTopDown().count { it.isFile && it.extension.equals("png", true) }
-        } else {
-            0
-        }
-        val unreviewed = if (evidenceRoot.isDirectory) {
-            evidenceRoot.walkTopDown()
-                .filter { it.isFile && it.name.endsWith(".review.json") }
-                .count {
-                    val text = it.readText()
-                    text.contains("\"reviewStatus\": \"UNREVIEWED\"") ||
-                        text.contains("\"reviewStatus\":\"UNREVIEWED\"")
-                }
-        } else {
-            0
+        val summaryFile = repoRoot.resolve("phase14-evidence/checkpoint-evidence-summary.json")
+        var evidence = 0
+        var unreviewed = 0
+        var visualAcceptance = "NONE"
+        if (summaryFile.isFile) {
+            val text = summaryFile.readText()
+            fun intField(name: String): Int {
+                val match = Regex("\"$name\"\\s*:\\s*(\\d+)").find(text)
+                return match?.groupValues?.get(1)?.toIntOrNull() ?: 0
+            }
+            fun stringField(name: String): String {
+                val match = Regex("\"$name\"\\s*:\\s*\"([^\"]+)\"").find(text)
+                return match?.groupValues?.get(1) ?: "NONE"
+            }
+            evidence = intField("evidence")
+            unreviewed = intField("unreviewed")
+            visualAcceptance = stringField("visualAcceptance")
         }
         val logicException = if (allowLogic) "YES" else "NO"
         println(
-            "QA_CHECKPOINT: PASS | auth=PASS | sale=PASS | collect=PASS | untested=0 | evidence=$pngCount | unreviewed=$unreviewed | logicException=$logicException",
+            "QA_CHECKPOINT: PASS | auth=PASS | sale=PASS | collect=PASS | untested=0 | evidence=$evidence | unreviewed=$unreviewed | visualAcceptance=$visualAcceptance | logicException=$logicException",
         )
     }
 }

@@ -383,7 +383,9 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithText("Collect is already open.").assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.CashierNavActivity).performClick()
-        composeRule.onNodeWithText("Activity is not connected in this native preview yet.").assertIsDisplayed()
+        waitForText("Today’s activity")
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavActivity).assertIsSelected()
+        composeRule.onNodeWithTag(NativeUiTags.ActivityEmpty).assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).performClick()
         composeRule.onNodeWithText("More is not connected in this native preview yet.").assertIsDisplayed()
@@ -428,9 +430,15 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithText("Has PKR 125.00 advance").assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.CollectViewRecord).performClick()
-        composeRule.onNodeWithText(
-            "Activity will open this record when the native Activity screen is connected.",
-        ).assertIsDisplayed()
+        composeRule.waitUntil(15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ActivityDetail).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ActivityDetail).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ActivityDetailEventId).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ActivityDetailBack).performClick()
+        waitForText("Collect payment")
         composeRule.onNodeWithTag(NativeUiTags.CollectAnother).performClick()
         composeRule.onNodeWithTag(NativeUiTags.CollectCustomerSelector).assertIsDisplayed()
         composeRule.onNodeWithText("Choose customer").assertIsDisplayed()

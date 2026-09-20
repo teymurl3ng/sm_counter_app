@@ -81,6 +81,18 @@ object NativeUiTags {
     const val CollectDiscardDraft = "collect_discard_draft"
     const val CollectKeepDraft = "collect_keep_draft"
 
+    const val ActivityRoot = "activity_root"
+    const val ActivityLoading = "activity_loading"
+    const val ActivityRetryLoad = "activity_retry_load"
+    const val ActivityEmpty = "activity_empty"
+    const val ActivityList = "activity_list"
+    const val ActivityError = "activity_error"
+    const val ActivityDetail = "activity_detail"
+    const val ActivityDetailBack = "activity_detail_back"
+    const val ActivityDetailEventId = "activity_detail_event_id"
+
+    fun activityRecord(eventId: Long): String = "activity_record_$eventId"
+
     fun cashierProduct(name: String): String = when (name.trim().lowercase()) {
         "milk" -> CashierProductMilk
         "yogurt" -> CashierProductYogurt

@@ -22,6 +22,7 @@ Run from `phase18/` (single Gradle process — do not wrap in another gradlew):
 ```text
 .\gradlew.bat qaFast
 .\gradlew.bat qaScreen -Pqa.screen=collect -Pqa.device=R8VXA02SNKH
+.\gradlew.bat qaScreen -Pqa.screen=activity -Pqa.device=R8VXA02SNKH
 .\gradlew.bat qaCheckpoint -Pqa.device=R8VXA02SNKH
 ```
 
@@ -30,7 +31,7 @@ Set `ANDROID_SERIAL=R8VXA02SNKH` in the shell before device gates when multiple 
 ### When each is mandatory
 
 - **qaFast** — after any native UI/test/build/doc edit before claiming the change is green.
-- **qaScreen** — after edits that affect a specific native screen (`auth` / `sale` / `collect`).
+- **qaScreen** — after edits that affect a specific native screen (`auth` / `sale` / `collect` / `activity`).
 - **qaCheckpoint** — before accepting a screen or shared helper as done; requires `untested=0`.
 
 ## Inventory rule
@@ -42,9 +43,11 @@ Every interactive control needs a stable tag and inventory row. Checkpoint fails
 
 ## Screenshot / review rule
 
-Evidence lands on-device under `/sdcard/Download/phase14-native-evidence/native-<screen>-a06/`, then pulls to `phase14-evidence/native-<screen>-a06/`.
+Evidence for a checkpoint is scoped to `phase14-evidence/checkpoint-current/` (pulled for that run) plus optional `phase14-evidence/retained-baselines/`.
 
-PNG existence is not visual PASS. Each capture has a `.review.json` sidecar (`PASS` / `FAIL` / `UNREVIEWED`). Checkpoint prints `unreviewed` count; owner review clears `UNREVIEWED`.
+Stale PNGs elsewhere under `phase14-evidence/` do **not** count. Every counted PNG needs a sibling `<name>.review.json` with at least an evidence/scenario id and `reviewStatus` of `PASS` / `FAIL` / `UNREVIEWED`. Missing or incomplete sidecars count as `UNREVIEWED`. `UNREVIEWED > 0` or any `FAIL` blocks visual acceptance (`visualAcceptance=BLOCKED`). If the run produced no evidence, report `evidence=0` / `visualAcceptance=NONE` honestly.
+
+PNG existence alone is not visual PASS. Owner review clears `UNREVIEWED` (see `scripts/qa/mark-evidence-reviewed.ps1`).
 
 ## Package / device safety
 

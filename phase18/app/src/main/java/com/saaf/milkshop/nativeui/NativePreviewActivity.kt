@@ -22,10 +22,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
 import com.saaf.milkshop.MilkShopApplication
 import com.saaf.milkshop.R
+import com.saaf.milkshop.application.activity.NativeActivityFacade
 import com.saaf.milkshop.application.authentication.NativeAuthenticationFacade
 import com.saaf.milkshop.application.authentication.NativeQuickUnlockFacade
 import com.saaf.milkshop.application.collection.NativeCollectionFacade
 import com.saaf.milkshop.application.sale.NativeSaleFacade
+import com.saaf.milkshop.nativeui.activity.CashierActivityScreen
+import com.saaf.milkshop.nativeui.activity.NativeActivityState
+import com.saaf.milkshop.nativeui.activity.NativeActivityViewModel
 import com.saaf.milkshop.nativeui.auth.NativeAuthenticationHost
 import com.saaf.milkshop.nativeui.auth.NativeAuthenticationState
 import com.saaf.milkshop.nativeui.auth.NativeAuthenticationViewModel
@@ -51,6 +55,7 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var quickUnlockFacade: NativeQuickUnlockFacade
     private lateinit var saleFacade: NativeSaleFacade
     private lateinit var collectionFacade: NativeCollectionFacade
+    private lateinit var activityFacade: NativeActivityFacade
 
     private val authenticationViewModel by viewModels<NativeAuthenticationViewModel> {
         val app = application as MilkShopApplication
@@ -74,6 +79,13 @@ class NativePreviewActivity : FragmentActivity() {
         )
     }
 
+    private val activityViewModel by viewModels<NativeActivityViewModel> {
+        NativeActivityViewModel.Factory(
+            facade = activityFacade,
+            onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -89,12 +101,14 @@ class NativePreviewActivity : FragmentActivity() {
         quickUnlockFacade = NativeQuickUnlockFacade(quickUnlockService, authenticationFacade)
         saleFacade = NativeSaleFacade(app.database, app.userSecurity)
         collectionFacade = NativeCollectionFacade(app.database, app.userSecurity)
+        activityFacade = NativeActivityFacade(app.database, app.userSecurity)
         authenticationViewModel.attachQuickUnlock(quickUnlockFacade)
         setContent {
             SaafTheme {
                 val authenticationState by authenticationViewModel.state.collectAsState()
                 val saleState by saleViewModel.state.collectAsState()
                 val collectionState by collectionViewModel.state.collectAsState()
+                val activityState by activityViewModel.state.collectAsState()
                 NativeFoundationPreview(
                     authenticationState = authenticationState,
                     authenticationViewModel = authenticationViewModel,
@@ -102,6 +116,8 @@ class NativePreviewActivity : FragmentActivity() {
                     saleViewModel = saleViewModel,
                     collectionState = collectionState,
                     collectionViewModel = collectionViewModel,
+                    activityState = activityState,
+                    activityViewModel = activityViewModel,
                 )
             }
         }
@@ -137,15 +153,16 @@ private fun NativeFoundationPreview(
     saleViewModel: NativeSaleViewModel,
     collectionState: NativeCollectionState,
     collectionViewModel: NativeCollectionViewModel,
+    activityState: NativeActivityState,
+    activityViewModel: NativeActivityViewModel,
 ) {
     var destination by rememberSaveable { mutableStateOf(PreviewDestination.Welcome) }
     var cashierSection by rememberSaveable { mutableStateOf(CashierSection.Sell) }
+    var activityReturnSection by rememberSaveable { mutableStateOf(CashierSection.Sell.name) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val sellNotice = stringResource(R.string.native_nav_sell_notice)
-    val activityNotice = stringResource(R.string.native_nav_activity_notice)
     val moreNotice = stringResource(R.string.native_nav_more_notice)
-    val viewRecordNotice = stringResource(R.string.native_collection_view_record_notice)
 
     fun showPreviewNotice(message: String) {
         coroutineScope.launch {
@@ -165,6 +182,7 @@ private fun NativeFoundationPreview(
             cashierSection = CashierSection.Sell
             saleViewModel.close()
             collectionViewModel.close()
+            activityViewModel.close()
         }
     }
 
@@ -196,13 +214,31 @@ private fun NativeFoundationPreview(
                         }
                     }
                     BackHandler {
-                        if (cashierSection == CashierSection.Collect) {
-                            cashierSection = CashierSection.Sell
-                        } else {
-                            saleViewModel.close()
-                            collectionViewModel.close()
-                            authenticationViewModel.leaveAuthenticatedArea()
-                            destination = PreviewDestination.Welcome
+                        when (cashierSection) {
+                            CashierSection.Collect -> cashierSection = CashierSection.Sell
+                            CashierSection.Activity -> {
+                                val ready = activityState as? NativeActivityState.Ready
+                                if (ready?.detail != null) {
+                                    activityViewModel.clearDetail()
+                                } else {
+                                    val returnTo = runCatching {
+                                        CashierSection.valueOf(activityReturnSection)
+                                    }.getOrDefault(CashierSection.Sell)
+                                    activityReturnSection = CashierSection.Sell.name
+                                    cashierSection = if (returnTo == CashierSection.Collect) {
+                                        CashierSection.Collect
+                                    } else {
+                                        CashierSection.Sell
+                                    }
+                                }
+                            }
+                            else -> {
+                                saleViewModel.close()
+                                collectionViewModel.close()
+                                activityViewModel.close()
+                                authenticationViewModel.leaveAuthenticatedArea()
+                                destination = PreviewDestination.Welcome
+                            }
                         }
                     }
                     val navigateCashier: (CashierSection) -> Unit = { section ->
@@ -218,7 +254,15 @@ private fun NativeFoundationPreview(
                                     cashierSection = CashierSection.Collect
                                 }
                             }
-                            CashierSection.Activity -> showPreviewNotice(activityNotice)
+                            CashierSection.Activity -> {
+                                if (cashierSection == CashierSection.Activity) {
+                                    showPreviewNotice("Activity is already open.")
+                                } else {
+                                    activityReturnSection = CashierSection.Sell.name
+                                    activityViewModel.open(authenticated.sessionHandle)
+                                    cashierSection = CashierSection.Activity
+                                }
+                            }
                             CashierSection.More -> showPreviewNotice(moreNotice)
                         }
                     }
@@ -233,6 +277,7 @@ private fun NativeFoundationPreview(
                             onLeaveConfirmed = {
                                 saleViewModel.close()
                                 collectionViewModel.close()
+                                activityViewModel.close()
                                 authenticationViewModel.leaveAuthenticatedArea()
                                 destination = PreviewDestination.Welcome
                             },
@@ -246,13 +291,39 @@ private fun NativeFoundationPreview(
                             onSelectCustomer = collectionViewModel::selectCustomer,
                             onRecordCollection = collectionViewModel::record,
                             onCollectAnother = collectionViewModel::collectAnother,
-                            onViewRecord = { showPreviewNotice(viewRecordNotice) },
+                            onViewRecord = { eventId ->
+                                activityReturnSection = CashierSection.Collect.name
+                                activityViewModel.openDetailFromCollect(authenticated.sessionHandle, eventId)
+                                cashierSection = CashierSection.Activity
+                            },
                             onLeaveConfirmed = { cashierSection = CashierSection.Sell },
                             onNavigate = navigateCashier,
                         )
-                        CashierSection.Activity,
-                        CashierSection.More,
-                        -> Unit
+                        CashierSection.Activity -> CashierActivityScreen(
+                            snackbarHostState = snackbarHostState,
+                            identity = authenticated.identity,
+                            state = activityState,
+                            onRetry = activityViewModel::refresh,
+                            onOpenRecord = activityViewModel::openDetail,
+                            onBackFromDetail = {
+                                val returnTo = runCatching {
+                                    CashierSection.valueOf(activityReturnSection)
+                                }.getOrDefault(CashierSection.Sell)
+                                if (returnTo == CashierSection.Collect) {
+                                    activityReturnSection = CashierSection.Sell.name
+                                    activityViewModel.clearDetail()
+                                    cashierSection = CashierSection.Collect
+                                } else {
+                                    activityViewModel.clearDetail()
+                                }
+                            },
+                            onLeaveConfirmed = {
+                                activityReturnSection = CashierSection.Sell.name
+                                cashierSection = CashierSection.Sell
+                            },
+                            onNavigate = navigateCashier,
+                        )
+                        CashierSection.More -> Unit
                     }
                 }
             } else {

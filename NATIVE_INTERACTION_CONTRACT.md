@@ -80,7 +80,7 @@ Before accepting a screen:
 | Record sale · customer account | Write one authoritative SALE event to the chosen customer balance and attribute the signed-in actor. | A numbered receipt appears and the selected customer's financial movement exists. | `customerAccountSaleWritesTheSelectedCustomerBalance`; `ownerRecordsValueSaleOnCustomerCreditAndNativeDerivesQuantity` |
 | Record sale · rejected | Preserve the draft and show the domain failure without a partial event, stock movement, or financial movement. | Insufficient-stock message appears beside the unchanged entry. | `insufficientStockKeepsDraftVisibleAndWritesNoSale`; `saleRejectsInsufficientStockClosedHistoryInvalidChannelAndUnauthorizedOperator` |
 | Navigation · Sell | Confirm that the already-selected destination remains open. | `Sell is already open.` appears. | `everyBottomDestinationProvidesItsDefinedPreviewResponse` |
-| Navigation · Collect | At this checkpoint, explain that the destination is not connected. | Explicit Collect preview notice appears. | `everyBottomDestinationProvidesItsDefinedPreviewResponse` |
+| Navigation · Collect | Open the native Collect payment destination. | `Collect payment` appears and Collect remains selected. | `everyBottomDestinationProvidesItsDefinedPreviewResponse`; `collectPaymentWritesRoomShowsReceiptAndOffersTheNextVisibleActions` |
 | Navigation · Activity | At this checkpoint, explain that the destination is not connected. | Explicit Activity preview notice appears. | `everyBottomDestinationProvidesItsDefinedPreviewResponse` |
 | Navigation · More | At this checkpoint, explain that the destination is not connected. | Explicit More preview notice appears. | `everyBottomDestinationProvidesItsDefinedPreviewResponse` |
 

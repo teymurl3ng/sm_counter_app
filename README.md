@@ -67,8 +67,9 @@ Product scope: Saaf Milk is the current working product identity, and Milk/Yogur
 - `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md` — accepted Owner, Store manager, and Administrator screen/state blueprint.
 - `PHASE14_8_2_COUNTER_LEDGER_ACCESS.md` — accepted branded welcome, account selection, authentication, first-Owner, staff-enrollment, and Quick-unlock blueprint.
 - `PHASE14_8_2_COUNTER_LEDGER_REFINEMENT.md` — owner decision to retain the original layouts and apply the typography/readability lessons from the Stitch study.
-- `PHASE14_8_3_COMPOSE_FOUNDATION.md` — active Compose foundation, authoritative authentication-to-Sale slice, lifecycle/accessibility hardening, and real-device evidence.
+- `PHASE14_8_3_COMPOSE_FOUNDATION.md` — active Compose foundation, authoritative authentication-to-Sale/Collect slice, lifecycle/accessibility hardening, and real-device evidence.
 - `NATIVE_INTERACTION_CONTRACT.md` — required workflow description, stable-tag, and device-test gate for every visible native control.
+- `NATIVE_SCREEN_ACCEPTANCE.md` — permanent `qaFast` / `qaScreen` / `qaCheckpoint` gate, risk tiers, inventory, and package/device safety.
 - `design/refined-counter-ledger/index.html` — accepted refined original Welcome, Cashier sale, and Owner overview visual reference.
 - `STITCH_DESIGN_PREPARATION.md` — verified Stitch connection, approved brief, six-screen comparison evidence, and recorded owner review.
 - `design/stitch/comparison.html` and `design/stitch/REVIEW.md` — generated A/B Welcome, Cashier New sale, and Owner Overview proposals retained as comparative evidence; neither treatment is selected wholesale.

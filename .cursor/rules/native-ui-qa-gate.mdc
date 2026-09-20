@@ -1,0 +1,18 @@
+---
+description: Native Compose UI QA gate for Saaf Milk Phase 14.8
+globs: phase18/app/src/main/java/com/saaf/milkshop/nativeui/**/*,phase18/app/src/androidTest/java/com/saaf/milkshop/**/*,NATIVE_INTERACTION_CONTRACT.md,NATIVE_SCREEN_ACCEPTANCE.md
+alwaysApply: false
+---
+
+# Native UI QA gate
+
+1. Read `NATIVE_INTERACTION_CONTRACT.md` and `NATIVE_SCREEN_ACCEPTANCE.md` before native UI work.
+2. Compose UI must not duplicate or change accounting/domain rules under `phase18/app/src/main/java/com/saaf/milkshop/domain/` or `data/`.
+3. Every interactive control needs a stable `NativeUiTags` tag and a row in `phase18/qa/native_control_inventory.tsv`.
+4. Money/data writes require real saved-domain proof plus refreshed visible UI.
+5. Layout/input changes require the applicable look/IME tier from `NATIVE_SCREEN_ACCEPTANCE.md`.
+6. Never weaken/delete an assertion without explicitly listing it in the change report.
+7. New critical assertions must be demonstrated capable of going RED once, then restored.
+8. Run `.\gradlew.bat qaFast` from `phase18/`; run `.\gradlew.bat qaScreen -Pqa.screen=<auth|sale|collect>` for affected screens.
+9. A checkpoint requires `.\gradlew.bat qaCheckpoint` and inventory `untested=0`.
+10. Never install/overwrite `com.saaf.milkshop`; after accepted work install/relaunch `com.saaf.milkshop.qa` on A06 (`R8VXA02SNKH`).

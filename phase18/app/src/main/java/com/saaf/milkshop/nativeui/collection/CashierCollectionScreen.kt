@@ -516,6 +516,7 @@ private fun CollectionForm(
                 placeholder = { Text("0") },
                 modifier = Modifier
                     .fillMaxWidth()
+                    .semantics { contentDescription = "Collection amount" }
                     .testTag(NativeUiTags.CollectAmountInput),
             )
             Spacer(Modifier.height(8.dp))

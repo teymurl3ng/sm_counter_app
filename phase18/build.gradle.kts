@@ -30,3 +30,208 @@ subprojects {
         dependsOn(rootProject.tasks.named("verifyUiCleanup"))
     }
 }
+
+val repoRoot = rootDir.parentFile
+val allowLogic = providers.gradleProperty("allow.logic").orNull.equals("true", ignoreCase = true)
+val qaScreenName = providers.gradleProperty("qa.screen").orNull?.trim().orEmpty()
+val qaDevice = providers.gradleProperty("qa.device").orNull?.trim().orEmpty()
+
+val screenClassMap = mapOf(
+    "auth" to listOf(
+        // NativeOwnerBootstrapUiTest requires saafSkipBootstrap=true + empty DB; runner seed
+        // makes first-run unreachable in shared connected suites. Covered separately via
+        // scripts/qa/run-connected-qa.ps1 auth-bootstrap when needed.
+        "com.saaf.milkshop.NativeAuthenticationScreenContractTest",
+        "com.saaf.milkshop.NativeAuthenticationFacadeTest",
+        "com.saaf.milkshop.NativeFoundationUiTest",
+    ),
+    "sale" to listOf(
+        "com.saaf.milkshop.NativeFoundationUiTest",
+        "com.saaf.milkshop.NativeSaleHardeningContractTest",
+        "com.saaf.milkshop.NativeSaleScreenContractTest",
+        "com.saaf.milkshop.Phase8SaleOperationsTest",
+        "com.saaf.milkshop.qa.NativeGoldenLedgerRegressionTest",
+    ),
+    "collect" to listOf(
+        "com.saaf.milkshop.NativeCollectionFacadeTest",
+        "com.saaf.milkshop.NativeCollectionScreenContractTest",
+        "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+        "com.saaf.milkshop.qa.NativeCollectionDeviceEvidenceTest",
+        "com.saaf.milkshop.NativeFoundationUiTest#everyBottomDestinationProvidesItsDefinedPreviewResponse",
+        "com.saaf.milkshop.NativeFoundationUiTest#collectPaymentWritesRoomShowsReceiptAndOffersTheNextVisibleActions",
+        "com.saaf.milkshop.qa.NativeGoldenLedgerRegressionTest",
+    ),
+)
+
+// Apply connected-test filter/sandbox via rootProject.extra (setProjectProperties is not
+// reliably visible to subproject providers.gradleProperty).
+val requestedTasks = gradle.startParameter.taskNames.map { it.substringAfterLast(':') }
+val wantsQaScreen = requestedTasks.any { it.equals("qaScreen", ignoreCase = true) }
+val wantsQaCheckpoint = requestedTasks.any { it.equals("qaCheckpoint", ignoreCase = true) }
+if (wantsQaScreen || wantsQaCheckpoint) {
+    val classes = if (wantsQaCheckpoint) {
+        (screenClassMap.getValue("auth") + screenClassMap.getValue("sale") + screenClassMap.getValue("collect"))
+            .distinct()
+    } else {
+        val screen = qaScreenName.lowercase()
+        require(screen.isNotEmpty()) { "qaScreen requires -Pqa.screen=auth|sale|collect" }
+        require(screenClassMap.containsKey(screen)) {
+            "Unknown qa.screen='$qaScreenName'. Valid: ${screenClassMap.keys.sorted()}"
+        }
+        screenClassMap.getValue(screen)
+    }
+    require(classes.isNotEmpty()) { "Selected QA screen has zero registered tests" }
+    val serial = qaDevice.ifEmpty { System.getenv("ANDROID_SERIAL").orEmpty() }
+        .ifEmpty { "R8VXA02SNKH" }
+    rootProject.extra["qa.forceInstrumentationSandbox"] = true
+    rootProject.extra["qa.connected.classFilter"] = classes.joinToString(",")
+    println("QA connected filter classCount=${classes.size} preferredSerial=$serial")
+    println("QA tip: export ANDROID_SERIAL=$serial before gradlew if multiple adb devices are connected")
+}
+
+fun Exec.powershellFile(scriptRelative: String, extraArgs: List<String> = emptyList()) {
+    workingDir = repoRoot
+    commandLine(
+        listOf(
+            "powershell",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            scriptRelative,
+        ) + extraArgs,
+    )
+}
+
+val checkUiOnly by tasks.registering(Exec::class) {
+    group = "qa"
+    description = "Fails when protected domain/SQL files change unless -Pallow.logic=true."
+    powershellFile(
+        "scripts/qa/check-ui-only.ps1",
+        if (allowLogic) listOf("-AllowLogic") else emptyList(),
+    )
+}
+
+val checkFrozenBaselines by tasks.registering(Exec::class) {
+    group = "qa"
+    description = "Verifies PHASE0 frozen logic-spec and SQL blueprint hashes."
+    powershellFile("scripts/qa/check-frozen-baselines.ps1")
+}
+
+val checkNativeInventory by tasks.registering(Exec::class) {
+    group = "qa"
+    description = "Machine inventory orphan/duplicate/missing-test coverage check."
+    powershellFile("scripts/qa/check-native-inventory.ps1")
+}
+
+val checkNativeInventoryCheckpoint by tasks.registering(Exec::class) {
+    group = "qa"
+    description = "Inventory check requiring untested=0."
+    powershellFile("scripts/qa/check-native-inventory.ps1", listOf("-RequireZeroUntested"))
+}
+
+val checkGoldenLedgerContract by tasks.registering(Exec::class) {
+    group = "qa"
+    description = "Host contract for the instrumented golden-ledger regression."
+    powershellFile("scripts/qa/check-golden-ledger-contract.ps1")
+}
+
+val devicePreflight by tasks.registering(Exec::class) {
+    group = "qa"
+    description = "Selects A06 device of record; never silently picks an arbitrary device."
+    powershellFile(
+        "scripts/qa/device-preflight.ps1",
+        buildList {
+            if (qaDevice.isNotEmpty()) {
+                add("-RequestedSerial")
+                add(qaDevice)
+            }
+        },
+    )
+}
+
+val qaFast by tasks.registering {
+    group = "qa"
+    description = "Cheap host-side native UI gate (no physical device)."
+    dependsOn(
+        checkUiOnly,
+        checkFrozenBaselines,
+        checkNativeInventory,
+        checkGoldenLedgerContract,
+        ":app:testDebugUnitTest",
+        ":app:compileDebugKotlin",
+        ":app:compileDebugAndroidTestKotlin",
+    )
+    doLast {
+        println("QA_FAST: PASS")
+    }
+}
+
+val qaScreen by tasks.registering {
+    group = "qa"
+    description = "Device acceptance for one native screen: -Pqa.screen=auth|sale|collect (no nested Gradle)."
+    dependsOn(checkUiOnly, checkNativeInventory, devicePreflight, ":app:connectedDebugAndroidTest")
+    doFirst {
+        val screen = qaScreenName.lowercase()
+        if (screen.isEmpty()) {
+            println("QA_SCREEN[]: FAIL")
+            throw GradleException("qaScreen requires -Pqa.screen=auth|sale|collect")
+        }
+        if (!screenClassMap.containsKey(screen)) {
+            println("QA_SCREEN[$screen]: FAIL")
+            throw GradleException("Unknown qa.screen='$qaScreenName'. Valid: ${screenClassMap.keys.sorted()}")
+        }
+        if (screenClassMap.getValue(screen).isEmpty()) {
+            println("QA_SCREEN[$screen]: FAIL")
+            throw GradleException("Screen '$screen' has zero registered tests")
+        }
+    }
+    doLast {
+        println("QA_SCREEN[${qaScreenName.lowercase()}]: PASS")
+    }
+}
+
+val qaCheckpointPullEvidence by tasks.registering(Exec::class) {
+    group = "qa"
+    description = "Pull native evidence PNGs after checkpoint connected tests."
+    mustRunAfter(":app:connectedDebugAndroidTest")
+    powershellFile("scripts/qa/pull-native-evidence.ps1")
+}
+
+val qaCheckpoint by tasks.registering {
+    group = "qa"
+    description = "Heavyweight Auth+Sale+Collect native acceptance gate with inventory and evidence."
+    dependsOn(
+        checkUiOnly,
+        checkFrozenBaselines,
+        checkNativeInventoryCheckpoint,
+        checkGoldenLedgerContract,
+        devicePreflight,
+        ":app:testDebugUnitTest",
+        ":app:connectedDebugAndroidTest",
+        qaCheckpointPullEvidence,
+    )
+    doLast {
+        val evidenceRoot = repoRoot.resolve("phase14-evidence")
+        val pngCount = if (evidenceRoot.isDirectory) {
+            evidenceRoot.walkTopDown().count { it.isFile && it.extension.equals("png", true) }
+        } else {
+            0
+        }
+        val unreviewed = if (evidenceRoot.isDirectory) {
+            evidenceRoot.walkTopDown()
+                .filter { it.isFile && it.name.endsWith(".review.json") }
+                .count {
+                    val text = it.readText()
+                    text.contains("\"reviewStatus\": \"UNREVIEWED\"") ||
+                        text.contains("\"reviewStatus\":\"UNREVIEWED\"")
+                }
+        } else {
+            0
+        }
+        val logicException = if (allowLogic) "YES" else "NO"
+        println(
+            "QA_CHECKPOINT: PASS | auth=PASS | sale=PASS | collect=PASS | untested=0 | evidence=$pngCount | unreviewed=$unreviewed | logicException=$logicException",
+        )
+    }
+}

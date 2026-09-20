@@ -5,7 +5,17 @@ plugins {
 }
 
 val isolatedQaData = providers.gradleProperty("saaf.isolatedQa").orNull.equals("true", ignoreCase = true)
-val instrumentationSandbox = providers.gradleProperty("saaf.instrumentationSandbox").orNull.equals("true", ignoreCase = true)
+val forceInstrumentationSandbox =
+    rootProject.extra.has("qa.forceInstrumentationSandbox") &&
+        rootProject.extra["qa.forceInstrumentationSandbox"] == true
+val instrumentationSandbox =
+    forceInstrumentationSandbox ||
+        providers.gradleProperty("saaf.instrumentationSandbox").orNull.equals("true", ignoreCase = true)
+val qaClassFilter = if (rootProject.extra.has("qa.connected.classFilter")) {
+    rootProject.extra["qa.connected.classFilter"] as String?
+} else {
+    null
+}
 val performanceTestBuild = providers.gradleProperty("saaf.performanceTestBuild").orNull.equals("true", ignoreCase = true)
 val googleWebClientId = providers.gradleProperty("saaf.googleWebClientId").orNull.orEmpty()
 val escapedGoogleWebClientId = googleWebClientId.replace("\\", "\\\\").replace("\"", "\\\"")
@@ -23,6 +33,10 @@ android {
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$escapedGoogleWebClientId\"")
 
         testInstrumentationRunner = "com.saaf.milkshop.SaafMilkTestRunner"
+        if (!qaClassFilter.isNullOrBlank()) {
+            testInstrumentationRunnerArguments["class"] = qaClassFilter
+            println("QA app class filter applied (${qaClassFilter.split(',').size} entries)")
+        }
     }
 
     buildFeatures {
@@ -132,6 +146,7 @@ dependencies {
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0")
     androidTestImplementation(libs.androidx.room.testing)
     androidTestImplementation(libs.androidx.work.testing)
     androidTestImplementation(composeBom)

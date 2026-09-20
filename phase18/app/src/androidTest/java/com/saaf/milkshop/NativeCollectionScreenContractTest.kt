@@ -78,7 +78,7 @@ class NativeCollectionScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.collectPaymentAccount(11L)).performClick()
         composeRule.onNodeWithText("Bank").assertIsDisplayed()
 
-        composeRule.onNodeWithTag(NativeUiTags.CollectNoteToggle).performScrollTo().performClick()
+        expandCollectNote()
         composeRule.onNodeWithTag(NativeUiTags.CollectNoteInput).performTextReplacement("Counter receipt 41")
         composeRule.onNodeWithText("Optional · 18/240").assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.CashierNavCollect).assertIsSelected()
@@ -97,7 +97,7 @@ class NativeCollectionScreenContractTest {
         )
 
         composeRule.onNodeWithTag(NativeUiTags.CollectAmountInput).performTextReplacement("1000.25")
-        composeRule.onNodeWithTag(NativeUiTags.CollectNoteToggle).performScrollTo().performClick()
+        expandCollectNote()
         composeRule.onNodeWithTag(NativeUiTags.CollectNoteInput).performTextReplacement("Paid at counter")
         composeRule.onNodeWithTag(NativeUiTags.CollectRecord).performScrollTo().assertIsEnabled().performClick()
 
@@ -131,16 +131,20 @@ class NativeCollectionScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.CollectRecord).performScrollTo().performClick()
 
         assertNull(request)
-        composeRule.onNodeWithText("Confirm customer advance").assertIsDisplayed()
+        waitForAdvanceDialog()
         composeRule.onNodeWithText("Ahmed Store currently owes PKR 500.00.").assertIsDisplayed()
         composeRule.onNodeWithText("You are recording PKR 650.00.").assertIsDisplayed()
         composeRule.onNodeWithText("PKR 150.00 will remain as customer advance.").assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.CollectCancelAdvance).performClick()
         assertNull(request)
-        composeRule.onNodeWithText("Confirm customer advance").assertDoesNotExist()
+        composeRule.waitUntil(5_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.CollectConfirmAdvance).fetchSemanticsNode()
+            }.isFailure
+        }
 
         composeRule.onNodeWithTag(NativeUiTags.CollectRecord).performScrollTo().performClick()
-        composeRule.onNodeWithText("Confirm customer advance").assertIsDisplayed()
+        waitForAdvanceDialog()
         composeRule.onNodeWithTag(NativeUiTags.CollectConfirmAdvance).performClick()
         assertNotNull(request)
         assertEquals(65_000L, request!!.amountPaisa)
@@ -223,6 +227,39 @@ class NativeCollectionScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.CollectError).performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.CollectAmountInput).assertTextEquals("725")
         composeRule.onNodeWithTag(NativeUiTags.CollectRecord).performScrollTo().assertIsEnabled()
+    }
+
+    private fun waitForAdvanceDialog() {
+        composeRule.waitForIdle()
+        composeRule.waitUntil(8_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.CollectConfirmAdvance).assertIsDisplayed()
+            }.isSuccess
+        }
+    }
+
+    private fun expandCollectNote() {
+        composeRule.waitForIdle()
+        repeat(3) { attempt ->
+            val visible = runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.CollectNoteInput).fetchSemanticsNode()
+            }.isSuccess
+            if (visible) return
+            composeRule.onNodeWithTag(NativeUiTags.CollectNoteToggle)
+                .performScrollTo()
+                .performClick()
+            composeRule.waitForIdle()
+            val opened = runCatching {
+                composeRule.waitUntil(3_000) {
+                    runCatching {
+                        composeRule.onNodeWithTag(NativeUiTags.CollectNoteInput).fetchSemanticsNode()
+                    }.isSuccess
+                }
+                true
+            }.getOrDefault(false)
+            if (opened) return
+            check(attempt < 2) { "Collect note input did not open after toggle retries" }
+        }
     }
 
     private fun setScreen(

@@ -237,10 +237,20 @@ class NativeCollectionScreenContractTest {
         composeRule.onNodeWithText("Loading customer payments…").assertIsDisplayed()
 
         state = ready(balancePaisa = 250_000L)
+        composeRule.waitUntil(5_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.CollectAmountInput).fetchSemanticsNode()
+            }.isSuccess
+        }
         composeRule.onNodeWithTag(NativeUiTags.CollectAmountInput).performTextReplacement("725")
         state = (state as NativeCollectionState.Ready).copy(
             error = "The payment was not recorded. Your entries are still here—check them and try again.",
         )
+        composeRule.waitUntil(5_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.CollectError).fetchSemanticsNode()
+            }.isSuccess
+        }
         composeRule.onNodeWithTag(NativeUiTags.CollectError).performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.CollectAmountInput).assertTextEquals("725")
         composeRule.onNodeWithTag(NativeUiTags.CollectRecord).performScrollTo().assertIsEnabled()

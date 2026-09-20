@@ -27,9 +27,11 @@ import com.saaf.milkshop.application.authentication.NativeAuthenticationFacade
 import com.saaf.milkshop.application.authentication.NativeQuickUnlockFacade
 import com.saaf.milkshop.application.collection.NativeCollectionFacade
 import com.saaf.milkshop.application.more.NativeMoreFacade
+import com.saaf.milkshop.application.operations.NativeOperationsWorkFacade
 import com.saaf.milkshop.application.preview.NativePreviewSampleData
 import com.saaf.milkshop.application.sale.NativeSaleFacade
 import com.saaf.milkshop.data.MilkShopDatabase
+import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.nativeui.activity.CashierActivityScreen
 import com.saaf.milkshop.nativeui.activity.NativeActivityState
 import com.saaf.milkshop.nativeui.activity.NativeActivityViewModel
@@ -43,6 +45,11 @@ import com.saaf.milkshop.nativeui.more.CashierMoreScreen
 import com.saaf.milkshop.nativeui.more.NativeMoreDestination
 import com.saaf.milkshop.nativeui.more.NativeMoreState
 import com.saaf.milkshop.nativeui.more.NativeMoreViewModel
+import com.saaf.milkshop.nativeui.operations.NativeOperationsWorkDestination
+import com.saaf.milkshop.nativeui.operations.NativeOperationsWorkState
+import com.saaf.milkshop.nativeui.operations.NativeOperationsWorkViewModel
+import com.saaf.milkshop.nativeui.operations.OperationsSection
+import com.saaf.milkshop.nativeui.operations.OperationsWorkScreen
 import com.saaf.milkshop.nativeui.sale.CashierSaleScreen
 import com.saaf.milkshop.nativeui.sale.CashierSection
 import com.saaf.milkshop.nativeui.sale.NativeSaleState
@@ -64,6 +71,7 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var collectionFacade: NativeCollectionFacade
     private lateinit var activityFacade: NativeActivityFacade
     private lateinit var moreFacade: NativeMoreFacade
+    private lateinit var operationsWorkFacade: NativeOperationsWorkFacade
 
     private val authenticationViewModel by viewModels<NativeAuthenticationViewModel> {
         val app = application as MilkShopApplication
@@ -101,6 +109,13 @@ class NativePreviewActivity : FragmentActivity() {
         )
     }
 
+    private val operationsWorkViewModel by viewModels<NativeOperationsWorkViewModel> {
+        NativeOperationsWorkViewModel.Factory(
+            facade = operationsWorkFacade,
+            onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -118,6 +133,7 @@ class NativePreviewActivity : FragmentActivity() {
         collectionFacade = NativeCollectionFacade(app.database, app.userSecurity)
         activityFacade = NativeActivityFacade(app.database, app.userSecurity)
         moreFacade = NativeMoreFacade(app.database, app.userSecurity, quickUnlockService)
+        operationsWorkFacade = NativeOperationsWorkFacade(app.database, app.userSecurity)
         authenticationViewModel.attachQuickUnlock(quickUnlockFacade)
         setContent {
             SaafTheme {
@@ -126,6 +142,7 @@ class NativePreviewActivity : FragmentActivity() {
                 val collectionState by collectionViewModel.state.collectAsState()
                 val activityState by activityViewModel.state.collectAsState()
                 val moreState by moreViewModel.state.collectAsState()
+                val operationsWorkState by operationsWorkViewModel.state.collectAsState()
                 NativeFoundationPreview(
                     database = app.database,
                     saleFacade = saleFacade,
@@ -141,6 +158,8 @@ class NativePreviewActivity : FragmentActivity() {
                     activityViewModel = activityViewModel,
                     moreState = moreState,
                     moreViewModel = moreViewModel,
+                    operationsWorkState = operationsWorkState,
+                    operationsWorkViewModel = operationsWorkViewModel,
                 )
             }
         }
@@ -184,9 +203,12 @@ private fun NativeFoundationPreview(
     activityViewModel: NativeActivityViewModel,
     moreState: NativeMoreState,
     moreViewModel: NativeMoreViewModel,
+    operationsWorkState: NativeOperationsWorkState,
+    operationsWorkViewModel: NativeOperationsWorkViewModel,
 ) {
     var destination by rememberSaveable { mutableStateOf(PreviewDestination.Welcome) }
     var cashierSection by rememberSaveable { mutableStateOf(CashierSection.Sell) }
+    var operationsSection by rememberSaveable { mutableStateOf(OperationsSection.Work) }
     var activityReturnSection by rememberSaveable { mutableStateOf(CashierSection.Sell.name) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -202,36 +224,39 @@ private fun NativeFoundationPreview(
         }
     }
 
-    fun leaveToWelcome() {
+    fun closeCashierShell() {
         saleViewModel.close()
         collectionViewModel.close()
         activityViewModel.close()
         moreViewModel.close()
+    }
+
+    fun leaveToWelcome() {
+        closeCashierShell()
+        operationsWorkViewModel.close()
         authenticationViewModel.leaveAuthenticatedArea()
         destination = PreviewDestination.Welcome
         cashierSection = CashierSection.Sell
+        operationsSection = OperationsSection.Work
     }
 
     fun leaveToAccountPicker() {
-        saleViewModel.close()
-        collectionViewModel.close()
-        activityViewModel.close()
-        moreViewModel.close()
+        closeCashierShell()
+        operationsWorkViewModel.close()
         authenticationViewModel.beginAccountSwitch()
         destination = PreviewDestination.Access
     }
 
-    val showingCashier = destination == PreviewDestination.Access &&
+    val showingAuthenticated = destination == PreviewDestination.Access &&
         authenticationState is NativeAuthenticationState.Authenticated
+    val authenticatedRole = (authenticationState as? NativeAuthenticationState.Authenticated)
+        ?.identity?.role
+    val showingOperator = showingAuthenticated && authenticatedRole == AppRole.OPERATOR
+    val showingCashier = showingAuthenticated && !showingOperator
 
-    androidx.compose.runtime.LaunchedEffect(showingCashier) {
-        if (!showingCashier) {
-            // Keep cashierSection so Switch-account → Back can reopen More (or the prior tab).
-            saleViewModel.close()
-            collectionViewModel.close()
-            activityViewModel.close()
-            moreViewModel.close()
-        }
+    androidx.compose.runtime.LaunchedEffect(showingCashier, showingOperator) {
+        if (!showingCashier) closeCashierShell()
+        if (!showingOperator) operationsWorkViewModel.close()
     }
 
     SystemBarAppearance(
@@ -246,7 +271,71 @@ private fun NativeFoundationPreview(
             onContinue = { destination = PreviewDestination.Access },
         )
         PreviewDestination.Access -> {
-            if (showingCashier) {
+            if (showingOperator) {
+                val authenticated = authenticationState as NativeAuthenticationState.Authenticated
+                SaafTheme(darkTheme = false) {
+                    var lastOpsSession by rememberSaveable { mutableStateOf<String?>(null) }
+                    androidx.compose.runtime.LaunchedEffect(authenticated.sessionHandle) {
+                        if (lastOpsSession != null && lastOpsSession != authenticated.sessionHandle) {
+                            operationsSection = OperationsSection.Work
+                        }
+                        lastOpsSession = authenticated.sessionHandle
+                    }
+                    androidx.compose.runtime.LaunchedEffect(
+                        authenticated.sessionHandle,
+                        operationsSection,
+                    ) {
+                        when (operationsSection) {
+                            OperationsSection.Work ->
+                                operationsWorkViewModel.open(authenticated.sessionHandle)
+                            else -> Unit
+                        }
+                    }
+                    BackHandler {
+                        when (operationsSection) {
+                            OperationsSection.Work -> {
+                                val ready = operationsWorkState as? NativeOperationsWorkState.Ready
+                                if (ready != null &&
+                                    ready.destination != NativeOperationsWorkDestination.Home
+                                ) {
+                                    operationsWorkViewModel.backToHome()
+                                } else {
+                                    leaveToWelcome()
+                                }
+                            }
+                            else -> operationsSection = OperationsSection.Work
+                        }
+                    }
+                    val navigateOps: (OperationsSection) -> Unit = { section ->
+                        when (section) {
+                            OperationsSection.Work -> {
+                                if (operationsSection == OperationsSection.Work) {
+                                    showPreviewNotice("Work is already open.")
+                                } else {
+                                    operationsSection = OperationsSection.Work
+                                }
+                            }
+                            OperationsSection.Deliveries,
+                            OperationsSection.Attendance,
+                            OperationsSection.More,
+                            -> operationsSection = section
+                        }
+                    }
+                    OperationsWorkScreen(
+                        snackbarHostState = snackbarHostState,
+                        identity = authenticated.identity,
+                        state = operationsWorkState,
+                        section = operationsSection,
+                        onRetry = operationsWorkViewModel::refresh,
+                        onOpenReceiveMilk = operationsWorkViewModel::openReceiveMilkPreview,
+                        onOpenMakeYogurt = operationsWorkViewModel::openMakeYogurtPreview,
+                        onOpenRecordSpoilage = operationsWorkViewModel::openRecordSpoilagePreview,
+                        onBackToHome = operationsWorkViewModel::backToHome,
+                        onLeaveConfirmed = { leaveToWelcome() },
+                        onNavigate = navigateOps,
+                    )
+                }
+            } else if (showingCashier) {
                 val authenticated = authenticationState as NativeAuthenticationState.Authenticated
                 // Counter Ledger Cashier surfaces stay on the approved light palette,
                 // matching authentication and the Collect blueprint. System dark mode

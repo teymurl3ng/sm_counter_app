@@ -198,6 +198,93 @@ class NativeFoundationUiTest {
     }
 
     @Test
+    fun operationsWorkHomeShowsPhysicalContext() {
+        openOperationsWork()
+        composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsWorkContext).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavWork).assertIsSelected()
+        composeRule.onNodeWithText("no money", substring = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun operationsNavPreviewDestinationsShowExplicitNotices() {
+        openOperationsWork()
+
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavDeliveries).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesPreview).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithText(
+            "Active deliveries are not connected in this native preview yet.",
+        ).assertIsDisplayed()
+
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavAttendance).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsAttendancePreview).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithText(
+            "My attendance is not connected in this native preview yet.",
+        ).assertIsDisplayed()
+
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavMore).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsMorePreview).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithText(
+            "Operations More is not connected in this native preview yet.",
+        ).assertIsDisplayed()
+
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavWork).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavWork).assertIsSelected()
+    }
+
+    @Test
+    fun operationsReceiveMilkOpensFamilyPreview() {
+        openOperationsWork()
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilk).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkPreview).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithText(
+            "Receive milk entry is next in this Operations family.",
+        ).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsWorkBack).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).fetchSemanticsNode()
+            }.isSuccess
+        }
+    }
+
+    @Test
+    fun operationsWorkHardwareBackEndsSessionLikeSell() {
+        openOperationsWork()
+
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+            activity.onBackPressedDispatcher.onBackPressed()
+            assertNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+
+        composeRule.onNodeWithText("Saaf Milk").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.WelcomeContinue).performClick()
+        waitForText("Who is using Saaf?")
+    }
+
+    @Test
     fun moreMenuHardwareBackReturnsToSellAndKeepsSession() {
         openCashier()
         openMoreMenu()
@@ -621,6 +708,27 @@ class NativeFoundationUiTest {
             .performTextReplacement(SaafMilkTestRunner.TEST_PASSPHRASE)
         composeRule.onNodeWithTag(NativeUiTags.AuthSignIn).performClick()
         waitForText("New sale")
+    }
+
+    private fun openOperationsWork() {
+        openAccountPicker()
+        composeRule.onNodeWithTag(
+            NativeUiTags.authAccount(SaafMilkTestRunner.TEST_OPERATOR_LOGIN),
+        ).performClick()
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput)
+            .performTextReplacement(SaafMilkTestRunner.TEST_OPERATOR_PASSPHRASE)
+        composeRule.onNodeWithTag(NativeUiTags.AuthSignIn).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).assertIsDisplayed()
     }
 
     private fun openMoreMenu() {

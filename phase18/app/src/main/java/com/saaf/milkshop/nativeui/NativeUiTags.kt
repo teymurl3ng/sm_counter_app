@@ -117,6 +117,27 @@ object NativeUiTags {
     const val MoreSecurityRemove = "more_security_remove"
     const val MoreSecurityRemoveConfirm = "more_security_remove_confirm"
 
+    const val OpsWorkRoot = "ops_work_root"
+    const val OpsWorkLoading = "ops_work_loading"
+    const val OpsWorkRetryLoad = "ops_work_retry_load"
+    const val OpsWorkHome = "ops_work_home"
+    const val OpsWorkContext = "ops_work_context"
+    const val OpsWorkClosed = "ops_work_closed"
+    const val OpsWorkBack = "ops_work_back"
+    const val OpsReceiveMilk = "ops_receive_milk"
+    const val OpsMakeYogurt = "ops_make_yogurt"
+    const val OpsRecordSpoilage = "ops_record_spoilage"
+    const val OpsReceiveMilkPreview = "ops_receive_milk_preview"
+    const val OpsMakeYogurtPreview = "ops_make_yogurt_preview"
+    const val OpsRecordSpoilagePreview = "ops_record_spoilage_preview"
+    const val OpsDeliveriesPreview = "ops_deliveries_preview"
+    const val OpsAttendancePreview = "ops_attendance_preview"
+    const val OpsMorePreview = "ops_more_preview"
+    const val OpsNavWork = "ops_nav_work"
+    const val OpsNavDeliveries = "ops_nav_deliveries"
+    const val OpsNavAttendance = "ops_nav_attendance"
+    const val OpsNavMore = "ops_nav_more"
+
     fun cashierProduct(name: String): String = when (name.trim().lowercase()) {
         "milk" -> CashierProductMilk
         "yogurt" -> CashierProductYogurt

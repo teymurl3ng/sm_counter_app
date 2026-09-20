@@ -52,7 +52,22 @@ class SaafMilkTestRunner : AndroidJUnitRunner() {
                         TEST_CASHIER_PASSPHRASE.toCharArray(),
                     )
                 }
+            val operator = app.database.appUserDao().findByLoginName(TEST_OPERATOR_LOGIN)
+                ?: app.userSecurity.beginUserEnrollment(
+                    ownerSession.sessionId,
+                    CreateUserInput(
+                        loginName = TEST_OPERATOR_LOGIN,
+                        displayName = "Instrumentation Operator",
+                        role = AppRole.OPERATOR.wireValue,
+                    ),
+                ).let { pending ->
+                    app.userSecurity.completeUserEnrollment(
+                        pending.enrollmentToken,
+                        TEST_OPERATOR_PASSPHRASE.toCharArray(),
+                    )
+                }
             val cashierSession = app.userSecurity.login(cashier.loginName, TEST_CASHIER_PASSPHRASE.toCharArray())
+            val operatorSession = app.userSecurity.login(operator.loginName, TEST_OPERATOR_PASSPHRASE.toCharArray())
             ensureCustomer(app, "Ahmed Store")
             ensureCustomer(app, "Bilal Dairy Point")
             val quickUnlock = QuickUnlockService(
@@ -67,6 +82,7 @@ class SaafMilkTestRunner : AndroidJUnitRunner() {
             } finally {
                 quickUnlock.close()
                 app.userSecurity.logout(cashierSession.sessionId)
+                app.userSecurity.logout(operatorSession.sessionId)
             }
             app.currentSessionId = ownerSession.sessionId
         }
@@ -81,6 +97,8 @@ class SaafMilkTestRunner : AndroidJUnitRunner() {
         const val TEST_CASHIER_LOGIN = "instrumentation.cashier"
         const val TEST_CASHIER_PASSPHRASE = "instrumentation cashier passphrase 2026"
         const val TEST_CASHIER_PIN = "731406"
+        const val TEST_OPERATOR_LOGIN = "instrumentation.operator"
+        const val TEST_OPERATOR_PASSPHRASE = "instrumentation operator passphrase 2026"
 
         private suspend fun enrollPin(
             quickUnlock: QuickUnlockService,

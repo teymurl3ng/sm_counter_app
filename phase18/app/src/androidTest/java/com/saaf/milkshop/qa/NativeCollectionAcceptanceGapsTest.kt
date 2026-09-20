@@ -13,6 +13,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.assertTextEquals
@@ -160,7 +161,12 @@ class NativeCollectionAcceptanceGapsTest {
         composeRule.onNodeWithTag(NativeUiTags.CollectPaymentSelector)
             .assert(hasText("Bank", substring = true))
         composeRule.onNodeWithTag(NativeUiTags.CollectAmountInput).performTextReplacement("1000")
-        composeRule.onNodeWithTag(NativeUiTags.CollectRecord).performScrollTo().performClick()
+        composeRule.onNodeWithTag(NativeUiTags.CollectRecord).performScrollTo().assertIsEnabled().performClick()
+        composeRule.waitUntil(5_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.CollectSuccess).fetchSemanticsNode()
+            }.isSuccess
+        }
         composeRule.onNodeWithTag(NativeUiTags.CollectSuccess).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.CollectAnother).performClick()
         composeRule.onNodeWithText("Choose customer").assertIsDisplayed()

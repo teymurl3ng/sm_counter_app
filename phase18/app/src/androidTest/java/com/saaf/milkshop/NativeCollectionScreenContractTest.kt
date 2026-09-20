@@ -65,12 +65,29 @@ class NativeCollectionScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.collectCustomer(1L)).assertDoesNotExist()
         composeRule.onNodeWithTag(NativeUiTags.collectCustomer(2L)).performClick()
         assertEquals(2L, selectedCustomerId)
+        composeRule.waitUntil(5_000) {
+            runCatching {
+                composeRule.onNodeWithText("Owes PKR 1,500.00").fetchSemanticsNode()
+            }.isSuccess
+        }
         composeRule.onNodeWithText("Owes PKR 1,500.00").assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.CollectQuick1000).performClick()
+        composeRule.waitUntil(5_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.CollectAmountInput).assertTextEquals("1000")
+                true
+            }.getOrDefault(false)
+        }
         composeRule.onNodeWithTag(NativeUiTags.CollectAmountInput).assertTextEquals("1000")
         composeRule.onNodeWithText("Bilal Dairy Point will owe PKR 500.00").assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.CollectPayFull).performClick()
+        composeRule.waitUntil(5_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.CollectAmountInput).assertTextEquals("1500")
+                true
+            }.getOrDefault(false)
+        }
         composeRule.onNodeWithTag(NativeUiTags.CollectAmountInput).assertTextEquals("1500")
         composeRule.onNodeWithText("Bilal Dairy Point will be paid up").assertIsDisplayed()
 

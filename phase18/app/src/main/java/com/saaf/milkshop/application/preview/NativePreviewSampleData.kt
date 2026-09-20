@@ -8,7 +8,11 @@ import com.saaf.milkshop.application.sale.NativeSaleFacade
 import com.saaf.milkshop.application.sale.NativeSalePaymentKind
 import com.saaf.milkshop.application.sale.NativeSaleRequest
 import com.saaf.milkshop.data.MilkShopDatabase
+import com.saaf.milkshop.domain.AppPermission
+import com.saaf.milkshop.domain.AppRole
+import com.saaf.milkshop.domain.CreateUserInput
 import com.saaf.milkshop.domain.CustomerManagementService
+import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.domain.VendorManagementService
 import com.saaf.milkshop.domain.VendorPurchaseInput
 import com.saaf.milkshop.domain.VendorPurchaseService
@@ -19,9 +23,19 @@ import java.time.LocalDate
  *
  * Uses existing domain and native facades only — no SQL/business-rule changes.
  * Idempotent: sample customers are created once; today's Activity rows are topped
- * up for the signed-in actor when the list is thin.
+ * up for the signed-in actor when the list is thin; a preview Operator account is
+ * enrolled once when the session can manage staff users.
  */
 object NativePreviewSampleData {
+    const val PREVIEW_OWNER_LOGIN = "preview.owner"
+    const val PREVIEW_OWNER_DISPLAY_NAME = "Preview Owner"
+    const val PREVIEW_OWNER_PASSPHRASE = "preview owner passphrase 2026"
+
+    const val PREVIEW_OPERATOR_LOGIN = "preview.operator"
+    const val PREVIEW_OPERATOR_DISPLAY_NAME = "Preview Operator"
+    const val PREVIEW_OPERATOR_PASSPHRASE = "preview operator passphrase 2026"
+    const val PREVIEW_VENDOR_NAME = "Sample · Dawn Dairy"
+
     private val sampleCustomerNames = listOf(
         "Sample · Noor Store",
         "Sample · Ahmed Traders",
@@ -32,20 +46,26 @@ object NativePreviewSampleData {
         val seededCustomers: Boolean,
         val seededStock: Boolean,
         val seededActivityRows: Int,
+        val seededOperator: Boolean,
+        val seededVendor: Boolean = false,
     ) {
         val changed: Boolean
-            get() = seededCustomers || seededStock || seededActivityRows > 0
+            get() = seededCustomers || seededStock || seededActivityRows > 0 ||
+                seededOperator || seededVendor
     }
 
     suspend fun ensureForSession(
         database: MilkShopDatabase,
+        security: UserSecurityService,
         sessionHandle: String,
         saleFacade: NativeSaleFacade,
         collectionFacade: NativeCollectionFacade,
         activityFacade: NativeActivityFacade,
         date: LocalDate = LocalDate.now(),
     ): Result {
+        val seededOperator = ensurePreviewOperator(database, security, sessionHandle)
         val seededCustomers = ensureSampleCustomers(database)
+        val seededVendor = ensureSampleVendor(database)
         val seededStock = ensureMilkStock(database, date)
         val seededActivityRows = ensureTodayActivity(
             sessionHandle = sessionHandle,
@@ -58,7 +78,56 @@ object NativePreviewSampleData {
             seededCustomers = seededCustomers,
             seededStock = seededStock,
             seededActivityRows = seededActivityRows,
+            seededOperator = seededOperator,
+            seededVendor = seededVendor,
         )
+    }
+
+    suspend fun ensureSampleVendor(database: MilkShopDatabase): Boolean {
+        val exists = database.accountDao().findByCategory("Vendor").any {
+            it.name.removePrefix("Vendor: ").trim().equals(PREVIEW_VENDOR_NAME, ignoreCase = true)
+        }
+        if (exists) return false
+        VendorManagementService(database).create(PREVIEW_VENDOR_NAME)
+        return true
+    }
+
+    private suspend fun ensurePreviewOperator(
+        database: MilkShopDatabase,
+        security: UserSecurityService,
+        sessionHandle: String,
+    ): Boolean {
+        val existing = database.appUserDao().findByLoginName(PREVIEW_OPERATOR_LOGIN)
+        if (existing != null &&
+            existing.status == com.saaf.milkshop.domain.UserSecurityService.STATUS_ACTIVE &&
+            !existing.credentialSetupRequired
+        ) {
+            return false
+        }
+        try {
+            security.requirePermission(sessionHandle, AppPermission.MANAGE_STAFF_USERS)
+        } catch (_: Throwable) {
+            return false
+        }
+        val pending = if (existing != null && existing.credentialSetupRequired) {
+            security.resumeUserEnrollment(sessionHandle, existing.userId)
+        } else {
+            security.beginUserEnrollment(
+                sessionHandle,
+                CreateUserInput(
+                    loginName = PREVIEW_OPERATOR_LOGIN,
+                    displayName = PREVIEW_OPERATOR_DISPLAY_NAME,
+                    role = AppRole.OPERATOR.wireValue,
+                ),
+            )
+        }
+        val passphrase = PREVIEW_OPERATOR_PASSPHRASE.toCharArray()
+        try {
+            security.completeUserEnrollment(pending.enrollmentToken, passphrase)
+        } finally {
+            passphrase.fill('\u0000')
+        }
+        return true
     }
 
     private suspend fun ensureSampleCustomers(database: MilkShopDatabase): Boolean {

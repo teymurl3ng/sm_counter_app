@@ -44,7 +44,7 @@ class NativeOperationsWorkScreenContractTest {
     }
 
     @Test
-    fun receiveMilkOpensFamilyPreview() {
+    fun receiveMilkOpensConnectedEntry() {
         var opened = false
         setScreen(
             NativeOperationsWorkState.Ready(context = openContext()),
@@ -55,32 +55,14 @@ class NativeOperationsWorkScreenContractTest {
     }
 
     @Test
-    fun receiveMilkPreviewShowsNextFamilyNotice() {
+    fun makeYogurtOpensConnectedEntry() {
+        var opened = false
         setScreen(
-            NativeOperationsWorkState.Ready(
-                context = openContext(),
-                destination = NativeOperationsWorkDestination.ReceiveMilkPreview,
-            ),
+            NativeOperationsWorkState.Ready(context = openContext()),
+            onOpenMakeYogurt = { opened = true },
         )
-        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkPreview).assertIsDisplayed()
-        composeRule.onNodeWithText(
-            "Receive milk entry is next in this Operations family.",
-        ).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OpsWorkBack).assertIsDisplayed()
-    }
-
-    @Test
-    fun yogurtPreviewShowsNextFamilyNotice() {
-        setScreen(
-            NativeOperationsWorkState.Ready(
-                context = openContext(),
-                destination = NativeOperationsWorkDestination.MakeYogurtPreview,
-            ),
-        )
-        composeRule.onNodeWithTag(NativeUiTags.OpsMakeYogurtPreview).assertIsDisplayed()
-        composeRule.onNodeWithText(
-            "Make yogurt entry is next in this Operations family.",
-        ).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsMakeYogurt).performClick()
+        assertTrue(opened)
     }
 
     @Test
@@ -163,6 +145,7 @@ class NativeOperationsWorkScreenContractTest {
         section: OperationsSection = OperationsSection.Work,
         onRetry: () -> Unit = {},
         onOpenReceiveMilk: () -> Unit = {},
+        onOpenMakeYogurt: () -> Unit = {},
         onNavigate: (OperationsSection) -> Unit = {},
     ) {
         composeRule.setContent {
@@ -174,7 +157,7 @@ class NativeOperationsWorkScreenContractTest {
                     section = section,
                     onRetry = onRetry,
                     onOpenReceiveMilk = onOpenReceiveMilk,
-                    onOpenMakeYogurt = {},
+                    onOpenMakeYogurt = onOpenMakeYogurt,
                     onOpenRecordSpoilage = {},
                     onBackToHome = {},
                     onLeaveConfirmed = {},

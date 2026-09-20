@@ -70,4 +70,4 @@ This is a service-connected authentication, hardened Sale, connected Collect, Ca
 
 ## Next checkpoint
 
-Cashier Sell / Collect / Activity / More and Operations Work home are connected in the debug harness. Next Operations retained screens: Deliveries, Attendance, then Operations More (and entry forms for Receive milk / Make yogurt / Record spoilage). Keep launcher ownership unchanged until the retained native screen families and full regression satisfy the migration gate.
+Cashier Sell / Collect / Activity / More and Operations Work home + Receive milk + Make yogurt are connected in the debug harness. Next Operations retained screens: Record spoilage, Deliveries, Attendance, then Operations More. Keep launcher ownership unchanged until the retained native screen families and full regression satisfy the migration gate.

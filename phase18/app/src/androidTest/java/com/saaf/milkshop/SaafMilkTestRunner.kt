@@ -5,6 +5,7 @@ import androidx.test.runner.AndroidJUnitRunner
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.CreateUserInput
 import com.saaf.milkshop.domain.CustomerManagementService
+import com.saaf.milkshop.domain.VendorManagementService
 import com.saaf.milkshop.quickunlock.AndroidQuickUnlockRecordStore
 import com.saaf.milkshop.quickunlock.DeviceAuthenticationStatus
 import com.saaf.milkshop.quickunlock.DeviceProtectedQuickToken
@@ -70,6 +71,7 @@ class SaafMilkTestRunner : AndroidJUnitRunner() {
             val operatorSession = app.userSecurity.login(operator.loginName, TEST_OPERATOR_PASSPHRASE.toCharArray())
             ensureCustomer(app, "Ahmed Store")
             ensureCustomer(app, "Bilal Dairy Point")
+            ensureVendor(app, "Dawn Dairy Supply")
             val quickUnlock = QuickUnlockService(
                 database = app.database,
                 security = app.userSecurity,
@@ -121,6 +123,13 @@ class SaafMilkTestRunner : AndroidJUnitRunner() {
                 it.name.removePrefix("Customer: ").trim().equals(name, ignoreCase = true)
             }
             if (!exists) CustomerManagementService(app.database).create(name)
+        }
+
+        private suspend fun ensureVendor(app: MilkShopApplication, name: String) {
+            val exists = app.database.accountDao().findByCategory("Vendor").any {
+                it.name.removePrefix("Vendor: ").trim().equals(name, ignoreCase = true)
+            }
+            if (!exists) VendorManagementService(app.database).create(name)
         }
     }
 }

@@ -188,28 +188,32 @@ private fun ReadyWork(
                 }
             }
         }
-        NativeOperationsWorkDestination.ReceiveMilkPreview -> TaskPreview(
-            snackbarHostState = snackbarHostState,
-            identity = identity,
-            context = state.context,
-            title = "Receive milk",
-            message = "Receive milk entry is next in this Operations family.",
-            tag = NativeUiTags.OpsReceiveMilkPreview,
-            onBack = onBackToHome,
-            onNavigate = onNavigate,
-            modifier = modifier,
-        )
-        NativeOperationsWorkDestination.MakeYogurtPreview -> TaskPreview(
-            snackbarHostState = snackbarHostState,
-            identity = identity,
-            context = state.context,
-            title = "Make yogurt",
-            message = "Make yogurt entry is next in this Operations family.",
-            tag = NativeUiTags.OpsMakeYogurtPreview,
-            onBack = onBackToHome,
-            onNavigate = onNavigate,
-            modifier = modifier,
-        )
+        NativeOperationsWorkDestination.ReceiveMilk,
+        NativeOperationsWorkDestination.MakeYogurt,
+        -> {
+            // Hosted by NativePreviewActivity via dedicated entry screens.
+            BackHandler(onBack = onBackToHome)
+            WorkScaffold(snackbarHostState, OperationsSection.Work, onNavigate, modifier) { padding ->
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(24.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    CircularProgressIndicator()
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        if (state.destination == NativeOperationsWorkDestination.MakeYogurt) {
+                            "Opening make yogurt…"
+                        } else {
+                            "Opening receive milk…"
+                        },
+                    )
+                }
+            }
+        }
         NativeOperationsWorkDestination.RecordSpoilagePreview -> TaskPreview(
             snackbarHostState = snackbarHostState,
             identity = identity,
@@ -405,7 +409,7 @@ private fun PreviewDestination(
 }
 
 @Composable
-private fun WorkScaffold(
+internal fun WorkScaffold(
     snackbarHostState: SnackbarHostState,
     section: OperationsSection,
     onNavigate: (OperationsSection) -> Unit,

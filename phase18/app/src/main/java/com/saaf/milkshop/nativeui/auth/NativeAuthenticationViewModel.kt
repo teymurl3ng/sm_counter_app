@@ -93,31 +93,7 @@ class NativeAuthenticationViewModel(
             cancelAccountSwitch()
             return
         }
-        if (pending != null) {
-            _state.value = NativeAuthenticationState.Loading
-            scope.launch {
-                try {
-                    withContext(Dispatchers.IO) { facade.signOut(pending.sessionHandle) }
-                    if (activeSessionHandle == pending.sessionHandle) {
-                        activeSessionHandle = null
-                        onSessionChanged(null)
-                    }
-                    switchReturn = null
-                    _state.value = if (account.hasQuickUnlock) {
-                        NativeAuthenticationState.MethodPicker(account)
-                    } else {
-                        NativeAuthenticationState.Passphrase(account)
-                    }
-                } catch (error: Throwable) {
-                    switchReturn = pending
-                    _state.value = current.copy(
-                        cancelReturnsToSession = true,
-                        error = publicMessage(error),
-                    )
-                }
-            }
-            return
-        }
+        // Keep the current session until a different account actually signs in (or switch is cancelled).
         _state.value = if (account.hasQuickUnlock) {
             NativeAuthenticationState.MethodPicker(account)
         } else {
@@ -152,6 +128,8 @@ class NativeAuthenticationViewModel(
     fun cancelAccountSwitch() {
         val restored = switchReturn ?: return
         switchReturn = null
+        activeSessionHandle = restored.sessionHandle
+        onSessionChanged(restored.sessionHandle)
         _state.value = restored
     }
 
@@ -330,6 +308,82 @@ class NativeAuthenticationViewModel(
         _state.value = NativeAuthenticationState.Authenticated(current.identity, sessionHandle)
     }
 
+    /**
+     * Debug/preview helper: ensure Preview Operator exists (using the current privileged
+     * session when needed), then sign in as that Operator and open Operations Work.
+     */
+    fun openPreviewOperatorWork() {
+        val privileged = activeSessionHandle
+            ?: (_state.value as? NativeAuthenticationState.Authenticated)?.sessionHandle
+            ?: switchReturn?.sessionHandle
+        scope.launch {
+            _state.value = NativeAuthenticationState.Loading
+            try {
+                val session = withContext(Dispatchers.IO) {
+                    ensurePreviewOperatorReady(privileged)
+                    facade.signInPreviewOperator()
+                }
+                acceptSession(session)
+            } catch (error: Throwable) {
+                _state.value = try {
+                    when (val startup = loadStartupState()) {
+                        is NativeAuthenticationState.AccountPicker -> startup.copy(
+                            error = publicMessage(error),
+                        )
+                        is NativeAuthenticationState.OwnerSetup -> startup.copy(
+                            error = publicMessage(error),
+                        )
+                        else -> NativeAuthenticationState.StartupFailure(publicMessage(error))
+                    }
+                } catch (loadError: Throwable) {
+                    NativeAuthenticationState.StartupFailure(publicMessage(loadError))
+                }
+            }
+        }
+    }
+
+    private suspend fun ensurePreviewOperatorReady(privilegedSessionHandle: String?) {
+        val sample = com.saaf.milkshop.application.preview.NativePreviewSampleData
+        val startup = facade.startup()
+        var privilegedHandle = privilegedSessionHandle
+        var temporaryOwnerHandle: String? = null
+        try {
+            if (startup.needsOwnerBootstrap) {
+                val boot = facade.bootstrapOwner(
+                    loginName = sample.PREVIEW_OWNER_LOGIN,
+                    displayName = sample.PREVIEW_OWNER_DISPLAY_NAME,
+                    passphrase = sample.PREVIEW_OWNER_PASSPHRASE.toCharArray(),
+                )
+                privilegedHandle = boot.session.sessionHandle
+                temporaryOwnerHandle = privilegedHandle
+            } else if (privilegedHandle == null) {
+                val ownerAccount = startup.accounts.firstOrNull {
+                    it.loginName == sample.PREVIEW_OWNER_LOGIN
+                }
+                if (ownerAccount != null) {
+                    val ownerSession = runCatching {
+                        facade.signIn(
+                            ownerAccount,
+                            sample.PREVIEW_OWNER_PASSPHRASE.toCharArray(),
+                        )
+                    }.getOrNull()
+                    if (ownerSession != null) {
+                        privilegedHandle = ownerSession.sessionHandle
+                        temporaryOwnerHandle = privilegedHandle
+                    }
+                }
+            }
+            if (privilegedHandle != null) {
+                facade.ensurePreviewOperator(privilegedHandle)
+            }
+            facade.ensurePreviewVendor()
+        } finally {
+            temporaryOwnerHandle?.let { handle ->
+                runCatching { facade.signOut(handle) }
+            }
+        }
+    }
+
     fun leaveAuthenticatedArea() {
         val sessionHandle = activeSessionHandle ?: return
         switchReturn = null
@@ -395,10 +449,32 @@ class NativeAuthenticationViewModel(
     }
 
     private fun acceptSession(session: com.saaf.milkshop.application.authentication.NativeAuthenticatedSession) {
+        val previousSwitch = switchReturn
         switchReturn = null
+        val previousHandle = activeSessionHandle
         activeSessionHandle = session.sessionHandle
         onSessionChanged(session.sessionHandle)
         _state.value = NativeAuthenticationState.Authenticated(session.identity, session.sessionHandle)
+        val staleHandles = buildList {
+            if (previousSwitch != null && previousSwitch.sessionHandle != session.sessionHandle) {
+                add(previousSwitch.sessionHandle)
+            }
+            if (previousHandle != null &&
+                previousHandle != session.sessionHandle &&
+                previousHandle != previousSwitch?.sessionHandle
+            ) {
+                add(previousHandle)
+            }
+        }
+        if (staleHandles.isNotEmpty()) {
+            scope.launch {
+                withContext(Dispatchers.IO) {
+                    staleHandles.forEach { handle ->
+                        runCatching { facade.signOut(handle) }
+                    }
+                }
+            }
+        }
     }
 
     private fun publicMessage(error: Throwable, account: NativeAccountSummary? = null): String = when (error) {

@@ -5,17 +5,26 @@ import com.saaf.milkshop.application.operations.NativeOperationsAttendanceStatus
 import com.saaf.milkshop.application.operations.NativeOperationsWorkFacade
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppRole
+import com.saaf.milkshop.domain.CorrectionInput
+import com.saaf.milkshop.domain.CorrectionService
 import com.saaf.milkshop.domain.CreateUserInput
 import com.saaf.milkshop.domain.UserSecurityService
+import com.saaf.milkshop.domain.VendorManagementService
+import com.saaf.milkshop.domain.VendorPurchaseInput
+import com.saaf.milkshop.domain.VendorPurchaseService
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.time.LocalDate
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @RunWith(AndroidJUnit4::class)
 class NativeOperationsWorkFacadeTest {
@@ -72,9 +81,40 @@ class NativeOperationsWorkFacadeTest {
     }
 
     @Test
+    fun loadUsesEffectivePurchaseNotSupersededOriginal() = runBlocking {
+        val vendorId = VendorManagementService(database).create("Ops Dairy")
+        val purchase = VendorPurchaseService(database).record(
+            VendorPurchaseInput(
+                vendorAccountId = vendorId,
+                occurredAt = DATE.toString(),
+                rawLiters = 40.0,
+                fatPercentage = 4.0,
+                lrReading = 28.0,
+            ),
+        )
+        CorrectionService(database).correct(
+            CorrectionInput.Purchase(
+                originalEventId = purchase.eventId,
+                occurredAt = DATE.toString(),
+                rawLiters = 45.0,
+                fatPercentage = 4.1,
+                lrReading = 28.2,
+            ),
+        )
+        val correction = database.eventDao().findAllDescending().single {
+            it.correctsEventId == purchase.eventId
+        }
+        val context = facade.load(operatorSession, DATE)
+        val expected = runCatching {
+            OffsetDateTime.parse(correction.createdAt).toLocalTime()
+                .format(DateTimeFormatter.ofPattern("h:mm a", Locale.getDefault()))
+        }.getOrElse { correction.createdAt }
+        assertEquals(expected, context.latestReceiptLabel)
+        assertNotEquals(purchase.eventId, correction.eventId)
+    }
+
+    @Test
     fun loadRejectsWhenSessionMissingOperationalPermission() = runBlocking {
-        // Use a session that cannot VIEW_OPERATIONAL — none of the seeded roles lack it,
-        // so revoke by logging out and attempting with a stale handle.
         security.logout(operatorSession)
         val failure = runCatching { facade.load(operatorSession, DATE) }.exceptionOrNull()
         assertTrue(failure != null)

@@ -96,6 +96,63 @@ class NativeAuthenticationFacade(
         security.logout(sessionHandle)
     }
 
+    /**
+     * Creates the debug Preview Operator when missing (or finishes stuck enrollment).
+     * Requires a session that can manage staff users.
+     */
+    suspend fun ensurePreviewOperator(sessionHandle: String): Boolean {
+        val existing = database.appUserDao().findByLoginName(
+            com.saaf.milkshop.application.preview.NativePreviewSampleData.PREVIEW_OPERATOR_LOGIN,
+        )
+        if (existing != null && !existing.credentialSetupRequired &&
+            existing.status == UserSecurityService.STATUS_ACTIVE
+        ) {
+            return false
+        }
+        security.requirePermission(sessionHandle, AppPermission.MANAGE_STAFF_USERS)
+        if (existing != null && existing.credentialSetupRequired) {
+            val pending = security.resumeUserEnrollment(sessionHandle, existing.userId)
+            val passphrase = com.saaf.milkshop.application.preview.NativePreviewSampleData
+                .PREVIEW_OPERATOR_PASSPHRASE.toCharArray()
+            try {
+                security.completeUserEnrollment(pending.enrollmentToken, passphrase)
+            } finally {
+                passphrase.fill('\u0000')
+            }
+            return true
+        }
+        val pending = security.beginUserEnrollment(
+            sessionHandle,
+            com.saaf.milkshop.domain.CreateUserInput(
+                loginName = com.saaf.milkshop.application.preview.NativePreviewSampleData.PREVIEW_OPERATOR_LOGIN,
+                displayName = com.saaf.milkshop.application.preview.NativePreviewSampleData.PREVIEW_OPERATOR_DISPLAY_NAME,
+                role = AppRole.OPERATOR.wireValue,
+            ),
+        )
+        val passphrase = com.saaf.milkshop.application.preview.NativePreviewSampleData
+            .PREVIEW_OPERATOR_PASSPHRASE.toCharArray()
+        try {
+            security.completeUserEnrollment(pending.enrollmentToken, passphrase)
+        } finally {
+            passphrase.fill('\u0000')
+        }
+        return true
+    }
+
+    suspend fun ensurePreviewVendor(): Boolean =
+        com.saaf.milkshop.application.preview.NativePreviewSampleData.ensureSampleVendor(database)
+
+    suspend fun signInPreviewOperator(): NativeAuthenticatedSession {
+        val account = activeAccounts().firstOrNull {
+            it.loginName == com.saaf.milkshop.application.preview.NativePreviewSampleData.PREVIEW_OPERATOR_LOGIN
+        } ?: error(
+            "Preview Operator is missing. Sign in as Owner once so the preview can create it, then try again.",
+        )
+        val passphrase = com.saaf.milkshop.application.preview.NativePreviewSampleData
+            .PREVIEW_OPERATOR_PASSPHRASE.toCharArray()
+        return signIn(account, passphrase)
+    }
+
     private suspend fun activeAccounts(): List<NativeAccountSummary> =
         database.appUserDao().all()
             .asSequence()

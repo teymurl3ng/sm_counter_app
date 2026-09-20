@@ -53,11 +53,13 @@ class NativeOperationsWorkFacade(
                 ?.quantityOnHand
         }
         val todayEvents = database.eventDao().findAllDescending()
-            .filter { it.occurredAt == businessDate && it.correctsEventId == null }
-        val latestReceipt = todayEvents.firstOrNull {
+            .filter { it.occurredAt == businessDate }
+        val supersededIds = todayEvents.mapNotNull { it.correctsEventId }.toSet()
+        val effectiveToday = todayEvents.filter { it.eventId !in supersededIds }
+        val latestReceipt = effectiveToday.firstOrNull {
             it.eventType == VendorPurchaseService.EVENT_TYPE_PURCHASE_RECEIPT
         }
-        val latestProduction = todayEvents.firstOrNull {
+        val latestProduction = effectiveToday.firstOrNull {
             it.eventType == YogurtProductionService.EVENT_TYPE_PRODUCTION
         }
         val activeDeliveryCount = database.deliveryDao().activeDeliveries().count { delivery ->

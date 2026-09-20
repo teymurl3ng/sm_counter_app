@@ -10,6 +10,7 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -19,6 +20,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.printToString
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -250,23 +253,148 @@ class NativeFoundationUiTest {
     }
 
     @Test
-    fun operationsReceiveMilkOpensFamilyPreview() {
+    fun operationsReceiveMilkOpensConnectedEntry() {
         openOperationsWork()
         composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilk).performClick()
         composeRule.waitUntil(10_000) {
             runCatching {
-                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkPreview).fetchSemanticsNode()
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkForm).fetchSemanticsNode()
             }.isSuccess
         }
-        composeRule.onNodeWithText(
-            "Receive milk entry is next in this Operations family.",
-        ).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkReview).assertIsDisplayed()
+        composeRule.onNodeWithText("No money", substring = true).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OpsWorkBack).performClick()
         composeRule.waitUntil(10_000) {
             runCatching {
                 composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).fetchSemanticsNode()
             }.isSuccess
         }
+    }
+
+    @Test
+    fun operationsReceiveMilkRecordsPhysicalReceipt() {
+        openOperationsWork()
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilk).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkSupplier).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkSupplier).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkSupplierPicker).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.waitUntil(10_000) {
+            composeRule.onAllNodesWithText("Dawn", substring = true).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onAllNodesWithText("Dawn", substring = true)[0].performClick()
+        enterReceiveMilkMeasurement(NativeUiTags.OpsReceiveMilkLiters, "25")
+        enterReceiveMilkMeasurement(NativeUiTags.OpsReceiveMilkFat, "4")
+        enterReceiveMilkMeasurement(NativeUiTags.OpsReceiveMilkLr, "28")
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkRecord).performScrollTo()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkRecord).assertIsEnabled()
+                true
+            }.getOrDefault(false)
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkRecord).performClick()
+        composeRule.waitUntil(15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkSuccess).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithText("Milk received").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkAnother).assertIsDisplayed()
+    }
+
+    @Test
+    fun operationsMakeYogurtOpensConnectedEntry() {
+        openOperationsWork()
+        composeRule.onNodeWithTag(NativeUiTags.OpsMakeYogurt).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsMakeYogurtForm).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsMakeYogurtReview).assertIsDisplayed()
+        composeRule.onNodeWithText("No money", substring = true).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsWorkBack).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).fetchSemanticsNode()
+            }.isSuccess
+        }
+    }
+
+    @Test
+    fun operationsMakeYogurtRecordsPhysicalBatch() {
+        openOperationsWork()
+        // Ensure milk stock exists for the conversion.
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilk).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkSupplier).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkSupplier).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkSupplierPicker).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.waitUntil(10_000) {
+            composeRule.onAllNodesWithText("Dawn", substring = true).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeRule.onAllNodesWithText("Dawn", substring = true)[0].performClick()
+        enterReceiveMilkMeasurement(NativeUiTags.OpsReceiveMilkLiters, "40")
+        enterReceiveMilkMeasurement(NativeUiTags.OpsReceiveMilkFat, "4")
+        enterReceiveMilkMeasurement(NativeUiTags.OpsReceiveMilkLr, "28")
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkRecord).performScrollTo()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkRecord).assertIsEnabled()
+                true
+            }.getOrDefault(false)
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkRecord).performClick()
+        composeRule.waitUntil(15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkSuccess).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsWorkBack).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).fetchSemanticsNode()
+            }.isSuccess
+        }
+
+        composeRule.onNodeWithTag(NativeUiTags.OpsMakeYogurt).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsMakeYogurtMilk).fetchSemanticsNode()
+            }.isSuccess
+        }
+        enterReceiveMilkMeasurement(NativeUiTags.OpsMakeYogurtMilk, "20")
+        enterReceiveMilkMeasurement(NativeUiTags.OpsMakeYogurtYogurt, "15")
+        composeRule.onNodeWithTag(NativeUiTags.OpsMakeYogurtRecord).performScrollTo()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsMakeYogurtRecord).assertIsEnabled()
+                true
+            }.getOrDefault(false)
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsMakeYogurtRecord).performClick()
+        composeRule.waitUntil(15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsMakeYogurtSuccess).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithText("Yogurt made").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsMakeYogurtAnother).assertIsDisplayed()
     }
 
     @Test
@@ -729,6 +857,16 @@ class NativeFoundationUiTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).assertIsDisplayed()
+    }
+
+    private fun enterReceiveMilkMeasurement(tag: String, value: String) {
+        val node = composeRule.onNode(
+            hasTestTag(tag) and hasSetTextAction(),
+            useUnmergedTree = true,
+        )
+        node.performScrollTo()
+        node.performTextClearance()
+        node.performTextInput(value)
     }
 
     private fun openMoreMenu() {

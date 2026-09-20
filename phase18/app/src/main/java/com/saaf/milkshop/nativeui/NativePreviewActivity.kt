@@ -27,11 +27,15 @@ import com.saaf.milkshop.application.authentication.NativeAuthenticationFacade
 import com.saaf.milkshop.application.authentication.NativeQuickUnlockFacade
 import com.saaf.milkshop.application.collection.NativeCollectionFacade
 import com.saaf.milkshop.application.more.NativeMoreFacade
+import com.saaf.milkshop.application.operations.NativeMakeYogurtFacade
 import com.saaf.milkshop.application.operations.NativeOperationsWorkFacade
+import com.saaf.milkshop.application.operations.NativeReceiveMilkFacade
 import com.saaf.milkshop.application.preview.NativePreviewSampleData
 import com.saaf.milkshop.application.sale.NativeSaleFacade
 import com.saaf.milkshop.data.MilkShopDatabase
+import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.AppRole
+import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.nativeui.activity.CashierActivityScreen
 import com.saaf.milkshop.nativeui.activity.NativeActivityState
 import com.saaf.milkshop.nativeui.activity.NativeActivityViewModel
@@ -45,11 +49,17 @@ import com.saaf.milkshop.nativeui.more.CashierMoreScreen
 import com.saaf.milkshop.nativeui.more.NativeMoreDestination
 import com.saaf.milkshop.nativeui.more.NativeMoreState
 import com.saaf.milkshop.nativeui.more.NativeMoreViewModel
+import com.saaf.milkshop.nativeui.operations.MakeYogurtScreen
+import com.saaf.milkshop.nativeui.operations.NativeMakeYogurtState
+import com.saaf.milkshop.nativeui.operations.NativeMakeYogurtViewModel
 import com.saaf.milkshop.nativeui.operations.NativeOperationsWorkDestination
 import com.saaf.milkshop.nativeui.operations.NativeOperationsWorkState
 import com.saaf.milkshop.nativeui.operations.NativeOperationsWorkViewModel
+import com.saaf.milkshop.nativeui.operations.NativeReceiveMilkState
+import com.saaf.milkshop.nativeui.operations.NativeReceiveMilkViewModel
 import com.saaf.milkshop.nativeui.operations.OperationsSection
 import com.saaf.milkshop.nativeui.operations.OperationsWorkScreen
+import com.saaf.milkshop.nativeui.operations.ReceiveMilkScreen
 import com.saaf.milkshop.nativeui.sale.CashierSaleScreen
 import com.saaf.milkshop.nativeui.sale.CashierSection
 import com.saaf.milkshop.nativeui.sale.NativeSaleState
@@ -72,6 +82,8 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var activityFacade: NativeActivityFacade
     private lateinit var moreFacade: NativeMoreFacade
     private lateinit var operationsWorkFacade: NativeOperationsWorkFacade
+    private lateinit var receiveMilkFacade: NativeReceiveMilkFacade
+    private lateinit var makeYogurtFacade: NativeMakeYogurtFacade
 
     private val authenticationViewModel by viewModels<NativeAuthenticationViewModel> {
         val app = application as MilkShopApplication
@@ -116,6 +128,20 @@ class NativePreviewActivity : FragmentActivity() {
         )
     }
 
+    private val receiveMilkViewModel by viewModels<NativeReceiveMilkViewModel> {
+        NativeReceiveMilkViewModel.Factory(
+            facade = receiveMilkFacade,
+            onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
+        )
+    }
+
+    private val makeYogurtViewModel by viewModels<NativeMakeYogurtViewModel> {
+        NativeMakeYogurtViewModel.Factory(
+            facade = makeYogurtFacade,
+            onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -134,7 +160,10 @@ class NativePreviewActivity : FragmentActivity() {
         activityFacade = NativeActivityFacade(app.database, app.userSecurity)
         moreFacade = NativeMoreFacade(app.database, app.userSecurity, quickUnlockService)
         operationsWorkFacade = NativeOperationsWorkFacade(app.database, app.userSecurity)
+        receiveMilkFacade = NativeReceiveMilkFacade(app.database, app.userSecurity)
+        makeYogurtFacade = NativeMakeYogurtFacade(app.database, app.userSecurity)
         authenticationViewModel.attachQuickUnlock(quickUnlockFacade)
+        val openOperator = intent.getBooleanExtra(EXTRA_OPEN_OPERATOR, false)
         setContent {
             SaafTheme {
                 val authenticationState by authenticationViewModel.state.collectAsState()
@@ -143,8 +172,11 @@ class NativePreviewActivity : FragmentActivity() {
                 val activityState by activityViewModel.state.collectAsState()
                 val moreState by moreViewModel.state.collectAsState()
                 val operationsWorkState by operationsWorkViewModel.state.collectAsState()
+                val receiveMilkState by receiveMilkViewModel.state.collectAsState()
+                val makeYogurtState by makeYogurtViewModel.state.collectAsState()
                 NativeFoundationPreview(
                     database = app.database,
+                    security = app.userSecurity,
                     saleFacade = saleFacade,
                     collectionFacade = collectionFacade,
                     activityFacade = activityFacade,
@@ -160,9 +192,18 @@ class NativePreviewActivity : FragmentActivity() {
                     moreViewModel = moreViewModel,
                     operationsWorkState = operationsWorkState,
                     operationsWorkViewModel = operationsWorkViewModel,
+                    receiveMilkState = receiveMilkState,
+                    receiveMilkViewModel = receiveMilkViewModel,
+                    makeYogurtState = makeYogurtState,
+                    makeYogurtViewModel = makeYogurtViewModel,
+                    openOperatorOnStart = openOperator,
                 )
             }
         }
+    }
+
+    companion object {
+        const val EXTRA_OPEN_OPERATOR = "open_operator"
     }
 
     override fun onStart() {
@@ -190,6 +231,7 @@ private enum class PreviewDestination { Welcome, Access }
 @Composable
 private fun NativeFoundationPreview(
     database: MilkShopDatabase,
+    security: UserSecurityService,
     saleFacade: NativeSaleFacade,
     collectionFacade: NativeCollectionFacade,
     activityFacade: NativeActivityFacade,
@@ -205,14 +247,67 @@ private fun NativeFoundationPreview(
     moreViewModel: NativeMoreViewModel,
     operationsWorkState: NativeOperationsWorkState,
     operationsWorkViewModel: NativeOperationsWorkViewModel,
+    receiveMilkState: NativeReceiveMilkState,
+    receiveMilkViewModel: NativeReceiveMilkViewModel,
+    makeYogurtState: NativeMakeYogurtState,
+    makeYogurtViewModel: NativeMakeYogurtViewModel,
+    openOperatorOnStart: Boolean = false,
 ) {
-    var destination by rememberSaveable { mutableStateOf(PreviewDestination.Welcome) }
+    var destination by rememberSaveable {
+        mutableStateOf(
+            if (openOperatorOnStart) PreviewDestination.Access else PreviewDestination.Welcome,
+        )
+    }
     var cashierSection by rememberSaveable { mutableStateOf(CashierSection.Sell) }
     var operationsSection by rememberSaveable { mutableStateOf(OperationsSection.Work) }
     var activityReturnSection by rememberSaveable { mutableStateOf(CashierSection.Sell.name) }
+    var wantOperator by rememberSaveable { mutableStateOf(openOperatorOnStart) }
+    var operatorSwitchInFlight by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val sellNotice = stringResource(R.string.native_nav_sell_notice)
+
+    androidx.compose.runtime.LaunchedEffect(authenticationState, wantOperator) {
+        if (!wantOperator || operatorSwitchInFlight) return@LaunchedEffect
+        when (val state = authenticationState) {
+            is NativeAuthenticationState.Authenticated -> {
+                if (state.identity.role == AppRole.OPERATOR) {
+                    wantOperator = false
+                    destination = PreviewDestination.Access
+                    return@LaunchedEffect
+                }
+                operatorSwitchInFlight = true
+                authenticationViewModel.openPreviewOperatorWork()
+            }
+            is NativeAuthenticationState.AccountPicker,
+            is NativeAuthenticationState.OwnerSetup,
+            -> {
+                operatorSwitchInFlight = true
+                authenticationViewModel.openPreviewOperatorWork()
+            }
+            is NativeAuthenticationState.Loading -> Unit
+            is NativeAuthenticationState.RecoveryCode -> {
+                authenticationViewModel.acknowledgeRecoveryCode()
+            }
+            else -> {
+                operatorSwitchInFlight = false
+            }
+        }
+    }
+
+    androidx.compose.runtime.LaunchedEffect(authenticationState) {
+        if (authenticationState is NativeAuthenticationState.Authenticated &&
+            authenticationState.identity.role == AppRole.OPERATOR
+        ) {
+            operatorSwitchInFlight = false
+            wantOperator = false
+        }
+        val failedPicker = authenticationState as? NativeAuthenticationState.AccountPicker
+        val failedOwner = authenticationState as? NativeAuthenticationState.OwnerSetup
+        if (failedPicker?.error != null || failedOwner?.error != null) {
+            operatorSwitchInFlight = false
+        }
+    }
 
     fun showPreviewNotice(message: String) {
         coroutineScope.launch {
@@ -234,6 +329,8 @@ private fun NativeFoundationPreview(
     fun leaveToWelcome() {
         closeCashierShell()
         operationsWorkViewModel.close()
+        receiveMilkViewModel.close()
+        makeYogurtViewModel.close()
         authenticationViewModel.leaveAuthenticatedArea()
         destination = PreviewDestination.Welcome
         cashierSection = CashierSection.Sell
@@ -243,6 +340,8 @@ private fun NativeFoundationPreview(
     fun leaveToAccountPicker() {
         closeCashierShell()
         operationsWorkViewModel.close()
+        receiveMilkViewModel.close()
+        makeYogurtViewModel.close()
         authenticationViewModel.beginAccountSwitch()
         destination = PreviewDestination.Access
     }
@@ -256,7 +355,11 @@ private fun NativeFoundationPreview(
 
     androidx.compose.runtime.LaunchedEffect(showingCashier, showingOperator) {
         if (!showingCashier) closeCashierShell()
-        if (!showingOperator) operationsWorkViewModel.close()
+        if (!showingOperator) {
+            operationsWorkViewModel.close()
+            receiveMilkViewModel.close()
+            makeYogurtViewModel.close()
+        }
     }
 
     SystemBarAppearance(
@@ -288,16 +391,56 @@ private fun NativeFoundationPreview(
                         when (operationsSection) {
                             OperationsSection.Work ->
                                 operationsWorkViewModel.open(authenticated.sessionHandle)
-                            else -> Unit
+                            else -> {
+                                receiveMilkViewModel.close()
+                                makeYogurtViewModel.close()
+                                operationsWorkViewModel.backToHome()
+                            }
                         }
                     }
-                    BackHandler {
+                    androidx.compose.runtime.LaunchedEffect(
+                        authenticated.sessionHandle,
+                        operationsSection,
+                        (operationsWorkState as? NativeOperationsWorkState.Ready)?.destination,
+                    ) {
+                        val destination =
+                            (operationsWorkState as? NativeOperationsWorkState.Ready)?.destination
+                        when {
+                            operationsSection != OperationsSection.Work -> {
+                                receiveMilkViewModel.close()
+                                makeYogurtViewModel.close()
+                            }
+                            destination == NativeOperationsWorkDestination.ReceiveMilk -> {
+                                makeYogurtViewModel.close()
+                                receiveMilkViewModel.open(authenticated.sessionHandle)
+                            }
+                            destination == NativeOperationsWorkDestination.MakeYogurt -> {
+                                receiveMilkViewModel.close()
+                                makeYogurtViewModel.open(authenticated.sessionHandle)
+                            }
+                            destination != null -> {
+                                receiveMilkViewModel.close()
+                                makeYogurtViewModel.close()
+                            }
+                        }
+                    }
+                    val workDestination =
+                        (operationsWorkState as? NativeOperationsWorkState.Ready)?.destination
+                    BackHandler(
+                        enabled = operationsSection != OperationsSection.Work ||
+                            (
+                                workDestination != NativeOperationsWorkDestination.ReceiveMilk &&
+                                    workDestination != NativeOperationsWorkDestination.MakeYogurt
+                                ),
+                    ) {
                         when (operationsSection) {
                             OperationsSection.Work -> {
                                 val ready = operationsWorkState as? NativeOperationsWorkState.Ready
                                 if (ready != null &&
                                     ready.destination != NativeOperationsWorkDestination.Home
                                 ) {
+                                    receiveMilkViewModel.close()
+                                    makeYogurtViewModel.close()
                                     operationsWorkViewModel.backToHome()
                                 } else {
                                     leaveToWelcome()
@@ -318,22 +461,74 @@ private fun NativeFoundationPreview(
                             OperationsSection.Deliveries,
                             OperationsSection.Attendance,
                             OperationsSection.More,
-                            -> operationsSection = section
+                            -> {
+                                receiveMilkViewModel.close()
+                                makeYogurtViewModel.close()
+                                operationsWorkViewModel.backToHome()
+                                operationsSection = section
+                            }
                         }
                     }
-                    OperationsWorkScreen(
-                        snackbarHostState = snackbarHostState,
-                        identity = authenticated.identity,
-                        state = operationsWorkState,
-                        section = operationsSection,
-                        onRetry = operationsWorkViewModel::refresh,
-                        onOpenReceiveMilk = operationsWorkViewModel::openReceiveMilkPreview,
-                        onOpenMakeYogurt = operationsWorkViewModel::openMakeYogurtPreview,
-                        onOpenRecordSpoilage = operationsWorkViewModel::openRecordSpoilagePreview,
-                        onBackToHome = operationsWorkViewModel::backToHome,
-                        onLeaveConfirmed = { leaveToWelcome() },
-                        onNavigate = navigateOps,
-                    )
+                    val workReady = operationsWorkState as? NativeOperationsWorkState.Ready
+                    when {
+                        operationsSection == OperationsSection.Work &&
+                            workReady?.destination == NativeOperationsWorkDestination.ReceiveMilk -> {
+                            ReceiveMilkScreen(
+                                snackbarHostState = snackbarHostState,
+                                identity = authenticated.identity,
+                                state = receiveMilkState,
+                                onRetry = receiveMilkViewModel::refresh,
+                                onSelectVendor = receiveMilkViewModel::selectVendor,
+                                onOpenVendorPicker = receiveMilkViewModel::openVendorPicker,
+                                onCloseVendorPicker = receiveMilkViewModel::closeVendorPicker,
+                                onPreview = receiveMilkViewModel::preview,
+                                onRecord = receiveMilkViewModel::record,
+                                onReceiveAnother = receiveMilkViewModel::receiveAnother,
+                                onBackToHome = {
+                                    receiveMilkViewModel.close()
+                                    operationsWorkViewModel.backToHome()
+                                },
+                                onNavigate = navigateOps,
+                            )
+                        }
+                        operationsSection == OperationsSection.Work &&
+                            workReady?.destination == NativeOperationsWorkDestination.MakeYogurt -> {
+                            MakeYogurtScreen(
+                                snackbarHostState = snackbarHostState,
+                                identity = authenticated.identity,
+                                state = makeYogurtState,
+                                onRetry = makeYogurtViewModel::refresh,
+                                onRecord = makeYogurtViewModel::record,
+                                onMakeAnother = makeYogurtViewModel::makeAnother,
+                                onBackToHome = {
+                                    makeYogurtViewModel.close()
+                                    operationsWorkViewModel.backToHome()
+                                },
+                                onNavigate = navigateOps,
+                            )
+                        }
+                        else -> {
+                            OperationsWorkScreen(
+                                snackbarHostState = snackbarHostState,
+                                identity = authenticated.identity,
+                                state = operationsWorkState,
+                                section = operationsSection,
+                                onRetry = operationsWorkViewModel::refresh,
+                                onOpenReceiveMilk = {
+                                    operationsWorkViewModel.openReceiveMilk()
+                                    receiveMilkViewModel.open(authenticated.sessionHandle)
+                                },
+                                onOpenMakeYogurt = {
+                                    operationsWorkViewModel.openMakeYogurt()
+                                    makeYogurtViewModel.open(authenticated.sessionHandle)
+                                },
+                                onOpenRecordSpoilage = operationsWorkViewModel::openRecordSpoilagePreview,
+                                onBackToHome = operationsWorkViewModel::backToHome,
+                                onLeaveConfirmed = { leaveToWelcome() },
+                                onNavigate = navigateOps,
+                            )
+                        }
+                    }
                 }
             } else if (showingCashier) {
                 val authenticated = authenticationState as NativeAuthenticationState.Authenticated
@@ -352,6 +547,7 @@ private fun NativeFoundationPreview(
                         val sample = runCatching {
                             NativePreviewSampleData.ensureForSession(
                                 database = database,
+                                security = security,
                                 sessionHandle = authenticated.sessionHandle,
                                 saleFacade = saleFacade,
                                 collectionFacade = collectionFacade,
@@ -359,7 +555,14 @@ private fun NativeFoundationPreview(
                             )
                         }.getOrNull()
                         sampleReady = true
-                        if (sample?.changed == true) {
+                        if (sample?.seededOperator == true) {
+                            snackbarHostState.showSnackbar(
+                                message = "Operator ready: ${NativePreviewSampleData.PREVIEW_OPERATOR_DISPLAY_NAME} " +
+                                    "(${NativePreviewSampleData.PREVIEW_OPERATOR_LOGIN}). " +
+                                    "More → Switch account, then full passphrase.",
+                                duration = SnackbarDuration.Long,
+                            )
+                        } else if (sample?.changed == true) {
                             snackbarHostState.showSnackbar(
                                 message = "Sample shop data ready for Sell, Collect, and Activity.",
                                 duration = SnackbarDuration.Short,

@@ -19,8 +19,8 @@ enum class OperationsSection { Work, Deliveries, Attendance, More }
 
 enum class NativeOperationsWorkDestination {
     Home,
-    ReceiveMilkPreview,
-    MakeYogurtPreview,
+    ReceiveMilk,
+    MakeYogurt,
     RecordSpoilagePreview,
 }
 
@@ -45,6 +45,11 @@ class NativeOperationsWorkViewModel(
     val state: StateFlow<NativeOperationsWorkState> = _state.asStateFlow()
 
     fun open(nextSessionHandle: String) {
+        if (sessionHandle == nextSessionHandle &&
+            _state.value is NativeOperationsWorkState.Ready
+        ) {
+            return
+        }
         sessionHandle = nextSessionHandle
         refresh()
     }
@@ -56,27 +61,33 @@ class NativeOperationsWorkViewModel(
 
     fun refresh() {
         val session = sessionHandle ?: return
+        val previousDestination =
+            (_state.value as? NativeOperationsWorkState.Ready)?.destination
+                ?: NativeOperationsWorkDestination.Home
         _state.value = NativeOperationsWorkState.Loading
         scope.launch {
             try {
                 val context = withContext(Dispatchers.IO) { facade.load(session) }
-                _state.value = NativeOperationsWorkState.Ready(context = context)
+                _state.value = NativeOperationsWorkState.Ready(
+                    context = context,
+                    destination = previousDestination,
+                )
             } catch (error: Throwable) {
                 handleLoadFailure(error)
             }
         }
     }
 
-    fun openReceiveMilkPreview() = openPreview(NativeOperationsWorkDestination.ReceiveMilkPreview)
-    fun openMakeYogurtPreview() = openPreview(NativeOperationsWorkDestination.MakeYogurtPreview)
-    fun openRecordSpoilagePreview() = openPreview(NativeOperationsWorkDestination.RecordSpoilagePreview)
+    fun openReceiveMilk() = openDestination(NativeOperationsWorkDestination.ReceiveMilk)
+    fun openMakeYogurt() = openDestination(NativeOperationsWorkDestination.MakeYogurt)
+    fun openRecordSpoilagePreview() = openDestination(NativeOperationsWorkDestination.RecordSpoilagePreview)
 
     fun backToHome() {
         val current = _state.value as? NativeOperationsWorkState.Ready ?: return
         _state.value = current.copy(destination = NativeOperationsWorkDestination.Home, error = null)
     }
 
-    private fun openPreview(destination: NativeOperationsWorkDestination) {
+    private fun openDestination(destination: NativeOperationsWorkDestination) {
         val current = _state.value as? NativeOperationsWorkState.Ready ?: return
         _state.value = current.copy(destination = destination, error = null)
     }

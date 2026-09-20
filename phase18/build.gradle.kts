@@ -101,6 +101,18 @@ val screenClassMap = mapOf(
         "com.saaf.milkshop.NativeFoundationUiTest#operationsRecordSpoilageOpensConnectedEntry",
         "com.saaf.milkshop.NativeFoundationUiTest#operationsRecordSpoilageRecordsPhysicalLoss",
     ),
+    "deliveries" to listOf(
+        "com.saaf.milkshop.NativeDeliveriesFacadeTest",
+        "com.saaf.milkshop.NativeDeliveriesScreenContractTest",
+        "com.saaf.milkshop.NativeFoundationUiTest#operationsDeliveriesOpensConnectedEntry",
+        "com.saaf.milkshop.NativeFoundationUiTest#operationsDeliveriesMarksPhysicalDelivery",
+    ),
+    "attendance" to listOf(
+        "com.saaf.milkshop.NativeAttendanceFacadeTest",
+        "com.saaf.milkshop.NativeAttendanceScreenContractTest",
+        "com.saaf.milkshop.NativeFoundationUiTest#operationsAttendanceOpensConnectedEntry",
+        "com.saaf.milkshop.NativeFoundationUiTest#operationsAttendanceMarksPresent",
+    ),
 )
 
 // Apply connected-test filter/sandbox via rootProject.extra (setProjectProperties is not
@@ -114,11 +126,12 @@ if (wantsQaScreen || wantsQaCheckpoint) {
             screenClassMap.getValue("collect") + screenClassMap.getValue("activity") +
             screenClassMap.getValue("more") + screenClassMap.getValue("work") +
             screenClassMap.getValue("receive") + screenClassMap.getValue("yogurt") +
-            screenClassMap.getValue("spoilage"))
+            screenClassMap.getValue("spoilage") + screenClassMap.getValue("deliveries") +
+            screenClassMap.getValue("attendance"))
             .distinct()
     } else {
         val screen = qaScreenName.lowercase()
-        require(screen.isNotEmpty()) { "qaScreen requires -Pqa.screen=auth|sale|collect|activity|more|work|receive|yogurt|spoilage" }
+        require(screen.isNotEmpty()) { "qaScreen requires -Pqa.screen=auth|sale|collect|activity|more|work|receive|yogurt|spoilage|deliveries|attendance" }
         require(screenClassMap.containsKey(screen)) {
             "Unknown qa.screen='$qaScreenName'. Valid: ${screenClassMap.keys.sorted()}"
         }
@@ -213,13 +226,13 @@ val qaFast by tasks.registering {
 
 val qaScreen by tasks.registering {
     group = "qa"
-    description = "Device acceptance for one native screen: -Pqa.screen=auth|sale|collect|activity|more|work|receive|yogurt|spoilage (no nested Gradle)."
+    description = "Device acceptance for one native screen: -Pqa.screen=auth|sale|collect|activity|more|work|receive|yogurt|spoilage|deliveries|attendance (no nested Gradle)."
     dependsOn(checkUiOnly, checkNativeInventory, devicePreflight, ":app:connectedDebugAndroidTest")
     doFirst {
         val screen = qaScreenName.lowercase()
         if (screen.isEmpty()) {
             println("QA_SCREEN[]: FAIL")
-            throw GradleException("qaScreen requires -Pqa.screen=auth|sale|collect|activity|more|work|receive|yogurt|spoilage")
+            throw GradleException("qaScreen requires -Pqa.screen=auth|sale|collect|activity|more|work|receive|yogurt|spoilage|deliveries|attendance")
         }
         if (!screenClassMap.containsKey(screen)) {
             println("QA_SCREEN[$screen]: FAIL")

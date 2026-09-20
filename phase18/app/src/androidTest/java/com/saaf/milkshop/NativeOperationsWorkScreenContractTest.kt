@@ -76,31 +76,25 @@ class NativeOperationsWorkScreenContractTest {
     }
 
     @Test
-    fun deliveriesNavShowsExplicitPreviewNotice() {
+    fun deliveriesNavOpensConnectedEntry() {
         var navigated: OperationsSection? = null
         setScreen(
             NativeOperationsWorkState.Ready(context = openContext()),
-            section = OperationsSection.Deliveries,
             onNavigate = { navigated = it },
         )
-        composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesPreview).assertIsDisplayed()
-        composeRule.onNodeWithText(
-            "Active deliveries are not connected in this native preview yet.",
-        ).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OpsNavWork).performClick()
-        assertEquals(OperationsSection.Work, navigated)
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavDeliveries).performClick()
+        assertEquals(OperationsSection.Deliveries, navigated)
     }
 
     @Test
-    fun attendanceNavShowsExplicitPreviewNotice() {
+    fun attendanceNavOpensConnectedEntry() {
+        var navigated: OperationsSection? = null
         setScreen(
             NativeOperationsWorkState.Ready(context = openContext()),
-            section = OperationsSection.Attendance,
+            onNavigate = { navigated = it },
         )
-        composeRule.onNodeWithTag(NativeUiTags.OpsAttendancePreview).assertIsDisplayed()
-        composeRule.onNodeWithText(
-            "My attendance is not connected in this native preview yet.",
-        ).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavAttendance).performClick()
+        assertEquals(OperationsSection.Attendance, navigated)
     }
 
     @Test

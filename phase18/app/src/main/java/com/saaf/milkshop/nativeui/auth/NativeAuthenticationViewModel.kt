@@ -377,6 +377,7 @@ class NativeAuthenticationViewModel(
                 facade.ensurePreviewOperator(privilegedHandle)
             }
             facade.ensurePreviewVendor()
+            facade.ensurePreviewOperatorEmployeeLink()
         } finally {
             temporaryOwnerHandle?.let { handle ->
                 runCatching { facade.signOut(handle) }

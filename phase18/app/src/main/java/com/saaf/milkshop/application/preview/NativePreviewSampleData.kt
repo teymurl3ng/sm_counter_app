@@ -12,6 +12,7 @@ import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.CreateUserInput
 import com.saaf.milkshop.domain.CustomerManagementService
+import com.saaf.milkshop.domain.EmployeeManagementService
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.domain.VendorManagementService
 import com.saaf.milkshop.domain.VendorPurchaseInput
@@ -87,8 +88,62 @@ object NativePreviewSampleData {
         val exists = database.accountDao().findByCategory("Vendor").any {
             it.name.removePrefix("Vendor: ").trim().equals(PREVIEW_VENDOR_NAME, ignoreCase = true)
         }
-        if (exists) return false
+        if (exists) {
+            ensureSamplePendingDeliveries(database)
+            return false
+        }
         VendorManagementService(database).create(PREVIEW_VENDOR_NAME)
+        ensureSamplePendingDeliveries(database)
+        return true
+    }
+
+    /**
+     * Links an Operator account to a Salary employee so My attendance can Mark present.
+     */
+    suspend fun ensurePreviewOperatorEmployeeLink(
+        database: MilkShopDatabase,
+        loginName: String = PREVIEW_OPERATOR_LOGIN,
+    ): Boolean {
+        val user = database.appUserDao().findByLoginName(loginName) ?: return false
+        if (user.employeeAccountId != null) return false
+        val employeeName = when (loginName) {
+            PREVIEW_OPERATOR_LOGIN -> "Preview Operator Staff"
+            else -> "Staff · ${user.displayName}"
+        }
+        val existing = database.accountDao().findByCategory("Salary").firstOrNull {
+            it.name.removePrefix("Employee: ").trim().equals(employeeName, ignoreCase = true)
+        }
+        val employeeId = existing?.accountId
+            ?: EmployeeManagementService(database).create(employeeName)
+        database.appUserDao().update(user.copy(employeeAccountId = employeeId))
+        return true
+    }
+
+    /**
+     * Seeds one pending Active delivery when none exist, so Operators can try Mark delivered.
+     */
+    suspend fun ensureSamplePendingDeliveries(
+        database: MilkShopDatabase,
+        date: LocalDate = LocalDate.now(),
+    ): Boolean {
+        val hasPending = database.deliveryDao().activeDeliveries().any { delivery ->
+            database.deliveryDao().latestStatus(delivery.deliveryId)?.status ==
+                com.saaf.milkshop.domain.DeliveryService.STATUS_PENDING
+        }
+        if (hasPending) return false
+        ensureSampleCustomers(database)
+        val customer = database.accountDao().findByCategory("Customer").firstOrNull() ?: return false
+        val milk = database.productDao().findByName("Milk") ?: return false
+        com.saaf.milkshop.domain.DeliveryService(database).create(
+            com.saaf.milkshop.domain.DeliveryInput(
+                customerAccountId = customer.accountId,
+                productId = milk.productId,
+                quantity = 5.0,
+                route = "Sample · Morning route",
+                businessDate = date.toString(),
+                notes = "Preview sample delivery",
+            ),
+        )
         return true
     }
 

@@ -111,28 +111,40 @@ fun OperationsWorkScreen(
                 modifier = modifier,
             )
         }
-        OperationsSection.Deliveries -> PreviewDestination(
-            snackbarHostState = snackbarHostState,
-            identity = identity,
-            section = section,
-            title = "Deliveries",
-            message = "Active deliveries are not connected in this native preview yet.",
-            tag = NativeUiTags.OpsDeliveriesPreview,
-            onNavigate = onNavigate,
-            onLeaveConfirmed = onLeaveConfirmed,
-            modifier = modifier,
-        )
-        OperationsSection.Attendance -> PreviewDestination(
-            snackbarHostState = snackbarHostState,
-            identity = identity,
-            section = section,
-            title = "Attendance",
-            message = "My attendance is not connected in this native preview yet.",
-            tag = NativeUiTags.OpsAttendancePreview,
-            onNavigate = onNavigate,
-            onLeaveConfirmed = onLeaveConfirmed,
-            modifier = modifier,
-        )
+        OperationsSection.Deliveries -> {
+            // Hosted by NativePreviewActivity via DeliveriesScreen.
+            WorkScaffold(snackbarHostState, section, onNavigate, modifier) { padding ->
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(24.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    CircularProgressIndicator()
+                    Spacer(Modifier.height(12.dp))
+                    Text("Opening deliveries…")
+                }
+            }
+        }
+        OperationsSection.Attendance -> {
+            // Hosted by NativePreviewActivity via AttendanceScreen.
+            WorkScaffold(snackbarHostState, section, onNavigate, modifier) { padding ->
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(24.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    CircularProgressIndicator()
+                    Spacer(Modifier.height(12.dp))
+                    Text("Opening attendance…")
+                }
+            }
+        }
         OperationsSection.More -> PreviewDestination(
             snackbarHostState = snackbarHostState,
             identity = identity,

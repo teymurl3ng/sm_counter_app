@@ -216,22 +216,18 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithTag(NativeUiTags.OpsNavDeliveries).performClick()
         composeRule.waitUntil(10_000) {
             runCatching {
-                composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesPreview).fetchSemanticsNode()
+                composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesRoot).fetchSemanticsNode()
             }.isSuccess
         }
-        composeRule.onNodeWithText(
-            "Active deliveries are not connected in this native preview yet.",
-        ).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavDeliveries).assertIsSelected()
 
         composeRule.onNodeWithTag(NativeUiTags.OpsNavAttendance).performClick()
         composeRule.waitUntil(10_000) {
             runCatching {
-                composeRule.onNodeWithTag(NativeUiTags.OpsAttendancePreview).fetchSemanticsNode()
+                composeRule.onNodeWithTag(NativeUiTags.OpsAttendanceRoot).fetchSemanticsNode()
             }.isSuccess
         }
-        composeRule.onNodeWithText(
-            "My attendance is not connected in this native preview yet.",
-        ).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavAttendance).assertIsSelected()
 
         composeRule.onNodeWithTag(NativeUiTags.OpsNavMore).performClick()
         composeRule.waitUntil(10_000) {
@@ -250,6 +246,103 @@ class NativeFoundationUiTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OpsNavWork).assertIsSelected()
+    }
+
+    @Test
+    fun operationsAttendanceOpensConnectedEntry() {
+        openOperationsWork()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavAttendance).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsAttendanceRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavAttendance).assertIsSelected()
+    }
+
+    @Test
+    fun operationsAttendanceMarksPresent() {
+        openOperationsWork()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            val app = activity.application as MilkShopApplication
+            kotlinx.coroutines.runBlocking {
+                com.saaf.milkshop.application.preview.NativePreviewSampleData
+                    .ensurePreviewOperatorEmployeeLink(
+                        app.database,
+                        loginName = SaafMilkTestRunner.TEST_OPERATOR_LOGIN,
+                    )
+            }
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavAttendance).performClick()
+        composeRule.waitUntil(15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsAttendanceRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.waitUntil(15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsAttendanceMarkPresent).fetchSemanticsNode()
+            }.isSuccess ||
+                runCatching {
+                    composeRule.onNodeWithTag(NativeUiTags.OpsAttendanceMarked).fetchSemanticsNode()
+                }.isSuccess
+        }
+        if (runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsAttendanceMarkPresent).fetchSemanticsNode()
+            }.isSuccess
+        ) {
+            composeRule.onNodeWithTag(NativeUiTags.OpsAttendanceMarkPresent).performClick()
+        }
+        composeRule.waitUntil(15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsAttendanceMarked).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithText("Today:", substring = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun operationsDeliveriesOpensConnectedEntry() {
+        openOperationsWork()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavDeliveries).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavDeliveries).assertIsSelected()
+    }
+
+    @Test
+    fun operationsDeliveriesMarksPhysicalDelivery() {
+        openOperationsWork()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            val app = activity.application as MilkShopApplication
+            kotlinx.coroutines.runBlocking {
+                com.saaf.milkshop.application.preview.NativePreviewSampleData
+                    .ensureSamplePendingDeliveries(app.database)
+            }
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavDeliveries).performClick()
+        composeRule.waitUntil(15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.waitUntil(15_000) {
+            runCatching {
+                composeRule.onAllNodesWithText("Delivered", substring = false)
+                    .fetchSemanticsNodes()
+                    .isNotEmpty()
+            }.getOrDefault(false)
+        }
+        composeRule.onAllNodesWithText("Delivered", substring = false)[0].performClick()
+        composeRule.waitUntil(15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesSuccess).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithText("Marked delivered", substring = true).assertIsDisplayed()
     }
 
     @Test

@@ -142,6 +142,10 @@ class NativeAuthenticationFacade(
     suspend fun ensurePreviewVendor(): Boolean =
         com.saaf.milkshop.application.preview.NativePreviewSampleData.ensureSampleVendor(database)
 
+    suspend fun ensurePreviewOperatorEmployeeLink(): Boolean =
+        com.saaf.milkshop.application.preview.NativePreviewSampleData
+            .ensurePreviewOperatorEmployeeLink(database)
+
     suspend fun signInPreviewOperator(): NativeAuthenticatedSession {
         val account = activeAccounts().firstOrNull {
             it.loginName == com.saaf.milkshop.application.preview.NativePreviewSampleData.PREVIEW_OPERATOR_LOGIN

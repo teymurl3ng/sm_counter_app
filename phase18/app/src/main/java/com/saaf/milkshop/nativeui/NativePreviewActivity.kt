@@ -27,6 +27,8 @@ import com.saaf.milkshop.application.authentication.NativeAuthenticationFacade
 import com.saaf.milkshop.application.authentication.NativeQuickUnlockFacade
 import com.saaf.milkshop.application.collection.NativeCollectionFacade
 import com.saaf.milkshop.application.more.NativeMoreFacade
+import com.saaf.milkshop.application.operations.NativeAttendanceFacade
+import com.saaf.milkshop.application.operations.NativeDeliveriesFacade
 import com.saaf.milkshop.application.operations.NativeMakeYogurtFacade
 import com.saaf.milkshop.application.operations.NativeOperationsWorkFacade
 import com.saaf.milkshop.application.operations.NativeReceiveMilkFacade
@@ -50,7 +52,13 @@ import com.saaf.milkshop.nativeui.more.CashierMoreScreen
 import com.saaf.milkshop.nativeui.more.NativeMoreDestination
 import com.saaf.milkshop.nativeui.more.NativeMoreState
 import com.saaf.milkshop.nativeui.more.NativeMoreViewModel
+import com.saaf.milkshop.nativeui.operations.AttendanceScreen
+import com.saaf.milkshop.nativeui.operations.DeliveriesScreen
 import com.saaf.milkshop.nativeui.operations.MakeYogurtScreen
+import com.saaf.milkshop.nativeui.operations.NativeAttendanceState
+import com.saaf.milkshop.nativeui.operations.NativeAttendanceViewModel
+import com.saaf.milkshop.nativeui.operations.NativeDeliveriesState
+import com.saaf.milkshop.nativeui.operations.NativeDeliveriesViewModel
 import com.saaf.milkshop.nativeui.operations.NativeMakeYogurtState
 import com.saaf.milkshop.nativeui.operations.NativeMakeYogurtViewModel
 import com.saaf.milkshop.nativeui.operations.NativeOperationsWorkDestination
@@ -89,6 +97,8 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var receiveMilkFacade: NativeReceiveMilkFacade
     private lateinit var makeYogurtFacade: NativeMakeYogurtFacade
     private lateinit var recordSpoilageFacade: NativeRecordSpoilageFacade
+    private lateinit var deliveriesFacade: NativeDeliveriesFacade
+    private lateinit var attendanceFacade: NativeAttendanceFacade
 
     private val authenticationViewModel by viewModels<NativeAuthenticationViewModel> {
         val app = application as MilkShopApplication
@@ -154,6 +164,20 @@ class NativePreviewActivity : FragmentActivity() {
         )
     }
 
+    private val deliveriesViewModel by viewModels<NativeDeliveriesViewModel> {
+        NativeDeliveriesViewModel.Factory(
+            facade = deliveriesFacade,
+            onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
+        )
+    }
+
+    private val attendanceViewModel by viewModels<NativeAttendanceViewModel> {
+        NativeAttendanceViewModel.Factory(
+            facade = attendanceFacade,
+            onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -175,6 +199,8 @@ class NativePreviewActivity : FragmentActivity() {
         receiveMilkFacade = NativeReceiveMilkFacade(app.database, app.userSecurity)
         makeYogurtFacade = NativeMakeYogurtFacade(app.database, app.userSecurity)
         recordSpoilageFacade = NativeRecordSpoilageFacade(app.database, app.userSecurity)
+        deliveriesFacade = NativeDeliveriesFacade(app.database, app.userSecurity)
+        attendanceFacade = NativeAttendanceFacade(app.database, app.userSecurity)
         authenticationViewModel.attachQuickUnlock(quickUnlockFacade)
         val openOperator = intent.getBooleanExtra(EXTRA_OPEN_OPERATOR, false)
         setContent {
@@ -188,6 +214,8 @@ class NativePreviewActivity : FragmentActivity() {
                 val receiveMilkState by receiveMilkViewModel.state.collectAsState()
                 val makeYogurtState by makeYogurtViewModel.state.collectAsState()
                 val recordSpoilageState by recordSpoilageViewModel.state.collectAsState()
+                val deliveriesState by deliveriesViewModel.state.collectAsState()
+                val attendanceState by attendanceViewModel.state.collectAsState()
                 NativeFoundationPreview(
                     database = app.database,
                     security = app.userSecurity,
@@ -212,6 +240,10 @@ class NativePreviewActivity : FragmentActivity() {
                     makeYogurtViewModel = makeYogurtViewModel,
                     recordSpoilageState = recordSpoilageState,
                     recordSpoilageViewModel = recordSpoilageViewModel,
+                    deliveriesState = deliveriesState,
+                    deliveriesViewModel = deliveriesViewModel,
+                    attendanceState = attendanceState,
+                    attendanceViewModel = attendanceViewModel,
                     openOperatorOnStart = openOperator,
                 )
             }
@@ -269,6 +301,10 @@ private fun NativeFoundationPreview(
     makeYogurtViewModel: NativeMakeYogurtViewModel,
     recordSpoilageState: NativeRecordSpoilageState,
     recordSpoilageViewModel: NativeRecordSpoilageViewModel,
+    deliveriesState: NativeDeliveriesState,
+    deliveriesViewModel: NativeDeliveriesViewModel,
+    attendanceState: NativeAttendanceState,
+    attendanceViewModel: NativeAttendanceViewModel,
     openOperatorOnStart: Boolean = false,
 ) {
     var destination by rememberSaveable {
@@ -349,6 +385,9 @@ private fun NativeFoundationPreview(
         operationsWorkViewModel.close()
         receiveMilkViewModel.close()
         makeYogurtViewModel.close()
+        recordSpoilageViewModel.close()
+        deliveriesViewModel.close()
+        attendanceViewModel.close()
         authenticationViewModel.leaveAuthenticatedArea()
         destination = PreviewDestination.Welcome
         cashierSection = CashierSection.Sell
@@ -360,6 +399,9 @@ private fun NativeFoundationPreview(
         operationsWorkViewModel.close()
         receiveMilkViewModel.close()
         makeYogurtViewModel.close()
+        recordSpoilageViewModel.close()
+        deliveriesViewModel.close()
+        attendanceViewModel.close()
         authenticationViewModel.beginAccountSwitch()
         destination = PreviewDestination.Access
     }
@@ -377,6 +419,9 @@ private fun NativeFoundationPreview(
             operationsWorkViewModel.close()
             receiveMilkViewModel.close()
             makeYogurtViewModel.close()
+            recordSpoilageViewModel.close()
+            deliveriesViewModel.close()
+            attendanceViewModel.close()
         }
     }
 
@@ -407,11 +452,33 @@ private fun NativeFoundationPreview(
                         operationsSection,
                     ) {
                         when (operationsSection) {
-                            OperationsSection.Work ->
+                            OperationsSection.Work -> {
+                                deliveriesViewModel.close()
+                                attendanceViewModel.close()
                                 operationsWorkViewModel.open(authenticated.sessionHandle)
+                            }
+                            OperationsSection.Deliveries -> {
+                                receiveMilkViewModel.close()
+                                makeYogurtViewModel.close()
+                                recordSpoilageViewModel.close()
+                                attendanceViewModel.close()
+                                operationsWorkViewModel.backToHome()
+                                deliveriesViewModel.open(authenticated.sessionHandle)
+                            }
+                            OperationsSection.Attendance -> {
+                                receiveMilkViewModel.close()
+                                makeYogurtViewModel.close()
+                                recordSpoilageViewModel.close()
+                                deliveriesViewModel.close()
+                                operationsWorkViewModel.backToHome()
+                                attendanceViewModel.open(authenticated.sessionHandle)
+                            }
                             else -> {
                                 receiveMilkViewModel.close()
                                 makeYogurtViewModel.close()
+                                recordSpoilageViewModel.close()
+                                deliveriesViewModel.close()
+                                attendanceViewModel.close()
                                 operationsWorkViewModel.backToHome()
                             }
                         }
@@ -494,6 +561,12 @@ private fun NativeFoundationPreview(
                                 receiveMilkViewModel.close()
                                 makeYogurtViewModel.close()
                                 recordSpoilageViewModel.close()
+                                if (section != OperationsSection.Deliveries) {
+                                    deliveriesViewModel.close()
+                                }
+                                if (section != OperationsSection.Attendance) {
+                                    attendanceViewModel.close()
+                                }
                                 operationsWorkViewModel.backToHome()
                                 operationsSection = section
                             }
@@ -501,6 +574,28 @@ private fun NativeFoundationPreview(
                     }
                     val workReady = operationsWorkState as? NativeOperationsWorkState.Ready
                     when {
+                        operationsSection == OperationsSection.Deliveries -> {
+                            DeliveriesScreen(
+                                snackbarHostState = snackbarHostState,
+                                identity = authenticated.identity,
+                                state = deliveriesState,
+                                onRetry = deliveriesViewModel::refresh,
+                                onMarkDelivered = deliveriesViewModel::markDelivered,
+                                onNavigate = navigateOps,
+                                onLeaveConfirmed = { leaveToWelcome() },
+                            )
+                        }
+                        operationsSection == OperationsSection.Attendance -> {
+                            AttendanceScreen(
+                                snackbarHostState = snackbarHostState,
+                                identity = authenticated.identity,
+                                state = attendanceState,
+                                onRetry = attendanceViewModel::refresh,
+                                onMarkPresent = attendanceViewModel::markPresent,
+                                onNavigate = navigateOps,
+                                onLeaveConfirmed = { leaveToWelcome() },
+                            )
+                        }
                         operationsSection == OperationsSection.Work &&
                             workReady?.destination == NativeOperationsWorkDestination.ReceiveMilk -> {
                             ReceiveMilkScreen(

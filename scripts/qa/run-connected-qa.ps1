@@ -1,7 +1,7 @@
 # Run isolated connected instrumentation for one screen or the full checkpoint set.
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet("auth", "sale", "collect", "activity", "checkpoint")]
+    [ValidateSet("auth", "sale", "collect", "activity", "more", "checkpoint")]
     [string]$Screen,
     [string]$Serial = "",
     [string]$Phase18Dir = ""
@@ -39,10 +39,18 @@ $map = @{
         "com.saaf.milkshop.NativeFoundationUiTest#everyBottomDestinationProvidesItsDefinedPreviewResponse",
         "com.saaf.milkshop.NativeFoundationUiTest#collectPaymentWritesRoomShowsReceiptAndOffersTheNextVisibleActions"
     )
+    more = @(
+        "com.saaf.milkshop.NativeMoreFacadeTest",
+        "com.saaf.milkshop.NativeMoreScreenContractTest",
+        "com.saaf.milkshop.NativeFoundationUiTest#everyBottomDestinationProvidesItsDefinedPreviewResponse",
+        "com.saaf.milkshop.NativeFoundationUiTest#moreMenuHardwareBackReturnsToSellAndKeepsSession",
+        "com.saaf.milkshop.NativeFoundationUiTest#switchAccountHardwareBackKeepsSessionAndReturnsToMore",
+        "com.saaf.milkshop.NativeFoundationUiTest#switchAccountUiBackKeepsSessionAndReturnsToMore"
+    )
 }
 
 if ($Screen -eq "checkpoint") {
-    $classes = @($map.auth + $map.sale + $map.collect + $map.activity | Select-Object -Unique)
+    $classes = @($map.auth + $map.sale + $map.collect + $map.activity + $map.more | Select-Object -Unique)
 } else {
     $classes = @($map[$Screen])
 }

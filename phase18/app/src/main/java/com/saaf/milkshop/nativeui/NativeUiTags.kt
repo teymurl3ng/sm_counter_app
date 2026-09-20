@@ -93,6 +93,30 @@ object NativeUiTags {
 
     fun activityRecord(eventId: Long): String = "activity_record_$eventId"
 
+    const val MoreRoot = "more_root"
+    const val MoreLoading = "more_loading"
+    const val MoreRetryLoad = "more_retry_load"
+    const val MoreMenu = "more_menu"
+    const val MoreCountCash = "more_count_cash"
+    const val MorePersonalSecurity = "more_personal_security"
+    const val MoreSwitchAccount = "more_switch_account"
+    const val MoreSignOut = "more_sign_out"
+    const val MoreBack = "more_back"
+    const val MoreError = "more_error"
+    const val MoreCountCashScreen = "more_count_cash_screen"
+    const val MoreCountAmount = "more_count_amount"
+    const val MoreCountNotes = "more_count_notes"
+    const val MoreCountRecord = "more_count_record"
+    const val MoreCountSuccess = "more_count_success"
+    const val MoreSecurityScreen = "more_security_screen"
+    const val MoreSecurityStatus = "more_security_status"
+    const val MoreSecurityPassphrase = "more_security_passphrase"
+    const val MoreSecurityPin = "more_security_pin"
+    const val MoreSecurityEnrollPin = "more_security_enroll_pin"
+    const val MoreSecurityEnrollPhone = "more_security_enroll_phone"
+    const val MoreSecurityRemove = "more_security_remove"
+    const val MoreSecurityRemoveConfirm = "more_security_remove_confirm"
+
     fun cashierProduct(name: String): String = when (name.trim().lowercase()) {
         "milk" -> CashierProductMilk
         "yogurt" -> CashierProductYogurt

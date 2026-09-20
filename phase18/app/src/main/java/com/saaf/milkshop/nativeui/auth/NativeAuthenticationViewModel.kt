@@ -26,6 +26,8 @@ sealed interface NativeAuthenticationState {
     data class AccountPicker(
         val accounts: List<NativeAccountSummary>,
         val error: String? = null,
+        /** True when opened from Cashier More → Switch account; Back restores the session. */
+        val cancelReturnsToSession: Boolean = false,
     ) : NativeAuthenticationState
     data class Passphrase(
         val account: NativeAccountSummary,
@@ -60,6 +62,7 @@ class NativeAuthenticationViewModel(
     private val _state = MutableStateFlow<NativeAuthenticationState>(NativeAuthenticationState.Loading)
     private var activeSessionHandle: String? = null
     private var quickUnlock: NativeQuickUnlockFacade? = null
+    private var switchReturn: NativeAuthenticationState.Authenticated? = null
     val state: StateFlow<NativeAuthenticationState> = _state.asStateFlow()
 
     fun attachQuickUnlock(facade: NativeQuickUnlockFacade) {
@@ -85,6 +88,36 @@ class NativeAuthenticationViewModel(
     fun selectAccount(account: NativeAccountSummary) {
         val current = _state.value as? NativeAuthenticationState.AccountPicker ?: return
         if (account !in current.accounts) return
+        val pending = switchReturn
+        if (pending != null && account.userId == pending.identity.userId) {
+            cancelAccountSwitch()
+            return
+        }
+        if (pending != null) {
+            _state.value = NativeAuthenticationState.Loading
+            scope.launch {
+                try {
+                    withContext(Dispatchers.IO) { facade.signOut(pending.sessionHandle) }
+                    if (activeSessionHandle == pending.sessionHandle) {
+                        activeSessionHandle = null
+                        onSessionChanged(null)
+                    }
+                    switchReturn = null
+                    _state.value = if (account.hasQuickUnlock) {
+                        NativeAuthenticationState.MethodPicker(account)
+                    } else {
+                        NativeAuthenticationState.Passphrase(account)
+                    }
+                } catch (error: Throwable) {
+                    switchReturn = pending
+                    _state.value = current.copy(
+                        cancelReturnsToSession = true,
+                        error = publicMessage(error),
+                    )
+                }
+            }
+            return
+        }
         _state.value = if (account.hasQuickUnlock) {
             NativeAuthenticationState.MethodPicker(account)
         } else {
@@ -92,10 +125,48 @@ class NativeAuthenticationViewModel(
         }
     }
 
+    fun beginAccountSwitch() {
+        val current = _state.value as? NativeAuthenticationState.Authenticated ?: return
+        switchReturn = current
+        _state.value = NativeAuthenticationState.Loading
+        scope.launch {
+            try {
+                when (val startup = loadStartupState()) {
+                    is NativeAuthenticationState.AccountPicker -> {
+                        _state.value = startup.copy(cancelReturnsToSession = true)
+                    }
+                    else -> {
+                        switchReturn = null
+                        _state.value = startup
+                    }
+                }
+            } catch (error: Throwable) {
+                val restored = switchReturn
+                switchReturn = null
+                _state.value = restored
+                    ?: NativeAuthenticationState.StartupFailure(publicMessage(error))
+            }
+        }
+    }
+
+    fun cancelAccountSwitch() {
+        val restored = switchReturn ?: return
+        switchReturn = null
+        _state.value = restored
+    }
+
+    fun isAccountSwitchPending(): Boolean = switchReturn != null
+
     fun chooseAnotherAccount() {
+        val keepSwitch = switchReturn != null
         scope.launch {
             _state.value = try {
-                loadStartupState()
+                val startup = loadStartupState()
+                if (keepSwitch && startup is NativeAuthenticationState.AccountPicker) {
+                    startup.copy(cancelReturnsToSession = true)
+                } else {
+                    startup
+                }
             } catch (error: Throwable) {
                 NativeAuthenticationState.StartupFailure(publicMessage(error))
             }
@@ -261,6 +332,7 @@ class NativeAuthenticationViewModel(
 
     fun leaveAuthenticatedArea() {
         val sessionHandle = activeSessionHandle ?: return
+        switchReturn = null
         activeSessionHandle = null
         onSessionChanged(null)
         _state.value = NativeAuthenticationState.Loading
@@ -323,6 +395,7 @@ class NativeAuthenticationViewModel(
     }
 
     private fun acceptSession(session: com.saaf.milkshop.application.authentication.NativeAuthenticatedSession) {
+        switchReturn = null
         activeSessionHandle = session.sessionHandle
         onSessionChanged(session.sessionHandle)
         _state.value = NativeAuthenticationState.Authenticated(session.identity, session.sessionHandle)

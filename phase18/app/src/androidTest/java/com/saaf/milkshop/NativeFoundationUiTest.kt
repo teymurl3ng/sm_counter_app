@@ -198,6 +198,66 @@ class NativeFoundationUiTest {
     }
 
     @Test
+    fun moreMenuHardwareBackReturnsToSellAndKeepsSession() {
+        openCashier()
+        openMoreMenu()
+
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+            activity.onBackPressedDispatcher.onBackPressed()
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavSell).assertIsSelected()
+        composeRule.onNodeWithTag(NativeUiTags.MoreMenu).assertDoesNotExist()
+    }
+
+    @Test
+    fun switchAccountHardwareBackKeepsSessionAndReturnsToMore() {
+        openCashier()
+        openMoreMenu()
+        openSwitchAccountPicker()
+
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+            activity.onBackPressedDispatcher.onBackPressed()
+            assertNotNull(
+                (activity.application as MilkShopApplication).currentSessionId,
+                "Hardware Back on Switch account must cancel the switch, not sign out.",
+            )
+        }
+
+        waitForMoreMenu()
+        composeRule.onNodeWithTag(NativeUiTags.MoreMenu).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertIsSelected()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
+    fun switchAccountUiBackKeepsSessionAndReturnsToMore() {
+        openCashier()
+        openMoreMenu()
+        openSwitchAccountPicker()
+
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AuthBackToWelcome).performClick()
+
+        waitForMoreMenu()
+        composeRule.onNodeWithTag(NativeUiTags.MoreMenu).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertIsSelected()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull(
+                (activity.application as MilkShopApplication).currentSessionId,
+                "UI Back on Switch account must cancel the switch, not sign out.",
+            )
+        }
+    }
+
+    @Test
     fun productButtonsSwitchProductRateUnitAndCalculatedEffects() {
         openCashier()
         val milkRate = retailRate(SettingKeys.RETAIL_RATE_MILK)
@@ -385,10 +445,18 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithTag(NativeUiTags.CashierNavActivity).performClick()
         waitForText("Today’s activity")
         composeRule.onNodeWithTag(NativeUiTags.CashierNavActivity).assertIsSelected()
-        composeRule.onNodeWithTag(NativeUiTags.ActivityEmpty).assertIsDisplayed()
+        composeRule.waitUntil(15_000) {
+            runCatching { composeRule.onNodeWithTag(NativeUiTags.ActivityEmpty).fetchSemanticsNode() }.isSuccess ||
+                runCatching { composeRule.onNodeWithTag(NativeUiTags.ActivityList).fetchSemanticsNode() }.isSuccess
+        }
 
         composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).performClick()
-        composeRule.onNodeWithText("More is not connected in this native preview yet.").assertIsDisplayed()
+        composeRule.waitUntil(15_000) {
+            runCatching { composeRule.onNodeWithTag(NativeUiTags.MoreMenu).fetchSemanticsNode() }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertIsSelected()
+        composeRule.onNodeWithTag(NativeUiTags.MoreMenu).assertIsDisplayed()
+        composeRule.onNodeWithText("More is not connected in this native preview yet.").assertDoesNotExist()
 
         composeRule.onNodeWithTag(NativeUiTags.CashierNavSell).performClick()
         waitForText("New sale")
@@ -553,6 +621,22 @@ class NativeFoundationUiTest {
             .performTextReplacement(SaafMilkTestRunner.TEST_PASSPHRASE)
         composeRule.onNodeWithTag(NativeUiTags.AuthSignIn).performClick()
         waitForText("New sale")
+    }
+
+    private fun openMoreMenu() {
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).performClick()
+        waitForMoreMenu()
+    }
+
+    private fun waitForMoreMenu() {
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching { composeRule.onNodeWithTag(NativeUiTags.MoreMenu).fetchSemanticsNode() }.isSuccess
+        }
+    }
+
+    private fun openSwitchAccountPicker() {
+        composeRule.onNodeWithTag(NativeUiTags.MoreSwitchAccount).performClick()
+        waitForText("Switch account")
     }
 
     private fun openAccountPicker() {

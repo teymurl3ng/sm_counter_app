@@ -26,7 +26,10 @@ import com.saaf.milkshop.application.activity.NativeActivityFacade
 import com.saaf.milkshop.application.authentication.NativeAuthenticationFacade
 import com.saaf.milkshop.application.authentication.NativeQuickUnlockFacade
 import com.saaf.milkshop.application.collection.NativeCollectionFacade
+import com.saaf.milkshop.application.more.NativeMoreFacade
+import com.saaf.milkshop.application.preview.NativePreviewSampleData
 import com.saaf.milkshop.application.sale.NativeSaleFacade
+import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.nativeui.activity.CashierActivityScreen
 import com.saaf.milkshop.nativeui.activity.NativeActivityState
 import com.saaf.milkshop.nativeui.activity.NativeActivityViewModel
@@ -36,6 +39,10 @@ import com.saaf.milkshop.nativeui.auth.NativeAuthenticationViewModel
 import com.saaf.milkshop.nativeui.collection.CashierCollectionScreen
 import com.saaf.milkshop.nativeui.collection.NativeCollectionState
 import com.saaf.milkshop.nativeui.collection.NativeCollectionViewModel
+import com.saaf.milkshop.nativeui.more.CashierMoreScreen
+import com.saaf.milkshop.nativeui.more.NativeMoreDestination
+import com.saaf.milkshop.nativeui.more.NativeMoreState
+import com.saaf.milkshop.nativeui.more.NativeMoreViewModel
 import com.saaf.milkshop.nativeui.sale.CashierSaleScreen
 import com.saaf.milkshop.nativeui.sale.CashierSection
 import com.saaf.milkshop.nativeui.sale.NativeSaleState
@@ -56,6 +63,7 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var saleFacade: NativeSaleFacade
     private lateinit var collectionFacade: NativeCollectionFacade
     private lateinit var activityFacade: NativeActivityFacade
+    private lateinit var moreFacade: NativeMoreFacade
 
     private val authenticationViewModel by viewModels<NativeAuthenticationViewModel> {
         val app = application as MilkShopApplication
@@ -86,6 +94,13 @@ class NativePreviewActivity : FragmentActivity() {
         )
     }
 
+    private val moreViewModel by viewModels<NativeMoreViewModel> {
+        NativeMoreViewModel.Factory(
+            facade = moreFacade,
+            onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -102,6 +117,7 @@ class NativePreviewActivity : FragmentActivity() {
         saleFacade = NativeSaleFacade(app.database, app.userSecurity)
         collectionFacade = NativeCollectionFacade(app.database, app.userSecurity)
         activityFacade = NativeActivityFacade(app.database, app.userSecurity)
+        moreFacade = NativeMoreFacade(app.database, app.userSecurity, quickUnlockService)
         authenticationViewModel.attachQuickUnlock(quickUnlockFacade)
         setContent {
             SaafTheme {
@@ -109,7 +125,12 @@ class NativePreviewActivity : FragmentActivity() {
                 val saleState by saleViewModel.state.collectAsState()
                 val collectionState by collectionViewModel.state.collectAsState()
                 val activityState by activityViewModel.state.collectAsState()
+                val moreState by moreViewModel.state.collectAsState()
                 NativeFoundationPreview(
+                    database = app.database,
+                    saleFacade = saleFacade,
+                    collectionFacade = collectionFacade,
+                    activityFacade = activityFacade,
                     authenticationState = authenticationState,
                     authenticationViewModel = authenticationViewModel,
                     saleState = saleState,
@@ -118,6 +139,8 @@ class NativePreviewActivity : FragmentActivity() {
                     collectionViewModel = collectionViewModel,
                     activityState = activityState,
                     activityViewModel = activityViewModel,
+                    moreState = moreState,
+                    moreViewModel = moreViewModel,
                 )
             }
         }
@@ -147,6 +170,10 @@ private enum class PreviewDestination { Welcome, Access }
 
 @Composable
 private fun NativeFoundationPreview(
+    database: MilkShopDatabase,
+    saleFacade: NativeSaleFacade,
+    collectionFacade: NativeCollectionFacade,
+    activityFacade: NativeActivityFacade,
     authenticationState: NativeAuthenticationState,
     authenticationViewModel: NativeAuthenticationViewModel,
     saleState: NativeSaleState,
@@ -155,6 +182,8 @@ private fun NativeFoundationPreview(
     collectionViewModel: NativeCollectionViewModel,
     activityState: NativeActivityState,
     activityViewModel: NativeActivityViewModel,
+    moreState: NativeMoreState,
+    moreViewModel: NativeMoreViewModel,
 ) {
     var destination by rememberSaveable { mutableStateOf(PreviewDestination.Welcome) }
     var cashierSection by rememberSaveable { mutableStateOf(CashierSection.Sell) }
@@ -162,7 +191,6 @@ private fun NativeFoundationPreview(
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val sellNotice = stringResource(R.string.native_nav_sell_notice)
-    val moreNotice = stringResource(R.string.native_nav_more_notice)
 
     fun showPreviewNotice(message: String) {
         coroutineScope.launch {
@@ -174,15 +202,35 @@ private fun NativeFoundationPreview(
         }
     }
 
+    fun leaveToWelcome() {
+        saleViewModel.close()
+        collectionViewModel.close()
+        activityViewModel.close()
+        moreViewModel.close()
+        authenticationViewModel.leaveAuthenticatedArea()
+        destination = PreviewDestination.Welcome
+        cashierSection = CashierSection.Sell
+    }
+
+    fun leaveToAccountPicker() {
+        saleViewModel.close()
+        collectionViewModel.close()
+        activityViewModel.close()
+        moreViewModel.close()
+        authenticationViewModel.beginAccountSwitch()
+        destination = PreviewDestination.Access
+    }
+
     val showingCashier = destination == PreviewDestination.Access &&
         authenticationState is NativeAuthenticationState.Authenticated
 
     androidx.compose.runtime.LaunchedEffect(showingCashier) {
         if (!showingCashier) {
-            cashierSection = CashierSection.Sell
+            // Keep cashierSection so Switch-account → Back can reopen More (or the prior tab).
             saleViewModel.close()
             collectionViewModel.close()
             activityViewModel.close()
+            moreViewModel.close()
         }
     }
 
@@ -204,13 +252,42 @@ private fun NativeFoundationPreview(
                 // matching authentication and the Collect blueprint. System dark mode
                 // must not invert Sell/Collect into a Material night theme.
                 SaafTheme(darkTheme = false) {
-                    androidx.compose.runtime.LaunchedEffect(authenticated.sessionHandle, cashierSection) {
+                    var sampleReady by remember(authenticated.sessionHandle) { mutableStateOf(false) }
+                    var lastCashierSession by rememberSaveable { mutableStateOf<String?>(null) }
+                    androidx.compose.runtime.LaunchedEffect(authenticated.sessionHandle) {
+                        if (lastCashierSession != null && lastCashierSession != authenticated.sessionHandle) {
+                            cashierSection = CashierSection.Sell
+                        }
+                        lastCashierSession = authenticated.sessionHandle
+                        sampleReady = false
+                        val sample = runCatching {
+                            NativePreviewSampleData.ensureForSession(
+                                database = database,
+                                sessionHandle = authenticated.sessionHandle,
+                                saleFacade = saleFacade,
+                                collectionFacade = collectionFacade,
+                                activityFacade = activityFacade,
+                            )
+                        }.getOrNull()
+                        sampleReady = true
+                        if (sample?.changed == true) {
+                            snackbarHostState.showSnackbar(
+                                message = "Sample shop data ready for Sell, Collect, and Activity.",
+                                duration = SnackbarDuration.Short,
+                            )
+                        }
+                    }
+                    androidx.compose.runtime.LaunchedEffect(
+                        authenticated.sessionHandle,
+                        cashierSection,
+                        sampleReady,
+                    ) {
+                        if (!sampleReady) return@LaunchedEffect
                         when (cashierSection) {
                             CashierSection.Sell -> saleViewModel.open(authenticated.sessionHandle)
                             CashierSection.Collect -> collectionViewModel.open(authenticated.sessionHandle)
-                            CashierSection.Activity,
-                            CashierSection.More,
-                            -> Unit
+                            CashierSection.Activity -> Unit
+                            CashierSection.More -> moreViewModel.open(authenticated.sessionHandle)
                         }
                     }
                     BackHandler {
@@ -232,13 +309,16 @@ private fun NativeFoundationPreview(
                                     }
                                 }
                             }
-                            else -> {
-                                saleViewModel.close()
-                                collectionViewModel.close()
-                                activityViewModel.close()
-                                authenticationViewModel.leaveAuthenticatedArea()
-                                destination = PreviewDestination.Welcome
+                            CashierSection.More -> {
+                                val ready = moreState as? NativeMoreState.Ready
+                                if (ready != null && ready.destination != NativeMoreDestination.Menu) {
+                                    moreViewModel.backToMenu()
+                                } else {
+                                    moreViewModel.close()
+                                    cashierSection = CashierSection.Sell
+                                }
                             }
+                            else -> leaveToWelcome()
                         }
                     }
                     val navigateCashier: (CashierSection) -> Unit = { section ->
@@ -263,7 +343,14 @@ private fun NativeFoundationPreview(
                                     cashierSection = CashierSection.Activity
                                 }
                             }
-                            CashierSection.More -> showPreviewNotice(moreNotice)
+                            CashierSection.More -> {
+                                if (cashierSection == CashierSection.More) {
+                                    showPreviewNotice("More is already open.")
+                                } else {
+                                    moreViewModel.open(authenticated.sessionHandle)
+                                    cashierSection = CashierSection.More
+                                }
+                            }
                         }
                     }
                     when (cashierSection) {
@@ -274,13 +361,7 @@ private fun NativeFoundationPreview(
                             onRetry = saleViewModel::refresh,
                             onClearFeedback = saleViewModel::clearFeedback,
                             onRecordSale = saleViewModel::record,
-                            onLeaveConfirmed = {
-                                saleViewModel.close()
-                                collectionViewModel.close()
-                                activityViewModel.close()
-                                authenticationViewModel.leaveAuthenticatedArea()
-                                destination = PreviewDestination.Welcome
-                            },
+                            onLeaveConfirmed = { leaveToWelcome() },
                             onNavigate = navigateCashier,
                         )
                         CashierSection.Collect -> CashierCollectionScreen(
@@ -323,11 +404,35 @@ private fun NativeFoundationPreview(
                             },
                             onNavigate = navigateCashier,
                         )
-                        CashierSection.More -> Unit
+                        CashierSection.More -> CashierMoreScreen(
+                            snackbarHostState = snackbarHostState,
+                            identity = authenticated.identity,
+                            state = moreState,
+                            onRetry = moreViewModel::refresh,
+                            onOpenCountCash = moreViewModel::openCountCash,
+                            onOpenPersonalSecurity = moreViewModel::openPersonalSecurity,
+                            onBackToMenu = moreViewModel::backToMenu,
+                            onRecordCashCount = moreViewModel::recordCashCount,
+                            onRequestRemoveQuickUnlock = moreViewModel::requestRemoveQuickUnlock,
+                            onCancelRemoveQuickUnlock = moreViewModel::cancelRemoveQuickUnlock,
+                            onRemoveQuickUnlock = moreViewModel::removeQuickUnlock,
+                            onEnrollQuickPin = moreViewModel::enrollQuickPin,
+                            onEnrollPhoneSecurity = moreViewModel::enrollPhoneSecurity,
+                            onSwitchAccount = { leaveToAccountPicker() },
+                            onSignOut = { leaveToWelcome() },
+                            onNavigate = navigateCashier,
+                        )
                     }
                 }
             } else {
                 when (authenticationState) {
+                    is NativeAuthenticationState.AccountPicker -> BackHandler {
+                        if (authenticationState.cancelReturnsToSession) {
+                            authenticationViewModel.cancelAccountSwitch()
+                        } else {
+                            destination = PreviewDestination.Welcome
+                        }
+                    }
                     is NativeAuthenticationState.MethodPicker -> BackHandler {
                         authenticationViewModel.chooseAnotherAccount()
                     }
@@ -338,12 +443,25 @@ private fun NativeFoundationPreview(
                         authenticationViewModel.backFromPassphrase()
                     }
                     is NativeAuthenticationState.RecoveryCode -> BackHandler(enabled = true) {}
-                    else -> BackHandler { destination = PreviewDestination.Welcome }
+                    else -> BackHandler {
+                        if (authenticationViewModel.isAccountSwitchPending()) {
+                            authenticationViewModel.cancelAccountSwitch()
+                        } else {
+                            destination = PreviewDestination.Welcome
+                        }
+                    }
                 }
                 NativeAuthenticationHost(
                     state = authenticationState,
                     onRetry = authenticationViewModel::refreshStartup,
-                    onBackToWelcome = { destination = PreviewDestination.Welcome },
+                    onBackToWelcome = {
+                        val picker = authenticationState as? NativeAuthenticationState.AccountPicker
+                        if (picker?.cancelReturnsToSession == true) {
+                            authenticationViewModel.cancelAccountSwitch()
+                        } else {
+                            destination = PreviewDestination.Welcome
+                        }
+                    },
                     onSelectAccount = authenticationViewModel::selectAccount,
                     onChooseAnotherAccount = authenticationViewModel::chooseAnotherAccount,
                     onBackFromPassphrase = authenticationViewModel::backFromPassphrase,

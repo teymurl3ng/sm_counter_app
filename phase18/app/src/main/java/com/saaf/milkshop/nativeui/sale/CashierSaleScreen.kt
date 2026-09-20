@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -97,8 +99,6 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import java.util.Locale
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 private enum class EntryMode { Quantity, Amount }
 private enum class PaymentChoice { PaidNow, CustomerAccount }
@@ -211,6 +211,7 @@ private fun CashierSaleContent(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             CashierNavigation(selected = CashierSection.Sell, onNavigate = onNavigate)
@@ -222,9 +223,10 @@ private fun CashierSaleContent(
                 .padding(innerPadding)
                 .imePadding(),
         ) {
-            CashierHeader(
+            CashierScreenHeader(
+                title = stringResource(R.string.native_new_sale),
                 displayName = identity.displayName,
-                role = identity.role.wireValue.replaceFirstChar { it.titlecase(Locale.US) },
+                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
                 businessDate = context.businessDate,
                 postingOpen = context.postingOpen,
             )
@@ -236,7 +238,7 @@ private fun CashierSaleContent(
             ) {
                 if (!context.postingOpen) {
                     StatusMessage(
-                        message = "${formatBusinessDate(context.businessDate)} is closed. Reopen the day before recording a sale.",
+                        message = "${formatCashierBusinessDate(context.businessDate)} is closed. Reopen the day before recording a sale.",
                         error = true,
                         tag = NativeUiTags.CashierPostingClosed,
                     )
@@ -499,12 +501,19 @@ private fun CashierLoadingScreen(
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             CashierNavigation(selected = CashierSection.Sell, onNavigate = onNavigate)
         },
     ) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .statusBarsPadding(),
+            contentAlignment = Alignment.Center,
+        ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(Modifier.height(12.dp))
@@ -524,13 +533,18 @@ private fun CashierLoadFailureScreen(
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             CashierNavigation(selected = CashierSection.Sell, onNavigate = onNavigate)
         },
     ) { padding ->
         Column(
-            Modifier.fillMaxSize().padding(padding).padding(24.dp),
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .statusBarsPadding()
+                .padding(24.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -604,33 +618,6 @@ private fun formatAmountInput(value: Double): String = when {
     value % 1.0 == 0.0 -> "%.0f".format(Locale.US, value)
     else -> "%.2f".format(Locale.US, value)
 }
-
-@Composable
-private fun CashierHeader(
-    displayName: String,
-    role: String,
-    businessDate: String,
-    postingOpen: Boolean,
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
-    ) {
-        Text(
-            text = stringResource(R.string.native_new_sale),
-            style = MaterialTheme.typography.headlineMedium,
-        )
-        Text(
-            text = "$displayName · $role · ${formatBusinessDate(businessDate)} · ${if (postingOpen) "Open" else "Closed"}",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-}
-
-private fun formatBusinessDate(value: String): String = runCatching {
-    LocalDate.parse(value).format(DateTimeFormatter.ofPattern("d MMM uuuu", Locale.getDefault()))
-}.getOrDefault(value)
 
 @Composable
 private fun SectionHeading(title: String, supporting: String? = null, stacked: Boolean = false) {

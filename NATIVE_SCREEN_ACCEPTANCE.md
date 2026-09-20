@@ -23,6 +23,7 @@ Run from `phase18/` (single Gradle process — do not wrap in another gradlew):
 .\gradlew.bat qaFast
 .\gradlew.bat qaScreen -Pqa.screen=collect -Pqa.device=R8VXA02SNKH
 .\gradlew.bat qaScreen -Pqa.screen=activity -Pqa.device=R8VXA02SNKH
+.\gradlew.bat qaScreen -Pqa.screen=more -Pqa.device=R8VXA02SNKH
 .\gradlew.bat qaCheckpoint -Pqa.device=R8VXA02SNKH
 ```
 
@@ -31,7 +32,7 @@ Set `ANDROID_SERIAL=R8VXA02SNKH` in the shell before device gates when multiple 
 ### When each is mandatory
 
 - **qaFast** — after any native UI/test/build/doc edit before claiming the change is green.
-- **qaScreen** — after edits that affect a specific native screen (`auth` / `sale` / `collect` / `activity`).
+- **qaScreen** — after edits that affect a specific native screen (`auth` / `sale` / `collect` / `activity` / `more`).
 - **qaCheckpoint** — before accepting a screen or shared helper as done; requires `untested=0`.
 
 ## Inventory rule

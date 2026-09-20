@@ -108,6 +108,7 @@ fun NativeAuthenticationHost(
             is NativeAuthenticationState.AccountPicker -> AccountPickerScreen(
                 accounts = state.accounts,
                 error = state.error,
+                cancelReturnsToSession = state.cancelReturnsToSession,
                 onBack = onBackToWelcome,
                 onSelectAccount = onSelectAccount,
                 modifier = modifier,
@@ -156,13 +157,18 @@ fun NativeAuthenticationHost(
 private fun AccountPickerScreen(
     accounts: List<NativeAccountSummary>,
     error: String?,
+    cancelReturnsToSession: Boolean,
     onBack: () -> Unit,
     onSelectAccount: (NativeAccountSummary) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AccessFrame(
-        title = "Who is using Saaf?",
-        subtitle = "Choose your own account. Your access stays separate from everyone else on this phone.",
+        title = if (cancelReturnsToSession) "Switch account" else "Who is using Saaf?",
+        subtitle = if (cancelReturnsToSession) {
+            "Pick another account to sign in. Back keeps you signed in on this account."
+        } else {
+            "Choose your own account. Your access stays separate from everyone else on this phone."
+        },
         onBack = onBack,
         modifier = modifier,
     ) {

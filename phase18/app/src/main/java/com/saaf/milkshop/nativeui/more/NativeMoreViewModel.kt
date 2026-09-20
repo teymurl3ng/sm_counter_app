@@ -1,0 +1,284 @@
+package com.saaf.milkshop.nativeui.more
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.saaf.milkshop.application.more.NativeBlindCashCountReceipt
+import com.saaf.milkshop.application.more.NativeMoreContext
+import com.saaf.milkshop.application.more.NativeMoreFacade
+import com.saaf.milkshop.application.more.NativeMoreSecurityStatus
+import com.saaf.milkshop.domain.SecurityFailure
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+enum class NativeMoreDestination {
+    Menu,
+    CountCash,
+    PersonalSecurity,
+}
+
+sealed interface NativeMoreState {
+    data object Idle : NativeMoreState
+    data object Loading : NativeMoreState
+    data class Ready(
+        val context: NativeMoreContext,
+        val destination: NativeMoreDestination = NativeMoreDestination.Menu,
+        val security: NativeMoreSecurityStatus? = null,
+        val countReceipt: NativeBlindCashCountReceipt? = null,
+        val saving: Boolean = false,
+        val confirmRemoveUnlock: Boolean = false,
+        val error: String? = null,
+    ) : NativeMoreState
+    data class LoadFailure(val message: String) : NativeMoreState
+}
+
+class NativeMoreViewModel(
+    private val facade: NativeMoreFacade,
+    private val onSessionExpired: () -> Unit,
+) : ViewModel() {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private val _state = MutableStateFlow<NativeMoreState>(NativeMoreState.Idle)
+    private var sessionHandle: String? = null
+    val state: StateFlow<NativeMoreState> = _state.asStateFlow()
+
+    fun open(nextSessionHandle: String) {
+        sessionHandle = nextSessionHandle
+        refresh()
+    }
+
+    fun refresh() {
+        val session = sessionHandle ?: return
+        _state.value = NativeMoreState.Loading
+        scope.launch {
+            try {
+                val context = withContext(Dispatchers.IO) { facade.load(session) }
+                val security = withContext(Dispatchers.IO) { facade.loadSecurity(session) }
+                _state.value = NativeMoreState.Ready(context = context, security = security)
+            } catch (error: Throwable) {
+                handleLoadFailure(error)
+            }
+        }
+    }
+
+    fun openCountCash() {
+        val current = _state.value as? NativeMoreState.Ready ?: return
+        _state.value = current.copy(
+            destination = NativeMoreDestination.CountCash,
+            countReceipt = null,
+            error = null,
+            saving = false,
+        )
+    }
+
+    fun openPersonalSecurity() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeMoreState.Ready ?: return
+        _state.value = current.copy(
+            destination = NativeMoreDestination.PersonalSecurity,
+            confirmRemoveUnlock = false,
+            error = null,
+            saving = false,
+        )
+        scope.launch {
+            try {
+                val security = withContext(Dispatchers.IO) { facade.loadSecurity(session) }
+                val latest = _state.value as? NativeMoreState.Ready ?: return@launch
+                _state.value = latest.copy(security = security)
+            } catch (error: Throwable) {
+                handleReadyFailure(error)
+            }
+        }
+    }
+
+    fun backToMenu() {
+        val current = _state.value as? NativeMoreState.Ready ?: return
+        _state.value = current.copy(
+            destination = NativeMoreDestination.Menu,
+            countReceipt = null,
+            confirmRemoveUnlock = false,
+            error = null,
+            saving = false,
+        )
+    }
+
+    fun recordCashCount(amountPaisa: Long, notes: String?) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeMoreState.Ready ?: return
+        if (current.saving) return
+        _state.value = current.copy(saving = true, error = null)
+        scope.launch {
+            try {
+                val receipt = withContext(Dispatchers.IO) {
+                    facade.recordBlindCashCount(session, amountPaisa, notes)
+                }
+                val latest = _state.value as? NativeMoreState.Ready ?: return@launch
+                _state.value = latest.copy(
+                    countReceipt = receipt,
+                    saving = false,
+                    error = null,
+                )
+            } catch (error: Throwable) {
+                handleReadyFailure(error)
+            }
+        }
+    }
+
+    fun requestRemoveQuickUnlock() {
+        val current = _state.value as? NativeMoreState.Ready ?: return
+        _state.value = current.copy(confirmRemoveUnlock = true, error = null)
+    }
+
+    fun cancelRemoveQuickUnlock() {
+        val current = _state.value as? NativeMoreState.Ready ?: return
+        _state.value = current.copy(confirmRemoveUnlock = false)
+    }
+
+    fun removeQuickUnlock(passphrase: CharArray) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeMoreState.Ready ?: return
+        if (current.saving) return
+        _state.value = current.copy(saving = true, error = null)
+        scope.launch {
+            try {
+                val security = withContext(Dispatchers.IO) {
+                    facade.removeQuickUnlock(session, passphrase)
+                }
+                val latest = _state.value as? NativeMoreState.Ready ?: return@launch
+                _state.value = latest.copy(
+                    security = security,
+                    saving = false,
+                    confirmRemoveUnlock = false,
+                    error = null,
+                )
+            } catch (error: Throwable) {
+                handleReadyFailure(error)
+            } finally {
+                passphrase.fill('\u0000')
+            }
+        }
+    }
+
+    fun enrollQuickPin(passphrase: CharArray, pin: CharArray) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeMoreState.Ready ?: return
+        if (current.saving) return
+        _state.value = current.copy(saving = true, error = null)
+        scope.launch {
+            try {
+                val security = withContext(Dispatchers.IO) {
+                    facade.enrollQuickUnlock(
+                        sessionHandle = session,
+                        currentPassphrase = passphrase,
+                        enablePhoneSecurity = current.security?.phoneSecurityEnabled == true,
+                        pin = pin,
+                    )
+                }
+                val latest = _state.value as? NativeMoreState.Ready ?: return@launch
+                _state.value = latest.copy(security = security, saving = false, error = null)
+            } catch (error: Throwable) {
+                handleReadyFailure(error)
+            } finally {
+                passphrase.fill('\u0000')
+                pin.fill('\u0000')
+            }
+        }
+    }
+
+    fun enrollPhoneSecurity(passphrase: CharArray, pin: CharArray?) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeMoreState.Ready ?: return
+        if (current.saving) return
+        if (current.security?.quickPinEnabled == true && (pin == null || pin.size != 4)) {
+            _state.value = current.copy(
+                error = "Enter your 4-digit Quick PIN to keep it while enabling phone security.",
+            )
+            passphrase.fill('\u0000')
+            pin?.fill('\u0000')
+            return
+        }
+        _state.value = current.copy(saving = true, error = null)
+        scope.launch {
+            try {
+                val security = withContext(Dispatchers.IO) {
+                    facade.enrollQuickUnlock(
+                        sessionHandle = session,
+                        currentPassphrase = passphrase,
+                        enablePhoneSecurity = true,
+                        pin = pin,
+                    )
+                }
+                val latest = _state.value as? NativeMoreState.Ready ?: return@launch
+                _state.value = latest.copy(security = security, saving = false, error = null)
+            } catch (error: Throwable) {
+                handleReadyFailure(error)
+            } finally {
+                passphrase.fill('\u0000')
+                pin?.fill('\u0000')
+            }
+        }
+    }
+
+    fun clearError() {
+        val current = _state.value as? NativeMoreState.Ready ?: return
+        _state.value = current.copy(error = null)
+    }
+
+    fun close() {
+        sessionHandle = null
+        _state.value = NativeMoreState.Idle
+    }
+
+    override fun onCleared() {
+        scope.cancel()
+        super.onCleared()
+    }
+
+    private fun handleReadyFailure(error: Throwable) {
+        if (error is SecurityFailure.SessionExpired) {
+            sessionHandle = null
+            _state.value = NativeMoreState.Idle
+            onSessionExpired()
+            return
+        }
+        val current = _state.value as? NativeMoreState.Ready
+        if (current != null) {
+            _state.value = current.copy(saving = false, error = publicMessage(error))
+        } else {
+            handleLoadFailure(error)
+        }
+    }
+
+    private fun handleLoadFailure(error: Throwable) {
+        if (error is SecurityFailure.SessionExpired) {
+            sessionHandle = null
+            _state.value = NativeMoreState.Idle
+            onSessionExpired()
+        } else {
+            _state.value = NativeMoreState.LoadFailure(publicMessage(error))
+        }
+    }
+
+    private fun publicMessage(error: Throwable): String = when (error) {
+        is SecurityFailure -> error.message ?: "More is unavailable."
+        is IllegalArgumentException, is IllegalStateException ->
+            error.message ?: "That action could not be completed."
+        else -> "More could not complete that action. Try again."
+    }
+
+    class Factory(
+        private val facade: NativeMoreFacade,
+        private val onSessionExpired: () -> Unit,
+    ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            require(modelClass.isAssignableFrom(NativeMoreViewModel::class.java))
+            return NativeMoreViewModel(facade, onSessionExpired) as T
+        }
+    }
+}

@@ -6,14 +6,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
@@ -25,7 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -43,11 +43,9 @@ import com.saaf.milkshop.application.activity.NativeActivityRecordSummary
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.sale.CashierNavigation
+import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.CashierSection
-import com.saaf.milkshop.nativeui.theme.SaafInk
-import com.saaf.milkshop.nativeui.theme.SaafYellow
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import java.util.Locale
 
 @Composable
@@ -103,18 +101,35 @@ fun CashierActivityScreen(
 }
 
 @Composable
+private fun ActivityScaffold(
+    snackbarHostState: SnackbarHostState,
+    onNavigate: (CashierSection) -> Unit,
+    modifier: Modifier,
+    rootTag: String,
+    content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit,
+) {
+    Scaffold(
+        modifier = modifier.fillMaxSize().testTag(rootTag),
+        containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        bottomBar = { CashierNavigation(selected = CashierSection.Activity, onNavigate = onNavigate) },
+        content = content,
+    )
+}
+
+@Composable
 private fun ActivityLoadingScreen(
     snackbarHostState: SnackbarHostState,
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier,
 ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize().testTag(NativeUiTags.ActivityRoot),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = { CashierNavigation(selected = CashierSection.Activity, onNavigate = onNavigate) },
-    ) { padding ->
+    ActivityScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.ActivityRoot) { padding ->
         Box(
-            Modifier.fillMaxSize().padding(padding),
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .statusBarsPadding(),
             contentAlignment = Alignment.Center,
         ) {
             CircularProgressIndicator(Modifier.testTag(NativeUiTags.ActivityLoading))
@@ -130,13 +145,13 @@ private fun ActivityLoadFailureScreen(
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier,
 ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize().testTag(NativeUiTags.ActivityRoot),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = { CashierNavigation(selected = CashierSection.Activity, onNavigate = onNavigate) },
-    ) { padding ->
+    ActivityScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.ActivityRoot) { padding ->
         Column(
-            Modifier.fillMaxSize().padding(padding).padding(24.dp),
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .statusBarsPadding()
+                .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -160,63 +175,71 @@ private fun ActivityListScreen(
     modifier: Modifier,
 ) {
     BackHandler(onBack = onLeaveConfirmed)
-    Scaffold(
-        modifier = modifier.fillMaxSize().testTag(NativeUiTags.ActivityRoot),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        topBar = { ActivityHeader(identity, state.day.context) },
-        bottomBar = { CashierNavigation(selected = CashierSection.Activity, onNavigate = onNavigate) },
-    ) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding)) {
-            when {
-                state.loadingDetail -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
+    ActivityScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.ActivityRoot) { padding ->
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(padding),
+        ) {
+            CashierScreenHeader(
+                title = "Today’s activity",
+                displayName = identity.displayName,
+                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                businessDate = state.day.context.businessDate,
+                postingOpen = state.day.context.postingOpen,
+            )
+            Box(Modifier.fillMaxSize()) {
+                when {
+                    state.loadingDetail -> {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
                     }
-                }
-                state.day.records.isEmpty() -> {
-                    Column(
-                        Modifier
-                            .fillMaxSize()
-                            .padding(24.dp)
-                            .testTag(NativeUiTags.ActivityEmpty),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            "No records yet today",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                        Text(
-                            "Sales and collections you record today will show up here.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = 8.dp),
-                        )
+                    state.day.records.isEmpty() -> {
+                        Column(
+                            Modifier
+                                .fillMaxSize()
+                                .padding(24.dp)
+                                .testTag(NativeUiTags.ActivityEmpty),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Text(
+                                "No records yet today",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                            Text(
+                                "Sales and collections you record today will show up here.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(top = 8.dp),
+                            )
+                        }
                     }
-                }
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .testTag(NativeUiTags.ActivityList),
-                    ) {
-                        items(state.day.records, key = { it.eventId }) { record ->
-                            ActivityRow(record = record, onClick = { onOpenRecord(record.eventId) })
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    else -> {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .testTag(NativeUiTags.ActivityList),
+                        ) {
+                            items(state.day.records, key = { it.eventId }) { record ->
+                                ActivityRow(record = record, onClick = { onOpenRecord(record.eventId) })
+                                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                            }
                         }
                     }
                 }
-            }
-            state.error?.let { message ->
-                Text(
-                    text = message,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(16.dp)
-                        .testTag(NativeUiTags.ActivityError),
-                )
+                state.error?.let { message ->
+                    Text(
+                        text = message,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(16.dp)
+                            .testTag(NativeUiTags.ActivityError),
+                    )
+                }
             }
         }
     }
@@ -233,98 +256,64 @@ private fun ActivityDetailScreen(
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBack)
-    Scaffold(
-        modifier = modifier.fillMaxSize().testTag(NativeUiTags.ActivityDetail),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        topBar = { ActivityHeader(identity, context) },
-        bottomBar = { CashierNavigation(selected = CashierSection.Activity, onNavigate = onNavigate) },
-    ) { padding ->
+    ActivityScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.ActivityDetail) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 18.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+                .padding(padding),
         ) {
-            TextButton(
-                onClick = onBack,
-                modifier = Modifier.testTag(NativeUiTags.ActivityDetailBack),
-            ) { Text("Back to today") }
-            Text(
-                detail.summary.taskLabel,
-                style = MaterialTheme.typography.headlineMedium,
+            CashierScreenHeader(
+                title = "Today’s activity",
+                displayName = identity.displayName,
+                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                businessDate = context.businessDate,
+                postingOpen = context.postingOpen,
             )
-            Text(
-                "#${detail.summary.eventId}",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.testTag(NativeUiTags.ActivityDetailEventId),
-            )
-            Text(
-                formatMoney(detail.summary.amountPaisa),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(detail.summary.timeLabel, style = MaterialTheme.typography.bodyLarge)
-            Text(detail.summary.stateLabel, style = MaterialTheme.typography.bodyLarge)
-            detail.counterpartLabel?.let {
-                LabeledValue("Customer", it)
-            }
-            detail.destinationLabel?.let {
-                LabeledValue("Received in", it)
-            }
-            detail.quantityLabel?.let {
-                LabeledValue("Quantity", it)
-            }
-            detail.notes?.let {
-                LabeledValue("Note", it)
-            }
-            Text(
-                "Corrections need a supervisor. This screen is inspect-only.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
-private fun ActivityHeader(
-    identity: NativeSignedInIdentity,
-    context: NativeActivityContext,
-) {
-    Surface(color = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary) {
-        Column(
-            Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Text("Today’s activity", style = MaterialTheme.typography.headlineMedium)
-            Row(
-                Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp, vertical = 18.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                Column(Modifier.weight(1f)) {
-                    Text(identity.displayName, style = MaterialTheme.typography.labelLarge)
-                    Text(
-                        identity.role.wireValue.replaceFirstChar { it.titlecase(Locale.US) } +
-                            " · " + formatBusinessDate(context.businessDate),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.82f),
-                    )
+                TextButton(
+                    onClick = onBack,
+                    modifier = Modifier.testTag(NativeUiTags.ActivityDetailBack),
+                ) { Text("Back to today") }
+                Text(
+                    detail.summary.taskLabel,
+                    style = MaterialTheme.typography.headlineMedium,
+                )
+                Text(
+                    "#${detail.summary.eventId}",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.testTag(NativeUiTags.ActivityDetailEventId),
+                )
+                Text(
+                    formatMoney(detail.summary.amountPaisa),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(detail.summary.timeLabel, style = MaterialTheme.typography.bodyLarge)
+                Text(detail.summary.stateLabel, style = MaterialTheme.typography.bodyLarge)
+                detail.counterpartLabel?.let {
+                    LabeledValue("Customer", it)
                 }
-                Surface(
-                    color = if (context.postingOpen) SaafYellow else MaterialTheme.colorScheme.error,
-                    contentColor = if (context.postingOpen) SaafInk else MaterialTheme.colorScheme.onError,
-                    shape = RoundedCornerShape(999.dp),
-                ) {
-                    Text(
-                        if (context.postingOpen) "Open" else "Closed",
-                        Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                        style = MaterialTheme.typography.labelLarge,
-                    )
+                detail.destinationLabel?.let {
+                    LabeledValue("Received in", it)
                 }
+                detail.quantityLabel?.let {
+                    LabeledValue("Quantity", it)
+                }
+                detail.notes?.let {
+                    LabeledValue("Note", it)
+                }
+                Text(
+                    "Corrections need a supervisor. This screen is inspect-only.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
     }
@@ -348,18 +337,10 @@ private fun ActivityRow(
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(record.taskLabel, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                Text(formatMoney(record.amountPaisa), style = MaterialTheme.typography.titleMedium)
+                Text(record.timeLabel, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            Text(
-                "${record.timeLabel} · #${record.eventId}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(
-                record.stateLabel,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Text("#${record.eventId} · ${record.stateLabel}", style = MaterialTheme.typography.bodyMedium)
+            Text(formatMoney(record.amountPaisa), style = MaterialTheme.typography.titleMedium)
         }
         Icon(Icons.Outlined.ChevronRight, contentDescription = null)
     }
@@ -368,20 +349,10 @@ private fun ActivityRow(
 @Composable
 private fun LabeledValue(label: String, value: String) {
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(label.uppercase(Locale.US), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(value, style = MaterialTheme.typography.bodyLarge)
     }
 }
 
-private fun formatMoney(paisa: Long): String {
-    val amount = BigDecimalPaisa(paisa)
-    return "PKR " + "%,.2f".format(Locale.US, amount)
-}
-
-private fun BigDecimalPaisa(paisa: Long): Double = paisa / 100.0
-
-private fun formatBusinessDate(value: String): String = try {
-    LocalDate.parse(value).format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale.US))
-} catch (_: Exception) {
-    value
-}
+private fun formatMoney(paisa: Long): String =
+    String.format(Locale.US, "PKR %,.2f", paisa / 100.0)

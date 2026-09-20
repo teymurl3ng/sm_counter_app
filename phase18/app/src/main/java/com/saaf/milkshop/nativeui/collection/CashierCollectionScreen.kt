@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -72,7 +74,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
-import com.saaf.milkshop.application.collection.NativeCollectionContext
 import com.saaf.milkshop.application.collection.NativeCollectionCustomer
 import com.saaf.milkshop.application.collection.NativeCollectionCustomerBalance
 import com.saaf.milkshop.application.collection.NativeCollectionPaymentAccount
@@ -80,13 +81,13 @@ import com.saaf.milkshop.application.collection.NativeCollectionReceipt
 import com.saaf.milkshop.application.collection.NativeCollectionRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.sale.CashierNavigation
+import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.CashierSection
+import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
@@ -139,7 +140,10 @@ private fun CollectionLoadingScreen(
 ) {
     CollectionScaffold(snackbarHostState, onNavigate, modifier) { padding ->
         Box(
-            Modifier.fillMaxSize().padding(padding),
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .statusBarsPadding(),
             contentAlignment = Alignment.Center,
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -161,7 +165,11 @@ private fun CollectionLoadFailureScreen(
 ) {
     CollectionScaffold(snackbarHostState, onNavigate, modifier) { padding ->
         Column(
-            Modifier.fillMaxSize().padding(padding).padding(24.dp),
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .statusBarsPadding()
+                .padding(24.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -184,6 +192,7 @@ private fun CollectionScaffold(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             CashierNavigation(selected = CashierSection.Collect, onNavigate = onNavigate)
@@ -318,7 +327,13 @@ private fun CollectionReadyScreen(
                 .padding(padding)
                 .imePadding(),
         ) {
-            CollectionHeader(identity, state.context)
+            CashierScreenHeader(
+                title = "Collect payment",
+                displayName = identity.displayName,
+                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                businessDate = state.context.businessDate,
+                postingOpen = state.context.postingOpen,
+            )
             if (state.receipt != null) {
                 CollectionSuccess(
                     receipt = state.receipt,
@@ -386,55 +401,6 @@ private fun CollectionReadyScreen(
                     },
                     modifier = Modifier.weight(1f),
                 )
-            }
-        }
-    }
-}
-
-@Composable
-private fun CollectionHeader(
-    identity: NativeSignedInIdentity,
-    context: NativeCollectionContext,
-) {
-    Surface(color = MaterialTheme.colorScheme.primary) {
-        Column(
-            Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Text(
-                "Collect payment",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onPrimary,
-            )
-            Row(
-                Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        identity.displayName,
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                    )
-                    Text(
-                        identity.role.wireValue.replaceFirstChar { it.titlecase(Locale.US) } +
-                            " · " + formatBusinessDate(context.businessDate),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.82f),
-                    )
-                }
-                Surface(
-                    color = if (context.postingOpen) SaafYellow else MaterialTheme.colorScheme.error,
-                    contentColor = if (context.postingOpen) SaafInk else MaterialTheme.colorScheme.onError,
-                    shape = RoundedCornerShape(999.dp),
-                ) {
-                    Text(
-                        if (context.postingOpen) "Open" else "Closed",
-                        Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                }
             }
         }
     }
@@ -984,7 +950,3 @@ private fun balanceLabel(balancePaisa: Long): String = when {
     balancePaisa < 0L -> "Has PKR ${formatMoney(-balancePaisa)} advance"
     else -> "Paid up"
 }
-
-private fun formatBusinessDate(value: String): String = runCatching {
-    LocalDate.parse(value).format(DateTimeFormatter.ofPattern("d MMM", Locale.US))
-}.getOrDefault(value)

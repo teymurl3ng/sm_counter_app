@@ -37,7 +37,7 @@ Authority for product shape:
 - Existing typed domain: `ProductCatalogService` / `ProductCatalogItem` / `ProductCatalogInput`; write path already used by `HybridCommandService.createProduct` / `updateProduct` / `setProductArchived` (permission `MANAGE_MASTER_DATA`)
 - Sibling UI: Owner More menu → sub-screen (Personal security); Cashier list/detail density where helpful
 
-This checkpoint owns **Owner Products** conservatively: active catalog list + read detail under Owner More, plus **create write depth in Phase 14.8.34**. Edit/archive write UI remain deferred with explicit notice.
+This checkpoint owns **Owner Products** conservatively: active catalog list + read detail under Owner More, plus **create write depth in Phase 14.8.34** and **edit + soft archive in Phase 14.8.35**. Unarchive remains deferred.
 
 ## What the existing product already guarantees
 
@@ -69,7 +69,7 @@ This checkpoint owns **Owner Products** conservatively: active catalog list + re
 4. List shows active products: name, unit, rate/status labels from catalog fields already available.
 5. Tap a row → read-only detail (or inline facts) for that product: name, unit, default rate, tracking, notes.
 6. Back from detail → Products list. Back from list → Owner More menu. Hardware Back matches that stack.
-7. **Add product** — connected create form in Phase 14.8.34 (`ProductCatalogInput` via typed facade). Edit/archive remain deferred with explicit notice on detail.
+7. **Add product** — connected create form in Phase 14.8.34 (`ProductCatalogInput` via typed facade). **Edit / archive** — connected in Phase 14.8.35 from detail (update + soft archive; unarchive deferred).
 8. Load failure shows inline error + Retry. Empty catalog shows an honest empty state.
 9. Owner nav remains; no Cashier/Ops bottom nav.
 
@@ -84,7 +84,7 @@ This checkpoint owns **Owner Products** conservatively: active catalog list + re
 
 ### Explicit preview / deferred
 
-- Edit / archive write UI (create connected in Phase 14.8.34)
+- Unarchive / restore archived products UI
 - Costing & plans, stock quantities, COGS
 - Customers / Suppliers / Employees / shop settings / backup
 - Manager / Admin Products shells
@@ -99,6 +99,8 @@ This checkpoint owns **Owner Products** conservatively: active catalog list + re
 | Back (list) | Return to More menu | Menu restored | Back contract |
 | Retry | Reload catalog | Ready list | Failure recovery |
 | Add product | Open create form; Save creates via facade | List refreshed with new product | Create tags + leave-guard |
+| Edit product | Open edit form from detail; Save updates via facade | Detail refreshed | Edit tags + leave-guard |
+| Archive product | Confirm from detail; soft-archive via facade | Leave detail; list refreshes without product | Archive tags |
 | Foreign chrome | Must not appear | No Cashier/Ops nav | Foundation |
 
 ## Material states
@@ -107,8 +109,9 @@ This checkpoint owns **Owner Products** conservatively: active catalog list + re
 |---|---|
 | Loading | Owner chrome + progress |
 | Ready list | Active products; empty copy when none |
-| Detail | Read-only facts |
+| Detail | Facts + Edit + Archive |
 | Create form | Fields + Save + Cancel/Back leave-guard |
+| Edit form | Prefill + Save + Cancel/Back leave-guard |
 | Load failure | Inline error + Retry |
 | Session expired | Leave via existing auth path |
 
@@ -120,7 +123,8 @@ This checkpoint owns **Owner Products** conservatively: active catalog list + re
 - require `MANAGE_MASTER_DATA` (or Owner + existing master-data gate equivalent) for catalog read;
 - list via `ProductCatalogService.list(includeArchived = false)`;
 - detail from the same catalog item fields — no new accounting formulas;
-- optional create via typed `ProductCatalogService.create` through `NativeOwnerProductsFacade.createProduct` (Phase 14.8.34); edit/archive still deferred;
+- optional create via typed `ProductCatalogService.create` through `NativeOwnerProductsFacade.createProduct` (Phase 14.8.34);
+- optional update/archive via `NativeOwnerProductsFacade.updateProduct` / `archiveProduct` (Phase 14.8.35); unarchive still deferred;
 - do not change Room schema, RolePermissions, Analytics, or costing engines.
 
 ## Visual / consistency notes
@@ -128,7 +132,7 @@ This checkpoint owns **Owner Products** conservatively: active catalog list + re
 - Nested under Owner More like Personal security (Back to More).
 - Dense list rows: name primary; unit + rate/status secondary.
 - Detail uses labeled facts, not a Sell dock.
-- Deferred edit/archive remains an explicit notice — not a silent no-op.
+- Edit/archive are connected write actions from detail — not a silent no-op.
 
 ## Out of scope
 
@@ -139,8 +143,8 @@ This checkpoint owns **Owner Products** conservatively: active catalog list + re
 
 ## Verification
 
-- Facade tests: Owner gate, list active products, create then list contains, reject non-Owner.
-- Compose contract: Products list + detail + create form tags; Add product opens create (not deferred notice).
+- Facade tests: Owner gate, list active products, create then list contains, update then detail, archive then absent from active list, reject non-Owner.
+- Compose contract: Products list + detail + create/edit form tags; Edit/Archive from detail (not deferred notice).
 - Inventory rows with real workflow test names (no `workflow_test=-`).
 - `qaScreen -Pqa.screen=ownermore` extended with Products Foundation/contract coverage.
 - Foundation: Owner chrome ✓, foreign nav ✗, Back → More menu, session intact.
@@ -148,4 +152,4 @@ This checkpoint owns **Owner Products** conservatively: active catalog list + re
 
 ## Accept gate
 
-**AUTO-ACCEPTED FOR NATIVE IMPLEMENTATION.** Connected scope: active list + read detail under Owner More shell; create write depth in Phase 14.8.34; edit/archive deferred with explicit notice.
+**AUTO-ACCEPTED FOR NATIVE IMPLEMENTATION.** Connected scope: active list + read detail under Owner More shell; create write depth in Phase 14.8.34; edit + soft archive in Phase 14.8.35; unarchive deferred.

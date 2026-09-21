@@ -13,6 +13,8 @@ data class NativeOwnerProductRow(
     val productId: Long,
     val name: String,
     val unit: String,
+    val defaultSaleRate: Double?,
+    val inventoryTracking: Boolean,
     val rateLabel: String?,
     val statusLabel: String,
     val trackingLabel: String,
@@ -28,7 +30,7 @@ data class NativeOwnerProductsSnapshot(
 )
 
 /**
- * Owner Products boundary: active catalog list + read detail + create from
+ * Owner Products boundary: active catalog list + read detail + create/update/archive from
  * [ProductCatalogService]. Does not invent costing/stock formulas or call bridge JSON.
  */
 class NativeOwnerProductsFacade(
@@ -61,6 +63,23 @@ class NativeOwnerProductsFacade(
         return catalog.create(input)
     }
 
+    suspend fun updateProduct(
+        sessionHandle: String,
+        productId: Long,
+        input: ProductCatalogInput,
+    ) {
+        requireOwnerMasterData(sessionHandle)
+        catalog.update(productId, input)
+    }
+
+    suspend fun archiveProduct(
+        sessionHandle: String,
+        productId: Long,
+    ) {
+        requireOwnerMasterData(sessionHandle)
+        catalog.setArchived(productId, true)
+    }
+
     private suspend fun requireOwnerMasterData(sessionHandle: String) {
         val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_MASTER_DATA)
         require(AppRole.parse(actor.role) == AppRole.OWNER) {
@@ -72,6 +91,8 @@ class NativeOwnerProductsFacade(
         productId = productId,
         name = name,
         unit = unit,
+        defaultSaleRate = defaultSaleRate,
+        inventoryTracking = inventoryTracking,
         rateLabel = defaultSaleRate?.let { rate ->
             String.format(Locale.US, "PKR %,.2f / %s", rate, unit)
         },

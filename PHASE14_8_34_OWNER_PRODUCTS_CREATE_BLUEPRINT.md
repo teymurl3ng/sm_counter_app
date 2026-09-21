@@ -28,7 +28,7 @@ Replace deferred **Add product** preview with a real create form using typed `Pr
 | inventoryTracking | Boolean, default `true` |
 | notes | Optional |
 
-On success: return to Products list; clear draft; refresh catalog. Edit/archive remain deferred with explicit read-only / notice copy.
+On success: return to Products list; clear draft; refresh catalog. Edit/archive connected in Phase 14.8.35.
 
 Permission: facade `requireOwnerMasterData` (`MANAGE_MASTER_DATA` + Owner) then `catalog.create`.
 
@@ -42,10 +42,10 @@ Permission: facade `requireOwnerMasterData` (`MANAGE_MASTER_DATA` + Owner) then 
 
 ## Explicit preview / deferred
 
-- Edit product / archive-restore write UI
+- Edit product / archive-restore write UI — **connected edit + soft archive in Phase 14.8.35**; unarchive remains deferred
 - Costing, stock on hand, COGS editors
 - Manager / Admin Products shells
 
 ## Accept gate
 
-**AUTO-ACCEPTED.** Connected = Owner Products create write depth under CORE METHOD; edit/archive still deferred.
+**AUTO-ACCEPTED.** Connected = Owner Products create write depth under CORE METHOD; edit/archive continue in 14.8.35.

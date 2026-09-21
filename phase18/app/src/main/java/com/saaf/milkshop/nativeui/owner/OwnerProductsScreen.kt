@@ -57,9 +57,10 @@ import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
+import java.util.Locale
 
 /**
- * Owner Products — active catalog list + read detail + create under OwnerScaffold.
+ * Owner Products — active catalog list + detail + create/edit/archive under OwnerScaffold.
  * Nested from Owner More; never mounts foreign role chrome.
  */
 @Composable
@@ -72,6 +73,9 @@ fun OwnerProductsScreen(
     productDetail: NativeOwnerProductDetail?,
     productCreateOpen: Boolean,
     productCreating: Boolean,
+    productEditOpen: Boolean,
+    productUpdating: Boolean,
+    productArchiving: Boolean,
     productsError: String?,
     onBackToMenu: () -> Unit,
     onRetry: () -> Unit,
@@ -80,18 +84,41 @@ fun OwnerProductsScreen(
     onOpenCreate: () -> Unit,
     onBackFromCreate: () -> Unit,
     onCreateProduct: (ProductCatalogInput) -> Unit,
+    onOpenEdit: () -> Unit,
+    onBackFromEdit: () -> Unit,
+    onUpdateProduct: (ProductCatalogInput) -> Unit,
+    onArchiveProduct: () -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (productCreateOpen) {
-        OwnerProductsCreateScreen(
+        OwnerProductsFormScreen(
             snackbarHostState = snackbarHostState,
             identity = identity,
             context = context,
-            creating = productCreating,
+            mode = OwnerProductsFormMode.Create,
+            initial = null,
+            saving = productCreating,
             error = productsError,
             onBack = onBackFromCreate,
-            onCreate = onCreateProduct,
+            onSave = onCreateProduct,
+            onNavigate = onNavigate,
+            modifier = modifier,
+        )
+        return
+    }
+
+    if (productEditOpen && productDetail != null) {
+        OwnerProductsFormScreen(
+            snackbarHostState = snackbarHostState,
+            identity = identity,
+            context = context,
+            mode = OwnerProductsFormMode.Edit,
+            initial = productDetail.row,
+            saving = productUpdating,
+            error = productsError,
+            onBack = onBackFromEdit,
+            onSave = onUpdateProduct,
             onNavigate = onNavigate,
             modifier = modifier,
         )
@@ -104,7 +131,11 @@ fun OwnerProductsScreen(
             identity = identity,
             context = context,
             detail = productDetail,
+            archiving = productArchiving,
+            error = productsError,
             onBack = onBackFromDetail,
+            onOpenEdit = onOpenEdit,
+            onArchive = onArchiveProduct,
             onNavigate = onNavigate,
             modifier = modifier,
         )
@@ -224,39 +255,98 @@ fun OwnerProductsScreen(
     }
 }
 
+private enum class OwnerProductsFormMode { Create, Edit }
+
+private data class OwnerProductsFormTags(
+    val form: String,
+    val name: String,
+    val unitLiters: String,
+    val unitKg: String,
+    val rate: String,
+    val tracking: String,
+    val notes: String,
+    val save: String,
+    val cancel: String,
+    val back: String,
+    val discard: String,
+    val keep: String,
+)
+
+private fun OwnerProductsFormMode.tags(): OwnerProductsFormTags = when (this) {
+    OwnerProductsFormMode.Create -> OwnerProductsFormTags(
+        form = NativeUiTags.OwnerProductsCreateForm,
+        name = NativeUiTags.OwnerProductsCreateName,
+        unitLiters = NativeUiTags.OwnerProductsCreateUnitLiters,
+        unitKg = NativeUiTags.OwnerProductsCreateUnitKg,
+        rate = NativeUiTags.OwnerProductsCreateRate,
+        tracking = NativeUiTags.OwnerProductsCreateTracking,
+        notes = NativeUiTags.OwnerProductsCreateNotes,
+        save = NativeUiTags.OwnerProductsCreateSave,
+        cancel = NativeUiTags.OwnerProductsCreateCancel,
+        back = NativeUiTags.OwnerProductsCreateBack,
+        discard = NativeUiTags.OwnerProductsCreateDiscard,
+        keep = NativeUiTags.OwnerProductsCreateKeep,
+    )
+    OwnerProductsFormMode.Edit -> OwnerProductsFormTags(
+        form = NativeUiTags.OwnerProductsEditForm,
+        name = NativeUiTags.OwnerProductsEditName,
+        unitLiters = NativeUiTags.OwnerProductsEditUnitLiters,
+        unitKg = NativeUiTags.OwnerProductsEditUnitKg,
+        rate = NativeUiTags.OwnerProductsEditRate,
+        tracking = NativeUiTags.OwnerProductsEditTracking,
+        notes = NativeUiTags.OwnerProductsEditNotes,
+        save = NativeUiTags.OwnerProductsEditSave,
+        cancel = NativeUiTags.OwnerProductsEditCancel,
+        back = NativeUiTags.OwnerProductsEditBack,
+        discard = NativeUiTags.OwnerProductsEditDiscard,
+        keep = NativeUiTags.OwnerProductsEditKeep,
+    )
+}
+
 @Composable
-private fun OwnerProductsCreateScreen(
+private fun OwnerProductsFormScreen(
     snackbarHostState: SnackbarHostState,
     identity: NativeSignedInIdentity,
     context: NativeOwnerMoreContext,
-    creating: Boolean,
+    mode: OwnerProductsFormMode,
+    initial: NativeOwnerProductRow?,
+    saving: Boolean,
     error: String?,
     onBack: () -> Unit,
-    onCreate: (ProductCatalogInput) -> Unit,
+    onSave: (ProductCatalogInput) -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier,
 ) {
+    val tags = mode.tags()
     val leaveGuard = rememberEntryLeaveGuard()
-    var name by rememberSaveable { mutableStateOf("") }
-    var unit by rememberSaveable { mutableStateOf("Liters") }
-    var rateText by rememberSaveable { mutableStateOf("") }
-    var inventoryTracking by rememberSaveable { mutableStateOf(true) }
-    var notes by rememberSaveable { mutableStateOf("") }
-    var draftTouched by rememberSaveable { mutableStateOf(false) }
+    val formKey = when (mode) {
+        OwnerProductsFormMode.Create -> "create"
+        OwnerProductsFormMode.Edit -> "edit-${initial?.productId ?: 0L}"
+    }
+    var name by rememberSaveable(formKey) { mutableStateOf(initial?.name.orEmpty()) }
+    var unit by rememberSaveable(formKey) { mutableStateOf(initial?.unit ?: "Liters") }
+    var rateText by rememberSaveable(formKey) {
+        mutableStateOf(formatRateForEdit(initial?.defaultSaleRate))
+    }
+    var inventoryTracking by rememberSaveable(formKey) {
+        mutableStateOf(initial?.inventoryTracking ?: true)
+    }
+    var notes by rememberSaveable(formKey) { mutableStateOf(initial?.notes.orEmpty()) }
+    var draftTouched by rememberSaveable(formKey) { mutableStateOf(false) }
 
     val rateTrimmed = rateText.trim()
     val rateValue = rateTrimmed.takeIf { it.isNotEmpty() }?.toDoubleOrNull()
     val rateValid = rateTrimmed.isEmpty() || (rateValue != null && rateValue > 0.0)
     val nameValid = name.trim().isNotEmpty() && !name.contains('\n')
-    val canSave = nameValid && rateValid && unit in setOf("Liters", "Kg") && !creating
-    val dirty = draftTouched && !creating
+    val canSave = nameValid && rateValid && unit in setOf("Liters", "Kg") && !saving
+    val dirty = draftTouched && !saving
 
     LaunchedEffect(dirty) {
         if (dirty) leaveGuard.markDirty() else leaveGuard.clear()
     }
 
     fun requestLeave(action: () -> Unit) {
-        if (creating) return
+        if (saving) return
         leaveGuard.requestLeave(action)
     }
 
@@ -273,7 +363,7 @@ private fun OwnerProductsCreateScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .testTag(NativeUiTags.OwnerProductsCreateForm),
+                    .testTag(tags.form),
             ) {
                 CashierScreenHeader(
                     title = "Products",
@@ -290,171 +380,212 @@ private fun OwnerProductsCreateScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                TextButton(
-                    onClick = { requestLeave(onBack) },
-                    enabled = !creating,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerProductsCreateBack),
-                ) { Text("Back to products") }
-                Text(
-                    "Add product",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = {
-                        name = it
-                        draftTouched = true
-                    },
-                    label = { Text("Name") },
-                    singleLine = true,
-                    enabled = !creating,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag(NativeUiTags.OwnerProductsCreateName),
-                )
-                Text(
-                    "Unit",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FilterChip(
-                        selected = unit == "Liters",
-                        onClick = {
-                            unit = "Liters"
-                            draftTouched = true
-                        },
-                        enabled = !creating,
-                        label = { Text("Liters") },
-                        modifier = Modifier.testTag(NativeUiTags.OwnerProductsCreateUnitLiters),
-                    )
-                    FilterChip(
-                        selected = unit == "Kg",
-                        onClick = {
-                            unit = "Kg"
-                            draftTouched = true
-                        },
-                        enabled = !creating,
-                        label = { Text("Kg") },
-                        modifier = Modifier.testTag(NativeUiTags.OwnerProductsCreateUnitKg),
-                    )
-                }
-                OutlinedTextField(
-                    value = rateText,
-                    onValueChange = {
-                        rateText = it
-                        draftTouched = true
-                    },
-                    label = { Text("Default sale rate (optional)") },
-                    singleLine = true,
-                    enabled = !creating,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    isError = !rateValid,
-                    supportingText = if (!rateValid) {
-                        { Text("Rate must be greater than zero when set") }
-                    } else {
-                        null
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag(NativeUiTags.OwnerProductsCreateRate),
-                )
-                Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        "Track inventory",
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                    Switch(
-                        checked = inventoryTracking,
-                        onCheckedChange = {
-                            inventoryTracking = it
-                            draftTouched = true
-                        },
-                        enabled = !creating,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerProductsCreateTracking),
-                    )
-                }
-                OutlinedTextField(
-                    value = notes,
-                    onValueChange = {
-                        notes = it
-                        draftTouched = true
-                    },
-                    label = { Text("Notes (optional)") },
-                    enabled = !creating,
-                    minLines = 2,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag(NativeUiTags.OwnerProductsCreateNotes),
-                )
-                error?.let {
-                    Text(
-                        it,
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerProductsError),
-                    )
-                }
-                Button(
-                    onClick = {
-                        if (!canSave) return@Button
-                        onCreate(
-                            ProductCatalogInput(
-                                name = name,
-                                unit = unit,
-                                defaultSaleRate = rateValue,
-                                inventoryTracking = inventoryTracking,
-                                notes = notes,
-                            ),
+                    TextButton(
+                        onClick = { requestLeave(onBack) },
+                        enabled = !saving,
+                        modifier = Modifier.testTag(tags.back),
+                    ) {
+                        Text(
+                            when (mode) {
+                                OwnerProductsFormMode.Create -> "Back to products"
+                                OwnerProductsFormMode.Edit -> "Back to detail"
+                            },
                         )
-                    },
-                    enabled = canSave,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag(NativeUiTags.OwnerProductsCreateSave),
-                ) {
-                    if (creating) {
-                        CircularProgressIndicator(
-                            Modifier.height(20.dp),
-                            strokeWidth = 2.dp,
-                        )
-                    } else {
-                        Text("Save product")
                     }
-                }
-                TextButton(
-                    onClick = { requestLeave(onBack) },
-                    enabled = !creating,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerProductsCreateCancel),
-                ) { Text("Cancel") }
+                    Text(
+                        when (mode) {
+                            OwnerProductsFormMode.Create -> "Add product"
+                            OwnerProductsFormMode.Edit -> "Edit product"
+                        },
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = {
+                            name = it
+                            draftTouched = true
+                        },
+                        label = { Text("Name") },
+                        singleLine = true,
+                        enabled = !saving,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(tags.name),
+                    )
+                    Text(
+                        "Unit",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterChip(
+                            selected = unit == "Liters",
+                            onClick = {
+                                unit = "Liters"
+                                draftTouched = true
+                            },
+                            enabled = !saving,
+                            label = { Text("Liters") },
+                            modifier = Modifier.testTag(tags.unitLiters),
+                        )
+                        FilterChip(
+                            selected = unit == "Kg",
+                            onClick = {
+                                unit = "Kg"
+                                draftTouched = true
+                            },
+                            enabled = !saving,
+                            label = { Text("Kg") },
+                            modifier = Modifier.testTag(tags.unitKg),
+                        )
+                    }
+                    OutlinedTextField(
+                        value = rateText,
+                        onValueChange = {
+                            rateText = it
+                            draftTouched = true
+                        },
+                        label = { Text("Default sale rate (optional)") },
+                        singleLine = true,
+                        enabled = !saving,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        isError = !rateValid,
+                        supportingText = if (!rateValid) {
+                            { Text("Rate must be greater than zero when set") }
+                        } else {
+                            null
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(tags.rate),
+                    )
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            "Track inventory",
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                        Switch(
+                            checked = inventoryTracking,
+                            onCheckedChange = {
+                                inventoryTracking = it
+                                draftTouched = true
+                            },
+                            enabled = !saving,
+                            modifier = Modifier.testTag(tags.tracking),
+                        )
+                    }
+                    OutlinedTextField(
+                        value = notes,
+                        onValueChange = {
+                            notes = it
+                            draftTouched = true
+                        },
+                        label = { Text("Notes (optional)") },
+                        enabled = !saving,
+                        minLines = 2,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(tags.notes),
+                    )
+                    error?.let {
+                        Text(
+                            it,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.testTag(NativeUiTags.OwnerProductsError),
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            if (!canSave) return@Button
+                            onSave(
+                                ProductCatalogInput(
+                                    name = name,
+                                    unit = unit,
+                                    defaultSaleRate = rateValue,
+                                    inventoryTracking = inventoryTracking,
+                                    notes = notes,
+                                ),
+                            )
+                        },
+                        enabled = canSave,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(tags.save),
+                    ) {
+                        if (saving) {
+                            CircularProgressIndicator(
+                                Modifier.height(20.dp),
+                                strokeWidth = 2.dp,
+                            )
+                        } else {
+                            Text(
+                                when (mode) {
+                                    OwnerProductsFormMode.Create -> "Save product"
+                                    OwnerProductsFormMode.Edit -> "Save changes"
+                                },
+                            )
+                        }
+                    }
+                    TextButton(
+                        onClick = { requestLeave(onBack) },
+                        enabled = !saving,
+                        modifier = Modifier.testTag(tags.cancel),
+                    ) { Text("Cancel") }
                 }
             }
         }
-        OwnerProductsCreateDiscardDialog(leaveGuard)
+        OwnerProductsFormDiscardDialog(
+            leaveGuard = leaveGuard,
+            mode = mode,
+            discardTag = tags.discard,
+            keepTag = tags.keep,
+        )
     }
 }
 
 @Composable
-private fun OwnerProductsCreateDiscardDialog(leaveGuard: EntryLeaveGuard) {
+private fun OwnerProductsFormDiscardDialog(
+    leaveGuard: EntryLeaveGuard,
+    mode: OwnerProductsFormMode,
+    discardTag: String,
+    keepTag: String,
+) {
     if (!leaveGuard.discardConfirmationOpen) return
     AlertDialog(
         onDismissRequest = leaveGuard::keepEditing,
-        title = { Text("Discard this product?") },
-        text = { Text("The name, unit, rate, and notes you entered will be cleared.") },
+        title = {
+            Text(
+                when (mode) {
+                    OwnerProductsFormMode.Create -> "Discard this product?"
+                    OwnerProductsFormMode.Edit -> "Discard changes?"
+                },
+            )
+        },
+        text = {
+            Text(
+                when (mode) {
+                    OwnerProductsFormMode.Create ->
+                        "The name, unit, rate, and notes you entered will be cleared."
+                    OwnerProductsFormMode.Edit ->
+                        "Unsaved edits to this product will be lost."
+                },
+            )
+        },
         confirmButton = {
             TextButton(
                 onClick = leaveGuard::confirmDiscard,
-                modifier = Modifier.testTag(NativeUiTags.OwnerProductsCreateDiscard),
+                modifier = Modifier.testTag(discardTag),
             ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(
                 onClick = leaveGuard::keepEditing,
-                modifier = Modifier.testTag(NativeUiTags.OwnerProductsCreateKeep),
+                modifier = Modifier.testTag(keepTag),
             ) { Text("Keep editing") }
         },
     )
@@ -466,11 +597,22 @@ private fun OwnerProductsDetailScreen(
     identity: NativeSignedInIdentity,
     context: NativeOwnerMoreContext,
     detail: NativeOwnerProductDetail,
+    archiving: Boolean,
+    error: String?,
     onBack: () -> Unit,
+    onOpenEdit: () -> Unit,
+    onArchive: () -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier,
 ) {
-    BackHandler(onBack = onBack)
+    var archiveConfirmOpen by rememberSaveable { mutableStateOf(false) }
+    BackHandler(enabled = !archiving) {
+        if (archiveConfirmOpen) {
+            archiveConfirmOpen = false
+        } else {
+            onBack()
+        }
+    }
     val row = detail.row
     OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
         Column(
@@ -495,6 +637,7 @@ private fun OwnerProductsDetailScreen(
             ) {
                 TextButton(
                     onClick = onBack,
+                    enabled = !archiving,
                     modifier = Modifier.testTag(NativeUiTags.OwnerProductsDetailBack),
                 ) { Text("Back to products") }
                 Text(
@@ -510,14 +653,66 @@ private fun OwnerProductsDetailScreen(
                 if (!row.notes.isNullOrBlank()) {
                     OwnerProductFact("Notes", row.notes)
                 }
-                Text(
-                    "Read only in this preview. Editing comes next.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerProductsDetailReadOnly),
-                )
+                error?.let {
+                    Text(
+                        it,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerProductsError),
+                    )
+                }
+                Button(
+                    onClick = onOpenEdit,
+                    enabled = !archiving,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(NativeUiTags.OwnerProductsDetailEdit),
+                ) { Text("Edit product") }
+                TextButton(
+                    onClick = { archiveConfirmOpen = true },
+                    enabled = !archiving,
+                    modifier = Modifier.testTag(NativeUiTags.OwnerProductsDetailArchive),
+                ) {
+                    if (archiving) {
+                        CircularProgressIndicator(
+                            Modifier.height(20.dp),
+                            strokeWidth = 2.dp,
+                        )
+                    } else {
+                        Text("Archive product")
+                    }
+                }
             }
         }
+    }
+    if (archiveConfirmOpen) {
+        AlertDialog(
+            onDismissRequest = {
+                if (!archiving) archiveConfirmOpen = false
+            },
+            title = { Text("Archive this product?") },
+            text = {
+                Text(
+                    "“${row.name}” will leave the active catalog and no longer appear in the product list.",
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        archiveConfirmOpen = false
+                        onArchive()
+                    },
+                    enabled = !archiving,
+                    modifier = Modifier.testTag(NativeUiTags.OwnerProductsArchiveConfirm),
+                ) { Text("Archive") }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { archiveConfirmOpen = false },
+                    enabled = !archiving,
+                    modifier = Modifier.testTag(NativeUiTags.OwnerProductsArchiveCancel),
+                ) { Text("Cancel") }
+            },
+        )
     }
 }
 
@@ -570,5 +765,14 @@ private fun OwnerProductFact(label: String, value: String) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(value, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+private fun formatRateForEdit(rate: Double?): String {
+    if (rate == null) return ""
+    return if (rate % 1.0 == 0.0) {
+        rate.toLong().toString()
+    } else {
+        String.format(Locale.US, "%s", rate)
     }
 }

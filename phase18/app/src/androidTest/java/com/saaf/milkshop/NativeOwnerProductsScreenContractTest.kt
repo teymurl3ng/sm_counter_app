@@ -65,18 +65,39 @@ class NativeOwnerProductsScreenContractTest {
     }
 
     @Test
-    fun detailShowsFactsAndBack() {
+    fun detailShowsFactsEditArchiveAndBack() {
         var back = false
+        var editOpened = false
         setScreen(
             products = listOf(sampleProduct()),
             productDetail = NativeOwnerProductDetail(sampleProduct()),
             onBackFromDetail = { back = true },
+            onOpenEdit = { editOpened = true },
         )
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetail).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailName).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailReadOnly).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailEdit).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailArchive).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailEdit).performClick()
+        assertTrue(editOpened)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailArchive).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsArchiveConfirm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsArchiveCancel).performClick()
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailBack).performClick()
         assertTrue(back)
+    }
+
+    @Test
+    fun archiveConfirmCallsArchive() {
+        var archived = false
+        setScreen(
+            products = listOf(sampleProduct()),
+            productDetail = NativeOwnerProductDetail(sampleProduct()),
+            onArchiveProduct = { archived = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailArchive).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsArchiveConfirm).performClick()
+        assertTrue(archived)
     }
 
     @Test
@@ -146,6 +167,51 @@ class NativeOwnerProductsScreenContractTest {
     }
 
     @Test
+    fun editFormPrefillsAndSaves() {
+        var saved: ProductCatalogInput? = null
+        setScreen(
+            products = listOf(sampleProduct()),
+            productDetail = NativeOwnerProductDetail(sampleProduct()),
+            productEditOpen = true,
+            onUpdateProduct = { saved = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsEditForm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsEditName)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsEditUnitLiters).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsEditUnitKg).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsEditRate)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsEditTracking)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsEditNotes)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertDoesNotExist()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsEditName)
+            .performScrollTo()
+            .performTextReplacement("Cream Updated")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsEditUnitLiters).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsEditRate)
+            .performScrollTo()
+            .performTextReplacement("525")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsEditSave)
+            .performScrollTo()
+            .assertIsEnabled()
+            .performClick()
+
+        assertEquals("Cream Updated", saved!!.name)
+        assertEquals("Liters", saved!!.unit)
+        assertEquals(525.0, saved!!.defaultSaleRate!!, 0.001)
+        assertTrue(saved!!.inventoryTracking)
+    }
+
+    @Test
     fun loadFailureOffersRetry() {
         var retries = 0
         setScreen(
@@ -163,6 +229,9 @@ class NativeOwnerProductsScreenContractTest {
         productDetail: NativeOwnerProductDetail? = null,
         productCreateOpen: Boolean = false,
         productCreating: Boolean = false,
+        productEditOpen: Boolean = false,
+        productUpdating: Boolean = false,
+        productArchiving: Boolean = false,
         productsError: String? = null,
         onBackToMenu: () -> Unit = {},
         onRetry: () -> Unit = {},
@@ -171,6 +240,10 @@ class NativeOwnerProductsScreenContractTest {
         onOpenCreate: () -> Unit = {},
         onBackFromCreate: () -> Unit = {},
         onCreateProduct: (ProductCatalogInput) -> Unit = {},
+        onOpenEdit: () -> Unit = {},
+        onBackFromEdit: () -> Unit = {},
+        onUpdateProduct: (ProductCatalogInput) -> Unit = {},
+        onArchiveProduct: () -> Unit = {},
         onNavigate: (OwnerSection) -> Unit = {},
     ) {
         composeRule.setContent {
@@ -194,6 +267,9 @@ class NativeOwnerProductsScreenContractTest {
                     productDetail = productDetail,
                     productCreateOpen = productCreateOpen,
                     productCreating = productCreating,
+                    productEditOpen = productEditOpen,
+                    productUpdating = productUpdating,
+                    productArchiving = productArchiving,
                     productsError = productsError,
                     onBackToMenu = onBackToMenu,
                     onRetry = onRetry,
@@ -202,6 +278,10 @@ class NativeOwnerProductsScreenContractTest {
                     onOpenCreate = onOpenCreate,
                     onBackFromCreate = onBackFromCreate,
                     onCreateProduct = onCreateProduct,
+                    onOpenEdit = onOpenEdit,
+                    onBackFromEdit = onBackFromEdit,
+                    onUpdateProduct = onUpdateProduct,
+                    onArchiveProduct = onArchiveProduct,
                     onNavigate = onNavigate,
                 )
             }
@@ -212,6 +292,8 @@ class NativeOwnerProductsScreenContractTest {
         productId = 11L,
         name = "Cream",
         unit = "Kg",
+        defaultSaleRate = 500.0,
+        inventoryTracking = true,
         rateLabel = "PKR 500.00 / Kg",
         statusLabel = "Active",
         trackingLabel = "Stock tracked",

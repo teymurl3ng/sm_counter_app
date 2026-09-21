@@ -118,12 +118,87 @@ class NativeOwnerProductsFacadeTest {
     }
 
     @Test
+    fun updateProductThenDetailReflectsChanges() = runBlocking {
+        val productId = facade.createProduct(
+            ownerSession,
+            ProductCatalogInput(
+                "Owner Edit Milk",
+                "Liters",
+                defaultSaleRate = 100.0,
+                inventoryTracking = true,
+                notes = "Before",
+            ),
+        )
+        facade.updateProduct(
+            ownerSession,
+            productId,
+            ProductCatalogInput(
+                "Owner Edit Milk Updated",
+                "Kg",
+                defaultSaleRate = 150.0,
+                inventoryTracking = false,
+                notes = "After",
+            ),
+        )
+        val detail = facade.loadDetail(ownerSession, productId)
+        assertEquals("Owner Edit Milk Updated", detail.row.name)
+        assertEquals("Kg", detail.row.unit)
+        assertEquals(150.0, detail.row.defaultSaleRate!!, 0.001)
+        assertEquals(false, detail.row.inventoryTracking)
+        assertEquals("Not stock tracked", detail.row.trackingLabel)
+        assertTrue(detail.row.rateLabel!!.contains("150"))
+        assertEquals("After", detail.row.notes)
+        assertEquals("Active", detail.row.statusLabel)
+    }
+
+    @Test
+    fun archiveProductThenAbsentFromActiveList() = runBlocking {
+        val productId = facade.createProduct(
+            ownerSession,
+            ProductCatalogInput("Owner Archive Milk", "Liters", defaultSaleRate = 80.0),
+        )
+        facade.archiveProduct(ownerSession, productId)
+        val snapshot = facade.loadProducts(ownerSession)
+        assertFalse(snapshot.products.any { it.productId == productId })
+        val detailRejected = runCatching { facade.loadDetail(ownerSession, productId) }
+        assertTrue(detailRejected.isFailure)
+    }
+
+    @Test
     fun createProductRejectsNonOwner() = runBlocking {
         val rejected = runCatching {
             facade.createProduct(
                 cashierSession,
                 ProductCatalogInput("Blocked Product", "Kg"),
             )
+        }
+        assertTrue(rejected.isFailure)
+    }
+
+    @Test
+    fun updateProductRejectsNonOwner() = runBlocking {
+        val productId = facade.createProduct(
+            ownerSession,
+            ProductCatalogInput("Owner Gate Milk", "Kg"),
+        )
+        val rejected = runCatching {
+            facade.updateProduct(
+                cashierSession,
+                productId,
+                ProductCatalogInput("Blocked Update", "Kg"),
+            )
+        }
+        assertTrue(rejected.isFailure)
+    }
+
+    @Test
+    fun archiveProductRejectsNonOwner() = runBlocking {
+        val productId = facade.createProduct(
+            ownerSession,
+            ProductCatalogInput("Owner Gate Archive", "Kg"),
+        )
+        val rejected = runCatching {
+            facade.archiveProduct(cashierSession, productId)
         }
         assertTrue(rejected.isFailure)
     }

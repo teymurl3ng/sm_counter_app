@@ -68,6 +68,9 @@ sealed interface NativeOwnerMoreState {
         val productDetail: NativeOwnerProductDetail? = null,
         val productCreateOpen: Boolean = false,
         val productCreating: Boolean = false,
+        val productEditOpen: Boolean = false,
+        val productUpdating: Boolean = false,
+        val productArchiving: Boolean = false,
         val productsError: String? = null,
         val customers: List<NativeOwnerCustomerRow> = emptyList(),
         val customersLoading: Boolean = false,
@@ -166,6 +169,9 @@ class NativeOwnerMoreViewModel(
             productDetail = null,
             productCreateOpen = false,
             productCreating = false,
+            productEditOpen = false,
+            productUpdating = false,
+            productArchiving = false,
             customersError = null,
             customerDetail = null,
             suppliersError = null,
@@ -193,6 +199,9 @@ class NativeOwnerMoreViewModel(
             productDetail = null,
             productCreateOpen = false,
             productCreating = false,
+            productEditOpen = false,
+            productUpdating = false,
+            productArchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -233,6 +242,9 @@ class NativeOwnerMoreViewModel(
             productDetail = null,
             productCreateOpen = false,
             productCreating = false,
+            productEditOpen = false,
+            productUpdating = false,
+            productArchiving = false,
         )
         scope.launch {
             try {
@@ -259,6 +271,9 @@ class NativeOwnerMoreViewModel(
             productsError = null,
             productCreateOpen = false,
             productCreating = false,
+            productEditOpen = false,
+            productUpdating = false,
+            productArchiving = false,
         )
         scope.launch {
             try {
@@ -280,7 +295,14 @@ class NativeOwnerMoreViewModel(
 
     fun clearProductDetail() {
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
-        _state.value = current.copy(productDetail = null, productsError = null, productsLoading = false)
+        _state.value = current.copy(
+            productDetail = null,
+            productEditOpen = false,
+            productUpdating = false,
+            productArchiving = false,
+            productsError = null,
+            productsLoading = false,
+        )
     }
 
     fun openProductCreate() {
@@ -289,6 +311,9 @@ class NativeOwnerMoreViewModel(
         _state.value = current.copy(
             productCreateOpen = true,
             productCreating = false,
+            productEditOpen = false,
+            productUpdating = false,
+            productArchiving = false,
             productDetail = null,
             productsError = null,
             productsLoading = false,
@@ -300,6 +325,9 @@ class NativeOwnerMoreViewModel(
         _state.value = current.copy(
             productCreateOpen = false,
             productCreating = false,
+            productEditOpen = false,
+            productUpdating = false,
+            productArchiving = false,
             productsError = null,
         )
     }
@@ -320,8 +348,97 @@ class NativeOwnerMoreViewModel(
                     products = snapshot.products,
                     productCreateOpen = false,
                     productCreating = false,
+                    productEditOpen = false,
+                    productUpdating = false,
+                    productArchiving = false,
                     productsError = null,
                     productDetail = null,
+                    productsLoading = false,
+                )
+            } catch (error: Throwable) {
+                handleProductsFailure(error)
+            }
+        }
+    }
+
+    fun openProductEdit() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Products) return
+        if (current.productDetail == null) return
+        _state.value = current.copy(
+            productEditOpen = true,
+            productUpdating = false,
+            productCreateOpen = false,
+            productCreating = false,
+            productArchiving = false,
+            productsError = null,
+            productsLoading = false,
+        )
+    }
+
+    fun clearProductEdit() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            productEditOpen = false,
+            productUpdating = false,
+            productsError = null,
+        )
+    }
+
+    fun updateProduct(input: ProductCatalogInput) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val productId = current.productDetail?.row?.productId ?: return
+        if (current.destination != NativeOwnerMoreDestination.Products || !current.productEditOpen) return
+        if (current.productUpdating) return
+        _state.value = current.copy(productUpdating = true, productsError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    productsFacade.updateProduct(session, productId, input)
+                }
+                val detail = withContext(Dispatchers.IO) {
+                    productsFacade.loadDetail(session, productId)
+                }
+                val snapshot = withContext(Dispatchers.IO) { productsFacade.loadProducts(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Products) return@launch
+                _state.value = latest.copy(
+                    products = snapshot.products,
+                    productDetail = detail,
+                    productEditOpen = false,
+                    productUpdating = false,
+                    productsError = null,
+                    productsLoading = false,
+                )
+            } catch (error: Throwable) {
+                handleProductsFailure(error)
+            }
+        }
+    }
+
+    fun archiveProduct() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val productId = current.productDetail?.row?.productId ?: return
+        if (current.destination != NativeOwnerMoreDestination.Products) return
+        if (current.productArchiving || current.productEditOpen || current.productCreateOpen) return
+        _state.value = current.copy(productArchiving = true, productsError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    productsFacade.archiveProduct(session, productId)
+                }
+                val snapshot = withContext(Dispatchers.IO) { productsFacade.loadProducts(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Products) return@launch
+                _state.value = latest.copy(
+                    products = snapshot.products,
+                    productDetail = null,
+                    productEditOpen = false,
+                    productUpdating = false,
+                    productArchiving = false,
+                    productsError = null,
                     productsLoading = false,
                 )
             } catch (error: Throwable) {
@@ -342,6 +459,9 @@ class NativeOwnerMoreViewModel(
             productDetail = null,
             productCreateOpen = false,
             productCreating = false,
+            productEditOpen = false,
+            productUpdating = false,
+            productArchiving = false,
             productsError = null,
             suppliersLoading = false,
             supplierDetail = null,
@@ -430,6 +550,9 @@ class NativeOwnerMoreViewModel(
             productDetail = null,
             productCreateOpen = false,
             productCreating = false,
+            productEditOpen = false,
+            productUpdating = false,
+            productArchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -518,6 +641,9 @@ class NativeOwnerMoreViewModel(
             productDetail = null,
             productCreateOpen = false,
             productCreating = false,
+            productEditOpen = false,
+            productUpdating = false,
+            productArchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -623,6 +749,9 @@ class NativeOwnerMoreViewModel(
             productDetail = null,
             productCreateOpen = false,
             productCreating = false,
+            productEditOpen = false,
+            productUpdating = false,
+            productArchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -740,6 +869,9 @@ class NativeOwnerMoreViewModel(
             productDetail = null,
             productCreateOpen = false,
             productCreating = false,
+            productEditOpen = false,
+            productUpdating = false,
+            productArchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -816,6 +948,9 @@ class NativeOwnerMoreViewModel(
             productDetail = null,
             productCreateOpen = false,
             productCreating = false,
+            productEditOpen = false,
+            productUpdating = false,
+            productArchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -920,6 +1055,9 @@ class NativeOwnerMoreViewModel(
             productDetail = null,
             productCreateOpen = false,
             productCreating = false,
+            productEditOpen = false,
+            productUpdating = false,
+            productArchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -1036,6 +1174,9 @@ class NativeOwnerMoreViewModel(
             productDetail = null,
             productCreateOpen = false,
             productCreating = false,
+            productEditOpen = false,
+            productUpdating = false,
+            productArchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -1111,6 +1252,9 @@ class NativeOwnerMoreViewModel(
             productDetail = null,
             productCreateOpen = false,
             productCreating = false,
+            productEditOpen = false,
+            productUpdating = false,
+            productArchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -1272,6 +1416,8 @@ class NativeOwnerMoreViewModel(
         _state.value = current.copy(
             productsLoading = false,
             productCreating = false,
+            productUpdating = false,
+            productArchiving = false,
             productsError = publicMessage(error),
         )
     }

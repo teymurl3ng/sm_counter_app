@@ -122,15 +122,14 @@ class NativeOwnerWorkScreenContractTest {
     }
 
     @Test
-    fun expensePreviewShowsExplicitNotConnectedCopy() {
+    fun recordExpenseOpensConnectedDestination() {
+        var opened: NativeOwnerWorkDestination? = null
         setScreen(
-            NativeOwnerWorkState.Ready(
-                context = openContext(),
-                destination = NativeOwnerWorkDestination.RecordExpense,
-            ),
+            NativeOwnerWorkState.Ready(context = openContext()),
+            onOpenDestination = { opened = it },
         )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkExpensePreview).assertIsDisplayed()
-        composeRule.onNodeWithText("not connected yet", substring = true).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkRecordExpense).performClick()
+        assertEquals(NativeOwnerWorkDestination.RecordExpense, opened)
     }
 
     @Test
@@ -172,7 +171,7 @@ class NativeOwnerWorkScreenContractTest {
         setScreen(
             state = NativeOwnerWorkState.Ready(
                 context = openContext(),
-                destination = NativeOwnerWorkDestination.RecordExpense,
+                destination = NativeOwnerWorkDestination.PaySupplier,
             ),
             onBackToHome = { returned = true },
         )

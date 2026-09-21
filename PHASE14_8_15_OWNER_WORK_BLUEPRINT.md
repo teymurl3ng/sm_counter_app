@@ -42,16 +42,19 @@ This checkpoint owns **Owner Work home** only: the all-command launcher. It conn
 
 ## Connected in this checkpoint
 
-- Record sale → existing `CashierSaleScreen` / sale facade
-- Record payment → existing `CashierCollectionScreen` / collection facade
-- Receive milk → existing `ReceiveMilkScreen`
-- Make yogurt → existing `MakeYogurtScreen`
-- Record spoilage → existing `RecordSpoilageScreen`
-- Deliveries → existing `DeliveriesScreen`
+- Record sale → Owner-hosted sale content / sale facade (CORE METHOD)
+- Record payment → Owner-hosted collection content / collection facade (CORE METHOD)
+- Receive milk → Owner-hosted receive content (CORE METHOD)
+- Make yogurt → Owner-hosted yogurt content (CORE METHOD)
+- Record spoilage → Owner-hosted spoilage content (CORE METHOD)
+- Deliveries → Owner-hosted deliveries content (CORE METHOD)
+
+## Connected later (Queue B)
+
+- Record expense → Owner-hosted expense content / `NativeExpenseFacade` (CORE METHOD) — see `PHASE14_8_27_OWNER_EXPENSE_BLUEPRINT.md`
 
 ## Preview notices in this checkpoint
 
-- Record expense
 - Pay supplier
 - Pay salary
 - Cash count and close
@@ -61,8 +64,8 @@ This checkpoint owns **Owner Work home** only: the all-command launcher. It conn
 | Control | Required workflow | Visible result | Native test obligation |
 |---|---|---|---|
 | Work nav | Open Owner Work home | Launcher groups visible | Destination asserted |
-| Record sale / payment / receive / yogurt / spoilage / deliveries | Open connected entry | Existing entry screen | Tags + open contracts |
-| Expense / pay supplier / salary / cash close | Preview notice | Explicit not-connected copy | Tags + copy |
+| Record sale / payment / receive / yogurt / spoilage / deliveries / expense | Open connected entry | Owner-hosted entry | Tags + Foundation chrome/Back |
+| Pay supplier / salary / cash close | Preview notice | Explicit not-connected copy | Tags + copy |
 | Hardware Back on Work home | Leave authenticated area | Welcome/Access like Overview | Back contract |
 | Hardware Back inside connected entry | Return to Work home | Work launcher | Back contract |
 

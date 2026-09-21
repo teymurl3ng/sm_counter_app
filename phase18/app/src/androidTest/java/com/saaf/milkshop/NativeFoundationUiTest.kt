@@ -331,21 +331,22 @@ class NativeFoundationUiTest {
     }
 
     @Test
-    fun ownerWorkExpenseShowsExplicitPreview() {
-        openOwnerOverview()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).performClick()
-        composeRule.waitUntil(10_000) {
-            runCatching {
-                composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).fetchSemanticsNode()
-            }.isSuccess
-        }
-        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkRecordExpense).performClick()
-        composeRule.waitUntil(10_000) {
-            runCatching {
-                composeRule.onNodeWithTag(NativeUiTags.OwnerWorkExpensePreview).fetchSemanticsNode()
-            }.isSuccess
-        }
-        composeRule.onNodeWithText("not connected yet", substring = true).assertIsDisplayed()
+    fun ownerExpenseOpensUnderOwnerChrome() {
+        openOwnerExpense()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerExpenseEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ExpenseCategorySelector)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+    }
+
+    @Test
+    fun ownerExpenseHardwareBackReturnsToWorkHome() {
+        openOwnerExpense()
+        pressHardwareBack()
+        assertReturnedToOwnerWorkHome()
     }
 
     @Test
@@ -1783,6 +1784,17 @@ class NativeFoundationUiTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OwnerCollectionEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerExpense() {
+        openOwnerWork()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkRecordExpense).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ExpenseCategorySelector).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerExpenseEntryRoot).assertIsDisplayed()
     }
 
     private fun openOwnerReceiveMilk() {

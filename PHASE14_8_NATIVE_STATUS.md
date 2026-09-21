@@ -11,9 +11,9 @@ Living canvas: open `native-phase-plan-overview` beside chat
 | Cashier (`Sell / Collect / Activity / More`) | **Done** |
 | Operations (`Work` + task entries + Deliveries + Attendance + More) | **Done** |
 | Owner primary nav (`Overview / Work / Records / More`) | **Done** |
-| Owner Work shared entries (Sale…Deliveries under Owner shell) | **Done** (CORE METHOD) |
+| Owner Work shared entries (Sale…Deliveries + Expense under Owner shell) | **Done** (CORE METHOD) |
 | Owner More deep destinations | **Done** (read slices; writes deferred) |
-| Owner Work money commands / Reports / Manager·Admin | **Left** |
+| Owner Work remaining money / Reports / Manager·Admin | **Left** |
 
 ## Done
 
@@ -26,12 +26,15 @@ Living canvas: open `native-phase-plan-overview` beside chat
 - **14.8.18–21** Products, Customers, Suppliers, Employees — list + read detail under More
 - **14.8.22** Costing & plans — policy list + read detail
 - **14.8.23–26** Shop settings, Users & roles, Security history, Backup & restore — read panels / lists (batch)
+- **14.8.27** Owner Work Record expense — Owner-hosted form + post (CORE METHOD; Cashier host deferred)
 
 ## Partial / uncommitted
 
 - **14.8.22–26** (Costing through Backup) — implemented + `qaScreen -Pqa.screen=ownermore` **PASS**, **still uncommitted**
+- **14.8.27** Record expense — implemented; run `qaScreen -Pqa.screen=ownerwork` before commit
 - Directory create/edit write UIs (Products…Employees, Costing approve, Shop edit, user enroll, backup export/restore/connect) — deferred with preview notices
 - Records ledgers / closing history / corrections **write** — deferred from 14.8.16
+- Cashier expense host wrapper — deferred from 14.8.27
 
 ## Left (preview or not started)
 
@@ -41,7 +44,6 @@ Living canvas: open `native-phase-plan-overview` beside chat
 
 ### Owner Work money
 
-- Record expense  
 - Pay supplier  
 - Pay salary  
 - Cash count & close (+ reopen later)
@@ -50,18 +52,14 @@ Living canvas: open `native-phase-plan-overview` beside chat
 
 - Month reports  
 - Manager / Admin native shells  
+- Cashier-hosted expense shell  
 
 ## Recommended next moves
 
-**Queue A is complete** for More menu destinations (read slices).
-
-**B — Pivot to Work money**  
-Expense / supplier / salary / Cash & close (larger write UIs; still CORE METHOD if multi-role)
-
-Or commit 14.8.22–26 as one batch, then start B.
+**Queue B continues** with Pay supplier / salary / Cash & close after expense qaScreen PASS.
 
 ## Authority
 
 - `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md` / journey / role calibration  
-- Owner blueprints `PHASE14_8_14` … `PHASE14_8_26`  
+- Owner blueprints `PHASE14_8_14` … `PHASE14_8_27`  
 - `.cursor/rules/native-shell-vs-content.mdc`

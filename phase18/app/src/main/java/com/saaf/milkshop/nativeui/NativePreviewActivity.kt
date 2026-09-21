@@ -26,6 +26,7 @@ import com.saaf.milkshop.application.activity.NativeActivityFacade
 import com.saaf.milkshop.application.authentication.NativeAuthenticationFacade
 import com.saaf.milkshop.application.authentication.NativeQuickUnlockFacade
 import com.saaf.milkshop.application.collection.NativeCollectionFacade
+import com.saaf.milkshop.application.expense.NativeExpenseFacade
 import com.saaf.milkshop.application.more.NativeMoreFacade
 import com.saaf.milkshop.application.operations.NativeAttendanceFacade
 import com.saaf.milkshop.application.operations.NativeDeliveriesFacade
@@ -58,6 +59,8 @@ import com.saaf.milkshop.nativeui.auth.NativeAuthenticationState
 import com.saaf.milkshop.nativeui.auth.NativeAuthenticationViewModel
 import com.saaf.milkshop.nativeui.collection.NativeCollectionState
 import com.saaf.milkshop.nativeui.collection.NativeCollectionViewModel
+import com.saaf.milkshop.nativeui.expense.NativeExpenseState
+import com.saaf.milkshop.nativeui.expense.NativeExpenseViewModel
 import com.saaf.milkshop.nativeui.more.NativeMoreState
 import com.saaf.milkshop.nativeui.more.NativeMoreViewModel
 import com.saaf.milkshop.nativeui.operations.NativeAttendanceState
@@ -105,6 +108,7 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var quickUnlockFacade: NativeQuickUnlockFacade
     private lateinit var saleFacade: NativeSaleFacade
     private lateinit var collectionFacade: NativeCollectionFacade
+    private lateinit var expenseFacade: NativeExpenseFacade
     private lateinit var activityFacade: NativeActivityFacade
     private lateinit var moreFacade: NativeMoreFacade
     private lateinit var operationsWorkFacade: NativeOperationsWorkFacade
@@ -146,6 +150,13 @@ class NativePreviewActivity : FragmentActivity() {
     private val collectionViewModel by viewModels<NativeCollectionViewModel> {
         NativeCollectionViewModel.Factory(
             facade = collectionFacade,
+            onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
+        )
+    }
+
+    private val expenseViewModel by viewModels<NativeExpenseViewModel> {
+        NativeExpenseViewModel.Factory(
+            facade = expenseFacade,
             onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
         )
     }
@@ -265,6 +276,7 @@ class NativePreviewActivity : FragmentActivity() {
         quickUnlockFacade = NativeQuickUnlockFacade(quickUnlockService, authenticationFacade)
         saleFacade = NativeSaleFacade(app.database, app.userSecurity)
         collectionFacade = NativeCollectionFacade(app.database, app.userSecurity)
+        expenseFacade = NativeExpenseFacade(app.database, app.userSecurity)
         activityFacade = NativeActivityFacade(app.database, app.userSecurity)
         moreFacade = NativeMoreFacade(app.database, app.userSecurity, quickUnlockService)
         operationsWorkFacade = NativeOperationsWorkFacade(app.database, app.userSecurity)
@@ -303,6 +315,7 @@ class NativePreviewActivity : FragmentActivity() {
                 val authenticationState by authenticationViewModel.state.collectAsState()
                 val saleState by saleViewModel.state.collectAsState()
                 val collectionState by collectionViewModel.state.collectAsState()
+                val expenseState by expenseViewModel.state.collectAsState()
                 val activityState by activityViewModel.state.collectAsState()
                 val moreState by moreViewModel.state.collectAsState()
                 val operationsWorkState by operationsWorkViewModel.state.collectAsState()
@@ -328,6 +341,8 @@ class NativePreviewActivity : FragmentActivity() {
                     saleViewModel = saleViewModel,
                     collectionState = collectionState,
                     collectionViewModel = collectionViewModel,
+                    expenseState = expenseState,
+                    expenseViewModel = expenseViewModel,
                     activityState = activityState,
                     activityViewModel = activityViewModel,
                     moreState = moreState,
@@ -401,6 +416,8 @@ private fun NativeFoundationPreview(
     saleViewModel: NativeSaleViewModel,
     collectionState: NativeCollectionState,
     collectionViewModel: NativeCollectionViewModel,
+    expenseState: NativeExpenseState,
+    expenseViewModel: NativeExpenseViewModel,
     activityState: NativeActivityState,
     activityViewModel: NativeActivityViewModel,
     moreState: NativeMoreState,
@@ -547,6 +564,7 @@ private fun NativeFoundationPreview(
     fun closeCashierShell() {
         saleViewModel.close()
         collectionViewModel.close()
+        expenseViewModel.close()
         activityViewModel.close()
         moreViewModel.close()
     }
@@ -652,6 +670,8 @@ private fun NativeFoundationPreview(
                     saleViewModel = saleViewModel,
                     collectionState = collectionState,
                     collectionViewModel = collectionViewModel,
+                    expenseState = expenseState,
+                    expenseViewModel = expenseViewModel,
                     receiveMilkState = receiveMilkState,
                     receiveMilkViewModel = receiveMilkViewModel,
                     makeYogurtState = makeYogurtState,

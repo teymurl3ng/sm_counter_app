@@ -136,7 +136,6 @@ private fun ReadyWork(
                 }
             }
         }
-        NativeOwnerWorkDestination.RecordExpense,
         NativeOwnerWorkDestination.PaySupplier,
         NativeOwnerWorkDestination.PaySalary,
         NativeOwnerWorkDestination.CashCountAndClose,
@@ -153,6 +152,7 @@ private fun ReadyWork(
         NativeOwnerWorkDestination.RecordSale,
         NativeOwnerWorkDestination.ReceiveMilk,
         NativeOwnerWorkDestination.RecordPayment,
+        NativeOwnerWorkDestination.RecordExpense,
         NativeOwnerWorkDestination.MakeYogurt,
         NativeOwnerWorkDestination.RecordSpoilage,
         NativeOwnerWorkDestination.Deliveries,
@@ -416,7 +416,6 @@ private fun PreviewDestination(
 }
 
 private fun previewTitle(destination: NativeOwnerWorkDestination): String = when (destination) {
-    NativeOwnerWorkDestination.RecordExpense -> "Record expense"
     NativeOwnerWorkDestination.PaySupplier -> "Pay supplier"
     NativeOwnerWorkDestination.PaySalary -> "Pay salary"
     NativeOwnerWorkDestination.CashCountAndClose -> "Cash count and close"
@@ -424,8 +423,6 @@ private fun previewTitle(destination: NativeOwnerWorkDestination): String = when
 }
 
 private fun previewMessage(destination: NativeOwnerWorkDestination): String = when (destination) {
-    NativeOwnerWorkDestination.RecordExpense ->
-        "Expense entry is not connected yet in Owner Work. Overview and connected daily commands stay available."
     NativeOwnerWorkDestination.PaySupplier ->
         "Supplier payment is not connected yet in Owner Work. Overview and connected daily commands stay available."
     NativeOwnerWorkDestination.PaySalary ->
@@ -436,7 +433,6 @@ private fun previewMessage(destination: NativeOwnerWorkDestination): String = wh
 }
 
 private fun previewTag(destination: NativeOwnerWorkDestination): String = when (destination) {
-    NativeOwnerWorkDestination.RecordExpense -> NativeUiTags.OwnerWorkExpensePreview
     NativeOwnerWorkDestination.PaySupplier -> NativeUiTags.OwnerWorkPaySupplierPreview
     NativeOwnerWorkDestination.PaySalary -> NativeUiTags.OwnerWorkPaySalaryPreview
     NativeOwnerWorkDestination.CashCountAndClose -> NativeUiTags.OwnerWorkCashClosePreview
@@ -446,6 +442,7 @@ private fun previewTag(destination: NativeOwnerWorkDestination): String = when (
 private fun openingLabel(destination: NativeOwnerWorkDestination): String = when (destination) {
     NativeOwnerWorkDestination.RecordSale -> "Opening record sale…"
     NativeOwnerWorkDestination.RecordPayment -> "Opening record payment…"
+    NativeOwnerWorkDestination.RecordExpense -> "Opening record expense…"
     NativeOwnerWorkDestination.ReceiveMilk -> "Opening receive milk…"
     NativeOwnerWorkDestination.MakeYogurt -> "Opening make yogurt…"
     NativeOwnerWorkDestination.RecordSpoilage -> "Opening record spoilage…"

@@ -350,6 +350,25 @@ class NativeFoundationUiTest {
     }
 
     @Test
+    fun ownerPaySupplierOpensUnderOwnerChrome() {
+        openOwnerPaySupplier()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerPaySupplierEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.VendorPaymentVendorSelector)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+    }
+
+    @Test
+    fun ownerPaySupplierHardwareBackReturnsToWorkHome() {
+        openOwnerPaySupplier()
+        pressHardwareBack()
+        assertReturnedToOwnerWorkHome()
+    }
+
+    @Test
     fun ownerRecordsOpensUnderOwnerChrome() {
         openOwnerRecords()
 
@@ -1795,6 +1814,17 @@ class NativeFoundationUiTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OwnerExpenseEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerPaySupplier() {
+        openOwnerWork()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkPaySupplier).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.VendorPaymentVendorSelector).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerPaySupplierEntryRoot).assertIsDisplayed()
     }
 
     private fun openOwnerReceiveMilk() {

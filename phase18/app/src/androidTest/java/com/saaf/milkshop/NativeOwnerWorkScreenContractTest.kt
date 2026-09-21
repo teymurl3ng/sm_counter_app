@@ -133,14 +133,14 @@ class NativeOwnerWorkScreenContractTest {
     }
 
     @Test
-    fun paySupplierPreviewShowsExplicitNotConnectedCopy() {
+    fun paySupplierOpensConnectedDestination() {
+        var opened: NativeOwnerWorkDestination? = null
         setScreen(
-            NativeOwnerWorkState.Ready(
-                context = openContext(),
-                destination = NativeOwnerWorkDestination.PaySupplier,
-            ),
+            NativeOwnerWorkState.Ready(context = openContext()),
+            onOpenDestination = { opened = it },
         )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkPaySupplierPreview).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkPaySupplier).performClick()
+        assertEquals(NativeOwnerWorkDestination.PaySupplier, opened)
     }
 
     @Test
@@ -171,7 +171,7 @@ class NativeOwnerWorkScreenContractTest {
         setScreen(
             state = NativeOwnerWorkState.Ready(
                 context = openContext(),
-                destination = NativeOwnerWorkDestination.PaySupplier,
+                destination = NativeOwnerWorkDestination.PaySalary,
             ),
             onBackToHome = { returned = true },
         )

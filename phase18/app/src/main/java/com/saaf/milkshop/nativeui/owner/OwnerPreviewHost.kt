@@ -32,6 +32,8 @@ import com.saaf.milkshop.nativeui.operations.NativeRecordSpoilageViewModel
 import com.saaf.milkshop.nativeui.sale.NativeSaleState
 import com.saaf.milkshop.nativeui.sale.NativeSaleViewModel
 import com.saaf.milkshop.nativeui.theme.SaafTheme
+import com.saaf.milkshop.nativeui.vendorpayment.NativeVendorPaymentState
+import com.saaf.milkshop.nativeui.vendorpayment.NativeVendorPaymentViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -66,6 +68,8 @@ fun OwnerPreviewHost(
     collectionViewModel: NativeCollectionViewModel,
     expenseState: NativeExpenseState,
     expenseViewModel: NativeExpenseViewModel,
+    vendorPaymentState: NativeVendorPaymentState,
+    vendorPaymentViewModel: NativeVendorPaymentViewModel,
     receiveMilkState: NativeReceiveMilkState,
     receiveMilkViewModel: NativeReceiveMilkViewModel,
     makeYogurtState: NativeMakeYogurtState,
@@ -86,6 +90,7 @@ fun OwnerPreviewHost(
             saleViewModel.close()
             collectionViewModel.close()
             expenseViewModel.close()
+            vendorPaymentViewModel.close()
             receiveMilkViewModel.close()
             makeYogurtViewModel.close()
             recordSpoilageViewModel.close()
@@ -201,6 +206,7 @@ fun OwnerPreviewHost(
                 workDestination == NativeOwnerWorkDestination.RecordSale -> {
                     collectionViewModel.close()
                     expenseViewModel.close()
+                    vendorPaymentViewModel.close()
                     receiveMilkViewModel.close()
                     makeYogurtViewModel.close()
                     recordSpoilageViewModel.close()
@@ -210,6 +216,7 @@ fun OwnerPreviewHost(
                 workDestination == NativeOwnerWorkDestination.RecordPayment -> {
                     saleViewModel.close()
                     expenseViewModel.close()
+                    vendorPaymentViewModel.close()
                     receiveMilkViewModel.close()
                     makeYogurtViewModel.close()
                     recordSpoilageViewModel.close()
@@ -219,16 +226,28 @@ fun OwnerPreviewHost(
                 workDestination == NativeOwnerWorkDestination.RecordExpense -> {
                     saleViewModel.close()
                     collectionViewModel.close()
+                    vendorPaymentViewModel.close()
                     receiveMilkViewModel.close()
                     makeYogurtViewModel.close()
                     recordSpoilageViewModel.close()
                     deliveriesViewModel.close()
                     expenseViewModel.open(sessionHandle)
                 }
+                workDestination == NativeOwnerWorkDestination.PaySupplier -> {
+                    saleViewModel.close()
+                    collectionViewModel.close()
+                    expenseViewModel.close()
+                    receiveMilkViewModel.close()
+                    makeYogurtViewModel.close()
+                    recordSpoilageViewModel.close()
+                    deliveriesViewModel.close()
+                    vendorPaymentViewModel.open(sessionHandle)
+                }
                 workDestination == NativeOwnerWorkDestination.ReceiveMilk -> {
                     saleViewModel.close()
                     collectionViewModel.close()
                     expenseViewModel.close()
+                    vendorPaymentViewModel.close()
                     makeYogurtViewModel.close()
                     recordSpoilageViewModel.close()
                     deliveriesViewModel.close()
@@ -238,6 +257,7 @@ fun OwnerPreviewHost(
                     saleViewModel.close()
                     collectionViewModel.close()
                     expenseViewModel.close()
+                    vendorPaymentViewModel.close()
                     receiveMilkViewModel.close()
                     recordSpoilageViewModel.close()
                     deliveriesViewModel.close()
@@ -247,6 +267,7 @@ fun OwnerPreviewHost(
                     saleViewModel.close()
                     collectionViewModel.close()
                     expenseViewModel.close()
+                    vendorPaymentViewModel.close()
                     receiveMilkViewModel.close()
                     makeYogurtViewModel.close()
                     deliveriesViewModel.close()
@@ -256,6 +277,7 @@ fun OwnerPreviewHost(
                     saleViewModel.close()
                     collectionViewModel.close()
                     expenseViewModel.close()
+                    vendorPaymentViewModel.close()
                     receiveMilkViewModel.close()
                     makeYogurtViewModel.close()
                     recordSpoilageViewModel.close()
@@ -271,6 +293,7 @@ fun OwnerPreviewHost(
                 NativeOwnerWorkDestination.RecordSale,
                 NativeOwnerWorkDestination.RecordPayment,
                 NativeOwnerWorkDestination.RecordExpense,
+                NativeOwnerWorkDestination.PaySupplier,
                 NativeOwnerWorkDestination.ReceiveMilk,
                 NativeOwnerWorkDestination.MakeYogurt,
                 NativeOwnerWorkDestination.RecordSpoilage,
@@ -573,6 +596,19 @@ fun OwnerPreviewHost(
                     onRetry = expenseViewModel::refresh,
                     onRecordExpense = expenseViewModel::record,
                     onRecordAnother = expenseViewModel::recordAnother,
+                    onBackToWork = { returnOwnerWorkHome() },
+                    onNavigate = navigateOwner,
+                )
+            }
+            ownerSection == OwnerSection.Work &&
+                ownerWorkDestination == NativeOwnerWorkDestination.PaySupplier -> {
+                OwnerPaySupplierEntryScreen(
+                    snackbarHostState = snackbarHostState,
+                    identity = identity,
+                    state = vendorPaymentState,
+                    onRetry = vendorPaymentViewModel::refresh,
+                    onRecordPayment = vendorPaymentViewModel::record,
+                    onRecordAnother = vendorPaymentViewModel::recordAnother,
                     onBackToWork = { returnOwnerWorkHome() },
                     onNavigate = navigateOwner,
                 )

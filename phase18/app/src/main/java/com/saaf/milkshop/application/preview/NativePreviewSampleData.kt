@@ -49,6 +49,7 @@ object NativePreviewSampleData {
         val seededActivityRows: Int,
         val seededOperator: Boolean,
         val seededVendor: Boolean = false,
+        val errors: List<String> = emptyList(),
     ) {
         val changed: Boolean
             get() = seededCustomers || seededStock || seededActivityRows > 0 ||
@@ -64,37 +65,81 @@ object NativePreviewSampleData {
         activityFacade: NativeActivityFacade,
         date: LocalDate = LocalDate.now(),
     ): Result {
-        val seededOperator = ensurePreviewOperator(database, security, sessionHandle)
-        val seededCustomers = ensureSampleCustomers(database)
-        val seededVendor = ensureSampleVendor(database)
-        val seededStock = ensureMilkStock(database, date)
-        val seededActivityRows = ensureTodayActivity(
-            sessionHandle = sessionHandle,
-            saleFacade = saleFacade,
-            collectionFacade = collectionFacade,
-            activityFacade = activityFacade,
-            date = date,
-        )
+        val errors = mutableListOf<String>()
+        suspend fun <T> step(label: String, fallback: T, block: suspend () -> T): T =
+            try {
+                block()
+            } catch (error: Throwable) {
+                errors += "$label: ${error.message ?: error.javaClass.simpleName}"
+                fallback
+            }
+
+        val seededOperator = step("operator", false) {
+            ensurePreviewOperator(database, security, sessionHandle)
+        }
+        val seededCustomers = step("customers", false) {
+            ensureSampleCustomers(database)
+        }
+        val seededVendor = step("vendor", false) {
+            ensureSampleVendor(database)
+        }
+        val seededStock = step("milk stock", false) {
+            ensureMilkStock(database, date)
+        }
+        val seededYogurt = step("yogurt stock", false) {
+            ensureYogurtStock(database, date)
+        }
+        val seededActivityRows = step("today activity", 0) {
+            ensureTodayActivity(
+                sessionHandle = sessionHandle,
+                saleFacade = saleFacade,
+                collectionFacade = collectionFacade,
+                activityFacade = activityFacade,
+                date = date,
+            )
+        }
         return Result(
             seededCustomers = seededCustomers,
-            seededStock = seededStock,
+            seededStock = seededStock || seededYogurt,
             seededActivityRows = seededActivityRows,
             seededOperator = seededOperator,
             seededVendor = seededVendor,
+            errors = errors,
         )
     }
+
+    /**
+     * Owner Overview preview filler: same shop sample plus yogurt stock so the
+     * decision summary is readable on an empty install.
+     */
+    suspend fun ensureForOwnerOverview(
+        database: MilkShopDatabase,
+        security: UserSecurityService,
+        sessionHandle: String,
+        saleFacade: NativeSaleFacade,
+        collectionFacade: NativeCollectionFacade,
+        activityFacade: NativeActivityFacade,
+        date: LocalDate = LocalDate.now(),
+    ): Result = ensureForSession(
+        database = database,
+        security = security,
+        sessionHandle = sessionHandle,
+        saleFacade = saleFacade,
+        collectionFacade = collectionFacade,
+        activityFacade = activityFacade,
+        date = date,
+    )
 
     suspend fun ensureSampleVendor(database: MilkShopDatabase): Boolean {
         val exists = database.accountDao().findByCategory("Vendor").any {
             it.name.removePrefix("Vendor: ").trim().equals(PREVIEW_VENDOR_NAME, ignoreCase = true)
         }
-        if (exists) {
-            ensureSamplePendingDeliveries(database)
-            return false
+        if (!exists) {
+            VendorManagementService(database).create(PREVIEW_VENDOR_NAME)
         }
-        VendorManagementService(database).create(PREVIEW_VENDOR_NAME)
-        ensureSamplePendingDeliveries(database)
-        return true
+        // Deliveries are optional preview chrome; never block stock/sales seeding.
+        runCatching { ensureSamplePendingDeliveries(database) }
+        return !exists
     }
 
     /**
@@ -186,7 +231,9 @@ object NativePreviewSampleData {
     }
 
     private suspend fun ensureSampleCustomers(database: MilkShopDatabase): Boolean {
-        val existing = database.accountDao().findByCategory("Customer").map { it.name }.toSet()
+        val existing = database.accountDao().findByCategory("Customer").map {
+            it.name.removePrefix("Customer: ").trim()
+        }.toSet()
         val missing = sampleCustomerNames.filterNot { it in existing }
         if (missing.isEmpty()) return false
         val customers = CustomerManagementService(database)
@@ -213,6 +260,31 @@ object NativePreviewSampleData {
                 fatPercentage = 4.2,
                 lrReading = 28.5,
                 notes = "Native preview sample stock",
+            ),
+        )
+        return true
+    }
+
+    private suspend fun ensureYogurtStock(database: MilkShopDatabase, date: LocalDate): Boolean {
+        val yogurt = database.productDao().findByName("Yogurt") ?: return false
+        val onHand = database.readModelDao().currentStock()
+            .firstOrNull { it.productId == yogurt.productId }
+            ?.quantityOnHand
+            ?: 0.0
+        if (onHand >= 10.0) return false
+        ensureMilkStock(database, date)
+        val milk = database.productDao().findByName("Milk") ?: return false
+        val milkOnHand = database.readModelDao().currentStock()
+            .firstOrNull { it.productId == milk.productId }
+            ?.quantityOnHand
+            ?: 0.0
+        if (milkOnHand < 20.0) return false
+        com.saaf.milkshop.domain.YogurtProductionService(database).record(
+            com.saaf.milkshop.domain.YogurtProductionInput(
+                occurredAt = date.toString(),
+                milkLitersUsed = 20.0,
+                yogurtKgProduced = 18.0,
+                notes = "Native preview sample yogurt batch",
             ),
         )
         return true

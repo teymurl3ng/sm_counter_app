@@ -34,6 +34,7 @@ import com.saaf.milkshop.application.operations.NativeOperationsMoreFacade
 import com.saaf.milkshop.application.operations.NativeOperationsWorkFacade
 import com.saaf.milkshop.application.operations.NativeReceiveMilkFacade
 import com.saaf.milkshop.application.operations.NativeRecordSpoilageFacade
+import com.saaf.milkshop.application.owner.NativeOwnerOverviewFacade
 import com.saaf.milkshop.application.preview.NativePreviewSampleData
 import com.saaf.milkshop.application.sale.NativeSaleFacade
 import com.saaf.milkshop.data.MilkShopDatabase
@@ -77,6 +78,10 @@ import com.saaf.milkshop.nativeui.operations.OperationsSection
 import com.saaf.milkshop.nativeui.operations.OperationsWorkScreen
 import com.saaf.milkshop.nativeui.operations.ReceiveMilkScreen
 import com.saaf.milkshop.nativeui.operations.RecordSpoilageScreen
+import com.saaf.milkshop.nativeui.owner.NativeOwnerOverviewState
+import com.saaf.milkshop.nativeui.owner.NativeOwnerOverviewViewModel
+import com.saaf.milkshop.nativeui.owner.OwnerOverviewScreen
+import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.sale.CashierSaleScreen
 import com.saaf.milkshop.nativeui.sale.CashierSection
 import com.saaf.milkshop.nativeui.sale.NativeSaleState
@@ -105,6 +110,7 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var deliveriesFacade: NativeDeliveriesFacade
     private lateinit var attendanceFacade: NativeAttendanceFacade
     private lateinit var operationsMoreFacade: NativeOperationsMoreFacade
+    private lateinit var ownerOverviewFacade: NativeOwnerOverviewFacade
 
     private val authenticationViewModel by viewModels<NativeAuthenticationViewModel> {
         val app = application as MilkShopApplication
@@ -191,6 +197,13 @@ class NativePreviewActivity : FragmentActivity() {
         )
     }
 
+    private val ownerOverviewViewModel by viewModels<NativeOwnerOverviewViewModel> {
+        NativeOwnerOverviewViewModel.Factory(
+            facade = ownerOverviewFacade,
+            onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -215,8 +228,14 @@ class NativePreviewActivity : FragmentActivity() {
         deliveriesFacade = NativeDeliveriesFacade(app.database, app.userSecurity)
         attendanceFacade = NativeAttendanceFacade(app.database, app.userSecurity)
         operationsMoreFacade = NativeOperationsMoreFacade(app.database, app.userSecurity, quickUnlockService)
+        ownerOverviewFacade = NativeOwnerOverviewFacade(
+            database = app.database,
+            security = app.userSecurity,
+            cloudBackupSettings = app.cloudBackupSettings,
+        )
         authenticationViewModel.attachQuickUnlock(quickUnlockFacade)
         val openOperator = intent.getBooleanExtra(EXTRA_OPEN_OPERATOR, false)
+        val openOwner = intent.getBooleanExtra(EXTRA_OPEN_OWNER, false)
         setContent {
             SaafTheme {
                 val authenticationState by authenticationViewModel.state.collectAsState()
@@ -231,6 +250,7 @@ class NativePreviewActivity : FragmentActivity() {
                 val deliveriesState by deliveriesViewModel.state.collectAsState()
                 val attendanceState by attendanceViewModel.state.collectAsState()
                 val operationsMoreState by operationsMoreViewModel.state.collectAsState()
+                val ownerOverviewState by ownerOverviewViewModel.state.collectAsState()
                 NativeFoundationPreview(
                     database = app.database,
                     security = app.userSecurity,
@@ -261,7 +281,10 @@ class NativePreviewActivity : FragmentActivity() {
                     attendanceViewModel = attendanceViewModel,
                     operationsMoreState = operationsMoreState,
                     operationsMoreViewModel = operationsMoreViewModel,
+                    ownerOverviewState = ownerOverviewState,
+                    ownerOverviewViewModel = ownerOverviewViewModel,
                     openOperatorOnStart = openOperator,
+                    openOwnerOnStart = openOwner,
                 )
             }
         }
@@ -269,6 +292,7 @@ class NativePreviewActivity : FragmentActivity() {
 
     companion object {
         const val EXTRA_OPEN_OPERATOR = "open_operator"
+        const val EXTRA_OPEN_OWNER = "open_owner"
     }
 
     override fun onStart() {
@@ -324,21 +348,73 @@ private fun NativeFoundationPreview(
     attendanceViewModel: NativeAttendanceViewModel,
     operationsMoreState: NativeOperationsMoreState,
     operationsMoreViewModel: NativeOperationsMoreViewModel,
+    ownerOverviewState: NativeOwnerOverviewState,
+    ownerOverviewViewModel: NativeOwnerOverviewViewModel,
     openOperatorOnStart: Boolean = false,
+    openOwnerOnStart: Boolean = false,
 ) {
     var destination by rememberSaveable {
         mutableStateOf(
-            if (openOperatorOnStart) PreviewDestination.Access else PreviewDestination.Welcome,
+            if (openOperatorOnStart || openOwnerOnStart) {
+                PreviewDestination.Access
+            } else {
+                PreviewDestination.Welcome
+            },
         )
     }
     var cashierSection by rememberSaveable { mutableStateOf(CashierSection.Sell) }
     var operationsSection by rememberSaveable { mutableStateOf(OperationsSection.Work) }
+    var ownerSection by rememberSaveable { mutableStateOf(OwnerSection.Overview) }
     var activityReturnSection by rememberSaveable { mutableStateOf(CashierSection.Sell.name) }
     var wantOperator by rememberSaveable { mutableStateOf(openOperatorOnStart) }
+    var wantOwner by rememberSaveable { mutableStateOf(openOwnerOnStart && !openOperatorOnStart) }
     var operatorSwitchInFlight by remember { mutableStateOf(false) }
+    var ownerSwitchInFlight by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val sellNotice = stringResource(R.string.native_nav_sell_notice)
+
+    androidx.compose.runtime.LaunchedEffect(authenticationState, wantOwner) {
+        if (!wantOwner || ownerSwitchInFlight || wantOperator) return@LaunchedEffect
+        when (val state = authenticationState) {
+            is NativeAuthenticationState.Authenticated -> {
+                if (state.identity.role == AppRole.OWNER) {
+                    wantOwner = false
+                    destination = PreviewDestination.Access
+                    return@LaunchedEffect
+                }
+                ownerSwitchInFlight = true
+                authenticationViewModel.openPreviewOwnerOverview()
+            }
+            is NativeAuthenticationState.AccountPicker,
+            is NativeAuthenticationState.OwnerSetup,
+            -> {
+                ownerSwitchInFlight = true
+                authenticationViewModel.openPreviewOwnerOverview()
+            }
+            is NativeAuthenticationState.Loading -> Unit
+            is NativeAuthenticationState.RecoveryCode -> {
+                authenticationViewModel.acknowledgeRecoveryCode()
+            }
+            else -> {
+                ownerSwitchInFlight = false
+            }
+        }
+    }
+
+    androidx.compose.runtime.LaunchedEffect(authenticationState) {
+        if (authenticationState is NativeAuthenticationState.Authenticated &&
+            authenticationState.identity.role == AppRole.OWNER
+        ) {
+            ownerSwitchInFlight = false
+            wantOwner = false
+        }
+        val failedPicker = authenticationState as? NativeAuthenticationState.AccountPicker
+        val failedOwner = authenticationState as? NativeAuthenticationState.OwnerSetup
+        if (failedPicker?.error != null || failedOwner?.error != null) {
+            ownerSwitchInFlight = false
+        }
+    }
 
     androidx.compose.runtime.LaunchedEffect(authenticationState, wantOperator) {
         if (!wantOperator || operatorSwitchInFlight) return@LaunchedEffect
@@ -408,10 +484,12 @@ private fun NativeFoundationPreview(
         deliveriesViewModel.close()
         attendanceViewModel.close()
         operationsMoreViewModel.close()
+        ownerOverviewViewModel.close()
         authenticationViewModel.leaveAuthenticatedArea()
         destination = PreviewDestination.Welcome
         cashierSection = CashierSection.Sell
         operationsSection = OperationsSection.Work
+        ownerSection = OwnerSection.Overview
     }
 
     fun leaveToAccountPicker() {
@@ -423,6 +501,7 @@ private fun NativeFoundationPreview(
         deliveriesViewModel.close()
         attendanceViewModel.close()
         operationsMoreViewModel.close()
+        ownerOverviewViewModel.close()
         authenticationViewModel.beginAccountSwitch()
         destination = PreviewDestination.Access
     }
@@ -432,9 +511,10 @@ private fun NativeFoundationPreview(
     val authenticatedRole = (authenticationState as? NativeAuthenticationState.Authenticated)
         ?.identity?.role
     val showingOperator = showingAuthenticated && authenticatedRole == AppRole.OPERATOR
-    val showingCashier = showingAuthenticated && !showingOperator
+    val showingOwner = showingAuthenticated && authenticatedRole == AppRole.OWNER
+    val showingCashier = showingAuthenticated && !showingOperator && !showingOwner
 
-    androidx.compose.runtime.LaunchedEffect(showingCashier, showingOperator) {
+    androidx.compose.runtime.LaunchedEffect(showingCashier, showingOperator, showingOwner) {
         if (!showingCashier) closeCashierShell()
         if (!showingOperator) {
             operationsWorkViewModel.close()
@@ -444,6 +524,9 @@ private fun NativeFoundationPreview(
             deliveriesViewModel.close()
             attendanceViewModel.close()
             operationsMoreViewModel.close()
+        }
+        if (!showingOwner) {
+            ownerOverviewViewModel.close()
         }
     }
 
@@ -459,7 +542,99 @@ private fun NativeFoundationPreview(
             onContinue = { destination = PreviewDestination.Access },
         )
         PreviewDestination.Access -> {
-            if (showingOperator) {
+            if (showingOwner) {
+                val authenticated = authenticationState as NativeAuthenticationState.Authenticated
+                SaafTheme(darkTheme = false) {
+                    var lastOwnerSession by rememberSaveable { mutableStateOf<String?>(null) }
+                    var ownerSampleReady by remember(authenticated.sessionHandle) { mutableStateOf(false) }
+                    androidx.compose.runtime.LaunchedEffect(authenticated.sessionHandle) {
+                        if (lastOwnerSession != null && lastOwnerSession != authenticated.sessionHandle) {
+                            ownerSection = OwnerSection.Overview
+                        }
+                        lastOwnerSession = authenticated.sessionHandle
+                        ownerSampleReady = false
+                        val sample = runCatching {
+                            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                                NativePreviewSampleData.ensureForOwnerOverview(
+                                    database = database,
+                                    security = security,
+                                    sessionHandle = authenticated.sessionHandle,
+                                    saleFacade = saleFacade,
+                                    collectionFacade = collectionFacade,
+                                    activityFacade = activityFacade,
+                                )
+                            }
+                        }.getOrElse { error ->
+                            snackbarHostState.showSnackbar(
+                                message = "Sample data failed: ${error.message ?: "unknown error"}",
+                                duration = SnackbarDuration.Long,
+                            )
+                            null
+                        }
+                        ownerSampleReady = true
+                        when {
+                            sample == null -> Unit
+                            sample.errors.isNotEmpty() -> {
+                                snackbarHostState.showSnackbar(
+                                    message = "Sample data partial: ${sample.errors.first()}",
+                                    duration = SnackbarDuration.Long,
+                                )
+                            }
+                            sample.changed -> {
+                                snackbarHostState.showSnackbar(
+                                    message = "Sample shop data ready for Owner Overview.",
+                                    duration = SnackbarDuration.Short,
+                                )
+                            }
+                        }
+                    }
+                    androidx.compose.runtime.LaunchedEffect(
+                        authenticated.sessionHandle,
+                        ownerSampleReady,
+                    ) {
+                        if (!ownerSampleReady) return@LaunchedEffect
+                        ownerOverviewViewModel.close()
+                        ownerOverviewViewModel.open(authenticated.sessionHandle)
+                        // Seed writes finish just before this; force a second load so the
+                        // decision summary cannot stick on an empty first paint.
+                        ownerOverviewViewModel.refresh()
+                    }
+                    BackHandler {
+                        when (ownerSection) {
+                            OwnerSection.Overview -> leaveToWelcome()
+                            else -> ownerSection = OwnerSection.Overview
+                        }
+                    }
+                    val navigateOwner: (OwnerSection) -> Unit = { section ->
+                        when (section) {
+                            OwnerSection.Overview -> {
+                                if (ownerSection == OwnerSection.Overview) {
+                                    showPreviewNotice("Overview is already open.")
+                                } else {
+                                    ownerSection = OwnerSection.Overview
+                                }
+                            }
+                            OwnerSection.Work,
+                            OwnerSection.Records,
+                            OwnerSection.More,
+                            -> ownerSection = section
+                        }
+                    }
+                    OwnerOverviewScreen(
+                        snackbarHostState = snackbarHostState,
+                        state = ownerOverviewState,
+                        section = ownerSection,
+                        onRetry = ownerOverviewViewModel::refresh,
+                        onLeaveConfirmed = { leaveToWelcome() },
+                        onNavigate = navigateOwner,
+                        onAttentionReview = {
+                            showPreviewNotice(
+                                "Close, Records, and Backup destinations come next in the Owner family.",
+                            )
+                        },
+                    )
+                }
+            } else if (showingOperator) {
                 val authenticated = authenticationState as NativeAuthenticationState.Authenticated
                 SaafTheme(darkTheme = false) {
                     var lastOpsSession by rememberSaveable { mutableStateOf<String?>(null) }

@@ -76,13 +76,26 @@ class NativeCollectionDeviceEvidenceTest {
         composeRule.onNodeWithTag(NativeUiTags.WelcomeContinue).performClick()
         composeRule.waitUntil(15_000) {
             runCatching {
-                composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_LOGIN)).fetchSemanticsNode()
+                composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_CASHIER_LOGIN)).fetchSemanticsNode()
             }.isSuccess
         }
-        composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_LOGIN)).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_CASHIER_LOGIN)).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).fetchSemanticsNode()
+            }.isSuccess ||
+                runCatching {
+                    composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).fetchSemanticsNode()
+                }.isSuccess
+        }
+        if (runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).fetchSemanticsNode()
+            }.isSuccess
+        ) {
+            composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).performClick()
+        }
         composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput)
-            .performTextReplacement(SaafMilkTestRunner.TEST_PASSPHRASE)
+            .performTextReplacement(SaafMilkTestRunner.TEST_CASHIER_PASSPHRASE)
         composeRule.onNodeWithTag(NativeUiTags.AuthSignIn).performClick()
         composeRule.waitUntil(15_000) {
             runCatching { composeRule.onNodeWithText("New sale").fetchSemanticsNode() }.isSuccess

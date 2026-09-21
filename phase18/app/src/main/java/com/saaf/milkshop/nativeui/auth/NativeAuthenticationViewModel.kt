@@ -342,6 +342,35 @@ class NativeAuthenticationViewModel(
         }
     }
 
+    /**
+     * Debug/preview helper: bootstrap or sign in as Preview Owner for Overview.
+     */
+    fun openPreviewOwnerOverview() {
+        scope.launch {
+            _state.value = NativeAuthenticationState.Loading
+            try {
+                val session = withContext(Dispatchers.IO) {
+                    facade.signInPreviewOwner()
+                }
+                acceptSession(session)
+            } catch (error: Throwable) {
+                _state.value = try {
+                    when (val startup = loadStartupState()) {
+                        is NativeAuthenticationState.AccountPicker -> startup.copy(
+                            error = publicMessage(error),
+                        )
+                        is NativeAuthenticationState.OwnerSetup -> startup.copy(
+                            error = publicMessage(error),
+                        )
+                        else -> NativeAuthenticationState.StartupFailure(publicMessage(error))
+                    }
+                } catch (loadError: Throwable) {
+                    NativeAuthenticationState.StartupFailure(publicMessage(loadError))
+                }
+            }
+        }
+    }
+
     private suspend fun ensurePreviewOperatorReady(privilegedSessionHandle: String?) {
         val sample = com.saaf.milkshop.application.preview.NativePreviewSampleData
         val startup = facade.startup()

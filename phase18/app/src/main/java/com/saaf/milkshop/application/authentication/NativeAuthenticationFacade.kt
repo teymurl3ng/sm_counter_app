@@ -157,6 +157,27 @@ class NativeAuthenticationFacade(
         return signIn(account, passphrase)
     }
 
+    /**
+     * Debug/preview helper: bootstrap or sign in as Preview Owner for Overview.
+     */
+    suspend fun signInPreviewOwner(): NativeAuthenticatedSession {
+        val sample = com.saaf.milkshop.application.preview.NativePreviewSampleData
+        if (security.needsOwnerBootstrap()) {
+            return bootstrapOwner(
+                loginName = sample.PREVIEW_OWNER_LOGIN,
+                displayName = sample.PREVIEW_OWNER_DISPLAY_NAME,
+                passphrase = sample.PREVIEW_OWNER_PASSPHRASE.toCharArray(),
+            ).session
+        }
+        val account = activeAccounts().firstOrNull { it.loginName == sample.PREVIEW_OWNER_LOGIN }
+            ?: error(
+                "Preview Owner (${sample.PREVIEW_OWNER_LOGIN}) is missing. " +
+                    "Sign in as Owner from the account picker, or clear app data to bootstrap preview.owner.",
+            )
+        val passphrase = sample.PREVIEW_OWNER_PASSPHRASE.toCharArray()
+        return signIn(account, passphrase)
+    }
+
     private suspend fun activeAccounts(): List<NativeAccountSummary> =
         database.appUserDao().all()
             .asSequence()

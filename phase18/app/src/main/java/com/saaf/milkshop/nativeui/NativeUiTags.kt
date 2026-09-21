@@ -226,6 +226,30 @@ object NativeUiTags {
     const val OpsNavAttendance = "ops_nav_attendance"
     const val OpsNavMore = "ops_nav_more"
 
+    const val OwnerShellRoot = "owner_shell_root"
+    const val OwnerOverviewRoot = "owner_overview_root"
+    const val OwnerOverviewLoading = "owner_overview_loading"
+    const val OwnerOverviewRetryLoad = "owner_overview_retry_load"
+    const val OwnerOverviewAttention = "owner_overview_attention"
+    const val OwnerOverviewAttentionReview = "owner_overview_attention_review"
+    const val OwnerOverviewClear = "owner_overview_clear"
+    const val OwnerOverviewSales = "owner_overview_sales"
+    const val OwnerOverviewGross = "owner_overview_gross"
+    const val OwnerOverviewCoverageWarning = "owner_overview_coverage_warning"
+    const val OwnerOverviewExpectedCash = "owner_overview_expected_cash"
+    const val OwnerOverviewCustomersDue = "owner_overview_customers_due"
+    const val OwnerOverviewSuppliersDue = "owner_overview_suppliers_due"
+    const val OwnerOverviewStock = "owner_overview_stock"
+    const val OwnerOverviewLatestActivity = "owner_overview_latest_activity"
+    const val OwnerOverviewLatestEmpty = "owner_overview_latest_empty"
+    const val OwnerWorkPreview = "owner_work_preview"
+    const val OwnerRecordsPreview = "owner_records_preview"
+    const val OwnerMorePreview = "owner_more_preview"
+    const val OwnerNavOverview = "owner_nav_overview"
+    const val OwnerNavWork = "owner_nav_work"
+    const val OwnerNavRecords = "owner_nav_records"
+    const val OwnerNavMore = "owner_nav_more"
+
     fun cashierProduct(name: String): String = when (name.trim().lowercase()) {
         "milk" -> CashierProductMilk
         "yogurt" -> CashierProductYogurt

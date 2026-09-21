@@ -68,7 +68,7 @@ class NativeOwnerBootstrapUiTest {
         }
         composeRule.onNodeWithText("Save your recovery code").assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.AuthRecoveryAcknowledge).performClick()
-        waitForText("New sale")
+        waitForText("Overview")
     }
 
     private fun waitForText(text: String) {

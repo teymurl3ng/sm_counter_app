@@ -136,7 +136,12 @@ class NativeFoundationUiTest {
             "The login name or passphrase is incorrect, or this account is unavailable.",
         ).assertDoesNotExist()
         composeRule.onNodeWithTag(NativeUiTags.AuthSignIn).performClick()
-        waitForText("New sale")
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).assertIsDisplayed()
     }
 
     @Test
@@ -148,7 +153,12 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinInput)
             .performTextReplacement(SaafMilkTestRunner.TEST_PIN)
         composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinSubmit).performClick()
-        waitForText("New sale")
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).assertIsDisplayed()
     }
 
     @Test
@@ -174,13 +184,17 @@ class NativeFoundationUiTest {
         ).assertDoesNotExist()
         composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinSubmit).performClick()
         try {
-            waitForText("New sale")
+            composeRule.waitUntil(timeoutMillis = 15_000) {
+                runCatching {
+                    composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).fetchSemanticsNode()
+                }.isSuccess
+            }
         } catch (timeout: Throwable) {
             val visibleError = runCatching {
                 composeRule.onNodeWithTag(NativeUiTags.AuthError).printToString()
             }.getOrElse { "No tagged authentication error was visible." }
             throw AssertionError(
-                "Correct selected-account PIN did not open Cashier. $visibleError",
+                "Correct selected-account PIN did not open Owner Overview. $visibleError",
                 timeout,
             )
         }
@@ -272,6 +286,33 @@ class NativeFoundationUiTest {
         }
         composeRule.onNodeWithTag(NativeUiTags.OpsMoreSignOut).performClick()
         waitForText("Continue")
+    }
+
+    @Test
+    fun ownerOverviewOpensConnectedEntry() {
+        openOwnerOverview()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewSales).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).assertIsSelected()
+    }
+
+    @Test
+    fun ownerOverviewPreviewNavShowsExplicitNotices() {
+        openOwnerOverview()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerWorkPreview).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithText("Owner Work comes next").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).assertIsSelected()
     }
 
     @Test
@@ -980,7 +1021,7 @@ class NativeFoundationUiTest {
         assertEquals(retailRate(SettingKeys.RETAIL_RATE_MILK) * 2, app.database.financialLogDao().findByEventId(sale.eventId).single().amount, 0.000001)
         val actor = app.database.eventActorLinkDao().find(sale.eventId)
         assertNotNull(actor)
-        assertEquals("Instrumentation Owner", actor!!.actorNameSnapshot)
+        assertEquals("Instrumentation Cashier", actor!!.actorNameSnapshot)
         composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).assertTextEquals("2.0")
         Unit
     }
@@ -1052,12 +1093,53 @@ class NativeFoundationUiTest {
 
     private fun openCashier() {
         openAccountPicker()
+        composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_CASHIER_LOGIN)).performClick()
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).fetchSemanticsNode()
+            }.isSuccess ||
+                runCatching {
+                    composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).fetchSemanticsNode()
+                }.isSuccess
+        }
+        if (runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).fetchSemanticsNode()
+            }.isSuccess
+        ) {
+            composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).performClick()
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput)
+            .performTextReplacement(SaafMilkTestRunner.TEST_CASHIER_PASSPHRASE)
+        composeRule.onNodeWithTag(NativeUiTags.AuthSignIn).performClick()
+        waitForText("New sale")
+    }
+
+    private fun openOwnerOverview() {
+        openAccountPicker()
         composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_LOGIN)).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).performClick()
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).fetchSemanticsNode()
+            }.isSuccess ||
+                runCatching {
+                    composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).fetchSemanticsNode()
+                }.isSuccess
+        }
+        if (runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).fetchSemanticsNode()
+            }.isSuccess
+        ) {
+            composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).performClick()
+        }
         composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput)
             .performTextReplacement(SaafMilkTestRunner.TEST_PASSPHRASE)
         composeRule.onNodeWithTag(NativeUiTags.AuthSignIn).performClick()
-        waitForText("New sale")
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).assertIsDisplayed()
     }
 
     private fun openOperationsWork() {

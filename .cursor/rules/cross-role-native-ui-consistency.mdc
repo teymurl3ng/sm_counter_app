@@ -22,11 +22,16 @@ This is an **implementation consistency** rule inside the already-accepted Count
 - Before building, find the closest shipped native sibling of the same surface kind and open it.
 - Reuse its scaffold, header, row chrome, and sub-screen layout; swap only role-safe actions, copy, and data boundaries.
 - Prefer extracting shared pieces when two roles truly share a shell (e.g. personal security form).
+- When an entry form is hosted by multiple roles, reuse role-neutral content
+  inside each role's own shell. Never host another role's bottom navigation or
+  translate foreign role-navigation events. See
+  `PHASE14_8_15A_SHELL_VS_CONTENT.md`.
 
 ## Do not
 
 - Start a same-kind surface from a blank Compose file when a sibling already defines the pattern.
 - “Redesign” a worker More/menu while implementing it just because it is a new file.
+- Treat a callback-only launcher test as proof that a cross-role hosted entry is correctly wired.
 - Override `PHASE14_8_2_*` role/journey planning in the name of consistency.
 
 ## Check

@@ -1,0 +1,89 @@
+package com.saaf.milkshop.nativeui.owner
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
+import com.saaf.milkshop.application.collection.NativeCollectionRequest
+import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.collection.CollectionDiscardDialog
+import com.saaf.milkshop.nativeui.collection.CollectionEntryContent
+import com.saaf.milkshop.nativeui.collection.CollectionLoadFailureBody
+import com.saaf.milkshop.nativeui.collection.CollectionLoadingBody
+import com.saaf.milkshop.nativeui.collection.NativeCollectionState
+import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
+
+/**
+ * Owner-owned shell around the role-neutral Collection entry surface.
+ */
+@Composable
+fun OwnerCollectionEntryScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    state: NativeCollectionState,
+    onRetry: () -> Unit,
+    onSelectCustomer: (Long) -> Unit,
+    onRecordCollection: (NativeCollectionRequest) -> Unit,
+    onCollectAnother: () -> Unit,
+    onViewRecord: (Long) -> Unit,
+    onBackToWork: () -> Unit,
+    onNavigate: (OwnerSection) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val leaveGuard = rememberEntryLeaveGuard()
+    val canLeave = (state as? NativeCollectionState.Ready)?.saving != true
+
+    LaunchedEffect(state is NativeCollectionState.Ready) {
+        if (state !is NativeCollectionState.Ready) leaveGuard.clear()
+    }
+    BackHandler {
+        if (canLeave) leaveGuard.requestLeave(onBackToWork)
+    }
+
+    Box(
+        modifier
+            .fillMaxSize()
+            .testTag(NativeUiTags.OwnerCollectionEntryRoot),
+    ) {
+        OwnerScaffold(
+            snackbarHostState = snackbarHostState,
+            section = OwnerSection.Work,
+            onNavigate = { section ->
+                if (canLeave) {
+                    leaveGuard.requestLeave { onNavigate(section) }
+                }
+            },
+            modifier = Modifier.fillMaxSize(),
+        ) { padding ->
+            when (state) {
+                NativeCollectionState.Idle,
+                NativeCollectionState.Loading,
+                -> CollectionLoadingBody(
+                    modifier = Modifier.padding(padding),
+                )
+                is NativeCollectionState.LoadFailure -> CollectionLoadFailureBody(
+                    message = state.message,
+                    onRetry = onRetry,
+                    modifier = Modifier.padding(padding),
+                )
+                is NativeCollectionState.Ready -> CollectionEntryContent(
+                    identity = identity,
+                    state = state,
+                    onSelectCustomer = onSelectCustomer,
+                    onRecordCollection = onRecordCollection,
+                    onCollectAnother = onCollectAnother,
+                    onViewRecord = onViewRecord,
+                    leaveGuard = leaveGuard,
+                    contentPadding = padding,
+                )
+            }
+        }
+        CollectionDiscardDialog(leaveGuard)
+    }
+}

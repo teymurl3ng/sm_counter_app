@@ -23,19 +23,54 @@ import java.time.LocalDate
  * Debug/preview shop filler for [com.saaf.milkshop.nativeui.NativePreviewActivity].
  *
  * Uses existing domain and native facades only — no SQL/business-rule changes.
- * Idempotent: sample customers are created once; today's Activity rows are topped
- * up for the signed-in actor when the list is thin; a preview Operator account is
- * enrolled once when the session can manage staff users.
+ * Idempotent: sample customers / stock / Activity rows are topped up when thin;
+ * preview role accounts are enrolled **once** when missing and are never
+ * re-created or passphrase-reset on later launches.
  */
 object NativePreviewSampleData {
+    /** Shared preview passphrase for every preview.* role account. */
+    const val PREVIEW_SHARED_PASSPHRASE = "1234567890qwert"
+
     const val PREVIEW_OWNER_LOGIN = "preview.owner"
     const val PREVIEW_OWNER_DISPLAY_NAME = "Preview Owner"
-    const val PREVIEW_OWNER_PASSPHRASE = "preview owner passphrase 2026"
+    const val PREVIEW_OWNER_PASSPHRASE = PREVIEW_SHARED_PASSPHRASE
+
+    const val PREVIEW_ADMIN_LOGIN = "preview.admin"
+    const val PREVIEW_ADMIN_DISPLAY_NAME = "Preview Admin"
+
+    const val PREVIEW_CASHIER_LOGIN = "preview.cashier"
+    const val PREVIEW_CASHIER_DISPLAY_NAME = "Preview Cashier"
 
     const val PREVIEW_OPERATOR_LOGIN = "preview.operator"
     const val PREVIEW_OPERATOR_DISPLAY_NAME = "Preview Operator"
-    const val PREVIEW_OPERATOR_PASSPHRASE = "preview operator passphrase 2026"
+    const val PREVIEW_OPERATOR_PASSPHRASE = PREVIEW_SHARED_PASSPHRASE
+
+    /** Older preview secrets — migrate once when found, never wipe on launch. */
+    private val LEGACY_PREVIEW_PASSPHRASES = listOf(
+        "preview owner passphrase 2026",
+        "preview operator passphrase 2026",
+    )
+
     const val PREVIEW_VENDOR_NAME = "Sample · Dawn Dairy"
+
+    private data class PreviewStaffSpec(
+        val loginName: String,
+        val displayName: String,
+        val role: AppRole,
+    )
+
+    private val previewStaff = listOf(
+        PreviewStaffSpec(PREVIEW_ADMIN_LOGIN, PREVIEW_ADMIN_DISPLAY_NAME, AppRole.ADMIN),
+        PreviewStaffSpec(PREVIEW_CASHIER_LOGIN, PREVIEW_CASHIER_DISPLAY_NAME, AppRole.CASHIER),
+        PreviewStaffSpec(PREVIEW_OPERATOR_LOGIN, PREVIEW_OPERATOR_DISPLAY_NAME, AppRole.OPERATOR),
+    )
+
+    fun isPreviewLogin(loginName: String): Boolean =
+        loginName.trim().lowercase().startsWith("preview.")
+
+    fun previewAccountsHint(): String =
+        "Preview logins: $PREVIEW_OWNER_LOGIN / $PREVIEW_ADMIN_LOGIN / " +
+            "$PREVIEW_CASHIER_LOGIN / $PREVIEW_OPERATOR_LOGIN — passphrase: $PREVIEW_SHARED_PASSPHRASE"
 
     private val sampleCustomerNames = listOf(
         "Sample · Noor Store",
@@ -48,12 +83,13 @@ object NativePreviewSampleData {
         val seededStock: Boolean,
         val seededActivityRows: Int,
         val seededOperator: Boolean,
+        val seededStaffAccounts: Int = 0,
         val seededVendor: Boolean = false,
         val errors: List<String> = emptyList(),
     ) {
         val changed: Boolean
             get() = seededCustomers || seededStock || seededActivityRows > 0 ||
-                seededOperator || seededVendor
+                seededOperator || seededStaffAccounts > 0 || seededVendor
     }
 
     suspend fun ensureForSession(
@@ -74,8 +110,8 @@ object NativePreviewSampleData {
                 fallback
             }
 
-        val seededOperator = step("operator", false) {
-            ensurePreviewOperator(database, security, sessionHandle)
+        val seededStaff = step("preview staff", 0) {
+            ensurePreviewStaffAccounts(database, security, sessionHandle)
         }
         val seededCustomers = step("customers", false) {
             ensureSampleCustomers(database)
@@ -102,7 +138,8 @@ object NativePreviewSampleData {
             seededCustomers = seededCustomers,
             seededStock = seededStock || seededYogurt,
             seededActivityRows = seededActivityRows,
-            seededOperator = seededOperator,
+            seededOperator = seededStaff > 0,
+            seededStaffAccounts = seededStaff,
             seededVendor = seededVendor,
             errors = errors,
         )
@@ -192,21 +229,41 @@ object NativePreviewSampleData {
         return true
     }
 
-    private suspend fun ensurePreviewOperator(
+    /**
+     * Enrolls Admin / Cashier / Operator preview accounts when missing.
+     * Existing active accounts are left untouched (no passphrase reset).
+     * @return count of accounts newly enrolled this call
+     */
+    suspend fun ensurePreviewStaffAccounts(
         database: MilkShopDatabase,
         security: UserSecurityService,
         sessionHandle: String,
-    ): Boolean {
-        val existing = database.appUserDao().findByLoginName(PREVIEW_OPERATOR_LOGIN)
-        if (existing != null &&
-            existing.status == com.saaf.milkshop.domain.UserSecurityService.STATUS_ACTIVE &&
-            !existing.credentialSetupRequired
-        ) {
-            return false
-        }
+    ): Int {
         try {
             security.requirePermission(sessionHandle, AppPermission.MANAGE_STAFF_USERS)
         } catch (_: Throwable) {
+            return 0
+        }
+        var created = 0
+        for (spec in previewStaff) {
+            if (ensureOnePreviewStaff(database, security, sessionHandle, spec)) {
+                created += 1
+            }
+        }
+        return created
+    }
+
+    private suspend fun ensureOnePreviewStaff(
+        database: MilkShopDatabase,
+        security: UserSecurityService,
+        sessionHandle: String,
+        spec: PreviewStaffSpec,
+    ): Boolean {
+        val existing = database.appUserDao().findByLoginName(spec.loginName)
+        if (existing != null &&
+            existing.status == UserSecurityService.STATUS_ACTIVE &&
+            !existing.credentialSetupRequired
+        ) {
             return false
         }
         val pending = if (existing != null && existing.credentialSetupRequired) {
@@ -215,19 +272,71 @@ object NativePreviewSampleData {
             security.beginUserEnrollment(
                 sessionHandle,
                 CreateUserInput(
-                    loginName = PREVIEW_OPERATOR_LOGIN,
-                    displayName = PREVIEW_OPERATOR_DISPLAY_NAME,
-                    role = AppRole.OPERATOR.wireValue,
+                    loginName = spec.loginName,
+                    displayName = spec.displayName,
+                    role = spec.role.wireValue,
                 ),
             )
         }
-        val passphrase = PREVIEW_OPERATOR_PASSPHRASE.toCharArray()
+        val passphrase = PREVIEW_SHARED_PASSPHRASE.toCharArray()
         try {
             security.completeUserEnrollment(pending.enrollmentToken, passphrase)
         } finally {
             passphrase.fill('\u0000')
         }
         return true
+    }
+
+    /**
+     * One-time: if a known preview login still uses a legacy passphrase, move it
+     * to [PREVIEW_SHARED_PASSPHRASE]. Never forces a reset when the shared secret
+     * already works, and never touches non-preview accounts.
+     */
+    suspend fun alignPreviewPassphrases(security: UserSecurityService) {
+        val logins = listOf(
+            PREVIEW_OWNER_LOGIN,
+            PREVIEW_ADMIN_LOGIN,
+            PREVIEW_CASHIER_LOGIN,
+            PREVIEW_OPERATOR_LOGIN,
+        )
+        for (login in logins) {
+            alignOnePreviewPassphrase(security, login)
+        }
+    }
+
+    private suspend fun alignOnePreviewPassphrase(
+        security: UserSecurityService,
+        loginName: String,
+    ) {
+        val shared = PREVIEW_SHARED_PASSPHRASE.toCharArray()
+        try {
+            val already = runCatching { security.login(loginName, shared) }.getOrNull()
+            if (already != null) {
+                runCatching { security.logout(already.sessionId) }
+                return
+            }
+        } finally {
+            shared.fill('\u0000')
+        }
+        for (legacy in LEGACY_PREVIEW_PASSPHRASES) {
+            val legacyChars = legacy.toCharArray()
+            val session = try {
+                runCatching { security.login(loginName, legacyChars) }.getOrNull()
+            } finally {
+                legacyChars.fill('\u0000')
+            } ?: continue
+            val current = legacy.toCharArray()
+            val next = PREVIEW_SHARED_PASSPHRASE.toCharArray()
+            try {
+                security.changeOwnPassphrase(session.sessionId, current, next)
+            } catch (_: Throwable) {
+                runCatching { security.logout(session.sessionId) }
+            } finally {
+                current.fill('\u0000')
+                next.fill('\u0000')
+            }
+            return
+        }
     }
 
     private suspend fun ensureSampleCustomers(database: MilkShopDatabase): Boolean {

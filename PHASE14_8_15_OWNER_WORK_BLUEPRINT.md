@@ -1,5 +1,7 @@
 # Phase 14.8.15 — Owner Work home blueprint
 
+> **WARNING (2026-09-21):** The **Connected in this checkpoint** lines that say host `CashierSaleScreen` / `CashierCollectionScreen` / `ReceiveMilkScreen` / `MakeYogurtScreen` / `RecordSpoilageScreen` / `DeliveriesScreen` as full foreign screens are **SUPERSEDED** by `PHASE14_8_15A_SHELL_VS_CONTENT.md` and the CORE METHOD in `.cursor/rules/native-shell-vs-content.mdc`. Do **not** follow those host-full-screen lines for new work. Use role-neutral content + Owner shell + Foundation proof. Keep the rest of this document as historical Work-home planning.
+
 Status: **AUTO-ACCEPTED FOR NATIVE IMPLEMENTATION** (owner: continue without blueprint pause)
 
 Date: 2026-09-21

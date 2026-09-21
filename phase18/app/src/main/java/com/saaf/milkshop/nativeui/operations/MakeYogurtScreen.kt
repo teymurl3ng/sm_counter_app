@@ -3,6 +3,7 @@ package com.saaf.milkshop.nativeui.operations
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,9 +30,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46,6 +47,8 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.operations.NativeMakeYogurtReceipt
 import com.saaf.milkshop.application.operations.NativeMakeYogurtRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.theme.SaafYellow
@@ -63,105 +66,118 @@ fun MakeYogurtScreen(
     onNavigate: (OperationsSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
-        NativeMakeYogurtState.Idle,
-        NativeMakeYogurtState.Loading,
-        -> MakeYogurtLoading(snackbarHostState, onNavigate, modifier)
-
-        is NativeMakeYogurtState.LoadFailure -> MakeYogurtLoadFailure(
-            snackbarHostState = snackbarHostState,
-            message = state.message,
-            onRetry = onRetry,
-            onNavigate = onNavigate,
-            onBackToHome = onBackToHome,
-            modifier = modifier,
-        )
-
-        is NativeMakeYogurtState.Ready -> MakeYogurtReady(
-            snackbarHostState = snackbarHostState,
-            identity = identity,
-            state = state,
-            onRecord = onRecord,
-            onMakeAnother = onMakeAnother,
-            onBackToHome = onBackToHome,
-            onNavigate = onNavigate,
-            modifier = modifier,
-        )
+    val leaveGuard = rememberEntryLeaveGuard()
+    val canLeave = (state as? NativeMakeYogurtState.Ready)?.saving != true
+    LaunchedEffect(state is NativeMakeYogurtState.Ready) {
+        if (state !is NativeMakeYogurtState.Ready) leaveGuard.clear()
     }
-}
+    BackHandler {
+        if (canLeave) leaveGuard.requestLeave(onBackToHome)
+    }
+    WorkScaffold(
+        snackbarHostState = snackbarHostState,
+        section = OperationsSection.Work,
+        onNavigate = { section ->
+            if (canLeave) leaveGuard.requestLeave { onNavigate(section) }
+        },
+        modifier = modifier,
+    ) { padding ->
+        when (state) {
+            NativeMakeYogurtState.Idle,
+            NativeMakeYogurtState.Loading,
+            -> MakeYogurtLoadingBody(
+                modifier = Modifier.padding(padding),
+            )
 
-@Composable
-private fun MakeYogurtLoading(
-    snackbarHostState: SnackbarHostState,
-    onNavigate: (OperationsSection) -> Unit,
-    modifier: Modifier,
-) {
-    WorkScaffold(snackbarHostState, OperationsSection.Work, onNavigate, modifier) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(it)
-                .padding(24.dp)
-                .testTag(NativeUiTags.OpsMakeYogurtLoading),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            CircularProgressIndicator()
-            Spacer(Modifier.height(12.dp))
-            Text("Loading make yogurt…")
+            is NativeMakeYogurtState.LoadFailure -> MakeYogurtLoadFailureBody(
+                message = state.message,
+                onRetry = onRetry,
+                onBackToHome = onBackToHome,
+                modifier = Modifier.padding(padding),
+            )
+
+            is NativeMakeYogurtState.Ready -> MakeYogurtReadyContent(
+                identity = identity,
+                state = state,
+                onRecord = onRecord,
+                onMakeAnother = onMakeAnother,
+                onBackToHome = onBackToHome,
+                leaveGuard = leaveGuard,
+                contentPadding = padding,
+            )
         }
     }
+    MakeYogurtDiscardDialog(leaveGuard)
 }
 
 @Composable
-private fun MakeYogurtLoadFailure(
-    snackbarHostState: SnackbarHostState,
+internal fun MakeYogurtLoadingBody(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier
+            .fillMaxSize()
+            .padding(24.dp)
+            .testTag(NativeUiTags.OpsMakeYogurtLoading),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        CircularProgressIndicator()
+        Spacer(Modifier.height(12.dp))
+        Text("Loading make yogurt…")
+    }
+}
+
+@Composable
+internal fun MakeYogurtLoadFailureBody(
     message: String,
     onRetry: () -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
     onBackToHome: () -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
-    BackHandler(onBack = onBackToHome)
-    WorkScaffold(snackbarHostState, OperationsSection.Work, onNavigate, modifier) { padding ->
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(message, style = MaterialTheme.typography.bodyLarge)
-            Button(
-                onClick = onRetry,
-                modifier = Modifier.testTag(NativeUiTags.OpsMakeYogurtRetryLoad),
-            ) { Text("Try again") }
-            TextButton(
-                onClick = onBackToHome,
-                modifier = Modifier.testTag(NativeUiTags.OpsWorkBack),
-            ) { Text("Back to Work") }
-        }
+    Column(
+        modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(message, style = MaterialTheme.typography.bodyLarge)
+        Button(
+            onClick = onRetry,
+            modifier = Modifier.testTag(NativeUiTags.OpsMakeYogurtRetryLoad),
+        ) { Text("Try again") }
+        TextButton(
+            onClick = onBackToHome,
+            modifier = Modifier.testTag(NativeUiTags.OpsWorkBack),
+        ) { Text("Back to Work") }
     }
 }
 
 @Composable
-private fun MakeYogurtReady(
-    snackbarHostState: SnackbarHostState,
+internal fun MakeYogurtReadyContent(
     identity: NativeSignedInIdentity,
     state: NativeMakeYogurtState.Ready,
     onRecord: (NativeMakeYogurtRequest) -> Unit,
     onMakeAnother: () -> Unit,
     onBackToHome: () -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
-    modifier: Modifier,
+    leaveGuard: EntryLeaveGuard,
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier,
 ) {
     var milkText by rememberSaveable { mutableStateOf("") }
     var yogurtText by rememberSaveable { mutableStateOf("") }
     var noteText by rememberSaveable { mutableStateOf("") }
     var noteOpen by rememberSaveable { mutableStateOf(false) }
-    var discardOpen by remember { mutableStateOf(false) }
 
-    val dirty = milkText.isNotBlank() || yogurtText.isNotBlank() || noteText.isNotBlank()
+    val draftDirty = milkText.isNotBlank() || yogurtText.isNotBlank() || noteText.isNotBlank()
+    LaunchedEffect(draftDirty, state.receipt) {
+        when {
+            state.receipt != null -> leaveGuard.clear()
+            draftDirty -> leaveGuard.markDirty()
+            else -> leaveGuard.clear()
+        }
+    }
+
     val milk = milkText.toFiniteDoubleOrNull()
     val yogurt = yogurtText.toFiniteDoubleOrNull()
     val setupReady = state.context.milkProductPresent && state.context.yogurtProductPresent
@@ -175,179 +191,170 @@ private fun MakeYogurtReady(
 
     fun requestLeave() {
         if (state.saving) return
-        if (state.receipt != null || !dirty) {
-            onBackToHome()
-        } else {
-            discardOpen = true
-        }
+        leaveGuard.requestLeave(onBackToHome)
     }
 
-    BackHandler(onBack = ::requestLeave)
-
-    WorkScaffold(snackbarHostState, OperationsSection.Work, onNavigate, modifier) { padding ->
+    Column(
+        modifier
+            .fillMaxSize()
+            .padding(contentPadding)
+            .imePadding()
+            .testTag(NativeUiTags.OpsMakeYogurtForm),
+    ) {
+        CashierScreenHeader(
+            title = "Make yogurt",
+            displayName = identity.displayName,
+            roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+            businessDate = state.context.businessDate,
+            postingOpen = state.context.postingOpen,
+        )
         Column(
             Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .imePadding()
-                .testTag(NativeUiTags.OpsMakeYogurtForm),
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            CashierScreenHeader(
-                title = "Make yogurt",
-                displayName = identity.displayName,
-                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                businessDate = state.context.businessDate,
-                postingOpen = state.context.postingOpen,
-            )
-            Column(
-                Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
+            TextButton(
+                onClick = ::requestLeave,
+                modifier = Modifier.testTag(NativeUiTags.OpsWorkBack),
+            ) { Text("Back to Work") }
+
+            if (!state.context.postingOpen) {
+                Text(
+                    "This business day is closed. Ask Owner to reopen it before recording.",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.testTag(NativeUiTags.OpsMakeYogurtClosed),
+                )
+            }
+            if (!setupReady) {
+                Text(
+                    "Ask Owner to set up Milk and Yogurt products before making yogurt.",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.testTag(NativeUiTags.OpsMakeYogurtMissingSetup),
+                )
+            }
+
+            if (state.receipt != null) {
+                SuccessCard(state.receipt, onMakeAnother)
+            } else {
+                Surface(
+                    tonalElevation = 1.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(NativeUiTags.OpsMakeYogurtStock),
+                ) {
+                    Column(
+                        Modifier.padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        Text("On hand now", style = MaterialTheme.typography.titleSmall)
+                        Text(state.context.milkOnHandLabel)
+                        Text(state.context.yogurtOnHandLabel)
+                    }
+                }
+                MeasurementField(
+                    label = "Milk used (L)",
+                    value = milkText,
+                    enabled = !state.saving,
+                    tag = NativeUiTags.OpsMakeYogurtMilk,
+                    onValueChange = { milkText = it.filterDecimalInput() },
+                )
+                MeasurementField(
+                    label = "Yogurt produced (kg)",
+                    value = yogurtText,
+                    enabled = !state.saving,
+                    tag = NativeUiTags.OpsMakeYogurtYogurt,
+                    onValueChange = { yogurtText = it.filterDecimalInput() },
+                )
                 TextButton(
-                    onClick = ::requestLeave,
-                    modifier = Modifier.testTag(NativeUiTags.OpsWorkBack),
-                ) { Text("Back to Work") }
-
-                if (!state.context.postingOpen) {
-                    Text(
-                        "This business day is closed. Ask Owner to reopen it before recording.",
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.testTag(NativeUiTags.OpsMakeYogurtClosed),
+                    onClick = { noteOpen = !noteOpen },
+                    enabled = !state.saving,
+                    modifier = Modifier.testTag(NativeUiTags.OpsMakeYogurtNoteToggle),
+                ) {
+                    Text(if (noteOpen) "Hide note" else "Add a note")
+                }
+                if (noteOpen) {
+                    OutlinedTextField(
+                        value = noteText,
+                        onValueChange = { noteText = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OpsMakeYogurtNote),
+                        enabled = !state.saving,
+                        label = { Text("Note") },
+                        minLines = 2,
                     )
                 }
-                if (!setupReady) {
+                ReviewDock(
+                    milk = milk,
+                    yogurt = yogurt,
+                    milkOnHand = state.context.milkOnHandLiters,
+                    milkOnHandLabel = state.context.milkOnHandLabel,
+                )
+                if (state.error != null) {
                     Text(
-                        "Ask Owner to set up Milk and Yogurt products before making yogurt.",
+                        state.error,
                         color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.testTag(NativeUiTags.OpsMakeYogurtMissingSetup),
+                        modifier = Modifier.testTag(NativeUiTags.OpsMakeYogurtError),
                     )
                 }
-
-                if (state.receipt != null) {
-                    SuccessCard(state.receipt, onMakeAnother)
+                val actionLabel = if (state.saving) {
+                    "Recording…"
+                } else if (milk != null && yogurt != null && milk > 0.0 && yogurt > 0.0) {
+                    "Record ${formatQty(milk)} L → ${formatQty(yogurt)} kg"
                 } else {
-                    Surface(
-                        tonalElevation = 1.dp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag(NativeUiTags.OpsMakeYogurtStock),
-                    ) {
-                        Column(
-                            Modifier.padding(14.dp),
-                            verticalArrangement = Arrangement.spacedBy(6.dp),
-                        ) {
-                            Text("On hand now", style = MaterialTheme.typography.titleSmall)
-                            Text(state.context.milkOnHandLabel)
-                            Text(state.context.yogurtOnHandLabel)
-                        }
-                    }
-                    MeasurementField(
-                        label = "Milk used (L)",
-                        value = milkText,
-                        enabled = !state.saving,
-                        tag = NativeUiTags.OpsMakeYogurtMilk,
-                        onValueChange = { milkText = it.filterDecimalInput() },
-                    )
-                    MeasurementField(
-                        label = "Yogurt produced (kg)",
-                        value = yogurtText,
-                        enabled = !state.saving,
-                        tag = NativeUiTags.OpsMakeYogurtYogurt,
-                        onValueChange = { yogurtText = it.filterDecimalInput() },
-                    )
-                    TextButton(
-                        onClick = { noteOpen = !noteOpen },
-                        enabled = !state.saving,
-                        modifier = Modifier.testTag(NativeUiTags.OpsMakeYogurtNoteToggle),
-                    ) {
-                        Text(if (noteOpen) "Hide note" else "Add a note")
-                    }
-                    if (noteOpen) {
-                        OutlinedTextField(
-                            value = noteText,
-                            onValueChange = { noteText = it },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .testTag(NativeUiTags.OpsMakeYogurtNote),
-                            enabled = !state.saving,
-                            label = { Text("Note") },
-                            minLines = 2,
+                    "Record batch"
+                }
+                Button(
+                    onClick = {
+                        val milkValue = milk ?: return@Button
+                        val yogurtValue = yogurt ?: return@Button
+                        onRecord(
+                            NativeMakeYogurtRequest(
+                                milkLitersUsed = milkValue,
+                                yogurtKgProduced = yogurtValue,
+                                notes = noteText,
+                            ),
                         )
-                    }
-                    ReviewDock(
-                        milk = milk,
-                        yogurt = yogurt,
-                        milkOnHand = state.context.milkOnHandLiters,
-                        milkOnHandLabel = state.context.milkOnHandLabel,
-                    )
-                    if (state.error != null) {
-                        Text(
-                            state.error,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.testTag(NativeUiTags.OpsMakeYogurtError),
-                        )
-                    }
-                    val actionLabel = if (state.saving) {
-                        "Recording…"
-                    } else if (milk != null && yogurt != null && milk > 0.0 && yogurt > 0.0) {
-                        "Record ${formatQty(milk)} L → ${formatQty(yogurt)} kg"
-                    } else {
-                        "Record batch"
-                    }
-                    Button(
-                        onClick = {
-                            val milkValue = milk ?: return@Button
-                            val yogurtValue = yogurt ?: return@Button
-                            onRecord(
-                                NativeMakeYogurtRequest(
-                                    milkLitersUsed = milkValue,
-                                    yogurtKgProduced = yogurtValue,
-                                    notes = noteText,
-                                ),
-                            )
-                        },
-                        enabled = canRecord,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = SaafYellow,
-                            contentColor = MaterialTheme.colorScheme.onSurface,
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 52.dp)
-                            .testTag(NativeUiTags.OpsMakeYogurtRecord),
-                    ) {
-                        Text(actionLabel, fontWeight = FontWeight.SemiBold)
-                    }
+                    },
+                    enabled = canRecord,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = SaafYellow,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 52.dp)
+                        .testTag(NativeUiTags.OpsMakeYogurtRecord),
+                ) {
+                    Text(actionLabel, fontWeight = FontWeight.SemiBold)
                 }
             }
         }
     }
+}
 
-    if (discardOpen) {
-        AlertDialog(
-            onDismissRequest = { discardOpen = false },
-            title = { Text("Discard this batch?") },
-            text = { Text("Your measurements stay if you keep editing.") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        discardOpen = false
-                        onBackToHome()
-                    },
-                    modifier = Modifier.testTag(NativeUiTags.OpsMakeYogurtDiscardConfirm),
-                ) { Text("Discard") }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { discardOpen = false },
-                    modifier = Modifier.testTag(NativeUiTags.OpsMakeYogurtDiscardCancel),
-                ) { Text("Keep editing") }
-            },
-        )
-    }
+@Composable
+internal fun MakeYogurtDiscardDialog(leaveGuard: EntryLeaveGuard) {
+    if (!leaveGuard.discardConfirmationOpen) return
+    AlertDialog(
+        onDismissRequest = leaveGuard::keepEditing,
+        title = { Text("Discard this batch?") },
+        text = { Text("Your measurements stay if you keep editing.") },
+        confirmButton = {
+            TextButton(
+                onClick = leaveGuard::confirmDiscard,
+                modifier = Modifier.testTag(NativeUiTags.OpsMakeYogurtDiscardConfirm),
+            ) { Text("Discard") }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = leaveGuard::keepEditing,
+                modifier = Modifier.testTag(NativeUiTags.OpsMakeYogurtDiscardCancel),
+            ) { Text("Keep editing") }
+        },
+    )
 }
 
 @Composable

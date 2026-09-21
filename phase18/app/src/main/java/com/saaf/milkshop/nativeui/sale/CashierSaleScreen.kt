@@ -62,10 +62,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -98,6 +96,8 @@ import com.saaf.milkshop.application.sale.NativeSalePaymentKind
 import com.saaf.milkshop.application.sale.NativeSaleProduct
 import com.saaf.milkshop.application.sale.NativeSaleRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import java.util.Locale
@@ -105,47 +105,6 @@ import java.util.Locale
 private enum class EntryMode { Quantity, Amount }
 private enum class PaymentChoice { PaidNow, CustomerAccount }
 enum class CashierSection { Sell, Collect, Activity, More }
-
-@Stable
-internal class SaleLeaveGuard {
-    var dirty by mutableStateOf(false)
-        private set
-
-    private var pendingLeave by mutableStateOf<(() -> Unit)?>(null)
-
-    val discardConfirmationOpen: Boolean
-        get() = pendingLeave != null
-
-    fun markDirty() {
-        dirty = true
-    }
-
-    fun clear() {
-        dirty = false
-        pendingLeave = null
-    }
-
-    fun requestLeave(action: () -> Unit) {
-        if (dirty) {
-            pendingLeave = action
-        } else {
-            action()
-        }
-    }
-
-    fun confirmDiscard() {
-        val action = pendingLeave
-        clear()
-        action?.invoke()
-    }
-
-    fun keepEditing() {
-        pendingLeave = null
-    }
-}
-
-@Composable
-internal fun rememberSaleLeaveGuard(): SaleLeaveGuard = remember { SaleLeaveGuard() }
 
 @Composable
 fun CashierSaleScreen(
@@ -159,7 +118,7 @@ fun CashierSaleScreen(
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val leaveGuard = rememberSaleLeaveGuard()
+    val leaveGuard = rememberEntryLeaveGuard()
     val canLeave = (state as? NativeSaleState.Ready)?.saving != true
     LaunchedEffect(state is NativeSaleState.Ready) {
         if (state !is NativeSaleState.Ready) leaveGuard.clear()
@@ -217,7 +176,7 @@ internal fun SaleEntryContent(
     state: NativeSaleState.Ready,
     onClearFeedback: () -> Unit,
     onRecordSale: (NativeSaleRequest) -> Unit,
-    leaveGuard: SaleLeaveGuard,
+    leaveGuard: EntryLeaveGuard,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
@@ -565,7 +524,7 @@ internal fun SaleLoadFailureBody(
 }
 
 @Composable
-internal fun SaleDiscardDialog(leaveGuard: SaleLeaveGuard) {
+internal fun SaleDiscardDialog(leaveGuard: EntryLeaveGuard) {
     if (!leaveGuard.discardConfirmationOpen) return
     AlertDialog(
         onDismissRequest = leaveGuard::keepEditing,

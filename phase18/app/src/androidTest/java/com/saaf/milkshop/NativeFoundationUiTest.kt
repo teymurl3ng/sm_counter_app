@@ -357,26 +357,15 @@ class NativeFoundationUiTest {
             .performScrollTo()
             .assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
-        composeRule.onNodeWithTag(NativeUiTags.CashierNavSell).assertDoesNotExist()
-        composeRule.onNodeWithTag(NativeUiTags.CashierNavCollect).assertDoesNotExist()
-        composeRule.onNodeWithTag(NativeUiTags.CashierNavActivity).assertDoesNotExist()
-        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertDoesNotExist()
+        assertOwnerShellWithoutForeignNav()
     }
 
     @Test
     fun ownerWorkRecordSaleHardwareBackReturnsToWork() {
         openOwnerSale()
 
-        composeRule.activityRule.scenario.onActivity {
-            it.onBackPressedDispatcher.onBackPressed()
-        }
-        composeRule.waitUntil(10_000) {
-            runCatching {
-                composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).fetchSemanticsNode()
-            }.isSuccess
-        }
-        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
+        pressHardwareBack()
+        assertReturnedToOwnerWorkHome()
     }
 
     @Test
@@ -399,6 +388,101 @@ class NativeFoundationUiTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).assertIsDisplayed()
+    }
+
+    @Test
+    fun ownerWorkRecordPaymentOpensUnderOwnerChrome() {
+        openOwnerCollection()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCollectionEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CollectCustomerSelector)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+    }
+
+    @Test
+    fun ownerWorkRecordPaymentHardwareBackReturnsToWork() {
+        openOwnerCollection()
+        pressHardwareBack()
+        assertReturnedToOwnerWorkHome()
+    }
+
+    @Test
+    fun ownerWorkReceiveMilkOpensUnderOwnerChrome() {
+        openOwnerReceiveMilk()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerReceiveMilkEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkForm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+    }
+
+    @Test
+    fun ownerWorkReceiveMilkHardwareBackReturnsToWork() {
+        openOwnerReceiveMilk()
+        pressHardwareBack()
+        assertReturnedToOwnerWorkHome()
+    }
+
+    @Test
+    fun ownerWorkMakeYogurtOpensUnderOwnerChrome() {
+        openOwnerMakeYogurt()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMakeYogurtEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsMakeYogurtForm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+    }
+
+    @Test
+    fun ownerWorkMakeYogurtHardwareBackReturnsToWork() {
+        openOwnerMakeYogurt()
+        pressHardwareBack()
+        assertReturnedToOwnerWorkHome()
+    }
+
+    @Test
+    fun ownerWorkRecordSpoilageOpensUnderOwnerChrome() {
+        openOwnerRecordSpoilage()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordSpoilageEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilageForm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+    }
+
+    @Test
+    fun ownerWorkRecordSpoilageHardwareBackReturnsToWork() {
+        openOwnerRecordSpoilage()
+        pressHardwareBack()
+        assertReturnedToOwnerWorkHome()
+    }
+
+    @Test
+    fun ownerWorkDeliveriesOpensUnderOwnerChrome() {
+        openOwnerDeliveries()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerDeliveriesEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+        // Regression: Owner Deliveries must not host Ops manager chrome / sign-out path.
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavWork).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavDeliveries).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavAttendance).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavMore).assertDoesNotExist()
+    }
+
+    @Test
+    fun ownerWorkDeliveriesHardwareBackReturnsToWork() {
+        openOwnerDeliveries()
+        pressHardwareBack()
+        assertReturnedToOwnerWorkHome()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavWork).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavDeliveries).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.WelcomeContinue).assertDoesNotExist()
     }
 
     @Test
@@ -1242,12 +1326,95 @@ class NativeFoundationUiTest {
     private fun openOwnerSale() {
         openOwnerWork()
         composeRule.onNodeWithTag(NativeUiTags.OwnerWorkRecordSale).performClick()
-        composeRule.waitUntil(timeoutMillis = 10_000) {
+        composeRule.waitUntil(timeoutMillis = 15_000) {
             runCatching {
-                composeRule.onNodeWithTag(NativeUiTags.OwnerSaleEntryRoot).fetchSemanticsNode()
+                composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).fetchSemanticsNode()
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OwnerSaleEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerCollection() {
+        openOwnerWork()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkRecordPayment).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.CollectCustomerSelector).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCollectionEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerReceiveMilk() {
+        openOwnerWork()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkReceiveMilk).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkForm).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerReceiveMilkEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerMakeYogurt() {
+        openOwnerWork()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkMakeYogurt).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsMakeYogurtForm).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMakeYogurtEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerRecordSpoilage() {
+        openOwnerWork()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkRecordSpoilage).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilageForm).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordSpoilageEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerDeliveries() {
+        openOwnerWork()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkDeliveries).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerDeliveriesEntryRoot).assertIsDisplayed()
+    }
+
+    private fun pressHardwareBack() {
+        composeRule.activityRule.scenario.onActivity {
+            it.onBackPressedDispatcher.onBackPressed()
+        }
+    }
+
+    private fun assertReturnedToOwnerWorkHome() {
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
+    }
+
+    private fun assertOwnerShellWithoutForeignNav() {
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavSell).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavCollect).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavActivity).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavWork).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavDeliveries).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavAttendance).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavMore).assertDoesNotExist()
     }
 
     private fun openOperationsWork() {

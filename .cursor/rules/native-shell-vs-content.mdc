@@ -1,0 +1,42 @@
+---
+description: CORE METHOD — shell vs content for every multi-role native entry. Unskippable. See PHASE14_8_15A.
+alwaysApply: true
+---
+
+# Native UI — shell vs content (CORE METHOD)
+
+This is the **absolute, unskippable requirement** for Saaf Milk native UI.
+Authority: `PHASE14_8_15A_SHELL_VS_CONTENT.md`. Proven by the Owner Work six-entry correction.
+
+## Hard rule
+
+Any entry surface used by **two or more roles** MUST separate:
+
+1. **Role-neutral content** — form, loading, failure, draft leave-guard presentation. No `OwnerSection` / `CashierSection` / `OperationsSection`. No foreign bottom nav.
+2. **Role-owned shell** — that role’s scaffold, nav, snackbar host, Back/exit path.
+3. **Foundation proof** — host-role chrome present, foreign chrome absent, Back returns to the host home, session stays authenticated.
+
+Mounting another role’s full screen (Cashier Collect, Ops Deliveries, etc.) inside Owner — or translating foreign nav events — is a **P0 defect**, not a shortcut.
+
+## Do
+
+- Split content first; wrap with each role’s shell (`OwnerXxxEntryScreen`, Cashier/Ops public screen).
+- Feature package depends **outward** only (owner → collection/operations/sale). Shared content never imports a role package.
+- Dirty drafts: `EntryLeaveGuard` on hardware Back **and** bottom-nav exits.
+- Inventory `COVERED` rows must name real Foundation/workflow tests — never `workflow_test=-` for a hosted entry.
+- Before claiming done: run the host role `qaScreen` gate that includes those Foundation tests.
+
+## Do not
+
+- Ship “connected” because a Work tile callback opens a foreign screen.
+- Treat launcher/callback-only tests as hosted-entry coverage.
+- Skip shell split “temporarily” to move to the next screen (Records, More, etc.).
+- Flatten roles: Owner / Cashier / Ops homes stay distinct; only **content** is shared.
+
+## Done check (every multi-role entry)
+
+- [ ] Content has no role nav / section enums
+- [ ] Each host role has its own wrapper + Back path
+- [ ] Foundation: host chrome ✓, foreign chrome ✗, Back → host home, session intact
+- [ ] Inventory points at those tests
+- [ ] Host `qaScreen` PASS

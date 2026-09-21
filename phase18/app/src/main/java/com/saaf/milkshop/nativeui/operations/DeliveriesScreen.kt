@@ -3,6 +3,7 @@ package com.saaf.milkshop.nativeui.operations
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,197 +49,182 @@ fun DeliveriesScreen(
     onLeaveConfirmed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
-        NativeDeliveriesState.Idle,
-        NativeDeliveriesState.Loading,
-        -> DeliveriesLoading(snackbarHostState, onNavigate, onLeaveConfirmed, modifier)
-
-        is NativeDeliveriesState.LoadFailure -> DeliveriesLoadFailure(
-            snackbarHostState = snackbarHostState,
-            message = state.message,
-            onRetry = onRetry,
-            onNavigate = onNavigate,
-            onLeaveConfirmed = onLeaveConfirmed,
-            modifier = modifier,
-        )
-
-        is NativeDeliveriesState.Ready -> DeliveriesReady(
-            snackbarHostState = snackbarHostState,
-            identity = identity,
-            state = state,
-            onMarkDelivered = onMarkDelivered,
-            onNavigate = onNavigate,
-            onLeaveConfirmed = onLeaveConfirmed,
-            modifier = modifier,
-        )
-    }
-}
-
-@Composable
-private fun DeliveriesLoading(
-    snackbarHostState: SnackbarHostState,
-    onNavigate: (OperationsSection) -> Unit,
-    onLeaveConfirmed: () -> Unit,
-    modifier: Modifier,
-) {
     BackHandler(onBack = onLeaveConfirmed)
-    WorkScaffold(snackbarHostState, OperationsSection.Deliveries, onNavigate, modifier) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(it)
-                .padding(24.dp)
-                .testTag(NativeUiTags.OpsDeliveriesLoading),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            CircularProgressIndicator()
-            Spacer(Modifier.height(12.dp))
-            Text("Loading deliveries…")
+    WorkScaffold(
+        snackbarHostState = snackbarHostState,
+        section = OperationsSection.Deliveries,
+        onNavigate = onNavigate,
+        modifier = modifier,
+    ) { padding ->
+        when (state) {
+            NativeDeliveriesState.Idle,
+            NativeDeliveriesState.Loading,
+            -> DeliveriesLoadingBody(
+                modifier = Modifier.padding(padding),
+            )
+
+            is NativeDeliveriesState.LoadFailure -> DeliveriesLoadFailureBody(
+                message = state.message,
+                onRetry = onRetry,
+                modifier = Modifier.padding(padding),
+            )
+
+            is NativeDeliveriesState.Ready -> DeliveriesReadyContent(
+                identity = identity,
+                state = state,
+                onMarkDelivered = onMarkDelivered,
+                contentPadding = padding,
+            )
         }
     }
 }
 
 @Composable
-private fun DeliveriesLoadFailure(
-    snackbarHostState: SnackbarHostState,
+internal fun DeliveriesLoadingBody(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier
+            .fillMaxSize()
+            .padding(24.dp)
+            .testTag(NativeUiTags.OpsDeliveriesLoading),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        CircularProgressIndicator()
+        Spacer(Modifier.height(12.dp))
+        Text("Loading deliveries…")
+    }
+}
+
+@Composable
+internal fun DeliveriesLoadFailureBody(
     message: String,
     onRetry: () -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
-    onLeaveConfirmed: () -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
-    BackHandler(onBack = onLeaveConfirmed)
-    WorkScaffold(snackbarHostState, OperationsSection.Deliveries, onNavigate, modifier) { padding ->
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(message, style = MaterialTheme.typography.bodyLarge)
-            Button(
-                onClick = onRetry,
-                modifier = Modifier.testTag(NativeUiTags.OpsDeliveriesRetryLoad),
-            ) { Text("Try again") }
-        }
+    Column(
+        modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(message, style = MaterialTheme.typography.bodyLarge)
+        Button(
+            onClick = onRetry,
+            modifier = Modifier.testTag(NativeUiTags.OpsDeliveriesRetryLoad),
+        ) { Text("Try again") }
     }
 }
 
 @Composable
-private fun DeliveriesReady(
-    snackbarHostState: SnackbarHostState,
+internal fun DeliveriesReadyContent(
     identity: NativeSignedInIdentity,
     state: NativeDeliveriesState.Ready,
     onMarkDelivered: (Long) -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
-    onLeaveConfirmed: () -> Unit,
-    modifier: Modifier,
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier,
 ) {
-    BackHandler(onBack = onLeaveConfirmed)
-    WorkScaffold(snackbarHostState, OperationsSection.Deliveries, onNavigate, modifier) { padding ->
+    Column(
+        modifier
+            .fillMaxSize()
+            .padding(contentPadding)
+            .testTag(NativeUiTags.OpsDeliveriesRoot),
+    ) {
+        CashierScreenHeader(
+            title = "Active deliveries",
+            displayName = identity.displayName,
+            roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+            businessDate = state.context.businessDate,
+            postingOpen = state.context.postingOpen,
+        )
         Column(
             Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .testTag(NativeUiTags.OpsDeliveriesRoot),
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            CashierScreenHeader(
-                title = "Active deliveries",
-                displayName = identity.displayName,
-                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                businessDate = state.context.businessDate,
-                postingOpen = state.context.postingOpen,
-            )
-            Column(
-                Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                if (!state.context.postingOpen) {
-                    Text(
-                        "This business day is closed. Ask Owner to reopen it before marking delivered.",
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.testTag(NativeUiTags.OpsDeliveriesClosed),
-                    )
-                }
-                if (state.lastDeliveredId != null) {
-                    Surface(
-                        tonalElevation = 2.dp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag(NativeUiTags.OpsDeliveriesSuccess),
+            if (!state.context.postingOpen) {
+                Text(
+                    "This business day is closed. Ask Owner to reopen it before marking delivered.",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.testTag(NativeUiTags.OpsDeliveriesClosed),
+                )
+            }
+            if (state.lastDeliveredId != null) {
+                Surface(
+                    tonalElevation = 2.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(NativeUiTags.OpsDeliveriesSuccess),
+                ) {
+                    Row(
+                        Modifier.padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Row(
-                            Modifier.padding(14.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(Icons.Outlined.CheckCircle, contentDescription = null)
-                            Spacer(Modifier.width(8.dp))
-                            Text(
-                                "Marked delivered (#${state.lastDeliveredId})",
-                                style = MaterialTheme.typography.titleMedium,
-                            )
-                        }
+                        Icon(Icons.Outlined.CheckCircle, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            "Marked delivered (#${state.lastDeliveredId})",
+                            style = MaterialTheme.typography.titleMedium,
+                        )
                     }
                 }
-                if (state.error != null) {
-                    Text(
-                        state.error,
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.testTag(NativeUiTags.OpsDeliveriesError),
-                    )
-                }
-                if (state.context.isEmpty) {
-                    Surface(
-                        tonalElevation = 1.dp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag(NativeUiTags.OpsDeliveriesEmpty),
+            }
+            if (state.error != null) {
+                Text(
+                    state.error,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.testTag(NativeUiTags.OpsDeliveriesError),
+                )
+            }
+            if (state.context.isEmpty) {
+                Surface(
+                    tonalElevation = 1.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(NativeUiTags.OpsDeliveriesEmpty),
+                ) {
+                    Column(
+                        Modifier.padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        Column(
-                            Modifier.padding(20.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            Icon(Icons.Outlined.LocalShipping, contentDescription = null)
-                            Text(
-                                "No active deliveries",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                            )
-                            Text(
-                                "When pending deliveries exist, they appear here to mark delivered.",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
+                        Icon(Icons.Outlined.LocalShipping, contentDescription = null)
+                        Text(
+                            "No active deliveries",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Text(
+                            "When pending deliveries exist, they appear here to mark delivered.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
-                } else {
-                    if (state.context.today.isNotEmpty()) {
-                        SectionLabel("Today")
-                        state.context.today.forEach { item ->
-                            DeliveryCard(
-                                item = item,
-                                marking = state.markingDeliveryId == item.deliveryId,
-                                canMark = state.context.postingOpen && state.markingDeliveryId == null,
-                                onMarkDelivered = onMarkDelivered,
-                            )
-                        }
+                }
+            } else {
+                if (state.context.today.isNotEmpty()) {
+                    SectionLabel("Today")
+                    state.context.today.forEach { item ->
+                        DeliveryCard(
+                            item = item,
+                            marking = state.markingDeliveryId == item.deliveryId,
+                            canMark = state.context.postingOpen && state.markingDeliveryId == null,
+                            onMarkDelivered = onMarkDelivered,
+                        )
                     }
-                    if (state.context.earlier.isNotEmpty()) {
-                        SectionLabel("Earlier")
-                        state.context.earlier.forEach { item ->
-                            DeliveryCard(
-                                item = item,
-                                marking = state.markingDeliveryId == item.deliveryId,
-                                canMark = state.context.postingOpen && state.markingDeliveryId == null,
-                                onMarkDelivered = onMarkDelivered,
-                            )
-                        }
+                }
+                if (state.context.earlier.isNotEmpty()) {
+                    SectionLabel("Earlier")
+                    state.context.earlier.forEach { item ->
+                        DeliveryCard(
+                            item = item,
+                            marking = state.markingDeliveryId == item.deliveryId,
+                            canMark = state.context.postingOpen && state.markingDeliveryId == null,
+                            onMarkDelivered = onMarkDelivered,
+                        )
                     }
                 }
             }
@@ -297,7 +282,7 @@ private fun DeliveryCard(
             )
             Button(
                 onClick = { onMarkDelivered(item.deliveryId) },
-                    enabled = canMark,
+                enabled = canMark,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SaafYellow,
                     contentColor = MaterialTheme.colorScheme.onSurface,

@@ -3,7 +3,9 @@ package com.saaf.milkshop.nativeui.operations
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,9 +34,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,6 +55,8 @@ import com.saaf.milkshop.application.operations.NativeRecordSpoilageRequest
 import com.saaf.milkshop.application.operations.NativeSpoilageProduct
 import com.saaf.milkshop.application.operations.NativeSpoilageReason
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.theme.SaafYellow
@@ -76,96 +80,101 @@ fun RecordSpoilageScreen(
     onNavigate: (OperationsSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
-        NativeRecordSpoilageState.Idle,
-        NativeRecordSpoilageState.Loading,
-        -> SpoilageLoading(snackbarHostState, onNavigate, modifier)
-
-        is NativeRecordSpoilageState.LoadFailure -> SpoilageLoadFailure(
-            snackbarHostState = snackbarHostState,
-            message = state.message,
-            onRetry = onRetry,
-            onNavigate = onNavigate,
-            onBackToHome = onBackToHome,
-            modifier = modifier,
-        )
-
-        is NativeRecordSpoilageState.Ready -> SpoilageReady(
-            snackbarHostState = snackbarHostState,
-            identity = identity,
-            state = state,
-            onSelectProduct = onSelectProduct,
-            onOpenProductPicker = onOpenProductPicker,
-            onCloseProductPicker = onCloseProductPicker,
-            onSelectReason = onSelectReason,
-            onOpenReasonPicker = onOpenReasonPicker,
-            onCloseReasonPicker = onCloseReasonPicker,
-            onRecord = onRecord,
-            onRecordAnother = onRecordAnother,
-            onBackToHome = onBackToHome,
-            onNavigate = onNavigate,
-            modifier = modifier,
-        )
+    val leaveGuard = rememberEntryLeaveGuard()
+    val canLeave = (state as? NativeRecordSpoilageState.Ready)?.saving != true
+    LaunchedEffect(state is NativeRecordSpoilageState.Ready) {
+        if (state !is NativeRecordSpoilageState.Ready) leaveGuard.clear()
     }
-}
+    BackHandler {
+        if (canLeave) leaveGuard.requestLeave(onBackToHome)
+    }
+    WorkScaffold(
+        snackbarHostState = snackbarHostState,
+        section = OperationsSection.Work,
+        onNavigate = { section ->
+            if (canLeave) leaveGuard.requestLeave { onNavigate(section) }
+        },
+        modifier = modifier,
+    ) { padding ->
+        when (state) {
+            NativeRecordSpoilageState.Idle,
+            NativeRecordSpoilageState.Loading,
+            -> RecordSpoilageLoadingBody(
+                modifier = Modifier.padding(padding),
+            )
 
-@Composable
-private fun SpoilageLoading(
-    snackbarHostState: SnackbarHostState,
-    onNavigate: (OperationsSection) -> Unit,
-    modifier: Modifier,
-) {
-    WorkScaffold(snackbarHostState, OperationsSection.Work, onNavigate, modifier) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(it)
-                .padding(24.dp)
-                .testTag(NativeUiTags.OpsRecordSpoilageLoading),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            CircularProgressIndicator()
-            Spacer(Modifier.height(12.dp))
-            Text("Loading record spoilage…")
+            is NativeRecordSpoilageState.LoadFailure -> RecordSpoilageLoadFailureBody(
+                message = state.message,
+                onRetry = onRetry,
+                onBackToHome = onBackToHome,
+                modifier = Modifier.padding(padding),
+            )
+
+            is NativeRecordSpoilageState.Ready -> RecordSpoilageReadyContent(
+                identity = identity,
+                state = state,
+                onSelectProduct = onSelectProduct,
+                onOpenProductPicker = onOpenProductPicker,
+                onCloseProductPicker = onCloseProductPicker,
+                onSelectReason = onSelectReason,
+                onOpenReasonPicker = onOpenReasonPicker,
+                onCloseReasonPicker = onCloseReasonPicker,
+                onRecord = onRecord,
+                onRecordAnother = onRecordAnother,
+                onBackToHome = onBackToHome,
+                leaveGuard = leaveGuard,
+                contentPadding = padding,
+            )
         }
     }
+    RecordSpoilageDiscardDialog(leaveGuard)
 }
 
 @Composable
-private fun SpoilageLoadFailure(
-    snackbarHostState: SnackbarHostState,
+internal fun RecordSpoilageLoadingBody(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier
+            .fillMaxSize()
+            .padding(24.dp)
+            .testTag(NativeUiTags.OpsRecordSpoilageLoading),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        CircularProgressIndicator()
+        Spacer(Modifier.height(12.dp))
+        Text("Loading record spoilage…")
+    }
+}
+
+@Composable
+internal fun RecordSpoilageLoadFailureBody(
     message: String,
     onRetry: () -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
     onBackToHome: () -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
-    BackHandler(onBack = onBackToHome)
-    WorkScaffold(snackbarHostState, OperationsSection.Work, onNavigate, modifier) { padding ->
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(message, style = MaterialTheme.typography.bodyLarge)
-            Button(
-                onClick = onRetry,
-                modifier = Modifier.testTag(NativeUiTags.OpsRecordSpoilageRetryLoad),
-            ) { Text("Try again") }
-            TextButton(
-                onClick = onBackToHome,
-                modifier = Modifier.testTag(NativeUiTags.OpsWorkBack),
-            ) { Text("Back to Work") }
-        }
+    Column(
+        modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(message, style = MaterialTheme.typography.bodyLarge)
+        Button(
+            onClick = onRetry,
+            modifier = Modifier.testTag(NativeUiTags.OpsRecordSpoilageRetryLoad),
+        ) { Text("Try again") }
+        TextButton(
+            onClick = onBackToHome,
+            modifier = Modifier.testTag(NativeUiTags.OpsWorkBack),
+        ) { Text("Back to Work") }
     }
 }
 
 @Composable
-private fun SpoilageReady(
-    snackbarHostState: SnackbarHostState,
+internal fun RecordSpoilageReadyContent(
     identity: NativeSignedInIdentity,
     state: NativeRecordSpoilageState.Ready,
     onSelectProduct: (Long) -> Unit,
@@ -177,16 +186,24 @@ private fun SpoilageReady(
     onRecord: (NativeRecordSpoilageRequest) -> Unit,
     onRecordAnother: () -> Unit,
     onBackToHome: () -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
-    modifier: Modifier,
+    leaveGuard: EntryLeaveGuard,
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier,
 ) {
     var quantityText by rememberSaveable { mutableStateOf("") }
     var noteText by rememberSaveable { mutableStateOf("") }
     var noteOpen by rememberSaveable { mutableStateOf(false) }
-    var discardOpen by remember { mutableStateOf(false) }
 
-    val dirty = quantityText.isNotBlank() || noteText.isNotBlank() ||
+    val draftDirty = quantityText.isNotBlank() || noteText.isNotBlank() ||
         state.selectedProduct != null || state.selectedReason != null
+    LaunchedEffect(draftDirty, state.receipt) {
+        when {
+            state.receipt != null -> leaveGuard.clear()
+            draftDirty -> leaveGuard.markDirty()
+            else -> leaveGuard.clear()
+        }
+    }
+
     val quantity = quantityText.toFiniteDoubleOrNull()
     val reason = state.selectedReason
     val product = state.selectedProduct
@@ -203,20 +220,14 @@ private fun SpoilageReady(
 
     fun requestLeave() {
         if (state.saving) return
-        if (state.receipt != null || !dirty) {
-            onBackToHome()
-        } else {
-            discardOpen = true
-        }
+        leaveGuard.requestLeave(onBackToHome)
     }
 
-    BackHandler(onBack = ::requestLeave)
-
-    WorkScaffold(snackbarHostState, OperationsSection.Work, onNavigate, modifier) { padding ->
+    Box(modifier.fillMaxSize()) {
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(contentPadding)
                 .imePadding()
                 .testTag(NativeUiTags.OpsRecordSpoilageForm),
         ) {
@@ -359,44 +370,44 @@ private fun SpoilageReady(
                 }
             }
         }
-    }
 
-    if (state.selectingProduct) {
-        ProductPickerDialog(
-            products = state.context.products,
-            onSelect = onSelectProduct,
-            onDismiss = onCloseProductPicker,
-        )
+        if (state.selectingProduct) {
+            ProductPickerDialog(
+                products = state.context.products,
+                onSelect = onSelectProduct,
+                onDismiss = onCloseProductPicker,
+            )
+        }
+        if (state.selectingReason) {
+            ReasonPickerDialog(
+                reasons = state.context.reasons,
+                onSelect = onSelectReason,
+                onDismiss = onCloseReasonPicker,
+            )
+        }
     }
-    if (state.selectingReason) {
-        ReasonPickerDialog(
-            reasons = state.context.reasons,
-            onSelect = onSelectReason,
-            onDismiss = onCloseReasonPicker,
-        )
-    }
-    if (discardOpen) {
-        AlertDialog(
-            onDismissRequest = { discardOpen = false },
-            title = { Text("Discard this entry?") },
-            text = { Text("Your product and quantity stay if you keep editing.") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        discardOpen = false
-                        onBackToHome()
-                    },
-                    modifier = Modifier.testTag(NativeUiTags.OpsRecordSpoilageDiscardConfirm),
-                ) { Text("Discard") }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { discardOpen = false },
-                    modifier = Modifier.testTag(NativeUiTags.OpsRecordSpoilageDiscardCancel),
-                ) { Text("Keep editing") }
-            },
-        )
-    }
+}
+
+@Composable
+internal fun RecordSpoilageDiscardDialog(leaveGuard: EntryLeaveGuard) {
+    if (!leaveGuard.discardConfirmationOpen) return
+    AlertDialog(
+        onDismissRequest = leaveGuard::keepEditing,
+        title = { Text("Discard this entry?") },
+        text = { Text("Your product and quantity stay if you keep editing.") },
+        confirmButton = {
+            TextButton(
+                onClick = leaveGuard::confirmDiscard,
+                modifier = Modifier.testTag(NativeUiTags.OpsRecordSpoilageDiscardConfirm),
+            ) { Text("Discard") }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = leaveGuard::keepEditing,
+                modifier = Modifier.testTag(NativeUiTags.OpsRecordSpoilageDiscardCancel),
+            ) { Text("Keep editing") }
+        },
+    )
 }
 
 @Composable

@@ -97,46 +97,22 @@ class NativeAuthenticationFacade(
     }
 
     /**
-     * Creates the debug Preview Operator when missing (or finishes stuck enrollment).
+     * Creates debug preview Admin / Cashier / Operator when missing.
+     * Existing active accounts are never passphrase-reset.
      * Requires a session that can manage staff users.
      */
-    suspend fun ensurePreviewOperator(sessionHandle: String): Boolean {
-        val existing = database.appUserDao().findByLoginName(
-            com.saaf.milkshop.application.preview.NativePreviewSampleData.PREVIEW_OPERATOR_LOGIN,
+    suspend fun ensurePreviewOperator(sessionHandle: String): Boolean =
+        ensurePreviewStaffAccounts(sessionHandle) > 0
+
+    suspend fun ensurePreviewStaffAccounts(sessionHandle: String): Int =
+        com.saaf.milkshop.application.preview.NativePreviewSampleData.ensurePreviewStaffAccounts(
+            database = database,
+            security = security,
+            sessionHandle = sessionHandle,
         )
-        if (existing != null && !existing.credentialSetupRequired &&
-            existing.status == UserSecurityService.STATUS_ACTIVE
-        ) {
-            return false
-        }
-        security.requirePermission(sessionHandle, AppPermission.MANAGE_STAFF_USERS)
-        if (existing != null && existing.credentialSetupRequired) {
-            val pending = security.resumeUserEnrollment(sessionHandle, existing.userId)
-            val passphrase = com.saaf.milkshop.application.preview.NativePreviewSampleData
-                .PREVIEW_OPERATOR_PASSPHRASE.toCharArray()
-            try {
-                security.completeUserEnrollment(pending.enrollmentToken, passphrase)
-            } finally {
-                passphrase.fill('\u0000')
-            }
-            return true
-        }
-        val pending = security.beginUserEnrollment(
-            sessionHandle,
-            com.saaf.milkshop.domain.CreateUserInput(
-                loginName = com.saaf.milkshop.application.preview.NativePreviewSampleData.PREVIEW_OPERATOR_LOGIN,
-                displayName = com.saaf.milkshop.application.preview.NativePreviewSampleData.PREVIEW_OPERATOR_DISPLAY_NAME,
-                role = AppRole.OPERATOR.wireValue,
-            ),
-        )
-        val passphrase = com.saaf.milkshop.application.preview.NativePreviewSampleData
-            .PREVIEW_OPERATOR_PASSPHRASE.toCharArray()
-        try {
-            security.completeUserEnrollment(pending.enrollmentToken, passphrase)
-        } finally {
-            passphrase.fill('\u0000')
-        }
-        return true
+
+    suspend fun alignPreviewPassphrases() {
+        com.saaf.milkshop.application.preview.NativePreviewSampleData.alignPreviewPassphrases(security)
     }
 
     suspend fun ensurePreviewVendor(): Boolean =
@@ -147,14 +123,35 @@ class NativeAuthenticationFacade(
             .ensurePreviewOperatorEmployeeLink(database)
 
     suspend fun signInPreviewOperator(): NativeAuthenticatedSession {
+        alignPreviewPassphrases()
         val account = activeAccounts().firstOrNull {
             it.loginName == com.saaf.milkshop.application.preview.NativePreviewSampleData.PREVIEW_OPERATOR_LOGIN
         } ?: error(
             "Preview Operator is missing. Sign in as Owner once so the preview can create it, then try again.",
         )
         val passphrase = com.saaf.milkshop.application.preview.NativePreviewSampleData
-            .PREVIEW_OPERATOR_PASSPHRASE.toCharArray()
+            .PREVIEW_SHARED_PASSPHRASE.toCharArray()
         return signIn(account, passphrase)
+    }
+
+    suspend fun signInPreviewCashier(): NativeAuthenticatedSession {
+        alignPreviewPassphrases()
+        val sample = com.saaf.milkshop.application.preview.NativePreviewSampleData
+        val account = activeAccounts().firstOrNull { it.loginName == sample.PREVIEW_CASHIER_LOGIN }
+            ?: error(
+                "Preview Cashier is missing. Sign in as Owner once so the preview can create it, then try again.",
+            )
+        return signIn(account, sample.PREVIEW_SHARED_PASSPHRASE.toCharArray())
+    }
+
+    suspend fun signInPreviewAdmin(): NativeAuthenticatedSession {
+        alignPreviewPassphrases()
+        val sample = com.saaf.milkshop.application.preview.NativePreviewSampleData
+        val account = activeAccounts().firstOrNull { it.loginName == sample.PREVIEW_ADMIN_LOGIN }
+            ?: error(
+                "Preview Admin is missing. Sign in as Owner once so the preview can create it, then try again.",
+            )
+        return signIn(account, sample.PREVIEW_SHARED_PASSPHRASE.toCharArray())
     }
 
     /**
@@ -166,16 +163,16 @@ class NativeAuthenticationFacade(
             return bootstrapOwner(
                 loginName = sample.PREVIEW_OWNER_LOGIN,
                 displayName = sample.PREVIEW_OWNER_DISPLAY_NAME,
-                passphrase = sample.PREVIEW_OWNER_PASSPHRASE.toCharArray(),
+                passphrase = sample.PREVIEW_SHARED_PASSPHRASE.toCharArray(),
             ).session
         }
+        alignPreviewPassphrases()
         val account = activeAccounts().firstOrNull { it.loginName == sample.PREVIEW_OWNER_LOGIN }
             ?: error(
                 "Preview Owner (${sample.PREVIEW_OWNER_LOGIN}) is missing. " +
                     "Sign in as Owner from the account picker, or clear app data to bootstrap preview.owner.",
             )
-        val passphrase = sample.PREVIEW_OWNER_PASSPHRASE.toCharArray()
-        return signIn(account, passphrase)
+        return signIn(account, sample.PREVIEW_SHARED_PASSPHRASE.toCharArray())
     }
 
     private suspend fun activeAccounts(): List<NativeAccountSummary> =

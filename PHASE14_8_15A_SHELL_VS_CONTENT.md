@@ -1,8 +1,10 @@
 # Phase 14.8.15A — Native shell vs content correction
 
-Status: **ACCEPTED FOR IMPLEMENTATION**
+Status: **CORE METHOD — absolute, unskippable for all multi-role native entries**
 
 Date: 2026-09-21
+
+Cursor enforcement: `.cursor/rules/native-shell-vs-content.mdc` (`alwaysApply: true`)
 
 ## Problem
 
@@ -55,10 +57,12 @@ Sale is the first correction:
 
 ## Follow-up sequence
 
-- 14.8.15A.2: Collect under Owner shell.
+- 14.8.15A.2: Collect under Owner shell. **DONE**
 - 14.8.15A.3: Receive Milk, Make Yogurt, Record Spoilage, and Deliveries under
-  Owner shell.
-- 14.8.15A.4: extract role hosts from `NativePreviewActivity`.
+  Owner shell. **DONE**
+- 14.8.15A.4: extract role hosts from `NativePreviewActivity`. **DONE**
+  (`OwnerPreviewHost`, `CashierPreviewHost`, `OperationsPreviewHost`; Activity wires
+  ViewModels/facades/session and selects the host.)
 - Later: destination-scoped ViewModels and a stronger local-unit test base.
 
 ## Non-goals
@@ -66,4 +70,4 @@ Sale is the first correction:
 - No Navigation Compose migration in this correction.
 - No role flattening: Owner, Cashier, and Operations homes stay distinct.
 - No changes to business logic, accounting, permissions, or domain models.
-- Phase 14.8.16 remains reserved for Owner Records.
+- Phase 14.8.16 Owner Records blueprint is next / in draft (`PHASE14_8_16_OWNER_RECORDS_BLUEPRINT.md`) — do not implement Records Compose until that draft is accepted.

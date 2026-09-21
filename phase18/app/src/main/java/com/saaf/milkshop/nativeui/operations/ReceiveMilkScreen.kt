@@ -3,7 +3,9 @@ package com.saaf.milkshop.nativeui.operations
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,9 +34,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,6 +55,8 @@ import com.saaf.milkshop.application.operations.NativeReceiveMilkReceipt
 import com.saaf.milkshop.application.operations.NativeReceiveMilkRequest
 import com.saaf.milkshop.application.operations.NativeReceiveMilkVendor
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.theme.SaafYellow
@@ -74,94 +78,99 @@ fun ReceiveMilkScreen(
     onNavigate: (OperationsSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
-        NativeReceiveMilkState.Idle,
-        NativeReceiveMilkState.Loading,
-        -> ReceiveMilkLoading(snackbarHostState, onNavigate, modifier)
-
-        is NativeReceiveMilkState.LoadFailure -> ReceiveMilkLoadFailure(
-            snackbarHostState = snackbarHostState,
-            message = state.message,
-            onRetry = onRetry,
-            onNavigate = onNavigate,
-            onBackToHome = onBackToHome,
-            modifier = modifier,
-        )
-
-        is NativeReceiveMilkState.Ready -> ReceiveMilkReady(
-            snackbarHostState = snackbarHostState,
-            identity = identity,
-            state = state,
-            onSelectVendor = onSelectVendor,
-            onOpenVendorPicker = onOpenVendorPicker,
-            onCloseVendorPicker = onCloseVendorPicker,
-            onPreview = onPreview,
-            onRecord = onRecord,
-            onReceiveAnother = onReceiveAnother,
-            onBackToHome = onBackToHome,
-            onNavigate = onNavigate,
-            modifier = modifier,
-        )
+    val leaveGuard = rememberEntryLeaveGuard()
+    val canLeave = (state as? NativeReceiveMilkState.Ready)?.saving != true
+    LaunchedEffect(state is NativeReceiveMilkState.Ready) {
+        if (state !is NativeReceiveMilkState.Ready) leaveGuard.clear()
     }
-}
+    BackHandler {
+        if (canLeave) leaveGuard.requestLeave(onBackToHome)
+    }
+    WorkScaffold(
+        snackbarHostState = snackbarHostState,
+        section = OperationsSection.Work,
+        onNavigate = { section ->
+            if (canLeave) leaveGuard.requestLeave { onNavigate(section) }
+        },
+        modifier = modifier,
+    ) { padding ->
+        when (state) {
+            NativeReceiveMilkState.Idle,
+            NativeReceiveMilkState.Loading,
+            -> ReceiveMilkLoadingBody(
+                modifier = Modifier.padding(padding),
+            )
 
-@Composable
-private fun ReceiveMilkLoading(
-    snackbarHostState: SnackbarHostState,
-    onNavigate: (OperationsSection) -> Unit,
-    modifier: Modifier,
-) {
-    WorkScaffold(snackbarHostState, OperationsSection.Work, onNavigate, modifier) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(it)
-                .padding(24.dp)
-                .testTag(NativeUiTags.OpsReceiveMilkLoading),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            CircularProgressIndicator()
-            Spacer(Modifier.height(12.dp))
-            Text("Loading receive milk…")
+            is NativeReceiveMilkState.LoadFailure -> ReceiveMilkLoadFailureBody(
+                message = state.message,
+                onRetry = onRetry,
+                onBackToHome = onBackToHome,
+                modifier = Modifier.padding(padding),
+            )
+
+            is NativeReceiveMilkState.Ready -> ReceiveMilkReadyContent(
+                identity = identity,
+                state = state,
+                onSelectVendor = onSelectVendor,
+                onOpenVendorPicker = onOpenVendorPicker,
+                onCloseVendorPicker = onCloseVendorPicker,
+                onPreview = onPreview,
+                onRecord = onRecord,
+                onReceiveAnother = onReceiveAnother,
+                onBackToHome = onBackToHome,
+                leaveGuard = leaveGuard,
+                contentPadding = padding,
+            )
         }
     }
+    ReceiveMilkDiscardDialog(leaveGuard)
 }
 
 @Composable
-private fun ReceiveMilkLoadFailure(
-    snackbarHostState: SnackbarHostState,
+internal fun ReceiveMilkLoadingBody(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier
+            .fillMaxSize()
+            .padding(24.dp)
+            .testTag(NativeUiTags.OpsReceiveMilkLoading),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        CircularProgressIndicator()
+        Spacer(Modifier.height(12.dp))
+        Text("Loading receive milk…")
+    }
+}
+
+@Composable
+internal fun ReceiveMilkLoadFailureBody(
     message: String,
     onRetry: () -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
     onBackToHome: () -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
-    BackHandler(onBack = onBackToHome)
-    WorkScaffold(snackbarHostState, OperationsSection.Work, onNavigate, modifier) { padding ->
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(message, style = MaterialTheme.typography.bodyLarge)
-            Button(
-                onClick = onRetry,
-                modifier = Modifier.testTag(NativeUiTags.OpsReceiveMilkRetryLoad),
-            ) { Text("Try again") }
-            TextButton(
-                onClick = onBackToHome,
-                modifier = Modifier.testTag(NativeUiTags.OpsWorkBack),
-            ) { Text("Back to Work") }
-        }
+    Column(
+        modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(message, style = MaterialTheme.typography.bodyLarge)
+        Button(
+            onClick = onRetry,
+            modifier = Modifier.testTag(NativeUiTags.OpsReceiveMilkRetryLoad),
+        ) { Text("Try again") }
+        TextButton(
+            onClick = onBackToHome,
+            modifier = Modifier.testTag(NativeUiTags.OpsWorkBack),
+        ) { Text("Back to Work") }
     }
 }
 
 @Composable
-private fun ReceiveMilkReady(
-    snackbarHostState: SnackbarHostState,
+internal fun ReceiveMilkReadyContent(
     identity: NativeSignedInIdentity,
     state: NativeReceiveMilkState.Ready,
     onSelectVendor: (Long) -> Unit,
@@ -171,18 +180,26 @@ private fun ReceiveMilkReady(
     onRecord: (NativeReceiveMilkRequest) -> Unit,
     onReceiveAnother: () -> Unit,
     onBackToHome: () -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
-    modifier: Modifier,
+    leaveGuard: EntryLeaveGuard,
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier,
 ) {
     var litersText by rememberSaveable { mutableStateOf("") }
     var fatText by rememberSaveable { mutableStateOf("") }
     var lrText by rememberSaveable { mutableStateOf("") }
     var noteText by rememberSaveable { mutableStateOf("") }
     var noteOpen by rememberSaveable { mutableStateOf(false) }
-    var discardOpen by remember { mutableStateOf(false) }
 
-    val dirty = litersText.isNotBlank() || fatText.isNotBlank() || lrText.isNotBlank() ||
+    val draftDirty = litersText.isNotBlank() || fatText.isNotBlank() || lrText.isNotBlank() ||
         noteText.isNotBlank() || state.selectedVendor != null
+    LaunchedEffect(draftDirty, state.receipt) {
+        when {
+            state.receipt != null -> leaveGuard.clear()
+            draftDirty -> leaveGuard.markDirty()
+            else -> leaveGuard.clear()
+        }
+    }
+
     val liters = litersText.toFiniteDoubleOrNull()
     val fat = fatText.toFiniteDoubleOrNull()
     val lr = lrText.toFiniteDoubleOrNull()
@@ -201,20 +218,14 @@ private fun ReceiveMilkReady(
 
     fun requestLeave() {
         if (state.saving) return
-        if (state.receipt != null || !dirty) {
-            onBackToHome()
-        } else {
-            discardOpen = true
-        }
+        leaveGuard.requestLeave(onBackToHome)
     }
 
-    BackHandler(onBack = ::requestLeave)
-
-    WorkScaffold(snackbarHostState, OperationsSection.Work, onNavigate, modifier) { padding ->
+    Box(modifier.fillMaxSize()) {
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(contentPadding)
                 .imePadding()
                 .testTag(NativeUiTags.OpsReceiveMilkForm),
         ) {
@@ -342,38 +353,37 @@ private fun ReceiveMilkReady(
                 }
             }
         }
-    }
 
-    if (state.selectingVendor) {
-        VendorPickerDialog(
-            vendors = state.context.vendors,
-            onSelect = onSelectVendor,
-            onDismiss = onCloseVendorPicker,
-        )
+        if (state.selectingVendor) {
+            VendorPickerDialog(
+                vendors = state.context.vendors,
+                onSelect = onSelectVendor,
+                onDismiss = onCloseVendorPicker,
+            )
+        }
     }
+}
 
-    if (discardOpen) {
-        AlertDialog(
-            onDismissRequest = { discardOpen = false },
-            title = { Text("Discard this receipt?") },
-            text = { Text("Your supplier and measurements stay if you keep editing.") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        discardOpen = false
-                        onBackToHome()
-                    },
-                    modifier = Modifier.testTag(NativeUiTags.OpsReceiveMilkDiscardConfirm),
-                ) { Text("Discard") }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { discardOpen = false },
-                    modifier = Modifier.testTag(NativeUiTags.OpsReceiveMilkDiscardCancel),
-                ) { Text("Keep editing") }
-            },
-        )
-    }
+@Composable
+internal fun ReceiveMilkDiscardDialog(leaveGuard: EntryLeaveGuard) {
+    if (!leaveGuard.discardConfirmationOpen) return
+    AlertDialog(
+        onDismissRequest = leaveGuard::keepEditing,
+        title = { Text("Discard this receipt?") },
+        text = { Text("Your supplier and measurements stay if you keep editing.") },
+        confirmButton = {
+            TextButton(
+                onClick = leaveGuard::confirmDiscard,
+                modifier = Modifier.testTag(NativeUiTags.OpsReceiveMilkDiscardConfirm),
+            ) { Text("Discard") }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = leaveGuard::keepEditing,
+                modifier = Modifier.testTag(NativeUiTags.OpsReceiveMilkDiscardCancel),
+            ) { Text("Keep editing") }
+        },
+    )
 }
 
 @Composable

@@ -189,6 +189,17 @@ private fun AccountPickerScreen(
                 }
             }
         }
+        if (accounts.any {
+                com.saaf.milkshop.application.preview.NativePreviewSampleData.isPreviewLogin(it.loginName)
+            }
+        ) {
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = com.saaf.milkshop.application.preview.NativePreviewSampleData.previewAccountsHint(),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
         Spacer(Modifier.height(20.dp))
         Text(
             text = "New staff accounts are created privately by an Owner or Administrator.",

@@ -403,7 +403,8 @@ class NativeAuthenticationViewModel(
                 }
             }
             if (privilegedHandle != null) {
-                facade.ensurePreviewOperator(privilegedHandle)
+                facade.ensurePreviewStaffAccounts(privilegedHandle)
+                facade.alignPreviewPassphrases()
             }
             facade.ensurePreviewVendor()
             facade.ensurePreviewOperatorEmployeeLink()

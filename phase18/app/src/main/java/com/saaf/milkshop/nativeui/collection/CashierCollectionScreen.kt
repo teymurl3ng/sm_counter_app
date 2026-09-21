@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -80,6 +81,8 @@ import com.saaf.milkshop.application.collection.NativeCollectionPaymentAccount
 import com.saaf.milkshop.application.collection.NativeCollectionReceipt
 import com.saaf.milkshop.application.collection.NativeCollectionRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierNavigation
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.CashierSection
@@ -104,80 +107,88 @@ fun CashierCollectionScreen(
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
-        NativeCollectionState.Idle,
-        NativeCollectionState.Loading,
-        -> CollectionLoadingScreen(snackbarHostState, onNavigate, modifier)
-
-        is NativeCollectionState.LoadFailure -> CollectionLoadFailureScreen(
-            snackbarHostState = snackbarHostState,
-            message = state.message,
-            onRetry = onRetry,
-            onNavigate = onNavigate,
-            modifier = modifier,
-        )
-
-        is NativeCollectionState.Ready -> CollectionReadyScreen(
-            snackbarHostState = snackbarHostState,
-            identity = identity,
-            state = state,
-            onSelectCustomer = onSelectCustomer,
-            onRecordCollection = onRecordCollection,
-            onCollectAnother = onCollectAnother,
-            onViewRecord = onViewRecord,
-            onLeaveConfirmed = onLeaveConfirmed,
-            onNavigate = onNavigate,
-            modifier = modifier,
-        )
+    val leaveGuard = rememberEntryLeaveGuard()
+    val canLeave = (state as? NativeCollectionState.Ready)?.saving != true
+    LaunchedEffect(state is NativeCollectionState.Ready) {
+        if (state !is NativeCollectionState.Ready) leaveGuard.clear()
     }
+    BackHandler {
+        if (canLeave) leaveGuard.requestLeave(onLeaveConfirmed)
+    }
+    CollectionScaffold(
+        snackbarHostState = snackbarHostState,
+        onNavigate = { section ->
+            if (canLeave) {
+                leaveGuard.requestLeave { onNavigate(section) }
+            }
+        },
+        modifier = modifier,
+    ) { padding ->
+        when (state) {
+            NativeCollectionState.Idle,
+            NativeCollectionState.Loading,
+            -> CollectionLoadingBody(
+                modifier = Modifier
+                    .padding(padding)
+                    .statusBarsPadding(),
+            )
+
+            is NativeCollectionState.LoadFailure -> CollectionLoadFailureBody(
+                message = state.message,
+                onRetry = onRetry,
+                modifier = Modifier
+                    .padding(padding)
+                    .statusBarsPadding(),
+            )
+
+            is NativeCollectionState.Ready -> CollectionEntryContent(
+                identity = identity,
+                state = state,
+                onSelectCustomer = onSelectCustomer,
+                onRecordCollection = onRecordCollection,
+                onCollectAnother = onCollectAnother,
+                onViewRecord = onViewRecord,
+                leaveGuard = leaveGuard,
+                contentPadding = padding,
+            )
+        }
+    }
+    CollectionDiscardDialog(leaveGuard)
 }
 
 @Composable
-private fun CollectionLoadingScreen(
-    snackbarHostState: SnackbarHostState,
-    onNavigate: (CashierSection) -> Unit,
-    modifier: Modifier,
+internal fun CollectionLoadingBody(
+    modifier: Modifier = Modifier,
 ) {
-    CollectionScaffold(snackbarHostState, onNavigate, modifier) { padding ->
-        Box(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .statusBarsPadding(),
-            contentAlignment = Alignment.Center,
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                CircularProgressIndicator()
-                Spacer(Modifier.height(12.dp))
-                Text("Loading customer payments…")
-            }
+    Box(
+        modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            CircularProgressIndicator()
+            Spacer(Modifier.height(12.dp))
+            Text("Loading customer payments…")
         }
     }
 }
 
 @Composable
-private fun CollectionLoadFailureScreen(
-    snackbarHostState: SnackbarHostState,
+internal fun CollectionLoadFailureBody(
     message: String,
     onRetry: () -> Unit,
-    onNavigate: (CashierSection) -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
-    CollectionScaffold(snackbarHostState, onNavigate, modifier) { padding ->
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .statusBarsPadding()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(message, style = MaterialTheme.typography.bodyLarge)
-            Spacer(Modifier.height(16.dp))
-            Button(onClick = onRetry, modifier = Modifier.testTag(NativeUiTags.CollectRetryLoad)) {
-                Text("Try again")
-            }
+    Column(
+        modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(message, style = MaterialTheme.typography.bodyLarge)
+        Spacer(Modifier.height(16.dp))
+        Button(onClick = onRetry, modifier = Modifier.testTag(NativeUiTags.CollectRetryLoad)) {
+            Text("Try again")
         }
     }
 }
@@ -187,7 +198,7 @@ private fun CollectionScaffold(
     snackbarHostState: SnackbarHostState,
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier,
-    content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit,
+    content: @Composable (PaddingValues) -> Unit,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -202,17 +213,38 @@ private fun CollectionScaffold(
 }
 
 @Composable
-private fun CollectionReadyScreen(
-    snackbarHostState: SnackbarHostState,
+internal fun CollectionDiscardDialog(leaveGuard: EntryLeaveGuard) {
+    if (!leaveGuard.discardConfirmationOpen) return
+    AlertDialog(
+        onDismissRequest = leaveGuard::keepEditing,
+        title = { Text("Discard this payment?") },
+        text = { Text("The customer, amount, and note you entered will be cleared.") },
+        confirmButton = {
+            TextButton(
+                onClick = leaveGuard::confirmDiscard,
+                modifier = Modifier.testTag(NativeUiTags.CollectDiscardDraft),
+            ) { Text("Discard and leave") }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = leaveGuard::keepEditing,
+                modifier = Modifier.testTag(NativeUiTags.CollectKeepDraft),
+            ) { Text("Keep editing") }
+        },
+    )
+}
+
+@Composable
+internal fun CollectionEntryContent(
     identity: NativeSignedInIdentity,
     state: NativeCollectionState.Ready,
     onSelectCustomer: (Long) -> Unit,
     onRecordCollection: (NativeCollectionRequest) -> Unit,
     onCollectAnother: () -> Unit,
     onViewRecord: (Long) -> Unit,
-    onLeaveConfirmed: () -> Unit,
-    onNavigate: (CashierSection) -> Unit,
-    modifier: Modifier,
+    leaveGuard: EntryLeaveGuard,
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier,
 ) {
     var customerPickerOpen by rememberSaveable { mutableStateOf(false) }
     var paymentPickerOpen by rememberSaveable { mutableStateOf(false) }
@@ -221,7 +253,6 @@ private fun CollectionReadyScreen(
     var notesExpanded by rememberSaveable { mutableStateOf(false) }
     var notes by rememberSaveable { mutableStateOf("") }
     var advanceConfirmationOpen by rememberSaveable { mutableStateOf(false) }
-    var discardConfirmationOpen by rememberSaveable { mutableStateOf(false) }
     var draftTouched by rememberSaveable { mutableStateOf(false) }
     val selectedCustomer = state.selectedCustomer
     val amountPaisa = parsePaisa(amountText)
@@ -242,34 +273,8 @@ private fun CollectionReadyScreen(
                 ?: state.context.paymentAccounts.firstOrNull()?.accountId
         }
     }
-
-    BackHandler(enabled = dirty) { discardConfirmationOpen = true }
-
-    if (discardConfirmationOpen) {
-        AlertDialog(
-            onDismissRequest = { discardConfirmationOpen = false },
-            title = { Text("Discard this payment?") },
-            text = { Text("The customer, amount, and note you entered will be cleared.") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        discardConfirmationOpen = false
-                        amountText = ""
-                        notes = ""
-                        notesExpanded = false
-                        draftTouched = false
-                        onLeaveConfirmed()
-                    },
-                    modifier = Modifier.testTag(NativeUiTags.CollectDiscardDraft),
-                ) { Text("Discard and leave") }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { discardConfirmationOpen = false },
-                    modifier = Modifier.testTag(NativeUiTags.CollectKeepDraft),
-                ) { Text("Keep editing") }
-            },
-        )
+    LaunchedEffect(dirty) {
+        if (dirty) leaveGuard.markDirty() else leaveGuard.clear()
     }
 
     if (advanceConfirmationOpen && selectedCustomer != null && amountPaisa != null) {
@@ -320,88 +325,86 @@ private fun CollectionReadyScreen(
         )
     }
 
-    CollectionScaffold(snackbarHostState, onNavigate, modifier) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .imePadding(),
-        ) {
-            CashierScreenHeader(
-                title = "Collect payment",
-                displayName = identity.displayName,
-                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                businessDate = state.context.businessDate,
-                postingOpen = state.context.postingOpen,
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(contentPadding)
+            .imePadding(),
+    ) {
+        CashierScreenHeader(
+            title = "Collect payment",
+            displayName = identity.displayName,
+            roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+            businessDate = state.context.businessDate,
+            postingOpen = state.context.postingOpen,
+        )
+        if (state.receipt != null) {
+            CollectionSuccess(
+                receipt = state.receipt,
+                onCollectAnother = {
+                    amountText = ""
+                    notes = ""
+                    notesExpanded = false
+                    draftTouched = false
+                    onCollectAnother()
+                },
+                onViewRecord = { onViewRecord(state.receipt.eventId) },
+                modifier = Modifier.weight(1f),
             )
-            if (state.receipt != null) {
-                CollectionSuccess(
-                    receipt = state.receipt,
-                    onCollectAnother = {
-                        amountText = ""
-                        notes = ""
-                        notesExpanded = false
-                        draftTouched = false
-                        onCollectAnother()
-                    },
-                    onViewRecord = { onViewRecord(state.receipt.eventId) },
-                    modifier = Modifier.weight(1f),
-                )
-            } else {
-                CollectionForm(
-                    state = state,
-                    amountText = amountText,
-                    amountPaisa = amountPaisa,
-                    selectedPaymentAccount = selectedPaymentAccount,
-                    resultingBalancePaisa = resultingBalance,
-                    advancePaisa = advancePaisa,
-                    notesExpanded = notesExpanded,
-                    notes = notes,
-                    validRequest = validRequest,
-                    onOpenCustomerPicker = { customerPickerOpen = true },
-                    onAmountChange = {
-                        amountText = sanitizeAmount(it)
+        } else {
+            CollectionForm(
+                state = state,
+                amountText = amountText,
+                amountPaisa = amountPaisa,
+                selectedPaymentAccount = selectedPaymentAccount,
+                resultingBalancePaisa = resultingBalance,
+                advancePaisa = advancePaisa,
+                notesExpanded = notesExpanded,
+                notes = notes,
+                validRequest = validRequest,
+                onOpenCustomerPicker = { customerPickerOpen = true },
+                onAmountChange = {
+                    amountText = sanitizeAmount(it)
+                    draftTouched = true
+                },
+                onQuick1000 = {
+                    amountText = "1000"
+                    draftTouched = true
+                },
+                onPayFull = {
+                    val owed = selectedCustomer?.balancePaisa ?: 0L
+                    if (owed > 0L) {
+                        amountText = formatInputPaisa(owed)
                         draftTouched = true
-                    },
-                    onQuick1000 = {
-                        amountText = "1000"
-                        draftTouched = true
-                    },
-                    onPayFull = {
-                        val owed = selectedCustomer?.balancePaisa ?: 0L
-                        if (owed > 0L) {
-                            amountText = formatInputPaisa(owed)
-                            draftTouched = true
-                        }
-                    },
-                    onOpenPaymentPicker = { paymentPickerOpen = true },
-                    onToggleNotes = {
-                        notesExpanded = !notesExpanded
-                        draftTouched = true
-                    },
-                    onNotesChange = {
-                        notes = it.take(240)
-                        draftTouched = true
-                    },
-                    onSubmit = {
-                        val customer = selectedCustomer ?: return@CollectionForm
-                        val amount = amountPaisa ?: return@CollectionForm
-                        if (advancePaisa > 0L) {
-                            advanceConfirmationOpen = true
-                        } else {
-                            onRecordCollection(
-                                NativeCollectionRequest(
-                                    customerAccountId = customer.customer.accountId,
-                                    paymentAccountId = requireNotNull(paymentAccountId),
-                                    amountPaisa = amount,
-                                    notes = notes,
-                                ),
-                            )
-                        }
-                    },
-                    modifier = Modifier.weight(1f),
-                )
-            }
+                    }
+                },
+                onOpenPaymentPicker = { paymentPickerOpen = true },
+                onToggleNotes = {
+                    notesExpanded = !notesExpanded
+                    draftTouched = true
+                },
+                onNotesChange = {
+                    notes = it.take(240)
+                    draftTouched = true
+                },
+                onSubmit = {
+                    val customer = selectedCustomer ?: return@CollectionForm
+                    val amount = amountPaisa ?: return@CollectionForm
+                    if (advancePaisa > 0L) {
+                        advanceConfirmationOpen = true
+                    } else {
+                        onRecordCollection(
+                            NativeCollectionRequest(
+                                customerAccountId = customer.customer.accountId,
+                                paymentAccountId = requireNotNull(paymentAccountId),
+                                amountPaisa = amount,
+                                notes = notes,
+                            ),
+                        )
+                    }
+                },
+                modifier = Modifier.weight(1f),
+            )
         }
     }
 }

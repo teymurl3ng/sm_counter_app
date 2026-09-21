@@ -260,8 +260,10 @@ fun OwnerPreviewHost(
                 (ownerRecordsState as? NativeOwnerRecordsState.Ready)?.detail != null
         val ownerMoreOwnsBack =
             ownerSection == OwnerSection.More &&
-                (ownerMoreState as? NativeOwnerMoreState.Ready)?.destination ==
-                NativeOwnerMoreDestination.PersonalSecurity
+                (ownerMoreState as? NativeOwnerMoreState.Ready)?.destination in setOf(
+                    NativeOwnerMoreDestination.PersonalSecurity,
+                    NativeOwnerMoreDestination.Products,
+                )
         BackHandler(enabled = !ownerEntryOwnsBack && !ownerRecordsOwnsBack && !ownerMoreOwnsBack) {
             when (ownerSection) {
                 OwnerSection.Overview -> onLeaveToWelcome()
@@ -285,10 +287,17 @@ fun OwnerPreviewHost(
                 }
                 OwnerSection.More -> {
                     val ready = ownerMoreState as? NativeOwnerMoreState.Ready
-                    if (ready?.destination == NativeOwnerMoreDestination.PersonalSecurity) {
-                        ownerMoreViewModel.backToMenu()
-                    } else {
-                        onLeaveToWelcome()
+                    when (ready?.destination) {
+                        NativeOwnerMoreDestination.PersonalSecurity ->
+                            ownerMoreViewModel.backToMenu()
+                        NativeOwnerMoreDestination.Products -> {
+                            if (ready.productDetail != null) {
+                                ownerMoreViewModel.clearProductDetail()
+                            } else {
+                                ownerMoreViewModel.backToMenu()
+                            }
+                        }
+                        else -> onLeaveToWelcome()
                     }
                 }
             }
@@ -357,7 +366,14 @@ fun OwnerPreviewHost(
                     state = ownerMoreState,
                     onRetry = ownerMoreViewModel::refresh,
                     onOpenPersonalSecurity = ownerMoreViewModel::openPersonalSecurity,
+                    onOpenProducts = ownerMoreViewModel::openProducts,
                     onBackToMenu = ownerMoreViewModel::backToMenu,
+                    onRetryProducts = ownerMoreViewModel::refreshProducts,
+                    onOpenProduct = ownerMoreViewModel::openProductDetail,
+                    onBackFromProductDetail = ownerMoreViewModel::clearProductDetail,
+                    onCreateProductPreview = {
+                        onShowNotice("Add product comes next in the Owner Products family.")
+                    },
                     onRequestRemoveQuickUnlock = ownerMoreViewModel::requestRemoveQuickUnlock,
                     onCancelRemoveQuickUnlock = ownerMoreViewModel::cancelRemoveQuickUnlock,
                     onRemoveQuickUnlock = ownerMoreViewModel::removeQuickUnlock,

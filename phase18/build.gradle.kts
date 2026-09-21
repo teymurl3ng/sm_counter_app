@@ -157,8 +157,12 @@ val screenClassMap = mapOf(
     "ownermore" to listOf(
         "com.saaf.milkshop.NativeOwnerMoreFacadeTest",
         "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+        "com.saaf.milkshop.NativeOwnerProductsFacadeTest",
+        "com.saaf.milkshop.NativeOwnerProductsScreenContractTest",
         "com.saaf.milkshop.NativeFoundationUiTest#ownerMoreOpensUnderOwnerChrome",
         "com.saaf.milkshop.NativeFoundationUiTest#ownerMoreSignsOutToWelcome",
+        "com.saaf.milkshop.NativeFoundationUiTest#ownerProductsOpensUnderOwnerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#ownerProductsHardwareBackReturnsToMoreMenu",
     ),
 )
 

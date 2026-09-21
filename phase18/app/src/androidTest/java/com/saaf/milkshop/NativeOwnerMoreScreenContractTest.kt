@@ -83,8 +83,21 @@ class NativeOwnerMoreScreenContractTest {
             NativeOwnerMoreState.Ready(context = openContext()),
             onDeferredDestination = { notice = it },
         )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreCustomers)
+            .performScrollTo()
+            .performClick()
+        assertEquals("Customers", notice)
+    }
+
+    @Test
+    fun productsOpensFromMenu() {
+        var opened = false
+        setScreen(
+            NativeOwnerMoreState.Ready(context = openContext()),
+            onOpenProducts = { opened = true },
+        )
         composeRule.onNodeWithTag(NativeUiTags.OwnerMoreProducts).performClick()
-        assertEquals("Products", notice)
+        assertTrue(opened)
     }
 
     @Test
@@ -151,6 +164,7 @@ class NativeOwnerMoreScreenContractTest {
         state: NativeOwnerMoreState,
         onRetry: () -> Unit = {},
         onOpenPersonalSecurity: () -> Unit = {},
+        onOpenProducts: () -> Unit = {},
         onBackToMenu: () -> Unit = {},
         onSwitchAccount: () -> Unit = {},
         onSignOut: () -> Unit = {},
@@ -171,7 +185,12 @@ class NativeOwnerMoreScreenContractTest {
                     state = state,
                     onRetry = onRetry,
                     onOpenPersonalSecurity = onOpenPersonalSecurity,
+                    onOpenProducts = onOpenProducts,
                     onBackToMenu = onBackToMenu,
+                    onRetryProducts = {},
+                    onOpenProduct = {},
+                    onBackFromProductDetail = {},
+                    onCreateProductPreview = {},
                     onRequestRemoveQuickUnlock = {},
                     onCancelRemoveQuickUnlock = {},
                     onRemoveQuickUnlock = {},

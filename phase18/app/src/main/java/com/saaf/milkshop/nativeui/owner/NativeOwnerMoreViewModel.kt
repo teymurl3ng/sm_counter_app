@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.saaf.milkshop.application.more.NativeMoreSecurityStatus
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
 import com.saaf.milkshop.application.owner.NativeOwnerMoreFacade
+import com.saaf.milkshop.application.owner.NativeOwnerProductDetail
+import com.saaf.milkshop.application.owner.NativeOwnerProductRow
+import com.saaf.milkshop.application.owner.NativeOwnerProductsFacade
 import com.saaf.milkshop.domain.SecurityFailure
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +22,7 @@ import kotlinx.coroutines.withContext
 enum class NativeOwnerMoreDestination {
     Menu,
     PersonalSecurity,
+    Products,
 }
 
 sealed interface NativeOwnerMoreState {
@@ -28,6 +32,10 @@ sealed interface NativeOwnerMoreState {
         val context: NativeOwnerMoreContext,
         val destination: NativeOwnerMoreDestination = NativeOwnerMoreDestination.Menu,
         val security: NativeMoreSecurityStatus? = null,
+        val products: List<NativeOwnerProductRow> = emptyList(),
+        val productsLoading: Boolean = false,
+        val productDetail: NativeOwnerProductDetail? = null,
+        val productsError: String? = null,
         val saving: Boolean = false,
         val confirmRemoveUnlock: Boolean = false,
         val error: String? = null,
@@ -37,6 +45,7 @@ sealed interface NativeOwnerMoreState {
 
 class NativeOwnerMoreViewModel(
     private val facade: NativeOwnerMoreFacade,
+    private val productsFacade: NativeOwnerProductsFacade,
     private val onSessionExpired: () -> Unit,
 ) : ViewModel() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -81,6 +90,8 @@ class NativeOwnerMoreViewModel(
             confirmRemoveUnlock = false,
             error = null,
             saving = false,
+            productsError = null,
+            productDetail = null,
         )
         scope.launch {
             try {
@@ -93,6 +104,83 @@ class NativeOwnerMoreViewModel(
         }
     }
 
+    fun openProducts() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            destination = NativeOwnerMoreDestination.Products,
+            productsLoading = true,
+            productDetail = null,
+            productsError = null,
+            confirmRemoveUnlock = false,
+            error = null,
+            saving = false,
+        )
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) { productsFacade.loadProducts(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Products) return@launch
+                _state.value = latest.copy(
+                    products = snapshot.products,
+                    productsLoading = false,
+                    productsError = null,
+                )
+            } catch (error: Throwable) {
+                handleProductsFailure(error)
+            }
+        }
+    }
+
+    fun refreshProducts() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Products) return
+        _state.value = current.copy(productsLoading = true, productsError = null, productDetail = null)
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) { productsFacade.loadProducts(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Products) return@launch
+                _state.value = latest.copy(
+                    products = snapshot.products,
+                    productsLoading = false,
+                    productsError = null,
+                )
+            } catch (error: Throwable) {
+                handleProductsFailure(error)
+            }
+        }
+    }
+
+    fun openProductDetail(productId: Long) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Products) return
+        _state.value = current.copy(productsLoading = true, productsError = null)
+        scope.launch {
+            try {
+                val detail = withContext(Dispatchers.IO) {
+                    productsFacade.loadDetail(session, productId)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Products) return@launch
+                _state.value = latest.copy(
+                    productDetail = detail,
+                    productsLoading = false,
+                    productsError = null,
+                )
+            } catch (error: Throwable) {
+                handleProductsFailure(error)
+            }
+        }
+    }
+
+    fun clearProductDetail() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(productDetail = null, productsError = null, productsLoading = false)
+    }
+
     fun backToMenu() {
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         _state.value = current.copy(
@@ -100,6 +188,9 @@ class NativeOwnerMoreViewModel(
             confirmRemoveUnlock = false,
             error = null,
             saving = false,
+            productsLoading = false,
+            productDetail = null,
+            productsError = null,
         )
     }
 
@@ -224,6 +315,20 @@ class NativeOwnerMoreViewModel(
         _state.value = current.copy(saving = false, error = publicMessage(error))
     }
 
+    private fun handleProductsFailure(error: Throwable) {
+        if (error is SecurityFailure.SessionExpired) {
+            sessionHandle = null
+            _state.value = NativeOwnerMoreState.Idle
+            onSessionExpired()
+            return
+        }
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            productsLoading = false,
+            productsError = publicMessage(error),
+        )
+    }
+
     private fun publicMessage(error: Throwable): String = when (error) {
         is SecurityFailure -> error.message ?: "More is unavailable."
         is IllegalArgumentException, is IllegalStateException ->
@@ -233,12 +338,13 @@ class NativeOwnerMoreViewModel(
 
     class Factory(
         private val facade: NativeOwnerMoreFacade,
+        private val productsFacade: NativeOwnerProductsFacade,
         private val onSessionExpired: () -> Unit,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             require(modelClass.isAssignableFrom(NativeOwnerMoreViewModel::class.java))
-            return NativeOwnerMoreViewModel(facade, onSessionExpired) as T
+            return NativeOwnerMoreViewModel(facade, productsFacade, onSessionExpired) as T
         }
     }
 }

@@ -41,6 +41,7 @@ fun OwnerOverviewScreen(
     onLeaveConfirmed: () -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     onAttentionReview: () -> Unit = {},
+    onOpenMonthReports: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     when (section) {
@@ -97,6 +98,7 @@ fun OwnerOverviewScreen(
                         OverviewBody(
                             snapshot = state.snapshot,
                             onAttentionReview = onAttentionReview,
+                            onOpenMonthReports = onOpenMonthReports,
                             modifier = Modifier
                                 .weight(1f)
                                 .testTag(NativeUiTags.OwnerOverviewRoot),
@@ -157,6 +159,7 @@ fun OwnerOverviewScreen(
 private fun OverviewBody(
     snapshot: NativeOwnerOverviewSnapshot,
     onAttentionReview: () -> Unit,
+    onOpenMonthReports: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -165,6 +168,15 @@ private fun OverviewBody(
             .padding(horizontal = 16.dp, vertical = 18.dp),
         verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
+        Button(
+            onClick = onOpenMonthReports,
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(NativeUiTags.OwnerOverviewMonthReports),
+        ) {
+            Text("Month reports")
+        }
+
         if (snapshot.attention.isNotEmpty()) {
             Column(
                 Modifier

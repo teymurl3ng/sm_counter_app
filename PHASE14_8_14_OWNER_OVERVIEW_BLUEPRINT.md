@@ -15,7 +15,7 @@ The accepted Counter Ledger plan’s next retained family is **Owner** (`Overvie
 - `design/refined-counter-ledger/index.html` (accepted Owner · Overview remake)
 - `.cursor/rules/cross-role-native-ui-consistency.mdc` (reuse sibling chrome only when the surface kind matches; do not flatten Owner into worker shells)
 
-This checkpoint owns **Owner Overview home** only: decision-first day summary + attention. It does not implement Owner Work, Records, More, month Reports, Cash & close, or reopen.
+This checkpoint owns **Owner Overview home** only: decision-first day summary + attention. Month reports nests under Overview as a later connected destination (`PHASE14_8_32_OWNER_REPORTS_BLUEPRINT.md`). It does not implement Owner Work, Records, More, Cash & close, or reopen in this checkpoint’s original slice.
 
 ## What the existing product already guarantees
 
@@ -102,11 +102,15 @@ Deferred (leadership HTML shows them; do not invent aging or restore UI here):
 
 ## Out of scope
 
-- Owner Work launcher, Records, More, month Reports, Cash & close, Owner reopen
+- Owner Work launcher, Records, More, Cash & close, Owner reopen (Month reports connected separately in 14.8.32)
 - Manager / Administrator shells
 - Overdue-balance aging engine
 - Launcher migration away from `HybridActivity`
 - Changing Cashier or Operations connected screens except shared harness wiring needed for Owner preview entry
+
+## Connected follow-on
+
+- **Month reports** — nested Overview destination; see `PHASE14_8_32_OWNER_REPORTS_BLUEPRINT.md`.
 
 ## Verification
 

@@ -8,6 +8,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.owner.NativeOwnerOverviewAttention
 import com.saaf.milkshop.application.owner.NativeOwnerOverviewAttentionKind
@@ -33,11 +34,14 @@ class NativeOwnerOverviewScreenContractTest {
     fun overviewShowsDecisionSummaryAndKeepsOverviewNavSelected() {
         setScreen(NativeOwnerOverviewState.Ready(snapshot = attentionSnapshot()))
         composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewMonthReports).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewAttention).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewSales).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewExpectedCash).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewStock).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewLatestActivity).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewLatestActivity)
+            .performScrollTo()
+            .assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).assertIsSelected()
         composeRule.onNodeWithText("PKR 472.00").assertIsDisplayed()
     }

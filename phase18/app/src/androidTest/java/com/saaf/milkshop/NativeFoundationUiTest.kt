@@ -293,7 +293,37 @@ class NativeFoundationUiTest {
         openOwnerOverview()
         composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewSales).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewMonthReports).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).assertIsSelected()
+    }
+
+    @Test
+    fun ownerMonthReportsOpensUnderOwnerChrome() {
+        openOwnerMonthReports()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerReportsRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerReportsContent).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+        composeRule.onNodeWithText("Count cash").assertDoesNotExist()
+    }
+
+    @Test
+    fun ownerMonthReportsHardwareBackReturnsToOverview() {
+        openOwnerMonthReports()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+            activity.onBackPressedDispatcher.onBackPressed()
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).assertIsSelected()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerReportsRoot).assertDoesNotExist()
+        assertOwnerShellWithoutForeignNav()
     }
 
     @Test
@@ -1698,6 +1728,19 @@ class NativeFoundationUiTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerMonthReports() {
+        openOwnerOverview()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewMonthReports)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerReportsRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerReportsRoot).assertIsDisplayed()
     }
 
     private fun openOwnerWork() {

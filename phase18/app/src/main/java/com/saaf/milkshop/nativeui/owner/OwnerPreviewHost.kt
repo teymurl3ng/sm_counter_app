@@ -711,6 +711,7 @@ fun OwnerPreviewHost(
                     onRetry = cashCloseViewModel::refresh,
                     onRecordCount = cashCloseViewModel::recordCount,
                     onCloseDay = cashCloseViewModel::closeDay,
+                    onReopenDay = cashCloseViewModel::reopenDay,
                     onBackToWork = { returnOwnerWorkHome() },
                     onNavigate = navigateOwner,
                 )

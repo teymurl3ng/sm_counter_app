@@ -14,6 +14,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -53,7 +54,7 @@ class NativeCashCloseFacadeTest {
         assertEquals(DATE.toString(), context.businessDate)
         assertNotNull(context.cashAccountId)
         assertEquals(null, context.latestCount)
-        assertEquals(null, context.reopenDeferredNotice)
+        assertNull(context.reopenDeferredNotice)
     }
 
     @Test
@@ -85,7 +86,78 @@ class NativeCashCloseFacadeTest {
 
         assertEquals(DATE.toString(), closed.receipt.businessDate)
         assertFalse(closed.refreshedContext.postingOpen)
-        assertNotNull(closed.refreshedContext.reopenDeferredNotice)
+        assertNull(closed.refreshedContext.reopenDeferredNotice)
+        assertTrue(database.dailyCloseDao().isPostingClosed(DATE.toString()))
+    }
+
+    @Test
+    fun closeThenReopenRestoresOpenPosting() = runBlocking {
+        val loaded = facade.load(ownerSession, DATE)
+        val counted = facade.recordCount(
+            ownerSession,
+            NativeCashCloseCountRequest(
+                countedCashPaisa = loaded.expectedCashPaisa,
+                notes = "Even drawer",
+            ),
+            DATE,
+        )
+        facade.closeDay(
+            ownerSession,
+            NativeCashCloseDayRequest(
+                physicalCashCountId = counted.count.countId,
+                varianceReason = null,
+            ),
+            DATE,
+        )
+        assertTrue(database.dailyCloseDao().isPostingClosed(DATE.toString()))
+
+        val passphrase = OWNER_PASSPHRASE.toCharArray()
+        val reopened = facade.reopenDay(
+            ownerSession,
+            reason = "Correct a verified cash posting",
+            passphrase = passphrase,
+            date = DATE,
+        )
+
+        assertTrue(passphrase.all { it == '\u0000' })
+        assertEquals(DATE.toString(), reopened.businessDate)
+        assertTrue(reopened.refreshedContext.postingOpen)
+        assertNull(reopened.refreshedContext.reopenDeferredNotice)
+        assertFalse(database.dailyCloseDao().isPostingClosed(DATE.toString()))
+        assertEquals("reopen", database.dailyCloseDao().currentAction(DATE.toString())!!.action)
+    }
+
+    @Test
+    fun reopenRejectsBlankReasonAndWrongPassphrase() = runBlocking {
+        val loaded = facade.load(ownerSession, DATE)
+        val counted = facade.recordCount(
+            ownerSession,
+            NativeCashCloseCountRequest(
+                countedCashPaisa = loaded.expectedCashPaisa,
+                notes = null,
+            ),
+            DATE,
+        )
+        facade.closeDay(
+            ownerSession,
+            NativeCashCloseDayRequest(
+                physicalCashCountId = counted.count.countId,
+                varianceReason = null,
+            ),
+            DATE,
+        )
+
+        val blank = runCatching {
+            facade.reopenDay(ownerSession, "  ", OWNER_PASSPHRASE.toCharArray(), DATE)
+        }.exceptionOrNull()
+        assertTrue(blank is IllegalArgumentException)
+
+        val wrongSecret = "definitely wrong passphrase".toCharArray()
+        val wrong = runCatching {
+            facade.reopenDay(ownerSession, "Need to reopen", wrongSecret, DATE)
+        }.exceptionOrNull()
+        assertTrue(wrongSecret.all { it == '\u0000' })
+        assertTrue(wrong is SecurityFailure.Authentication)
         assertTrue(database.dailyCloseDao().isPostingClosed(DATE.toString()))
     }
 

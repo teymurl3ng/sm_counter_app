@@ -4,11 +4,11 @@ import com.saaf.milkshop.application.bridge.ReconciliationBridgeCommandService
 import com.saaf.milkshop.application.readmodels.money
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
-import com.saaf.milkshop.domain.DailyCloseService
 import com.saaf.milkshop.domain.PhysicalCashCountInput
 import com.saaf.milkshop.domain.PhysicalCashCountService
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.domain.VerifiedDailyCloseInput
+import com.saaf.milkshop.domain.VerifiedDailyReopenInput
 import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.math.abs
@@ -29,8 +29,11 @@ data class NativeCashCloseContext(
     /** Current drawer expectation from the Cash account balance (same source as Owner Overview). */
     val expectedCashPaisa: Long,
     val latestCount: NativeCashCloseCountSnapshot?,
-    /** Present when the day is closed; reopen write UI is deferred this slice. */
-    val reopenDeferredNotice: String?,
+    /**
+     * Always null for Owner Cash close — reopen write UI is connected.
+     * Retained for binary compatibility with earlier contract fixtures.
+     */
+    val reopenDeferredNotice: String? = null,
 )
 
 data class NativeCashCloseCountRequest(
@@ -61,12 +64,18 @@ data class NativeCashCloseDaySubmission(
     val refreshedContext: NativeCashCloseContext,
 )
 
+data class NativeCashCloseReopenSubmission(
+    val businessDate: String,
+    val actionId: Long,
+    val refreshedContext: NativeCashCloseContext,
+)
+
 /**
- * Typed native boundary for Owner Cash count and close.
+ * Typed native boundary for Owner Cash count and close (including reopen depth).
  *
- * Count and close go through [ReconciliationBridgeCommandService].
+ * Count, close, and reopen go through [ReconciliationBridgeCommandService].
  * Expected cash comes from the Cash account balance / latest physical count —
- * never invents formulas. Does not expose reopen writes.
+ * never invents formulas. Reopen requires full passphrase re-auth (not Quick PIN).
  */
 class NativeCashCloseFacade(
     private val database: MilkShopDatabase,
@@ -97,12 +106,6 @@ class NativeCashCloseFacade(
                 countedAt = snapshot.count.countedAt,
             )
         }
-        val currentAction = database.dailyCloseDao().currentAction(businessDate)
-        val reopenDeferredNotice = when {
-            currentAction?.action == DailyCloseService.ACTION_CLOSE ->
-                "This date is closed. Reopening is not available in this Owner Work slice yet."
-            else -> null
-        }
         return NativeCashCloseContext(
             businessDate = businessDate,
             postingOpen = postingOpen,
@@ -110,7 +113,7 @@ class NativeCashCloseFacade(
             cashAccountName = cash.name,
             expectedCashPaisa = expectedCashPaisa,
             latestCount = latest,
-            reopenDeferredNotice = reopenDeferredNotice,
+            reopenDeferredNotice = null,
         )
     }
 
@@ -186,6 +189,45 @@ class NativeCashCloseFacade(
             ),
             refreshedContext = load(sessionHandle, date),
         )
+    }
+
+    /**
+     * Reopens a closed business date. Requires [AppPermission.REOPEN_DAY] and a full
+     * passphrase re-authentication (Quick PIN cannot authorize). Wipes [passphrase]
+     * before returning.
+     */
+    suspend fun reopenDay(
+        sessionHandle: String,
+        reason: String,
+        passphrase: CharArray,
+        date: LocalDate = LocalDate.now(),
+    ): NativeCashCloseReopenSubmission {
+        try {
+            val cleanedReason = reason.trim()
+            require(cleanedReason.isNotEmpty()) { "Enter a reason for reopening the business date." }
+            security.requirePermission(sessionHandle, AppPermission.REOPEN_DAY)
+            val context = load(sessionHandle, date)
+            if (context.postingOpen) {
+                throw IllegalStateException("This business date is already open.")
+            }
+            security.reauthenticate(sessionHandle, passphrase)
+            val result = reconciliation.reopenDate(
+                sessionHandle,
+                VerifiedDailyReopenInput(
+                    businessDate = context.businessDate,
+                    reason = cleanedReason,
+                ),
+            )
+            val refreshed = load(sessionHandle, date)
+            require(refreshed.postingOpen) { "Reopen did not restore an open posting day." }
+            return NativeCashCloseReopenSubmission(
+                businessDate = context.businessDate,
+                actionId = result.action.actionId,
+                refreshedContext = refreshed,
+            )
+        } finally {
+            passphrase.fill('\u0000')
+        }
     }
 
     companion object {

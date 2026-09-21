@@ -6,6 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -16,6 +18,7 @@ import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.cashclose.NativeCashCloseContext
+import com.saaf.milkshop.application.cashclose.NativeCashCloseReopenSubmission
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
@@ -70,6 +73,63 @@ class NativeOwnerCashCloseScreenContractTest {
     }
 
     @Test
+    fun closedDateShowsReopenFormAndSubmits() {
+        var reopenedReason: String? = null
+        var reopenedPassphrase: CharArray? = null
+        setScreen(
+            state = NativeCashCloseState.Ready(context = closedContext()),
+            onReopenDay = { reason, passphrase ->
+                reopenedReason = reason
+                reopenedPassphrase = passphrase
+            },
+        )
+
+        composeRule.onNodeWithTag(NativeUiTags.CashClosePostingClosed)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashCloseReopenDay)
+            .performScrollTo()
+            .assertIsNotEnabled()
+
+        composeRule.onNodeWithTag(NativeUiTags.CashCloseReopenReason)
+            .performScrollTo()
+            .performTextReplacement("Correct a verified posting")
+        composeRule.onNodeWithTag(NativeUiTags.CashCloseReopenPassphrase)
+            .performScrollTo()
+            .performTextReplacement("owner-full-passphrase")
+        composeRule.onNodeWithTag(NativeUiTags.CashCloseReopenDay)
+            .performScrollTo()
+            .assertIsEnabled()
+            .performClick()
+
+        assertEquals("Correct a verified posting", reopenedReason)
+        assertTrue(reopenedPassphrase.contentEquals("owner-full-passphrase".toCharArray()))
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavSell).assertDoesNotExist()
+    }
+
+    @Test
+    fun reopenSuccessShowsOpenFeedbackUnderOwnerChrome() {
+        val success = NativeCashCloseReopenSubmission(
+            businessDate = "2026-09-21",
+            actionId = 42L,
+            refreshedContext = openContext(),
+        )
+        setScreen(
+            NativeCashCloseState.Ready(
+                context = openContext(),
+                reopenSuccess = success,
+            ),
+        )
+
+        composeRule.onNodeWithTag(NativeUiTags.CashCloseReopenSuccess)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashClosePostingOpen).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
+        composeRule.onNodeWithTag(NativeUiTags.CashCloseReopenDay).assertDoesNotExist()
+    }
+
+    @Test
     fun loadFailureRetainsOwnerShellAndRetries() {
         var retried = false
         composeRule.setContent {
@@ -87,6 +147,7 @@ class NativeOwnerCashCloseScreenContractTest {
                     },
                     onRecordCount = {},
                     onCloseDay = {},
+                    onReopenDay = { _, _ -> },
                     onBackToWork = {},
                     onNavigate = {},
                 )
@@ -104,6 +165,7 @@ class NativeOwnerCashCloseScreenContractTest {
     private fun setScreen(
         state: NativeCashCloseState,
         onNavigate: (OwnerSection) -> Unit = {},
+        onReopenDay: (String, CharArray) -> Unit = { _, _ -> },
     ) {
         composeRule.setContent {
             SaafTheme(darkTheme = false) {
@@ -114,6 +176,7 @@ class NativeOwnerCashCloseScreenContractTest {
                     onRetry = {},
                     onRecordCount = {},
                     onCloseDay = {},
+                    onReopenDay = onReopenDay,
                     onBackToWork = {},
                     onNavigate = onNavigate,
                 )
@@ -132,6 +195,16 @@ class NativeOwnerCashCloseScreenContractTest {
     private fun openContext() = NativeCashCloseContext(
         businessDate = "2026-09-21",
         postingOpen = true,
+        cashAccountId = 4L,
+        cashAccountName = "Cash",
+        expectedCashPaisa = 12_500L,
+        latestCount = null,
+        reopenDeferredNotice = null,
+    )
+
+    private fun closedContext() = NativeCashCloseContext(
+        businessDate = "2026-09-21",
+        postingOpen = false,
         cashAccountId = 4L,
         cashAccountName = "Cash",
         expectedCashPaisa = 12_500L,

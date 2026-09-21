@@ -51,6 +51,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
@@ -59,6 +60,7 @@ import com.saaf.milkshop.application.cashclose.NativeCashCloseCountSnapshot
 import com.saaf.milkshop.application.cashclose.NativeCashCloseDayRequest
 import com.saaf.milkshop.application.cashclose.NativeCashCloseFacade
 import com.saaf.milkshop.application.cashclose.NativeCashCloseReceipt
+import com.saaf.milkshop.application.cashclose.NativeCashCloseReopenSubmission
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -111,7 +113,7 @@ internal fun CashCloseDiscardDialog(leaveGuard: EntryLeaveGuard) {
     AlertDialog(
         onDismissRequest = leaveGuard::keepEditing,
         title = { Text("Discard this count?") },
-        text = { Text("The counted amount and variance reason you entered will be cleared.") },
+        text = { Text("The counted amount and reopen details you entered will be cleared.") },
         confirmButton = {
             TextButton(
                 onClick = leaveGuard::confirmDiscard,
@@ -133,6 +135,7 @@ internal fun CashCloseEntryContent(
     state: NativeCashCloseState.Ready,
     onRecordCount: (NativeCashCloseCountRequest) -> Unit,
     onCloseDay: (NativeCashCloseDayRequest) -> Unit,
+    onReopenDay: (String, CharArray) -> Unit,
     onBack: () -> Unit,
     leaveGuard: EntryLeaveGuard,
     contentPadding: PaddingValues,
@@ -141,15 +144,25 @@ internal fun CashCloseEntryContent(
     var countedText by rememberSaveable { mutableStateOf("") }
     var notes by rememberSaveable { mutableStateOf("") }
     var varianceReason by rememberSaveable { mutableStateOf("") }
+    var reopenReason by rememberSaveable { mutableStateOf("") }
+    var reopenPassphrase by rememberSaveable { mutableStateOf("") }
     var draftTouched by rememberSaveable { mutableStateOf(false) }
     val countedPaisa = parsePaisa(countedText)
     val activeCount = state.lastRecordedCount ?: state.context.latestCount
     val needsReason = activeCount != null &&
         NativeCashCloseFacade.needsVarianceReason(activeCount.variancePaisa)
-    val dirty = draftTouched && state.receipt == null
+    val dirty = draftTouched && state.receipt == null && state.reopenSuccess == null
 
     LaunchedEffect(dirty) {
         if (dirty) leaveGuard.markDirty() else leaveGuard.clear()
+    }
+
+    LaunchedEffect(state.reopenSuccess?.actionId) {
+        if (state.reopenSuccess != null) {
+            reopenReason = ""
+            reopenPassphrase = ""
+            draftTouched = false
+        }
     }
 
     Column(
@@ -178,6 +191,8 @@ internal fun CashCloseEntryContent(
                 countedPaisa = countedPaisa,
                 notes = notes,
                 varianceReason = varianceReason,
+                reopenReason = reopenReason,
+                reopenPassphrase = reopenPassphrase,
                 activeCount = activeCount,
                 needsReason = needsReason,
                 onCountedChange = {
@@ -190,6 +205,14 @@ internal fun CashCloseEntryContent(
                 },
                 onVarianceReasonChange = {
                     varianceReason = it.take(240)
+                    draftTouched = true
+                },
+                onReopenReasonChange = {
+                    reopenReason = it.take(240)
+                    draftTouched = true
+                },
+                onReopenPassphraseChange = {
+                    reopenPassphrase = it
                     draftTouched = true
                 },
                 onRecordCount = {
@@ -212,6 +235,13 @@ internal fun CashCloseEntryContent(
                     )
                     draftTouched = false
                 },
+                onReopenDay = {
+                    if (reopenReason.trim().isEmpty() || reopenPassphrase.isBlank()) return@CashCloseForm
+                    val secret = reopenPassphrase.toCharArray()
+                    reopenPassphrase = ""
+                    onReopenDay(reopenReason.trim(), secret)
+                    draftTouched = false
+                },
                 modifier = Modifier.weight(1f),
             )
         }
@@ -225,13 +255,18 @@ private fun CashCloseForm(
     countedPaisa: Long?,
     notes: String,
     varianceReason: String,
+    reopenReason: String,
+    reopenPassphrase: String,
     activeCount: NativeCashCloseCountSnapshot?,
     needsReason: Boolean,
     onCountedChange: (String) -> Unit,
     onNotesChange: (String) -> Unit,
     onVarianceReasonChange: (String) -> Unit,
+    onReopenReasonChange: (String) -> Unit,
+    onReopenPassphraseChange: (String) -> Unit,
     onRecordCount: () -> Unit,
     onCloseDay: () -> Unit,
+    onReopenDay: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
@@ -244,6 +279,10 @@ private fun CashCloseForm(
         activeCount != null &&
         reasonOk &&
         !state.saving
+    val canReopen = !state.context.postingOpen &&
+        reopenReason.trim().isNotEmpty() &&
+        reopenPassphrase.isNotBlank() &&
+        !state.saving
 
     Column(
         modifier = modifier
@@ -255,10 +294,18 @@ private fun CashCloseForm(
         if (!state.context.postingOpen) {
             StatusPanel(
                 title = "Today is closed",
-                message = state.context.reopenDeferredNotice
-                    ?: "Transactions and cash counts for this date are locked.",
+                message = "Transactions and cash counts for this date are locked. Reopen with a reason and your full passphrase.",
                 warning = true,
                 tag = NativeUiTags.CashClosePostingClosed,
+            )
+            ReopenPanel(
+                reason = reopenReason,
+                passphrase = reopenPassphrase,
+                saving = state.saving,
+                canReopen = canReopen,
+                onReasonChange = onReopenReasonChange,
+                onPassphraseChange = onReopenPassphraseChange,
+                onReopen = onReopenDay,
             )
         } else {
             StatusPanel(
@@ -267,6 +314,9 @@ private fun CashCloseForm(
                 warning = false,
                 tag = NativeUiTags.CashClosePostingOpen,
             )
+            state.reopenSuccess?.let { success ->
+                ReopenSuccessPanel(success)
+            }
         }
 
         Surface(
@@ -333,7 +383,7 @@ private fun CashCloseForm(
                 .testTag(NativeUiTags.CashCloseRecordCount),
         ) {
             Text(
-                if (state.saving) "Saving count…" else "Record count",
+                if (state.saving && state.context.postingOpen) "Saving count…" else "Record count",
                 style = MaterialTheme.typography.titleMedium,
             )
         }
@@ -385,6 +435,100 @@ private fun CashCloseForm(
             )
         }
         Spacer(Modifier.height(4.dp))
+    }
+}
+
+@Composable
+private fun ReopenPanel(
+    reason: String,
+    passphrase: String,
+    saving: Boolean,
+    canReopen: Boolean,
+    onReasonChange: (String) -> Unit,
+    onPassphraseChange: (String) -> Unit,
+    onReopen: () -> Unit,
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text("Reopen this date", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Quick PIN cannot authorize reopen. Enter your full Saaf passphrase.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            OutlinedTextField(
+                value = reason,
+                onValueChange = onReasonChange,
+                enabled = !saving,
+                label = { Text("Reason for reopening") },
+                supportingText = { Text("Required · ${reason.length}/240") },
+                minLines = 2,
+                maxLines = 4,
+                modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseReopenReason),
+            )
+            OutlinedTextField(
+                value = passphrase,
+                onValueChange = onPassphraseChange,
+                enabled = !saving,
+                label = { Text("Current full passphrase") },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done,
+                ),
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics { contentDescription = "Current full passphrase for reopen" }
+                    .testTag(NativeUiTags.CashCloseReopenPassphrase),
+            )
+            Button(
+                onClick = onReopen,
+                enabled = canReopen,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp)
+                    .testTag(NativeUiTags.CashCloseReopenDay),
+            ) {
+                Text(
+                    if (saving) "Reopening…" else "Confirm Reopen",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReopenSuccessPanel(success: NativeCashCloseReopenSubmission) {
+    Surface(
+        color = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        shape = RoundedCornerShape(14.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics { liveRegion = LiveRegionMode.Polite }
+            .testTag(NativeUiTags.CashCloseReopenSuccess),
+    ) {
+        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.Top) {
+            Icon(Icons.Outlined.CheckCircle, contentDescription = null)
+            Spacer(Modifier.width(10.dp))
+            Column {
+                Text("Date reopened", fontWeight = FontWeight.Bold)
+                Text(
+                    "${success.businessDate} is open again. Count the drawer before closing.",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+        }
     }
 }
 

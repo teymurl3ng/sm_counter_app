@@ -8,6 +8,7 @@ import com.saaf.milkshop.application.cashclose.NativeCashCloseCountSnapshot
 import com.saaf.milkshop.application.cashclose.NativeCashCloseDayRequest
 import com.saaf.milkshop.application.cashclose.NativeCashCloseFacade
 import com.saaf.milkshop.application.cashclose.NativeCashCloseReceipt
+import com.saaf.milkshop.application.cashclose.NativeCashCloseReopenSubmission
 import com.saaf.milkshop.domain.SecurityFailure
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,7 @@ sealed interface NativeCashCloseState {
         val saving: Boolean = false,
         val lastRecordedCount: NativeCashCloseCountSnapshot? = null,
         val receipt: NativeCashCloseReceipt? = null,
+        val reopenSuccess: NativeCashCloseReopenSubmission? = null,
         val error: String? = null,
     ) : NativeCashCloseState
     data class LoadFailure(val message: String) : NativeCashCloseState
@@ -65,7 +67,7 @@ class NativeCashCloseViewModel(
         val session = sessionHandle ?: return
         val current = _state.value as? NativeCashCloseState.Ready ?: return
         if (current.saving) return
-        _state.value = current.copy(saving = true, receipt = null, error = null)
+        _state.value = current.copy(saving = true, receipt = null, reopenSuccess = null, error = null)
         scope.launch {
             try {
                 val submission = withContext(Dispatchers.IO) { facade.recordCount(session, request) }
@@ -89,7 +91,7 @@ class NativeCashCloseViewModel(
         val session = sessionHandle ?: return
         val current = _state.value as? NativeCashCloseState.Ready ?: return
         if (current.saving) return
-        _state.value = current.copy(saving = true, receipt = null, error = null)
+        _state.value = current.copy(saving = true, receipt = null, reopenSuccess = null, error = null)
         scope.launch {
             try {
                 val submission = withContext(Dispatchers.IO) { facade.closeDay(session, request) }
@@ -109,9 +111,43 @@ class NativeCashCloseViewModel(
         }
     }
 
+    fun reopenDay(reason: String, passphrase: CharArray) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeCashCloseState.Ready ?: return
+        if (current.saving) {
+            passphrase.fill('\u0000')
+            return
+        }
+        _state.value = current.copy(saving = true, receipt = null, reopenSuccess = null, error = null)
+        scope.launch {
+            try {
+                val submission = withContext(Dispatchers.IO) {
+                    facade.reopenDay(session, reason, passphrase)
+                }
+                _state.value = NativeCashCloseState.Ready(
+                    context = submission.refreshedContext,
+                    reopenSuccess = submission,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.SessionExpired) {
+                    sessionHandle = null
+                    _state.value = NativeCashCloseState.Idle
+                    onSessionExpired()
+                } else {
+                    _state.value = current.copy(error = publicMessage(error))
+                }
+            }
+        }
+    }
+
     fun clearFeedback() {
         val current = _state.value as? NativeCashCloseState.Ready ?: return
-        _state.value = current.copy(receipt = null, lastRecordedCount = null, error = null)
+        _state.value = current.copy(
+            receipt = null,
+            lastRecordedCount = null,
+            reopenSuccess = null,
+            error = null,
+        )
     }
 
     fun close() {

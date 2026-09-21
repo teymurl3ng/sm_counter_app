@@ -54,11 +54,12 @@ This checkpoint owns **Owner Work home** only: the all-command launcher. It conn
 - Record expense → Owner-hosted expense content / `NativeExpenseFacade` (CORE METHOD) — see `PHASE14_8_27_OWNER_EXPENSE_BLUEPRINT.md`
 - Pay supplier → Owner-hosted vendor payment content / `NativeVendorPaymentFacade` (CORE METHOD) — see `PHASE14_8_28_OWNER_PAY_SUPPLIER_BLUEPRINT.md`
 - Pay salary → Owner-hosted salary payment content / `NativeSalaryPaymentFacade` (CORE METHOD) — see `PHASE14_8_29_OWNER_PAY_SALARY_BLUEPRINT.md`
-- Cash count and close → Owner-hosted count + close content / `NativeCashCloseFacade` (CORE METHOD; reopen deferred) — see `PHASE14_8_30_OWNER_CASH_CLOSE_BLUEPRINT.md`
+- Cash count and close → Owner-hosted count + close content / `NativeCashCloseFacade` (CORE METHOD) — see `PHASE14_8_30_OWNER_CASH_CLOSE_BLUEPRINT.md`
+- Reopen day → Owner-gated write depth inside Cash count and close — see `PHASE14_8_33_OWNER_REOPEN_BLUEPRINT.md`
 
 ## Preview notices in this checkpoint
 
-- _(none remaining on Work money — reopen day write UI deferred inside Cash count and close)_
+- _(none remaining on Work money)_
 
 ## Control contract
 
@@ -80,7 +81,6 @@ This checkpoint owns **Owner Work home** only: the all-command launcher. It conn
 ## Out of scope
 
 - Owner Records, More, Reports
-- Reopen day write UI (deferred from Cash count and close)
 - Manager / Admin shells
 - Launcher migration away from `HybridActivity`
 

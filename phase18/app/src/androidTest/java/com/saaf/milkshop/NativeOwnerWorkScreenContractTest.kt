@@ -47,8 +47,12 @@ class NativeOwnerWorkScreenContractTest {
                 context = openContext().copy(activeDeliveryCount = 3),
             ),
         )
-        composeRule.onNodeWithTag("${NativeUiTags.OwnerWorkDeliveries}_badge").assertIsDisplayed()
-        composeRule.onNodeWithText("3").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkDeliveries).assertIsDisplayed()
+        composeRule.onNodeWithTag(
+            "${NativeUiTags.OwnerWorkDeliveries}_badge",
+            useUnmergedTree = true,
+        ).assertIsDisplayed()
+        composeRule.onNodeWithText("3 active deliveries").assertIsDisplayed()
     }
 
     @Test

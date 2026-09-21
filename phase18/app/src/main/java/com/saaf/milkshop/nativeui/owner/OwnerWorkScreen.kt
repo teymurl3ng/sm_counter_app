@@ -39,14 +39,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.owner.NativeOwnerWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
-import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
-@Composable
+import com.saaf.milkshop.nativeui.sale.CashierScreenHeader@Composable
 fun OwnerWorkScreen(
     snackbarHostState: SnackbarHostState,
     state: NativeOwnerWorkState,
@@ -349,7 +345,6 @@ private fun CommandRow(
             .fillMaxWidth()
             .heightIn(min = 64.dp)
             .testTag(tag)
-            .semantics { role = Role.Button }
             .clickable(onClick = onClick)
             .padding(vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),

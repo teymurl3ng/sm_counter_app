@@ -263,6 +263,7 @@ fun OwnerPreviewHost(
                 (ownerMoreState as? NativeOwnerMoreState.Ready)?.destination in setOf(
                     NativeOwnerMoreDestination.PersonalSecurity,
                     NativeOwnerMoreDestination.Products,
+                    NativeOwnerMoreDestination.Customers,
                 )
         BackHandler(enabled = !ownerEntryOwnsBack && !ownerRecordsOwnsBack && !ownerMoreOwnsBack) {
             when (ownerSection) {
@@ -293,6 +294,13 @@ fun OwnerPreviewHost(
                         NativeOwnerMoreDestination.Products -> {
                             if (ready.productDetail != null) {
                                 ownerMoreViewModel.clearProductDetail()
+                            } else {
+                                ownerMoreViewModel.backToMenu()
+                            }
+                        }
+                        NativeOwnerMoreDestination.Customers -> {
+                            if (ready.customerDetail != null) {
+                                ownerMoreViewModel.clearCustomerDetail()
                             } else {
                                 ownerMoreViewModel.backToMenu()
                             }
@@ -367,12 +375,19 @@ fun OwnerPreviewHost(
                     onRetry = ownerMoreViewModel::refresh,
                     onOpenPersonalSecurity = ownerMoreViewModel::openPersonalSecurity,
                     onOpenProducts = ownerMoreViewModel::openProducts,
+                    onOpenCustomers = ownerMoreViewModel::openCustomers,
                     onBackToMenu = ownerMoreViewModel::backToMenu,
                     onRetryProducts = ownerMoreViewModel::refreshProducts,
                     onOpenProduct = ownerMoreViewModel::openProductDetail,
                     onBackFromProductDetail = ownerMoreViewModel::clearProductDetail,
                     onCreateProductPreview = {
                         onShowNotice("Add product comes next in the Owner Products family.")
+                    },
+                    onRetryCustomers = ownerMoreViewModel::refreshCustomers,
+                    onOpenCustomer = ownerMoreViewModel::openCustomerDetail,
+                    onBackFromCustomerDetail = ownerMoreViewModel::clearCustomerDetail,
+                    onCreateCustomerPreview = {
+                        onShowNotice("Add customer comes next in the Owner Customers family.")
                     },
                     onRequestRemoveQuickUnlock = ownerMoreViewModel::requestRemoveQuickUnlock,
                     onCancelRemoveQuickUnlock = ownerMoreViewModel::cancelRemoveQuickUnlock,

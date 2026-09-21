@@ -75,11 +75,16 @@ fun OwnerMoreScreen(
     onRetry: () -> Unit,
     onOpenPersonalSecurity: () -> Unit,
     onOpenProducts: () -> Unit,
+    onOpenCustomers: () -> Unit,
     onBackToMenu: () -> Unit,
     onRetryProducts: () -> Unit,
     onOpenProduct: (Long) -> Unit,
     onBackFromProductDetail: () -> Unit,
     onCreateProductPreview: () -> Unit,
+    onRetryCustomers: () -> Unit,
+    onOpenCustomer: (Long) -> Unit,
+    onBackFromCustomerDetail: () -> Unit,
+    onCreateCustomerPreview: () -> Unit,
     onRequestRemoveQuickUnlock: () -> Unit,
     onCancelRemoveQuickUnlock: () -> Unit,
     onRemoveQuickUnlock: (CharArray) -> Unit,
@@ -140,6 +145,7 @@ fun OwnerMoreScreen(
                 state = state,
                 onOpenPersonalSecurity = onOpenPersonalSecurity,
                 onOpenProducts = onOpenProducts,
+                onOpenCustomers = onOpenCustomers,
                 onSwitchAccount = onSwitchAccount,
                 onSignOut = onSignOut,
                 onDeferredDestination = onDeferredDestination,
@@ -175,6 +181,22 @@ fun OwnerMoreScreen(
                 onNavigate = onNavigate,
                 modifier = modifier,
             )
+            NativeOwnerMoreDestination.Customers -> OwnerCustomersScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = state.context,
+                customers = state.customers,
+                customersLoading = state.customersLoading,
+                customerDetail = state.customerDetail,
+                customersError = state.customersError,
+                onBackToMenu = onBackToMenu,
+                onRetry = onRetryCustomers,
+                onOpenCustomer = onOpenCustomer,
+                onBackFromDetail = onBackFromCustomerDetail,
+                onCreatePreview = onCreateCustomerPreview,
+                onNavigate = onNavigate,
+                modifier = modifier,
+            )
         }
     }
 }
@@ -186,6 +208,7 @@ private fun OwnerMoreMenuScreen(
     state: NativeOwnerMoreState.Ready,
     onOpenPersonalSecurity: () -> Unit,
     onOpenProducts: () -> Unit,
+    onOpenCustomers: () -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
     onDeferredDestination: (String) -> Unit,
@@ -222,7 +245,7 @@ private fun OwnerMoreMenuScreen(
                     title = "Customers",
                     subtitle = "Customer accounts and balances",
                     tag = NativeUiTags.OwnerMoreCustomers,
-                    onClick = { onDeferredDestination("Customers") },
+                    onClick = onOpenCustomers,
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 OwnerMoreMenuRow(

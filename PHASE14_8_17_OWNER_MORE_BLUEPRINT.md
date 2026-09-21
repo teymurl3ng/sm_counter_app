@@ -67,7 +67,7 @@ This checkpoint owns **Owner More home** conservatively: sectioned menu matching
 2. Header matches Owner chrome: title **More**, shop/identity line, business date, Open/Closed. Do not paste Cashier or Ops More header/nav.
 3. First viewport is the sectioned More landing (journey groups):
    - **Things you sell** — Products (**connected in 14.8.18** — list + read detail; was preview in 14.8.17)
-   - **People and businesses** — Customers, Suppliers, Employees (preview)
+   - **People and businesses** — Customers (**connected in 14.8.19** — list + read detail); Suppliers, Employees (preview)
    - **Planning and setup** — Costing & plans, Shop settings (preview)
    - **Your account and staff access** — Personal security (connected Quick unlock); Users & roles, Security history (preview)
    - **Safety and recovery** — Backup & restore (preview)
@@ -91,7 +91,8 @@ This checkpoint owns **Owner More home** conservatively: sectioned menu matching
 ### Explicit preview / deferred (do not invent these UIs here)
 
 - Products master-data editor — **connected in Phase 14.8.18** as active list + read detail under Owner More (create/edit remain deferred there unless explicitly proven)
-- Customers / Suppliers / Employees directories and editors
+- Customers directory — **connected in Phase 14.8.19** as list + read detail under Owner More (create/edit remain deferred there)
+- Suppliers / Employees directories and editors
 - Costing / plans, shop settings, opening state, expense categories
 - Users & roles administration
 - Security history / audit browser
@@ -105,8 +106,9 @@ This checkpoint owns **Owner More home** conservatively: sectioned menu matching
 |---|---|---|---|
 | More nav | Open Owner More home | Sectioned menu; Owner nav selected | Destination asserted; preview notice gone |
 | Personal security | Open Quick unlock manage | Status + enroll/remove controls | Destination + tags |
-| Deferred row (Customers, etc.) | Preview notice | Explicit not-connected copy | Tags + notice contract |
+| Deferred row (Suppliers, etc.) | Preview notice | Explicit not-connected copy | Tags + notice contract |
 | Products row | Open Owner Products | Active list under Owner More | Connected in 14.8.18 |
+| Customers row | Open Owner Customers | Customer list under Owner More | Connected in 14.8.19 |
 | Switch account | Leave → picker | Account picker | Leave path |
 | Sign out | Leave → Welcome | Welcome | Foundation leave |
 | Back (security) | Return to More menu | Menu restored | Back contract |

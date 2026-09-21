@@ -420,6 +420,35 @@ class NativeFoundationUiTest {
     }
 
     @Test
+    fun ownerCustomersOpensUnderOwnerChrome() {
+        openOwnerCustomers()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+        composeRule.onNodeWithText("Count cash").assertDoesNotExist()
+    }
+
+    @Test
+    fun ownerCustomersHardwareBackReturnsToMoreMenu() {
+        openOwnerCustomers()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerMoreMenu).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreMenu).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
     fun ownerWorkRecordSaleOpensUnderOwnerChrome() {
         openOwnerSale()
 
@@ -1425,6 +1454,19 @@ class NativeFoundationUiTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerCustomers() {
+        openOwnerMore()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreCustomers)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersRoot).assertIsDisplayed()
     }
 
     private fun openOwnerSale() {

@@ -35,6 +35,7 @@ import com.saaf.milkshop.application.operations.NativeOperationsWorkFacade
 import com.saaf.milkshop.application.operations.NativeReceiveMilkFacade
 import com.saaf.milkshop.application.operations.NativeRecordSpoilageFacade
 import com.saaf.milkshop.application.owner.NativeOwnerMoreFacade
+import com.saaf.milkshop.application.owner.NativeOwnerCustomersFacade
 import com.saaf.milkshop.application.owner.NativeOwnerProductsFacade
 import com.saaf.milkshop.application.owner.NativeOwnerOverviewFacade
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsFacade
@@ -111,6 +112,7 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var ownerRecordsFacade: NativeOwnerRecordsFacade
     private lateinit var ownerMoreFacade: NativeOwnerMoreFacade
     private lateinit var ownerProductsFacade: NativeOwnerProductsFacade
+    private lateinit var ownerCustomersFacade: NativeOwnerCustomersFacade
 
     private val authenticationViewModel by viewModels<NativeAuthenticationViewModel> {
         val app = application as MilkShopApplication
@@ -222,6 +224,7 @@ class NativePreviewActivity : FragmentActivity() {
         NativeOwnerMoreViewModel.Factory(
             facade = ownerMoreFacade,
             productsFacade = ownerProductsFacade,
+            customersFacade = ownerCustomersFacade,
             onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
         )
     }
@@ -259,6 +262,7 @@ class NativePreviewActivity : FragmentActivity() {
         ownerRecordsFacade = NativeOwnerRecordsFacade(app.database, app.userSecurity)
         ownerMoreFacade = NativeOwnerMoreFacade(app.database, app.userSecurity, quickUnlockService)
         ownerProductsFacade = NativeOwnerProductsFacade(app.database, app.userSecurity)
+        ownerCustomersFacade = NativeOwnerCustomersFacade(app.database, app.userSecurity)
         authenticationViewModel.attachQuickUnlock(quickUnlockFacade)
         val openOperator = intent.getBooleanExtra(EXTRA_OPEN_OPERATOR, false)
         val openOwner = intent.getBooleanExtra(EXTRA_OPEN_OWNER, false)

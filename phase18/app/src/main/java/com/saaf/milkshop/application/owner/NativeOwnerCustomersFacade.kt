@@ -4,6 +4,7 @@ import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.CustomerManagementService
+import com.saaf.milkshop.domain.CustomerProfileInput
 import com.saaf.milkshop.domain.CustomerProfileService
 import com.saaf.milkshop.domain.UserSecurityService
 import java.util.Locale
@@ -21,6 +22,9 @@ data class NativeOwnerCustomerDetail(
     val row: NativeOwnerCustomerRow,
     val address: String?,
     val notes: String?,
+    val creditLimit: Double?,
+    val dailyQuota: Double?,
+    val active: Boolean,
     val creditLimitLabel: String?,
     val dailyQuotaLabel: String?,
 )
@@ -30,8 +34,8 @@ data class NativeOwnerCustomersSnapshot(
 )
 
 /**
- * Owner Customers boundary: customer list + read detail + create from
- * [CustomerManagementService] / [CustomerProfileService]. Does not invent
+ * Owner Customers boundary: customer list + read detail + create/rename/profile
+ * from [CustomerManagementService] / [CustomerProfileService]. Does not invent
  * balance formulas or call bridge JSON.
  */
 class NativeOwnerCustomersFacade(
@@ -61,8 +65,9 @@ class NativeOwnerCustomersFacade(
         val info = customers.list().firstOrNull { it.accountId == accountId }
             ?: error("This customer is not in the customer list.")
         val profile = profiles.get(accountId)
+        val active = profile?.active ?: true
         val row = info.toRow(
-            active = profile?.active ?: true,
+            active = active,
             phone = profile?.phone,
             areaRoute = profile?.areaRoute,
         )
@@ -70,6 +75,9 @@ class NativeOwnerCustomersFacade(
             row = row,
             address = profile?.address,
             notes = profile?.notes,
+            creditLimit = profile?.creditLimit,
+            dailyQuota = profile?.dailyQuota,
+            active = active,
             creditLimitLabel = profile?.creditLimit?.let { formatMoney(it) },
             dailyQuotaLabel = profile?.dailyQuota?.let {
                 String.format(Locale.US, "%,.2f L / day", it)
@@ -83,6 +91,20 @@ class NativeOwnerCustomersFacade(
     ): Long {
         requireOwnerMasterData(sessionHandle)
         return customers.create(name)
+    }
+
+    /**
+     * Rename then save profile (auth once). Deactivate is [CustomerProfileInput.active] = false.
+     */
+    suspend fun updateCustomer(
+        sessionHandle: String,
+        accountId: Long,
+        name: String,
+        profile: CustomerProfileInput,
+    ) {
+        requireOwnerMasterData(sessionHandle)
+        customers.rename(accountId, name)
+        profiles.save(accountId, profile)
     }
 
     private suspend fun requireOwnerMasterData(sessionHandle: String) {

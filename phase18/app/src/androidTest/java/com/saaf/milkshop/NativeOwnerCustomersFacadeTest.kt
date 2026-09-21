@@ -97,6 +97,9 @@ class NativeOwnerCustomersFacadeTest {
         assertEquals("Route B", detail.row.areaRoute)
         assertEquals("Main Market", detail.address)
         assertEquals("Friday collect", detail.notes)
+        assertEquals(12_000.0, detail.creditLimit!!, 0.001)
+        assertEquals(25.0, detail.dailyQuota!!, 0.001)
+        assertTrue(detail.active)
         assertTrue(detail.creditLimitLabel!!.contains("12,000"))
         assertTrue(detail.dailyQuotaLabel!!.contains("25"))
     }
@@ -116,8 +119,73 @@ class NativeOwnerCustomersFacadeTest {
     }
 
     @Test
+    fun updateCustomerRenamesAndSavesProfile() = runBlocking {
+        val accountId = facade.createCustomer(ownerSession, "Owner Edit Cafe")
+        facade.updateCustomer(
+            ownerSession,
+            accountId,
+            "Owner Edit Cafe Updated",
+            CustomerProfileInput(
+                phone = "0322",
+                areaRoute = "Route Z",
+                address = "Side Street",
+                notes = "Collect Monday",
+                creditLimit = 8_000.0,
+                dailyQuota = 12.5,
+                active = true,
+            ),
+        )
+        val detail = facade.loadDetail(ownerSession, accountId)
+        assertEquals("Owner Edit Cafe Updated", detail.row.name)
+        assertEquals("0322", detail.row.phone)
+        assertEquals("Route Z", detail.row.areaRoute)
+        assertEquals("Side Street", detail.address)
+        assertEquals("Collect Monday", detail.notes)
+        assertEquals(8_000.0, detail.creditLimit!!, 0.001)
+        assertEquals(12.5, detail.dailyQuota!!, 0.001)
+        assertTrue(detail.active)
+        assertEquals("Active", detail.row.statusLabel)
+        assertTrue(detail.creditLimitLabel!!.contains("8,000"))
+        assertTrue(detail.dailyQuotaLabel!!.contains("12.5"))
+    }
+
+    @Test
+    fun updateCustomerCanDeactivateViaActiveFlag() = runBlocking {
+        val accountId = facade.createCustomer(ownerSession, "Owner Deactivate Cafe")
+        facade.updateCustomer(
+            ownerSession,
+            accountId,
+            "Owner Deactivate Cafe",
+            CustomerProfileInput(active = false),
+        )
+        val detail = facade.loadDetail(ownerSession, accountId)
+        assertEquals(false, detail.active)
+        assertEquals("Inactive", detail.row.statusLabel)
+        val snapshot = facade.loadCustomers(ownerSession)
+        assertTrue(
+            snapshot.customers.any {
+                it.accountId == accountId && it.statusLabel == "Inactive"
+            },
+        )
+    }
+
+    @Test
     fun createCustomerRejectsNonOwner() = runBlocking {
         val rejected = runCatching { facade.createCustomer(cashierSession, "Blocked Customer") }
+        assertTrue(rejected.isFailure)
+    }
+
+    @Test
+    fun updateCustomerRejectsNonOwner() = runBlocking {
+        val accountId = facade.createCustomer(ownerSession, "Owner Gate Cafe")
+        val rejected = runCatching {
+            facade.updateCustomer(
+                cashierSession,
+                accountId,
+                "Blocked Rename",
+                CustomerProfileInput(phone = "0000"),
+            )
+        }
         assertTrue(rejected.isFailure)
     }
 

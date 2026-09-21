@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.more.NativeMoreSecurityStatus
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
+import com.saaf.milkshop.domain.CustomerProfileInput
 import com.saaf.milkshop.domain.ProductCatalogInput
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -101,6 +102,9 @@ fun OwnerMoreScreen(
     onOpenCustomerCreate: () -> Unit,
     onBackFromCustomerCreate: () -> Unit,
     onCreateCustomer: (String) -> Unit,
+    onOpenCustomerEdit: () -> Unit,
+    onBackFromCustomerEdit: () -> Unit,
+    onUpdateCustomer: (String, CustomerProfileInput) -> Unit,
     onRetrySuppliers: () -> Unit,
     onOpenSupplier: (Long) -> Unit,
     onBackFromSupplierDetail: () -> Unit,
@@ -247,6 +251,8 @@ fun OwnerMoreScreen(
                 customerDetail = state.customerDetail,
                 customerCreateOpen = state.customerCreateOpen,
                 customerCreating = state.customerCreating,
+                customerEditOpen = state.customerEditOpen,
+                customerUpdating = state.customerUpdating,
                 customersError = state.customersError,
                 onBackToMenu = onBackToMenu,
                 onRetry = onRetryCustomers,
@@ -255,6 +261,9 @@ fun OwnerMoreScreen(
                 onOpenCreate = onOpenCustomerCreate,
                 onBackFromCreate = onBackFromCustomerCreate,
                 onCreateCustomer = onCreateCustomer,
+                onOpenEdit = onOpenCustomerEdit,
+                onBackFromEdit = onBackFromCustomerEdit,
+                onUpdateCustomer = onUpdateCustomer,
                 onNavigate = onNavigate,
                 modifier = modifier,
             )

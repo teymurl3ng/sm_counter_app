@@ -17,6 +17,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerCustomerDetail
 import com.saaf.milkshop.application.owner.NativeOwnerCustomerRow
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
 import com.saaf.milkshop.domain.AppRole
+import com.saaf.milkshop.domain.CustomerProfileInput
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.owner.OwnerCustomersScreen
@@ -64,24 +65,22 @@ class NativeOwnerCustomersScreenContractTest {
     }
 
     @Test
-    fun detailShowsFactsAndBack() {
+    fun detailShowsFactsAndEdit() {
         var back = false
+        var editOpened = false
         setScreen(
             customers = listOf(sampleCustomer()),
-            customerDetail = NativeOwnerCustomerDetail(
-                row = sampleCustomer(),
-                address = "Main Market",
-                notes = "Friday collect",
-                creditLimitLabel = "PKR 12,000.00",
-                dailyQuotaLabel = "25.00 L / day",
-            ),
+            customerDetail = sampleDetail(),
             onBackFromDetail = { back = true },
+            onOpenEdit = { editOpened = true },
         )
         composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersDetail).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersDetailName).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersDetailReadOnly)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersDetailEdit)
             .performScrollTo()
             .assertIsDisplayed()
+            .performClick()
+        assertTrue(editOpened)
         composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersDetailBack).performClick()
         assertTrue(back)
     }
@@ -135,6 +134,71 @@ class NativeOwnerCustomersScreenContractTest {
     }
 
     @Test
+    fun editFormPrefillsAndSaves() {
+        var savedName: String? = null
+        var savedProfile: CustomerProfileInput? = null
+        setScreen(
+            customers = listOf(sampleCustomer()),
+            customerDetail = sampleDetail(),
+            customerEditOpen = true,
+            onUpdateCustomer = { name, profile ->
+                savedName = name
+                savedProfile = profile
+            },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersEditForm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersEditName)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersEditPhone)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersEditAddress)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersEditAreaRoute)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersEditNotes)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersEditCreditLimit)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersEditDailyQuota)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersEditActive)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertDoesNotExist()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersEditName)
+            .performScrollTo()
+            .performTextReplacement("Corner Cafe Updated")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersEditPhone)
+            .performScrollTo()
+            .performTextReplacement("0311")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersEditCreditLimit)
+            .performScrollTo()
+            .performTextReplacement("15000")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersEditSave)
+            .performScrollTo()
+            .assertIsEnabled()
+            .performClick()
+
+        assertEquals("Corner Cafe Updated", savedName)
+        assertEquals("0311", savedProfile!!.phone)
+        assertEquals("Main Market", savedProfile!!.address)
+        assertEquals("Route A", savedProfile!!.areaRoute)
+        assertEquals("Friday collect", savedProfile!!.notes)
+        assertEquals(15_000.0, savedProfile!!.creditLimit!!, 0.001)
+        assertEquals(25.0, savedProfile!!.dailyQuota!!, 0.001)
+        assertTrue(savedProfile!!.active)
+    }
+
+    @Test
     fun loadFailureOffersRetry() {
         var retries = 0
         setScreen(
@@ -152,6 +216,8 @@ class NativeOwnerCustomersScreenContractTest {
         customerDetail: NativeOwnerCustomerDetail? = null,
         customerCreateOpen: Boolean = false,
         customerCreating: Boolean = false,
+        customerEditOpen: Boolean = false,
+        customerUpdating: Boolean = false,
         customersError: String? = null,
         onBackToMenu: () -> Unit = {},
         onRetry: () -> Unit = {},
@@ -160,6 +226,9 @@ class NativeOwnerCustomersScreenContractTest {
         onOpenCreate: () -> Unit = {},
         onBackFromCreate: () -> Unit = {},
         onCreateCustomer: (String) -> Unit = {},
+        onOpenEdit: () -> Unit = {},
+        onBackFromEdit: () -> Unit = {},
+        onUpdateCustomer: (String, CustomerProfileInput) -> Unit = { _, _ -> },
         onNavigate: (OwnerSection) -> Unit = {},
     ) {
         composeRule.setContent {
@@ -183,6 +252,8 @@ class NativeOwnerCustomersScreenContractTest {
                     customerDetail = customerDetail,
                     customerCreateOpen = customerCreateOpen,
                     customerCreating = customerCreating,
+                    customerEditOpen = customerEditOpen,
+                    customerUpdating = customerUpdating,
                     customersError = customersError,
                     onBackToMenu = onBackToMenu,
                     onRetry = onRetry,
@@ -191,6 +262,9 @@ class NativeOwnerCustomersScreenContractTest {
                     onOpenCreate = onOpenCreate,
                     onBackFromCreate = onBackFromCreate,
                     onCreateCustomer = onCreateCustomer,
+                    onOpenEdit = onOpenEdit,
+                    onBackFromEdit = onBackFromEdit,
+                    onUpdateCustomer = onUpdateCustomer,
                     onNavigate = onNavigate,
                 )
             }
@@ -204,5 +278,16 @@ class NativeOwnerCustomersScreenContractTest {
         statusLabel = "Active",
         phone = "0300",
         areaRoute = "Route A",
+    )
+
+    private fun sampleDetail() = NativeOwnerCustomerDetail(
+        row = sampleCustomer(),
+        address = "Main Market",
+        notes = "Friday collect",
+        creditLimit = 12_000.0,
+        dailyQuota = 25.0,
+        active = true,
+        creditLimitLabel = "PKR 12,000.00",
+        dailyQuotaLabel = "25.00 L / day",
     )
 }

@@ -24,7 +24,7 @@ Replace deferred **Add customer** preview with a real create form using typed `C
 |---|---|
 | name | Required, non-empty trim, no newline |
 
-On success: return to Customers list; clear draft; refresh list. Rename / profile edit / deactivate remain deferred (detail still shows editing-comes-next copy).
+On success: return to Customers list; clear draft; refresh list. Rename / profile edit connected in Phase 14.8.37.
 
 Permission: facade `requireOwnerMasterData` (`MANAGE_MASTER_DATA` + Owner) then `customers.create(name)`.
 
@@ -38,11 +38,9 @@ Permission: facade `requireOwnerMasterData` (`MANAGE_MASTER_DATA` + Owner) then 
 
 ## Explicit preview / deferred
 
-- Rename / profile save / deactivate write UI
-- Phone, address, credit limit, daily quota editors
 - Balance / payment posting engines
 - Manager / Admin Customers shells
 
 ## Accept gate
 
-**AUTO-ACCEPTED.** Connected = Owner Customers create write depth under CORE METHOD; rename/profile/deactivate remain deferred.
+**AUTO-ACCEPTED.** Connected = Owner Customers create write depth under CORE METHOD; rename/profile follow in 14.8.37.

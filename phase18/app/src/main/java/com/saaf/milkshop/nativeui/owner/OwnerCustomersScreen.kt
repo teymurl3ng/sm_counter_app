@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -47,14 +48,16 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.owner.NativeOwnerCustomerDetail
 import com.saaf.milkshop.application.owner.NativeOwnerCustomerRow
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
+import com.saaf.milkshop.domain.CustomerProfileInput
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
+import java.util.Locale
 
 /**
- * Owner Customers — customer list + read detail + create under OwnerScaffold.
+ * Owner Customers — customer list + detail + create/edit under OwnerScaffold.
  * Nested from Owner More; never mounts foreign role chrome.
  */
 @Composable
@@ -67,6 +70,8 @@ fun OwnerCustomersScreen(
     customerDetail: NativeOwnerCustomerDetail?,
     customerCreateOpen: Boolean,
     customerCreating: Boolean,
+    customerEditOpen: Boolean,
+    customerUpdating: Boolean,
     customersError: String?,
     onBackToMenu: () -> Unit,
     onRetry: () -> Unit,
@@ -75,6 +80,9 @@ fun OwnerCustomersScreen(
     onOpenCreate: () -> Unit,
     onBackFromCreate: () -> Unit,
     onCreateCustomer: (String) -> Unit,
+    onOpenEdit: () -> Unit,
+    onBackFromEdit: () -> Unit,
+    onUpdateCustomer: (String, CustomerProfileInput) -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -93,13 +101,31 @@ fun OwnerCustomersScreen(
         return
     }
 
+    if (customerEditOpen && customerDetail != null) {
+        OwnerCustomersEditScreen(
+            snackbarHostState = snackbarHostState,
+            identity = identity,
+            context = context,
+            detail = customerDetail,
+            saving = customerUpdating,
+            error = customersError,
+            onBack = onBackFromEdit,
+            onSave = onUpdateCustomer,
+            onNavigate = onNavigate,
+            modifier = modifier,
+        )
+        return
+    }
+
     if (customerDetail != null) {
         OwnerCustomersDetailScreen(
             snackbarHostState = snackbarHostState,
             identity = identity,
             context = context,
             detail = customerDetail,
+            error = customersError,
             onBack = onBackFromDetail,
+            onOpenEdit = onOpenEdit,
             onNavigate = onNavigate,
             modifier = modifier,
         )
@@ -335,27 +361,299 @@ private fun OwnerCustomersCreateScreen(
                 }
             }
         }
-        OwnerCustomersCreateDiscardDialog(leaveGuard = leaveGuard)
+        OwnerCustomersDiscardDialog(
+            leaveGuard = leaveGuard,
+            title = "Discard this customer?",
+            body = "The name you entered will be cleared.",
+            discardTag = NativeUiTags.OwnerCustomersCreateDiscard,
+            keepTag = NativeUiTags.OwnerCustomersCreateKeep,
+        )
     }
 }
 
 @Composable
-private fun OwnerCustomersCreateDiscardDialog(leaveGuard: EntryLeaveGuard) {
+private fun OwnerCustomersEditScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    context: NativeOwnerMoreContext,
+    detail: NativeOwnerCustomerDetail,
+    saving: Boolean,
+    error: String?,
+    onBack: () -> Unit,
+    onSave: (String, CustomerProfileInput) -> Unit,
+    onNavigate: (OwnerSection) -> Unit,
+    modifier: Modifier,
+) {
+    val leaveGuard = rememberEntryLeaveGuard()
+    val formKey = "edit-${detail.row.accountId}"
+    var name by rememberSaveable(formKey) { mutableStateOf(detail.row.name) }
+    var phone by rememberSaveable(formKey) { mutableStateOf(detail.row.phone.orEmpty()) }
+    var address by rememberSaveable(formKey) { mutableStateOf(detail.address.orEmpty()) }
+    var areaRoute by rememberSaveable(formKey) { mutableStateOf(detail.row.areaRoute.orEmpty()) }
+    var notes by rememberSaveable(formKey) { mutableStateOf(detail.notes.orEmpty()) }
+    var creditLimitText by rememberSaveable(formKey) {
+        mutableStateOf(formatOptionalDoubleForEdit(detail.creditLimit))
+    }
+    var dailyQuotaText by rememberSaveable(formKey) {
+        mutableStateOf(formatOptionalDoubleForEdit(detail.dailyQuota))
+    }
+    var active by rememberSaveable(formKey) { mutableStateOf(detail.active) }
+    var draftTouched by rememberSaveable(formKey) { mutableStateOf(false) }
+
+    val creditTrimmed = creditLimitText.trim()
+    val creditValue = creditTrimmed.takeIf { it.isNotEmpty() }?.toDoubleOrNull()
+    val creditValid = creditTrimmed.isEmpty() || (creditValue != null && creditValue >= 0.0)
+    val quotaTrimmed = dailyQuotaText.trim()
+    val quotaValue = quotaTrimmed.takeIf { it.isNotEmpty() }?.toDoubleOrNull()
+    val quotaValid = quotaTrimmed.isEmpty() || (quotaValue != null && quotaValue >= 0.0)
+    val nameValid = name.trim().isNotEmpty() && !name.contains('\n')
+    val canSave = nameValid && creditValid && quotaValid && !saving
+    val dirty = draftTouched && !saving
+
+    LaunchedEffect(dirty) {
+        if (dirty) leaveGuard.markDirty() else leaveGuard.clear()
+    }
+
+    fun requestLeave(action: () -> Unit) {
+        if (saving) return
+        leaveGuard.requestLeave(action)
+    }
+
+    BackHandler { requestLeave(onBack) }
+
+    Box(modifier.fillMaxSize()) {
+        OwnerScaffold(
+            snackbarHostState = snackbarHostState,
+            section = OwnerSection.More,
+            onNavigate = { section -> requestLeave { onNavigate(section) } },
+            modifier = Modifier.fillMaxSize(),
+        ) { padding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .testTag(NativeUiTags.OwnerCustomersEditForm),
+            ) {
+                CashierScreenHeader(
+                    title = "Customers",
+                    displayName = context.shopName,
+                    roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                    businessDate = context.businessDate,
+                    postingOpen = context.postingOpen,
+                )
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .imePadding()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    TextButton(
+                        onClick = { requestLeave(onBack) },
+                        enabled = !saving,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerCustomersEditBack),
+                    ) { Text("Back to detail") }
+                    Text(
+                        "Edit customer",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = {
+                            name = it
+                            draftTouched = true
+                        },
+                        label = { Text("Name") },
+                        singleLine = true,
+                        enabled = !saving,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerCustomersEditName),
+                    )
+                    OutlinedTextField(
+                        value = phone,
+                        onValueChange = {
+                            phone = it
+                            draftTouched = true
+                        },
+                        label = { Text("Phone (optional)") },
+                        singleLine = true,
+                        enabled = !saving,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerCustomersEditPhone),
+                    )
+                    OutlinedTextField(
+                        value = address,
+                        onValueChange = {
+                            address = it
+                            draftTouched = true
+                        },
+                        label = { Text("Address (optional)") },
+                        enabled = !saving,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerCustomersEditAddress),
+                    )
+                    OutlinedTextField(
+                        value = areaRoute,
+                        onValueChange = {
+                            areaRoute = it
+                            draftTouched = true
+                        },
+                        label = { Text("Area / route (optional)") },
+                        singleLine = true,
+                        enabled = !saving,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerCustomersEditAreaRoute),
+                    )
+                    OutlinedTextField(
+                        value = notes,
+                        onValueChange = {
+                            notes = it
+                            draftTouched = true
+                        },
+                        label = { Text("Notes (optional)") },
+                        enabled = !saving,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerCustomersEditNotes),
+                    )
+                    OutlinedTextField(
+                        value = creditLimitText,
+                        onValueChange = {
+                            creditLimitText = it
+                            draftTouched = true
+                        },
+                        label = { Text("Credit limit (optional)") },
+                        singleLine = true,
+                        enabled = !saving,
+                        isError = !creditValid,
+                        supportingText = if (!creditValid) {
+                            { Text("Enter a number ≥ 0, or leave blank") }
+                        } else {
+                            null
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerCustomersEditCreditLimit),
+                    )
+                    OutlinedTextField(
+                        value = dailyQuotaText,
+                        onValueChange = {
+                            dailyQuotaText = it
+                            draftTouched = true
+                        },
+                        label = { Text("Daily quota liters (optional)") },
+                        singleLine = true,
+                        enabled = !saving,
+                        isError = !quotaValid,
+                        supportingText = if (!quotaValid) {
+                            { Text("Enter a number ≥ 0, or leave blank") }
+                        } else {
+                            null
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerCustomersEditDailyQuota),
+                    )
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text("Active", style = MaterialTheme.typography.bodyLarge)
+                        Switch(
+                            checked = active,
+                            onCheckedChange = {
+                                active = it
+                                draftTouched = true
+                            },
+                            enabled = !saving,
+                            modifier = Modifier.testTag(NativeUiTags.OwnerCustomersEditActive),
+                        )
+                    }
+                    error?.let {
+                        Text(
+                            it,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.testTag(NativeUiTags.OwnerCustomersError),
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            if (!canSave) return@Button
+                            onSave(
+                                name,
+                                CustomerProfileInput(
+                                    phone = phone.trim().takeIf { it.isNotEmpty() },
+                                    areaRoute = areaRoute.trim().takeIf { it.isNotEmpty() },
+                                    address = address.trim().takeIf { it.isNotEmpty() },
+                                    notes = notes.trim().takeIf { it.isNotEmpty() },
+                                    creditLimit = creditValue,
+                                    dailyQuota = quotaValue,
+                                    active = active,
+                                ),
+                            )
+                        },
+                        enabled = canSave,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerCustomersEditSave),
+                    ) {
+                        if (saving) {
+                            CircularProgressIndicator(
+                                Modifier.height(20.dp),
+                                strokeWidth = 2.dp,
+                            )
+                        } else {
+                            Text("Save changes")
+                        }
+                    }
+                    TextButton(
+                        onClick = { requestLeave(onBack) },
+                        enabled = !saving,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerCustomersEditCancel),
+                    ) { Text("Cancel") }
+                }
+            }
+        }
+        OwnerCustomersDiscardDialog(
+            leaveGuard = leaveGuard,
+            title = "Discard changes?",
+            body = "Unsaved customer edits will be lost.",
+            discardTag = NativeUiTags.OwnerCustomersEditDiscard,
+            keepTag = NativeUiTags.OwnerCustomersEditKeep,
+        )
+    }
+}
+
+@Composable
+private fun OwnerCustomersDiscardDialog(
+    leaveGuard: EntryLeaveGuard,
+    title: String,
+    body: String,
+    discardTag: String,
+    keepTag: String,
+) {
     if (!leaveGuard.discardConfirmationOpen) return
     AlertDialog(
         onDismissRequest = leaveGuard::keepEditing,
-        title = { Text("Discard this customer?") },
-        text = { Text("The name you entered will be cleared.") },
+        title = { Text(title) },
+        text = { Text(body) },
         confirmButton = {
             TextButton(
                 onClick = leaveGuard::confirmDiscard,
-                modifier = Modifier.testTag(NativeUiTags.OwnerCustomersCreateDiscard),
+                modifier = Modifier.testTag(discardTag),
             ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(
                 onClick = leaveGuard::keepEditing,
-                modifier = Modifier.testTag(NativeUiTags.OwnerCustomersCreateKeep),
+                modifier = Modifier.testTag(keepTag),
             ) { Text("Keep editing") }
         },
     )
@@ -367,7 +665,9 @@ private fun OwnerCustomersDetailScreen(
     identity: NativeSignedInIdentity,
     context: NativeOwnerMoreContext,
     detail: NativeOwnerCustomerDetail,
+    error: String?,
     onBack: () -> Unit,
+    onOpenEdit: () -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier,
 ) {
@@ -412,12 +712,19 @@ private fun OwnerCustomersDetailScreen(
                 detail.creditLimitLabel?.let { OwnerCustomerFact("Credit limit", it) }
                 detail.dailyQuotaLabel?.let { OwnerCustomerFact("Daily quota", it) }
                 detail.notes?.takeIf { it.isNotBlank() }?.let { OwnerCustomerFact("Notes", it) }
-                Text(
-                    "Read only in this preview. Editing comes next.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerCustomersDetailReadOnly),
-                )
+                error?.let {
+                    Text(
+                        it,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerCustomersError),
+                    )
+                }
+                Button(
+                    onClick = onOpenEdit,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(NativeUiTags.OwnerCustomersDetailEdit),
+                ) { Text("Edit customer") }
             }
         }
     }
@@ -472,5 +779,14 @@ private fun OwnerCustomerFact(label: String, value: String) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(value, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+private fun formatOptionalDoubleForEdit(value: Double?): String {
+    if (value == null) return ""
+    return if (value % 1.0 == 0.0) {
+        value.toLong().toString()
+    } else {
+        String.format(Locale.US, "%s", value)
     }
 }

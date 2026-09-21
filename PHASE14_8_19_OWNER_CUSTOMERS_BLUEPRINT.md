@@ -37,7 +37,7 @@ Authority for product shape:
 - Existing typed domain: `CustomerManagementService` / `CustomerInfo`; `CustomerProfileService` / `CustomerProfileEntity`; account category `Customer`; balances from existing `readModelDao().accountBalances()` via management list (no new formulas)
 - Sibling UI: Owner Products list/detail under Owner More
 
-This checkpoint owns **Owner Customers** conservatively: customer list + read detail under Owner More, plus **create write depth in Phase 14.8.36**. Rename / profile edit / deactivate remain deferred.
+This checkpoint owns **Owner Customers** conservatively: customer list + read detail under Owner More, plus **create write depth in Phase 14.8.36** and **rename + profile save in Phase 14.8.37**.
 
 ## What the existing product already guarantees
 
@@ -57,7 +57,7 @@ This checkpoint owns **Owner Customers** conservatively: customer list + read de
 | `CustomerManagementService.list` | Yes — primary list boundary |
 | `CustomerProfileService.get` | Yes — detail facts |
 | Balance from management list / existing accountBalances | Yes — display only; do not invent formulas |
-| Create / rename / profile save write UI | Create connected in 14.8.36 (name only); rename/profile still deferred |
+| Create / rename / profile save write UI | Create connected in 14.8.36 (name only); rename + profile save in 14.8.37 |
 | Bridge JSON / `query.masterData` from Compose | **No** |
 | Suppliers / Employees / Backup under Customers | **No** |
 
@@ -67,11 +67,12 @@ This checkpoint owns **Owner Customers** conservatively: customer list + read de
 2. Tap **Customers** → Owner Customers list (not a deferred snackbar).
 3. Header stays Owner More chrome (title **Customers** under Owner header tokens); business date / Open-Closed from More context.
 4. List shows customers: name primary; balance + active/inactive secondary from typed fields.
-5. Tap a row → read-only detail: name, balance, profile facts (phone, route, address, notes, credit limit, daily quota, status).
+5. Tap a row → detail: name, balance, profile facts (phone, route, address, notes, credit limit, daily quota, status).
 6. Back from detail → Customers list. Back from list → Owner More menu. Hardware Back matches that stack.
-7. **Add customer** — connected create form in Phase 14.8.36 (`CustomerManagementService.create(name)` via typed facade). Rename / profile edit remain deferred from detail.
-8. Load failure shows inline error + Retry. Empty list shows an honest empty state.
-9. Owner nav remains; no Cashier/Ops bottom nav.
+7. **Add customer** — connected create form in Phase 14.8.36 (`CustomerManagementService.create(name)` via typed facade).
+8. **Edit customer** — connected rename + profile save in Phase 14.8.37 (`rename` then `CustomerProfileService.save`; deactivate via `active=false`).
+9. Load failure shows inline error + Retry. Empty list shows an honest empty state.
+10. Owner nav remains; no Cashier/Ops bottom nav.
 
 ## Connected vs preview / deferred in this checkpoint
 
@@ -81,14 +82,15 @@ This checkpoint owns **Owner Customers** conservatively: customer list + read de
 - Customer list from `CustomerManagementService` (+ profile active label).
 - Read detail with profile facts where present.
 - Create write depth in Phase 14.8.36 (`NativeOwnerCustomersFacade.createCustomer`).
+- Rename + profile save write depth in Phase 14.8.37 (`NativeOwnerCustomersFacade.updateCustomer`).
 - Owner chrome + Back → More menu; inventory + Foundation + `qaScreen` (extend `ownermore`).
 
 ### Explicit preview / deferred
 
-- Rename / deactivate / profile edit write UI
 - Payment posting, credit engines, delivery routes as workflows
 - Suppliers / Employees / shop settings / backup
 - Manager / Admin Customers shells
+- Separate archive command beyond `active=false`
 
 ## Control contract
 
@@ -100,6 +102,7 @@ This checkpoint owns **Owner Customers** conservatively: customer list + read de
 | Back (list) | Return to More menu | Menu restored | Back contract |
 | Retry | Reload list | Ready list | Failure recovery |
 | Add customer | Open create form → Save | New customer on refreshed list | Create contract |
+| Edit customer | Open edit form → Save | Renamed + profile facts refreshed | Edit contract |
 | Foreign chrome | Must not appear | No Cashier/Ops nav | Foundation |
 
 ## Material states
@@ -108,8 +111,9 @@ This checkpoint owns **Owner Customers** conservatively: customer list + read de
 |---|---|
 | Loading | Owner chrome + progress |
 | Ready list | Customers; empty copy when none |
-| Detail | Read-only facts |
+| Detail | Facts + Edit customer |
 | Create form | Name field + leave-guard; Save creates |
+| Edit form | Name + profile fields + Active + leave-guard; Save renames then saves profile |
 | Load failure | Inline error + Retry |
 | Session expired | Leave via existing auth path |
 
@@ -118,30 +122,30 @@ This checkpoint owns **Owner Customers** conservatively: customer list + read de
 `NativeOwnerCustomersFacade` (presentation-neutral) + Owner More ViewModel Customers destination:
 
 - require authenticated Owner session;
-- require `MANAGE_MASTER_DATA` for customer read/create;
+- require `MANAGE_MASTER_DATA` for customer read/create/update;
 - list via `CustomerManagementService.list()`;
 - detail via management row + `CustomerProfileService.get` — balances only as already returned by management list;
 - create via `NativeOwnerCustomersFacade.createCustomer` → `CustomerManagementService.create(name)` — never bridge JSON from Compose;
+- update via `NativeOwnerCustomersFacade.updateCustomer` → `rename` then `CustomerProfileService.save` — never bridge JSON from Compose;
 - do not change Room schema, RolePermissions, Analytics, or balance engines.
 
 ## Visual / consistency notes
 
-- Nested under Owner More like Products (Back to More; detail → list; create → list).
+- Nested under Owner More like Products (Back to More; detail → list; create → list; edit → detail).
 - Dense list rows: name primary; balance + status secondary.
 - Detail uses labeled facts, not a Collect dock or delivery picker.
-- Create is name-only (Products-create minimalism); profile fields stay on deferred edit.
+- Create is name-only (Products-create minimalism); profile fields live on edit (14.8.37).
 
 ## Out of scope
 
-- Full people-master write suite beyond create name
 - Payment / credit / delivery workflow UIs
 - Foreign role Customer screens
 - Launcher migration away from `HybridActivity`
 
 ## Verification
 
-- Facade tests: Owner gate, list customers with balance/status, create then list, reject non-Owner.
-- Compose contract: Customers list + detail + create tags; Customers row opens destination (not deferred notice).
+- Facade tests: Owner gate, list customers with balance/status, create then list, update rename/profile/deactivate, reject non-Owner.
+- Compose contract: Customers list + detail + create + edit tags; Customers row opens destination (not deferred notice).
 - Inventory rows with real workflow test names (no `workflow_test=-`).
 - `qaScreen -Pqa.screen=ownermore` extended with Customers Foundation/contract coverage.
 - Foundation: Owner chrome ✓, foreign nav ✗, Back → More menu, session intact.
@@ -149,4 +153,4 @@ This checkpoint owns **Owner Customers** conservatively: customer list + read de
 
 ## Accept gate
 
-**AUTO-ACCEPTED FOR NATIVE IMPLEMENTATION.** Connected scope: customer list + read detail under Owner More shell; create write depth in Phase 14.8.36; rename/profile/deactivate deferred.
+**AUTO-ACCEPTED FOR NATIVE IMPLEMENTATION.** Connected scope: customer list + read detail under Owner More shell; create write depth in Phase 14.8.36; rename + profile save in Phase 14.8.37.

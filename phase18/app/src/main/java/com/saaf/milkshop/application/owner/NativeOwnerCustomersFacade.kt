@@ -30,7 +30,7 @@ data class NativeOwnerCustomersSnapshot(
 )
 
 /**
- * Owner Customers boundary: customer list + read detail from
+ * Owner Customers boundary: customer list + read detail + create from
  * [CustomerManagementService] / [CustomerProfileService]. Does not invent
  * balance formulas or call bridge JSON.
  */
@@ -75,6 +75,14 @@ class NativeOwnerCustomersFacade(
                 String.format(Locale.US, "%,.2f L / day", it)
             },
         )
+    }
+
+    suspend fun createCustomer(
+        sessionHandle: String,
+        name: String,
+    ): Long {
+        requireOwnerMasterData(sessionHandle)
+        return customers.create(name)
     }
 
     private suspend fun requireOwnerMasterData(sessionHandle: String) {

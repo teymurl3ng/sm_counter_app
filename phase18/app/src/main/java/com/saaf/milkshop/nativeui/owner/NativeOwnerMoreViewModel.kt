@@ -75,6 +75,8 @@ sealed interface NativeOwnerMoreState {
         val customers: List<NativeOwnerCustomerRow> = emptyList(),
         val customersLoading: Boolean = false,
         val customerDetail: NativeOwnerCustomerDetail? = null,
+        val customerCreateOpen: Boolean = false,
+        val customerCreating: Boolean = false,
         val customersError: String? = null,
         val suppliers: List<NativeOwnerSupplierRow> = emptyList(),
         val suppliersLoading: Boolean = false,
@@ -174,6 +176,8 @@ class NativeOwnerMoreViewModel(
             productArchiving = false,
             customersError = null,
             customerDetail = null,
+            customerCreateOpen = false,
+            customerCreating = false,
             suppliersError = null,
             supplierDetail = null,
             employeesError = null,
@@ -205,6 +209,8 @@ class NativeOwnerMoreViewModel(
             productsError = null,
             customersLoading = false,
             customerDetail = null,
+            customerCreateOpen = false,
+            customerCreating = false,
             customersError = null,
             suppliersLoading = false,
             supplierDetail = null,
@@ -454,6 +460,8 @@ class NativeOwnerMoreViewModel(
             destination = NativeOwnerMoreDestination.Customers,
             customersLoading = true,
             customerDetail = null,
+            customerCreateOpen = false,
+            customerCreating = false,
             customersError = null,
             productsLoading = false,
             productDetail = null,
@@ -493,7 +501,13 @@ class NativeOwnerMoreViewModel(
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.Customers) return
-        _state.value = current.copy(customersLoading = true, customersError = null, customerDetail = null)
+        _state.value = current.copy(
+            customersLoading = true,
+            customersError = null,
+            customerDetail = null,
+            customerCreateOpen = false,
+            customerCreating = false,
+        )
         scope.launch {
             try {
                 val snapshot = withContext(Dispatchers.IO) { customersFacade.loadCustomers(session) }
@@ -514,7 +528,12 @@ class NativeOwnerMoreViewModel(
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.Customers) return
-        _state.value = current.copy(customersLoading = true, customersError = null)
+        _state.value = current.copy(
+            customersLoading = true,
+            customersError = null,
+            customerCreateOpen = false,
+            customerCreating = false,
+        )
         scope.launch {
             try {
                 val detail = withContext(Dispatchers.IO) {
@@ -538,6 +557,53 @@ class NativeOwnerMoreViewModel(
         _state.value = current.copy(customerDetail = null, customersError = null, customersLoading = false)
     }
 
+    fun openCustomerCreate() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Customers) return
+        _state.value = current.copy(
+            customerCreateOpen = true,
+            customerCreating = false,
+            customerDetail = null,
+            customersError = null,
+            customersLoading = false,
+        )
+    }
+
+    fun clearCustomerCreate() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            customerCreateOpen = false,
+            customerCreating = false,
+            customersError = null,
+        )
+    }
+
+    fun createCustomer(name: String) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Customers || !current.customerCreateOpen) return
+        if (current.customerCreating) return
+        _state.value = current.copy(customerCreating = true, customersError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) { customersFacade.createCustomer(session, name) }
+                val snapshot = withContext(Dispatchers.IO) { customersFacade.loadCustomers(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Customers) return@launch
+                _state.value = latest.copy(
+                    customers = snapshot.customers,
+                    customerCreateOpen = false,
+                    customerCreating = false,
+                    customersError = null,
+                    customerDetail = null,
+                    customersLoading = false,
+                )
+            } catch (error: Throwable) {
+                handleCustomersFailure(error)
+            }
+        }
+    }
+
     fun openSuppliers() {
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
@@ -556,6 +622,8 @@ class NativeOwnerMoreViewModel(
             productsError = null,
             customersLoading = false,
             customerDetail = null,
+            customerCreateOpen = false,
+            customerCreating = false,
             customersError = null,
             employeesLoading = false,
             employeeDetail = null,
@@ -647,6 +715,8 @@ class NativeOwnerMoreViewModel(
             productsError = null,
             customersLoading = false,
             customerDetail = null,
+            customerCreateOpen = false,
+            customerCreating = false,
             customersError = null,
             suppliersLoading = false,
             supplierDetail = null,
@@ -755,6 +825,8 @@ class NativeOwnerMoreViewModel(
             productsError = null,
             customersLoading = false,
             customerDetail = null,
+            customerCreateOpen = false,
+            customerCreating = false,
             customersError = null,
             suppliersLoading = false,
             supplierDetail = null,
@@ -875,6 +947,8 @@ class NativeOwnerMoreViewModel(
             productsError = null,
             customersLoading = false,
             customerDetail = null,
+            customerCreateOpen = false,
+            customerCreating = false,
             customersError = null,
             suppliersLoading = false,
             supplierDetail = null,
@@ -954,6 +1028,8 @@ class NativeOwnerMoreViewModel(
             productsError = null,
             customersLoading = false,
             customerDetail = null,
+            customerCreateOpen = false,
+            customerCreating = false,
             customersError = null,
             suppliersLoading = false,
             supplierDetail = null,
@@ -1061,6 +1137,8 @@ class NativeOwnerMoreViewModel(
             productsError = null,
             customersLoading = false,
             customerDetail = null,
+            customerCreateOpen = false,
+            customerCreating = false,
             customersError = null,
             suppliersLoading = false,
             supplierDetail = null,
@@ -1180,6 +1258,8 @@ class NativeOwnerMoreViewModel(
             productsError = null,
             customersLoading = false,
             customerDetail = null,
+            customerCreateOpen = false,
+            customerCreating = false,
             customersError = null,
             suppliersLoading = false,
             supplierDetail = null,
@@ -1258,6 +1338,8 @@ class NativeOwnerMoreViewModel(
             productsError = null,
             customersLoading = false,
             customerDetail = null,
+            customerCreateOpen = false,
+            customerCreating = false,
             customersError = null,
             suppliersLoading = false,
             supplierDetail = null,
@@ -1432,6 +1514,7 @@ class NativeOwnerMoreViewModel(
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         _state.value = current.copy(
             customersLoading = false,
+            customerCreating = false,
             customersError = publicMessage(error),
         )
     }

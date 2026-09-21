@@ -102,6 +102,26 @@ class NativeOwnerCustomersFacadeTest {
     }
 
     @Test
+    fun createCustomerThenListContains() = runBlocking {
+        val accountId = facade.createCustomer(ownerSession, "Owner Create Cafe")
+        val snapshot = facade.loadCustomers(ownerSession)
+        assertTrue(
+            snapshot.customers.any {
+                it.accountId == accountId && it.name == "Owner Create Cafe"
+            },
+        )
+        val created = snapshot.customers.first { it.accountId == accountId }
+        assertEquals("Active", created.statusLabel)
+        assertTrue(created.balanceLabel.contains("PKR"))
+    }
+
+    @Test
+    fun createCustomerRejectsNonOwner() = runBlocking {
+        val rejected = runCatching { facade.createCustomer(cashierSession, "Blocked Customer") }
+        assertTrue(rejected.isFailure)
+    }
+
+    @Test
     fun loadRejectsNonOwner() = runBlocking {
         val rejected = runCatching { facade.loadCustomers(cashierSession) }
         assertTrue(rejected.isFailure)

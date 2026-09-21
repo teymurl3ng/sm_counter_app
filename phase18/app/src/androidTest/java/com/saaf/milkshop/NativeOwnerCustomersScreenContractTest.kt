@@ -3,12 +3,14 @@ package com.saaf.milkshop
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.owner.NativeOwnerCustomerDetail
@@ -96,14 +98,40 @@ class NativeOwnerCustomersScreenContractTest {
     }
 
     @Test
-    fun createPreviewSurfacesNotice() {
-        var preview = false
+    fun addCustomerOpensCreateForm() {
+        var opened = false
         setScreen(
             customers = listOf(sampleCustomer()),
-            onCreatePreview = { preview = true },
+            onOpenCreate = { opened = true },
         )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersCreatePreview).performClick()
-        assertTrue(preview)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersCreateOpen).performClick()
+        assertTrue(opened)
+    }
+
+    @Test
+    fun createFormShowsFieldsAndSave() {
+        var saved: String? = null
+        setScreen(
+            customers = listOf(sampleCustomer()),
+            customerCreateOpen = true,
+            onCreateCustomer = { saved = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersCreateForm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersCreateName)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertDoesNotExist()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersCreateName)
+            .performScrollTo()
+            .performTextReplacement("Fresh Route Cafe")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersCreateSave)
+            .performScrollTo()
+            .assertIsEnabled()
+            .performClick()
+
+        assertEquals("Fresh Route Cafe", saved)
     }
 
     @Test
@@ -122,12 +150,16 @@ class NativeOwnerCustomersScreenContractTest {
         customers: List<NativeOwnerCustomerRow>,
         customersLoading: Boolean = false,
         customerDetail: NativeOwnerCustomerDetail? = null,
+        customerCreateOpen: Boolean = false,
+        customerCreating: Boolean = false,
         customersError: String? = null,
         onBackToMenu: () -> Unit = {},
         onRetry: () -> Unit = {},
         onOpenCustomer: (Long) -> Unit = {},
         onBackFromDetail: () -> Unit = {},
-        onCreatePreview: () -> Unit = {},
+        onOpenCreate: () -> Unit = {},
+        onBackFromCreate: () -> Unit = {},
+        onCreateCustomer: (String) -> Unit = {},
         onNavigate: (OwnerSection) -> Unit = {},
     ) {
         composeRule.setContent {
@@ -149,12 +181,16 @@ class NativeOwnerCustomersScreenContractTest {
                     customers = customers,
                     customersLoading = customersLoading,
                     customerDetail = customerDetail,
+                    customerCreateOpen = customerCreateOpen,
+                    customerCreating = customerCreating,
                     customersError = customersError,
                     onBackToMenu = onBackToMenu,
                     onRetry = onRetry,
                     onOpenCustomer = onOpenCustomer,
                     onBackFromDetail = onBackFromDetail,
-                    onCreatePreview = onCreatePreview,
+                    onOpenCreate = onOpenCreate,
+                    onBackFromCreate = onBackFromCreate,
+                    onCreateCustomer = onCreateCustomer,
                     onNavigate = onNavigate,
                 )
             }

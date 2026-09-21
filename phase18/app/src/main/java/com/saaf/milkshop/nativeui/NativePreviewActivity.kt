@@ -792,6 +792,8 @@ private fun NativeFoundationPreview(
                     activityViewModel = activityViewModel,
                     moreState = moreState,
                     moreViewModel = moreViewModel,
+                    expenseState = expenseState,
+                    expenseViewModel = expenseViewModel,
                     onLeaveToWelcome = { leaveToWelcome() },
                     onLeaveToAccountPicker = { leaveToAccountPicker() },
                     onShowNotice = { showPreviewNotice(it) },

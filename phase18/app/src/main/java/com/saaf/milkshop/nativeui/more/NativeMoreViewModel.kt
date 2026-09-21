@@ -20,6 +20,7 @@ import kotlinx.coroutines.withContext
 enum class NativeMoreDestination {
     Menu,
     CountCash,
+    Expense,
     PersonalSecurity,
 }
 
@@ -71,6 +72,17 @@ class NativeMoreViewModel(
         _state.value = current.copy(
             destination = NativeMoreDestination.CountCash,
             countReceipt = null,
+            error = null,
+            saving = false,
+        )
+    }
+
+    fun openExpense() {
+        val current = _state.value as? NativeMoreState.Ready ?: return
+        _state.value = current.copy(
+            destination = NativeMoreDestination.Expense,
+            countReceipt = null,
+            confirmRemoveUnlock = false,
             error = null,
             saving = false,
         )

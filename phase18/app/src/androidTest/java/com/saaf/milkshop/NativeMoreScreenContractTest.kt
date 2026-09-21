@@ -41,6 +41,7 @@ class NativeMoreScreenContractTest {
     fun menuShowsCashierActionsAndKeepsMoreNavSelected() {
         setScreen(NativeMoreState.Ready(context = openContext()))
         composeRule.onNodeWithTag(NativeUiTags.MoreMenu).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.MoreExpense).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.MoreCountCash).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.MorePersonalSecurity).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.MoreSwitchAccount).assertIsDisplayed()
@@ -107,6 +108,17 @@ class NativeMoreScreenContractTest {
     }
 
     @Test
+    fun menuOpensExpenseEntry() {
+        var opened = false
+        setScreen(
+            NativeMoreState.Ready(context = openContext()),
+            onOpenExpense = { opened = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.MoreExpense).performClick()
+        assertTrue(opened)
+    }
+
+    @Test
     fun switchAccountAndSignOutFireFromMenu() {
         var switched = false
         var signedOut = false
@@ -154,6 +166,7 @@ class NativeMoreScreenContractTest {
         state: NativeMoreState,
         onRetry: () -> Unit = {},
         onOpenCountCash: () -> Unit = {},
+        onOpenExpense: () -> Unit = {},
         onRecordCashCount: (Long, String?) -> Unit = { _, _ -> },
         onSwitchAccount: () -> Unit = {},
         onSignOut: () -> Unit = {},
@@ -162,6 +175,7 @@ class NativeMoreScreenContractTest {
             stateProvider = { state },
             onRetry = onRetry,
             onOpenCountCash = onOpenCountCash,
+            onOpenExpense = onOpenExpense,
             onRecordCashCount = onRecordCashCount,
             onSwitchAccount = onSwitchAccount,
             onSignOut = onSignOut,
@@ -172,6 +186,7 @@ class NativeMoreScreenContractTest {
         stateProvider: () -> NativeMoreState,
         onRetry: () -> Unit = {},
         onOpenCountCash: () -> Unit = {},
+        onOpenExpense: () -> Unit = {},
         onRecordCashCount: (Long, String?) -> Unit = { _, _ -> },
         onSwitchAccount: () -> Unit = {},
         onSignOut: () -> Unit = {},
@@ -185,6 +200,7 @@ class NativeMoreScreenContractTest {
                     state = state,
                     onRetry = onRetry,
                     onOpenCountCash = onOpenCountCash,
+                    onOpenExpense = onOpenExpense,
                     onOpenPersonalSecurity = {},
                     onBackToMenu = {},
                     onRecordCashCount = onRecordCashCount,

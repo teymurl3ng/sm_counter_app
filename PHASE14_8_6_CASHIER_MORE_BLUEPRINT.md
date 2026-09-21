@@ -69,7 +69,8 @@ Add a presentation-neutral `NativeMoreFacade` (and thin ViewModel):
 
 ## Out of scope
 
-- Expense, Deliveries, day close / reopen UI (even though Cashier has `CASH_COUNT_AND_CLOSE`)
+- Deliveries, day close / reopen UI (even though Cashier has `CASH_COUNT_AND_CLOSE`)
+- Expense is connected in Phase 14.8.31 as Cashier More → `CashierExpenseEntryScreen` (CORE METHOD; shared content)
 - Showing expected cash, variance, or shop-wide reconciliation archive
 - Changing passphrase from More (full passphrase change remains a later personal-security deepening if needed)
 - Owner/Admin/Manager/Operator More shells

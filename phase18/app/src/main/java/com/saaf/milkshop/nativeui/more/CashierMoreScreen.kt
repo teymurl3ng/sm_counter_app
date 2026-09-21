@@ -23,6 +23,7 @@ import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.outlined.Payments
+import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -72,6 +73,7 @@ fun CashierMoreScreen(
     state: NativeMoreState,
     onRetry: () -> Unit,
     onOpenCountCash: () -> Unit,
+    onOpenExpense: () -> Unit,
     onOpenPersonalSecurity: () -> Unit,
     onBackToMenu: () -> Unit,
     onRecordCashCount: (Long, String?) -> Unit,
@@ -105,6 +107,7 @@ fun CashierMoreScreen(
                     identity = identity,
                     state = state,
                     onOpenCountCash = onOpenCountCash,
+                    onOpenExpense = onOpenExpense,
                     onOpenPersonalSecurity = onOpenPersonalSecurity,
                     onSwitchAccount = onSwitchAccount,
                     onSignOut = onSignOut,
@@ -120,6 +123,10 @@ fun CashierMoreScreen(
                     onNavigate = onNavigate,
                     modifier = modifier,
                 )
+                NativeMoreDestination.Expense -> {
+                    // Hosted by CashierPreviewHost via CashierExpenseEntryScreen.
+                    MoreLoadingScreen(snackbarHostState, onNavigate, modifier)
+                }
                 NativeMoreDestination.PersonalSecurity -> MorePersonalSecurityScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -201,6 +208,7 @@ private fun MoreMenuScreen(
     identity: NativeSignedInIdentity,
     state: NativeMoreState.Ready,
     onOpenCountCash: () -> Unit,
+    onOpenExpense: () -> Unit,
     onOpenPersonalSecurity: () -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
@@ -216,6 +224,19 @@ private fun MoreMenuScreen(
                     .verticalScroll(rememberScrollState())
                     .testTag(NativeUiTags.MoreMenu),
             ) {
+                MoreMenuRow(
+                    icon = Icons.Outlined.ReceiptLong,
+                    title = "Expense",
+                    subtitle = if (state.context.postingOpen) {
+                        "Record shop spending from Cash or Bank"
+                    } else {
+                        "Day is closed — posting disabled"
+                    },
+                    enabled = state.context.postingOpen,
+                    tag = NativeUiTags.MoreExpense,
+                    onClick = onOpenExpense,
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 MoreMenuRow(
                     icon = Icons.Outlined.Payments,
                     title = "Count cash",

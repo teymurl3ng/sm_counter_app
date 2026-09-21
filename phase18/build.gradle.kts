@@ -70,8 +70,12 @@ val screenClassMap = mapOf(
     "more" to listOf(
         "com.saaf.milkshop.NativeMoreFacadeTest",
         "com.saaf.milkshop.NativeMoreScreenContractTest",
+        "com.saaf.milkshop.NativeCashierExpenseScreenContractTest",
+        "com.saaf.milkshop.NativeExpenseFacadeTest",
         "com.saaf.milkshop.NativeFoundationUiTest#everyBottomDestinationProvidesItsDefinedPreviewResponse",
         "com.saaf.milkshop.NativeFoundationUiTest#moreMenuHardwareBackReturnsToSellAndKeepsSession",
+        "com.saaf.milkshop.NativeFoundationUiTest#cashierExpenseOpensUnderCashierChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#cashierExpenseHardwareBackReturnsToMoreMenu",
         "com.saaf.milkshop.NativeFoundationUiTest#switchAccountHardwareBackKeepsSessionAndReturnsToMore",
         "com.saaf.milkshop.NativeFoundationUiTest#switchAccountUiBackKeepsSessionAndReturnsToMore",
     ),

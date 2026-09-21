@@ -23,6 +23,9 @@ import com.saaf.milkshop.nativeui.activity.NativeActivityViewModel
 import com.saaf.milkshop.nativeui.collection.CashierCollectionScreen
 import com.saaf.milkshop.nativeui.collection.NativeCollectionState
 import com.saaf.milkshop.nativeui.collection.NativeCollectionViewModel
+import com.saaf.milkshop.nativeui.expense.NativeExpenseState
+import com.saaf.milkshop.nativeui.expense.NativeExpenseViewModel
+import com.saaf.milkshop.nativeui.more.CashierExpenseEntryScreen
 import com.saaf.milkshop.nativeui.more.CashierMoreScreen
 import com.saaf.milkshop.nativeui.more.NativeMoreDestination
 import com.saaf.milkshop.nativeui.more.NativeMoreState
@@ -54,6 +57,8 @@ fun CashierPreviewHost(
     activityViewModel: NativeActivityViewModel,
     moreState: NativeMoreState,
     moreViewModel: NativeMoreViewModel,
+    expenseState: NativeExpenseState,
+    expenseViewModel: NativeExpenseViewModel,
     onLeaveToWelcome: () -> Unit,
     onLeaveToAccountPicker: () -> Unit,
     onShowNotice: (String) -> Unit,
@@ -101,10 +106,30 @@ fun CashierPreviewHost(
         ) {
             if (!sampleReady) return@LaunchedEffect
             when (cashierSection) {
-                CashierSection.Sell -> saleViewModel.open(sessionHandle)
-                CashierSection.Collect -> collectionViewModel.open(sessionHandle)
-                CashierSection.Activity -> Unit
+                CashierSection.Sell -> {
+                    expenseViewModel.close()
+                    saleViewModel.open(sessionHandle)
+                }
+                CashierSection.Collect -> {
+                    expenseViewModel.close()
+                    collectionViewModel.open(sessionHandle)
+                }
+                CashierSection.Activity -> expenseViewModel.close()
                 CashierSection.More -> moreViewModel.open(sessionHandle)
+            }
+        }
+        LaunchedEffect(
+            sessionHandle,
+            cashierSection,
+            sampleReady,
+            (moreState as? NativeMoreState.Ready)?.destination,
+        ) {
+            if (!sampleReady || cashierSection != CashierSection.More) return@LaunchedEffect
+            val destination = (moreState as? NativeMoreState.Ready)?.destination
+            if (destination == NativeMoreDestination.Expense) {
+                expenseViewModel.open(sessionHandle)
+            } else {
+                expenseViewModel.close()
             }
         }
         BackHandler {
@@ -130,10 +155,13 @@ fun CashierPreviewHost(
                 }
                 CashierSection.More -> {
                     val ready = moreState as? NativeMoreState.Ready
-                    if (ready != null && ready.destination != NativeMoreDestination.Menu) {
+                    if (ready != null && ready.destination == NativeMoreDestination.Expense) {
+                        // CashierExpenseEntryScreen owns Back + leave-guard.
+                    } else if (ready != null && ready.destination != NativeMoreDestination.Menu) {
                         moreViewModel.backToMenu()
                     } else {
                         moreViewModel.close()
+                        expenseViewModel.close()
                         onCashierSectionChange(CashierSection.Sell)
                     }
                 }
@@ -223,24 +251,54 @@ fun CashierPreviewHost(
                 },
                 onNavigate = navigateCashier,
             )
-            CashierSection.More -> CashierMoreScreen(
-                snackbarHostState = snackbarHostState,
-                identity = identity,
-                state = moreState,
-                onRetry = moreViewModel::refresh,
-                onOpenCountCash = moreViewModel::openCountCash,
-                onOpenPersonalSecurity = moreViewModel::openPersonalSecurity,
-                onBackToMenu = moreViewModel::backToMenu,
-                onRecordCashCount = moreViewModel::recordCashCount,
-                onRequestRemoveQuickUnlock = moreViewModel::requestRemoveQuickUnlock,
-                onCancelRemoveQuickUnlock = moreViewModel::cancelRemoveQuickUnlock,
-                onRemoveQuickUnlock = moreViewModel::removeQuickUnlock,
-                onEnrollQuickPin = moreViewModel::enrollQuickPin,
-                onEnrollPhoneSecurity = moreViewModel::enrollPhoneSecurity,
-                onSwitchAccount = onLeaveToAccountPicker,
-                onSignOut = onLeaveToWelcome,
-                onNavigate = navigateCashier,
-            )
+            CashierSection.More -> {
+                val moreReady = moreState as? NativeMoreState.Ready
+                if (moreReady?.destination == NativeMoreDestination.Expense) {
+                    CashierExpenseEntryScreen(
+                        snackbarHostState = snackbarHostState,
+                        identity = identity,
+                        state = expenseState,
+                        onRetry = expenseViewModel::refresh,
+                        onRecordExpense = expenseViewModel::record,
+                        onRecordAnother = expenseViewModel::recordAnother,
+                        onBackToMore = {
+                            expenseViewModel.close()
+                            moreViewModel.backToMenu()
+                        },
+                        onNavigate = { section ->
+                            expenseViewModel.close()
+                            moreViewModel.backToMenu()
+                            navigateCashier(section)
+                        },
+                    )
+                } else {
+                    CashierMoreScreen(
+                        snackbarHostState = snackbarHostState,
+                        identity = identity,
+                        state = moreState,
+                        onRetry = moreViewModel::refresh,
+                        onOpenCountCash = moreViewModel::openCountCash,
+                        onOpenExpense = {
+                            moreViewModel.openExpense()
+                            expenseViewModel.open(sessionHandle)
+                        },
+                        onOpenPersonalSecurity = moreViewModel::openPersonalSecurity,
+                        onBackToMenu = {
+                            expenseViewModel.close()
+                            moreViewModel.backToMenu()
+                        },
+                        onRecordCashCount = moreViewModel::recordCashCount,
+                        onRequestRemoveQuickUnlock = moreViewModel::requestRemoveQuickUnlock,
+                        onCancelRemoveQuickUnlock = moreViewModel::cancelRemoveQuickUnlock,
+                        onRemoveQuickUnlock = moreViewModel::removeQuickUnlock,
+                        onEnrollQuickPin = moreViewModel::enrollQuickPin,
+                        onEnrollPhoneSecurity = moreViewModel::enrollPhoneSecurity,
+                        onSwitchAccount = onLeaveToAccountPicker,
+                        onSignOut = onLeaveToWelcome,
+                        onNavigate = navigateCashier,
+                    )
+                }
+            }
         }
     }
 }

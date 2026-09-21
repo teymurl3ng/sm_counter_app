@@ -1222,6 +1222,33 @@ class NativeFoundationUiTest {
     }
 
     @Test
+    fun cashierExpenseOpensUnderCashierChrome() {
+        openCashierExpense()
+        composeRule.onNodeWithTag(NativeUiTags.CashierExpenseEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertIsSelected()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavMore).assertDoesNotExist()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
+    fun cashierExpenseHardwareBackReturnsToMoreMenu() {
+        openCashierExpense()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+            activity.onBackPressedDispatcher.onBackPressed()
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+        waitForMoreMenu()
+        composeRule.onNodeWithTag(NativeUiTags.MoreMenu).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertIsSelected()
+        composeRule.onNodeWithTag(NativeUiTags.CashierExpenseEntryRoot).assertDoesNotExist()
+    }
+
+    @Test
     fun switchAccountHardwareBackKeepsSessionAndReturnsToMore() {
         openCashier()
         openMoreMenu()
@@ -2011,6 +2038,18 @@ class NativeFoundationUiTest {
     private fun openMoreMenu() {
         composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).performClick()
         waitForMoreMenu()
+    }
+
+    private fun openCashierExpense() {
+        openCashier()
+        openMoreMenu()
+        composeRule.onNodeWithTag(NativeUiTags.MoreExpense).performClick()
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.CashierExpenseEntryRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.CashierExpenseEntryRoot).assertIsDisplayed()
     }
 
     private fun waitForMoreMenu() {

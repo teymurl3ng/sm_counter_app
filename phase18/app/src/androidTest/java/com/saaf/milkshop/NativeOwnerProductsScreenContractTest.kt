@@ -3,17 +3,21 @@ package com.saaf.milkshop
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
 import com.saaf.milkshop.application.owner.NativeOwnerProductDetail
 import com.saaf.milkshop.application.owner.NativeOwnerProductRow
 import com.saaf.milkshop.domain.AppRole
+import com.saaf.milkshop.domain.ProductCatalogInput
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.owner.OwnerProductsScreen
@@ -87,14 +91,58 @@ class NativeOwnerProductsScreenContractTest {
     }
 
     @Test
-    fun createPreviewSurfacesNotice() {
-        var preview = false
+    fun addProductOpensCreateForm() {
+        var opened = false
         setScreen(
             products = listOf(sampleProduct()),
-            onCreatePreview = { preview = true },
+            onOpenCreate = { opened = true },
         )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsCreatePreview).performClick()
-        assertTrue(preview)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsCreateOpen).performClick()
+        assertTrue(opened)
+    }
+
+    @Test
+    fun createFormShowsFieldsAndSave() {
+        var saved: ProductCatalogInput? = null
+        setScreen(
+            products = listOf(sampleProduct()),
+            productCreateOpen = true,
+            onCreateProduct = { saved = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsCreateForm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsCreateName)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsCreateUnitLiters).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsCreateUnitKg).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsCreateRate)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsCreateTracking)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsCreateNotes)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertDoesNotExist()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsCreateName)
+            .performScrollTo()
+            .performTextReplacement("Fresh Cream")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsCreateUnitKg).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsCreateRate)
+            .performScrollTo()
+            .performTextReplacement("450")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsCreateSave)
+            .performScrollTo()
+            .assertIsEnabled()
+            .performClick()
+
+        assertEquals("Fresh Cream", saved!!.name)
+        assertEquals("Kg", saved!!.unit)
+        assertEquals(450.0, saved!!.defaultSaleRate!!, 0.001)
+        assertTrue(saved!!.inventoryTracking)
     }
 
     @Test
@@ -113,12 +161,16 @@ class NativeOwnerProductsScreenContractTest {
         products: List<NativeOwnerProductRow>,
         productsLoading: Boolean = false,
         productDetail: NativeOwnerProductDetail? = null,
+        productCreateOpen: Boolean = false,
+        productCreating: Boolean = false,
         productsError: String? = null,
         onBackToMenu: () -> Unit = {},
         onRetry: () -> Unit = {},
         onOpenProduct: (Long) -> Unit = {},
         onBackFromDetail: () -> Unit = {},
-        onCreatePreview: () -> Unit = {},
+        onOpenCreate: () -> Unit = {},
+        onBackFromCreate: () -> Unit = {},
+        onCreateProduct: (ProductCatalogInput) -> Unit = {},
         onNavigate: (OwnerSection) -> Unit = {},
     ) {
         composeRule.setContent {
@@ -140,12 +192,16 @@ class NativeOwnerProductsScreenContractTest {
                     products = products,
                     productsLoading = productsLoading,
                     productDetail = productDetail,
+                    productCreateOpen = productCreateOpen,
+                    productCreating = productCreating,
                     productsError = productsError,
                     onBackToMenu = onBackToMenu,
                     onRetry = onRetry,
                     onOpenProduct = onOpenProduct,
                     onBackFromDetail = onBackFromDetail,
-                    onCreatePreview = onCreatePreview,
+                    onOpenCreate = onOpenCreate,
+                    onBackFromCreate = onBackFromCreate,
+                    onCreateProduct = onCreateProduct,
                     onNavigate = onNavigate,
                 )
             }

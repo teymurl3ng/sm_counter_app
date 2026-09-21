@@ -9,11 +9,12 @@ Branch: `fix/native-shell-vs-content-owner-work`
 |---|---|
 | Cashier (`Sell / Collect / Activity / More` + Expense host) | **Done** |
 | Operations | **Done** |
-| Owner primary nav + Work entries + More deep dirs + Month reports + Reopen day | **Done** (read slices / money posts + Cash close reopen depth) |
-| Manager·Admin / More write-depth | **Left** |
+| Owner primary nav + Work entries + More deep dirs + Month reports + Reopen day + Products create | **Done** (read slices / money posts + Cash close reopen + first More write depth) |
+| Manager·Admin / remaining More write-depth | **Left** |
 
 ## Done (recent)
 
+- **14.8.34** Owner Products create — write depth inside Products (`ProductCatalogService.create`)
 - **14.8.33** Owner Reopen day — depth inside Cash count and close (`REOPEN_DAY` + full passphrase re-auth)
 - **14.8.32** Owner Month reports — Overview nested destination; `profitabilityReport` read panel
 - **14.8.27–30** Owner Work money (Expense…Cash close)
@@ -22,14 +23,14 @@ Branch: `fix/native-shell-vs-content-owner-work`
 
 ## Deferred depth
 
-- More write UIs; Manager/Admin shells; Cashier Deliveries-from-More; custom report date range
+- Remaining More write UIs (edit/archive Products; Customers/Suppliers/… create); Manager/Admin shells; Cashier Deliveries-from-More; custom report date range
 
 ## Recommended next
 
-1. More write depth  
+1. Next More write-depth slice (e.g. Customers create or Products edit)
 2. Manager / Admin shells  
 
 ## Authority
 
-- Owner/Cashier blueprints through `PHASE14_8_33`  
+- Owner/Cashier blueprints through `PHASE14_8_34`  
 - `.cursor/rules/native-shell-vs-content.mdc`

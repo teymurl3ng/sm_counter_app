@@ -66,7 +66,7 @@ This checkpoint owns **Owner More home** conservatively: sectioned menu matching
 1. An Owner signs in (preview harness: `open_owner=true`) and opens **More** from Owner navigation.
 2. Header matches Owner chrome: title **More**, shop/identity line, business date, Open/Closed. Do not paste Cashier or Ops More header/nav.
 3. First viewport is the sectioned More landing (journey groups):
-   - **Things you sell** — Products (**connected in 14.8.18** — list + read detail; was preview in 14.8.17)
+   - **Things you sell** — Products (**connected in 14.8.18** — list + read detail; **create in 14.8.34**)
    - **People and businesses** — Customers (**connected in 14.8.19** — list + read detail); Suppliers (**connected in 14.8.20** — list + read detail); Employees (**connected in 14.8.21** — list + read detail)
    - **Planning and setup** — Costing & plans (**connected in 14.8.22** — policy list + read detail); Shop settings (**connected in 14.8.23** — read panel; edit deferred)
    - **Your account and staff access** — Personal security (connected Quick unlock); Users & roles (**connected in 14.8.24** — list + read detail; enroll deferred); Security history (**connected in 14.8.25** — list + read detail)
@@ -90,7 +90,7 @@ This checkpoint owns **Owner More home** conservatively: sectioned menu matching
 
 ### Explicit preview / deferred (do not invent these UIs here)
 
-- Products master-data editor — **connected in Phase 14.8.18** as active list + read detail under Owner More (create/edit remain deferred there unless explicitly proven)
+- Products master-data editor — **connected in Phase 14.8.18** as active list + read detail under Owner More; **create write depth in Phase 14.8.34**; edit/archive remain deferred there
 - Customers directory — **connected in Phase 14.8.19** as list + read detail under Owner More (create/edit remain deferred there)
 - Suppliers directory — **connected in Phase 14.8.20** as list + read detail under Owner More (create/edit remain deferred there)
 - Employees directory — **connected in Phase 14.8.21** as list + read detail under Owner More (create/edit remain deferred there; distinct from Users & roles)
@@ -108,7 +108,7 @@ This checkpoint owns **Owner More home** conservatively: sectioned menu matching
 |---|---|---|---|
 | More nav | Open Owner More home | Sectioned menu; Owner nav selected | Destination asserted; preview notice gone |
 | Personal security | Open Quick unlock manage | Status + enroll/remove controls | Destination + tags |
-| Products row | Open Owner Products | Active list under Owner More | Connected in 14.8.18 |
+| Products row | Open Owner Products | Active list + create under Owner More | Connected in 14.8.18 / create 14.8.34 |
 | Customers row | Open Owner Customers | Customer list under Owner More | Connected in 14.8.19 |
 | Suppliers row | Open Owner Suppliers | Supplier list under Owner More | Connected in 14.8.20 |
 | Employees row | Open Owner Employees | Employee list under Owner More | Connected in 14.8.21 |

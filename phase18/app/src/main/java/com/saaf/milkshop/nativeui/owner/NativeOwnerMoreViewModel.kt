@@ -28,6 +28,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerSupplierDetail
 import com.saaf.milkshop.application.owner.NativeOwnerSupplierRow
 import com.saaf.milkshop.application.owner.NativeOwnerSuppliersFacade
 import com.saaf.milkshop.application.owner.NativeOwnerUserDetail
+import com.saaf.milkshop.domain.ProductCatalogInput
 import com.saaf.milkshop.application.owner.NativeOwnerUserRow
 import com.saaf.milkshop.application.owner.NativeOwnerUsersRolesFacade
 import com.saaf.milkshop.domain.SecurityFailure
@@ -65,6 +66,8 @@ sealed interface NativeOwnerMoreState {
         val products: List<NativeOwnerProductRow> = emptyList(),
         val productsLoading: Boolean = false,
         val productDetail: NativeOwnerProductDetail? = null,
+        val productCreateOpen: Boolean = false,
+        val productCreating: Boolean = false,
         val productsError: String? = null,
         val customers: List<NativeOwnerCustomerRow> = emptyList(),
         val customersLoading: Boolean = false,
@@ -161,6 +164,8 @@ class NativeOwnerMoreViewModel(
             saving = false,
             productsError = null,
             productDetail = null,
+            productCreateOpen = false,
+            productCreating = false,
             customersError = null,
             customerDetail = null,
             suppliersError = null,
@@ -186,6 +191,8 @@ class NativeOwnerMoreViewModel(
             destination = NativeOwnerMoreDestination.Products,
             productsLoading = true,
             productDetail = null,
+            productCreateOpen = false,
+            productCreating = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -220,7 +227,13 @@ class NativeOwnerMoreViewModel(
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.Products) return
-        _state.value = current.copy(productsLoading = true, productsError = null, productDetail = null)
+        _state.value = current.copy(
+            productsLoading = true,
+            productsError = null,
+            productDetail = null,
+            productCreateOpen = false,
+            productCreating = false,
+        )
         scope.launch {
             try {
                 val snapshot = withContext(Dispatchers.IO) { productsFacade.loadProducts(session) }
@@ -241,7 +254,12 @@ class NativeOwnerMoreViewModel(
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.Products) return
-        _state.value = current.copy(productsLoading = true, productsError = null)
+        _state.value = current.copy(
+            productsLoading = true,
+            productsError = null,
+            productCreateOpen = false,
+            productCreating = false,
+        )
         scope.launch {
             try {
                 val detail = withContext(Dispatchers.IO) {
@@ -265,6 +283,53 @@ class NativeOwnerMoreViewModel(
         _state.value = current.copy(productDetail = null, productsError = null, productsLoading = false)
     }
 
+    fun openProductCreate() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Products) return
+        _state.value = current.copy(
+            productCreateOpen = true,
+            productCreating = false,
+            productDetail = null,
+            productsError = null,
+            productsLoading = false,
+        )
+    }
+
+    fun clearProductCreate() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            productCreateOpen = false,
+            productCreating = false,
+            productsError = null,
+        )
+    }
+
+    fun createProduct(input: ProductCatalogInput) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Products || !current.productCreateOpen) return
+        if (current.productCreating) return
+        _state.value = current.copy(productCreating = true, productsError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) { productsFacade.createProduct(session, input) }
+                val snapshot = withContext(Dispatchers.IO) { productsFacade.loadProducts(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Products) return@launch
+                _state.value = latest.copy(
+                    products = snapshot.products,
+                    productCreateOpen = false,
+                    productCreating = false,
+                    productsError = null,
+                    productDetail = null,
+                    productsLoading = false,
+                )
+            } catch (error: Throwable) {
+                handleProductsFailure(error)
+            }
+        }
+    }
+
     fun openCustomers() {
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
@@ -275,6 +340,8 @@ class NativeOwnerMoreViewModel(
             customersError = null,
             productsLoading = false,
             productDetail = null,
+            productCreateOpen = false,
+            productCreating = false,
             productsError = null,
             suppliersLoading = false,
             supplierDetail = null,
@@ -361,6 +428,8 @@ class NativeOwnerMoreViewModel(
             suppliersError = null,
             productsLoading = false,
             productDetail = null,
+            productCreateOpen = false,
+            productCreating = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -447,6 +516,8 @@ class NativeOwnerMoreViewModel(
             employeesError = null,
             productsLoading = false,
             productDetail = null,
+            productCreateOpen = false,
+            productCreating = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -550,6 +621,8 @@ class NativeOwnerMoreViewModel(
             costingCurrentMonthSummary = null,
             productsLoading = false,
             productDetail = null,
+            productCreateOpen = false,
+            productCreating = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -665,6 +738,8 @@ class NativeOwnerMoreViewModel(
             shopSettingsError = null,
             productsLoading = false,
             productDetail = null,
+            productCreateOpen = false,
+            productCreating = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -739,6 +814,8 @@ class NativeOwnerMoreViewModel(
             usersError = null,
             productsLoading = false,
             productDetail = null,
+            productCreateOpen = false,
+            productCreating = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -841,6 +918,8 @@ class NativeOwnerMoreViewModel(
             securityHistoryError = null,
             productsLoading = false,
             productDetail = null,
+            productCreateOpen = false,
+            productCreating = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -955,6 +1034,8 @@ class NativeOwnerMoreViewModel(
             backupError = null,
             productsLoading = false,
             productDetail = null,
+            productCreateOpen = false,
+            productCreating = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -1028,6 +1109,8 @@ class NativeOwnerMoreViewModel(
             saving = false,
             productsLoading = false,
             productDetail = null,
+            productCreateOpen = false,
+            productCreating = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -1188,6 +1271,7 @@ class NativeOwnerMoreViewModel(
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         _state.value = current.copy(
             productsLoading = false,
+            productCreating = false,
             productsError = publicMessage(error),
         )
     }

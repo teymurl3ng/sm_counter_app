@@ -91,6 +91,44 @@ class NativeOwnerProductsFacadeTest {
     }
 
     @Test
+    fun createProductThenListContains() = runBlocking {
+        val productId = facade.createProduct(
+            ownerSession,
+            ProductCatalogInput(
+                "Owner Create Milk",
+                "Liters",
+                defaultSaleRate = 95.0,
+                inventoryTracking = true,
+                notes = "Create slice",
+            ),
+        )
+        val snapshot = facade.loadProducts(ownerSession)
+        assertTrue(
+            snapshot.products.any {
+                it.productId == productId &&
+                    it.name == "Owner Create Milk" &&
+                    it.unit == "Liters"
+            },
+        )
+        val created = snapshot.products.first { it.productId == productId }
+        assertEquals("Active", created.statusLabel)
+        assertEquals("Stock tracked", created.trackingLabel)
+        assertTrue(created.rateLabel!!.contains("95"))
+        assertEquals("Create slice", created.notes)
+    }
+
+    @Test
+    fun createProductRejectsNonOwner() = runBlocking {
+        val rejected = runCatching {
+            facade.createProduct(
+                cashierSession,
+                ProductCatalogInput("Blocked Product", "Kg"),
+            )
+        }
+        assertTrue(rejected.isFailure)
+    }
+
+    @Test
     fun loadRejectsNonOwner() = runBlocking {
         val rejected = runCatching { facade.loadProducts(cashierSession) }
         assertTrue(rejected.isFailure)

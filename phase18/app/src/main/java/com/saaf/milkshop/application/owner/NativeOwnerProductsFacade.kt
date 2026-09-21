@@ -3,6 +3,7 @@ package com.saaf.milkshop.application.owner
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.AppRole
+import com.saaf.milkshop.domain.ProductCatalogInput
 import com.saaf.milkshop.domain.ProductCatalogItem
 import com.saaf.milkshop.domain.ProductCatalogService
 import com.saaf.milkshop.domain.UserSecurityService
@@ -27,7 +28,7 @@ data class NativeOwnerProductsSnapshot(
 )
 
 /**
- * Owner Products boundary: active catalog list + read detail from
+ * Owner Products boundary: active catalog list + read detail + create from
  * [ProductCatalogService]. Does not invent costing/stock formulas or call bridge JSON.
  */
 class NativeOwnerProductsFacade(
@@ -50,6 +51,14 @@ class NativeOwnerProductsFacade(
             .firstOrNull { it.productId == productId }
             ?: error("This product is not in the active catalog.")
         return NativeOwnerProductDetail(row = item.toRow())
+    }
+
+    suspend fun createProduct(
+        sessionHandle: String,
+        input: ProductCatalogInput,
+    ): Long {
+        requireOwnerMasterData(sessionHandle)
+        return catalog.create(input)
     }
 
     private suspend fun requireOwnerMasterData(sessionHandle: String) {

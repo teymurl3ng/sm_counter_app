@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.more.NativeMoreSecurityStatus
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
+import com.saaf.milkshop.domain.ProductCatalogInput
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
@@ -87,7 +88,9 @@ fun OwnerMoreScreen(
     onRetryProducts: () -> Unit,
     onOpenProduct: (Long) -> Unit,
     onBackFromProductDetail: () -> Unit,
-    onCreateProductPreview: () -> Unit,
+    onOpenProductCreate: () -> Unit,
+    onBackFromProductCreate: () -> Unit,
+    onCreateProduct: (ProductCatalogInput) -> Unit,
     onRetryCustomers: () -> Unit,
     onOpenCustomer: (Long) -> Unit,
     onBackFromCustomerDetail: () -> Unit,
@@ -209,12 +212,16 @@ fun OwnerMoreScreen(
                 products = state.products,
                 productsLoading = state.productsLoading,
                 productDetail = state.productDetail,
+                productCreateOpen = state.productCreateOpen,
+                productCreating = state.productCreating,
                 productsError = state.productsError,
                 onBackToMenu = onBackToMenu,
                 onRetry = onRetryProducts,
                 onOpenProduct = onOpenProduct,
                 onBackFromDetail = onBackFromProductDetail,
-                onCreatePreview = onCreateProductPreview,
+                onOpenCreate = onOpenProductCreate,
+                onBackFromCreate = onBackFromProductCreate,
+                onCreateProduct = onCreateProduct,
                 onNavigate = onNavigate,
                 modifier = modifier,
             )

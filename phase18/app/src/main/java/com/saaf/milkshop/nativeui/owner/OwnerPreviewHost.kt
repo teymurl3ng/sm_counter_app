@@ -553,9 +553,9 @@ fun OwnerPreviewHost(
                     onRetryProducts = ownerMoreViewModel::refreshProducts,
                     onOpenProduct = ownerMoreViewModel::openProductDetail,
                     onBackFromProductDetail = ownerMoreViewModel::clearProductDetail,
-                    onCreateProductPreview = {
-                        onShowNotice("Add product comes next in the Owner Products family.")
-                    },
+                    onOpenProductCreate = ownerMoreViewModel::openProductCreate,
+                    onBackFromProductCreate = ownerMoreViewModel::clearProductCreate,
+                    onCreateProduct = ownerMoreViewModel::createProduct,
                     onRetryCustomers = ownerMoreViewModel::refreshCustomers,
                     onOpenCustomer = ownerMoreViewModel::openCustomerDetail,
                     onBackFromCustomerDetail = ownerMoreViewModel::clearCustomerDetail,

@@ -85,6 +85,7 @@ import com.saaf.milkshop.nativeui.owner.NativeOwnerWorkDestination
 import com.saaf.milkshop.nativeui.owner.NativeOwnerWorkState
 import com.saaf.milkshop.nativeui.owner.NativeOwnerWorkViewModel
 import com.saaf.milkshop.nativeui.owner.OwnerOverviewScreen
+import com.saaf.milkshop.nativeui.owner.OwnerSaleEntryScreen
 import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.owner.OwnerWorkScreen
 import com.saaf.milkshop.nativeui.sale.CashierSaleScreen
@@ -716,6 +717,7 @@ private fun NativeFoundationPreview(
                         (ownerWorkState as? NativeOwnerWorkState.Ready)?.destination
                     val ownerEntryOwnsBack = ownerSection == OwnerSection.Work &&
                         ownerWorkDestination in setOf(
+                            NativeOwnerWorkDestination.RecordSale,
                             NativeOwnerWorkDestination.ReceiveMilk,
                             NativeOwnerWorkDestination.MakeYogurt,
                             NativeOwnerWorkDestination.RecordSpoilage,
@@ -787,15 +789,15 @@ private fun NativeFoundationPreview(
                     when {
                         ownerSection == OwnerSection.Work &&
                             ownerWorkDestination == NativeOwnerWorkDestination.RecordSale -> {
-                            CashierSaleScreen(
+                            OwnerSaleEntryScreen(
                                 snackbarHostState = snackbarHostState,
                                 identity = authenticated.identity,
                                 state = saleState,
                                 onRetry = saleViewModel::refresh,
                                 onClearFeedback = saleViewModel::clearFeedback,
                                 onRecordSale = saleViewModel::record,
-                                onLeaveConfirmed = { returnOwnerWorkHome() },
-                                onNavigate = navigateOwnerCashierEntry,
+                                onBackToWork = { returnOwnerWorkHome() },
+                                onNavigate = navigateOwner,
                             )
                         }
                         ownerSection == OwnerSection.Work &&

@@ -264,6 +264,7 @@ object NativeUiTags {
     const val OwnerWorkPaySupplierPreview = "owner_work_pay_supplier_preview"
     const val OwnerWorkPaySalaryPreview = "owner_work_pay_salary_preview"
     const val OwnerWorkCashClosePreview = "owner_work_cash_close_preview"
+    const val OwnerSaleEntryRoot = "owner_sale_entry_root"
     const val OwnerRecordsPreview = "owner_records_preview"
     const val OwnerMorePreview = "owner_more_preview"
     const val OwnerNavOverview = "owner_nav_overview"

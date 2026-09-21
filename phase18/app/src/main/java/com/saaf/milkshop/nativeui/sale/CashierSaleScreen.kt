@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -61,6 +62,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -104,6 +106,47 @@ private enum class EntryMode { Quantity, Amount }
 private enum class PaymentChoice { PaidNow, CustomerAccount }
 enum class CashierSection { Sell, Collect, Activity, More }
 
+@Stable
+internal class SaleLeaveGuard {
+    var dirty by mutableStateOf(false)
+        private set
+
+    private var pendingLeave by mutableStateOf<(() -> Unit)?>(null)
+
+    val discardConfirmationOpen: Boolean
+        get() = pendingLeave != null
+
+    fun markDirty() {
+        dirty = true
+    }
+
+    fun clear() {
+        dirty = false
+        pendingLeave = null
+    }
+
+    fun requestLeave(action: () -> Unit) {
+        if (dirty) {
+            pendingLeave = action
+        } else {
+            action()
+        }
+    }
+
+    fun confirmDiscard() {
+        val action = pendingLeave
+        clear()
+        action?.invoke()
+    }
+
+    fun keepEditing() {
+        pendingLeave = null
+    }
+}
+
+@Composable
+internal fun rememberSaleLeaveGuard(): SaleLeaveGuard = remember { SaleLeaveGuard() }
+
 @Composable
 fun CashierSaleScreen(
     snackbarHostState: SnackbarHostState,
@@ -116,42 +159,66 @@ fun CashierSaleScreen(
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
-        NativeSaleState.Idle,
-        NativeSaleState.Loading -> CashierLoadingScreen(
-            snackbarHostState = snackbarHostState,
-            onNavigate = onNavigate,
-            modifier = modifier,
-        )
-        is NativeSaleState.LoadFailure -> CashierLoadFailureScreen(
-            snackbarHostState = snackbarHostState,
-            message = state.message,
-            onRetry = onRetry,
-            onNavigate = onNavigate,
-            modifier = modifier,
-        )
-        is NativeSaleState.Ready -> CashierSaleContent(
-            snackbarHostState = snackbarHostState,
-            identity = identity,
-            state = state,
-            onClearFeedback = onClearFeedback,
-            onRecordSale = onRecordSale,
-            onLeaveConfirmed = onLeaveConfirmed,
-            onNavigate = onNavigate,
-            modifier = modifier,
-        )
+    val leaveGuard = rememberSaleLeaveGuard()
+    val canLeave = (state as? NativeSaleState.Ready)?.saving != true
+    LaunchedEffect(state is NativeSaleState.Ready) {
+        if (state !is NativeSaleState.Ready) leaveGuard.clear()
     }
+    BackHandler {
+        if (canLeave) leaveGuard.requestLeave(onLeaveConfirmed)
+    }
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        bottomBar = {
+            CashierNavigation(
+                selected = CashierSection.Sell,
+                onNavigate = { section ->
+                    if (canLeave) {
+                        leaveGuard.requestLeave { onNavigate(section) }
+                    }
+                },
+            )
+        },
+    ) { padding ->
+        when (state) {
+            NativeSaleState.Idle,
+            NativeSaleState.Loading,
+            -> SaleLoadingBody(
+                modifier = Modifier
+                    .padding(padding)
+                    .statusBarsPadding(),
+            )
+            is NativeSaleState.LoadFailure -> SaleLoadFailureBody(
+                message = state.message,
+                onRetry = onRetry,
+                modifier = Modifier
+                    .padding(padding)
+                    .statusBarsPadding(),
+            )
+            is NativeSaleState.Ready -> SaleEntryContent(
+                identity = identity,
+                state = state,
+                onClearFeedback = onClearFeedback,
+                onRecordSale = onRecordSale,
+                leaveGuard = leaveGuard,
+                contentPadding = padding,
+            )
+        }
+    }
+    SaleDiscardDialog(leaveGuard)
 }
 
 @Composable
-private fun CashierSaleContent(
-    snackbarHostState: SnackbarHostState,
+internal fun SaleEntryContent(
     identity: NativeSignedInIdentity,
     state: NativeSaleState.Ready,
     onClearFeedback: () -> Unit,
     onRecordSale: (NativeSaleRequest) -> Unit,
-    onLeaveConfirmed: () -> Unit,
-    onNavigate: (CashierSection) -> Unit,
+    leaveGuard: SaleLeaveGuard,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
     val context = state.context
@@ -162,8 +229,6 @@ private fun CashierSaleContent(
     var selectedCustomerId by rememberSaveable { mutableStateOf<Long?>(null) }
     var showCustomerPicker by rememberSaveable { mutableStateOf(false) }
     var secondaryDetailsExpanded by rememberSaveable { mutableStateOf(false) }
-    var draftTouched by rememberSaveable { mutableStateOf(false) }
-    var showDiscardConfirmation by rememberSaveable { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     val useStackedLayout = LocalDensity.current.fontScale >= 1.3f
 
@@ -194,8 +259,6 @@ private fun CashierSaleContent(
             PaymentChoice.CustomerAccount -> selectedCustomer != null
         }
 
-    BackHandler(enabled = draftTouched && !state.saving) { showDiscardConfirmation = true }
-
     LaunchedEffect(state.receipt?.eventId) {
         if (state.receipt != null) {
             selectedProductId = context.products.firstOrNull()?.productId
@@ -204,25 +267,16 @@ private fun CashierSaleContent(
             entryValue = "2.0"
             selectedCustomerId = null
             secondaryDetailsExpanded = false
-            draftTouched = false
+            leaveGuard.clear()
         }
     }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = {
-            CashierNavigation(selected = CashierSection.Sell, onNavigate = onNavigate)
-        },
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .imePadding(),
-        ) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(contentPadding)
+            .imePadding(),
+    ) {
             CashierScreenHeader(
                 title = stringResource(R.string.native_new_sale),
                 displayName = identity.displayName,
@@ -255,7 +309,7 @@ private fun CashierSaleContent(
                     stacked = useStackedLayout,
                     onSelected = { option ->
                         selectedProductId = option.productId
-                        draftTouched = true
+                        leaveGuard.markDirty()
                         onClearFeedback()
                     },
                 )
@@ -280,7 +334,7 @@ private fun CashierSaleContent(
                                 rate = rate,
                             )
                             entryMode = nextMode
-                            draftTouched = true
+                            leaveGuard.markDirty()
                             onClearFeedback()
                         }
                     },
@@ -308,7 +362,7 @@ private fun CashierSaleContent(
                     onValueChange = { next ->
                         if (isValidDecimalInput(next)) {
                             entryValue = next
-                            draftTouched = true
+                            leaveGuard.markDirty()
                             onClearFeedback()
                         }
                     },
@@ -318,7 +372,7 @@ private fun CashierSaleContent(
                             delta = if (entryMode == EntryMode.Quantity) -0.5 else -50.0,
                             mode = entryMode,
                         )
-                        draftTouched = true
+                        leaveGuard.markDirty()
                         onClearFeedback()
                     },
                     onIncrease = {
@@ -327,7 +381,7 @@ private fun CashierSaleContent(
                             delta = if (entryMode == EntryMode.Quantity) 0.5 else 50.0,
                             mode = entryMode,
                         )
-                        draftTouched = true
+                        leaveGuard.markDirty()
                         onClearFeedback()
                     },
                 )
@@ -361,7 +415,7 @@ private fun CashierSaleContent(
                     onPaidNow = {
                         focusManager.clearFocus()
                         payment = PaymentChoice.PaidNow
-                        draftTouched = true
+                        leaveGuard.markDirty()
                         onClearFeedback()
                     },
                     onCustomer = {
@@ -455,7 +509,6 @@ private fun CashierSaleContent(
                 Spacer(Modifier.height(12.dp))
             }
         }
-    }
 
     if (showCustomerPicker) {
         CustomerAccountDialog(
@@ -465,96 +518,72 @@ private fun CashierSaleContent(
                 selectedCustomerId = customer.accountId
                 payment = PaymentChoice.CustomerAccount
                 showCustomerPicker = false
-                draftTouched = true
+                leaveGuard.markDirty()
                 onClearFeedback()
             },
             onDismiss = { showCustomerPicker = false },
         )
     }
 
-    if (showDiscardConfirmation) {
-        AlertDialog(
-            onDismissRequest = { showDiscardConfirmation = false },
-            title = { Text("Discard this sale draft?") },
-            text = { Text("Your unsaved sale entry will be cleared before leaving.") },
-            confirmButton = {
-                TextButton(
-                    onClick = onLeaveConfirmed,
-                    modifier = Modifier.testTag(NativeUiTags.CashierDiscardDraft),
-                ) { Text("Discard and leave") }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { showDiscardConfirmation = false },
-                    modifier = Modifier.testTag(NativeUiTags.CashierKeepDraft),
-                ) { Text("Keep editing") }
-            },
-        )
-    }
 }
 
 @Composable
-private fun CashierLoadingScreen(
-    snackbarHostState: SnackbarHostState,
-    onNavigate: (CashierSection) -> Unit,
-    modifier: Modifier,
+internal fun SaleLoadingBody(
+    modifier: Modifier = Modifier,
 ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = {
-            CashierNavigation(selected = CashierSection.Sell, onNavigate = onNavigate)
-        },
-    ) { padding ->
-        Box(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .statusBarsPadding(),
-            contentAlignment = Alignment.Center,
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                CircularProgressIndicator()
-                Spacer(Modifier.height(12.dp))
-                Text("Loading today’s sale details…")
-            }
+    Box(
+        modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            CircularProgressIndicator()
+            Spacer(Modifier.height(12.dp))
+            Text("Loading today’s sale details…")
         }
     }
 }
 
 @Composable
-private fun CashierLoadFailureScreen(
-    snackbarHostState: SnackbarHostState,
+internal fun SaleLoadFailureBody(
     message: String,
     onRetry: () -> Unit,
-    onNavigate: (CashierSection) -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = {
-            CashierNavigation(selected = CashierSection.Sell, onNavigate = onNavigate)
-        },
-    ) { padding ->
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .statusBarsPadding()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(message, style = MaterialTheme.typography.bodyLarge)
-            Spacer(Modifier.height(16.dp))
-            Button(onClick = onRetry, modifier = Modifier.testTag(NativeUiTags.CashierRetryLoad)) {
-                Text("Try again")
-            }
+    Column(
+        modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(message, style = MaterialTheme.typography.bodyLarge)
+        Spacer(Modifier.height(16.dp))
+        Button(onClick = onRetry, modifier = Modifier.testTag(NativeUiTags.CashierRetryLoad)) {
+            Text("Try again")
         }
     }
+}
+
+@Composable
+internal fun SaleDiscardDialog(leaveGuard: SaleLeaveGuard) {
+    if (!leaveGuard.discardConfirmationOpen) return
+    AlertDialog(
+        onDismissRequest = leaveGuard::keepEditing,
+        title = { Text("Discard this sale draft?") },
+        text = { Text("Your unsaved sale entry will be cleared before leaving.") },
+        confirmButton = {
+            TextButton(
+                onClick = leaveGuard::confirmDiscard,
+                modifier = Modifier.testTag(NativeUiTags.CashierDiscardDraft),
+            ) { Text("Discard and leave") }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = leaveGuard::keepEditing,
+                modifier = Modifier.testTag(NativeUiTags.CashierKeepDraft),
+            ) { Text("Keep editing") }
+        },
+    )
 }
 
 @Composable

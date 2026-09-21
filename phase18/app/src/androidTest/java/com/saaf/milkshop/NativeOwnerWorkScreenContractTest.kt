@@ -167,6 +167,21 @@ class NativeOwnerWorkScreenContractTest {
     }
 
     @Test
+    fun previewBackReturnsToWork() {
+        var returned = false
+        setScreen(
+            state = NativeOwnerWorkState.Ready(
+                context = openContext(),
+                destination = NativeOwnerWorkDestination.RecordExpense,
+            ),
+            onBackToHome = { returned = true },
+        )
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkBack).performClick()
+        assertEquals(true, returned)
+    }
+
+    @Test
     fun loadFailureOffersRetry() {
         var retries = 0
         setScreen(
@@ -192,6 +207,7 @@ class NativeOwnerWorkScreenContractTest {
         state: NativeOwnerWorkState,
         onRetry: () -> Unit = {},
         onOpenDestination: (NativeOwnerWorkDestination) -> Unit = {},
+        onBackToHome: () -> Unit = {},
         onNavigate: (OwnerSection) -> Unit = {},
     ) {
         composeRule.setContent {
@@ -201,7 +217,7 @@ class NativeOwnerWorkScreenContractTest {
                     state = state,
                     onRetry = onRetry,
                     onOpenDestination = onOpenDestination,
-                    onBackToHome = {},
+                    onBackToHome = onBackToHome,
                     onLeaveConfirmed = {},
                     onNavigate = onNavigate,
                 )

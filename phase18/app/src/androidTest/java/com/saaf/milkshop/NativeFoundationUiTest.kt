@@ -349,6 +349,59 @@ class NativeFoundationUiTest {
     }
 
     @Test
+    fun ownerWorkRecordSaleOpensUnderOwnerChrome() {
+        openOwnerSale()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSaleEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavSell).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavCollect).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavActivity).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertDoesNotExist()
+    }
+
+    @Test
+    fun ownerWorkRecordSaleHardwareBackReturnsToWork() {
+        openOwnerSale()
+
+        composeRule.activityRule.scenario.onActivity {
+            it.onBackPressedDispatcher.onBackPressed()
+        }
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
+    }
+
+    @Test
+    fun ownerWorkRecordSaleDirtyBackRequiresDiscard() {
+        openOwnerSale()
+        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput)
+            .performScrollTo()
+            .performTextReplacement("3.0")
+
+        composeRule.activityRule.scenario.onActivity {
+            it.onBackPressedDispatcher.onBackPressed()
+        }
+        composeRule.onNodeWithText("Discard this sale draft?").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSaleEntryRoot).assertIsDisplayed()
+
+        composeRule.onNodeWithTag(NativeUiTags.CashierDiscardDraft).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).assertIsDisplayed()
+    }
+
+    @Test
     fun operationsAttendanceOpensConnectedEntry() {
         openOperationsWork()
         composeRule.onNodeWithTag(NativeUiTags.OpsNavAttendance).performClick()
@@ -1173,6 +1226,28 @@ class NativeFoundationUiTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerWork() {
+        openOwnerOverview()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).performClick()
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).assertIsDisplayed()
+    }
+
+    private fun openOwnerSale() {
+        openOwnerWork()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkRecordSale).performClick()
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerSaleEntryRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSaleEntryRoot).assertIsDisplayed()
     }
 
     private fun openOperationsWork() {

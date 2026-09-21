@@ -85,6 +85,52 @@ class NativeOwnerOverviewScreenContractTest {
         composeRule.onNodeWithText("Opening work…").assertIsDisplayed()
     }
 
+    @Test
+    fun recordsNavRequestsRecordsDestination() {
+        var navigated: OwnerSection? = null
+        setScreen(
+            NativeOwnerOverviewState.Ready(snapshot = attentionSnapshot()),
+            onNavigate = { navigated = it },
+        )
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavRecords).performClick()
+        assertEquals(OwnerSection.Records, navigated)
+    }
+
+    @Test
+    fun recordsPreviewShowsExplicitNotConnectedCopy() {
+        setScreen(
+            NativeOwnerOverviewState.Ready(snapshot = attentionSnapshot()),
+            section = OwnerSection.Records,
+        )
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsPreview).assertIsDisplayed()
+        composeRule.onNodeWithText("Owner Records comes next").assertIsDisplayed()
+    }
+
+    @Test
+    fun moreNavRequestsMoreDestination() {
+        var navigated: OwnerSection? = null
+        setScreen(
+            NativeOwnerOverviewState.Ready(snapshot = attentionSnapshot()),
+            onNavigate = { navigated = it },
+        )
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).performClick()
+        assertEquals(OwnerSection.More, navigated)
+    }
+
+    @Test
+    fun morePreviewShowsExplicitNotConnectedCopy() {
+        setScreen(
+            NativeOwnerOverviewState.Ready(snapshot = attentionSnapshot()),
+            section = OwnerSection.More,
+        )
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMorePreview).assertIsDisplayed()
+        composeRule.onNodeWithText("Owner More comes next").assertIsDisplayed()
+    }
+
     private fun setScreen(
         state: NativeOwnerOverviewState,
         section: OwnerSection = OwnerSection.Overview,

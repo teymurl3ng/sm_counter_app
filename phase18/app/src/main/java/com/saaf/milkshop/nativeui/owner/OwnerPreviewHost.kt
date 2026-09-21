@@ -21,6 +21,8 @@ import com.saaf.milkshop.nativeui.collection.NativeCollectionState
 import com.saaf.milkshop.nativeui.collection.NativeCollectionViewModel
 import com.saaf.milkshop.nativeui.expense.NativeExpenseState
 import com.saaf.milkshop.nativeui.expense.NativeExpenseViewModel
+import com.saaf.milkshop.nativeui.cashclose.NativeCashCloseState
+import com.saaf.milkshop.nativeui.cashclose.NativeCashCloseViewModel
 import com.saaf.milkshop.nativeui.operations.NativeDeliveriesState
 import com.saaf.milkshop.nativeui.operations.NativeDeliveriesViewModel
 import com.saaf.milkshop.nativeui.operations.NativeMakeYogurtState
@@ -74,6 +76,8 @@ fun OwnerPreviewHost(
     vendorPaymentViewModel: NativeVendorPaymentViewModel,
     salaryPaymentState: NativeSalaryPaymentState,
     salaryPaymentViewModel: NativeSalaryPaymentViewModel,
+    cashCloseState: NativeCashCloseState,
+    cashCloseViewModel: NativeCashCloseViewModel,
     receiveMilkState: NativeReceiveMilkState,
     receiveMilkViewModel: NativeReceiveMilkViewModel,
     makeYogurtState: NativeMakeYogurtState,
@@ -96,6 +100,7 @@ fun OwnerPreviewHost(
             expenseViewModel.close()
             vendorPaymentViewModel.close()
             salaryPaymentViewModel.close()
+            cashCloseViewModel.close()
             receiveMilkViewModel.close()
             makeYogurtViewModel.close()
             recordSpoilageViewModel.close()
@@ -213,6 +218,7 @@ fun OwnerPreviewHost(
                     expenseViewModel.close()
                     vendorPaymentViewModel.close()
                     salaryPaymentViewModel.close()
+                    cashCloseViewModel.close()
                     receiveMilkViewModel.close()
                     makeYogurtViewModel.close()
                     recordSpoilageViewModel.close()
@@ -224,6 +230,7 @@ fun OwnerPreviewHost(
                     expenseViewModel.close()
                     vendorPaymentViewModel.close()
                     salaryPaymentViewModel.close()
+                    cashCloseViewModel.close()
                     receiveMilkViewModel.close()
                     makeYogurtViewModel.close()
                     recordSpoilageViewModel.close()
@@ -235,6 +242,7 @@ fun OwnerPreviewHost(
                     collectionViewModel.close()
                     vendorPaymentViewModel.close()
                     salaryPaymentViewModel.close()
+                    cashCloseViewModel.close()
                     receiveMilkViewModel.close()
                     makeYogurtViewModel.close()
                     recordSpoilageViewModel.close()
@@ -246,6 +254,7 @@ fun OwnerPreviewHost(
                     collectionViewModel.close()
                     expenseViewModel.close()
                     salaryPaymentViewModel.close()
+                    cashCloseViewModel.close()
                     receiveMilkViewModel.close()
                     makeYogurtViewModel.close()
                     recordSpoilageViewModel.close()
@@ -257,11 +266,24 @@ fun OwnerPreviewHost(
                     collectionViewModel.close()
                     expenseViewModel.close()
                     vendorPaymentViewModel.close()
+                    cashCloseViewModel.close()
                     receiveMilkViewModel.close()
                     makeYogurtViewModel.close()
                     recordSpoilageViewModel.close()
                     deliveriesViewModel.close()
                     salaryPaymentViewModel.open(sessionHandle)
+                }
+                workDestination == NativeOwnerWorkDestination.CashCountAndClose -> {
+                    saleViewModel.close()
+                    collectionViewModel.close()
+                    expenseViewModel.close()
+                    vendorPaymentViewModel.close()
+                    salaryPaymentViewModel.close()
+                    receiveMilkViewModel.close()
+                    makeYogurtViewModel.close()
+                    recordSpoilageViewModel.close()
+                    deliveriesViewModel.close()
+                    cashCloseViewModel.open(sessionHandle)
                 }
                 workDestination == NativeOwnerWorkDestination.ReceiveMilk -> {
                     saleViewModel.close()
@@ -269,6 +291,7 @@ fun OwnerPreviewHost(
                     expenseViewModel.close()
                     vendorPaymentViewModel.close()
                     salaryPaymentViewModel.close()
+                    cashCloseViewModel.close()
                     makeYogurtViewModel.close()
                     recordSpoilageViewModel.close()
                     deliveriesViewModel.close()
@@ -280,6 +303,7 @@ fun OwnerPreviewHost(
                     expenseViewModel.close()
                     vendorPaymentViewModel.close()
                     salaryPaymentViewModel.close()
+                    cashCloseViewModel.close()
                     receiveMilkViewModel.close()
                     recordSpoilageViewModel.close()
                     deliveriesViewModel.close()
@@ -291,6 +315,7 @@ fun OwnerPreviewHost(
                     expenseViewModel.close()
                     vendorPaymentViewModel.close()
                     salaryPaymentViewModel.close()
+                    cashCloseViewModel.close()
                     receiveMilkViewModel.close()
                     makeYogurtViewModel.close()
                     deliveriesViewModel.close()
@@ -302,6 +327,7 @@ fun OwnerPreviewHost(
                     expenseViewModel.close()
                     vendorPaymentViewModel.close()
                     salaryPaymentViewModel.close()
+                    cashCloseViewModel.close()
                     receiveMilkViewModel.close()
                     makeYogurtViewModel.close()
                     recordSpoilageViewModel.close()
@@ -319,6 +345,7 @@ fun OwnerPreviewHost(
                 NativeOwnerWorkDestination.RecordExpense,
                 NativeOwnerWorkDestination.PaySupplier,
                 NativeOwnerWorkDestination.PaySalary,
+                NativeOwnerWorkDestination.CashCountAndClose,
                 NativeOwnerWorkDestination.ReceiveMilk,
                 NativeOwnerWorkDestination.MakeYogurt,
                 NativeOwnerWorkDestination.RecordSpoilage,
@@ -647,6 +674,19 @@ fun OwnerPreviewHost(
                     onRetry = salaryPaymentViewModel::refresh,
                     onRecordPayment = salaryPaymentViewModel::record,
                     onRecordAnother = salaryPaymentViewModel::recordAnother,
+                    onBackToWork = { returnOwnerWorkHome() },
+                    onNavigate = navigateOwner,
+                )
+            }
+            ownerSection == OwnerSection.Work &&
+                ownerWorkDestination == NativeOwnerWorkDestination.CashCountAndClose -> {
+                OwnerCashCloseEntryScreen(
+                    snackbarHostState = snackbarHostState,
+                    identity = identity,
+                    state = cashCloseState,
+                    onRetry = cashCloseViewModel::refresh,
+                    onRecordCount = cashCloseViewModel::recordCount,
+                    onCloseDay = cashCloseViewModel::closeDay,
                     onBackToWork = { returnOwnerWorkHome() },
                     onNavigate = navigateOwner,
                 )

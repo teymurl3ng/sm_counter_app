@@ -54,18 +54,18 @@ This checkpoint owns **Owner Work home** only: the all-command launcher. It conn
 - Record expense → Owner-hosted expense content / `NativeExpenseFacade` (CORE METHOD) — see `PHASE14_8_27_OWNER_EXPENSE_BLUEPRINT.md`
 - Pay supplier → Owner-hosted vendor payment content / `NativeVendorPaymentFacade` (CORE METHOD) — see `PHASE14_8_28_OWNER_PAY_SUPPLIER_BLUEPRINT.md`
 - Pay salary → Owner-hosted salary payment content / `NativeSalaryPaymentFacade` (CORE METHOD) — see `PHASE14_8_29_OWNER_PAY_SALARY_BLUEPRINT.md`
+- Cash count and close → Owner-hosted count + close content / `NativeCashCloseFacade` (CORE METHOD; reopen deferred) — see `PHASE14_8_30_OWNER_CASH_CLOSE_BLUEPRINT.md`
 
 ## Preview notices in this checkpoint
 
-- Cash count and close
+- _(none remaining on Work money — reopen day write UI deferred inside Cash count and close)_
 
 ## Control contract
 
 | Control | Required workflow | Visible result | Native test obligation |
 |---|---|---|---|
 | Work nav | Open Owner Work home | Launcher groups visible | Destination asserted |
-| Record sale / payment / receive / yogurt / spoilage / deliveries / expense / pay supplier / pay salary | Open connected entry | Owner-hosted entry | Tags + Foundation chrome/Back |
-| Cash close | Preview notice | Explicit not-connected copy | Tags + copy |
+| Record sale / payment / receive / yogurt / spoilage / deliveries / expense / pay supplier / pay salary / cash close | Open connected entry | Owner-hosted entry | Tags + Foundation chrome/Back |
 | Hardware Back on Work home | Leave authenticated area | Welcome/Access like Overview | Back contract |
 | Hardware Back inside connected entry | Return to Work home | Work launcher | Back contract |
 
@@ -79,8 +79,8 @@ This checkpoint owns **Owner Work home** only: the all-command launcher. It conn
 
 ## Out of scope
 
-- Owner Records, More, Reports, Cash & close write UI, reopen
-- New Expense / supplier / salary native forms
+- Owner Records, More, Reports
+- Reopen day write UI (deferred from Cash count and close)
 - Manager / Admin shells
 - Launcher migration away from `HybridActivity`
 

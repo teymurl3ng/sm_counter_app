@@ -388,6 +388,25 @@ class NativeFoundationUiTest {
     }
 
     @Test
+    fun ownerCashCloseOpensUnderOwnerChrome() {
+        openOwnerCashClose()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCashCloseEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashCloseAmountInput)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+    }
+
+    @Test
+    fun ownerCashCloseHardwareBackReturnsToWorkHome() {
+        openOwnerCashClose()
+        pressHardwareBack()
+        assertReturnedToOwnerWorkHome()
+    }
+
+    @Test
     fun ownerRecordsOpensUnderOwnerChrome() {
         openOwnerRecords()
 
@@ -1865,6 +1884,25 @@ class NativeFoundationUiTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OwnerPaySalaryEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerCashClose() {
+        openOwnerWork()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkCashClose)
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerCashCloseEntryRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.CashCloseAmountInput).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCashCloseEntryRoot).assertIsDisplayed()
     }
 
     private fun openOwnerReceiveMilk() {

@@ -25,6 +25,7 @@ import com.saaf.milkshop.R
 import com.saaf.milkshop.application.activity.NativeActivityFacade
 import com.saaf.milkshop.application.authentication.NativeAuthenticationFacade
 import com.saaf.milkshop.application.authentication.NativeQuickUnlockFacade
+import com.saaf.milkshop.application.cashclose.NativeCashCloseFacade
 import com.saaf.milkshop.application.collection.NativeCollectionFacade
 import com.saaf.milkshop.application.expense.NativeExpenseFacade
 import com.saaf.milkshop.application.more.NativeMoreFacade
@@ -63,6 +64,8 @@ import com.saaf.milkshop.nativeui.collection.NativeCollectionState
 import com.saaf.milkshop.nativeui.collection.NativeCollectionViewModel
 import com.saaf.milkshop.nativeui.expense.NativeExpenseState
 import com.saaf.milkshop.nativeui.expense.NativeExpenseViewModel
+import com.saaf.milkshop.nativeui.cashclose.NativeCashCloseState
+import com.saaf.milkshop.nativeui.cashclose.NativeCashCloseViewModel
 import com.saaf.milkshop.nativeui.salarypayment.NativeSalaryPaymentState
 import com.saaf.milkshop.nativeui.salarypayment.NativeSalaryPaymentViewModel
 import com.saaf.milkshop.nativeui.vendorpayment.NativeVendorPaymentState
@@ -117,6 +120,7 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var expenseFacade: NativeExpenseFacade
     private lateinit var vendorPaymentFacade: NativeVendorPaymentFacade
     private lateinit var salaryPaymentFacade: NativeSalaryPaymentFacade
+    private lateinit var cashCloseFacade: NativeCashCloseFacade
     private lateinit var activityFacade: NativeActivityFacade
     private lateinit var moreFacade: NativeMoreFacade
     private lateinit var operationsWorkFacade: NativeOperationsWorkFacade
@@ -179,6 +183,13 @@ class NativePreviewActivity : FragmentActivity() {
     private val salaryPaymentViewModel by viewModels<NativeSalaryPaymentViewModel> {
         NativeSalaryPaymentViewModel.Factory(
             facade = salaryPaymentFacade,
+            onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
+        )
+    }
+
+    private val cashCloseViewModel by viewModels<NativeCashCloseViewModel> {
+        NativeCashCloseViewModel.Factory(
+            facade = cashCloseFacade,
             onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
         )
     }
@@ -301,6 +312,7 @@ class NativePreviewActivity : FragmentActivity() {
         expenseFacade = NativeExpenseFacade(app.database, app.userSecurity)
         vendorPaymentFacade = NativeVendorPaymentFacade(app.database, app.userSecurity)
         salaryPaymentFacade = NativeSalaryPaymentFacade(app.database, app.userSecurity)
+        cashCloseFacade = NativeCashCloseFacade(app.database, app.userSecurity)
         activityFacade = NativeActivityFacade(app.database, app.userSecurity)
         moreFacade = NativeMoreFacade(app.database, app.userSecurity, quickUnlockService)
         operationsWorkFacade = NativeOperationsWorkFacade(app.database, app.userSecurity)
@@ -342,6 +354,7 @@ class NativePreviewActivity : FragmentActivity() {
                 val expenseState by expenseViewModel.state.collectAsState()
                 val vendorPaymentState by vendorPaymentViewModel.state.collectAsState()
                 val salaryPaymentState by salaryPaymentViewModel.state.collectAsState()
+                val cashCloseState by cashCloseViewModel.state.collectAsState()
                 val activityState by activityViewModel.state.collectAsState()
                 val moreState by moreViewModel.state.collectAsState()
                 val operationsWorkState by operationsWorkViewModel.state.collectAsState()
@@ -373,6 +386,8 @@ class NativePreviewActivity : FragmentActivity() {
                     vendorPaymentViewModel = vendorPaymentViewModel,
                     salaryPaymentState = salaryPaymentState,
                     salaryPaymentViewModel = salaryPaymentViewModel,
+                    cashCloseState = cashCloseState,
+                    cashCloseViewModel = cashCloseViewModel,
                     activityState = activityState,
                     activityViewModel = activityViewModel,
                     moreState = moreState,
@@ -452,6 +467,8 @@ private fun NativeFoundationPreview(
     vendorPaymentViewModel: NativeVendorPaymentViewModel,
     salaryPaymentState: NativeSalaryPaymentState,
     salaryPaymentViewModel: NativeSalaryPaymentViewModel,
+    cashCloseState: NativeCashCloseState,
+    cashCloseViewModel: NativeCashCloseViewModel,
     activityState: NativeActivityState,
     activityViewModel: NativeActivityViewModel,
     moreState: NativeMoreState,
@@ -601,6 +618,7 @@ private fun NativeFoundationPreview(
         expenseViewModel.close()
         vendorPaymentViewModel.close()
         salaryPaymentViewModel.close()
+        cashCloseViewModel.close()
         activityViewModel.close()
         moreViewModel.close()
     }
@@ -712,6 +730,8 @@ private fun NativeFoundationPreview(
                     vendorPaymentViewModel = vendorPaymentViewModel,
                     salaryPaymentState = salaryPaymentState,
                     salaryPaymentViewModel = salaryPaymentViewModel,
+                    cashCloseState = cashCloseState,
+                    cashCloseViewModel = cashCloseViewModel,
                     receiveMilkState = receiveMilkState,
                     receiveMilkViewModel = receiveMilkViewModel,
                     makeYogurtState = makeYogurtState,

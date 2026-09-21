@@ -33,7 +33,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -136,23 +135,13 @@ private fun ReadyWork(
                 }
             }
         }
-        NativeOwnerWorkDestination.CashCountAndClose,
-        -> PreviewDestination(
-            snackbarHostState = snackbarHostState,
-            context = state.context,
-            title = previewTitle(state.destination),
-            message = previewMessage(state.destination),
-            tag = previewTag(state.destination),
-            onBack = onBackToHome,
-            onNavigate = onNavigate,
-            modifier = modifier,
-        )
         NativeOwnerWorkDestination.RecordSale,
         NativeOwnerWorkDestination.ReceiveMilk,
         NativeOwnerWorkDestination.RecordPayment,
         NativeOwnerWorkDestination.RecordExpense,
         NativeOwnerWorkDestination.PaySupplier,
         NativeOwnerWorkDestination.PaySalary,
+        NativeOwnerWorkDestination.CashCountAndClose,
         NativeOwnerWorkDestination.MakeYogurt,
         NativeOwnerWorkDestination.RecordSpoilage,
         NativeOwnerWorkDestination.Deliveries,
@@ -196,7 +185,7 @@ private fun WorkHomeBody(
         )
         if (!context.postingOpen) {
             Text(
-                text = "This business date is closed. Reopen from Cash count and close when that destination is connected.",
+                text = "This business date is closed. Reopen is not available in this Owner Work slice yet.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.testTag(NativeUiTags.OwnerWorkClosed),
@@ -377,66 +366,13 @@ private fun CommandRow(
     }
 }
 
-@Composable
-private fun PreviewDestination(
-    snackbarHostState: SnackbarHostState,
-    context: NativeOwnerWorkContext,
-    title: String,
-    message: String,
-    tag: String,
-    onBack: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    BackHandler(onBack = onBack)
-    OwnerScaffold(snackbarHostState, OwnerSection.Work, onNavigate, modifier) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
-            CashierScreenHeader(
-                title = title,
-                displayName = context.shopName,
-                roleLabel = "Owner",
-                businessDate = context.businessDate,
-                postingOpen = context.postingOpen,
-            )
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .padding(24.dp)
-                    .testTag(tag),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Text(message, style = MaterialTheme.typography.bodyLarge)
-                TextButton(
-                    onClick = onBack,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerWorkBack),
-                ) { Text("Back to Work") }
-            }
-        }
-    }
-}
-
-private fun previewTitle(destination: NativeOwnerWorkDestination): String = when (destination) {
-    NativeOwnerWorkDestination.CashCountAndClose -> "Cash count and close"
-    else -> "Coming next"
-}
-
-private fun previewMessage(destination: NativeOwnerWorkDestination): String = when (destination) {
-    NativeOwnerWorkDestination.CashCountAndClose ->
-        "Cash count and close is not connected yet in Owner Work. Overview and connected daily commands stay available."
-    else -> "This destination is not connected yet."
-}
-
-private fun previewTag(destination: NativeOwnerWorkDestination): String = when (destination) {
-    NativeOwnerWorkDestination.CashCountAndClose -> NativeUiTags.OwnerWorkCashClosePreview
-    else -> NativeUiTags.OwnerWorkHome
-}
-
 private fun openingLabel(destination: NativeOwnerWorkDestination): String = when (destination) {
     NativeOwnerWorkDestination.RecordSale -> "Opening record sale…"
     NativeOwnerWorkDestination.RecordPayment -> "Opening record payment…"
     NativeOwnerWorkDestination.RecordExpense -> "Opening record expense…"
     NativeOwnerWorkDestination.PaySupplier -> "Opening pay supplier…"
     NativeOwnerWorkDestination.PaySalary -> "Opening pay salary…"
+    NativeOwnerWorkDestination.CashCountAndClose -> "Opening cash count and close…"
     NativeOwnerWorkDestination.ReceiveMilk -> "Opening receive milk…"
     NativeOwnerWorkDestination.MakeYogurt -> "Opening make yogurt…"
     NativeOwnerWorkDestination.RecordSpoilage -> "Opening record spoilage…"

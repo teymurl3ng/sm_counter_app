@@ -159,29 +159,17 @@ class NativeOwnerWorkScreenContractTest {
     }
 
     @Test
-    fun cashClosePreviewShowsExplicitNotConnectedCopy() {
+    fun cashCloseOpensConnectedDestination() {
+        var opened: NativeOwnerWorkDestination? = null
         setScreen(
-            NativeOwnerWorkState.Ready(
-                context = openContext(),
-                destination = NativeOwnerWorkDestination.CashCountAndClose,
-            ),
+            NativeOwnerWorkState.Ready(context = openContext()),
+            onOpenDestination = { opened = it },
         )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkCashClosePreview).assertIsDisplayed()
-    }
-
-    @Test
-    fun previewBackReturnsToWork() {
-        var returned = false
-        setScreen(
-            state = NativeOwnerWorkState.Ready(
-                context = openContext(),
-                destination = NativeOwnerWorkDestination.CashCountAndClose,
-            ),
-            onBackToHome = { returned = true },
-        )
-
-        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkBack).performClick()
-        assertEquals(true, returned)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkCashClose)
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
+        assertEquals(NativeOwnerWorkDestination.CashCountAndClose, opened)
     }
 
     @Test

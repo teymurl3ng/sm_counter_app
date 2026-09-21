@@ -266,6 +266,11 @@ fun OwnerPreviewHost(
                     NativeOwnerMoreDestination.Customers,
                     NativeOwnerMoreDestination.Suppliers,
                     NativeOwnerMoreDestination.Employees,
+                    NativeOwnerMoreDestination.CostingPlans,
+                    NativeOwnerMoreDestination.ShopSettings,
+                    NativeOwnerMoreDestination.UsersRoles,
+                    NativeOwnerMoreDestination.SecurityHistory,
+                    NativeOwnerMoreDestination.Backup,
                 )
         BackHandler(enabled = !ownerEntryOwnsBack && !ownerRecordsOwnsBack && !ownerMoreOwnsBack) {
             when (ownerSection) {
@@ -321,6 +326,31 @@ fun OwnerPreviewHost(
                                 ownerMoreViewModel.backToMenu()
                             }
                         }
+                        NativeOwnerMoreDestination.CostingPlans -> {
+                            if (ready.costingPolicyDetail != null) {
+                                ownerMoreViewModel.clearCostingPolicyDetail()
+                            } else {
+                                ownerMoreViewModel.backToMenu()
+                            }
+                        }
+                        NativeOwnerMoreDestination.ShopSettings ->
+                            ownerMoreViewModel.backToMenu()
+                        NativeOwnerMoreDestination.UsersRoles -> {
+                            if (ready.userDetail != null) {
+                                ownerMoreViewModel.clearUserDetail()
+                            } else {
+                                ownerMoreViewModel.backToMenu()
+                            }
+                        }
+                        NativeOwnerMoreDestination.SecurityHistory -> {
+                            if (ready.securityAuditDetail != null) {
+                                ownerMoreViewModel.clearSecurityAuditDetail()
+                            } else {
+                                ownerMoreViewModel.backToMenu()
+                            }
+                        }
+                        NativeOwnerMoreDestination.Backup ->
+                            ownerMoreViewModel.backToMenu()
                         else -> onLeaveToWelcome()
                     }
                 }
@@ -394,6 +424,11 @@ fun OwnerPreviewHost(
                     onOpenCustomers = ownerMoreViewModel::openCustomers,
                     onOpenSuppliers = ownerMoreViewModel::openSuppliers,
                     onOpenEmployees = ownerMoreViewModel::openEmployees,
+                    onOpenCostingPlans = ownerMoreViewModel::openCostingPlans,
+                    onOpenShopSettings = ownerMoreViewModel::openShopSettings,
+                    onOpenUsersRoles = ownerMoreViewModel::openUsersRoles,
+                    onOpenSecurityHistory = ownerMoreViewModel::openSecurityHistory,
+                    onOpenBackup = ownerMoreViewModel::openBackup,
                     onBackToMenu = ownerMoreViewModel::backToMenu,
                     onRetryProducts = ownerMoreViewModel::refreshProducts,
                     onOpenProduct = ownerMoreViewModel::openProductDetail,
@@ -419,6 +454,35 @@ fun OwnerPreviewHost(
                     onCreateEmployeePreview = {
                         onShowNotice("Add employee comes next in the Owner Employees family.")
                     },
+                    onRetryCostingPlans = ownerMoreViewModel::refreshCostingPlans,
+                    onOpenCostingPolicy = ownerMoreViewModel::openCostingPolicyDetail,
+                    onBackFromCostingPolicyDetail = ownerMoreViewModel::clearCostingPolicyDetail,
+                    onApproveCostingPolicyPreview = {
+                        onShowNotice("Approve or edit costing policy comes next in the Owner Costing & plans family.")
+                    },
+                    onRetryShopSettings = ownerMoreViewModel::refreshShopSettings,
+                    onEditShopSettingsPreview = {
+                        onShowNotice("Edit shop settings comes next…")
+                    },
+                    onRetryUsersRoles = ownerMoreViewModel::refreshUsersRoles,
+                    onOpenUser = ownerMoreViewModel::openUserDetail,
+                    onBackFromUserDetail = ownerMoreViewModel::clearUserDetail,
+                    onCreateUserPreview = {
+                        onShowNotice("Enroll or change staff access comes next…")
+                    },
+                    onRetrySecurityHistory = ownerMoreViewModel::refreshSecurityHistory,
+                    onOpenSecurityAudit = ownerMoreViewModel::openSecurityAuditDetail,
+                    onBackFromSecurityAuditDetail = ownerMoreViewModel::clearSecurityAuditDetail,
+                    onRetryBackup = ownerMoreViewModel::refreshBackup,
+                    onExportBackupPreview = {
+                        onShowNotice("Export backup comes next in the Owner Backup family.")
+                    },
+                    onRestoreBackupPreview = {
+                        onShowNotice("Restore backup comes next in the Owner Backup family.")
+                    },
+                    onConnectBackupPreview = {
+                        onShowNotice("Connect Drive comes next in the Owner Backup family.")
+                    },
                     onRequestRemoveQuickUnlock = ownerMoreViewModel::requestRemoveQuickUnlock,
                     onCancelRemoveQuickUnlock = ownerMoreViewModel::cancelRemoveQuickUnlock,
                     onRemoveQuickUnlock = ownerMoreViewModel::removeQuickUnlock,
@@ -426,11 +490,6 @@ fun OwnerPreviewHost(
                     onEnrollPhoneSecurity = ownerMoreViewModel::enrollPhoneSecurity,
                     onSwitchAccount = onLeaveToAccountPicker,
                     onSignOut = onLeaveToWelcome,
-                    onDeferredDestination = { destination ->
-                        onShowNotice(
-                            "$destination comes next in the Owner More family.",
-                        )
-                    },
                     onNavigate = navigateOwner,
                     onLeaveConfirmed = onLeaveToWelcome,
                 )

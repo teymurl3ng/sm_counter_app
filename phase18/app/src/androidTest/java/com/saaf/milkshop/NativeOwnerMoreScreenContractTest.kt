@@ -77,19 +77,6 @@ class NativeOwnerMoreScreenContractTest {
     }
 
     @Test
-    fun deferredDestinationSurfacesNotice() {
-        var notice: String? = null
-        setScreen(
-            NativeOwnerMoreState.Ready(context = openContext()),
-            onDeferredDestination = { notice = it },
-        )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreCosting)
-            .performScrollTo()
-            .performClick()
-        assertEquals("Costing & plans", notice)
-    }
-
-    @Test
     fun productsOpensFromMenu() {
         var opened = false
         setScreen(
@@ -134,6 +121,71 @@ class NativeOwnerMoreScreenContractTest {
             onOpenEmployees = { opened = true },
         )
         composeRule.onNodeWithTag(NativeUiTags.OwnerMoreEmployees)
+            .performScrollTo()
+            .performClick()
+        assertTrue(opened)
+    }
+
+    @Test
+    fun costingPlansOpensFromMenu() {
+        var opened = false
+        setScreen(
+            NativeOwnerMoreState.Ready(context = openContext()),
+            onOpenCostingPlans = { opened = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreCosting)
+            .performScrollTo()
+            .performClick()
+        assertTrue(opened)
+    }
+
+    @Test
+    fun shopSettingsOpensFromMenu() {
+        var opened = false
+        setScreen(
+            NativeOwnerMoreState.Ready(context = openContext()),
+            onOpenShopSettings = { opened = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreShopSettings)
+            .performScrollTo()
+            .performClick()
+        assertTrue(opened)
+    }
+
+    @Test
+    fun usersRolesOpensFromMenu() {
+        var opened = false
+        setScreen(
+            NativeOwnerMoreState.Ready(context = openContext()),
+            onOpenUsersRoles = { opened = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreUsersRoles)
+            .performScrollTo()
+            .performClick()
+        assertTrue(opened)
+    }
+
+    @Test
+    fun securityHistoryOpensFromMenu() {
+        var opened = false
+        setScreen(
+            NativeOwnerMoreState.Ready(context = openContext()),
+            onOpenSecurityHistory = { opened = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreSecurityHistory)
+            .performScrollTo()
+            .performClick()
+        assertTrue(opened)
+    }
+
+    @Test
+    fun backupOpensFromMenu() {
+        var opened = false
+        setScreen(
+            NativeOwnerMoreState.Ready(context = openContext()),
+            onOpenBackup = { opened = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreBackup)
             .performScrollTo()
             .performClick()
         assertTrue(opened)
@@ -207,10 +259,14 @@ class NativeOwnerMoreScreenContractTest {
         onOpenCustomers: () -> Unit = {},
         onOpenSuppliers: () -> Unit = {},
         onOpenEmployees: () -> Unit = {},
+        onOpenCostingPlans: () -> Unit = {},
+        onOpenShopSettings: () -> Unit = {},
+        onOpenUsersRoles: () -> Unit = {},
+        onOpenSecurityHistory: () -> Unit = {},
+        onOpenBackup: () -> Unit = {},
         onBackToMenu: () -> Unit = {},
         onSwitchAccount: () -> Unit = {},
         onSignOut: () -> Unit = {},
-        onDeferredDestination: (String) -> Unit = {},
         onNavigate: (OwnerSection) -> Unit = {},
     ) {
         composeRule.setContent {
@@ -231,6 +287,11 @@ class NativeOwnerMoreScreenContractTest {
                     onOpenCustomers = onOpenCustomers,
                     onOpenSuppliers = onOpenSuppliers,
                     onOpenEmployees = onOpenEmployees,
+                    onOpenCostingPlans = onOpenCostingPlans,
+                    onOpenShopSettings = onOpenShopSettings,
+                    onOpenUsersRoles = onOpenUsersRoles,
+                    onOpenSecurityHistory = onOpenSecurityHistory,
+                    onOpenBackup = onOpenBackup,
                     onBackToMenu = onBackToMenu,
                     onRetryProducts = {},
                     onOpenProduct = {},
@@ -248,6 +309,23 @@ class NativeOwnerMoreScreenContractTest {
                     onOpenEmployee = {},
                     onBackFromEmployeeDetail = {},
                     onCreateEmployeePreview = {},
+                    onRetryCostingPlans = {},
+                    onOpenCostingPolicy = {},
+                    onBackFromCostingPolicyDetail = {},
+                    onApproveCostingPolicyPreview = {},
+                    onRetryShopSettings = {},
+                    onEditShopSettingsPreview = {},
+                    onRetryUsersRoles = {},
+                    onOpenUser = {},
+                    onBackFromUserDetail = {},
+                    onCreateUserPreview = {},
+                    onRetrySecurityHistory = {},
+                    onOpenSecurityAudit = {},
+                    onBackFromSecurityAuditDetail = {},
+                    onRetryBackup = {},
+                    onExportBackupPreview = {},
+                    onRestoreBackupPreview = {},
+                    onConnectBackupPreview = {},
                     onRequestRemoveQuickUnlock = {},
                     onCancelRemoveQuickUnlock = {},
                     onRemoveQuickUnlock = {},
@@ -255,7 +333,6 @@ class NativeOwnerMoreScreenContractTest {
                     onEnrollPhoneSecurity = { _, _ -> },
                     onSwitchAccount = onSwitchAccount,
                     onSignOut = onSignOut,
-                    onDeferredDestination = onDeferredDestination,
                     onNavigate = onNavigate,
                     onLeaveConfirmed = {},
                 )

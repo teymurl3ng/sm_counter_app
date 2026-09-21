@@ -507,6 +507,151 @@ class NativeFoundationUiTest {
     }
 
     @Test
+    fun ownerCostingPlansOpensUnderOwnerChrome() {
+        openOwnerCostingPlans()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+        composeRule.onNodeWithText("Count cash").assertDoesNotExist()
+    }
+
+    @Test
+    fun ownerCostingPlansHardwareBackReturnsToMoreMenu() {
+        openOwnerCostingPlans()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerMoreMenu).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreMenu).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
+    fun ownerShopSettingsOpensUnderOwnerChrome() {
+        openOwnerShopSettings()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerShopSettingsRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+        composeRule.onNodeWithText("Count cash").assertDoesNotExist()
+    }
+
+    @Test
+    fun ownerShopSettingsHardwareBackReturnsToMoreMenu() {
+        openOwnerShopSettings()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerMoreMenu).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreMenu).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
+    fun ownerUsersRolesOpensUnderOwnerChrome() {
+        openOwnerUsersRoles()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerUsersRolesRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+        composeRule.onNodeWithText("Count cash").assertDoesNotExist()
+    }
+
+    @Test
+    fun ownerUsersRolesHardwareBackReturnsToMoreMenu() {
+        openOwnerUsersRoles()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerMoreMenu).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreMenu).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
+    fun ownerSecurityHistoryOpensUnderOwnerChrome() {
+        openOwnerSecurityHistory()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSecurityHistoryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+        composeRule.onNodeWithText("Count cash").assertDoesNotExist()
+    }
+
+    @Test
+    fun ownerSecurityHistoryHardwareBackReturnsToMoreMenu() {
+        openOwnerSecurityHistory()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerMoreMenu).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreMenu).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
+    fun ownerBackupOpensUnderOwnerChrome() {
+        openOwnerBackup()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+        composeRule.onNodeWithText("Count cash").assertDoesNotExist()
+    }
+
+    @Test
+    fun ownerBackupHardwareBackReturnsToMoreMenu() {
+        openOwnerBackup()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerMoreMenu).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreMenu).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
     fun ownerWorkRecordSaleOpensUnderOwnerChrome() {
         openOwnerSale()
 
@@ -1551,6 +1696,71 @@ class NativeFoundationUiTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerCostingPlans() {
+        openOwnerMore()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreCosting)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerShopSettings() {
+        openOwnerMore()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreShopSettings)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerShopSettingsRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerShopSettingsRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerUsersRoles() {
+        openOwnerMore()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreUsersRoles)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerUsersRolesRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerUsersRolesRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerSecurityHistory() {
+        openOwnerMore()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreSecurityHistory)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerSecurityHistoryRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSecurityHistoryRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerBackup() {
+        openOwnerMore()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreBackup)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerBackupRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupRoot).assertIsDisplayed()
     }
 
     private fun openOwnerSale() {

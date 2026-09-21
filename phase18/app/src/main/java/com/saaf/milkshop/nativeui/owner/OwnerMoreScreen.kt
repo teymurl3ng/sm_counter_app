@@ -78,6 +78,11 @@ fun OwnerMoreScreen(
     onOpenCustomers: () -> Unit,
     onOpenSuppliers: () -> Unit,
     onOpenEmployees: () -> Unit,
+    onOpenCostingPlans: () -> Unit,
+    onOpenShopSettings: () -> Unit,
+    onOpenUsersRoles: () -> Unit,
+    onOpenSecurityHistory: () -> Unit,
+    onOpenBackup: () -> Unit,
     onBackToMenu: () -> Unit,
     onRetryProducts: () -> Unit,
     onOpenProduct: (Long) -> Unit,
@@ -95,6 +100,23 @@ fun OwnerMoreScreen(
     onOpenEmployee: (Long) -> Unit,
     onBackFromEmployeeDetail: () -> Unit,
     onCreateEmployeePreview: () -> Unit,
+    onRetryCostingPlans: () -> Unit,
+    onOpenCostingPolicy: (Long) -> Unit,
+    onBackFromCostingPolicyDetail: () -> Unit,
+    onApproveCostingPolicyPreview: () -> Unit,
+    onRetryShopSettings: () -> Unit,
+    onEditShopSettingsPreview: () -> Unit,
+    onRetryUsersRoles: () -> Unit,
+    onOpenUser: (Long) -> Unit,
+    onBackFromUserDetail: () -> Unit,
+    onCreateUserPreview: () -> Unit,
+    onRetrySecurityHistory: () -> Unit,
+    onOpenSecurityAudit: (Long) -> Unit,
+    onBackFromSecurityAuditDetail: () -> Unit,
+    onRetryBackup: () -> Unit,
+    onExportBackupPreview: () -> Unit,
+    onRestoreBackupPreview: () -> Unit,
+    onConnectBackupPreview: () -> Unit,
     onRequestRemoveQuickUnlock: () -> Unit,
     onCancelRemoveQuickUnlock: () -> Unit,
     onRemoveQuickUnlock: (CharArray) -> Unit,
@@ -102,7 +124,6 @@ fun OwnerMoreScreen(
     onEnrollPhoneSecurity: (CharArray, CharArray?) -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
-    onDeferredDestination: (String) -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     onLeaveConfirmed: () -> Unit,
     modifier: Modifier = Modifier,
@@ -158,9 +179,13 @@ fun OwnerMoreScreen(
                 onOpenCustomers = onOpenCustomers,
                 onOpenSuppliers = onOpenSuppliers,
                 onOpenEmployees = onOpenEmployees,
+                onOpenCostingPlans = onOpenCostingPlans,
+                onOpenShopSettings = onOpenShopSettings,
+                onOpenUsersRoles = onOpenUsersRoles,
+                onOpenSecurityHistory = onOpenSecurityHistory,
+                onOpenBackup = onOpenBackup,
                 onSwitchAccount = onSwitchAccount,
                 onSignOut = onSignOut,
-                onDeferredDestination = onDeferredDestination,
                 onNavigate = onNavigate,
                 modifier = modifier,
             )
@@ -241,6 +266,82 @@ fun OwnerMoreScreen(
                 onNavigate = onNavigate,
                 modifier = modifier,
             )
+            NativeOwnerMoreDestination.CostingPlans -> OwnerCostingPlansScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = state.context,
+                policies = state.costingPolicies,
+                policiesLoading = state.costingPoliciesLoading,
+                policyDetail = state.costingPolicyDetail,
+                policiesError = state.costingPoliciesError,
+                currentMonthSummary = state.costingCurrentMonthSummary,
+                onBackToMenu = onBackToMenu,
+                onRetry = onRetryCostingPlans,
+                onOpenPolicy = onOpenCostingPolicy,
+                onBackFromDetail = onBackFromCostingPolicyDetail,
+                onApprovePreview = onApproveCostingPolicyPreview,
+                onNavigate = onNavigate,
+                modifier = modifier,
+            )
+            NativeOwnerMoreDestination.ShopSettings -> OwnerShopSettingsScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = state.context,
+                snapshot = state.shopSettings,
+                loading = state.shopSettingsLoading,
+                error = state.shopSettingsError,
+                onBackToMenu = onBackToMenu,
+                onRetry = onRetryShopSettings,
+                onEditPreview = onEditShopSettingsPreview,
+                onNavigate = onNavigate,
+                modifier = modifier,
+            )
+            NativeOwnerMoreDestination.UsersRoles -> OwnerUsersRolesScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = state.context,
+                users = state.users,
+                usersLoading = state.usersLoading,
+                userDetail = state.userDetail,
+                usersError = state.usersError,
+                onBackToMenu = onBackToMenu,
+                onRetry = onRetryUsersRoles,
+                onOpenUser = onOpenUser,
+                onBackFromDetail = onBackFromUserDetail,
+                onCreatePreview = onCreateUserPreview,
+                onNavigate = onNavigate,
+                modifier = modifier,
+            )
+            NativeOwnerMoreDestination.SecurityHistory -> OwnerSecurityHistoryScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = state.context,
+                audits = state.securityAudits,
+                auditsLoading = state.securityHistoryLoading,
+                auditDetail = state.securityAuditDetail,
+                auditsError = state.securityHistoryError,
+                onBackToMenu = onBackToMenu,
+                onRetry = onRetrySecurityHistory,
+                onOpenAudit = onOpenSecurityAudit,
+                onBackFromDetail = onBackFromSecurityAuditDetail,
+                onNavigate = onNavigate,
+                modifier = modifier,
+            )
+            NativeOwnerMoreDestination.Backup -> OwnerBackupScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = state.context,
+                snapshot = state.backup,
+                loading = state.backupLoading,
+                error = state.backupError,
+                onBackToMenu = onBackToMenu,
+                onRetry = onRetryBackup,
+                onExportPreview = onExportBackupPreview,
+                onRestorePreview = onRestoreBackupPreview,
+                onConnectPreview = onConnectBackupPreview,
+                onNavigate = onNavigate,
+                modifier = modifier,
+            )
         }
     }
 }
@@ -255,9 +356,13 @@ private fun OwnerMoreMenuScreen(
     onOpenCustomers: () -> Unit,
     onOpenSuppliers: () -> Unit,
     onOpenEmployees: () -> Unit,
+    onOpenCostingPlans: () -> Unit,
+    onOpenShopSettings: () -> Unit,
+    onOpenUsersRoles: () -> Unit,
+    onOpenSecurityHistory: () -> Unit,
+    onOpenBackup: () -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
-    onDeferredDestination: (String) -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier,
 ) {
@@ -317,7 +422,7 @@ private fun OwnerMoreMenuScreen(
                     title = "Costing & plans",
                     subtitle = "Cost coverage and planning",
                     tag = NativeUiTags.OwnerMoreCosting,
-                    onClick = { onDeferredDestination("Costing & plans") },
+                    onClick = onOpenCostingPlans,
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 OwnerMoreMenuRow(
@@ -325,7 +430,7 @@ private fun OwnerMoreMenuScreen(
                     title = "Shop settings",
                     subtitle = "Store name, opening state, categories",
                     tag = NativeUiTags.OwnerMoreShopSettings,
-                    onClick = { onDeferredDestination("Shop settings") },
+                    onClick = onOpenShopSettings,
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
@@ -343,7 +448,7 @@ private fun OwnerMoreMenuScreen(
                     title = "Users & roles",
                     subtitle = "Staff access and role assignment",
                     tag = NativeUiTags.OwnerMoreUsersRoles,
-                    onClick = { onDeferredDestination("Users & roles") },
+                    onClick = onOpenUsersRoles,
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 OwnerMoreMenuRow(
@@ -351,7 +456,7 @@ private fun OwnerMoreMenuScreen(
                     title = "Security history",
                     subtitle = "Audit of sensitive account actions",
                     tag = NativeUiTags.OwnerMoreSecurityHistory,
-                    onClick = { onDeferredDestination("Security history") },
+                    onClick = onOpenSecurityHistory,
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
@@ -361,7 +466,7 @@ private fun OwnerMoreMenuScreen(
                     title = "Backup & restore",
                     subtitle = "Local export, Drive backup, restore",
                     tag = NativeUiTags.OwnerMoreBackup,
-                    onClick = { onDeferredDestination("Backup & restore") },
+                    onClick = onOpenBackup,
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 

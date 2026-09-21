@@ -3,6 +3,11 @@ package com.saaf.milkshop.nativeui.owner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.saaf.milkshop.application.more.NativeMoreSecurityStatus
+import com.saaf.milkshop.application.owner.NativeOwnerBackupFacade
+import com.saaf.milkshop.application.owner.NativeOwnerBackupSnapshot
+import com.saaf.milkshop.application.owner.NativeOwnerCostingPolicyDetail
+import com.saaf.milkshop.application.owner.NativeOwnerCostingPolicyRow
+import com.saaf.milkshop.application.owner.NativeOwnerCostingPlansFacade
 import com.saaf.milkshop.application.owner.NativeOwnerCustomerDetail
 import com.saaf.milkshop.application.owner.NativeOwnerCustomerRow
 import com.saaf.milkshop.application.owner.NativeOwnerCustomersFacade
@@ -14,9 +19,17 @@ import com.saaf.milkshop.application.owner.NativeOwnerMoreFacade
 import com.saaf.milkshop.application.owner.NativeOwnerProductDetail
 import com.saaf.milkshop.application.owner.NativeOwnerProductRow
 import com.saaf.milkshop.application.owner.NativeOwnerProductsFacade
+import com.saaf.milkshop.application.owner.NativeOwnerSecurityAuditDetail
+import com.saaf.milkshop.application.owner.NativeOwnerSecurityAuditRow
+import com.saaf.milkshop.application.owner.NativeOwnerSecurityHistoryFacade
+import com.saaf.milkshop.application.owner.NativeOwnerShopSettingsFacade
+import com.saaf.milkshop.application.owner.NativeOwnerShopSettingsSnapshot
 import com.saaf.milkshop.application.owner.NativeOwnerSupplierDetail
 import com.saaf.milkshop.application.owner.NativeOwnerSupplierRow
 import com.saaf.milkshop.application.owner.NativeOwnerSuppliersFacade
+import com.saaf.milkshop.application.owner.NativeOwnerUserDetail
+import com.saaf.milkshop.application.owner.NativeOwnerUserRow
+import com.saaf.milkshop.application.owner.NativeOwnerUsersRolesFacade
 import com.saaf.milkshop.domain.SecurityFailure
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +48,11 @@ enum class NativeOwnerMoreDestination {
     Customers,
     Suppliers,
     Employees,
+    CostingPlans,
+    ShopSettings,
+    UsersRoles,
+    SecurityHistory,
+    Backup,
 }
 
 sealed interface NativeOwnerMoreState {
@@ -60,6 +78,25 @@ sealed interface NativeOwnerMoreState {
         val employeesLoading: Boolean = false,
         val employeeDetail: NativeOwnerEmployeeDetail? = null,
         val employeesError: String? = null,
+        val costingPolicies: List<NativeOwnerCostingPolicyRow> = emptyList(),
+        val costingPoliciesLoading: Boolean = false,
+        val costingPolicyDetail: NativeOwnerCostingPolicyDetail? = null,
+        val costingPoliciesError: String? = null,
+        val costingCurrentMonthSummary: String? = null,
+        val shopSettings: NativeOwnerShopSettingsSnapshot? = null,
+        val shopSettingsLoading: Boolean = false,
+        val shopSettingsError: String? = null,
+        val users: List<NativeOwnerUserRow> = emptyList(),
+        val usersLoading: Boolean = false,
+        val userDetail: NativeOwnerUserDetail? = null,
+        val usersError: String? = null,
+        val securityAudits: List<NativeOwnerSecurityAuditRow> = emptyList(),
+        val securityHistoryLoading: Boolean = false,
+        val securityAuditDetail: NativeOwnerSecurityAuditDetail? = null,
+        val securityHistoryError: String? = null,
+        val backup: NativeOwnerBackupSnapshot? = null,
+        val backupLoading: Boolean = false,
+        val backupError: String? = null,
         val saving: Boolean = false,
         val confirmRemoveUnlock: Boolean = false,
         val error: String? = null,
@@ -73,6 +110,11 @@ class NativeOwnerMoreViewModel(
     private val customersFacade: NativeOwnerCustomersFacade,
     private val suppliersFacade: NativeOwnerSuppliersFacade,
     private val employeesFacade: NativeOwnerEmployeesFacade,
+    private val costingPlansFacade: NativeOwnerCostingPlansFacade,
+    private val shopSettingsFacade: NativeOwnerShopSettingsFacade,
+    private val usersRolesFacade: NativeOwnerUsersRolesFacade,
+    private val securityHistoryFacade: NativeOwnerSecurityHistoryFacade,
+    private val backupFacade: NativeOwnerBackupFacade,
     private val onSessionExpired: () -> Unit,
 ) : ViewModel() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -412,6 +454,22 @@ class NativeOwnerMoreViewModel(
             suppliersLoading = false,
             supplierDetail = null,
             suppliersError = null,
+            costingPoliciesLoading = false,
+            costingPolicyDetail = null,
+            costingPoliciesError = null,
+            costingCurrentMonthSummary = null,
+            shopSettingsLoading = false,
+            shopSettings = null,
+            shopSettingsError = null,
+            usersLoading = false,
+            userDetail = null,
+            usersError = null,
+            securityHistoryLoading = false,
+            securityAuditDetail = null,
+            securityHistoryError = null,
+            backupLoading = false,
+            backup = null,
+            backupError = null,
             confirmRemoveUnlock = false,
             error = null,
             saving = false,
@@ -481,6 +539,486 @@ class NativeOwnerMoreViewModel(
         _state.value = current.copy(employeeDetail = null, employeesError = null, employeesLoading = false)
     }
 
+    fun openCostingPlans() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            destination = NativeOwnerMoreDestination.CostingPlans,
+            costingPoliciesLoading = true,
+            costingPolicyDetail = null,
+            costingPoliciesError = null,
+            costingCurrentMonthSummary = null,
+            productsLoading = false,
+            productDetail = null,
+            productsError = null,
+            customersLoading = false,
+            customerDetail = null,
+            customersError = null,
+            suppliersLoading = false,
+            supplierDetail = null,
+            suppliersError = null,
+            employeesLoading = false,
+            employeeDetail = null,
+            employeesError = null,
+            shopSettingsLoading = false,
+            shopSettings = null,
+            shopSettingsError = null,
+            usersLoading = false,
+            userDetail = null,
+            usersError = null,
+            securityHistoryLoading = false,
+            securityAuditDetail = null,
+            securityHistoryError = null,
+            backupLoading = false,
+            backup = null,
+            backupError = null,
+            confirmRemoveUnlock = false,
+            error = null,
+            saving = false,
+        )
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) {
+                    costingPlansFacade.loadPolicies(session, current.context.businessDate)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
+                _state.value = latest.copy(
+                    costingPolicies = snapshot.policies,
+                    costingPoliciesLoading = false,
+                    costingPoliciesError = null,
+                    costingCurrentMonthSummary = snapshot.currentMonthSummary,
+                )
+            } catch (error: Throwable) {
+                handleCostingPlansFailure(error)
+            }
+        }
+    }
+
+    fun refreshCostingPlans() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.CostingPlans) return
+        _state.value = current.copy(
+            costingPoliciesLoading = true,
+            costingPoliciesError = null,
+            costingPolicyDetail = null,
+        )
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) {
+                    costingPlansFacade.loadPolicies(session, current.context.businessDate)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
+                _state.value = latest.copy(
+                    costingPolicies = snapshot.policies,
+                    costingPoliciesLoading = false,
+                    costingPoliciesError = null,
+                    costingCurrentMonthSummary = snapshot.currentMonthSummary,
+                )
+            } catch (error: Throwable) {
+                handleCostingPlansFailure(error)
+            }
+        }
+    }
+
+    fun openCostingPolicyDetail(policyId: Long) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.CostingPlans) return
+        _state.value = current.copy(costingPoliciesLoading = true, costingPoliciesError = null)
+        scope.launch {
+            try {
+                val detail = withContext(Dispatchers.IO) {
+                    costingPlansFacade.loadDetail(session, policyId)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
+                _state.value = latest.copy(
+                    costingPolicyDetail = detail,
+                    costingPoliciesLoading = false,
+                    costingPoliciesError = null,
+                )
+            } catch (error: Throwable) {
+                handleCostingPlansFailure(error)
+            }
+        }
+    }
+
+    fun clearCostingPolicyDetail() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            costingPolicyDetail = null,
+            costingPoliciesError = null,
+            costingPoliciesLoading = false,
+        )
+    }
+
+    fun openShopSettings() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            destination = NativeOwnerMoreDestination.ShopSettings,
+            shopSettingsLoading = true,
+            shopSettings = null,
+            shopSettingsError = null,
+            productsLoading = false,
+            productDetail = null,
+            productsError = null,
+            customersLoading = false,
+            customerDetail = null,
+            customersError = null,
+            suppliersLoading = false,
+            supplierDetail = null,
+            suppliersError = null,
+            employeesLoading = false,
+            employeeDetail = null,
+            employeesError = null,
+            costingPoliciesLoading = false,
+            costingPolicyDetail = null,
+            costingPoliciesError = null,
+            costingCurrentMonthSummary = null,
+            usersLoading = false,
+            userDetail = null,
+            usersError = null,
+            securityHistoryLoading = false,
+            securityAuditDetail = null,
+            securityHistoryError = null,
+            backupLoading = false,
+            backup = null,
+            backupError = null,
+            confirmRemoveUnlock = false,
+            error = null,
+            saving = false,
+        )
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) { shopSettingsFacade.load(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.ShopSettings) return@launch
+                _state.value = latest.copy(
+                    shopSettings = snapshot,
+                    shopSettingsLoading = false,
+                    shopSettingsError = null,
+                )
+            } catch (error: Throwable) {
+                handleShopSettingsFailure(error)
+            }
+        }
+    }
+
+    fun refreshShopSettings() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.ShopSettings) return
+        _state.value = current.copy(shopSettingsLoading = true, shopSettingsError = null)
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) { shopSettingsFacade.load(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.ShopSettings) return@launch
+                _state.value = latest.copy(
+                    shopSettings = snapshot,
+                    shopSettingsLoading = false,
+                    shopSettingsError = null,
+                )
+            } catch (error: Throwable) {
+                handleShopSettingsFailure(error)
+            }
+        }
+    }
+
+    fun openUsersRoles() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            destination = NativeOwnerMoreDestination.UsersRoles,
+            usersLoading = true,
+            userDetail = null,
+            usersError = null,
+            productsLoading = false,
+            productDetail = null,
+            productsError = null,
+            customersLoading = false,
+            customerDetail = null,
+            customersError = null,
+            suppliersLoading = false,
+            supplierDetail = null,
+            suppliersError = null,
+            employeesLoading = false,
+            employeeDetail = null,
+            employeesError = null,
+            costingPoliciesLoading = false,
+            costingPolicyDetail = null,
+            costingPoliciesError = null,
+            costingCurrentMonthSummary = null,
+            shopSettingsLoading = false,
+            shopSettings = null,
+            shopSettingsError = null,
+            securityHistoryLoading = false,
+            securityAuditDetail = null,
+            securityHistoryError = null,
+            backupLoading = false,
+            backup = null,
+            backupError = null,
+            confirmRemoveUnlock = false,
+            error = null,
+            saving = false,
+        )
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) { usersRolesFacade.loadUsers(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.UsersRoles) return@launch
+                _state.value = latest.copy(
+                    users = snapshot.users,
+                    usersLoading = false,
+                    usersError = null,
+                )
+            } catch (error: Throwable) {
+                handleUsersRolesFailure(error)
+            }
+        }
+    }
+
+    fun refreshUsersRoles() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.UsersRoles) return
+        _state.value = current.copy(usersLoading = true, usersError = null, userDetail = null)
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) { usersRolesFacade.loadUsers(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.UsersRoles) return@launch
+                _state.value = latest.copy(
+                    users = snapshot.users,
+                    usersLoading = false,
+                    usersError = null,
+                )
+            } catch (error: Throwable) {
+                handleUsersRolesFailure(error)
+            }
+        }
+    }
+
+    fun openUserDetail(userId: Long) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.UsersRoles) return
+        _state.value = current.copy(usersLoading = true, usersError = null)
+        scope.launch {
+            try {
+                val detail = withContext(Dispatchers.IO) {
+                    usersRolesFacade.loadDetail(session, userId)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.UsersRoles) return@launch
+                _state.value = latest.copy(
+                    userDetail = detail,
+                    usersLoading = false,
+                    usersError = null,
+                )
+            } catch (error: Throwable) {
+                handleUsersRolesFailure(error)
+            }
+        }
+    }
+
+    fun clearUserDetail() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(userDetail = null, usersError = null, usersLoading = false)
+    }
+
+    fun openSecurityHistory() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            destination = NativeOwnerMoreDestination.SecurityHistory,
+            securityHistoryLoading = true,
+            securityAuditDetail = null,
+            securityHistoryError = null,
+            productsLoading = false,
+            productDetail = null,
+            productsError = null,
+            customersLoading = false,
+            customerDetail = null,
+            customersError = null,
+            suppliersLoading = false,
+            supplierDetail = null,
+            suppliersError = null,
+            employeesLoading = false,
+            employeeDetail = null,
+            employeesError = null,
+            costingPoliciesLoading = false,
+            costingPolicyDetail = null,
+            costingPoliciesError = null,
+            costingCurrentMonthSummary = null,
+            shopSettingsLoading = false,
+            shopSettings = null,
+            shopSettingsError = null,
+            usersLoading = false,
+            userDetail = null,
+            usersError = null,
+            backupLoading = false,
+            backup = null,
+            backupError = null,
+            confirmRemoveUnlock = false,
+            error = null,
+            saving = false,
+        )
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) {
+                    securityHistoryFacade.loadAudits(session)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.SecurityHistory) return@launch
+                _state.value = latest.copy(
+                    securityAudits = snapshot.audits,
+                    securityHistoryLoading = false,
+                    securityHistoryError = null,
+                )
+            } catch (error: Throwable) {
+                handleSecurityHistoryFailure(error)
+            }
+        }
+    }
+
+    fun refreshSecurityHistory() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.SecurityHistory) return
+        _state.value = current.copy(
+            securityHistoryLoading = true,
+            securityHistoryError = null,
+            securityAuditDetail = null,
+        )
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) {
+                    securityHistoryFacade.loadAudits(session)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.SecurityHistory) return@launch
+                _state.value = latest.copy(
+                    securityAudits = snapshot.audits,
+                    securityHistoryLoading = false,
+                    securityHistoryError = null,
+                )
+            } catch (error: Throwable) {
+                handleSecurityHistoryFailure(error)
+            }
+        }
+    }
+
+    fun openSecurityAuditDetail(auditId: Long) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.SecurityHistory) return
+        _state.value = current.copy(securityHistoryLoading = true, securityHistoryError = null)
+        scope.launch {
+            try {
+                val detail = withContext(Dispatchers.IO) {
+                    securityHistoryFacade.loadDetail(session, auditId)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.SecurityHistory) return@launch
+                _state.value = latest.copy(
+                    securityAuditDetail = detail,
+                    securityHistoryLoading = false,
+                    securityHistoryError = null,
+                )
+            } catch (error: Throwable) {
+                handleSecurityHistoryFailure(error)
+            }
+        }
+    }
+
+    fun clearSecurityAuditDetail() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            securityAuditDetail = null,
+            securityHistoryError = null,
+            securityHistoryLoading = false,
+        )
+    }
+
+    fun openBackup() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            destination = NativeOwnerMoreDestination.Backup,
+            backupLoading = true,
+            backup = null,
+            backupError = null,
+            productsLoading = false,
+            productDetail = null,
+            productsError = null,
+            customersLoading = false,
+            customerDetail = null,
+            customersError = null,
+            suppliersLoading = false,
+            supplierDetail = null,
+            suppliersError = null,
+            employeesLoading = false,
+            employeeDetail = null,
+            employeesError = null,
+            costingPoliciesLoading = false,
+            costingPolicyDetail = null,
+            costingPoliciesError = null,
+            costingCurrentMonthSummary = null,
+            shopSettingsLoading = false,
+            shopSettings = null,
+            shopSettingsError = null,
+            usersLoading = false,
+            userDetail = null,
+            usersError = null,
+            securityHistoryLoading = false,
+            securityAuditDetail = null,
+            securityHistoryError = null,
+            confirmRemoveUnlock = false,
+            error = null,
+            saving = false,
+        )
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) { backupFacade.load(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Backup) return@launch
+                _state.value = latest.copy(
+                    backup = snapshot,
+                    backupLoading = false,
+                    backupError = null,
+                )
+            } catch (error: Throwable) {
+                handleBackupFailure(error)
+            }
+        }
+    }
+
+    fun refreshBackup() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Backup) return
+        _state.value = current.copy(backupLoading = true, backupError = null)
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) { backupFacade.load(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Backup) return@launch
+                _state.value = latest.copy(
+                    backup = snapshot,
+                    backupLoading = false,
+                    backupError = null,
+                )
+            } catch (error: Throwable) {
+                handleBackupFailure(error)
+            }
+        }
+    }
+
     fun backToMenu() {
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         _state.value = current.copy(
@@ -500,6 +1038,22 @@ class NativeOwnerMoreViewModel(
             employeesLoading = false,
             employeeDetail = null,
             employeesError = null,
+            costingPoliciesLoading = false,
+            costingPolicyDetail = null,
+            costingPoliciesError = null,
+            costingCurrentMonthSummary = null,
+            shopSettingsLoading = false,
+            shopSettings = null,
+            shopSettingsError = null,
+            usersLoading = false,
+            userDetail = null,
+            usersError = null,
+            securityHistoryLoading = false,
+            securityAuditDetail = null,
+            securityHistoryError = null,
+            backupLoading = false,
+            backup = null,
+            backupError = null,
         )
     }
 
@@ -680,6 +1234,76 @@ class NativeOwnerMoreViewModel(
         )
     }
 
+    private fun handleCostingPlansFailure(error: Throwable) {
+        if (error is SecurityFailure.SessionExpired) {
+            sessionHandle = null
+            _state.value = NativeOwnerMoreState.Idle
+            onSessionExpired()
+            return
+        }
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            costingPoliciesLoading = false,
+            costingPoliciesError = publicMessage(error),
+        )
+    }
+
+    private fun handleShopSettingsFailure(error: Throwable) {
+        if (error is SecurityFailure.SessionExpired) {
+            sessionHandle = null
+            _state.value = NativeOwnerMoreState.Idle
+            onSessionExpired()
+            return
+        }
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            shopSettingsLoading = false,
+            shopSettingsError = publicMessage(error),
+        )
+    }
+
+    private fun handleUsersRolesFailure(error: Throwable) {
+        if (error is SecurityFailure.SessionExpired) {
+            sessionHandle = null
+            _state.value = NativeOwnerMoreState.Idle
+            onSessionExpired()
+            return
+        }
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            usersLoading = false,
+            usersError = publicMessage(error),
+        )
+    }
+
+    private fun handleSecurityHistoryFailure(error: Throwable) {
+        if (error is SecurityFailure.SessionExpired) {
+            sessionHandle = null
+            _state.value = NativeOwnerMoreState.Idle
+            onSessionExpired()
+            return
+        }
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            securityHistoryLoading = false,
+            securityHistoryError = publicMessage(error),
+        )
+    }
+
+    private fun handleBackupFailure(error: Throwable) {
+        if (error is SecurityFailure.SessionExpired) {
+            sessionHandle = null
+            _state.value = NativeOwnerMoreState.Idle
+            onSessionExpired()
+            return
+        }
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            backupLoading = false,
+            backupError = publicMessage(error),
+        )
+    }
+
     private fun publicMessage(error: Throwable): String = when (error) {
         is SecurityFailure -> error.message ?: "More is unavailable."
         is IllegalArgumentException, is IllegalStateException ->
@@ -693,6 +1317,11 @@ class NativeOwnerMoreViewModel(
         private val customersFacade: NativeOwnerCustomersFacade,
         private val suppliersFacade: NativeOwnerSuppliersFacade,
         private val employeesFacade: NativeOwnerEmployeesFacade,
+        private val costingPlansFacade: NativeOwnerCostingPlansFacade,
+        private val shopSettingsFacade: NativeOwnerShopSettingsFacade,
+        private val usersRolesFacade: NativeOwnerUsersRolesFacade,
+        private val securityHistoryFacade: NativeOwnerSecurityHistoryFacade,
+        private val backupFacade: NativeOwnerBackupFacade,
         private val onSessionExpired: () -> Unit,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
@@ -704,6 +1333,11 @@ class NativeOwnerMoreViewModel(
                 customersFacade,
                 suppliersFacade,
                 employeesFacade,
+                costingPlansFacade,
+                shopSettingsFacade,
+                usersRolesFacade,
+                securityHistoryFacade,
+                backupFacade,
                 onSessionExpired,
             ) as T
         }

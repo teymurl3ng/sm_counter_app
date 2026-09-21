@@ -37,7 +37,7 @@ Authority for product shape:
 - Shell law: `PHASE14_8_15A_SHELL_VS_CONTENT.md`
 - Existing Quick unlock: `QuickUnlockService` via the same enroll/remove path Cashier/Ops More already use
 
-This checkpoint owns **Owner More home** conservatively: sectioned menu matching journey groups, connected personal security + switch account + sign out, and explicit preview notices for deep destinations not yet native. It does **not** implement Products/Customers/Suppliers/Employees editors, costing/plans, shop settings, users/roles admin, security history browser, or backup/restore write UI.
+This checkpoint owns **Owner More home** conservatively: sectioned menu matching journey groups, connected personal security + switch account + sign out, and nested deep destinations connected in follow-on slices (14.8.18–26). Write UIs for master-data editors, shop-settings edit, user enrollment, and backup/restore remain deferred behind explicit preview notices.
 
 ## What the existing product already guarantees
 
@@ -68,9 +68,9 @@ This checkpoint owns **Owner More home** conservatively: sectioned menu matching
 3. First viewport is the sectioned More landing (journey groups):
    - **Things you sell** — Products (**connected in 14.8.18** — list + read detail; was preview in 14.8.17)
    - **People and businesses** — Customers (**connected in 14.8.19** — list + read detail); Suppliers (**connected in 14.8.20** — list + read detail); Employees (**connected in 14.8.21** — list + read detail)
-   - **Planning and setup** — Costing & plans, Shop settings (preview)
-   - **Your account and staff access** — Personal security (connected Quick unlock); Users & roles, Security history (preview)
-   - **Safety and recovery** — Backup & restore (preview)
+   - **Planning and setup** — Costing & plans (**connected in 14.8.22** — policy list + read detail); Shop settings (**connected in 14.8.23** — read panel; edit deferred)
+   - **Your account and staff access** — Personal security (connected Quick unlock); Users & roles (**connected in 14.8.24** — list + read detail; enroll deferred); Security history (**connected in 14.8.25** — list + read detail)
+   - **Safety and recovery** — Backup & restore (**connected in 14.8.26** — status panel; export/restore/connect deferred)
    - **Account** — Switch account, Sign out (connected)
 4. Tap **Personal security** → Owner-scoped Quick unlock manage (status, enroll PIN / phone security, remove with confirmation) using the same service path as Cashier/Ops More.
 5. Back from Personal security returns to Owner More menu. Hardware Back on More home leaves the authenticated area like Overview/Work/Records home (or returns to Overview if that is the existing Owner Back contract for non-home tabs — keep consistent with current OwnerPreviewHost More behavior after wiring).
@@ -94,10 +94,11 @@ This checkpoint owns **Owner More home** conservatively: sectioned menu matching
 - Customers directory — **connected in Phase 14.8.19** as list + read detail under Owner More (create/edit remain deferred there)
 - Suppliers directory — **connected in Phase 14.8.20** as list + read detail under Owner More (create/edit remain deferred there)
 - Employees directory — **connected in Phase 14.8.21** as list + read detail under Owner More (create/edit remain deferred there; distinct from Users & roles)
-- Costing / plans, shop settings, opening state, expense categories
-- Users & roles administration
-- Security history / audit browser
-- Local backup, Drive backup, restore write UI
+- Costing & plans — **connected in Phase 14.8.22** as costing policy list + read detail under Owner More (approve/edit remain deferred there)
+- Shop settings — **connected in Phase 14.8.23** as read panel under Owner More (edit settings / opening / categories remain deferred there)
+- Users & roles — **connected in Phase 14.8.24** as staff login list + read detail under Owner More (enroll/disable remain deferred there; distinct from Employees)
+- Security history — **connected in Phase 14.8.25** as audit list + read detail under Owner More
+- Backup & restore — **connected in Phase 14.8.26** as Drive vault status panel under Owner More (export / restore / Drive connect remain deferred there)
 - Month reports, Cash & close (remain Overview / Work)
 - Manager / Admin More shells
 
@@ -107,10 +108,15 @@ This checkpoint owns **Owner More home** conservatively: sectioned menu matching
 |---|---|---|---|
 | More nav | Open Owner More home | Sectioned menu; Owner nav selected | Destination asserted; preview notice gone |
 | Personal security | Open Quick unlock manage | Status + enroll/remove controls | Destination + tags |
-| Deferred row (Costing, Users & roles, etc.) | Preview notice | Explicit not-connected copy | Tags + notice contract |
 | Products row | Open Owner Products | Active list under Owner More | Connected in 14.8.18 |
 | Customers row | Open Owner Customers | Customer list under Owner More | Connected in 14.8.19 |
 | Suppliers row | Open Owner Suppliers | Supplier list under Owner More | Connected in 14.8.20 |
+| Employees row | Open Owner Employees | Employee list under Owner More | Connected in 14.8.21 |
+| Costing & plans row | Open Owner Costing & plans | Policy list under Owner More | Connected in 14.8.22 |
+| Shop settings row | Open Owner Shop settings | Settings read panel under Owner More | Connected in 14.8.23 |
+| Users & roles row | Open Owner Users & roles | Staff login list under Owner More | Connected in 14.8.24 |
+| Security history row | Open Owner Security history | Audit list under Owner More | Connected in 14.8.25 |
+| Backup & restore row | Open Owner Backup | Status panel under Owner More | Connected in 14.8.26 |
 | Switch account | Leave → picker | Account picker | Leave path |
 | Sign out | Leave → Welcome | Welcome | Foundation leave |
 | Back (security) | Return to More menu | Menu restored | Back contract |

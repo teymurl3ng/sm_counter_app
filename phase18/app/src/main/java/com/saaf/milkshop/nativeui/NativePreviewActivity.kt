@@ -34,13 +34,18 @@ import com.saaf.milkshop.application.operations.NativeOperationsMoreFacade
 import com.saaf.milkshop.application.operations.NativeOperationsWorkFacade
 import com.saaf.milkshop.application.operations.NativeReceiveMilkFacade
 import com.saaf.milkshop.application.operations.NativeRecordSpoilageFacade
-import com.saaf.milkshop.application.owner.NativeOwnerMoreFacade
+import com.saaf.milkshop.application.owner.NativeOwnerBackupFacade
+import com.saaf.milkshop.application.owner.NativeOwnerCostingPlansFacade
 import com.saaf.milkshop.application.owner.NativeOwnerCustomersFacade
-import com.saaf.milkshop.application.owner.NativeOwnerSuppliersFacade
 import com.saaf.milkshop.application.owner.NativeOwnerEmployeesFacade
-import com.saaf.milkshop.application.owner.NativeOwnerProductsFacade
+import com.saaf.milkshop.application.owner.NativeOwnerMoreFacade
 import com.saaf.milkshop.application.owner.NativeOwnerOverviewFacade
+import com.saaf.milkshop.application.owner.NativeOwnerProductsFacade
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsFacade
+import com.saaf.milkshop.application.owner.NativeOwnerSecurityHistoryFacade
+import com.saaf.milkshop.application.owner.NativeOwnerShopSettingsFacade
+import com.saaf.milkshop.application.owner.NativeOwnerSuppliersFacade
+import com.saaf.milkshop.application.owner.NativeOwnerUsersRolesFacade
 import com.saaf.milkshop.application.owner.NativeOwnerWorkFacade
 import com.saaf.milkshop.application.sale.NativeSaleFacade
 import com.saaf.milkshop.data.MilkShopDatabase
@@ -117,6 +122,11 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var ownerCustomersFacade: NativeOwnerCustomersFacade
     private lateinit var ownerSuppliersFacade: NativeOwnerSuppliersFacade
     private lateinit var ownerEmployeesFacade: NativeOwnerEmployeesFacade
+    private lateinit var ownerCostingPlansFacade: NativeOwnerCostingPlansFacade
+    private lateinit var ownerShopSettingsFacade: NativeOwnerShopSettingsFacade
+    private lateinit var ownerUsersRolesFacade: NativeOwnerUsersRolesFacade
+    private lateinit var ownerSecurityHistoryFacade: NativeOwnerSecurityHistoryFacade
+    private lateinit var ownerBackupFacade: NativeOwnerBackupFacade
 
     private val authenticationViewModel by viewModels<NativeAuthenticationViewModel> {
         val app = application as MilkShopApplication
@@ -231,6 +241,11 @@ class NativePreviewActivity : FragmentActivity() {
             customersFacade = ownerCustomersFacade,
             suppliersFacade = ownerSuppliersFacade,
             employeesFacade = ownerEmployeesFacade,
+            costingPlansFacade = ownerCostingPlansFacade,
+            shopSettingsFacade = ownerShopSettingsFacade,
+            usersRolesFacade = ownerUsersRolesFacade,
+            securityHistoryFacade = ownerSecurityHistoryFacade,
+            backupFacade = ownerBackupFacade,
             onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
         )
     }
@@ -271,6 +286,15 @@ class NativePreviewActivity : FragmentActivity() {
         ownerCustomersFacade = NativeOwnerCustomersFacade(app.database, app.userSecurity)
         ownerSuppliersFacade = NativeOwnerSuppliersFacade(app.database, app.userSecurity)
         ownerEmployeesFacade = NativeOwnerEmployeesFacade(app.database, app.userSecurity)
+        ownerCostingPlansFacade = NativeOwnerCostingPlansFacade(app.database, app.userSecurity)
+        ownerShopSettingsFacade = NativeOwnerShopSettingsFacade(app.database, app.userSecurity)
+        ownerUsersRolesFacade = NativeOwnerUsersRolesFacade(app.database, app.userSecurity)
+        ownerSecurityHistoryFacade = NativeOwnerSecurityHistoryFacade(app.database, app.userSecurity)
+        ownerBackupFacade = NativeOwnerBackupFacade(
+            database = app.database,
+            security = app.userSecurity,
+            cloudBackupSettings = app.cloudBackupSettings,
+        )
         authenticationViewModel.attachQuickUnlock(quickUnlockFacade)
         val openOperator = intent.getBooleanExtra(EXTRA_OPEN_OPERATOR, false)
         val openOwner = intent.getBooleanExtra(EXTRA_OPEN_OWNER, false)

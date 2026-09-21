@@ -83,10 +83,10 @@ class NativeOwnerMoreScreenContractTest {
             NativeOwnerMoreState.Ready(context = openContext()),
             onDeferredDestination = { notice = it },
         )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreSuppliers)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreEmployees)
             .performScrollTo()
             .performClick()
-        assertEquals("Suppliers", notice)
+        assertEquals("Employees", notice)
     }
 
     @Test
@@ -108,6 +108,19 @@ class NativeOwnerMoreScreenContractTest {
             onOpenCustomers = { opened = true },
         )
         composeRule.onNodeWithTag(NativeUiTags.OwnerMoreCustomers)
+            .performScrollTo()
+            .performClick()
+        assertTrue(opened)
+    }
+
+    @Test
+    fun suppliersOpensFromMenu() {
+        var opened = false
+        setScreen(
+            NativeOwnerMoreState.Ready(context = openContext()),
+            onOpenSuppliers = { opened = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreSuppliers)
             .performScrollTo()
             .performClick()
         assertTrue(opened)
@@ -179,6 +192,7 @@ class NativeOwnerMoreScreenContractTest {
         onOpenPersonalSecurity: () -> Unit = {},
         onOpenProducts: () -> Unit = {},
         onOpenCustomers: () -> Unit = {},
+        onOpenSuppliers: () -> Unit = {},
         onBackToMenu: () -> Unit = {},
         onSwitchAccount: () -> Unit = {},
         onSignOut: () -> Unit = {},
@@ -201,6 +215,7 @@ class NativeOwnerMoreScreenContractTest {
                     onOpenPersonalSecurity = onOpenPersonalSecurity,
                     onOpenProducts = onOpenProducts,
                     onOpenCustomers = onOpenCustomers,
+                    onOpenSuppliers = onOpenSuppliers,
                     onBackToMenu = onBackToMenu,
                     onRetryProducts = {},
                     onOpenProduct = {},
@@ -210,6 +225,10 @@ class NativeOwnerMoreScreenContractTest {
                     onOpenCustomer = {},
                     onBackFromCustomerDetail = {},
                     onCreateCustomerPreview = {},
+                    onRetrySuppliers = {},
+                    onOpenSupplier = {},
+                    onBackFromSupplierDetail = {},
+                    onCreateSupplierPreview = {},
                     onRequestRemoveQuickUnlock = {},
                     onCancelRemoveQuickUnlock = {},
                     onRemoveQuickUnlock = {},

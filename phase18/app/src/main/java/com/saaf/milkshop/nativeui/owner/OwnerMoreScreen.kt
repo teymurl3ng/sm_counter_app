@@ -76,6 +76,7 @@ fun OwnerMoreScreen(
     onOpenPersonalSecurity: () -> Unit,
     onOpenProducts: () -> Unit,
     onOpenCustomers: () -> Unit,
+    onOpenSuppliers: () -> Unit,
     onBackToMenu: () -> Unit,
     onRetryProducts: () -> Unit,
     onOpenProduct: (Long) -> Unit,
@@ -85,6 +86,10 @@ fun OwnerMoreScreen(
     onOpenCustomer: (Long) -> Unit,
     onBackFromCustomerDetail: () -> Unit,
     onCreateCustomerPreview: () -> Unit,
+    onRetrySuppliers: () -> Unit,
+    onOpenSupplier: (Long) -> Unit,
+    onBackFromSupplierDetail: () -> Unit,
+    onCreateSupplierPreview: () -> Unit,
     onRequestRemoveQuickUnlock: () -> Unit,
     onCancelRemoveQuickUnlock: () -> Unit,
     onRemoveQuickUnlock: (CharArray) -> Unit,
@@ -146,6 +151,7 @@ fun OwnerMoreScreen(
                 onOpenPersonalSecurity = onOpenPersonalSecurity,
                 onOpenProducts = onOpenProducts,
                 onOpenCustomers = onOpenCustomers,
+                onOpenSuppliers = onOpenSuppliers,
                 onSwitchAccount = onSwitchAccount,
                 onSignOut = onSignOut,
                 onDeferredDestination = onDeferredDestination,
@@ -197,6 +203,22 @@ fun OwnerMoreScreen(
                 onNavigate = onNavigate,
                 modifier = modifier,
             )
+            NativeOwnerMoreDestination.Suppliers -> OwnerSuppliersScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = state.context,
+                suppliers = state.suppliers,
+                suppliersLoading = state.suppliersLoading,
+                supplierDetail = state.supplierDetail,
+                suppliersError = state.suppliersError,
+                onBackToMenu = onBackToMenu,
+                onRetry = onRetrySuppliers,
+                onOpenSupplier = onOpenSupplier,
+                onBackFromDetail = onBackFromSupplierDetail,
+                onCreatePreview = onCreateSupplierPreview,
+                onNavigate = onNavigate,
+                modifier = modifier,
+            )
         }
     }
 }
@@ -209,6 +231,7 @@ private fun OwnerMoreMenuScreen(
     onOpenPersonalSecurity: () -> Unit,
     onOpenProducts: () -> Unit,
     onOpenCustomers: () -> Unit,
+    onOpenSuppliers: () -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
     onDeferredDestination: (String) -> Unit,
@@ -253,7 +276,7 @@ private fun OwnerMoreMenuScreen(
                     title = "Suppliers",
                     subtitle = "Supplier accounts and milk receipts",
                     tag = NativeUiTags.OwnerMoreSuppliers,
-                    onClick = { onDeferredDestination("Suppliers") },
+                    onClick = onOpenSuppliers,
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 OwnerMoreMenuRow(

@@ -35,6 +35,7 @@ import com.saaf.milkshop.application.operations.NativeOperationsWorkFacade
 import com.saaf.milkshop.application.operations.NativeReceiveMilkFacade
 import com.saaf.milkshop.application.operations.NativeRecordSpoilageFacade
 import com.saaf.milkshop.application.owner.NativeOwnerOverviewFacade
+import com.saaf.milkshop.application.owner.NativeOwnerRecordsFacade
 import com.saaf.milkshop.application.owner.NativeOwnerWorkFacade
 import com.saaf.milkshop.application.sale.NativeSaleFacade
 import com.saaf.milkshop.data.MilkShopDatabase
@@ -67,6 +68,8 @@ import com.saaf.milkshop.nativeui.operations.OperationsPreviewHost
 import com.saaf.milkshop.nativeui.operations.OperationsSection
 import com.saaf.milkshop.nativeui.owner.NativeOwnerOverviewState
 import com.saaf.milkshop.nativeui.owner.NativeOwnerOverviewViewModel
+import com.saaf.milkshop.nativeui.owner.NativeOwnerRecordsState
+import com.saaf.milkshop.nativeui.owner.NativeOwnerRecordsViewModel
 import com.saaf.milkshop.nativeui.owner.NativeOwnerWorkState
 import com.saaf.milkshop.nativeui.owner.NativeOwnerWorkViewModel
 import com.saaf.milkshop.nativeui.owner.OwnerPreviewHost
@@ -101,6 +104,7 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var operationsMoreFacade: NativeOperationsMoreFacade
     private lateinit var ownerOverviewFacade: NativeOwnerOverviewFacade
     private lateinit var ownerWorkFacade: NativeOwnerWorkFacade
+    private lateinit var ownerRecordsFacade: NativeOwnerRecordsFacade
 
     private val authenticationViewModel by viewModels<NativeAuthenticationViewModel> {
         val app = application as MilkShopApplication
@@ -201,6 +205,13 @@ class NativePreviewActivity : FragmentActivity() {
         )
     }
 
+    private val ownerRecordsViewModel by viewModels<NativeOwnerRecordsViewModel> {
+        NativeOwnerRecordsViewModel.Factory(
+            facade = ownerRecordsFacade,
+            onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -231,6 +242,7 @@ class NativePreviewActivity : FragmentActivity() {
             cloudBackupSettings = app.cloudBackupSettings,
         )
         ownerWorkFacade = NativeOwnerWorkFacade(app.database, app.userSecurity)
+        ownerRecordsFacade = NativeOwnerRecordsFacade(app.database, app.userSecurity)
         authenticationViewModel.attachQuickUnlock(quickUnlockFacade)
         val openOperator = intent.getBooleanExtra(EXTRA_OPEN_OPERATOR, false)
         val openOwner = intent.getBooleanExtra(EXTRA_OPEN_OWNER, false)
@@ -250,6 +262,7 @@ class NativePreviewActivity : FragmentActivity() {
                 val operationsMoreState by operationsMoreViewModel.state.collectAsState()
                 val ownerOverviewState by ownerOverviewViewModel.state.collectAsState()
                 val ownerWorkState by ownerWorkViewModel.state.collectAsState()
+                val ownerRecordsState by ownerRecordsViewModel.state.collectAsState()
                 NativeFoundationPreview(
                     database = app.database,
                     security = app.userSecurity,
@@ -284,6 +297,8 @@ class NativePreviewActivity : FragmentActivity() {
                     ownerOverviewViewModel = ownerOverviewViewModel,
                     ownerWorkState = ownerWorkState,
                     ownerWorkViewModel = ownerWorkViewModel,
+                    ownerRecordsState = ownerRecordsState,
+                    ownerRecordsViewModel = ownerRecordsViewModel,
                     openOperatorOnStart = openOperator,
                     openOwnerOnStart = openOwner,
                 )
@@ -353,6 +368,8 @@ private fun NativeFoundationPreview(
     ownerOverviewViewModel: NativeOwnerOverviewViewModel,
     ownerWorkState: NativeOwnerWorkState,
     ownerWorkViewModel: NativeOwnerWorkViewModel,
+    ownerRecordsState: NativeOwnerRecordsState,
+    ownerRecordsViewModel: NativeOwnerRecordsViewModel,
     openOperatorOnStart: Boolean = false,
     openOwnerOnStart: Boolean = false,
 ) {
@@ -488,6 +505,7 @@ private fun NativeFoundationPreview(
         operationsMoreViewModel.close()
         ownerOverviewViewModel.close()
         ownerWorkViewModel.close()
+        ownerRecordsViewModel.close()
         authenticationViewModel.leaveAuthenticatedArea()
         destination = PreviewDestination.Welcome
         cashierSection = CashierSection.Sell
@@ -506,6 +524,7 @@ private fun NativeFoundationPreview(
         operationsMoreViewModel.close()
         ownerOverviewViewModel.close()
         ownerWorkViewModel.close()
+        ownerRecordsViewModel.close()
         authenticationViewModel.beginAccountSwitch()
         destination = PreviewDestination.Access
     }
@@ -532,6 +551,7 @@ private fun NativeFoundationPreview(
         if (!showingOwner) {
             ownerOverviewViewModel.close()
             ownerWorkViewModel.close()
+            ownerRecordsViewModel.close()
         }
     }
 
@@ -564,6 +584,8 @@ private fun NativeFoundationPreview(
                     ownerOverviewViewModel = ownerOverviewViewModel,
                     ownerWorkState = ownerWorkState,
                     ownerWorkViewModel = ownerWorkViewModel,
+                    ownerRecordsState = ownerRecordsState,
+                    ownerRecordsViewModel = ownerRecordsViewModel,
                     saleState = saleState,
                     saleViewModel = saleViewModel,
                     collectionState = collectionState,

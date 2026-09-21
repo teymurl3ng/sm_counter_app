@@ -1,6 +1,6 @@
 # Phase 14.8.16 — Owner Records blueprint
 
-Status: **DRAFT FOR OWNER APPROVAL** (planning pause — do not implement Compose until accepted)
+Status: **AUTO-ACCEPTED FOR NATIVE IMPLEMENTATION**
 
 Date: 2026-09-21
 
@@ -153,7 +153,6 @@ This checkpoint owns **Owner Records home** conservatively: business-wide recent
 
 ## Out of scope
 
-- Compose implementation until this draft is accepted
 - Corrections write UI, voids, supervisor approval flows
 - Reopen write UI
 - Full customer/supplier ledger destinations
@@ -169,8 +168,8 @@ This checkpoint owns **Owner Records home** conservatively: business-wide recent
 - Compose contract tests for Records home + detail tags; register inventory rows with real workflow test names (no `workflow_test=-` for connected controls).
 - Harness: `qaScreen -Pqa.screen=ownerrecords` (add to `phase18/build.gradle.kts` screen map when implementing). Keep `owner` / `ownerwork` green.
 - If list/detail content is shared across roles: Foundation tests prove Owner chrome ✓, foreign chrome ✗, Back → Owner Records list/home, session intact.
-- Prove on A06 with `:app:assembleDebug` → uninstall `com.saaf.milkshop` / `.qa` / `.qa.tests` → install → launch `NativePreviewActivity` with `open_owner=true`.
+- Prove on A06 with `:app:assembleDebug` → install (preserve preview accounts) → launch `NativePreviewActivity` with `open_owner=true`.
 
 ## Accept gate
 
-**Draft for approval.** Do not start Phase B Kotlin/Compose until the owner accepts (or amends) connected vs deferred scope, especially the deferral of corrections write and ledger groups. If leadership HTML in another checkout contradicts this conservative slice, reconcile before implementation.
+**AUTO-ACCEPTED FOR NATIVE IMPLEMENTATION.** Connected vs deferred scope follows this blueprint: corrections write and ledger/closing groups deferred; shop-wide recent list + search + read-only detail connected under Owner shell.

@@ -349,6 +349,18 @@ class NativeFoundationUiTest {
     }
 
     @Test
+    fun ownerRecordsOpensUnderOwnerChrome() {
+        openOwnerRecords()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsSearch).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavRecords).assertIsSelected()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerShellRoot).assertIsDisplayed()
+        assertOwnerShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavActivity).assertDoesNotExist()
+    }
+
+    @Test
     fun ownerWorkRecordSaleOpensUnderOwnerChrome() {
         openOwnerSale()
 
@@ -1323,6 +1335,17 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).assertIsDisplayed()
     }
 
+    private fun openOwnerRecords() {
+        openOwnerOverview()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavRecords).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsRoot).assertIsDisplayed()
+    }
+
     private fun openOwnerSale() {
         openOwnerWork()
         composeRule.onNodeWithTag(NativeUiTags.OwnerWorkRecordSale).performClick()
@@ -1406,7 +1429,7 @@ class NativeFoundationUiTest {
     }
 
     private fun assertOwnerShellWithoutForeignNav() {
-        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerShellRoot).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.CashierNavSell).assertDoesNotExist()
         composeRule.onNodeWithTag(NativeUiTags.CashierNavCollect).assertDoesNotExist()
         composeRule.onNodeWithTag(NativeUiTags.CashierNavActivity).assertDoesNotExist()

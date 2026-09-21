@@ -148,6 +148,12 @@ val screenClassMap = mapOf(
         "com.saaf.milkshop.NativeFoundationUiTest#ownerWorkDeliveriesOpensUnderOwnerChrome",
         "com.saaf.milkshop.NativeFoundationUiTest#ownerWorkDeliveriesHardwareBackReturnsToWork",
     ),
+    "ownerrecords" to listOf(
+        "com.saaf.milkshop.NativeOwnerRecordsFacadeTest",
+        "com.saaf.milkshop.NativeOwnerRecordsScreenContractTest",
+        "com.saaf.milkshop.NativeFoundationUiTest#ownerRecordsOpensUnderOwnerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#ownerOverviewPreviewNavShowsExplicitNotices",
+    ),
 )
 
 // Apply connected-test filter/sandbox via rootProject.extra (setProjectProperties is not
@@ -163,11 +169,12 @@ if (wantsQaScreen || wantsQaCheckpoint) {
             screenClassMap.getValue("receive") + screenClassMap.getValue("yogurt") +
             screenClassMap.getValue("spoilage") + screenClassMap.getValue("deliveries") +
             screenClassMap.getValue("attendance") + screenClassMap.getValue("opsmore") +
-            screenClassMap.getValue("owner") + screenClassMap.getValue("ownerwork"))
+            screenClassMap.getValue("owner") + screenClassMap.getValue("ownerwork") +
+            screenClassMap.getValue("ownerrecords"))
             .distinct()
     } else {
         val screen = qaScreenName.lowercase()
-        require(screen.isNotEmpty()) { "qaScreen requires -Pqa.screen=auth|sale|collect|activity|more|work|receive|yogurt|spoilage|deliveries|attendance|opsmore|owner|ownerwork" }
+        require(screen.isNotEmpty()) { "qaScreen requires -Pqa.screen=auth|sale|collect|activity|more|work|receive|yogurt|spoilage|deliveries|attendance|opsmore|owner|ownerwork|ownerrecords" }
         require(screenClassMap.containsKey(screen)) {
             "Unknown qa.screen='$qaScreenName'. Valid: ${screenClassMap.keys.sorted()}"
         }

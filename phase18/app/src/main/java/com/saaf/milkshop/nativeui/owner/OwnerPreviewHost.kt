@@ -54,6 +54,8 @@ fun OwnerPreviewHost(
     ownerOverviewViewModel: NativeOwnerOverviewViewModel,
     ownerWorkState: NativeOwnerWorkState,
     ownerWorkViewModel: NativeOwnerWorkViewModel,
+    ownerRecordsState: NativeOwnerRecordsState,
+    ownerRecordsViewModel: NativeOwnerRecordsViewModel,
     saleState: NativeSaleState,
     saleViewModel: NativeSaleViewModel,
     collectionState: NativeCollectionState,
@@ -91,6 +93,7 @@ fun OwnerPreviewHost(
             if (lastOwnerSession != null && lastOwnerSession != sessionHandle) {
                 onOwnerSectionChange(OwnerSection.Overview)
                 ownerWorkViewModel.close()
+                ownerRecordsViewModel.close()
                 closeOwnerWorkEntries()
             }
             lastOwnerSession = sessionHandle
@@ -149,20 +152,27 @@ fun OwnerPreviewHost(
                 OwnerSection.Overview -> {
                     closeOwnerWorkEntries()
                     ownerWorkViewModel.close()
+                    ownerRecordsViewModel.close()
                     ownerOverviewViewModel.close()
                     ownerOverviewViewModel.open(sessionHandle)
                     ownerOverviewViewModel.refresh()
                 }
                 OwnerSection.Work -> {
                     ownerOverviewViewModel.close()
+                    ownerRecordsViewModel.close()
                     ownerWorkViewModel.open(sessionHandle)
                 }
-                OwnerSection.Records,
-                OwnerSection.More,
-                -> {
+                OwnerSection.Records -> {
                     closeOwnerWorkEntries()
                     ownerWorkViewModel.close()
                     ownerOverviewViewModel.close()
+                    ownerRecordsViewModel.open(sessionHandle)
+                }
+                OwnerSection.More -> {
+                    closeOwnerWorkEntries()
+                    ownerWorkViewModel.close()
+                    ownerOverviewViewModel.close()
+                    ownerRecordsViewModel.close()
                 }
             }
         }
@@ -237,7 +247,10 @@ fun OwnerPreviewHost(
                 NativeOwnerWorkDestination.RecordSpoilage,
                 NativeOwnerWorkDestination.Deliveries,
             )
-        BackHandler(enabled = !ownerEntryOwnsBack) {
+        val ownerRecordsOwnsBack =
+            ownerSection == OwnerSection.Records &&
+                (ownerRecordsState as? NativeOwnerRecordsState.Ready)?.detail != null
+        BackHandler(enabled = !ownerEntryOwnsBack && !ownerRecordsOwnsBack) {
             when (ownerSection) {
                 OwnerSection.Overview -> onLeaveToWelcome()
                 OwnerSection.Work -> {
@@ -246,6 +259,14 @@ fun OwnerPreviewHost(
                         ready.destination != NativeOwnerWorkDestination.Home
                     ) {
                         returnOwnerWorkHome()
+                    } else {
+                        onLeaveToWelcome()
+                    }
+                }
+                OwnerSection.Records -> {
+                    val ready = ownerRecordsState as? NativeOwnerRecordsState.Ready
+                    if (ready?.detail != null) {
+                        ownerRecordsViewModel.clearDetail()
                     } else {
                         onLeaveToWelcome()
                     }
@@ -261,6 +282,7 @@ fun OwnerPreviewHost(
                     } else {
                         closeOwnerWorkEntries()
                         ownerWorkViewModel.close()
+                        ownerRecordsViewModel.close()
                         onOwnerSectionChange(OwnerSection.Overview)
                     }
                 }
@@ -271,20 +293,49 @@ fun OwnerPreviewHost(
                         onShowNotice("Work is already open.")
                     } else {
                         closeOwnerWorkEntries()
+                        ownerRecordsViewModel.close()
                         ownerWorkViewModel.backToHome()
                         onOwnerSectionChange(OwnerSection.Work)
                     }
                 }
-                OwnerSection.Records,
-                OwnerSection.More,
-                -> {
+                OwnerSection.Records -> {
                     closeOwnerWorkEntries()
                     ownerWorkViewModel.close()
+                    if (ownerSection == OwnerSection.Records &&
+                        (ownerRecordsState as? NativeOwnerRecordsState.Ready)?.detail == null
+                    ) {
+                        onShowNotice("Records is already open.")
+                    } else {
+                        ownerRecordsViewModel.clearDetail()
+                        onOwnerSectionChange(OwnerSection.Records)
+                    }
+                }
+                OwnerSection.More -> {
+                    closeOwnerWorkEntries()
+                    ownerWorkViewModel.close()
+                    ownerRecordsViewModel.close()
                     onOwnerSectionChange(section)
                 }
             }
         }
         when {
+            ownerSection == OwnerSection.Records -> {
+                OwnerRecordsScreen(
+                    snackbarHostState = snackbarHostState,
+                    state = ownerRecordsState,
+                    onRetry = ownerRecordsViewModel::refresh,
+                    onSearchQueryChange = ownerRecordsViewModel::setSearchQuery,
+                    onOpenRecord = ownerRecordsViewModel::openDetail,
+                    onBackFromDetail = ownerRecordsViewModel::clearDetail,
+                    onLeaveConfirmed = onLeaveToWelcome,
+                    onNavigate = navigateOwner,
+                    onDeferredGroup = { group ->
+                        onShowNotice(
+                            "$group comes next in the Owner Records family.",
+                        )
+                    },
+                )
+            }
             ownerSection == OwnerSection.Work &&
                 ownerWorkDestination == NativeOwnerWorkDestination.RecordSale -> {
                 OwnerSaleEntryScreen(

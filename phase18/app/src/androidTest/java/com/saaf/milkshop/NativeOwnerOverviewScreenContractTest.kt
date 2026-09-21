@@ -98,14 +98,13 @@ class NativeOwnerOverviewScreenContractTest {
     }
 
     @Test
-    fun recordsPreviewShowsExplicitNotConnectedCopy() {
+    fun recordsSectionShowsOpeningPlaceholderWhileHosted() {
         setScreen(
             NativeOwnerOverviewState.Ready(snapshot = attentionSnapshot()),
             section = OwnerSection.Records,
         )
-
-        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsPreview).assertIsDisplayed()
-        composeRule.onNodeWithText("Owner Records comes next").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsLoading).assertIsDisplayed()
+        composeRule.onNodeWithText("Opening records…").assertIsDisplayed()
     }
 
     @Test

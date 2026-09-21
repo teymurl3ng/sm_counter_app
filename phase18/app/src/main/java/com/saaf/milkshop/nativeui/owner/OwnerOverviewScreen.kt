@@ -121,29 +121,19 @@ fun OwnerOverviewScreen(
                 Text("Opening work…")
             }
         }
-        OwnerSection.Records,
-        OwnerSection.More,
-        -> OwnerScaffold(snackbarHostState, section, onNavigate, modifier) { padding ->
+        OwnerSection.More -> OwnerScaffold(snackbarHostState, section, onNavigate, modifier) { padding ->
             Column(
                 Modifier
                     .fillMaxSize()
                     .padding(padding)
                     .padding(24.dp)
-                    .testTag(
-                        when (section) {
-                            OwnerSection.Records -> NativeUiTags.OwnerRecordsPreview
-                            else -> NativeUiTags.OwnerMorePreview
-                        },
-                    ),
+                    .testTag(NativeUiTags.OwnerMorePreview),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Spacer(Modifier.height(24.dp))
                 Text(
-                    when (section) {
-                        OwnerSection.Records -> "Owner Records comes next"
-                        else -> "Owner More comes next"
-                    },
+                    "Owner More comes next",
                     style = MaterialTheme.typography.headlineSmall,
                 )
                 Text(
@@ -153,6 +143,21 @@ fun OwnerOverviewScreen(
                 OutlinedButton(onClick = { onNavigate(OwnerSection.Overview) }) {
                     Text("Back to Overview")
                 }
+            }
+        }
+        OwnerSection.Records -> OwnerScaffold(snackbarHostState, section, onNavigate, modifier) {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(it)
+                    .padding(24.dp)
+                    .testTag(NativeUiTags.OwnerRecordsLoading),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                CircularProgressIndicator()
+                Spacer(Modifier.height(12.dp))
+                Text("Opening records…")
             }
         }
     }

@@ -232,12 +232,10 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithTag(NativeUiTags.OpsNavMore).performClick()
         composeRule.waitUntil(10_000) {
             runCatching {
-                composeRule.onNodeWithTag(NativeUiTags.OpsMorePreview).fetchSemanticsNode()
+                composeRule.onNodeWithTag(NativeUiTags.OpsMoreRoot).fetchSemanticsNode()
             }.isSuccess
         }
-        composeRule.onNodeWithText(
-            "Operations More is not connected in this native preview yet.",
-        ).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavMore).assertIsSelected()
 
         composeRule.onNodeWithTag(NativeUiTags.OpsNavWork).performClick()
         composeRule.waitUntil(10_000) {
@@ -246,6 +244,34 @@ class NativeFoundationUiTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OpsNavWork).assertIsSelected()
+    }
+
+    @Test
+    fun operationsMoreOpensConnectedEntry() {
+        openOperationsWork()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavMore).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsMoreRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsMoreMenu).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsMoreTodayWork).assertIsDisplayed()
+        composeRule.onNodeWithText("Count cash").assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavMore).assertIsSelected()
+    }
+
+    @Test
+    fun operationsMoreSignsOutToWelcome() {
+        openOperationsWork()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavMore).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsMoreSignOut).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsMoreSignOut).performClick()
+        waitForText("Continue")
     }
 
     @Test

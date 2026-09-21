@@ -145,17 +145,23 @@ fun OperationsWorkScreen(
                 }
             }
         }
-        OperationsSection.More -> PreviewDestination(
-            snackbarHostState = snackbarHostState,
-            identity = identity,
-            section = section,
-            title = "More",
-            message = "Operations More is not connected in this native preview yet.",
-            tag = NativeUiTags.OpsMorePreview,
-            onNavigate = onNavigate,
-            onLeaveConfirmed = onLeaveConfirmed,
-            modifier = modifier,
-        )
+        OperationsSection.More -> {
+            // Hosted by NativePreviewActivity via OperationsMoreScreen.
+            WorkScaffold(snackbarHostState, section, onNavigate, modifier) { padding ->
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(24.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    CircularProgressIndicator()
+                    Spacer(Modifier.height(12.dp))
+                    Text("Opening More…")
+                }
+            }
+        }
     }
 }
 
@@ -421,40 +427,46 @@ internal fun WorkScaffold(
     Scaffold(
         modifier = modifier.testTag(NativeUiTags.OpsWorkRoot),
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = {
-            NavigationBar {
-                OpsNavItem(
-                    selected = section == OperationsSection.Work,
-                    label = "Work",
-                    icon = Icons.Outlined.WorkOutline,
-                    tag = NativeUiTags.OpsNavWork,
-                    onClick = { onNavigate(OperationsSection.Work) },
-                )
-                OpsNavItem(
-                    selected = section == OperationsSection.Deliveries,
-                    label = "Deliveries",
-                    icon = Icons.Outlined.LocalShipping,
-                    tag = NativeUiTags.OpsNavDeliveries,
-                    onClick = { onNavigate(OperationsSection.Deliveries) },
-                )
-                OpsNavItem(
-                    selected = section == OperationsSection.Attendance,
-                    label = "Attendance",
-                    icon = Icons.Outlined.EventAvailable,
-                    tag = NativeUiTags.OpsNavAttendance,
-                    onClick = { onNavigate(OperationsSection.Attendance) },
-                )
-                OpsNavItem(
-                    selected = section == OperationsSection.More,
-                    label = "More",
-                    icon = Icons.Outlined.MoreHoriz,
-                    tag = NativeUiTags.OpsNavMore,
-                    onClick = { onNavigate(OperationsSection.More) },
-                )
-            }
-        },
+        bottomBar = { OperationsNavigation(selected = section, onNavigate = onNavigate) },
         content = content,
     )
+}
+
+@Composable
+internal fun OperationsNavigation(
+    selected: OperationsSection,
+    onNavigate: (OperationsSection) -> Unit,
+) {
+    NavigationBar {
+        OpsNavItem(
+            selected = selected == OperationsSection.Work,
+            label = "Work",
+            icon = Icons.Outlined.WorkOutline,
+            tag = NativeUiTags.OpsNavWork,
+            onClick = { onNavigate(OperationsSection.Work) },
+        )
+        OpsNavItem(
+            selected = selected == OperationsSection.Deliveries,
+            label = "Deliveries",
+            icon = Icons.Outlined.LocalShipping,
+            tag = NativeUiTags.OpsNavDeliveries,
+            onClick = { onNavigate(OperationsSection.Deliveries) },
+        )
+        OpsNavItem(
+            selected = selected == OperationsSection.Attendance,
+            label = "Attendance",
+            icon = Icons.Outlined.EventAvailable,
+            tag = NativeUiTags.OpsNavAttendance,
+            onClick = { onNavigate(OperationsSection.Attendance) },
+        )
+        OpsNavItem(
+            selected = selected == OperationsSection.More,
+            label = "More",
+            icon = Icons.Outlined.MoreHoriz,
+            tag = NativeUiTags.OpsNavMore,
+            onClick = { onNavigate(OperationsSection.More) },
+        )
+    }
 }
 
 @Composable

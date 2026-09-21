@@ -1,7 +1,7 @@
 # Run isolated connected instrumentation for one screen or the full checkpoint set.
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet("auth", "sale", "collect", "activity", "more", "work", "receive", "yogurt", "spoilage", "deliveries", "attendance", "checkpoint")]
+    [ValidateSet("auth", "sale", "collect", "activity", "more", "work", "receive", "yogurt", "spoilage", "deliveries", "attendance", "opsmore", "checkpoint")]
     [string]$Screen,
     [string]$Serial = "",
     [string]$Phase18Dir = ""
@@ -85,10 +85,16 @@ $map = @{
         "com.saaf.milkshop.NativeFoundationUiTest#operationsAttendanceOpensConnectedEntry",
         "com.saaf.milkshop.NativeFoundationUiTest#operationsAttendanceMarksPresent"
     )
+    opsmore = @(
+        "com.saaf.milkshop.NativeOperationsMoreFacadeTest",
+        "com.saaf.milkshop.NativeOperationsMoreScreenContractTest",
+        "com.saaf.milkshop.NativeFoundationUiTest#operationsMoreOpensConnectedEntry",
+        "com.saaf.milkshop.NativeFoundationUiTest#operationsMoreSignsOutToWelcome"
+    )
 }
 
 if ($Screen -eq "checkpoint") {
-    $classes = @($map.auth + $map.sale + $map.collect + $map.activity + $map.more + $map.work + $map.receive + $map.yogurt + $map.spoilage + $map.deliveries + $map.attendance | Select-Object -Unique)
+    $classes = @($map.auth + $map.sale + $map.collect + $map.activity + $map.more + $map.work + $map.receive + $map.yogurt + $map.spoilage + $map.deliveries + $map.attendance + $map.opsmore | Select-Object -Unique)
 } else {
     $classes = @($map[$Screen])
 }

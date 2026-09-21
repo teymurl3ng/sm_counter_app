@@ -98,15 +98,14 @@ class NativeOperationsWorkScreenContractTest {
     }
 
     @Test
-    fun moreNavShowsExplicitPreviewNotice() {
+    fun moreNavOpensConnectedEntry() {
+        var navigated: OperationsSection? = null
         setScreen(
             NativeOperationsWorkState.Ready(context = openContext()),
-            section = OperationsSection.More,
+            onNavigate = { navigated = it },
         )
-        composeRule.onNodeWithTag(NativeUiTags.OpsMorePreview).assertIsDisplayed()
-        composeRule.onNodeWithText(
-            "Operations More is not connected in this native preview yet.",
-        ).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavMore).performClick()
+        assertEquals(OperationsSection.More, navigated)
     }
 
     @Test

@@ -1,0 +1,36 @@
+---
+description: Reuse existing native sibling shells when implementing the same surface; do not erase planned role redesigns.
+alwaysApply: true
+---
+
+# Native UI — reuse siblings, respect planned role designs
+
+## What this means
+
+When a surface already exists in native Compose for one role (e.g. Cashier **More**), implementing that same surface for another role (e.g. Operations **More**) must **adapt the existing screen shell** — header, menu-row pattern, security form, scaffold, spacing — not invent a parallel layout from scratch.
+
+This is an **implementation consistency** rule inside the already-accepted Counter Ledger / role designs.
+
+## What this does not mean
+
+- Owner, Cashier, Operator, Manager, and Admin experiences are **not** supposed to look the same.
+- Extensive planning that redesigns screens by role (journeys, density, first viewport, authority-gated content) remains authoritative.
+- Do not flatten Owner oversight into Cashier entry chrome, or force leadership layouts onto worker shells.
+
+## Do
+
+- Before building, find the closest shipped native sibling of the same surface kind and open it.
+- Reuse its scaffold, header, row chrome, and sub-screen layout; swap only role-safe actions, copy, and data boundaries.
+- Prefer extracting shared pieces when two roles truly share a shell (e.g. personal security form).
+
+## Do not
+
+- Start a same-kind surface from a blank Compose file when a sibling already defines the pattern.
+- “Redesign” a worker More/menu while implementing it just because it is a new file.
+- Override `PHASE14_8_2_*` role/journey planning in the name of consistency.
+
+## Check
+
+1. What does planning say this role’s screen should be?
+2. Is there already a native sibling for this surface kind?
+3. If yes → adapt that sibling under the planned role content. If the surface is inherently different (Sell dock vs Work home) → new layout is fine; still keep shared app chrome (nav, snackbars, identity header where planned).

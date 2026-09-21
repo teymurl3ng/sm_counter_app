@@ -302,10 +302,11 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).performClick()
         composeRule.waitUntil(10_000) {
             runCatching {
-                composeRule.onNodeWithTag(NativeUiTags.OwnerWorkPreview).fetchSemanticsNode()
+                composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).fetchSemanticsNode()
             }.isSuccess
         }
-        composeRule.onNodeWithText("Owner Work comes next").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
         composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).performClick()
         composeRule.waitUntil(10_000) {
             runCatching {
@@ -313,6 +314,38 @@ class NativeFoundationUiTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).assertIsSelected()
+    }
+
+    @Test
+    fun ownerWorkOpensConnectedEntry() {
+        openOwnerOverview()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkRecordSale).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkPrimaryActions).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
+    }
+
+    @Test
+    fun ownerWorkExpenseShowsExplicitPreview() {
+        openOwnerOverview()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkRecordExpense).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerWorkExpensePreview).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithText("not connected yet", substring = true).assertIsDisplayed()
     }
 
     @Test

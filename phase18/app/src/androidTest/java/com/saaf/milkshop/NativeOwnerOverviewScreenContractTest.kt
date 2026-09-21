@@ -76,13 +76,13 @@ class NativeOwnerOverviewScreenContractTest {
     }
 
     @Test
-    fun workPreviewShowsExplicitNotConnectedCopy() {
+    fun workSectionShowsOpeningPlaceholderWhileHosted() {
         setScreen(
             NativeOwnerOverviewState.Ready(snapshot = attentionSnapshot()),
             section = OwnerSection.Work,
         )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkPreview).assertIsDisplayed()
-        composeRule.onNodeWithText("Owner Work comes next").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkLoading).assertIsDisplayed()
+        composeRule.onNodeWithText("Opening work…").assertIsDisplayed()
     }
 
     private fun setScreen(

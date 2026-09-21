@@ -35,6 +35,7 @@ import com.saaf.milkshop.application.operations.NativeOperationsWorkFacade
 import com.saaf.milkshop.application.operations.NativeReceiveMilkFacade
 import com.saaf.milkshop.application.operations.NativeRecordSpoilageFacade
 import com.saaf.milkshop.application.owner.NativeOwnerOverviewFacade
+import com.saaf.milkshop.application.owner.NativeOwnerWorkFacade
 import com.saaf.milkshop.application.preview.NativePreviewSampleData
 import com.saaf.milkshop.application.sale.NativeSaleFacade
 import com.saaf.milkshop.data.MilkShopDatabase
@@ -80,8 +81,12 @@ import com.saaf.milkshop.nativeui.operations.ReceiveMilkScreen
 import com.saaf.milkshop.nativeui.operations.RecordSpoilageScreen
 import com.saaf.milkshop.nativeui.owner.NativeOwnerOverviewState
 import com.saaf.milkshop.nativeui.owner.NativeOwnerOverviewViewModel
+import com.saaf.milkshop.nativeui.owner.NativeOwnerWorkDestination
+import com.saaf.milkshop.nativeui.owner.NativeOwnerWorkState
+import com.saaf.milkshop.nativeui.owner.NativeOwnerWorkViewModel
 import com.saaf.milkshop.nativeui.owner.OwnerOverviewScreen
 import com.saaf.milkshop.nativeui.owner.OwnerSection
+import com.saaf.milkshop.nativeui.owner.OwnerWorkScreen
 import com.saaf.milkshop.nativeui.sale.CashierSaleScreen
 import com.saaf.milkshop.nativeui.sale.CashierSection
 import com.saaf.milkshop.nativeui.sale.NativeSaleState
@@ -111,6 +116,7 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var attendanceFacade: NativeAttendanceFacade
     private lateinit var operationsMoreFacade: NativeOperationsMoreFacade
     private lateinit var ownerOverviewFacade: NativeOwnerOverviewFacade
+    private lateinit var ownerWorkFacade: NativeOwnerWorkFacade
 
     private val authenticationViewModel by viewModels<NativeAuthenticationViewModel> {
         val app = application as MilkShopApplication
@@ -204,6 +210,13 @@ class NativePreviewActivity : FragmentActivity() {
         )
     }
 
+    private val ownerWorkViewModel by viewModels<NativeOwnerWorkViewModel> {
+        NativeOwnerWorkViewModel.Factory(
+            facade = ownerWorkFacade,
+            onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -233,6 +246,7 @@ class NativePreviewActivity : FragmentActivity() {
             security = app.userSecurity,
             cloudBackupSettings = app.cloudBackupSettings,
         )
+        ownerWorkFacade = NativeOwnerWorkFacade(app.database, app.userSecurity)
         authenticationViewModel.attachQuickUnlock(quickUnlockFacade)
         val openOperator = intent.getBooleanExtra(EXTRA_OPEN_OPERATOR, false)
         val openOwner = intent.getBooleanExtra(EXTRA_OPEN_OWNER, false)
@@ -251,6 +265,7 @@ class NativePreviewActivity : FragmentActivity() {
                 val attendanceState by attendanceViewModel.state.collectAsState()
                 val operationsMoreState by operationsMoreViewModel.state.collectAsState()
                 val ownerOverviewState by ownerOverviewViewModel.state.collectAsState()
+                val ownerWorkState by ownerWorkViewModel.state.collectAsState()
                 NativeFoundationPreview(
                     database = app.database,
                     security = app.userSecurity,
@@ -283,6 +298,8 @@ class NativePreviewActivity : FragmentActivity() {
                     operationsMoreViewModel = operationsMoreViewModel,
                     ownerOverviewState = ownerOverviewState,
                     ownerOverviewViewModel = ownerOverviewViewModel,
+                    ownerWorkState = ownerWorkState,
+                    ownerWorkViewModel = ownerWorkViewModel,
                     openOperatorOnStart = openOperator,
                     openOwnerOnStart = openOwner,
                 )
@@ -350,6 +367,8 @@ private fun NativeFoundationPreview(
     operationsMoreViewModel: NativeOperationsMoreViewModel,
     ownerOverviewState: NativeOwnerOverviewState,
     ownerOverviewViewModel: NativeOwnerOverviewViewModel,
+    ownerWorkState: NativeOwnerWorkState,
+    ownerWorkViewModel: NativeOwnerWorkViewModel,
     openOperatorOnStart: Boolean = false,
     openOwnerOnStart: Boolean = false,
 ) {
@@ -475,6 +494,15 @@ private fun NativeFoundationPreview(
         moreViewModel.close()
     }
 
+    fun closeOwnerWorkEntries() {
+        saleViewModel.close()
+        collectionViewModel.close()
+        receiveMilkViewModel.close()
+        makeYogurtViewModel.close()
+        recordSpoilageViewModel.close()
+        deliveriesViewModel.close()
+    }
+
     fun leaveToWelcome() {
         closeCashierShell()
         operationsWorkViewModel.close()
@@ -485,6 +513,7 @@ private fun NativeFoundationPreview(
         attendanceViewModel.close()
         operationsMoreViewModel.close()
         ownerOverviewViewModel.close()
+        ownerWorkViewModel.close()
         authenticationViewModel.leaveAuthenticatedArea()
         destination = PreviewDestination.Welcome
         cashierSection = CashierSection.Sell
@@ -502,6 +531,7 @@ private fun NativeFoundationPreview(
         attendanceViewModel.close()
         operationsMoreViewModel.close()
         ownerOverviewViewModel.close()
+        ownerWorkViewModel.close()
         authenticationViewModel.beginAccountSwitch()
         destination = PreviewDestination.Access
     }
@@ -515,8 +545,8 @@ private fun NativeFoundationPreview(
     val showingCashier = showingAuthenticated && !showingOperator && !showingOwner
 
     androidx.compose.runtime.LaunchedEffect(showingCashier, showingOperator, showingOwner) {
-        if (!showingCashier) closeCashierShell()
-        if (!showingOperator) {
+        if (!showingCashier && !showingOwner) closeCashierShell()
+        if (!showingOperator && !showingOwner) {
             operationsWorkViewModel.close()
             receiveMilkViewModel.close()
             makeYogurtViewModel.close()
@@ -527,6 +557,7 @@ private fun NativeFoundationPreview(
         }
         if (!showingOwner) {
             ownerOverviewViewModel.close()
+            ownerWorkViewModel.close()
         }
     }
 
@@ -547,9 +578,15 @@ private fun NativeFoundationPreview(
                 SaafTheme(darkTheme = false) {
                     var lastOwnerSession by rememberSaveable { mutableStateOf<String?>(null) }
                     var ownerSampleReady by remember(authenticated.sessionHandle) { mutableStateOf(false) }
+                    fun returnOwnerWorkHome() {
+                        closeOwnerWorkEntries()
+                        ownerWorkViewModel.backToHome()
+                    }
                     androidx.compose.runtime.LaunchedEffect(authenticated.sessionHandle) {
                         if (lastOwnerSession != null && lastOwnerSession != authenticated.sessionHandle) {
                             ownerSection = OwnerSection.Overview
+                            ownerWorkViewModel.close()
+                            closeOwnerWorkEntries()
                         }
                         lastOwnerSession = authenticated.sessionHandle
                         ownerSampleReady = false
@@ -591,17 +628,112 @@ private fun NativeFoundationPreview(
                     androidx.compose.runtime.LaunchedEffect(
                         authenticated.sessionHandle,
                         ownerSampleReady,
+                        ownerSection,
                     ) {
                         if (!ownerSampleReady) return@LaunchedEffect
-                        ownerOverviewViewModel.close()
-                        ownerOverviewViewModel.open(authenticated.sessionHandle)
-                        // Seed writes finish just before this; force a second load so the
-                        // decision summary cannot stick on an empty first paint.
-                        ownerOverviewViewModel.refresh()
+                        when (ownerSection) {
+                            OwnerSection.Overview -> {
+                                closeOwnerWorkEntries()
+                                ownerWorkViewModel.close()
+                                ownerOverviewViewModel.close()
+                                ownerOverviewViewModel.open(authenticated.sessionHandle)
+                                ownerOverviewViewModel.refresh()
+                            }
+                            OwnerSection.Work -> {
+                                ownerOverviewViewModel.close()
+                                ownerWorkViewModel.open(authenticated.sessionHandle)
+                            }
+                            OwnerSection.Records,
+                            OwnerSection.More,
+                            -> {
+                                closeOwnerWorkEntries()
+                                ownerWorkViewModel.close()
+                                ownerOverviewViewModel.close()
+                            }
+                        }
                     }
-                    BackHandler {
+                    androidx.compose.runtime.LaunchedEffect(
+                        authenticated.sessionHandle,
+                        ownerSection,
+                        (ownerWorkState as? NativeOwnerWorkState.Ready)?.destination,
+                    ) {
+                        val workDestination =
+                            (ownerWorkState as? NativeOwnerWorkState.Ready)?.destination
+                        when {
+                            ownerSection != OwnerSection.Work -> closeOwnerWorkEntries()
+                            workDestination == NativeOwnerWorkDestination.RecordSale -> {
+                                collectionViewModel.close()
+                                receiveMilkViewModel.close()
+                                makeYogurtViewModel.close()
+                                recordSpoilageViewModel.close()
+                                deliveriesViewModel.close()
+                                saleViewModel.open(authenticated.sessionHandle)
+                            }
+                            workDestination == NativeOwnerWorkDestination.RecordPayment -> {
+                                saleViewModel.close()
+                                receiveMilkViewModel.close()
+                                makeYogurtViewModel.close()
+                                recordSpoilageViewModel.close()
+                                deliveriesViewModel.close()
+                                collectionViewModel.open(authenticated.sessionHandle)
+                            }
+                            workDestination == NativeOwnerWorkDestination.ReceiveMilk -> {
+                                saleViewModel.close()
+                                collectionViewModel.close()
+                                makeYogurtViewModel.close()
+                                recordSpoilageViewModel.close()
+                                deliveriesViewModel.close()
+                                receiveMilkViewModel.open(authenticated.sessionHandle)
+                            }
+                            workDestination == NativeOwnerWorkDestination.MakeYogurt -> {
+                                saleViewModel.close()
+                                collectionViewModel.close()
+                                receiveMilkViewModel.close()
+                                recordSpoilageViewModel.close()
+                                deliveriesViewModel.close()
+                                makeYogurtViewModel.open(authenticated.sessionHandle)
+                            }
+                            workDestination == NativeOwnerWorkDestination.RecordSpoilage -> {
+                                saleViewModel.close()
+                                collectionViewModel.close()
+                                receiveMilkViewModel.close()
+                                makeYogurtViewModel.close()
+                                deliveriesViewModel.close()
+                                recordSpoilageViewModel.open(authenticated.sessionHandle)
+                            }
+                            workDestination == NativeOwnerWorkDestination.Deliveries -> {
+                                saleViewModel.close()
+                                collectionViewModel.close()
+                                receiveMilkViewModel.close()
+                                makeYogurtViewModel.close()
+                                recordSpoilageViewModel.close()
+                                deliveriesViewModel.open(authenticated.sessionHandle)
+                            }
+                            else -> closeOwnerWorkEntries()
+                        }
+                    }
+                    val ownerWorkDestination =
+                        (ownerWorkState as? NativeOwnerWorkState.Ready)?.destination
+                    val ownerEntryOwnsBack = ownerSection == OwnerSection.Work &&
+                        ownerWorkDestination in setOf(
+                            NativeOwnerWorkDestination.ReceiveMilk,
+                            NativeOwnerWorkDestination.MakeYogurt,
+                            NativeOwnerWorkDestination.RecordSpoilage,
+                            NativeOwnerWorkDestination.Deliveries,
+                        )
+                    BackHandler(enabled = !ownerEntryOwnsBack) {
                         when (ownerSection) {
                             OwnerSection.Overview -> leaveToWelcome()
+                            OwnerSection.Work -> {
+                                val ready = ownerWorkState as? NativeOwnerWorkState.Ready
+                                if (ready != null &&
+                                    ready.destination != NativeOwnerWorkDestination.Home
+                                ) {
+                                    returnOwnerWorkHome()
+                                } else {
+                                    leaveToWelcome()
+                                }
+                            }
                             else -> ownerSection = OwnerSection.Overview
                         }
                     }
@@ -611,28 +743,168 @@ private fun NativeFoundationPreview(
                                 if (ownerSection == OwnerSection.Overview) {
                                     showPreviewNotice("Overview is already open.")
                                 } else {
+                                    closeOwnerWorkEntries()
+                                    ownerWorkViewModel.close()
                                     ownerSection = OwnerSection.Overview
                                 }
                             }
-                            OwnerSection.Work,
+                            OwnerSection.Work -> {
+                                if (ownerSection == OwnerSection.Work &&
+                                    ownerWorkDestination == NativeOwnerWorkDestination.Home
+                                ) {
+                                    showPreviewNotice("Work is already open.")
+                                } else {
+                                    closeOwnerWorkEntries()
+                                    ownerWorkViewModel.backToHome()
+                                    ownerSection = OwnerSection.Work
+                                }
+                            }
                             OwnerSection.Records,
                             OwnerSection.More,
-                            -> ownerSection = section
+                            -> {
+                                closeOwnerWorkEntries()
+                                ownerWorkViewModel.close()
+                                ownerSection = section
+                            }
                         }
                     }
-                    OwnerOverviewScreen(
-                        snackbarHostState = snackbarHostState,
-                        state = ownerOverviewState,
-                        section = ownerSection,
-                        onRetry = ownerOverviewViewModel::refresh,
-                        onLeaveConfirmed = { leaveToWelcome() },
-                        onNavigate = navigateOwner,
-                        onAttentionReview = {
-                            showPreviewNotice(
-                                "Close, Records, and Backup destinations come next in the Owner family.",
+                    val navigateOwnerOpsEntry: (OperationsSection) -> Unit = { section ->
+                        if (section == OperationsSection.Work) {
+                            returnOwnerWorkHome()
+                        } else {
+                            showPreviewNotice("Return to Owner Work for other commands.")
+                            returnOwnerWorkHome()
+                        }
+                    }
+                    val navigateOwnerCashierEntry: (CashierSection) -> Unit = { section ->
+                        if (section == CashierSection.Sell || section == CashierSection.Collect) {
+                            Unit
+                        } else {
+                            showPreviewNotice("Return to Owner Work for other commands.")
+                            returnOwnerWorkHome()
+                        }
+                    }
+                    when {
+                        ownerSection == OwnerSection.Work &&
+                            ownerWorkDestination == NativeOwnerWorkDestination.RecordSale -> {
+                            CashierSaleScreen(
+                                snackbarHostState = snackbarHostState,
+                                identity = authenticated.identity,
+                                state = saleState,
+                                onRetry = saleViewModel::refresh,
+                                onClearFeedback = saleViewModel::clearFeedback,
+                                onRecordSale = saleViewModel::record,
+                                onLeaveConfirmed = { returnOwnerWorkHome() },
+                                onNavigate = navigateOwnerCashierEntry,
                             )
-                        },
-                    )
+                        }
+                        ownerSection == OwnerSection.Work &&
+                            ownerWorkDestination == NativeOwnerWorkDestination.RecordPayment -> {
+                            CashierCollectionScreen(
+                                snackbarHostState = snackbarHostState,
+                                identity = authenticated.identity,
+                                state = collectionState,
+                                onRetry = collectionViewModel::refresh,
+                                onSelectCustomer = collectionViewModel::selectCustomer,
+                                onRecordCollection = collectionViewModel::record,
+                                onCollectAnother = collectionViewModel::collectAnother,
+                                onViewRecord = {
+                                    showPreviewNotice(
+                                        "Owner Records comes next. Payment stays available from Work.",
+                                    )
+                                },
+                                onLeaveConfirmed = { returnOwnerWorkHome() },
+                                onNavigate = navigateOwnerCashierEntry,
+                            )
+                        }
+                        ownerSection == OwnerSection.Work &&
+                            ownerWorkDestination == NativeOwnerWorkDestination.ReceiveMilk -> {
+                            ReceiveMilkScreen(
+                                snackbarHostState = snackbarHostState,
+                                identity = authenticated.identity,
+                                state = receiveMilkState,
+                                onRetry = receiveMilkViewModel::refresh,
+                                onSelectVendor = receiveMilkViewModel::selectVendor,
+                                onOpenVendorPicker = receiveMilkViewModel::openVendorPicker,
+                                onCloseVendorPicker = receiveMilkViewModel::closeVendorPicker,
+                                onPreview = receiveMilkViewModel::preview,
+                                onRecord = receiveMilkViewModel::record,
+                                onReceiveAnother = receiveMilkViewModel::receiveAnother,
+                                onBackToHome = { returnOwnerWorkHome() },
+                                onNavigate = navigateOwnerOpsEntry,
+                            )
+                        }
+                        ownerSection == OwnerSection.Work &&
+                            ownerWorkDestination == NativeOwnerWorkDestination.MakeYogurt -> {
+                            MakeYogurtScreen(
+                                snackbarHostState = snackbarHostState,
+                                identity = authenticated.identity,
+                                state = makeYogurtState,
+                                onRetry = makeYogurtViewModel::refresh,
+                                onRecord = makeYogurtViewModel::record,
+                                onMakeAnother = makeYogurtViewModel::makeAnother,
+                                onBackToHome = { returnOwnerWorkHome() },
+                                onNavigate = navigateOwnerOpsEntry,
+                            )
+                        }
+                        ownerSection == OwnerSection.Work &&
+                            ownerWorkDestination == NativeOwnerWorkDestination.RecordSpoilage -> {
+                            RecordSpoilageScreen(
+                                snackbarHostState = snackbarHostState,
+                                identity = authenticated.identity,
+                                state = recordSpoilageState,
+                                onRetry = recordSpoilageViewModel::refresh,
+                                onSelectProduct = recordSpoilageViewModel::selectProduct,
+                                onOpenProductPicker = recordSpoilageViewModel::openProductPicker,
+                                onCloseProductPicker = recordSpoilageViewModel::closeProductPicker,
+                                onSelectReason = recordSpoilageViewModel::selectReason,
+                                onOpenReasonPicker = recordSpoilageViewModel::openReasonPicker,
+                                onCloseReasonPicker = recordSpoilageViewModel::closeReasonPicker,
+                                onRecord = recordSpoilageViewModel::record,
+                                onRecordAnother = recordSpoilageViewModel::recordAnother,
+                                onBackToHome = { returnOwnerWorkHome() },
+                                onNavigate = navigateOwnerOpsEntry,
+                            )
+                        }
+                        ownerSection == OwnerSection.Work &&
+                            ownerWorkDestination == NativeOwnerWorkDestination.Deliveries -> {
+                            DeliveriesScreen(
+                                snackbarHostState = snackbarHostState,
+                                identity = authenticated.identity,
+                                state = deliveriesState,
+                                onRetry = deliveriesViewModel::refresh,
+                                onMarkDelivered = deliveriesViewModel::markDelivered,
+                                onNavigate = navigateOwnerOpsEntry,
+                                onLeaveConfirmed = { returnOwnerWorkHome() },
+                            )
+                        }
+                        ownerSection == OwnerSection.Work -> {
+                            OwnerWorkScreen(
+                                snackbarHostState = snackbarHostState,
+                                state = ownerWorkState,
+                                onRetry = ownerWorkViewModel::refresh,
+                                onOpenDestination = ownerWorkViewModel::openDestination,
+                                onBackToHome = { returnOwnerWorkHome() },
+                                onLeaveConfirmed = { leaveToWelcome() },
+                                onNavigate = navigateOwner,
+                            )
+                        }
+                        else -> {
+                            OwnerOverviewScreen(
+                                snackbarHostState = snackbarHostState,
+                                state = ownerOverviewState,
+                                section = ownerSection,
+                                onRetry = ownerOverviewViewModel::refresh,
+                                onLeaveConfirmed = { leaveToWelcome() },
+                                onNavigate = navigateOwner,
+                                onAttentionReview = {
+                                    showPreviewNotice(
+                                        "Close, Records, and Backup destinations come next in the Owner family.",
+                                    )
+                                },
+                            )
+                        }
+                    }
                 }
             } else if (showingOperator) {
                 val authenticated = authenticationState as NativeAuthenticationState.Authenticated

@@ -8,25 +8,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.GridView
-import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.MoreHoriz
-import androidx.compose.material.icons.outlined.WorkOutline
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -34,7 +22,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -119,7 +106,21 @@ fun OwnerOverviewScreen(
                 }
             }
         }
-        OwnerSection.Work,
+        OwnerSection.Work -> OwnerScaffold(snackbarHostState, section, onNavigate, modifier) {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(it)
+                    .padding(24.dp)
+                    .testTag(NativeUiTags.OwnerWorkLoading),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                CircularProgressIndicator()
+                Spacer(Modifier.height(12.dp))
+                Text("Opening work…")
+            }
+        }
         OwnerSection.Records,
         OwnerSection.More,
         -> OwnerScaffold(snackbarHostState, section, onNavigate, modifier) { padding ->
@@ -130,7 +131,6 @@ fun OwnerOverviewScreen(
                     .padding(24.dp)
                     .testTag(
                         when (section) {
-                            OwnerSection.Work -> NativeUiTags.OwnerWorkPreview
                             OwnerSection.Records -> NativeUiTags.OwnerRecordsPreview
                             else -> NativeUiTags.OwnerMorePreview
                         },
@@ -141,7 +141,6 @@ fun OwnerOverviewScreen(
                 Spacer(Modifier.height(24.dp))
                 Text(
                     when (section) {
-                        OwnerSection.Work -> "Owner Work comes next"
                         OwnerSection.Records -> "Owner Records comes next"
                         else -> "Owner More comes next"
                     },
@@ -342,90 +341,6 @@ private fun BalanceRow(label: String, paisa: Long, tag: String) {
         Text(label, style = MaterialTheme.typography.bodyLarge)
         Text("PKR ${formatMoney(paisa)}", style = MaterialTheme.typography.titleMedium)
     }
-}
-
-@Composable
-private fun OwnerScaffold(
-    snackbarHostState: SnackbarHostState,
-    section: OwnerSection,
-    onNavigate: (OwnerSection) -> Unit,
-    modifier: Modifier = Modifier,
-    content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit,
-) {
-    Scaffold(
-        modifier = modifier.testTag(NativeUiTags.OwnerShellRoot),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = {
-            OwnerNavigation(selected = section, onNavigate = onNavigate)
-        },
-        content = content,
-    )
-}
-
-@Composable
-private fun OwnerNavigation(
-    selected: OwnerSection,
-    onNavigate: (OwnerSection) -> Unit,
-) {
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 0.dp,
-    ) {
-        OwnerNavItem(
-            selected = selected == OwnerSection.Overview,
-            tag = NativeUiTags.OwnerNavOverview,
-            onClick = { onNavigate(OwnerSection.Overview) },
-            icon = Icons.Outlined.GridView,
-            label = "Overview",
-        )
-        OwnerNavItem(
-            selected = selected == OwnerSection.Work,
-            tag = NativeUiTags.OwnerNavWork,
-            onClick = { onNavigate(OwnerSection.Work) },
-            icon = Icons.Outlined.WorkOutline,
-            label = "Work",
-        )
-        OwnerNavItem(
-            selected = selected == OwnerSection.Records,
-            tag = NativeUiTags.OwnerNavRecords,
-            onClick = { onNavigate(OwnerSection.Records) },
-            icon = Icons.Outlined.History,
-            label = "Records",
-        )
-        OwnerNavItem(
-            selected = selected == OwnerSection.More,
-            tag = NativeUiTags.OwnerNavMore,
-            onClick = { onNavigate(OwnerSection.More) },
-            icon = Icons.Outlined.MoreHoriz,
-            label = "More",
-        )
-    }
-}
-
-@Composable
-private fun androidx.compose.foundation.layout.RowScope.OwnerNavItem(
-    selected: Boolean,
-    tag: String,
-    onClick: () -> Unit,
-    icon: ImageVector,
-    label: String,
-) {
-    NavigationBarItem(
-        selected = selected,
-        onClick = onClick,
-        modifier = Modifier
-            .testTag(tag)
-            .heightIn(min = 56.dp),
-        icon = { Icon(icon, contentDescription = null) },
-        label = { Text(label) },
-        colors = NavigationBarItemDefaults.colors(
-            selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-            selectedTextColor = MaterialTheme.colorScheme.primary,
-            indicatorColor = MaterialTheme.colorScheme.primary,
-            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        ),
-    )
 }
 
 private fun formatMoney(paisa: Long): String =

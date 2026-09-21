@@ -14,7 +14,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -121,28 +120,19 @@ fun OwnerOverviewScreen(
                 Text("Opening work…")
             }
         }
-        OwnerSection.More -> OwnerScaffold(snackbarHostState, section, onNavigate, modifier) { padding ->
+        OwnerSection.More -> OwnerScaffold(snackbarHostState, section, onNavigate, modifier) {
             Column(
                 Modifier
                     .fillMaxSize()
-                    .padding(padding)
+                    .padding(it)
                     .padding(24.dp)
-                    .testTag(NativeUiTags.OwnerMorePreview),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                    .testTag(NativeUiTags.OwnerMoreLoading),
+                verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Spacer(Modifier.height(24.dp))
-                Text(
-                    "Owner More comes next",
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-                Text(
-                    "This destination is not connected yet. Overview stays available.",
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-                OutlinedButton(onClick = { onNavigate(OwnerSection.Overview) }) {
-                    Text("Back to Overview")
-                }
+                CircularProgressIndicator()
+                Spacer(Modifier.height(12.dp))
+                Text("Opening more…")
             }
         }
         OwnerSection.Records -> OwnerScaffold(snackbarHostState, section, onNavigate, modifier) {

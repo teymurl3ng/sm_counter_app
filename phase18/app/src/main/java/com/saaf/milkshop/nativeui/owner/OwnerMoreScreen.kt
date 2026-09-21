@@ -1,0 +1,512 @@
+package com.saaf.milkshop.nativeui.owner
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Logout
+import androidx.compose.material.icons.outlined.Backup
+import androidx.compose.material.icons.outlined.Business
+import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Inventory2
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.People
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.SwapHoriz
+import androidx.compose.material.icons.outlined.Tune
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
+import com.saaf.milkshop.application.more.NativeMoreSecurityStatus
+import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
+import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
+import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
+
+/**
+ * Owner More — leadership business-control menu under OwnerScaffold.
+ * Reuses Cashier/Ops More menu-row and personal-security patterns; never mounts
+ * Cashier or Ops More shells.
+ */
+@Composable
+fun OwnerMoreScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    state: NativeOwnerMoreState,
+    onRetry: () -> Unit,
+    onOpenPersonalSecurity: () -> Unit,
+    onBackToMenu: () -> Unit,
+    onRequestRemoveQuickUnlock: () -> Unit,
+    onCancelRemoveQuickUnlock: () -> Unit,
+    onRemoveQuickUnlock: (CharArray) -> Unit,
+    onEnrollQuickPin: (CharArray, CharArray) -> Unit,
+    onEnrollPhoneSecurity: (CharArray, CharArray?) -> Unit,
+    onSwitchAccount: () -> Unit,
+    onSignOut: () -> Unit,
+    onDeferredDestination: (String) -> Unit,
+    onNavigate: (OwnerSection) -> Unit,
+    onLeaveConfirmed: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    when (state) {
+        NativeOwnerMoreState.Idle,
+        NativeOwnerMoreState.Loading,
+        -> OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .padding(it)
+                    .testTag(NativeUiTags.OwnerMoreLoading),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        is NativeOwnerMoreState.LoadFailure -> OwnerScaffold(
+            snackbarHostState,
+            OwnerSection.More,
+            onNavigate,
+            modifier,
+        ) { padding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(24.dp)
+                    .testTag(NativeUiTags.OwnerMoreRoot),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(state.message, style = MaterialTheme.typography.bodyLarge)
+                Spacer(Modifier.height(16.dp))
+                Button(
+                    onClick = onRetry,
+                    modifier = Modifier.testTag(NativeUiTags.OwnerMoreRetryLoad),
+                ) {
+                    Text("Try again")
+                }
+            }
+        }
+
+        is NativeOwnerMoreState.Ready -> when (state.destination) {
+            NativeOwnerMoreDestination.Menu -> OwnerMoreMenuScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                state = state,
+                onOpenPersonalSecurity = onOpenPersonalSecurity,
+                onSwitchAccount = onSwitchAccount,
+                onSignOut = onSignOut,
+                onDeferredDestination = onDeferredDestination,
+                onNavigate = onNavigate,
+                modifier = modifier,
+            )
+            NativeOwnerMoreDestination.PersonalSecurity -> OwnerMorePersonalSecurityScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                state = state,
+                onBack = onBackToMenu,
+                onRequestRemove = onRequestRemoveQuickUnlock,
+                onCancelRemove = onCancelRemoveQuickUnlock,
+                onRemove = onRemoveQuickUnlock,
+                onEnrollPin = onEnrollQuickPin,
+                onEnrollPhone = onEnrollPhoneSecurity,
+                onNavigate = onNavigate,
+                modifier = modifier,
+            )
+        }
+    }
+}
+
+@Composable
+private fun OwnerMoreMenuScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    state: NativeOwnerMoreState.Ready,
+    onOpenPersonalSecurity: () -> Unit,
+    onSwitchAccount: () -> Unit,
+    onSignOut: () -> Unit,
+    onDeferredDestination: (String) -> Unit,
+    onNavigate: (OwnerSection) -> Unit,
+    modifier: Modifier,
+) {
+    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .testTag(NativeUiTags.OwnerMoreRoot),
+        ) {
+            OwnerMoreHeader(identity, state.context)
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .testTag(NativeUiTags.OwnerMoreMenu),
+            ) {
+                OwnerMoreSectionLabel("Things you sell")
+                OwnerMoreMenuRow(
+                    icon = Icons.Outlined.Inventory2,
+                    title = "Products",
+                    subtitle = "What you sell and how it is measured",
+                    tag = NativeUiTags.OwnerMoreProducts,
+                    onClick = { onDeferredDestination("Products") },
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+                OwnerMoreSectionLabel("People and businesses")
+                OwnerMoreMenuRow(
+                    icon = Icons.Outlined.People,
+                    title = "Customers",
+                    subtitle = "Customer accounts and balances",
+                    tag = NativeUiTags.OwnerMoreCustomers,
+                    onClick = { onDeferredDestination("Customers") },
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                OwnerMoreMenuRow(
+                    icon = Icons.Outlined.Business,
+                    title = "Suppliers",
+                    subtitle = "Supplier accounts and milk receipts",
+                    tag = NativeUiTags.OwnerMoreSuppliers,
+                    onClick = { onDeferredDestination("Suppliers") },
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                OwnerMoreMenuRow(
+                    icon = Icons.Outlined.Person,
+                    title = "Employees",
+                    subtitle = "Employee profiles and attendance",
+                    tag = NativeUiTags.OwnerMoreEmployees,
+                    onClick = { onDeferredDestination("Employees") },
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+                OwnerMoreSectionLabel("Planning and setup")
+                OwnerMoreMenuRow(
+                    icon = Icons.Outlined.Tune,
+                    title = "Costing & plans",
+                    subtitle = "Cost coverage and planning",
+                    tag = NativeUiTags.OwnerMoreCosting,
+                    onClick = { onDeferredDestination("Costing & plans") },
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                OwnerMoreMenuRow(
+                    icon = Icons.Outlined.Settings,
+                    title = "Shop settings",
+                    subtitle = "Store name, opening state, categories",
+                    tag = NativeUiTags.OwnerMoreShopSettings,
+                    onClick = { onDeferredDestination("Shop settings") },
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+                OwnerMoreSectionLabel("Your account and staff access")
+                OwnerMoreMenuRow(
+                    icon = Icons.Outlined.Lock,
+                    title = "Personal security",
+                    subtitle = "Quick unlock for this account on this phone",
+                    tag = NativeUiTags.OwnerMorePersonalSecurity,
+                    onClick = onOpenPersonalSecurity,
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                OwnerMoreMenuRow(
+                    icon = Icons.Outlined.People,
+                    title = "Users & roles",
+                    subtitle = "Staff access and role assignment",
+                    tag = NativeUiTags.OwnerMoreUsersRoles,
+                    onClick = { onDeferredDestination("Users & roles") },
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                OwnerMoreMenuRow(
+                    icon = Icons.Outlined.History,
+                    title = "Security history",
+                    subtitle = "Audit of sensitive account actions",
+                    tag = NativeUiTags.OwnerMoreSecurityHistory,
+                    onClick = { onDeferredDestination("Security history") },
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+                OwnerMoreSectionLabel("Safety and recovery")
+                OwnerMoreMenuRow(
+                    icon = Icons.Outlined.Backup,
+                    title = "Backup & restore",
+                    subtitle = "Local export, Drive backup, restore",
+                    tag = NativeUiTags.OwnerMoreBackup,
+                    onClick = { onDeferredDestination("Backup & restore") },
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+                OwnerMoreSectionLabel("Account")
+                OwnerMoreMenuRow(
+                    icon = Icons.Outlined.SwapHoriz,
+                    title = "Switch account",
+                    subtitle = "Choose another person on this phone",
+                    tag = NativeUiTags.OwnerMoreSwitchAccount,
+                    onClick = onSwitchAccount,
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                OwnerMoreMenuRow(
+                    icon = Icons.AutoMirrored.Outlined.Logout,
+                    title = "Sign out",
+                    subtitle = "Return to Welcome",
+                    tag = NativeUiTags.OwnerMoreSignOut,
+                    onClick = onSignOut,
+                )
+                Spacer(Modifier.height(24.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun OwnerMorePersonalSecurityScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    state: NativeOwnerMoreState.Ready,
+    onBack: () -> Unit,
+    onRequestRemove: () -> Unit,
+    onCancelRemove: () -> Unit,
+    onRemove: (CharArray) -> Unit,
+    onEnrollPin: (CharArray, CharArray) -> Unit,
+    onEnrollPhone: (CharArray, CharArray?) -> Unit,
+    onNavigate: (OwnerSection) -> Unit,
+    modifier: Modifier,
+) {
+    BackHandler(onBack = onBack)
+    val security = state.security
+    var passphrase by rememberSaveable { mutableStateOf("") }
+    var pin by rememberSaveable { mutableStateOf("") }
+
+    if (state.confirmRemoveUnlock) {
+        AlertDialog(
+            onDismissRequest = onCancelRemove,
+            title = { Text("Remove Quick unlock?") },
+            text = {
+                Text("This clears Quick PIN and phone security for ${identity.displayName} on this phone.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { onRemove(passphrase.toCharArray()) },
+                    modifier = Modifier.testTag(NativeUiTags.OwnerMoreSecurityRemoveConfirm),
+                ) { Text("Remove") }
+            },
+            dismissButton = {
+                TextButton(onClick = onCancelRemove) { Text("Keep") }
+            },
+        )
+    }
+
+    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .imePadding()
+                .testTag(NativeUiTags.OwnerMoreSecurityScreen),
+        ) {
+            OwnerMoreHeader(identity, state.context)
+            Column(
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp, vertical = 18.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                TextButton(
+                    onClick = onBack,
+                    modifier = Modifier.testTag(NativeUiTags.OwnerMoreBack),
+                ) {
+                    Text("Back to More")
+                }
+                Text("Personal security", style = MaterialTheme.typography.headlineMedium)
+                if (security == null) {
+                    CircularProgressIndicator()
+                } else {
+                    OwnerMoreSecurityStatus(security)
+                    OutlinedTextField(
+                        value = passphrase,
+                        onValueChange = { passphrase = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerMoreSecurityPassphrase),
+                        label = { Text("Current full passphrase") },
+                        visualTransformation = PasswordVisualTransformation(),
+                        singleLine = true,
+                        enabled = !state.saving,
+                    )
+                    OutlinedTextField(
+                        value = pin,
+                        onValueChange = { pin = it.filter { ch -> ch.isDigit() }.take(4) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerMoreSecurityPin),
+                        label = { Text("New Quick PIN (4 digits)") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                        visualTransformation = PasswordVisualTransformation(),
+                        singleLine = true,
+                        enabled = !state.saving,
+                    )
+                    state.error?.let {
+                        Text(
+                            it,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.testTag(NativeUiTags.OwnerMoreError),
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            if (passphrase.isBlank() || pin.length != 4) return@Button
+                            onEnrollPin(passphrase.toCharArray(), pin.toCharArray())
+                        },
+                        enabled = !state.saving && passphrase.isNotBlank() && pin.length == 4,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerMoreSecurityEnrollPin),
+                    ) { Text(if (state.saving) "Saving…" else "Save Quick PIN") }
+                    if (security.phoneSecurityAvailable) {
+                        Button(
+                            onClick = {
+                                if (passphrase.isBlank()) return@Button
+                                onEnrollPhone(
+                                    passphrase.toCharArray(),
+                                    pin.takeIf { it.length == 4 }?.toCharArray(),
+                                )
+                            },
+                            enabled = !state.saving && passphrase.isNotBlank(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag(NativeUiTags.OwnerMoreSecurityEnrollPhone),
+                        ) { Text("Enable ${security.phoneSecurityLabel}") }
+                    }
+                    if (security.quickPinEnabled || security.phoneSecurityEnabled) {
+                        TextButton(
+                            onClick = onRequestRemove,
+                            enabled = !state.saving && passphrase.isNotBlank(),
+                            modifier = Modifier.testTag(NativeUiTags.OwnerMoreSecurityRemove),
+                        ) { Text("Remove Quick unlock") }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun OwnerMoreHeader(identity: NativeSignedInIdentity, context: NativeOwnerMoreContext) {
+    CashierScreenHeader(
+        title = "More",
+        displayName = context.shopName,
+        roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+        businessDate = context.businessDate,
+        postingOpen = context.postingOpen,
+    )
+}
+
+@Composable
+private fun OwnerMoreSectionLabel(label: String) {
+    Text(
+        label,
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        fontWeight = FontWeight.SemiBold,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 10.dp)
+            .testTag(NativeUiTags.OwnerMoreSectionLabel),
+    )
+}
+
+@Composable
+private fun OwnerMoreMenuRow(
+    icon: ImageVector,
+    title: String,
+    subtitle: String,
+    tag: String,
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 72.dp)
+            .semantics { role = Role.Button }
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .testTag(tag),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(
+                subtitle,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Icon(Icons.Outlined.ChevronRight, contentDescription = null)
+    }
+}
+
+@Composable
+private fun OwnerMoreSecurityStatus(security: NativeMoreSecurityStatus) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .testTag(NativeUiTags.OwnerMoreSecurityStatus),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Text(
+            "Quick PIN: ${if (security.quickPinEnabled) "On" else "Off"}",
+            style = MaterialTheme.typography.bodyLarge,
+        )
+        Text(
+            "${security.phoneSecurityLabel}: ${
+                when {
+                    !security.phoneSecurityAvailable -> "Unavailable on this phone"
+                    security.phoneSecurityEnabled -> "On"
+                    else -> "Off"
+                }
+            }",
+            style = MaterialTheme.typography.bodyLarge,
+        )
+    }
+}

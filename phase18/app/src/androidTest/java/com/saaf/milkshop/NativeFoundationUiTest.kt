@@ -361,6 +361,36 @@ class NativeFoundationUiTest {
     }
 
     @Test
+    fun ownerMoreOpensUnderOwnerChrome() {
+        openOwnerMore()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreMenu).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreProducts).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMorePersonalSecurity)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithText("Count cash").assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+    }
+
+    @Test
+    fun ownerMoreSignsOutToWelcome() {
+        openOwnerMore()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreSignOut)
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.WelcomeContinue).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.WelcomeContinue).assertIsDisplayed()
+    }
+
+    @Test
     fun ownerWorkRecordSaleOpensUnderOwnerChrome() {
         openOwnerSale()
 
@@ -1344,6 +1374,17 @@ class NativeFoundationUiTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerMore() {
+        openOwnerOverview()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerMoreRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreRoot).assertIsDisplayed()
     }
 
     private fun openOwnerSale() {

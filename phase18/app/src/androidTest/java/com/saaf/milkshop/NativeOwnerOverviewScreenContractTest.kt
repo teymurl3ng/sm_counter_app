@@ -120,14 +120,13 @@ class NativeOwnerOverviewScreenContractTest {
     }
 
     @Test
-    fun morePreviewShowsExplicitNotConnectedCopy() {
+    fun moreSectionShowsOpeningPlaceholderWhileHosted() {
         setScreen(
             NativeOwnerOverviewState.Ready(snapshot = attentionSnapshot()),
             section = OwnerSection.More,
         )
-
-        composeRule.onNodeWithTag(NativeUiTags.OwnerMorePreview).assertIsDisplayed()
-        composeRule.onNodeWithText("Owner More comes next").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreLoading).assertIsDisplayed()
+        composeRule.onNodeWithText("Opening more…").assertIsDisplayed()
     }
 
     private fun setScreen(

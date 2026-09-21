@@ -56,6 +56,8 @@ fun OwnerPreviewHost(
     ownerWorkViewModel: NativeOwnerWorkViewModel,
     ownerRecordsState: NativeOwnerRecordsState,
     ownerRecordsViewModel: NativeOwnerRecordsViewModel,
+    ownerMoreState: NativeOwnerMoreState,
+    ownerMoreViewModel: NativeOwnerMoreViewModel,
     saleState: NativeSaleState,
     saleViewModel: NativeSaleViewModel,
     collectionState: NativeCollectionState,
@@ -69,6 +71,7 @@ fun OwnerPreviewHost(
     deliveriesState: NativeDeliveriesState,
     deliveriesViewModel: NativeDeliveriesViewModel,
     onLeaveToWelcome: () -> Unit,
+    onLeaveToAccountPicker: () -> Unit,
     onShowNotice: (String) -> Unit,
 ) {
     SaafTheme(darkTheme = false) {
@@ -94,6 +97,7 @@ fun OwnerPreviewHost(
                 onOwnerSectionChange(OwnerSection.Overview)
                 ownerWorkViewModel.close()
                 ownerRecordsViewModel.close()
+                ownerMoreViewModel.close()
                 closeOwnerWorkEntries()
             }
             lastOwnerSession = sessionHandle
@@ -153,6 +157,7 @@ fun OwnerPreviewHost(
                     closeOwnerWorkEntries()
                     ownerWorkViewModel.close()
                     ownerRecordsViewModel.close()
+                    ownerMoreViewModel.close()
                     ownerOverviewViewModel.close()
                     ownerOverviewViewModel.open(sessionHandle)
                     ownerOverviewViewModel.refresh()
@@ -160,12 +165,14 @@ fun OwnerPreviewHost(
                 OwnerSection.Work -> {
                     ownerOverviewViewModel.close()
                     ownerRecordsViewModel.close()
+                    ownerMoreViewModel.close()
                     ownerWorkViewModel.open(sessionHandle)
                 }
                 OwnerSection.Records -> {
                     closeOwnerWorkEntries()
                     ownerWorkViewModel.close()
                     ownerOverviewViewModel.close()
+                    ownerMoreViewModel.close()
                     ownerRecordsViewModel.open(sessionHandle)
                 }
                 OwnerSection.More -> {
@@ -173,6 +180,7 @@ fun OwnerPreviewHost(
                     ownerWorkViewModel.close()
                     ownerOverviewViewModel.close()
                     ownerRecordsViewModel.close()
+                    ownerMoreViewModel.open(sessionHandle)
                 }
             }
         }
@@ -250,7 +258,11 @@ fun OwnerPreviewHost(
         val ownerRecordsOwnsBack =
             ownerSection == OwnerSection.Records &&
                 (ownerRecordsState as? NativeOwnerRecordsState.Ready)?.detail != null
-        BackHandler(enabled = !ownerEntryOwnsBack && !ownerRecordsOwnsBack) {
+        val ownerMoreOwnsBack =
+            ownerSection == OwnerSection.More &&
+                (ownerMoreState as? NativeOwnerMoreState.Ready)?.destination ==
+                NativeOwnerMoreDestination.PersonalSecurity
+        BackHandler(enabled = !ownerEntryOwnsBack && !ownerRecordsOwnsBack && !ownerMoreOwnsBack) {
             when (ownerSection) {
                 OwnerSection.Overview -> onLeaveToWelcome()
                 OwnerSection.Work -> {
@@ -271,7 +283,14 @@ fun OwnerPreviewHost(
                         onLeaveToWelcome()
                     }
                 }
-                else -> onOwnerSectionChange(OwnerSection.Overview)
+                OwnerSection.More -> {
+                    val ready = ownerMoreState as? NativeOwnerMoreState.Ready
+                    if (ready?.destination == NativeOwnerMoreDestination.PersonalSecurity) {
+                        ownerMoreViewModel.backToMenu()
+                    } else {
+                        onLeaveToWelcome()
+                    }
+                }
             }
         }
         val navigateOwner: (OwnerSection) -> Unit = { section ->
@@ -283,6 +302,7 @@ fun OwnerPreviewHost(
                         closeOwnerWorkEntries()
                         ownerWorkViewModel.close()
                         ownerRecordsViewModel.close()
+                        ownerMoreViewModel.close()
                         onOwnerSectionChange(OwnerSection.Overview)
                     }
                 }
@@ -294,6 +314,7 @@ fun OwnerPreviewHost(
                     } else {
                         closeOwnerWorkEntries()
                         ownerRecordsViewModel.close()
+                        ownerMoreViewModel.close()
                         ownerWorkViewModel.backToHome()
                         onOwnerSectionChange(OwnerSection.Work)
                     }
@@ -301,6 +322,7 @@ fun OwnerPreviewHost(
                 OwnerSection.Records -> {
                     closeOwnerWorkEntries()
                     ownerWorkViewModel.close()
+                    ownerMoreViewModel.close()
                     if (ownerSection == OwnerSection.Records &&
                         (ownerRecordsState as? NativeOwnerRecordsState.Ready)?.detail == null
                     ) {
@@ -314,11 +336,44 @@ fun OwnerPreviewHost(
                     closeOwnerWorkEntries()
                     ownerWorkViewModel.close()
                     ownerRecordsViewModel.close()
-                    onOwnerSectionChange(section)
+                    if (ownerSection == OwnerSection.More &&
+                        (ownerMoreState as? NativeOwnerMoreState.Ready)?.destination ==
+                        NativeOwnerMoreDestination.Menu
+                    ) {
+                        onShowNotice("More is already open.")
+                    } else {
+                        snackbarHostState.currentSnackbarData?.dismiss()
+                        ownerMoreViewModel.backToMenu()
+                        onOwnerSectionChange(OwnerSection.More)
+                    }
                 }
             }
         }
         when {
+            ownerSection == OwnerSection.More -> {
+                OwnerMoreScreen(
+                    snackbarHostState = snackbarHostState,
+                    identity = identity,
+                    state = ownerMoreState,
+                    onRetry = ownerMoreViewModel::refresh,
+                    onOpenPersonalSecurity = ownerMoreViewModel::openPersonalSecurity,
+                    onBackToMenu = ownerMoreViewModel::backToMenu,
+                    onRequestRemoveQuickUnlock = ownerMoreViewModel::requestRemoveQuickUnlock,
+                    onCancelRemoveQuickUnlock = ownerMoreViewModel::cancelRemoveQuickUnlock,
+                    onRemoveQuickUnlock = ownerMoreViewModel::removeQuickUnlock,
+                    onEnrollQuickPin = ownerMoreViewModel::enrollQuickPin,
+                    onEnrollPhoneSecurity = ownerMoreViewModel::enrollPhoneSecurity,
+                    onSwitchAccount = onLeaveToAccountPicker,
+                    onSignOut = onLeaveToWelcome,
+                    onDeferredDestination = { destination ->
+                        onShowNotice(
+                            "$destination comes next in the Owner More family.",
+                        )
+                    },
+                    onNavigate = navigateOwner,
+                    onLeaveConfirmed = onLeaveToWelcome,
+                )
+            }
             ownerSection == OwnerSection.Records -> {
                 OwnerRecordsScreen(
                     snackbarHostState = snackbarHostState,

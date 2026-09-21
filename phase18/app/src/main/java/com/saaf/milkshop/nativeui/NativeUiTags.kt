@@ -357,6 +357,21 @@ object NativeUiTags {
     const val OwnerSuppliersDetailReadOnly = "owner_suppliers_detail_read_only"
 
     fun ownerSupplier(accountId: Long): String = "owner_supplier_$accountId"
+
+    const val OwnerEmployeesRoot = "owner_employees_root"
+    const val OwnerEmployeesLoading = "owner_employees_loading"
+    const val OwnerEmployeesList = "owner_employees_list"
+    const val OwnerEmployeesEmpty = "owner_employees_empty"
+    const val OwnerEmployeesError = "owner_employees_error"
+    const val OwnerEmployeesRetry = "owner_employees_retry"
+    const val OwnerEmployeesBack = "owner_employees_back"
+    const val OwnerEmployeesCreatePreview = "owner_employees_create_preview"
+    const val OwnerEmployeesDetail = "owner_employees_detail"
+    const val OwnerEmployeesDetailBack = "owner_employees_detail_back"
+    const val OwnerEmployeesDetailName = "owner_employees_detail_name"
+    const val OwnerEmployeesDetailReadOnly = "owner_employees_detail_read_only"
+
+    fun ownerEmployee(accountId: Long): String = "owner_employee_$accountId"
     fun ownerRecordsRecord(eventId: Long): String = "owner_records_record_$eventId"
     const val OwnerNavOverview = "owner_nav_overview"
     const val OwnerNavWork = "owner_nav_work"

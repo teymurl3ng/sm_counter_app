@@ -77,6 +77,7 @@ fun OwnerMoreScreen(
     onOpenProducts: () -> Unit,
     onOpenCustomers: () -> Unit,
     onOpenSuppliers: () -> Unit,
+    onOpenEmployees: () -> Unit,
     onBackToMenu: () -> Unit,
     onRetryProducts: () -> Unit,
     onOpenProduct: (Long) -> Unit,
@@ -90,6 +91,10 @@ fun OwnerMoreScreen(
     onOpenSupplier: (Long) -> Unit,
     onBackFromSupplierDetail: () -> Unit,
     onCreateSupplierPreview: () -> Unit,
+    onRetryEmployees: () -> Unit,
+    onOpenEmployee: (Long) -> Unit,
+    onBackFromEmployeeDetail: () -> Unit,
+    onCreateEmployeePreview: () -> Unit,
     onRequestRemoveQuickUnlock: () -> Unit,
     onCancelRemoveQuickUnlock: () -> Unit,
     onRemoveQuickUnlock: (CharArray) -> Unit,
@@ -152,6 +157,7 @@ fun OwnerMoreScreen(
                 onOpenProducts = onOpenProducts,
                 onOpenCustomers = onOpenCustomers,
                 onOpenSuppliers = onOpenSuppliers,
+                onOpenEmployees = onOpenEmployees,
                 onSwitchAccount = onSwitchAccount,
                 onSignOut = onSignOut,
                 onDeferredDestination = onDeferredDestination,
@@ -219,6 +225,22 @@ fun OwnerMoreScreen(
                 onNavigate = onNavigate,
                 modifier = modifier,
             )
+            NativeOwnerMoreDestination.Employees -> OwnerEmployeesScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = state.context,
+                employees = state.employees,
+                employeesLoading = state.employeesLoading,
+                employeeDetail = state.employeeDetail,
+                employeesError = state.employeesError,
+                onBackToMenu = onBackToMenu,
+                onRetry = onRetryEmployees,
+                onOpenEmployee = onOpenEmployee,
+                onBackFromDetail = onBackFromEmployeeDetail,
+                onCreatePreview = onCreateEmployeePreview,
+                onNavigate = onNavigate,
+                modifier = modifier,
+            )
         }
     }
 }
@@ -232,6 +254,7 @@ private fun OwnerMoreMenuScreen(
     onOpenProducts: () -> Unit,
     onOpenCustomers: () -> Unit,
     onOpenSuppliers: () -> Unit,
+    onOpenEmployees: () -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
     onDeferredDestination: (String) -> Unit,
@@ -284,7 +307,7 @@ private fun OwnerMoreMenuScreen(
                     title = "Employees",
                     subtitle = "Employee profiles and attendance",
                     tag = NativeUiTags.OwnerMoreEmployees,
-                    onClick = { onDeferredDestination("Employees") },
+                    onClick = onOpenEmployees,
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 

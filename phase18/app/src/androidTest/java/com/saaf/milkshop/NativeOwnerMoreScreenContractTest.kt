@@ -83,10 +83,10 @@ class NativeOwnerMoreScreenContractTest {
             NativeOwnerMoreState.Ready(context = openContext()),
             onDeferredDestination = { notice = it },
         )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreEmployees)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreCosting)
             .performScrollTo()
             .performClick()
-        assertEquals("Employees", notice)
+        assertEquals("Costing & plans", notice)
     }
 
     @Test
@@ -121,6 +121,19 @@ class NativeOwnerMoreScreenContractTest {
             onOpenSuppliers = { opened = true },
         )
         composeRule.onNodeWithTag(NativeUiTags.OwnerMoreSuppliers)
+            .performScrollTo()
+            .performClick()
+        assertTrue(opened)
+    }
+
+    @Test
+    fun employeesOpensFromMenu() {
+        var opened = false
+        setScreen(
+            NativeOwnerMoreState.Ready(context = openContext()),
+            onOpenEmployees = { opened = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreEmployees)
             .performScrollTo()
             .performClick()
         assertTrue(opened)
@@ -193,6 +206,7 @@ class NativeOwnerMoreScreenContractTest {
         onOpenProducts: () -> Unit = {},
         onOpenCustomers: () -> Unit = {},
         onOpenSuppliers: () -> Unit = {},
+        onOpenEmployees: () -> Unit = {},
         onBackToMenu: () -> Unit = {},
         onSwitchAccount: () -> Unit = {},
         onSignOut: () -> Unit = {},
@@ -216,6 +230,7 @@ class NativeOwnerMoreScreenContractTest {
                     onOpenProducts = onOpenProducts,
                     onOpenCustomers = onOpenCustomers,
                     onOpenSuppliers = onOpenSuppliers,
+                    onOpenEmployees = onOpenEmployees,
                     onBackToMenu = onBackToMenu,
                     onRetryProducts = {},
                     onOpenProduct = {},
@@ -229,6 +244,10 @@ class NativeOwnerMoreScreenContractTest {
                     onOpenSupplier = {},
                     onBackFromSupplierDetail = {},
                     onCreateSupplierPreview = {},
+                    onRetryEmployees = {},
+                    onOpenEmployee = {},
+                    onBackFromEmployeeDetail = {},
+                    onCreateEmployeePreview = {},
                     onRequestRemoveQuickUnlock = {},
                     onCancelRemoveQuickUnlock = {},
                     onRemoveQuickUnlock = {},

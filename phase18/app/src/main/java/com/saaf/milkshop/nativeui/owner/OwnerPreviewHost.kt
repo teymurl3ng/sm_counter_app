@@ -265,6 +265,7 @@ fun OwnerPreviewHost(
                     NativeOwnerMoreDestination.Products,
                     NativeOwnerMoreDestination.Customers,
                     NativeOwnerMoreDestination.Suppliers,
+                    NativeOwnerMoreDestination.Employees,
                 )
         BackHandler(enabled = !ownerEntryOwnsBack && !ownerRecordsOwnsBack && !ownerMoreOwnsBack) {
             when (ownerSection) {
@@ -309,6 +310,13 @@ fun OwnerPreviewHost(
                         NativeOwnerMoreDestination.Suppliers -> {
                             if (ready.supplierDetail != null) {
                                 ownerMoreViewModel.clearSupplierDetail()
+                            } else {
+                                ownerMoreViewModel.backToMenu()
+                            }
+                        }
+                        NativeOwnerMoreDestination.Employees -> {
+                            if (ready.employeeDetail != null) {
+                                ownerMoreViewModel.clearEmployeeDetail()
                             } else {
                                 ownerMoreViewModel.backToMenu()
                             }
@@ -385,6 +393,7 @@ fun OwnerPreviewHost(
                     onOpenProducts = ownerMoreViewModel::openProducts,
                     onOpenCustomers = ownerMoreViewModel::openCustomers,
                     onOpenSuppliers = ownerMoreViewModel::openSuppliers,
+                    onOpenEmployees = ownerMoreViewModel::openEmployees,
                     onBackToMenu = ownerMoreViewModel::backToMenu,
                     onRetryProducts = ownerMoreViewModel::refreshProducts,
                     onOpenProduct = ownerMoreViewModel::openProductDetail,
@@ -403,6 +412,12 @@ fun OwnerPreviewHost(
                     onBackFromSupplierDetail = ownerMoreViewModel::clearSupplierDetail,
                     onCreateSupplierPreview = {
                         onShowNotice("Add supplier comes next in the Owner Suppliers family.")
+                    },
+                    onRetryEmployees = ownerMoreViewModel::refreshEmployees,
+                    onOpenEmployee = ownerMoreViewModel::openEmployeeDetail,
+                    onBackFromEmployeeDetail = ownerMoreViewModel::clearEmployeeDetail,
+                    onCreateEmployeePreview = {
+                        onShowNotice("Add employee comes next in the Owner Employees family.")
                     },
                     onRequestRemoveQuickUnlock = ownerMoreViewModel::requestRemoveQuickUnlock,
                     onCancelRemoveQuickUnlock = ownerMoreViewModel::cancelRemoveQuickUnlock,

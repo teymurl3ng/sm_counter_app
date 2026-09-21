@@ -136,7 +136,6 @@ private fun ReadyWork(
                 }
             }
         }
-        NativeOwnerWorkDestination.PaySalary,
         NativeOwnerWorkDestination.CashCountAndClose,
         -> PreviewDestination(
             snackbarHostState = snackbarHostState,
@@ -153,6 +152,7 @@ private fun ReadyWork(
         NativeOwnerWorkDestination.RecordPayment,
         NativeOwnerWorkDestination.RecordExpense,
         NativeOwnerWorkDestination.PaySupplier,
+        NativeOwnerWorkDestination.PaySalary,
         NativeOwnerWorkDestination.MakeYogurt,
         NativeOwnerWorkDestination.RecordSpoilage,
         NativeOwnerWorkDestination.Deliveries,
@@ -416,21 +416,17 @@ private fun PreviewDestination(
 }
 
 private fun previewTitle(destination: NativeOwnerWorkDestination): String = when (destination) {
-    NativeOwnerWorkDestination.PaySalary -> "Pay salary"
     NativeOwnerWorkDestination.CashCountAndClose -> "Cash count and close"
     else -> "Coming next"
 }
 
 private fun previewMessage(destination: NativeOwnerWorkDestination): String = when (destination) {
-    NativeOwnerWorkDestination.PaySalary ->
-        "Salary payment is not connected yet in Owner Work. Overview and connected daily commands stay available."
     NativeOwnerWorkDestination.CashCountAndClose ->
         "Cash count and close is not connected yet in Owner Work. Overview and connected daily commands stay available."
     else -> "This destination is not connected yet."
 }
 
 private fun previewTag(destination: NativeOwnerWorkDestination): String = when (destination) {
-    NativeOwnerWorkDestination.PaySalary -> NativeUiTags.OwnerWorkPaySalaryPreview
     NativeOwnerWorkDestination.CashCountAndClose -> NativeUiTags.OwnerWorkCashClosePreview
     else -> NativeUiTags.OwnerWorkHome
 }
@@ -440,6 +436,7 @@ private fun openingLabel(destination: NativeOwnerWorkDestination): String = when
     NativeOwnerWorkDestination.RecordPayment -> "Opening record payment…"
     NativeOwnerWorkDestination.RecordExpense -> "Opening record expense…"
     NativeOwnerWorkDestination.PaySupplier -> "Opening pay supplier…"
+    NativeOwnerWorkDestination.PaySalary -> "Opening pay salary…"
     NativeOwnerWorkDestination.ReceiveMilk -> "Opening receive milk…"
     NativeOwnerWorkDestination.MakeYogurt -> "Opening make yogurt…"
     NativeOwnerWorkDestination.RecordSpoilage -> "Opening record spoilage…"

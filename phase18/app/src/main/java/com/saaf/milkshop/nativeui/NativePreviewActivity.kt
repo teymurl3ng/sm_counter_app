@@ -38,7 +38,6 @@ import com.saaf.milkshop.application.operations.NativeRecordSpoilageFacade
 import com.saaf.milkshop.application.owner.NativeOwnerBackupFacade
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPlansFacade
 import com.saaf.milkshop.application.owner.NativeOwnerCustomersFacade
-import com.saaf.milkshop.application.vendorpayment.NativeVendorPaymentFacade
 import com.saaf.milkshop.application.owner.NativeOwnerEmployeesFacade
 import com.saaf.milkshop.application.owner.NativeOwnerMoreFacade
 import com.saaf.milkshop.application.owner.NativeOwnerOverviewFacade
@@ -48,6 +47,8 @@ import com.saaf.milkshop.application.owner.NativeOwnerSecurityHistoryFacade
 import com.saaf.milkshop.application.owner.NativeOwnerShopSettingsFacade
 import com.saaf.milkshop.application.owner.NativeOwnerSuppliersFacade
 import com.saaf.milkshop.application.owner.NativeOwnerUsersRolesFacade
+import com.saaf.milkshop.application.salarypayment.NativeSalaryPaymentFacade
+import com.saaf.milkshop.application.vendorpayment.NativeVendorPaymentFacade
 import com.saaf.milkshop.application.owner.NativeOwnerWorkFacade
 import com.saaf.milkshop.application.sale.NativeSaleFacade
 import com.saaf.milkshop.data.MilkShopDatabase
@@ -62,6 +63,8 @@ import com.saaf.milkshop.nativeui.collection.NativeCollectionState
 import com.saaf.milkshop.nativeui.collection.NativeCollectionViewModel
 import com.saaf.milkshop.nativeui.expense.NativeExpenseState
 import com.saaf.milkshop.nativeui.expense.NativeExpenseViewModel
+import com.saaf.milkshop.nativeui.salarypayment.NativeSalaryPaymentState
+import com.saaf.milkshop.nativeui.salarypayment.NativeSalaryPaymentViewModel
 import com.saaf.milkshop.nativeui.vendorpayment.NativeVendorPaymentState
 import com.saaf.milkshop.nativeui.vendorpayment.NativeVendorPaymentViewModel
 import com.saaf.milkshop.nativeui.more.NativeMoreState
@@ -113,6 +116,7 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var collectionFacade: NativeCollectionFacade
     private lateinit var expenseFacade: NativeExpenseFacade
     private lateinit var vendorPaymentFacade: NativeVendorPaymentFacade
+    private lateinit var salaryPaymentFacade: NativeSalaryPaymentFacade
     private lateinit var activityFacade: NativeActivityFacade
     private lateinit var moreFacade: NativeMoreFacade
     private lateinit var operationsWorkFacade: NativeOperationsWorkFacade
@@ -168,6 +172,13 @@ class NativePreviewActivity : FragmentActivity() {
     private val vendorPaymentViewModel by viewModels<NativeVendorPaymentViewModel> {
         NativeVendorPaymentViewModel.Factory(
             facade = vendorPaymentFacade,
+            onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
+        )
+    }
+
+    private val salaryPaymentViewModel by viewModels<NativeSalaryPaymentViewModel> {
+        NativeSalaryPaymentViewModel.Factory(
+            facade = salaryPaymentFacade,
             onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
         )
     }
@@ -289,6 +300,7 @@ class NativePreviewActivity : FragmentActivity() {
         collectionFacade = NativeCollectionFacade(app.database, app.userSecurity)
         expenseFacade = NativeExpenseFacade(app.database, app.userSecurity)
         vendorPaymentFacade = NativeVendorPaymentFacade(app.database, app.userSecurity)
+        salaryPaymentFacade = NativeSalaryPaymentFacade(app.database, app.userSecurity)
         activityFacade = NativeActivityFacade(app.database, app.userSecurity)
         moreFacade = NativeMoreFacade(app.database, app.userSecurity, quickUnlockService)
         operationsWorkFacade = NativeOperationsWorkFacade(app.database, app.userSecurity)
@@ -329,6 +341,7 @@ class NativePreviewActivity : FragmentActivity() {
                 val collectionState by collectionViewModel.state.collectAsState()
                 val expenseState by expenseViewModel.state.collectAsState()
                 val vendorPaymentState by vendorPaymentViewModel.state.collectAsState()
+                val salaryPaymentState by salaryPaymentViewModel.state.collectAsState()
                 val activityState by activityViewModel.state.collectAsState()
                 val moreState by moreViewModel.state.collectAsState()
                 val operationsWorkState by operationsWorkViewModel.state.collectAsState()
@@ -358,6 +371,8 @@ class NativePreviewActivity : FragmentActivity() {
                     expenseViewModel = expenseViewModel,
                     vendorPaymentState = vendorPaymentState,
                     vendorPaymentViewModel = vendorPaymentViewModel,
+                    salaryPaymentState = salaryPaymentState,
+                    salaryPaymentViewModel = salaryPaymentViewModel,
                     activityState = activityState,
                     activityViewModel = activityViewModel,
                     moreState = moreState,
@@ -435,6 +450,8 @@ private fun NativeFoundationPreview(
     expenseViewModel: NativeExpenseViewModel,
     vendorPaymentState: NativeVendorPaymentState,
     vendorPaymentViewModel: NativeVendorPaymentViewModel,
+    salaryPaymentState: NativeSalaryPaymentState,
+    salaryPaymentViewModel: NativeSalaryPaymentViewModel,
     activityState: NativeActivityState,
     activityViewModel: NativeActivityViewModel,
     moreState: NativeMoreState,
@@ -583,6 +600,7 @@ private fun NativeFoundationPreview(
         collectionViewModel.close()
         expenseViewModel.close()
         vendorPaymentViewModel.close()
+        salaryPaymentViewModel.close()
         activityViewModel.close()
         moreViewModel.close()
     }
@@ -692,6 +710,8 @@ private fun NativeFoundationPreview(
                     expenseViewModel = expenseViewModel,
                     vendorPaymentState = vendorPaymentState,
                     vendorPaymentViewModel = vendorPaymentViewModel,
+                    salaryPaymentState = salaryPaymentState,
+                    salaryPaymentViewModel = salaryPaymentViewModel,
                     receiveMilkState = receiveMilkState,
                     receiveMilkViewModel = receiveMilkViewModel,
                     makeYogurtState = makeYogurtState,

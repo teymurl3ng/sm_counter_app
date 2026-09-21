@@ -8,6 +8,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.owner.NativeOwnerWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
@@ -144,14 +145,17 @@ class NativeOwnerWorkScreenContractTest {
     }
 
     @Test
-    fun paySalaryPreviewShowsExplicitNotConnectedCopy() {
+    fun paySalaryOpensConnectedDestination() {
+        var opened: NativeOwnerWorkDestination? = null
         setScreen(
-            NativeOwnerWorkState.Ready(
-                context = openContext(),
-                destination = NativeOwnerWorkDestination.PaySalary,
-            ),
+            NativeOwnerWorkState.Ready(context = openContext()),
+            onOpenDestination = { opened = it },
         )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkPaySalaryPreview).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkCashClose).performScrollTo()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkPaySalary)
+            .assertIsDisplayed()
+            .performClick()
+        assertEquals(NativeOwnerWorkDestination.PaySalary, opened)
     }
 
     @Test
@@ -171,7 +175,7 @@ class NativeOwnerWorkScreenContractTest {
         setScreen(
             state = NativeOwnerWorkState.Ready(
                 context = openContext(),
-                destination = NativeOwnerWorkDestination.PaySalary,
+                destination = NativeOwnerWorkDestination.CashCountAndClose,
             ),
             onBackToHome = { returned = true },
         )

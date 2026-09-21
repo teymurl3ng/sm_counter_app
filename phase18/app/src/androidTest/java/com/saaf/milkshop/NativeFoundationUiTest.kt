@@ -369,6 +369,25 @@ class NativeFoundationUiTest {
     }
 
     @Test
+    fun ownerPaySalaryOpensUnderOwnerChrome() {
+        openOwnerPaySalary()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerPaySalaryEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.SalaryPaymentEmployeeSelector)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
+        assertOwnerShellWithoutForeignNav()
+    }
+
+    @Test
+    fun ownerPaySalaryHardwareBackReturnsToWorkHome() {
+        openOwnerPaySalary()
+        pressHardwareBack()
+        assertReturnedToOwnerWorkHome()
+    }
+
+    @Test
     fun ownerRecordsOpensUnderOwnerChrome() {
         openOwnerRecords()
 
@@ -1825,6 +1844,27 @@ class NativeFoundationUiTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OwnerPaySupplierEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openOwnerPaySalary() {
+        openOwnerWork()
+        // Scroll the row below Pay salary into view so the salary control sits above
+        // Owner bottom nav (otherwise performClick can hit nav instead of the row).
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkCashClose).performScrollTo()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkPaySalary)
+            .assertIsDisplayed()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerPaySalaryEntryRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.SalaryPaymentEmployeeSelector).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerPaySalaryEntryRoot).assertIsDisplayed()
     }
 
     private fun openOwnerReceiveMilk() {

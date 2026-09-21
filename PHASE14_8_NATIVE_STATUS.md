@@ -11,7 +11,7 @@ Living canvas: open `native-phase-plan-overview` beside chat
 | Cashier (`Sell / Collect / Activity / More`) | **Done** |
 | Operations (`Work` + task entries + Deliveries + Attendance + More) | **Done** |
 | Owner primary nav (`Overview / Work / Records / More`) | **Done** |
-| Owner Work shared entries (Sale…Deliveries + Expense + Pay supplier under Owner shell) | **Done** (CORE METHOD) |
+| Owner Work shared entries (Sale…Deliveries + Expense + Pay supplier + Pay salary under Owner shell) | **Done** (CORE METHOD) |
 | Owner More deep destinations | **Done** (read slices; writes deferred) |
 | Owner Work remaining money / Reports / Manager·Admin | **Left** |
 
@@ -28,12 +28,14 @@ Living canvas: open `native-phase-plan-overview` beside chat
 - **14.8.23–26** Shop settings, Users & roles, Security history, Backup & restore — read panels / lists (batch)
 - **14.8.27** Owner Work Record expense — Owner-hosted form + post (CORE METHOD; Cashier host deferred)
 - **14.8.28** Owner Work Pay supplier — Owner-hosted form + post (CORE METHOD; Manager/Admin hosts deferred)
+- **14.8.29** Owner Work Pay salary — Owner-hosted form + post (CORE METHOD; Manager/Admin hosts deferred)
 
 ## Partial / uncommitted
 
 - **14.8.22–26** (Costing through Backup) — implemented + `qaScreen -Pqa.screen=ownermore` **PASS**, **still uncommitted**
 - **14.8.27** Record expense — committed as `a4081ed`
 - **14.8.28** Pay supplier — implemented; run `qaScreen -Pqa.screen=ownerwork` before commit
+- **14.8.29** Pay salary — implemented; run `qaScreen -Pqa.screen=ownerwork` before commit
 - Directory create/edit write UIs (Products…Employees, Costing approve, Shop edit, user enroll, backup export/restore/connect) — deferred with preview notices
 - Records ledgers / closing history / corrections **write** — deferred from 14.8.16
 - Cashier expense host wrapper — deferred from 14.8.27
@@ -46,7 +48,6 @@ Living canvas: open `native-phase-plan-overview` beside chat
 
 ### Owner Work money
 
-- Pay salary  
 - Cash count & close (+ reopen later)
 
 ### Later depth
@@ -54,14 +55,14 @@ Living canvas: open `native-phase-plan-overview` beside chat
 - Month reports  
 - Manager / Admin native shells  
 - Cashier-hosted expense shell  
-- Manager / Admin Pay-supplier hosts  
+- Manager / Admin Pay-supplier / Pay-salary hosts  
 
 ## Recommended next moves
 
-**Queue B continues** with Pay salary / Cash & close after pay-supplier qaScreen PASS.
+**Queue B continues** with Cash & close after pay-salary qaScreen PASS.
 
 ## Authority
 
 - `PHASE14_8_2_COUNTER_LEDGER_LEADERSHIP.md` / journey / role calibration  
-- Owner blueprints `PHASE14_8_14` … `PHASE14_8_28`  
+- Owner blueprints `PHASE14_8_14` … `PHASE14_8_29`  
 - `.cursor/rules/native-shell-vs-content.mdc`

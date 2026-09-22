@@ -12,6 +12,7 @@ import com.saaf.milkshop.domain.UserSecurityService
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -94,9 +95,92 @@ class NativeOwnerEmployeesFacadeTest {
         assertEquals("Active", detail.row.statusLabel)
         assertEquals("Delivery rider", detail.row.role)
         assertEquals("0301", detail.row.phone)
+        assertEquals(35_000.0, detail.referenceSalary!!, 0.001)
         assertEquals("PKR 35,000.00", detail.referenceSalaryLabel)
         assertEquals("monthly", detail.salaryPeriod)
         assertEquals("2026-01-15", detail.joinDate)
+        assertTrue(detail.active)
+    }
+
+    @Test
+    fun createEmployeeThenListContains() = runBlocking {
+        val accountId = facade.createEmployee(ownerSession, "Owner Create Rider")
+        val snapshot = facade.loadEmployees(ownerSession)
+        assertTrue(
+            snapshot.employees.any {
+                it.accountId == accountId && it.name == "Owner Create Rider"
+            },
+        )
+        val created = snapshot.employees.first { it.accountId == accountId }
+        assertEquals("Active", created.statusLabel)
+        assertTrue(created.balanceLabel.contains("PKR"))
+    }
+
+    @Test
+    fun updateEmployeeRenamesAndSavesProfile() = runBlocking {
+        val accountId = facade.createEmployee(ownerSession, "Owner Edit Rider")
+        facade.updateEmployee(
+            ownerSession,
+            accountId,
+            "Owner Edit Rider Updated",
+            EmployeeProfileInput(
+                role = "Shop helper",
+                phone = "0322",
+                referenceSalary = 40_000.0,
+                salaryPeriod = "monthly",
+                joinDate = "2026-03-01",
+                active = true,
+            ),
+        )
+        val detail = facade.loadDetail(ownerSession, accountId)
+        assertEquals("Owner Edit Rider Updated", detail.row.name)
+        assertEquals("Shop helper", detail.row.role)
+        assertEquals("0322", detail.row.phone)
+        assertEquals(40_000.0, detail.referenceSalary!!, 0.001)
+        assertEquals("monthly", detail.salaryPeriod)
+        assertEquals("2026-03-01", detail.joinDate)
+        assertTrue(detail.active)
+        assertEquals("Active", detail.row.statusLabel)
+    }
+
+    @Test
+    fun updateEmployeeCanDeactivateViaActiveFlag() = runBlocking {
+        val accountId = facade.createEmployee(ownerSession, "Owner Deactivate Rider")
+        facade.updateEmployee(
+            ownerSession,
+            accountId,
+            "Owner Deactivate Rider",
+            EmployeeProfileInput(active = false),
+        )
+        val detail = facade.loadDetail(ownerSession, accountId)
+        assertFalse(detail.active)
+        assertEquals("Inactive", detail.row.statusLabel)
+        val snapshot = facade.loadEmployees(ownerSession)
+        assertTrue(
+            snapshot.employees.any {
+                it.accountId == accountId && it.statusLabel == "Inactive"
+            },
+        )
+    }
+
+    @Test
+    fun createEmployeeRejectsNonOwner() = runBlocking {
+        val rejected = runCatching { facade.createEmployee(cashierSession, "Blocked Employee") }
+        assertTrue(rejected.isFailure)
+    }
+
+    @Test
+    fun updateEmployeeRejectsNonOwner() = runBlocking {
+        val accountId = facade.createEmployee(ownerSession, "Owner Gate Rider")
+        val rejected = runCatching {
+            facade.updateEmployee(
+                cashierSession,
+                accountId,
+                "Blocked Rename",
+                EmployeeProfileInput(phone = "0000"),
+            )
+        }
+        assertTrue(rejected.isFailure)
     }
 
     @Test

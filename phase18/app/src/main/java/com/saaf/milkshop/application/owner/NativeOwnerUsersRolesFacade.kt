@@ -4,6 +4,8 @@ import com.saaf.milkshop.data.AppUserEntity
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.AppRole
+import com.saaf.milkshop.domain.CreateUserInput
+import com.saaf.milkshop.domain.PendingUserEnrollment
 import com.saaf.milkshop.domain.UserSecurityService
 import java.util.Locale
 
@@ -11,8 +13,10 @@ data class NativeOwnerUserRow(
     val userId: Long,
     val loginName: String,
     val displayName: String,
+    val roleWire: String,
     val roleLabel: String,
     val statusLabel: String,
+    val enabled: Boolean,
     val setupRequired: Boolean,
 )
 
@@ -28,15 +32,24 @@ data class NativeOwnerUsersRolesSnapshot(
     val users: List<NativeOwnerUserRow>,
 )
 
+data class NativeOwnerPendingEnrollment(
+    val userId: Long,
+    val displayName: String,
+    val loginName: String,
+    val enrollmentToken: String,
+)
+
 /**
  * Owner Users & roles boundary: staff login accounts from
- * [UserSecurityService.listUsers]. Distinct from Employees salary accounts.
- * Does not invent enrollment/disable write flows or call bridge JSON.
+ * [UserSecurityService.listUsers] plus enroll / enable / role-change writes.
+ * Distinct from Employees salary accounts. Never calls bridge JSON.
  */
 class NativeOwnerUsersRolesFacade(
     private val database: MilkShopDatabase,
     private val security: UserSecurityService,
 ) {
+    fun enrollableRoles(): List<AppRole> = AppRole.entries.toList()
+
     suspend fun loadUsers(sessionHandle: String): NativeOwnerUsersRolesSnapshot {
         requireOwnerStaffUsers(sessionHandle)
         val rows = security.listUsers(sessionHandle)
@@ -61,6 +74,61 @@ class NativeOwnerUsersRolesFacade(
         )
     }
 
+    suspend fun beginEnroll(
+        sessionHandle: String,
+        input: CreateUserInput,
+    ): NativeOwnerPendingEnrollment {
+        requireOwnerStaffUsers(sessionHandle)
+        val pending = security.beginUserEnrollment(sessionHandle, input)
+        return pending.toNative()
+    }
+
+    suspend fun completeEnroll(
+        enrollmentToken: String,
+        passphrase: CharArray,
+    ): NativeOwnerUserRow {
+        try {
+            val completed = security.completeUserEnrollment(enrollmentToken, passphrase)
+            return completed.toRow()
+        } finally {
+            passphrase.fill('\u0000')
+        }
+    }
+
+    suspend fun setEnabled(
+        sessionHandle: String,
+        userId: Long,
+        enabled: Boolean,
+    ) {
+        requireOwnerStaffUsers(sessionHandle)
+        security.setUserEnabled(sessionHandle, userId, enabled)
+    }
+
+    suspend fun changeRole(
+        sessionHandle: String,
+        userId: Long,
+        newRoleValue: String,
+    ) {
+        requireOwnerStaffUsers(sessionHandle)
+        security.changeRole(sessionHandle, userId, newRoleValue)
+    }
+
+    /**
+     * Full passphrase re-authentication for sensitive Users & roles writes.
+     * Wipes [passphrase] before returning.
+     */
+    suspend fun reauthenticate(
+        sessionHandle: String,
+        passphrase: CharArray,
+    ) {
+        try {
+            requireOwnerStaffUsers(sessionHandle)
+            security.reauthenticate(sessionHandle, passphrase)
+        } finally {
+            passphrase.fill('\u0000')
+        }
+    }
+
     private suspend fun requireOwnerStaffUsers(sessionHandle: String) {
         val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_STAFF_USERS)
         require(AppRole.parse(actor.role) == AppRole.OWNER) {
@@ -68,12 +136,22 @@ class NativeOwnerUsersRolesFacade(
         }
     }
 
+    private fun PendingUserEnrollment.toNative(): NativeOwnerPendingEnrollment =
+        NativeOwnerPendingEnrollment(
+            userId = user.userId,
+            displayName = user.displayName,
+            loginName = user.loginName,
+            enrollmentToken = enrollmentToken,
+        )
+
     private fun AppUserEntity.toRow(): NativeOwnerUserRow = NativeOwnerUserRow(
         userId = userId,
         loginName = loginName,
         displayName = displayName,
+        roleWire = role,
         roleLabel = humanizeCode(role),
         statusLabel = humanizeCode(status),
+        enabled = status == UserSecurityService.STATUS_ACTIVE,
         setupRequired = credentialSetupRequired,
     )
 

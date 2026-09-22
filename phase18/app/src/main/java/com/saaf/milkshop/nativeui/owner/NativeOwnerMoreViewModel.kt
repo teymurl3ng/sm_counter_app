@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.saaf.milkshop.application.more.NativeMoreSecurityStatus
 import com.saaf.milkshop.application.owner.NativeOwnerBackupFacade
+import com.saaf.milkshop.application.owner.NativeOwnerBackupFailure
+import com.saaf.milkshop.application.owner.NativeOwnerBackupInspection
 import com.saaf.milkshop.application.owner.NativeOwnerBackupSnapshot
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPolicyDetail
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPolicyRow
@@ -22,17 +24,27 @@ import com.saaf.milkshop.application.owner.NativeOwnerProductsFacade
 import com.saaf.milkshop.application.owner.NativeOwnerSecurityAuditDetail
 import com.saaf.milkshop.application.owner.NativeOwnerSecurityAuditRow
 import com.saaf.milkshop.application.owner.NativeOwnerSecurityHistoryFacade
+import com.saaf.milkshop.application.owner.NativeOwnerExpenseCategoryRow
 import com.saaf.milkshop.application.owner.NativeOwnerShopSettingsFacade
 import com.saaf.milkshop.application.owner.NativeOwnerShopSettingsSnapshot
 import com.saaf.milkshop.application.owner.NativeOwnerSupplierDetail
 import com.saaf.milkshop.application.owner.NativeOwnerSupplierRow
 import com.saaf.milkshop.application.owner.NativeOwnerSuppliersFacade
+import com.saaf.milkshop.application.owner.NativeOwnerPendingEnrollment
 import com.saaf.milkshop.application.owner.NativeOwnerUserDetail
 import com.saaf.milkshop.application.owner.NativeOwnerUserRow
 import com.saaf.milkshop.application.owner.NativeOwnerUsersRolesFacade
+import com.saaf.milkshop.domain.AppRole
+import com.saaf.milkshop.domain.BusinessSettings
+import com.saaf.milkshop.domain.CostingPolicyInput
+import com.saaf.milkshop.domain.CreateUserInput
 import com.saaf.milkshop.domain.CustomerProfileInput
 import com.saaf.milkshop.domain.ProductCatalogInput
+import com.saaf.milkshop.domain.EmployeeProfileInput
+import com.saaf.milkshop.domain.StoreIdentityInput
+import com.saaf.milkshop.domain.VendorProfileInput
 import com.saaf.milkshop.domain.SecurityFailure
+import android.net.Uri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -66,12 +78,14 @@ sealed interface NativeOwnerMoreState {
         val security: NativeMoreSecurityStatus? = null,
         val products: List<NativeOwnerProductRow> = emptyList(),
         val productsLoading: Boolean = false,
+        val productsShowArchived: Boolean = false,
         val productDetail: NativeOwnerProductDetail? = null,
         val productCreateOpen: Boolean = false,
         val productCreating: Boolean = false,
         val productEditOpen: Boolean = false,
         val productUpdating: Boolean = false,
         val productArchiving: Boolean = false,
+        val productUnarchiving: Boolean = false,
         val productsError: String? = null,
         val customers: List<NativeOwnerCustomerRow> = emptyList(),
         val customersLoading: Boolean = false,
@@ -84,22 +98,56 @@ sealed interface NativeOwnerMoreState {
         val suppliers: List<NativeOwnerSupplierRow> = emptyList(),
         val suppliersLoading: Boolean = false,
         val supplierDetail: NativeOwnerSupplierDetail? = null,
+        val supplierCreateOpen: Boolean = false,
+        val supplierCreating: Boolean = false,
+        val supplierEditOpen: Boolean = false,
+        val supplierUpdating: Boolean = false,
         val suppliersError: String? = null,
         val employees: List<NativeOwnerEmployeeRow> = emptyList(),
         val employeesLoading: Boolean = false,
         val employeeDetail: NativeOwnerEmployeeDetail? = null,
+        val employeeCreateOpen: Boolean = false,
+        val employeeCreating: Boolean = false,
+        val employeeEditOpen: Boolean = false,
+        val employeeUpdating: Boolean = false,
         val employeesError: String? = null,
         val costingPolicies: List<NativeOwnerCostingPolicyRow> = emptyList(),
         val costingPoliciesLoading: Boolean = false,
         val costingPolicyDetail: NativeOwnerCostingPolicyDetail? = null,
         val costingPoliciesError: String? = null,
         val costingCurrentMonthSummary: String? = null,
+        val costingApproveOpen: Boolean = false,
+        val costingApproveSeed: NativeOwnerCostingPolicyDetail? = null,
+        val costingApproving: Boolean = false,
+        val costingReauthOpen: Boolean = false,
+        val costingReauthBusy: Boolean = false,
+        val costingReviewReasons: List<String> = emptyList(),
+        val costingComponentCodes: List<String> = emptyList(),
         val shopSettings: NativeOwnerShopSettingsSnapshot? = null,
         val shopSettingsLoading: Boolean = false,
+        val shopSettingsIdentityEditOpen: Boolean = false,
+        val shopSettingsIdentitySaving: Boolean = false,
+        val shopSettingsRatesEditOpen: Boolean = false,
+        val shopSettingsRatesSaving: Boolean = false,
+        val shopSettingsCategoryCreateOpen: Boolean = false,
+        val shopSettingsCategoryCreating: Boolean = false,
+        val shopSettingsCategoryDetail: NativeOwnerExpenseCategoryRow? = null,
+        val shopSettingsCategoryArchiving: Boolean = false,
         val shopSettingsError: String? = null,
         val users: List<NativeOwnerUserRow> = emptyList(),
         val usersLoading: Boolean = false,
         val userDetail: NativeOwnerUserDetail? = null,
+        val userEnrollOpen: Boolean = false,
+        val userEnrollPending: NativeOwnerPendingEnrollment? = null,
+        val userEnrollBusy: Boolean = false,
+        val userRoleChangeOpen: Boolean = false,
+        val userRoleChanging: Boolean = false,
+        val userEnableConfirmOpen: Boolean = false,
+        val userEnableTargetEnabled: Boolean = false,
+        val userEnableBusy: Boolean = false,
+        val userReauthOpen: Boolean = false,
+        val userReauthBusy: Boolean = false,
+        val enrollableRoles: List<AppRole> = AppRole.entries.toList(),
         val usersError: String? = null,
         val securityAudits: List<NativeOwnerSecurityAuditRow> = emptyList(),
         val securityHistoryLoading: Boolean = false,
@@ -108,6 +156,14 @@ sealed interface NativeOwnerMoreState {
         val backup: NativeOwnerBackupSnapshot? = null,
         val backupLoading: Boolean = false,
         val backupError: String? = null,
+        val backupExportOpen: Boolean = false,
+        val backupRestoreOpen: Boolean = false,
+        val backupConnectOpen: Boolean = false,
+        val backupInspection: NativeOwnerBackupInspection? = null,
+        val backupBusy: Boolean = false,
+        val backupReauthOpen: Boolean = false,
+        val backupReauthBusy: Boolean = false,
+        val backupDisconnectConfirmOpen: Boolean = false,
         val saving: Boolean = false,
         val confirmRemoveUnlock: Boolean = false,
         val error: String? = null,
@@ -131,7 +187,25 @@ class NativeOwnerMoreViewModel(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val _state = MutableStateFlow<NativeOwnerMoreState>(NativeOwnerMoreState.Idle)
     private var sessionHandle: String? = null
+    private var pendingUsersAction: PendingUsersRolesAction? = null
+    private var pendingCostingApprove: CostingPolicyInput? = null
+    private var pendingBackupAction: PendingBackupAction? = null
     val state: StateFlow<NativeOwnerMoreState> = _state.asStateFlow()
+
+    private sealed interface PendingUsersRolesAction {
+        data class BeginEnroll(val input: CreateUserInput) : PendingUsersRolesAction
+        data class SetEnabled(val userId: Long, val enabled: Boolean) : PendingUsersRolesAction
+        data class ChangeRole(val userId: Long, val roleWire: String) : PendingUsersRolesAction
+    }
+
+    private sealed interface PendingBackupAction {
+        data class Export(val uri: Uri, val passphrase: CharArray) : PendingBackupAction
+        data class Inspect(val uri: Uri, val passphrase: CharArray) : PendingBackupAction
+        data class ConfirmRestore(val confirm: Boolean) : PendingBackupAction
+        data class Connect(val passphrase: CharArray, val allowMetered: Boolean) : PendingBackupAction
+        data class SetPolicy(val enabled: Boolean) : PendingBackupAction
+        data object Disconnect : PendingBackupAction
+    }
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle &&
@@ -145,6 +219,7 @@ class NativeOwnerMoreViewModel(
 
     fun close() {
         sessionHandle = null
+        clearPendingBackupSecrets()
         _state.value = NativeOwnerMoreState.Idle
     }
 
@@ -171,12 +246,14 @@ class NativeOwnerMoreViewModel(
             error = null,
             saving = false,
             productsError = null,
+            productsShowArchived = false,
             productDetail = null,
             productCreateOpen = false,
             productCreating = false,
             productEditOpen = false,
             productUpdating = false,
             productArchiving = false,
+            productUnarchiving = false,
             customersError = null,
             customerDetail = null,
             customerCreateOpen = false,
@@ -185,8 +262,16 @@ class NativeOwnerMoreViewModel(
             customerUpdating = false,
             suppliersError = null,
             supplierDetail = null,
+            supplierCreateOpen = false,
+            supplierCreating = false,
+            supplierEditOpen = false,
+            supplierUpdating = false,
             employeesError = null,
             employeeDetail = null,
+            employeeCreateOpen = false,
+            employeeCreating = false,
+            employeeEditOpen = false,
+            employeeUpdating = false,
         )
         scope.launch {
             try {
@@ -205,12 +290,14 @@ class NativeOwnerMoreViewModel(
         _state.value = current.copy(
             destination = NativeOwnerMoreDestination.Products,
             productsLoading = true,
+            productsShowArchived = false,
             productDetail = null,
             productCreateOpen = false,
             productCreating = false,
             productEditOpen = false,
             productUpdating = false,
             productArchiving = false,
+            productUnarchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -221,9 +308,17 @@ class NativeOwnerMoreViewModel(
             customersError = null,
             suppliersLoading = false,
             supplierDetail = null,
+            supplierCreateOpen = false,
+            supplierCreating = false,
+            supplierEditOpen = false,
+            supplierUpdating = false,
             suppliersError = null,
             employeesLoading = false,
             employeeDetail = null,
+            employeeCreateOpen = false,
+            employeeCreating = false,
+            employeeEditOpen = false,
+            employeeUpdating = false,
             employeesError = null,
             confirmRemoveUnlock = false,
             error = null,
@@ -231,7 +326,9 @@ class NativeOwnerMoreViewModel(
         )
         scope.launch {
             try {
-                val snapshot = withContext(Dispatchers.IO) { productsFacade.loadProducts(session) }
+                val snapshot = withContext(Dispatchers.IO) {
+                    productsFacade.loadProducts(session, includeArchived = false)
+                }
                 val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (latest.destination != NativeOwnerMoreDestination.Products) return@launch
                 _state.value = latest.copy(
@@ -249,6 +346,7 @@ class NativeOwnerMoreViewModel(
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.Products) return
+        val showArchived = current.productsShowArchived
         _state.value = current.copy(
             productsLoading = true,
             productsError = null,
@@ -258,10 +356,53 @@ class NativeOwnerMoreViewModel(
             productEditOpen = false,
             productUpdating = false,
             productArchiving = false,
+            productUnarchiving = false,
         )
         scope.launch {
             try {
-                val snapshot = withContext(Dispatchers.IO) { productsFacade.loadProducts(session) }
+                val snapshot = withContext(Dispatchers.IO) {
+                    productsFacade.loadProducts(session, includeArchived = showArchived)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Products) return@launch
+                _state.value = latest.copy(
+                    products = snapshot.products,
+                    productsLoading = false,
+                    productsError = null,
+                )
+            } catch (error: Throwable) {
+                handleProductsFailure(error)
+            }
+        }
+    }
+
+    fun setProductsShowArchived(showArchived: Boolean) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Products) return
+        if (current.productsShowArchived == showArchived &&
+            !current.productsLoading &&
+            current.productDetail == null
+        ) {
+            return
+        }
+        _state.value = current.copy(
+            productsShowArchived = showArchived,
+            productsLoading = true,
+            productsError = null,
+            productDetail = null,
+            productCreateOpen = false,
+            productCreating = false,
+            productEditOpen = false,
+            productUpdating = false,
+            productArchiving = false,
+            productUnarchiving = false,
+        )
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) {
+                    productsFacade.loadProducts(session, includeArchived = showArchived)
+                }
                 val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (latest.destination != NativeOwnerMoreDestination.Products) return@launch
                 _state.value = latest.copy(
@@ -287,6 +428,7 @@ class NativeOwnerMoreViewModel(
             productEditOpen = false,
             productUpdating = false,
             productArchiving = false,
+            productUnarchiving = false,
         )
         scope.launch {
             try {
@@ -313,6 +455,7 @@ class NativeOwnerMoreViewModel(
             productEditOpen = false,
             productUpdating = false,
             productArchiving = false,
+            productUnarchiving = false,
             productsError = null,
             productsLoading = false,
         )
@@ -321,12 +464,14 @@ class NativeOwnerMoreViewModel(
     fun openProductCreate() {
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.Products) return
+        if (current.productsShowArchived) return
         _state.value = current.copy(
             productCreateOpen = true,
             productCreating = false,
             productEditOpen = false,
             productUpdating = false,
             productArchiving = false,
+            productUnarchiving = false,
             productDetail = null,
             productsError = null,
             productsLoading = false,
@@ -341,6 +486,7 @@ class NativeOwnerMoreViewModel(
             productEditOpen = false,
             productUpdating = false,
             productArchiving = false,
+            productUnarchiving = false,
             productsError = null,
         )
     }
@@ -354,16 +500,20 @@ class NativeOwnerMoreViewModel(
         scope.launch {
             try {
                 withContext(Dispatchers.IO) { productsFacade.createProduct(session, input) }
-                val snapshot = withContext(Dispatchers.IO) { productsFacade.loadProducts(session) }
+                val snapshot = withContext(Dispatchers.IO) {
+                    productsFacade.loadProducts(session, includeArchived = false)
+                }
                 val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (latest.destination != NativeOwnerMoreDestination.Products) return@launch
                 _state.value = latest.copy(
                     products = snapshot.products,
+                    productsShowArchived = false,
                     productCreateOpen = false,
                     productCreating = false,
                     productEditOpen = false,
                     productUpdating = false,
                     productArchiving = false,
+                    productUnarchiving = false,
                     productsError = null,
                     productDetail = null,
                     productsLoading = false,
@@ -377,13 +527,15 @@ class NativeOwnerMoreViewModel(
     fun openProductEdit() {
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.Products) return
-        if (current.productDetail == null) return
+        val detail = current.productDetail ?: return
+        if (detail.row.archived) return
         _state.value = current.copy(
             productEditOpen = true,
             productUpdating = false,
             productCreateOpen = false,
             productCreating = false,
             productArchiving = false,
+            productUnarchiving = false,
             productsError = null,
             productsLoading = false,
         )
@@ -404,6 +556,7 @@ class NativeOwnerMoreViewModel(
         val productId = current.productDetail?.row?.productId ?: return
         if (current.destination != NativeOwnerMoreDestination.Products || !current.productEditOpen) return
         if (current.productUpdating) return
+        val showArchived = current.productsShowArchived
         _state.value = current.copy(productUpdating = true, productsError = null)
         scope.launch {
             try {
@@ -413,7 +566,9 @@ class NativeOwnerMoreViewModel(
                 val detail = withContext(Dispatchers.IO) {
                     productsFacade.loadDetail(session, productId)
                 }
-                val snapshot = withContext(Dispatchers.IO) { productsFacade.loadProducts(session) }
+                val snapshot = withContext(Dispatchers.IO) {
+                    productsFacade.loadProducts(session, includeArchived = showArchived)
+                }
                 val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (latest.destination != NativeOwnerMoreDestination.Products) return@launch
                 _state.value = latest.copy(
@@ -435,14 +590,22 @@ class NativeOwnerMoreViewModel(
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         val productId = current.productDetail?.row?.productId ?: return
         if (current.destination != NativeOwnerMoreDestination.Products) return
-        if (current.productArchiving || current.productEditOpen || current.productCreateOpen) return
+        if (current.productDetail?.row?.archived == true) return
+        if (current.productArchiving || current.productUnarchiving ||
+            current.productEditOpen || current.productCreateOpen
+        ) {
+            return
+        }
+        val showArchived = current.productsShowArchived
         _state.value = current.copy(productArchiving = true, productsError = null)
         scope.launch {
             try {
                 withContext(Dispatchers.IO) {
                     productsFacade.archiveProduct(session, productId)
                 }
-                val snapshot = withContext(Dispatchers.IO) { productsFacade.loadProducts(session) }
+                val snapshot = withContext(Dispatchers.IO) {
+                    productsFacade.loadProducts(session, includeArchived = showArchived)
+                }
                 val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (latest.destination != NativeOwnerMoreDestination.Products) return@launch
                 _state.value = latest.copy(
@@ -451,6 +614,46 @@ class NativeOwnerMoreViewModel(
                     productEditOpen = false,
                     productUpdating = false,
                     productArchiving = false,
+                    productUnarchiving = false,
+                    productsError = null,
+                    productsLoading = false,
+                )
+            } catch (error: Throwable) {
+                handleProductsFailure(error)
+            }
+        }
+    }
+
+    fun unarchiveProduct() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val productId = current.productDetail?.row?.productId ?: return
+        if (current.destination != NativeOwnerMoreDestination.Products) return
+        if (current.productDetail?.row?.archived != true) return
+        if (current.productUnarchiving || current.productArchiving ||
+            current.productEditOpen || current.productCreateOpen
+        ) {
+            return
+        }
+        val showArchived = current.productsShowArchived
+        _state.value = current.copy(productUnarchiving = true, productsError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    productsFacade.unarchiveProduct(session, productId)
+                }
+                val snapshot = withContext(Dispatchers.IO) {
+                    productsFacade.loadProducts(session, includeArchived = showArchived)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Products) return@launch
+                _state.value = latest.copy(
+                    products = snapshot.products,
+                    productDetail = null,
+                    productEditOpen = false,
+                    productUpdating = false,
+                    productArchiving = false,
+                    productUnarchiving = false,
                     productsError = null,
                     productsLoading = false,
                 )
@@ -479,12 +682,21 @@ class NativeOwnerMoreViewModel(
             productEditOpen = false,
             productUpdating = false,
             productArchiving = false,
+            productUnarchiving = false,
             productsError = null,
             suppliersLoading = false,
             supplierDetail = null,
+            supplierCreateOpen = false,
+            supplierCreating = false,
+            supplierEditOpen = false,
+            supplierUpdating = false,
             suppliersError = null,
             employeesLoading = false,
             employeeDetail = null,
+            employeeCreateOpen = false,
+            employeeCreating = false,
+            employeeEditOpen = false,
+            employeeUpdating = false,
             employeesError = null,
             confirmRemoveUnlock = false,
             error = null,
@@ -691,6 +903,10 @@ class NativeOwnerMoreViewModel(
             destination = NativeOwnerMoreDestination.Suppliers,
             suppliersLoading = true,
             supplierDetail = null,
+            supplierCreateOpen = false,
+            supplierCreating = false,
+            supplierEditOpen = false,
+            supplierUpdating = false,
             suppliersError = null,
             productsLoading = false,
             productDetail = null,
@@ -699,6 +915,7 @@ class NativeOwnerMoreViewModel(
             productEditOpen = false,
             productUpdating = false,
             productArchiving = false,
+            productUnarchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -709,6 +926,10 @@ class NativeOwnerMoreViewModel(
             customersError = null,
             employeesLoading = false,
             employeeDetail = null,
+            employeeCreateOpen = false,
+            employeeCreating = false,
+            employeeEditOpen = false,
+            employeeUpdating = false,
             employeesError = null,
             confirmRemoveUnlock = false,
             error = null,
@@ -734,7 +955,15 @@ class NativeOwnerMoreViewModel(
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.Suppliers) return
-        _state.value = current.copy(suppliersLoading = true, suppliersError = null, supplierDetail = null)
+        _state.value = current.copy(
+            suppliersLoading = true,
+            suppliersError = null,
+            supplierDetail = null,
+            supplierCreateOpen = false,
+            supplierCreating = false,
+            supplierEditOpen = false,
+            supplierUpdating = false,
+        )
         scope.launch {
             try {
                 val snapshot = withContext(Dispatchers.IO) { suppliersFacade.loadSuppliers(session) }
@@ -755,7 +984,14 @@ class NativeOwnerMoreViewModel(
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.Suppliers) return
-        _state.value = current.copy(suppliersLoading = true, suppliersError = null)
+        _state.value = current.copy(
+            suppliersLoading = true,
+            suppliersError = null,
+            supplierCreateOpen = false,
+            supplierCreating = false,
+            supplierEditOpen = false,
+            supplierUpdating = false,
+        )
         scope.launch {
             try {
                 val detail = withContext(Dispatchers.IO) {
@@ -776,7 +1012,121 @@ class NativeOwnerMoreViewModel(
 
     fun clearSupplierDetail() {
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
-        _state.value = current.copy(supplierDetail = null, suppliersError = null, suppliersLoading = false)
+        _state.value = current.copy(
+            supplierDetail = null,
+            supplierEditOpen = false,
+            supplierUpdating = false,
+            suppliersError = null,
+            suppliersLoading = false,
+        )
+    }
+
+    fun openSupplierCreate() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Suppliers) return
+        _state.value = current.copy(
+            supplierCreateOpen = true,
+            supplierCreating = false,
+            supplierEditOpen = false,
+            supplierUpdating = false,
+            supplierDetail = null,
+            suppliersError = null,
+            suppliersLoading = false,
+        )
+    }
+
+    fun clearSupplierCreate() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            supplierCreateOpen = false,
+            supplierCreating = false,
+            supplierEditOpen = false,
+            supplierUpdating = false,
+            suppliersError = null,
+        )
+    }
+
+    fun createSupplier(name: String) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Suppliers || !current.supplierCreateOpen) return
+        if (current.supplierCreating) return
+        _state.value = current.copy(supplierCreating = true, suppliersError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) { suppliersFacade.createSupplier(session, name) }
+                val snapshot = withContext(Dispatchers.IO) { suppliersFacade.loadSuppliers(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Suppliers) return@launch
+                _state.value = latest.copy(
+                    suppliers = snapshot.suppliers,
+                    supplierCreateOpen = false,
+                    supplierCreating = false,
+                    supplierEditOpen = false,
+                    supplierUpdating = false,
+                    suppliersError = null,
+                    supplierDetail = null,
+                    suppliersLoading = false,
+                )
+            } catch (error: Throwable) {
+                handleSuppliersFailure(error)
+            }
+        }
+    }
+
+    fun openSupplierEdit() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Suppliers) return
+        if (current.supplierDetail == null) return
+        _state.value = current.copy(
+            supplierEditOpen = true,
+            supplierUpdating = false,
+            supplierCreateOpen = false,
+            supplierCreating = false,
+            suppliersError = null,
+            suppliersLoading = false,
+        )
+    }
+
+    fun clearSupplierEdit() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            supplierEditOpen = false,
+            supplierUpdating = false,
+            suppliersError = null,
+        )
+    }
+
+    fun updateSupplier(name: String, profile: VendorProfileInput) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val accountId = current.supplierDetail?.row?.accountId ?: return
+        if (current.destination != NativeOwnerMoreDestination.Suppliers || !current.supplierEditOpen) return
+        if (current.supplierUpdating) return
+        _state.value = current.copy(supplierUpdating = true, suppliersError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    suppliersFacade.updateSupplier(session, accountId, name, profile)
+                }
+                val detail = withContext(Dispatchers.IO) {
+                    suppliersFacade.loadDetail(session, accountId)
+                }
+                val snapshot = withContext(Dispatchers.IO) { suppliersFacade.loadSuppliers(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Suppliers) return@launch
+                _state.value = latest.copy(
+                    suppliers = snapshot.suppliers,
+                    supplierDetail = detail,
+                    supplierEditOpen = false,
+                    supplierUpdating = false,
+                    suppliersError = null,
+                    suppliersLoading = false,
+                )
+            } catch (error: Throwable) {
+                handleSuppliersFailure(error)
+            }
+        }
     }
 
     fun openEmployees() {
@@ -786,6 +1136,10 @@ class NativeOwnerMoreViewModel(
             destination = NativeOwnerMoreDestination.Employees,
             employeesLoading = true,
             employeeDetail = null,
+            employeeCreateOpen = false,
+            employeeCreating = false,
+            employeeEditOpen = false,
+            employeeUpdating = false,
             employeesError = null,
             productsLoading = false,
             productDetail = null,
@@ -794,6 +1148,7 @@ class NativeOwnerMoreViewModel(
             productEditOpen = false,
             productUpdating = false,
             productArchiving = false,
+            productUnarchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -804,13 +1159,30 @@ class NativeOwnerMoreViewModel(
             customersError = null,
             suppliersLoading = false,
             supplierDetail = null,
+            supplierCreateOpen = false,
+            supplierCreating = false,
+            supplierEditOpen = false,
+            supplierUpdating = false,
             suppliersError = null,
             costingPoliciesLoading = false,
             costingPolicyDetail = null,
             costingPoliciesError = null,
             costingCurrentMonthSummary = null,
+            costingApproveOpen = false,
+            costingApproveSeed = null,
+            costingApproving = false,
+            costingReauthOpen = false,
+            costingReauthBusy = false,
             shopSettingsLoading = false,
             shopSettings = null,
+            shopSettingsIdentityEditOpen = false,
+            shopSettingsIdentitySaving = false,
+            shopSettingsRatesEditOpen = false,
+            shopSettingsRatesSaving = false,
+            shopSettingsCategoryCreateOpen = false,
+            shopSettingsCategoryCreating = false,
+            shopSettingsCategoryDetail = null,
+            shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
             usersLoading = false,
             userDetail = null,
@@ -821,6 +1193,14 @@ class NativeOwnerMoreViewModel(
             backupLoading = false,
             backup = null,
             backupError = null,
+            backupExportOpen = false,
+            backupRestoreOpen = false,
+            backupConnectOpen = false,
+            backupInspection = null,
+            backupBusy = false,
+            backupReauthOpen = false,
+            backupReauthBusy = false,
+            backupDisconnectConfirmOpen = false,
             confirmRemoveUnlock = false,
             error = null,
             saving = false,
@@ -845,7 +1225,15 @@ class NativeOwnerMoreViewModel(
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.Employees) return
-        _state.value = current.copy(employeesLoading = true, employeesError = null, employeeDetail = null)
+        _state.value = current.copy(
+            employeesLoading = true,
+            employeesError = null,
+            employeeDetail = null,
+            employeeCreateOpen = false,
+            employeeCreating = false,
+            employeeEditOpen = false,
+            employeeUpdating = false,
+        )
         scope.launch {
             try {
                 val snapshot = withContext(Dispatchers.IO) { employeesFacade.loadEmployees(session) }
@@ -866,7 +1254,14 @@ class NativeOwnerMoreViewModel(
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.Employees) return
-        _state.value = current.copy(employeesLoading = true, employeesError = null)
+        _state.value = current.copy(
+            employeesLoading = true,
+            employeesError = null,
+            employeeCreateOpen = false,
+            employeeCreating = false,
+            employeeEditOpen = false,
+            employeeUpdating = false,
+        )
         scope.launch {
             try {
                 val detail = withContext(Dispatchers.IO) {
@@ -887,18 +1282,138 @@ class NativeOwnerMoreViewModel(
 
     fun clearEmployeeDetail() {
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
-        _state.value = current.copy(employeeDetail = null, employeesError = null, employeesLoading = false)
+        _state.value = current.copy(
+            employeeDetail = null,
+            employeeEditOpen = false,
+            employeeUpdating = false,
+            employeesError = null,
+            employeesLoading = false,
+        )
+    }
+
+    fun openEmployeeCreate() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Employees) return
+        _state.value = current.copy(
+            employeeCreateOpen = true,
+            employeeCreating = false,
+            employeeEditOpen = false,
+            employeeUpdating = false,
+            employeeDetail = null,
+            employeesError = null,
+            employeesLoading = false,
+        )
+    }
+
+    fun clearEmployeeCreate() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            employeeCreateOpen = false,
+            employeeCreating = false,
+            employeeEditOpen = false,
+            employeeUpdating = false,
+            employeesError = null,
+        )
+    }
+
+    fun createEmployee(name: String) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Employees || !current.employeeCreateOpen) return
+        if (current.employeeCreating) return
+        _state.value = current.copy(employeeCreating = true, employeesError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) { employeesFacade.createEmployee(session, name) }
+                val snapshot = withContext(Dispatchers.IO) { employeesFacade.loadEmployees(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Employees) return@launch
+                _state.value = latest.copy(
+                    employees = snapshot.employees,
+                    employeeCreateOpen = false,
+                    employeeCreating = false,
+                    employeeEditOpen = false,
+                    employeeUpdating = false,
+                    employeesError = null,
+                    employeeDetail = null,
+                    employeesLoading = false,
+                )
+            } catch (error: Throwable) {
+                handleEmployeesFailure(error)
+            }
+        }
+    }
+
+    fun openEmployeeEdit() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Employees) return
+        if (current.employeeDetail == null) return
+        _state.value = current.copy(
+            employeeEditOpen = true,
+            employeeUpdating = false,
+            employeeCreateOpen = false,
+            employeeCreating = false,
+            employeesError = null,
+            employeesLoading = false,
+        )
+    }
+
+    fun clearEmployeeEdit() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            employeeEditOpen = false,
+            employeeUpdating = false,
+            employeesError = null,
+        )
+    }
+
+    fun updateEmployee(name: String, profile: EmployeeProfileInput) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val accountId = current.employeeDetail?.row?.accountId ?: return
+        if (current.destination != NativeOwnerMoreDestination.Employees || !current.employeeEditOpen) return
+        if (current.employeeUpdating) return
+        _state.value = current.copy(employeeUpdating = true, employeesError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    employeesFacade.updateEmployee(session, accountId, name, profile)
+                }
+                val detail = withContext(Dispatchers.IO) {
+                    employeesFacade.loadDetail(session, accountId)
+                }
+                val snapshot = withContext(Dispatchers.IO) { employeesFacade.loadEmployees(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Employees) return@launch
+                _state.value = latest.copy(
+                    employees = snapshot.employees,
+                    employeeDetail = detail,
+                    employeeEditOpen = false,
+                    employeeUpdating = false,
+                    employeesError = null,
+                    employeesLoading = false,
+                )
+            } catch (error: Throwable) {
+                handleEmployeesFailure(error)
+            }
+        }
     }
 
     fun openCostingPlans() {
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        pendingCostingApprove = null
         _state.value = current.copy(
             destination = NativeOwnerMoreDestination.CostingPlans,
             costingPoliciesLoading = true,
             costingPolicyDetail = null,
             costingPoliciesError = null,
             costingCurrentMonthSummary = null,
+            costingApproveOpen = false,
+            costingApproveSeed = null,
+            costingApproving = false,
+            costingReauthOpen = false,
+            costingReauthBusy = false,
             productsLoading = false,
             productDetail = null,
             productCreateOpen = false,
@@ -906,6 +1421,7 @@ class NativeOwnerMoreViewModel(
             productEditOpen = false,
             productUpdating = false,
             productArchiving = false,
+            productUnarchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -916,12 +1432,28 @@ class NativeOwnerMoreViewModel(
             customersError = null,
             suppliersLoading = false,
             supplierDetail = null,
+            supplierCreateOpen = false,
+            supplierCreating = false,
+            supplierEditOpen = false,
+            supplierUpdating = false,
             suppliersError = null,
             employeesLoading = false,
             employeeDetail = null,
+            employeeCreateOpen = false,
+            employeeCreating = false,
+            employeeEditOpen = false,
+            employeeUpdating = false,
             employeesError = null,
             shopSettingsLoading = false,
             shopSettings = null,
+            shopSettingsIdentityEditOpen = false,
+            shopSettingsIdentitySaving = false,
+            shopSettingsRatesEditOpen = false,
+            shopSettingsRatesSaving = false,
+            shopSettingsCategoryCreateOpen = false,
+            shopSettingsCategoryCreating = false,
+            shopSettingsCategoryDetail = null,
+            shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
             usersLoading = false,
             userDetail = null,
@@ -932,6 +1464,14 @@ class NativeOwnerMoreViewModel(
             backupLoading = false,
             backup = null,
             backupError = null,
+            backupExportOpen = false,
+            backupRestoreOpen = false,
+            backupConnectOpen = false,
+            backupInspection = null,
+            backupBusy = false,
+            backupReauthOpen = false,
+            backupReauthBusy = false,
+            backupDisconnectConfirmOpen = false,
             confirmRemoveUnlock = false,
             error = null,
             saving = false,
@@ -1008,10 +1548,169 @@ class NativeOwnerMoreViewModel(
 
     fun clearCostingPolicyDetail() {
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.costingApproveOpen || current.costingReauthOpen) return
         _state.value = current.copy(
             costingPolicyDetail = null,
             costingPoliciesError = null,
             costingPoliciesLoading = false,
+        )
+    }
+
+    fun openCostingApprove() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.CostingPlans) return
+        pendingCostingApprove = null
+        _state.value = current.copy(
+            costingApproveOpen = true,
+            costingApproveSeed = null,
+            costingApproving = false,
+            costingReauthOpen = false,
+            costingReauthBusy = false,
+            costingReviewReasons = costingPlansFacade.reviewReasons(),
+            costingComponentCodes = costingPlansFacade.componentCodes(),
+            costingPoliciesError = null,
+        )
+    }
+
+    fun openCostingApproveFromDetail() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val detail = current.costingPolicyDetail ?: return
+        if (current.destination != NativeOwnerMoreDestination.CostingPlans) return
+        if (detail.row.statusLabel != "Active") return
+        pendingCostingApprove = null
+        _state.value = current.copy(
+            costingApproveOpen = true,
+            costingApproveSeed = detail,
+            costingApproving = false,
+            costingReauthOpen = false,
+            costingReauthBusy = false,
+            costingReviewReasons = costingPlansFacade.reviewReasons(),
+            costingComponentCodes = costingPlansFacade.componentCodes(),
+            costingPoliciesError = null,
+        )
+    }
+
+    fun clearCostingApprove() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        pendingCostingApprove = null
+        _state.value = current.copy(
+            costingApproveOpen = false,
+            costingApproveSeed = null,
+            costingApproving = false,
+            costingReauthOpen = false,
+            costingReauthBusy = false,
+            costingPoliciesError = null,
+        )
+    }
+
+    fun approveCostingPolicy(input: CostingPolicyInput) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.CostingPlans ||
+            !current.costingApproveOpen ||
+            current.costingApproving
+        ) {
+            return
+        }
+        _state.value = current.copy(costingApproving = true, costingPoliciesError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    costingPlansFacade.approvePolicy(session, input)
+                }
+                val snapshot = withContext(Dispatchers.IO) {
+                    costingPlansFacade.loadPolicies(session, current.context.businessDate)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
+                pendingCostingApprove = null
+                _state.value = latest.copy(
+                    costingPolicies = snapshot.policies,
+                    costingCurrentMonthSummary = snapshot.currentMonthSummary,
+                    costingPolicyDetail = null,
+                    costingApproveOpen = false,
+                    costingApproveSeed = null,
+                    costingApproving = false,
+                    costingReauthOpen = false,
+                    costingReauthBusy = false,
+                    costingPoliciesLoading = false,
+                    costingPoliciesError = null,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.RecentAuthenticationRequired) {
+                    pendingCostingApprove = input
+                    val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    _state.value = latest.copy(
+                        costingApproving = false,
+                        costingReauthOpen = true,
+                        costingReauthBusy = false,
+                        costingPoliciesError = null,
+                    )
+                } else {
+                    handleCostingPlansFailure(error)
+                }
+            }
+        }
+    }
+
+    fun submitCostingReauth(passphrase: CharArray) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.CostingPlans ||
+            !current.costingReauthOpen ||
+            current.costingReauthBusy
+        ) {
+            passphrase.fill('\u0000')
+            return
+        }
+        val pending = pendingCostingApprove
+        if (pending == null) {
+            passphrase.fill('\u0000')
+            _state.value = current.copy(costingReauthOpen = false, costingPoliciesError = null)
+            return
+        }
+        _state.value = current.copy(costingReauthBusy = true, costingPoliciesError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    costingPlansFacade.reauthenticate(session, passphrase)
+                }
+                withContext(Dispatchers.IO) {
+                    costingPlansFacade.approvePolicy(session, pending)
+                }
+                val snapshot = withContext(Dispatchers.IO) {
+                    costingPlansFacade.loadPolicies(session, current.context.businessDate)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
+                pendingCostingApprove = null
+                _state.value = latest.copy(
+                    costingPolicies = snapshot.policies,
+                    costingCurrentMonthSummary = snapshot.currentMonthSummary,
+                    costingPolicyDetail = null,
+                    costingApproveOpen = false,
+                    costingApproveSeed = null,
+                    costingApproving = false,
+                    costingReauthOpen = false,
+                    costingReauthBusy = false,
+                    costingPoliciesLoading = false,
+                    costingPoliciesError = null,
+                )
+            } catch (error: Throwable) {
+                handleCostingPlansFailure(error)
+            } finally {
+                passphrase.fill('\u0000')
+            }
+        }
+    }
+
+    fun cancelCostingReauth() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        pendingCostingApprove = null
+        _state.value = current.copy(
+            costingReauthOpen = false,
+            costingReauthBusy = false,
+            costingApproving = false,
         )
     }
 
@@ -1022,6 +1721,14 @@ class NativeOwnerMoreViewModel(
             destination = NativeOwnerMoreDestination.ShopSettings,
             shopSettingsLoading = true,
             shopSettings = null,
+            shopSettingsIdentityEditOpen = false,
+            shopSettingsIdentitySaving = false,
+            shopSettingsRatesEditOpen = false,
+            shopSettingsRatesSaving = false,
+            shopSettingsCategoryCreateOpen = false,
+            shopSettingsCategoryCreating = false,
+            shopSettingsCategoryDetail = null,
+            shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
             productsLoading = false,
             productDetail = null,
@@ -1030,6 +1737,7 @@ class NativeOwnerMoreViewModel(
             productEditOpen = false,
             productUpdating = false,
             productArchiving = false,
+            productUnarchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -1040,14 +1748,27 @@ class NativeOwnerMoreViewModel(
             customersError = null,
             suppliersLoading = false,
             supplierDetail = null,
+            supplierCreateOpen = false,
+            supplierCreating = false,
+            supplierEditOpen = false,
+            supplierUpdating = false,
             suppliersError = null,
             employeesLoading = false,
             employeeDetail = null,
+            employeeCreateOpen = false,
+            employeeCreating = false,
+            employeeEditOpen = false,
+            employeeUpdating = false,
             employeesError = null,
             costingPoliciesLoading = false,
             costingPolicyDetail = null,
             costingPoliciesError = null,
             costingCurrentMonthSummary = null,
+            costingApproveOpen = false,
+            costingApproveSeed = null,
+            costingApproving = false,
+            costingReauthOpen = false,
+            costingReauthBusy = false,
             usersLoading = false,
             userDetail = null,
             usersError = null,
@@ -1057,6 +1778,14 @@ class NativeOwnerMoreViewModel(
             backupLoading = false,
             backup = null,
             backupError = null,
+            backupExportOpen = false,
+            backupRestoreOpen = false,
+            backupConnectOpen = false,
+            backupInspection = null,
+            backupBusy = false,
+            backupReauthOpen = false,
+            backupReauthBusy = false,
+            backupDisconnectConfirmOpen = false,
             confirmRemoveUnlock = false,
             error = null,
             saving = false,
@@ -1098,13 +1827,269 @@ class NativeOwnerMoreViewModel(
         }
     }
 
+    fun openShopIdentityEdit() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.ShopSettings) return
+        if (current.shopSettings == null) return
+        _state.value = current.copy(
+            shopSettingsIdentityEditOpen = true,
+            shopSettingsIdentitySaving = false,
+            shopSettingsRatesEditOpen = false,
+            shopSettingsRatesSaving = false,
+            shopSettingsCategoryCreateOpen = false,
+            shopSettingsCategoryCreating = false,
+            shopSettingsCategoryDetail = null,
+            shopSettingsCategoryArchiving = false,
+            shopSettingsError = null,
+            shopSettingsLoading = false,
+        )
+    }
+
+    fun clearShopIdentityEdit() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            shopSettingsIdentityEditOpen = false,
+            shopSettingsIdentitySaving = false,
+            shopSettingsError = null,
+        )
+    }
+
+    fun saveShopIdentity(input: StoreIdentityInput) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.ShopSettings ||
+            !current.shopSettingsIdentityEditOpen
+        ) {
+            return
+        }
+        if (current.shopSettingsIdentitySaving) return
+        _state.value = current.copy(shopSettingsIdentitySaving = true, shopSettingsError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) { shopSettingsFacade.saveIdentity(session, input) }
+                val snapshot = withContext(Dispatchers.IO) { shopSettingsFacade.load(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.ShopSettings) return@launch
+                _state.value = latest.copy(
+                    shopSettings = snapshot,
+                    shopSettingsIdentityEditOpen = false,
+                    shopSettingsIdentitySaving = false,
+                    shopSettingsError = null,
+                    shopSettingsLoading = false,
+                )
+            } catch (error: Throwable) {
+                handleShopSettingsFailure(error)
+            }
+        }
+    }
+
+    fun openShopRatesEdit() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.ShopSettings) return
+        if (current.shopSettings == null) return
+        _state.value = current.copy(
+            shopSettingsRatesEditOpen = true,
+            shopSettingsRatesSaving = false,
+            shopSettingsIdentityEditOpen = false,
+            shopSettingsIdentitySaving = false,
+            shopSettingsCategoryCreateOpen = false,
+            shopSettingsCategoryCreating = false,
+            shopSettingsCategoryDetail = null,
+            shopSettingsCategoryArchiving = false,
+            shopSettingsError = null,
+            shopSettingsLoading = false,
+        )
+    }
+
+    fun clearShopRatesEdit() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            shopSettingsRatesEditOpen = false,
+            shopSettingsRatesSaving = false,
+            shopSettingsError = null,
+        )
+    }
+
+    fun updateShopRates(settings: BusinessSettings) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.ShopSettings ||
+            !current.shopSettingsRatesEditOpen
+        ) {
+            return
+        }
+        if (current.shopSettingsRatesSaving) return
+        _state.value = current.copy(shopSettingsRatesSaving = true, shopSettingsError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) { shopSettingsFacade.updateRates(session, settings) }
+                val snapshot = withContext(Dispatchers.IO) { shopSettingsFacade.load(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.ShopSettings) return@launch
+                _state.value = latest.copy(
+                    shopSettings = snapshot,
+                    shopSettingsRatesEditOpen = false,
+                    shopSettingsRatesSaving = false,
+                    shopSettingsError = null,
+                    shopSettingsLoading = false,
+                )
+            } catch (error: Throwable) {
+                handleShopSettingsFailure(error)
+            }
+        }
+    }
+
+    fun openShopCategoryCreate() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.ShopSettings) return
+        _state.value = current.copy(
+            shopSettingsCategoryCreateOpen = true,
+            shopSettingsCategoryCreating = false,
+            shopSettingsIdentityEditOpen = false,
+            shopSettingsIdentitySaving = false,
+            shopSettingsRatesEditOpen = false,
+            shopSettingsRatesSaving = false,
+            shopSettingsCategoryDetail = null,
+            shopSettingsCategoryArchiving = false,
+            shopSettingsError = null,
+            shopSettingsLoading = false,
+        )
+    }
+
+    fun clearShopCategoryCreate() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            shopSettingsCategoryCreateOpen = false,
+            shopSettingsCategoryCreating = false,
+            shopSettingsError = null,
+        )
+    }
+
+    fun createShopExpenseCategory(name: String) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.ShopSettings ||
+            !current.shopSettingsCategoryCreateOpen
+        ) {
+            return
+        }
+        if (current.shopSettingsCategoryCreating) return
+        _state.value = current.copy(shopSettingsCategoryCreating = true, shopSettingsError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    shopSettingsFacade.createExpenseCategory(session, name)
+                }
+                val snapshot = withContext(Dispatchers.IO) { shopSettingsFacade.load(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.ShopSettings) return@launch
+                _state.value = latest.copy(
+                    shopSettings = snapshot,
+                    shopSettingsCategoryCreateOpen = false,
+                    shopSettingsCategoryCreating = false,
+                    shopSettingsError = null,
+                    shopSettingsLoading = false,
+                )
+            } catch (error: Throwable) {
+                handleShopSettingsFailure(error)
+            }
+        }
+    }
+
+    fun openShopCategoryDetail(accountId: Long) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.ShopSettings) return
+        _state.value = current.copy(
+            shopSettingsLoading = true,
+            shopSettingsCategoryDetail = null,
+            shopSettingsCategoryArchiving = false,
+            shopSettingsCategoryCreateOpen = false,
+            shopSettingsCategoryCreating = false,
+            shopSettingsIdentityEditOpen = false,
+            shopSettingsIdentitySaving = false,
+            shopSettingsRatesEditOpen = false,
+            shopSettingsRatesSaving = false,
+            shopSettingsError = null,
+        )
+        scope.launch {
+            try {
+                val detail = withContext(Dispatchers.IO) {
+                    shopSettingsFacade.loadCategoryDetail(session, accountId)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.ShopSettings) return@launch
+                _state.value = latest.copy(
+                    shopSettingsCategoryDetail = detail,
+                    shopSettingsLoading = false,
+                    shopSettingsError = null,
+                )
+            } catch (error: Throwable) {
+                handleShopSettingsFailure(error)
+            }
+        }
+    }
+
+    fun clearShopCategoryDetail() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            shopSettingsCategoryDetail = null,
+            shopSettingsCategoryArchiving = false,
+            shopSettingsError = null,
+            shopSettingsLoading = false,
+        )
+    }
+
+    fun setShopExpenseCategoryArchived(archived: Boolean) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val accountId = current.shopSettingsCategoryDetail?.accountId ?: return
+        if (current.destination != NativeOwnerMoreDestination.ShopSettings) return
+        if (current.shopSettingsCategoryArchiving) return
+        _state.value = current.copy(shopSettingsCategoryArchiving = true, shopSettingsError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    shopSettingsFacade.setExpenseCategoryArchived(session, accountId, archived)
+                }
+                val detail = withContext(Dispatchers.IO) {
+                    shopSettingsFacade.loadCategoryDetail(session, accountId)
+                }
+                val snapshot = withContext(Dispatchers.IO) { shopSettingsFacade.load(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.ShopSettings) return@launch
+                _state.value = latest.copy(
+                    shopSettings = snapshot,
+                    shopSettingsCategoryDetail = detail,
+                    shopSettingsCategoryArchiving = false,
+                    shopSettingsError = null,
+                    shopSettingsLoading = false,
+                )
+            } catch (error: Throwable) {
+                handleShopSettingsFailure(error)
+            }
+        }
+    }
+
     fun openUsersRoles() {
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        pendingUsersAction = null
         _state.value = current.copy(
             destination = NativeOwnerMoreDestination.UsersRoles,
             usersLoading = true,
             userDetail = null,
+            userEnrollOpen = false,
+            userEnrollPending = null,
+            userEnrollBusy = false,
+            userRoleChangeOpen = false,
+            userRoleChanging = false,
+            userEnableConfirmOpen = false,
+            userEnableTargetEnabled = false,
+            userEnableBusy = false,
+            userReauthOpen = false,
+            userReauthBusy = false,
+            enrollableRoles = usersRolesFacade.enrollableRoles(),
             usersError = null,
             productsLoading = false,
             productDetail = null,
@@ -1113,6 +2098,7 @@ class NativeOwnerMoreViewModel(
             productEditOpen = false,
             productUpdating = false,
             productArchiving = false,
+            productUnarchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -1123,16 +2109,37 @@ class NativeOwnerMoreViewModel(
             customersError = null,
             suppliersLoading = false,
             supplierDetail = null,
+            supplierCreateOpen = false,
+            supplierCreating = false,
+            supplierEditOpen = false,
+            supplierUpdating = false,
             suppliersError = null,
             employeesLoading = false,
             employeeDetail = null,
+            employeeCreateOpen = false,
+            employeeCreating = false,
+            employeeEditOpen = false,
+            employeeUpdating = false,
             employeesError = null,
             costingPoliciesLoading = false,
             costingPolicyDetail = null,
             costingPoliciesError = null,
             costingCurrentMonthSummary = null,
+            costingApproveOpen = false,
+            costingApproveSeed = null,
+            costingApproving = false,
+            costingReauthOpen = false,
+            costingReauthBusy = false,
             shopSettingsLoading = false,
             shopSettings = null,
+            shopSettingsIdentityEditOpen = false,
+            shopSettingsIdentitySaving = false,
+            shopSettingsRatesEditOpen = false,
+            shopSettingsRatesSaving = false,
+            shopSettingsCategoryCreateOpen = false,
+            shopSettingsCategoryCreating = false,
+            shopSettingsCategoryDetail = null,
+            shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
             securityHistoryLoading = false,
             securityAuditDetail = null,
@@ -1140,6 +2147,14 @@ class NativeOwnerMoreViewModel(
             backupLoading = false,
             backup = null,
             backupError = null,
+            backupExportOpen = false,
+            backupRestoreOpen = false,
+            backupConnectOpen = false,
+            backupInspection = null,
+            backupBusy = false,
+            backupReauthOpen = false,
+            backupReauthBusy = false,
+            backupDisconnectConfirmOpen = false,
             confirmRemoveUnlock = false,
             error = null,
             saving = false,
@@ -1164,7 +2179,21 @@ class NativeOwnerMoreViewModel(
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.UsersRoles) return
-        _state.value = current.copy(usersLoading = true, usersError = null, userDetail = null)
+        _state.value = current.copy(
+            usersLoading = true,
+            usersError = null,
+            userDetail = null,
+            userEnrollOpen = false,
+            userEnrollPending = null,
+            userEnrollBusy = false,
+            userRoleChangeOpen = false,
+            userRoleChanging = false,
+            userEnableConfirmOpen = false,
+            userEnableBusy = false,
+            userReauthOpen = false,
+            userReauthBusy = false,
+        )
+        pendingUsersAction = null
         scope.launch {
             try {
                 val snapshot = withContext(Dispatchers.IO) { usersRolesFacade.loadUsers(session) }
@@ -1185,7 +2214,16 @@ class NativeOwnerMoreViewModel(
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.UsersRoles) return
-        _state.value = current.copy(usersLoading = true, usersError = null)
+        _state.value = current.copy(
+            usersLoading = true,
+            usersError = null,
+            userEnrollOpen = false,
+            userEnrollPending = null,
+            userRoleChangeOpen = false,
+            userEnableConfirmOpen = false,
+            userReauthOpen = false,
+        )
+        pendingUsersAction = null
         scope.launch {
             try {
                 val detail = withContext(Dispatchers.IO) {
@@ -1206,7 +2244,396 @@ class NativeOwnerMoreViewModel(
 
     fun clearUserDetail() {
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
-        _state.value = current.copy(userDetail = null, usersError = null, usersLoading = false)
+        pendingUsersAction = null
+        _state.value = current.copy(
+            userDetail = null,
+            userRoleChangeOpen = false,
+            userRoleChanging = false,
+            userEnableConfirmOpen = false,
+            userEnableBusy = false,
+            userReauthOpen = false,
+            userReauthBusy = false,
+            usersError = null,
+            usersLoading = false,
+        )
+    }
+
+    fun openUserEnroll() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.UsersRoles) return
+        pendingUsersAction = null
+        _state.value = current.copy(
+            userEnrollOpen = true,
+            userEnrollPending = null,
+            userEnrollBusy = false,
+            userDetail = null,
+            userRoleChangeOpen = false,
+            userEnableConfirmOpen = false,
+            userReauthOpen = false,
+            usersError = null,
+        )
+    }
+
+    fun clearUserEnroll() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        pendingUsersAction = null
+        _state.value = current.copy(
+            userEnrollOpen = false,
+            userEnrollPending = null,
+            userEnrollBusy = false,
+            userReauthOpen = false,
+            userReauthBusy = false,
+            usersError = null,
+        )
+    }
+
+    fun beginUserEnroll(loginName: String, displayName: String, roleWire: String) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.UsersRoles ||
+            !current.userEnrollOpen ||
+            current.userEnrollBusy
+        ) {
+            return
+        }
+        val input = CreateUserInput(
+            loginName = loginName,
+            displayName = displayName,
+            role = roleWire,
+        )
+        _state.value = current.copy(userEnrollBusy = true, usersError = null)
+        scope.launch {
+            try {
+                val pending = withContext(Dispatchers.IO) {
+                    usersRolesFacade.beginEnroll(session, input)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.UsersRoles) return@launch
+                pendingUsersAction = null
+                _state.value = latest.copy(
+                    userEnrollPending = pending,
+                    userEnrollBusy = false,
+                    userReauthOpen = false,
+                    usersError = null,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.RecentAuthenticationRequired) {
+                    pendingUsersAction = PendingUsersRolesAction.BeginEnroll(input)
+                    val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    _state.value = latest.copy(
+                        userEnrollBusy = false,
+                        userReauthOpen = true,
+                        userReauthBusy = false,
+                        usersError = null,
+                    )
+                } else {
+                    handleUsersRolesFailure(error)
+                }
+            }
+        }
+    }
+
+    fun completeUserEnroll(passphrase: CharArray, confirmation: CharArray) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val pending = current.userEnrollPending
+        if (current.destination != NativeOwnerMoreDestination.UsersRoles ||
+            pending == null ||
+            current.userEnrollBusy
+        ) {
+            passphrase.fill('\u0000')
+            confirmation.fill('\u0000')
+            return
+        }
+        if (!passphrase.contentEquals(confirmation)) {
+            passphrase.fill('\u0000')
+            confirmation.fill('\u0000')
+            _state.value = current.copy(usersError = "Passphrases do not match")
+            return
+        }
+        confirmation.fill('\u0000')
+        _state.value = current.copy(userEnrollBusy = true, usersError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    usersRolesFacade.completeEnroll(pending.enrollmentToken, passphrase)
+                }
+                val snapshot = withContext(Dispatchers.IO) { usersRolesFacade.loadUsers(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.UsersRoles) return@launch
+                pendingUsersAction = null
+                _state.value = latest.copy(
+                    users = snapshot.users,
+                    userEnrollOpen = false,
+                    userEnrollPending = null,
+                    userEnrollBusy = false,
+                    usersLoading = false,
+                    usersError = null,
+                )
+            } catch (error: Throwable) {
+                handleUsersRolesFailure(error)
+            } finally {
+                passphrase.fill('\u0000')
+            }
+        }
+    }
+
+    fun openUserRoleChange() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.UsersRoles ||
+            current.userDetail == null
+        ) {
+            return
+        }
+        pendingUsersAction = null
+        _state.value = current.copy(
+            userRoleChangeOpen = true,
+            userRoleChanging = false,
+            userEnableConfirmOpen = false,
+            userReauthOpen = false,
+            usersError = null,
+        )
+    }
+
+    fun clearUserRoleChange() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        pendingUsersAction = null
+        _state.value = current.copy(
+            userRoleChangeOpen = false,
+            userRoleChanging = false,
+            userReauthOpen = false,
+            userReauthBusy = false,
+            usersError = null,
+        )
+    }
+
+    fun changeUserRole(roleWire: String) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val detail = current.userDetail ?: return
+        if (current.destination != NativeOwnerMoreDestination.UsersRoles ||
+            !current.userRoleChangeOpen ||
+            current.userRoleChanging
+        ) {
+            return
+        }
+        _state.value = current.copy(userRoleChanging = true, usersError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    usersRolesFacade.changeRole(session, detail.row.userId, roleWire)
+                }
+                val refreshed = withContext(Dispatchers.IO) {
+                    usersRolesFacade.loadDetail(session, detail.row.userId)
+                }
+                val snapshot = withContext(Dispatchers.IO) { usersRolesFacade.loadUsers(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.UsersRoles) return@launch
+                pendingUsersAction = null
+                _state.value = latest.copy(
+                    users = snapshot.users,
+                    userDetail = refreshed,
+                    userRoleChangeOpen = false,
+                    userRoleChanging = false,
+                    userReauthOpen = false,
+                    usersError = null,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.RecentAuthenticationRequired) {
+                    pendingUsersAction = PendingUsersRolesAction.ChangeRole(
+                        userId = detail.row.userId,
+                        roleWire = roleWire,
+                    )
+                    val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    _state.value = latest.copy(
+                        userRoleChanging = false,
+                        userReauthOpen = true,
+                        userReauthBusy = false,
+                        usersError = null,
+                    )
+                } else {
+                    handleUsersRolesFailure(error)
+                }
+            }
+        }
+    }
+
+    fun requestSetUserEnabled(enabled: Boolean) {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.UsersRoles ||
+            current.userDetail == null
+        ) {
+            return
+        }
+        _state.value = current.copy(
+            userEnableConfirmOpen = true,
+            userEnableTargetEnabled = enabled,
+            usersError = null,
+        )
+    }
+
+    fun cancelSetUserEnabled() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            userEnableConfirmOpen = false,
+            userEnableBusy = false,
+        )
+    }
+
+    fun confirmSetUserEnabled() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val detail = current.userDetail ?: return
+        if (current.destination != NativeOwnerMoreDestination.UsersRoles ||
+            !current.userEnableConfirmOpen ||
+            current.userEnableBusy
+        ) {
+            return
+        }
+        val enabled = current.userEnableTargetEnabled
+        _state.value = current.copy(userEnableBusy = true, usersError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    usersRolesFacade.setEnabled(session, detail.row.userId, enabled)
+                }
+                val refreshed = withContext(Dispatchers.IO) {
+                    usersRolesFacade.loadDetail(session, detail.row.userId)
+                }
+                val snapshot = withContext(Dispatchers.IO) { usersRolesFacade.loadUsers(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.UsersRoles) return@launch
+                pendingUsersAction = null
+                _state.value = latest.copy(
+                    users = snapshot.users,
+                    userDetail = refreshed,
+                    userEnableConfirmOpen = false,
+                    userEnableBusy = false,
+                    userReauthOpen = false,
+                    usersError = null,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.RecentAuthenticationRequired) {
+                    pendingUsersAction = PendingUsersRolesAction.SetEnabled(
+                        userId = detail.row.userId,
+                        enabled = enabled,
+                    )
+                    val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    _state.value = latest.copy(
+                        userEnableBusy = false,
+                        userEnableConfirmOpen = false,
+                        userReauthOpen = true,
+                        userReauthBusy = false,
+                        usersError = null,
+                    )
+                } else {
+                    handleUsersRolesFailure(error)
+                }
+            }
+        }
+    }
+
+    fun submitUsersRolesReauth(passphrase: CharArray) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.UsersRoles ||
+            !current.userReauthOpen ||
+            current.userReauthBusy
+        ) {
+            passphrase.fill('\u0000')
+            return
+        }
+        val pending = pendingUsersAction
+        if (pending == null) {
+            passphrase.fill('\u0000')
+            _state.value = current.copy(userReauthOpen = false, usersError = null)
+            return
+        }
+        _state.value = current.copy(userReauthBusy = true, usersError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    usersRolesFacade.reauthenticate(session, passphrase)
+                }
+                when (pending) {
+                    is PendingUsersRolesAction.BeginEnroll -> {
+                        val enrollPending = withContext(Dispatchers.IO) {
+                            usersRolesFacade.beginEnroll(session, pending.input)
+                        }
+                        val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                        pendingUsersAction = null
+                        _state.value = latest.copy(
+                            userEnrollPending = enrollPending,
+                            userEnrollBusy = false,
+                            userReauthOpen = false,
+                            userReauthBusy = false,
+                            usersError = null,
+                        )
+                    }
+                    is PendingUsersRolesAction.SetEnabled -> {
+                        withContext(Dispatchers.IO) {
+                            usersRolesFacade.setEnabled(session, pending.userId, pending.enabled)
+                        }
+                        val refreshed = withContext(Dispatchers.IO) {
+                            usersRolesFacade.loadDetail(session, pending.userId)
+                        }
+                        val snapshot = withContext(Dispatchers.IO) {
+                            usersRolesFacade.loadUsers(session)
+                        }
+                        val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                        pendingUsersAction = null
+                        _state.value = latest.copy(
+                            users = snapshot.users,
+                            userDetail = refreshed,
+                            userEnableConfirmOpen = false,
+                            userEnableBusy = false,
+                            userReauthOpen = false,
+                            userReauthBusy = false,
+                            usersError = null,
+                        )
+                    }
+                    is PendingUsersRolesAction.ChangeRole -> {
+                        withContext(Dispatchers.IO) {
+                            usersRolesFacade.changeRole(session, pending.userId, pending.roleWire)
+                        }
+                        val refreshed = withContext(Dispatchers.IO) {
+                            usersRolesFacade.loadDetail(session, pending.userId)
+                        }
+                        val snapshot = withContext(Dispatchers.IO) {
+                            usersRolesFacade.loadUsers(session)
+                        }
+                        val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                        pendingUsersAction = null
+                        _state.value = latest.copy(
+                            users = snapshot.users,
+                            userDetail = refreshed,
+                            userRoleChangeOpen = false,
+                            userRoleChanging = false,
+                            userReauthOpen = false,
+                            userReauthBusy = false,
+                            usersError = null,
+                        )
+                    }
+                }
+            } catch (error: Throwable) {
+                handleUsersRolesFailure(error)
+            } finally {
+                passphrase.fill('\u0000')
+            }
+        }
+    }
+
+    fun cancelUsersRolesReauth() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        pendingUsersAction = null
+        _state.value = current.copy(
+            userReauthOpen = false,
+            userReauthBusy = false,
+            userEnrollBusy = false,
+            userRoleChanging = false,
+            userEnableBusy = false,
+            usersError = null,
+        )
     }
 
     fun openSecurityHistory() {
@@ -1224,6 +2651,7 @@ class NativeOwnerMoreViewModel(
             productEditOpen = false,
             productUpdating = false,
             productArchiving = false,
+            productUnarchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -1234,16 +2662,37 @@ class NativeOwnerMoreViewModel(
             customersError = null,
             suppliersLoading = false,
             supplierDetail = null,
+            supplierCreateOpen = false,
+            supplierCreating = false,
+            supplierEditOpen = false,
+            supplierUpdating = false,
             suppliersError = null,
             employeesLoading = false,
             employeeDetail = null,
+            employeeCreateOpen = false,
+            employeeCreating = false,
+            employeeEditOpen = false,
+            employeeUpdating = false,
             employeesError = null,
             costingPoliciesLoading = false,
             costingPolicyDetail = null,
             costingPoliciesError = null,
             costingCurrentMonthSummary = null,
+            costingApproveOpen = false,
+            costingApproveSeed = null,
+            costingApproving = false,
+            costingReauthOpen = false,
+            costingReauthBusy = false,
             shopSettingsLoading = false,
             shopSettings = null,
+            shopSettingsIdentityEditOpen = false,
+            shopSettingsIdentitySaving = false,
+            shopSettingsRatesEditOpen = false,
+            shopSettingsRatesSaving = false,
+            shopSettingsCategoryCreateOpen = false,
+            shopSettingsCategoryCreating = false,
+            shopSettingsCategoryDetail = null,
+            shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
             usersLoading = false,
             userDetail = null,
@@ -1251,6 +2700,14 @@ class NativeOwnerMoreViewModel(
             backupLoading = false,
             backup = null,
             backupError = null,
+            backupExportOpen = false,
+            backupRestoreOpen = false,
+            backupConnectOpen = false,
+            backupInspection = null,
+            backupBusy = false,
+            backupReauthOpen = false,
+            backupReauthBusy = false,
+            backupDisconnectConfirmOpen = false,
             confirmRemoveUnlock = false,
             error = null,
             saving = false,
@@ -1335,11 +2792,21 @@ class NativeOwnerMoreViewModel(
     fun openBackup() {
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        clearPendingBackupSecrets()
+        current.backupInspection?.restoreTicket?.let(backupFacade::cancelRestoreTicket)
         _state.value = current.copy(
             destination = NativeOwnerMoreDestination.Backup,
             backupLoading = true,
             backup = null,
             backupError = null,
+            backupExportOpen = false,
+            backupRestoreOpen = false,
+            backupConnectOpen = false,
+            backupInspection = null,
+            backupBusy = false,
+            backupReauthOpen = false,
+            backupReauthBusy = false,
+            backupDisconnectConfirmOpen = false,
             productsLoading = false,
             productDetail = null,
             productCreateOpen = false,
@@ -1347,6 +2814,7 @@ class NativeOwnerMoreViewModel(
             productEditOpen = false,
             productUpdating = false,
             productArchiving = false,
+            productUnarchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -1357,16 +2825,37 @@ class NativeOwnerMoreViewModel(
             customersError = null,
             suppliersLoading = false,
             supplierDetail = null,
+            supplierCreateOpen = false,
+            supplierCreating = false,
+            supplierEditOpen = false,
+            supplierUpdating = false,
             suppliersError = null,
             employeesLoading = false,
             employeeDetail = null,
+            employeeCreateOpen = false,
+            employeeCreating = false,
+            employeeEditOpen = false,
+            employeeUpdating = false,
             employeesError = null,
             costingPoliciesLoading = false,
             costingPolicyDetail = null,
             costingPoliciesError = null,
             costingCurrentMonthSummary = null,
+            costingApproveOpen = false,
+            costingApproveSeed = null,
+            costingApproving = false,
+            costingReauthOpen = false,
+            costingReauthBusy = false,
             shopSettingsLoading = false,
             shopSettings = null,
+            shopSettingsIdentityEditOpen = false,
+            shopSettingsIdentitySaving = false,
+            shopSettingsRatesEditOpen = false,
+            shopSettingsRatesSaving = false,
+            shopSettingsCategoryCreateOpen = false,
+            shopSettingsCategoryCreating = false,
+            shopSettingsCategoryDetail = null,
+            shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
             usersLoading = false,
             userDetail = null,
@@ -1415,20 +2904,480 @@ class NativeOwnerMoreViewModel(
         }
     }
 
+    fun openBackupExport() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Backup) return
+        clearPendingBackupSecrets()
+        _state.value = current.copy(
+            backupExportOpen = true,
+            backupRestoreOpen = false,
+            backupConnectOpen = false,
+            backupInspection = null,
+            backupBusy = false,
+            backupReauthOpen = false,
+            backupReauthBusy = false,
+            backupDisconnectConfirmOpen = false,
+            backupError = null,
+        )
+    }
+
+    fun clearBackupExport() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        clearPendingBackupSecrets()
+        _state.value = current.copy(
+            backupExportOpen = false,
+            backupBusy = false,
+            backupReauthOpen = false,
+            backupReauthBusy = false,
+            backupError = null,
+        )
+    }
+
+    fun exportBackup(uri: Uri, passphrase: CharArray) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Backup ||
+            !current.backupExportOpen ||
+            current.backupBusy
+        ) {
+            passphrase.fill('\u0000')
+            return
+        }
+        _state.value = current.copy(backupBusy = true, backupError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    backupFacade.exportEncrypted(session, uri, passphrase)
+                }
+                val snapshot = withContext(Dispatchers.IO) { backupFacade.load(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Backup) return@launch
+                clearPendingBackupSecrets()
+                _state.value = latest.copy(
+                    backup = snapshot,
+                    backupExportOpen = false,
+                    backupBusy = false,
+                    backupReauthOpen = false,
+                    backupReauthBusy = false,
+                    backupError = null,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.RecentAuthenticationRequired) {
+                    pendingBackupAction = PendingBackupAction.Export(uri, passphrase.copyOf())
+                    passphrase.fill('\u0000')
+                    val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    _state.value = latest.copy(
+                        backupBusy = false,
+                        backupReauthOpen = true,
+                        backupReauthBusy = false,
+                        backupError = null,
+                    )
+                } else {
+                    passphrase.fill('\u0000')
+                    handleBackupFailure(error)
+                }
+            }
+        }
+    }
+
+    fun openBackupRestore() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Backup) return
+        clearPendingBackupSecrets()
+        current.backupInspection?.restoreTicket?.let(backupFacade::cancelRestoreTicket)
+        _state.value = current.copy(
+            backupRestoreOpen = true,
+            backupExportOpen = false,
+            backupConnectOpen = false,
+            backupInspection = null,
+            backupBusy = false,
+            backupReauthOpen = false,
+            backupReauthBusy = false,
+            backupDisconnectConfirmOpen = false,
+            backupError = null,
+        )
+    }
+
+    fun clearBackupRestore() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        clearPendingBackupSecrets()
+        current.backupInspection?.restoreTicket?.let(backupFacade::cancelRestoreTicket)
+        _state.value = current.copy(
+            backupRestoreOpen = false,
+            backupInspection = null,
+            backupBusy = false,
+            backupReauthOpen = false,
+            backupReauthBusy = false,
+            backupError = null,
+        )
+    }
+
+    fun inspectBackupRestore(uri: Uri, passphrase: CharArray) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Backup ||
+            !current.backupRestoreOpen ||
+            current.backupBusy
+        ) {
+            passphrase.fill('\u0000')
+            return
+        }
+        _state.value = current.copy(backupBusy = true, backupError = null)
+        scope.launch {
+            try {
+                val inspection = withContext(Dispatchers.IO) {
+                    backupFacade.inspectEncrypted(session, uri, passphrase)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Backup) return@launch
+                _state.value = latest.copy(
+                    backupInspection = inspection,
+                    backupBusy = false,
+                    backupReauthOpen = false,
+                    backupReauthBusy = false,
+                    backupError = null,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.RecentAuthenticationRequired) {
+                    pendingBackupAction = PendingBackupAction.Inspect(uri, passphrase.copyOf())
+                    passphrase.fill('\u0000')
+                    val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    _state.value = latest.copy(
+                        backupBusy = false,
+                        backupReauthOpen = true,
+                        backupReauthBusy = false,
+                        backupError = null,
+                    )
+                } else {
+                    passphrase.fill('\u0000')
+                    handleBackupFailure(error)
+                }
+            }
+        }
+    }
+
+    fun confirmBackupRestore(confirm: Boolean) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val ticket = current.backupInspection?.restoreTicket ?: return
+        if (current.destination != NativeOwnerMoreDestination.Backup ||
+            !current.backupRestoreOpen ||
+            current.backupBusy
+        ) {
+            return
+        }
+        _state.value = current.copy(backupBusy = true, backupError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    backupFacade.confirmRestore(session, ticket, confirm)
+                }
+                clearPendingBackupSecrets()
+                sessionHandle = null
+                _state.value = NativeOwnerMoreState.Idle
+                onSessionExpired()
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.RecentAuthenticationRequired) {
+                    pendingBackupAction = PendingBackupAction.ConfirmRestore(confirm)
+                    val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    _state.value = latest.copy(
+                        backupBusy = false,
+                        backupReauthOpen = true,
+                        backupReauthBusy = false,
+                        backupError = null,
+                    )
+                } else {
+                    handleBackupFailure(error)
+                }
+            }
+        }
+    }
+
+    fun openBackupConnect() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Backup) return
+        clearPendingBackupSecrets()
+        _state.value = current.copy(
+            backupConnectOpen = true,
+            backupExportOpen = false,
+            backupRestoreOpen = false,
+            backupInspection = null,
+            backupBusy = false,
+            backupReauthOpen = false,
+            backupReauthBusy = false,
+            backupDisconnectConfirmOpen = false,
+            backupError = null,
+        )
+    }
+
+    fun clearBackupConnect() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        clearPendingBackupSecrets()
+        _state.value = current.copy(
+            backupConnectOpen = false,
+            backupBusy = false,
+            backupReauthOpen = false,
+            backupReauthBusy = false,
+            backupError = null,
+        )
+    }
+
+    fun connectDriveBackup(passphrase: CharArray, allowMetered: Boolean) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Backup ||
+            !current.backupConnectOpen ||
+            current.backupBusy
+        ) {
+            passphrase.fill('\u0000')
+            return
+        }
+        _state.value = current.copy(backupBusy = true, backupError = null)
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) {
+                    backupFacade.connectDrive(session, passphrase, allowMetered)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Backup) return@launch
+                clearPendingBackupSecrets()
+                _state.value = latest.copy(
+                    backup = snapshot,
+                    backupConnectOpen = false,
+                    backupBusy = false,
+                    backupReauthOpen = false,
+                    backupReauthBusy = false,
+                    backupError = null,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.RecentAuthenticationRequired) {
+                    pendingBackupAction = PendingBackupAction.Connect(passphrase.copyOf(), allowMetered)
+                    passphrase.fill('\u0000')
+                    val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    _state.value = latest.copy(
+                        backupBusy = false,
+                        backupReauthOpen = true,
+                        backupReauthBusy = false,
+                        backupError = null,
+                    )
+                } else {
+                    passphrase.fill('\u0000')
+                    handleBackupFailure(error)
+                }
+            }
+        }
+    }
+
+    fun setDriveBackupEnabled(enabled: Boolean) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Backup || current.backupBusy) return
+        val allowMetered = current.backup?.allowMetered ?: false
+        _state.value = current.copy(backupBusy = true, backupError = null)
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) {
+                    backupFacade.setDrivePolicy(session, enabled, allowMetered)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Backup) return@launch
+                _state.value = latest.copy(
+                    backup = snapshot,
+                    backupBusy = false,
+                    backupReauthOpen = false,
+                    backupReauthBusy = false,
+                    backupError = null,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.RecentAuthenticationRequired) {
+                    pendingBackupAction = PendingBackupAction.SetPolicy(enabled)
+                    val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    _state.value = latest.copy(
+                        backupBusy = false,
+                        backupReauthOpen = true,
+                        backupReauthBusy = false,
+                        backupError = null,
+                    )
+                } else {
+                    handleBackupFailure(error)
+                }
+            }
+        }
+    }
+
+    fun runDriveBackupNow() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Backup || current.backupBusy) return
+        _state.value = current.copy(backupBusy = true, backupError = null)
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) {
+                    backupFacade.runDriveBackupNow(session)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Backup) return@launch
+                _state.value = latest.copy(
+                    backup = snapshot,
+                    backupBusy = false,
+                    backupError = null,
+                )
+            } catch (error: Throwable) {
+                handleBackupFailure(error)
+            }
+        }
+    }
+
+    fun requestBackupDisconnect() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Backup) return
+        _state.value = current.copy(backupDisconnectConfirmOpen = true, backupError = null)
+    }
+
+    fun cancelBackupDisconnect() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(backupDisconnectConfirmOpen = false)
+    }
+
+    fun confirmBackupDisconnect() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Backup || current.backupBusy) return
+        _state.value = current.copy(
+            backupBusy = true,
+            backupDisconnectConfirmOpen = false,
+            backupError = null,
+        )
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) {
+                    backupFacade.disconnectDrive(session, confirmRevoke = true)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Backup) return@launch
+                _state.value = latest.copy(
+                    backup = snapshot,
+                    backupBusy = false,
+                    backupReauthOpen = false,
+                    backupReauthBusy = false,
+                    backupError = null,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.RecentAuthenticationRequired) {
+                    pendingBackupAction = PendingBackupAction.Disconnect
+                    val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    _state.value = latest.copy(
+                        backupBusy = false,
+                        backupReauthOpen = true,
+                        backupReauthBusy = false,
+                        backupError = null,
+                    )
+                } else {
+                    handleBackupFailure(error)
+                }
+            }
+        }
+    }
+
+    fun submitBackupReauth(passphrase: CharArray) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (!current.backupReauthOpen || current.backupReauthBusy) {
+            passphrase.fill('\u0000')
+            return
+        }
+        val pending = pendingBackupAction
+        if (pending == null) {
+            passphrase.fill('\u0000')
+            _state.value = current.copy(backupReauthOpen = false, backupReauthBusy = false)
+            return
+        }
+        val retryAction = pending
+        _state.value = current.copy(backupReauthBusy = true, backupError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    backupFacade.reauthenticate(session, passphrase)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                _state.value = latest.copy(
+                    backupReauthOpen = false,
+                    backupReauthBusy = false,
+                    backupError = null,
+                )
+                when (retryAction) {
+                    is PendingBackupAction.Export -> {
+                        pendingBackupAction = null
+                        exportBackup(retryAction.uri, retryAction.passphrase)
+                    }
+                    is PendingBackupAction.Inspect -> {
+                        pendingBackupAction = null
+                        inspectBackupRestore(retryAction.uri, retryAction.passphrase)
+                    }
+                    is PendingBackupAction.ConfirmRestore -> {
+                        pendingBackupAction = null
+                        confirmBackupRestore(retryAction.confirm)
+                    }
+                    is PendingBackupAction.Connect -> {
+                        pendingBackupAction = null
+                        connectDriveBackup(retryAction.passphrase, retryAction.allowMetered)
+                    }
+                    is PendingBackupAction.SetPolicy -> {
+                        pendingBackupAction = null
+                        setDriveBackupEnabled(retryAction.enabled)
+                    }
+                    PendingBackupAction.Disconnect -> {
+                        pendingBackupAction = null
+                        confirmBackupDisconnect()
+                    }
+                }
+            } catch (error: Throwable) {
+                passphrase.fill('\u0000')
+                handleBackupFailure(error)
+            }
+        }
+    }
+
+    fun cancelBackupReauth() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        clearPendingBackupSecrets()
+        _state.value = current.copy(
+            backupReauthOpen = false,
+            backupReauthBusy = false,
+            backupBusy = false,
+            backupError = null,
+        )
+    }
+
+    private fun clearPendingBackupSecrets() {
+        when (val pending = pendingBackupAction) {
+            is PendingBackupAction.Export -> pending.passphrase.fill('\u0000')
+            is PendingBackupAction.Inspect -> pending.passphrase.fill('\u0000')
+            is PendingBackupAction.Connect -> pending.passphrase.fill('\u0000')
+            else -> Unit
+        }
+        pendingBackupAction = null
+    }
+
     fun backToMenu() {
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        pendingUsersAction = null
+        clearPendingBackupSecrets()
+        current.backupInspection?.restoreTicket?.let(backupFacade::cancelRestoreTicket)
         _state.value = current.copy(
             destination = NativeOwnerMoreDestination.Menu,
             confirmRemoveUnlock = false,
             error = null,
             saving = false,
             productsLoading = false,
+            productsShowArchived = false,
             productDetail = null,
             productCreateOpen = false,
             productCreating = false,
             productEditOpen = false,
             productUpdating = false,
             productArchiving = false,
+            productUnarchiving = false,
             productsError = null,
             customersLoading = false,
             customerDetail = null,
@@ -1439,19 +3388,49 @@ class NativeOwnerMoreViewModel(
             customersError = null,
             suppliersLoading = false,
             supplierDetail = null,
+            supplierCreateOpen = false,
+            supplierCreating = false,
+            supplierEditOpen = false,
+            supplierUpdating = false,
             suppliersError = null,
             employeesLoading = false,
             employeeDetail = null,
+            employeeCreateOpen = false,
+            employeeCreating = false,
+            employeeEditOpen = false,
+            employeeUpdating = false,
             employeesError = null,
             costingPoliciesLoading = false,
             costingPolicyDetail = null,
             costingPoliciesError = null,
             costingCurrentMonthSummary = null,
+            costingApproveOpen = false,
+            costingApproveSeed = null,
+            costingApproving = false,
+            costingReauthOpen = false,
+            costingReauthBusy = false,
             shopSettingsLoading = false,
             shopSettings = null,
+            shopSettingsIdentityEditOpen = false,
+            shopSettingsIdentitySaving = false,
+            shopSettingsRatesEditOpen = false,
+            shopSettingsRatesSaving = false,
+            shopSettingsCategoryCreateOpen = false,
+            shopSettingsCategoryCreating = false,
+            shopSettingsCategoryDetail = null,
+            shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
             usersLoading = false,
             userDetail = null,
+            userEnrollOpen = false,
+            userEnrollPending = null,
+            userEnrollBusy = false,
+            userRoleChangeOpen = false,
+            userRoleChanging = false,
+            userEnableConfirmOpen = false,
+            userEnableBusy = false,
+            userReauthOpen = false,
+            userReauthBusy = false,
             usersError = null,
             securityHistoryLoading = false,
             securityAuditDetail = null,
@@ -1459,6 +3438,14 @@ class NativeOwnerMoreViewModel(
             backupLoading = false,
             backup = null,
             backupError = null,
+            backupExportOpen = false,
+            backupRestoreOpen = false,
+            backupConnectOpen = false,
+            backupInspection = null,
+            backupBusy = false,
+            backupReauthOpen = false,
+            backupReauthBusy = false,
+            backupDisconnectConfirmOpen = false,
         )
     }
 
@@ -1596,6 +3583,7 @@ class NativeOwnerMoreViewModel(
             productCreating = false,
             productUpdating = false,
             productArchiving = false,
+            productUnarchiving = false,
             productsError = publicMessage(error),
         )
     }
@@ -1626,6 +3614,8 @@ class NativeOwnerMoreViewModel(
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         _state.value = current.copy(
             suppliersLoading = false,
+            supplierCreating = false,
+            supplierUpdating = false,
             suppliersError = publicMessage(error),
         )
     }
@@ -1640,6 +3630,8 @@ class NativeOwnerMoreViewModel(
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         _state.value = current.copy(
             employeesLoading = false,
+            employeeCreating = false,
+            employeeUpdating = false,
             employeesError = publicMessage(error),
         )
     }
@@ -1647,6 +3639,7 @@ class NativeOwnerMoreViewModel(
     private fun handleCostingPlansFailure(error: Throwable) {
         if (error is SecurityFailure.SessionExpired) {
             sessionHandle = null
+            pendingCostingApprove = null
             _state.value = NativeOwnerMoreState.Idle
             onSessionExpired()
             return
@@ -1654,6 +3647,8 @@ class NativeOwnerMoreViewModel(
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         _state.value = current.copy(
             costingPoliciesLoading = false,
+            costingApproving = false,
+            costingReauthBusy = false,
             costingPoliciesError = publicMessage(error),
         )
     }
@@ -1668,6 +3663,10 @@ class NativeOwnerMoreViewModel(
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         _state.value = current.copy(
             shopSettingsLoading = false,
+            shopSettingsIdentitySaving = false,
+            shopSettingsRatesSaving = false,
+            shopSettingsCategoryCreating = false,
+            shopSettingsCategoryArchiving = false,
             shopSettingsError = publicMessage(error),
         )
     }
@@ -1675,6 +3674,7 @@ class NativeOwnerMoreViewModel(
     private fun handleUsersRolesFailure(error: Throwable) {
         if (error is SecurityFailure.SessionExpired) {
             sessionHandle = null
+            pendingUsersAction = null
             _state.value = NativeOwnerMoreState.Idle
             onSessionExpired()
             return
@@ -1682,6 +3682,11 @@ class NativeOwnerMoreViewModel(
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         _state.value = current.copy(
             usersLoading = false,
+            userEnrollBusy = false,
+            userRoleChanging = false,
+            userEnableBusy = false,
+            userEnableConfirmOpen = false,
+            userReauthBusy = false,
             usersError = publicMessage(error),
         )
     }
@@ -1703,6 +3708,7 @@ class NativeOwnerMoreViewModel(
     private fun handleBackupFailure(error: Throwable) {
         if (error is SecurityFailure.SessionExpired) {
             sessionHandle = null
+            clearPendingBackupSecrets()
             _state.value = NativeOwnerMoreState.Idle
             onSessionExpired()
             return
@@ -1710,11 +3716,14 @@ class NativeOwnerMoreViewModel(
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         _state.value = current.copy(
             backupLoading = false,
+            backupBusy = false,
+            backupReauthBusy = false,
             backupError = publicMessage(error),
         )
     }
 
     private fun publicMessage(error: Throwable): String = when (error) {
+        is NativeOwnerBackupFailure -> error.message ?: "Backup could not be completed."
         is SecurityFailure -> error.message ?: "More is unavailable."
         is IllegalArgumentException, is IllegalStateException ->
             error.message ?: "That action could not be completed. Check it and try again."

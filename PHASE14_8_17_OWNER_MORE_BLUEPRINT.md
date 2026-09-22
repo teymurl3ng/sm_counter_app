@@ -66,11 +66,11 @@ This checkpoint owns **Owner More home** conservatively: sectioned menu matching
 1. An Owner signs in (preview harness: `open_owner=true`) and opens **More** from Owner navigation.
 2. Header matches Owner chrome: title **More**, shop/identity line, business date, Open/Closed. Do not paste Cashier or Ops More header/nav.
 3. First viewport is the sectioned More landing (journey groups):
-   - **Things you sell** — Products (**connected in 14.8.18** — list + read detail; **create in 14.8.34**; **edit + archive in 14.8.35**)
-   - **People and businesses** — Customers (**connected in 14.8.19** — list + read detail; **create in 14.8.36**; **rename + profile save in 14.8.37**); Suppliers (**connected in 14.8.20** — list + read detail); Employees (**connected in 14.8.21** — list + read detail)
-   - **Planning and setup** — Costing & plans (**connected in 14.8.22** — policy list + read detail); Shop settings (**connected in 14.8.23** — read panel; edit deferred)
-   - **Your account and staff access** — Personal security (connected Quick unlock); Users & roles (**connected in 14.8.24** — list + read detail; enroll deferred); Security history (**connected in 14.8.25** — list + read detail)
-   - **Safety and recovery** — Backup & restore (**connected in 14.8.26** — status panel; export/restore/connect deferred)
+   - **Things you sell** — Products (**connected in 14.8.18** — list + read detail; **create in 14.8.34**; **edit + archive in 14.8.35**; **unarchive in 14.8.38**)
+   - **People and businesses** — Customers (**connected in 14.8.19** — list + read detail; **create in 14.8.36**; **rename + profile save in 14.8.37**); Suppliers (**connected in 14.8.20** — list + read detail; **create + rename/profile in 14.8.39**); Employees (**connected in 14.8.21** — list + read detail; **create + rename/profile in 14.8.40**)
+   - **Planning and setup** — Costing & plans (**connected in 14.8.22** — policy list + read detail; **approve/supersede in 14.8.43**); Shop settings (**connected in 14.8.23** — read panel; **identity/rates/category writes in 14.8.41**; opening record/correct still deferred)
+   - **Your account and staff access** — Personal security (connected Quick unlock); Users & roles (**connected in 14.8.24** — list + read detail; **write depth in 14.8.42**); Security history (**connected in 14.8.25** — list + read detail)
+   - **Safety and recovery** — Backup & restore (**connected in 14.8.26** — status panel; **export/restore/Drive connect in 14.8.44**; cloud remote restore still deferred)
    - **Account** — Switch account, Sign out (connected)
 4. Tap **Personal security** → Owner-scoped Quick unlock manage (status, enroll PIN / phone security, remove with confirmation) using the same service path as Cashier/Ops More.
 5. Back from Personal security returns to Owner More menu. Hardware Back on More home leaves the authenticated area like Overview/Work/Records home (or returns to Overview if that is the existing Owner Back contract for non-home tabs — keep consistent with current OwnerPreviewHost More behavior after wiring).
@@ -90,15 +90,15 @@ This checkpoint owns **Owner More home** conservatively: sectioned menu matching
 
 ### Explicit preview / deferred (do not invent these UIs here)
 
-- Products master-data editor — **connected in Phase 14.8.18** as active list + read detail under Owner More; **create write depth in Phase 14.8.34**; **edit + soft archive in Phase 14.8.35** (unarchive deferred)
+- Products master-data editor — **connected in Phase 14.8.18** as active list + read detail under Owner More; **create write depth in Phase 14.8.34**; **edit + soft archive in Phase 14.8.35**; **Active\|Archived filter + unarchive in Phase 14.8.38**
 - Customers directory — **connected in Phase 14.8.19** as list + read detail under Owner More; **create write depth in Phase 14.8.36**; **rename + profile save in Phase 14.8.37**
-- Suppliers directory — **connected in Phase 14.8.20** as list + read detail under Owner More (create/edit remain deferred there)
-- Employees directory — **connected in Phase 14.8.21** as list + read detail under Owner More (create/edit remain deferred there; distinct from Users & roles)
-- Costing & plans — **connected in Phase 14.8.22** as costing policy list + read detail under Owner More (approve/edit remain deferred there)
-- Shop settings — **connected in Phase 14.8.23** as read panel under Owner More (edit settings / opening / categories remain deferred there)
-- Users & roles — **connected in Phase 14.8.24** as staff login list + read detail under Owner More (enroll/disable remain deferred there; distinct from Employees)
+- Suppliers directory — **connected in Phase 14.8.20** as list + read detail under Owner More; **create + rename/profile write depth in Phase 14.8.39**
+- Employees directory — **connected in Phase 14.8.21** as list + read detail under Owner More; **create + rename/profile write depth in 14.8.40** (distinct from Users & roles)
+- Costing & plans — **connected in Phase 14.8.22** as costing policy list + read detail under Owner More; **approve/supersede connected in 14.8.43** (budgets / yield / opening basis / in-place edit remain deferred)
+- Shop settings — **connected in Phase 14.8.23** as read panel under Owner More; **identity / rates / expense category create+archive write depth in Phase 14.8.41** (opening record/correct remain deferred there)
+- Users & roles — **connected in Phase 14.8.24** as staff login list + read detail under Owner More; **enroll + disable/enable + role change write depth in Phase 14.8.42** (credential reset remains deferred there; distinct from Employees)
 - Security history — **connected in Phase 14.8.25** as audit list + read detail under Owner More
-- Backup & restore — **connected in Phase 14.8.26** as Drive vault status panel under Owner More (export / restore / Drive connect remain deferred there)
+- Backup & restore — **connected in Phase 14.8.26** as Drive vault status panel under Owner More; **local export / restore + Drive connect/enable/run-now/disconnect write depth in Phase 14.8.44** (cloud remote list/inspect/restore remain deferred)
 - Month reports, Cash & close (remain Overview / Work)
 - Manager / Admin More shells
 
@@ -108,15 +108,15 @@ This checkpoint owns **Owner More home** conservatively: sectioned menu matching
 |---|---|---|---|
 | More nav | Open Owner More home | Sectioned menu; Owner nav selected | Destination asserted; preview notice gone |
 | Personal security | Open Quick unlock manage | Status + enroll/remove controls | Destination + tags |
-| Products row | Open Owner Products | Active list + create/edit/archive under Owner More | Connected in 14.8.18 / create 14.8.34 / edit+archive 14.8.35 |
+| Products row | Open Owner Products | Active/Archived list + create/edit/archive/unarchive under Owner More | Connected in 14.8.18 / create 14.8.34 / edit+archive 14.8.35 / unarchive 14.8.38 |
 | Customers row | Open Owner Customers | Customer list + create/edit under Owner More | Connected in 14.8.19 / create 14.8.36 / edit 14.8.37 |
-| Suppliers row | Open Owner Suppliers | Supplier list under Owner More | Connected in 14.8.20 |
-| Employees row | Open Owner Employees | Employee list under Owner More | Connected in 14.8.21 |
-| Costing & plans row | Open Owner Costing & plans | Policy list under Owner More | Connected in 14.8.22 |
-| Shop settings row | Open Owner Shop settings | Settings read panel under Owner More | Connected in 14.8.23 |
-| Users & roles row | Open Owner Users & roles | Staff login list under Owner More | Connected in 14.8.24 |
+| Suppliers row | Open Owner Suppliers | Supplier list + create/edit under Owner More | Connected in 14.8.20 / create+edit 14.8.39 |
+| Employees row | Open Owner Employees | Employee list under Owner More; create/edit in 14.8.40 | Connected in 14.8.21 + 14.8.40 |
+| Costing & plans row | Open Owner Costing & plans | Policy list under Owner More | Connected in 14.8.22; approve in 14.8.43 |
+| Shop settings row | Open Owner Shop settings | Settings panel + identity/rates/category writes under Owner More | Connected in 14.8.23 / write depth 14.8.41 |
+| Users & roles row | Open Owner Users & roles | Staff login list + enroll/disable/role-change under Owner More | Connected in 14.8.24 / write depth 14.8.42 |
 | Security history row | Open Owner Security history | Audit list under Owner More | Connected in 14.8.25 |
-| Backup & restore row | Open Owner Backup | Status panel under Owner More | Connected in 14.8.26 |
+| Backup & restore row | Open Owner Backup | Status + export/restore/Drive writes | Connected in 14.8.26; writes in 14.8.44 |
 | Switch account | Leave → picker | Account picker | Leave path |
 | Sign out | Leave → Welcome | Welcome | Foundation leave |
 | Back (security) | Return to More menu | Menu restored | Back contract |
@@ -160,10 +160,10 @@ This checkpoint owns **Owner More home** conservatively: sectioned menu matching
 
 ## Out of scope
 
-- Full master-data editors (products, people, costing, settings)
-- Users/roles write UI, security audit browser
-- Backup/restore write UI
-- Month Reports, Cash & close
+- Full master-data editors beyond their later write-depth slices (products…shop settings / users enroll landed in follow-on blueprints)
+- Users/roles credential-reset write UI (deferred in 14.8.42); costing budgets / yield / opening basis (deferred in 14.8.43)
+- Cloud remote backup list / inspect / restore (deferred in 14.8.44)
+- Month Reports, Cash & close (owned by Overview / Work families)
 - Manager / Administrator / Cashier / Ops More shells
 - Mounting or translating foreign role screens
 - Launcher migration away from `HybridActivity`

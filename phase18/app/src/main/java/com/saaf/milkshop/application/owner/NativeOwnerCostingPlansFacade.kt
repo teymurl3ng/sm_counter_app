@@ -5,6 +5,7 @@ import com.saaf.milkshop.data.CostingPolicyVersionEntity
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.AppRole
+import com.saaf.milkshop.domain.CostingPolicyInput
 import com.saaf.milkshop.domain.CostingPolicyService
 import com.saaf.milkshop.domain.UserSecurityService
 import java.math.BigDecimal
@@ -23,6 +24,7 @@ data class NativeOwnerCostingPolicyRow(
 
 data class NativeOwnerCostingComponentRow(
     val componentCode: String,
+    val sourceAmountPaisa: Long,
     val sourceAmountLabel: String,
     val basisQuantityKg: String,
 )
@@ -43,14 +45,30 @@ data class NativeOwnerCostingPlansSnapshot(
 
 /**
  * Owner Costing & plans boundary: read approved policy versions + components
- * from [CostingPolicyDao] / [CostingPolicyService]. Does not invent rates or
- * call bridge JSON. Approve/edit stays out of this facade.
+ * and approve new/superseding versions via [CostingPolicyService]. Does not
+ * invent rates or call bridge JSON.
  */
 class NativeOwnerCostingPlansFacade(
     private val database: MilkShopDatabase,
     private val security: UserSecurityService,
     private val policies: CostingPolicyService = CostingPolicyService(database, security),
 ) {
+    fun reviewReasons(): List<String> = CostingPolicyService.REVIEW_REASONS.sorted()
+
+    fun componentCodes(): List<String> =
+        CostingPolicyService.COMPONENT_CODES.sortedWith(
+            compareBy { code ->
+                when (code) {
+                    "culture" -> 0
+                    "packaging" -> 1
+                    "variable_energy" -> 2
+                    "direct_labor" -> 3
+                    CostingPolicyService.COMPONENT_FIXED_OVERHEAD -> 4
+                    else -> 99
+                }
+            },
+        )
+
     suspend fun loadPolicies(
         sessionHandle: String,
         businessDate: String,
@@ -108,14 +126,48 @@ class NativeOwnerCostingPlansFacade(
             approvedAt = version.approvedAt,
             components = components
                 .sortedBy { it.componentCode }
-                .map { component ->
-                    NativeOwnerCostingComponentRow(
-                        componentCode = component.componentCode,
-                        sourceAmountLabel = formatPaisa(component.sourceAmountPaisa),
-                        basisQuantityKg = component.basisQuantityKg,
-                    )
-                },
+                .map { it.toRow() },
         )
+    }
+
+    /**
+     * Approves a new or superseding costing policy via typed domain input.
+     * Requires recent authentication (caller handles reauth + retry).
+     */
+    suspend fun approvePolicy(
+        sessionHandle: String,
+        input: CostingPolicyInput,
+    ): NativeOwnerCostingPolicyDetail {
+        requireOwnerBusinessSettings(sessionHandle)
+        val snapshot = policies.approve(sessionHandle, input)
+        return NativeOwnerCostingPolicyDetail(
+            row = snapshot.version.toRow(
+                superseded = false,
+                components = snapshot.components,
+            ),
+            normalCapacityKg = snapshot.version.normalCapacityKg,
+            notes = snapshot.version.notes,
+            approvedAt = snapshot.version.approvedAt,
+            components = snapshot.components
+                .sortedBy { it.componentCode }
+                .map { it.toRow() },
+        )
+    }
+
+    /**
+     * Full passphrase re-authentication for costing policy approve.
+     * Wipes [passphrase] before returning.
+     */
+    suspend fun reauthenticate(
+        sessionHandle: String,
+        passphrase: CharArray,
+    ) {
+        try {
+            requireOwnerBusinessSettings(sessionHandle)
+            security.reauthenticate(sessionHandle, passphrase)
+        } finally {
+            passphrase.fill('\u0000')
+        }
     }
 
     private suspend fun requireOwnerBusinessSettings(sessionHandle: String) {
@@ -135,6 +187,14 @@ class NativeOwnerCostingPlansFacade(
         conversionCostLabel = formatPaisaPerKg(CostingPolicyService.ratePerKg(components)),
         reviewReason = reviewReason,
     )
+
+    private fun CostingPolicyComponentEntity.toRow(): NativeOwnerCostingComponentRow =
+        NativeOwnerCostingComponentRow(
+            componentCode = componentCode,
+            sourceAmountPaisa = sourceAmountPaisa,
+            sourceAmountLabel = formatPaisa(sourceAmountPaisa),
+            basisQuantityKg = basisQuantityKg,
+        )
 
     private fun formatPaisaPerKg(rate: BigDecimal): String {
         val scaled = rate.setScale(4, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()

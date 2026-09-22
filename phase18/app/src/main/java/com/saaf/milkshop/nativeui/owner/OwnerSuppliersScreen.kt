@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,15 +19,23 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -39,12 +48,15 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
 import com.saaf.milkshop.application.owner.NativeOwnerSupplierDetail
 import com.saaf.milkshop.application.owner.NativeOwnerSupplierRow
+import com.saaf.milkshop.domain.VendorProfileInput
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 
 /**
- * Owner Suppliers — vendor list + read detail under OwnerScaffold.
+ * Owner Suppliers — vendor list + detail + create/edit under OwnerScaffold.
  * Nested from Owner More; never mounts foreign role chrome.
  */
 @Composable
@@ -55,22 +67,64 @@ fun OwnerSuppliersScreen(
     suppliers: List<NativeOwnerSupplierRow>,
     suppliersLoading: Boolean,
     supplierDetail: NativeOwnerSupplierDetail?,
+    supplierCreateOpen: Boolean,
+    supplierCreating: Boolean,
+    supplierEditOpen: Boolean,
+    supplierUpdating: Boolean,
     suppliersError: String?,
     onBackToMenu: () -> Unit,
     onRetry: () -> Unit,
     onOpenSupplier: (Long) -> Unit,
     onBackFromDetail: () -> Unit,
-    onCreatePreview: () -> Unit,
+    onOpenCreate: () -> Unit,
+    onBackFromCreate: () -> Unit,
+    onCreateSupplier: (String) -> Unit,
+    onOpenEdit: () -> Unit,
+    onBackFromEdit: () -> Unit,
+    onUpdateSupplier: (String, VendorProfileInput) -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    if (supplierCreateOpen) {
+        OwnerSuppliersCreateScreen(
+            snackbarHostState = snackbarHostState,
+            identity = identity,
+            context = context,
+            saving = supplierCreating,
+            error = suppliersError,
+            onBack = onBackFromCreate,
+            onSave = onCreateSupplier,
+            onNavigate = onNavigate,
+            modifier = modifier,
+        )
+        return
+    }
+
+    if (supplierEditOpen && supplierDetail != null) {
+        OwnerSuppliersEditScreen(
+            snackbarHostState = snackbarHostState,
+            identity = identity,
+            context = context,
+            detail = supplierDetail,
+            saving = supplierUpdating,
+            error = suppliersError,
+            onBack = onBackFromEdit,
+            onSave = onUpdateSupplier,
+            onNavigate = onNavigate,
+            modifier = modifier,
+        )
+        return
+    }
+
     if (supplierDetail != null) {
         OwnerSuppliersDetailScreen(
             snackbarHostState = snackbarHostState,
             identity = identity,
             context = context,
             detail = supplierDetail,
+            error = suppliersError,
             onBack = onBackFromDetail,
+            onOpenEdit = onOpenEdit,
             onNavigate = onNavigate,
             modifier = modifier,
         )
@@ -141,8 +195,8 @@ fun OwnerSuppliersScreen(
                                 modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersBack),
                             ) { Text("Back to More") }
                             TextButton(
-                                onClick = onCreatePreview,
-                                modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersCreatePreview),
+                                onClick = onOpenCreate,
+                                modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersCreateOpen),
                             ) { Text("Add supplier") }
                         }
                         suppliersError?.let {
@@ -191,12 +245,362 @@ fun OwnerSuppliersScreen(
 }
 
 @Composable
+private fun OwnerSuppliersCreateScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    context: NativeOwnerMoreContext,
+    saving: Boolean,
+    error: String?,
+    onBack: () -> Unit,
+    onSave: (String) -> Unit,
+    onNavigate: (OwnerSection) -> Unit,
+    modifier: Modifier,
+) {
+    val leaveGuard = rememberEntryLeaveGuard()
+    var name by rememberSaveable { mutableStateOf("") }
+    var draftTouched by rememberSaveable { mutableStateOf(false) }
+
+    val nameValid = name.trim().isNotEmpty() && !name.contains('\n')
+    val canSave = nameValid && !saving
+    val dirty = draftTouched && !saving
+
+    LaunchedEffect(dirty) {
+        if (dirty) leaveGuard.markDirty() else leaveGuard.clear()
+    }
+
+    fun requestLeave(action: () -> Unit) {
+        if (saving) return
+        leaveGuard.requestLeave(action)
+    }
+
+    BackHandler { requestLeave(onBack) }
+
+    Box(modifier.fillMaxSize()) {
+        OwnerScaffold(
+            snackbarHostState = snackbarHostState,
+            section = OwnerSection.More,
+            onNavigate = { section -> requestLeave { onNavigate(section) } },
+            modifier = Modifier.fillMaxSize(),
+        ) { padding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .testTag(NativeUiTags.OwnerSuppliersCreateForm),
+            ) {
+                CashierScreenHeader(
+                    title = "Suppliers",
+                    displayName = context.shopName,
+                    roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                    businessDate = context.businessDate,
+                    postingOpen = context.postingOpen,
+                )
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .imePadding()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    TextButton(
+                        onClick = { requestLeave(onBack) },
+                        enabled = !saving,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersCreateBack),
+                    ) { Text("Back to suppliers") }
+                    Text(
+                        "Add supplier",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = {
+                            name = it
+                            draftTouched = true
+                        },
+                        label = { Text("Name") },
+                        singleLine = true,
+                        enabled = !saving,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerSuppliersCreateName),
+                    )
+                    error?.let {
+                        Text(
+                            it,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersError),
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            if (!canSave) return@Button
+                            onSave(name)
+                        },
+                        enabled = canSave,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerSuppliersCreateSave),
+                    ) {
+                        if (saving) {
+                            CircularProgressIndicator(
+                                Modifier.height(20.dp),
+                                strokeWidth = 2.dp,
+                            )
+                        } else {
+                            Text("Save supplier")
+                        }
+                    }
+                    TextButton(
+                        onClick = { requestLeave(onBack) },
+                        enabled = !saving,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersCreateCancel),
+                    ) { Text("Cancel") }
+                }
+            }
+        }
+        OwnerSuppliersDiscardDialog(
+            leaveGuard = leaveGuard,
+            title = "Discard this supplier?",
+            body = "The name you entered will be cleared.",
+            discardTag = NativeUiTags.OwnerSuppliersCreateDiscard,
+            keepTag = NativeUiTags.OwnerSuppliersCreateKeep,
+        )
+    }
+}
+
+@Composable
+private fun OwnerSuppliersEditScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    context: NativeOwnerMoreContext,
+    detail: NativeOwnerSupplierDetail,
+    saving: Boolean,
+    error: String?,
+    onBack: () -> Unit,
+    onSave: (String, VendorProfileInput) -> Unit,
+    onNavigate: (OwnerSection) -> Unit,
+    modifier: Modifier,
+) {
+    val leaveGuard = rememberEntryLeaveGuard()
+    val formKey = "edit-${detail.row.accountId}"
+    var name by rememberSaveable(formKey) { mutableStateOf(detail.row.name) }
+    var phone by rememberSaveable(formKey) { mutableStateOf(detail.row.phone.orEmpty()) }
+    var location by rememberSaveable(formKey) { mutableStateOf(detail.row.location.orEmpty()) }
+    var notes by rememberSaveable(formKey) { mutableStateOf(detail.notes.orEmpty()) }
+    var active by rememberSaveable(formKey) { mutableStateOf(detail.active) }
+    var draftTouched by rememberSaveable(formKey) { mutableStateOf(false) }
+
+    val nameValid = name.trim().isNotEmpty() && !name.contains('\n')
+    val canSave = nameValid && !saving
+    val dirty = draftTouched && !saving
+
+    LaunchedEffect(dirty) {
+        if (dirty) leaveGuard.markDirty() else leaveGuard.clear()
+    }
+
+    fun requestLeave(action: () -> Unit) {
+        if (saving) return
+        leaveGuard.requestLeave(action)
+    }
+
+    BackHandler { requestLeave(onBack) }
+
+    Box(modifier.fillMaxSize()) {
+        OwnerScaffold(
+            snackbarHostState = snackbarHostState,
+            section = OwnerSection.More,
+            onNavigate = { section -> requestLeave { onNavigate(section) } },
+            modifier = Modifier.fillMaxSize(),
+        ) { padding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .testTag(NativeUiTags.OwnerSuppliersEditForm),
+            ) {
+                CashierScreenHeader(
+                    title = "Suppliers",
+                    displayName = context.shopName,
+                    roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                    businessDate = context.businessDate,
+                    postingOpen = context.postingOpen,
+                )
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .imePadding()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    TextButton(
+                        onClick = { requestLeave(onBack) },
+                        enabled = !saving,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersEditBack),
+                    ) { Text("Back to detail") }
+                    Text(
+                        "Edit supplier",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = {
+                            name = it
+                            draftTouched = true
+                        },
+                        label = { Text("Name") },
+                        singleLine = true,
+                        enabled = !saving,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerSuppliersEditName),
+                    )
+                    OutlinedTextField(
+                        value = phone,
+                        onValueChange = {
+                            phone = it
+                            draftTouched = true
+                        },
+                        label = { Text("Phone (optional)") },
+                        singleLine = true,
+                        enabled = !saving,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerSuppliersEditPhone),
+                    )
+                    OutlinedTextField(
+                        value = location,
+                        onValueChange = {
+                            location = it
+                            draftTouched = true
+                        },
+                        label = { Text("Location (optional)") },
+                        singleLine = true,
+                        enabled = !saving,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerSuppliersEditLocation),
+                    )
+                    OutlinedTextField(
+                        value = notes,
+                        onValueChange = {
+                            notes = it
+                            draftTouched = true
+                        },
+                        label = { Text("Notes (optional)") },
+                        enabled = !saving,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerSuppliersEditNotes),
+                    )
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text("Active", style = MaterialTheme.typography.bodyLarge)
+                        Switch(
+                            checked = active,
+                            onCheckedChange = {
+                                active = it
+                                draftTouched = true
+                            },
+                            enabled = !saving,
+                            modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersEditActive),
+                        )
+                    }
+                    error?.let {
+                        Text(
+                            it,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersError),
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            if (!canSave) return@Button
+                            onSave(
+                                name,
+                                VendorProfileInput(
+                                    phone = phone.trim().takeIf { it.isNotEmpty() },
+                                    location = location.trim().takeIf { it.isNotEmpty() },
+                                    notes = notes.trim().takeIf { it.isNotEmpty() },
+                                    active = active,
+                                ),
+                            )
+                        },
+                        enabled = canSave,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerSuppliersEditSave),
+                    ) {
+                        if (saving) {
+                            CircularProgressIndicator(
+                                Modifier.height(20.dp),
+                                strokeWidth = 2.dp,
+                            )
+                        } else {
+                            Text("Save changes")
+                        }
+                    }
+                    TextButton(
+                        onClick = { requestLeave(onBack) },
+                        enabled = !saving,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersEditCancel),
+                    ) { Text("Cancel") }
+                }
+            }
+        }
+        OwnerSuppliersDiscardDialog(
+            leaveGuard = leaveGuard,
+            title = "Discard changes?",
+            body = "Unsaved supplier edits will be lost.",
+            discardTag = NativeUiTags.OwnerSuppliersEditDiscard,
+            keepTag = NativeUiTags.OwnerSuppliersEditKeep,
+        )
+    }
+}
+
+@Composable
+private fun OwnerSuppliersDiscardDialog(
+    leaveGuard: EntryLeaveGuard,
+    title: String,
+    body: String,
+    discardTag: String,
+    keepTag: String,
+) {
+    if (!leaveGuard.discardConfirmationOpen) return
+    AlertDialog(
+        onDismissRequest = leaveGuard::keepEditing,
+        title = { Text(title) },
+        text = { Text(body) },
+        confirmButton = {
+            TextButton(
+                onClick = leaveGuard::confirmDiscard,
+                modifier = Modifier.testTag(discardTag),
+            ) { Text("Discard and leave") }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = leaveGuard::keepEditing,
+                modifier = Modifier.testTag(keepTag),
+            ) { Text("Keep editing") }
+        },
+    )
+}
+
+@Composable
 private fun OwnerSuppliersDetailScreen(
     snackbarHostState: SnackbarHostState,
     identity: NativeSignedInIdentity,
     context: NativeOwnerMoreContext,
     detail: NativeOwnerSupplierDetail,
+    error: String?,
     onBack: () -> Unit,
+    onOpenEdit: () -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier,
 ) {
@@ -238,12 +642,19 @@ private fun OwnerSuppliersDetailScreen(
                 row.phone?.takeIf { it.isNotBlank() }?.let { OwnerSupplierFact("Phone", it) }
                 row.location?.takeIf { it.isNotBlank() }?.let { OwnerSupplierFact("Location", it) }
                 detail.notes?.takeIf { it.isNotBlank() }?.let { OwnerSupplierFact("Notes", it) }
-                Text(
-                    "Read only in this preview. Editing comes next.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersDetailReadOnly),
-                )
+                error?.let {
+                    Text(
+                        it,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersError),
+                    )
+                }
+                Button(
+                    onClick = onOpenEdit,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(NativeUiTags.OwnerSuppliersDetailEdit),
+                ) { Text("Edit supplier") }
             }
         }
     }

@@ -15,6 +15,7 @@ data class NativeOwnerProductRow(
     val unit: String,
     val defaultSaleRate: Double?,
     val inventoryTracking: Boolean,
+    val archived: Boolean,
     val rateLabel: String?,
     val statusLabel: String,
     val trackingLabel: String,
@@ -30,17 +31,26 @@ data class NativeOwnerProductsSnapshot(
 )
 
 /**
- * Owner Products boundary: active catalog list + read detail + create/update/archive from
- * [ProductCatalogService]. Does not invent costing/stock formulas or call bridge JSON.
+ * Owner Products boundary: active/archived catalog list + read detail + create/update/archive/unarchive
+ * from [ProductCatalogService]. Does not invent costing/stock formulas or call bridge JSON.
  */
 class NativeOwnerProductsFacade(
     private val database: MilkShopDatabase,
     private val security: UserSecurityService,
     private val catalog: ProductCatalogService = ProductCatalogService(database),
 ) {
-    suspend fun loadProducts(sessionHandle: String): NativeOwnerProductsSnapshot {
+    suspend fun loadProducts(
+        sessionHandle: String,
+        includeArchived: Boolean = false,
+    ): NativeOwnerProductsSnapshot {
         requireOwnerMasterData(sessionHandle)
-        val products = catalog.list(includeArchived = false).map { it.toRow() }
+        val products = if (includeArchived) {
+            catalog.list(includeArchived = true)
+                .filter { it.archived }
+                .map { it.toRow() }
+        } else {
+            catalog.list(includeArchived = false).map { it.toRow() }
+        }
         return NativeOwnerProductsSnapshot(products = products)
     }
 
@@ -49,9 +59,9 @@ class NativeOwnerProductsFacade(
         productId: Long,
     ): NativeOwnerProductDetail {
         requireOwnerMasterData(sessionHandle)
-        val item = catalog.list(includeArchived = false)
+        val item = catalog.list(includeArchived = true)
             .firstOrNull { it.productId == productId }
-            ?: error("This product is not in the active catalog.")
+            ?: error("This product was not found in the catalog.")
         return NativeOwnerProductDetail(row = item.toRow())
     }
 
@@ -80,6 +90,14 @@ class NativeOwnerProductsFacade(
         catalog.setArchived(productId, true)
     }
 
+    suspend fun unarchiveProduct(
+        sessionHandle: String,
+        productId: Long,
+    ) {
+        requireOwnerMasterData(sessionHandle)
+        catalog.setArchived(productId, false)
+    }
+
     private suspend fun requireOwnerMasterData(sessionHandle: String) {
         val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_MASTER_DATA)
         require(AppRole.parse(actor.role) == AppRole.OWNER) {
@@ -93,6 +111,7 @@ class NativeOwnerProductsFacade(
         unit = unit,
         defaultSaleRate = defaultSaleRate,
         inventoryTracking = inventoryTracking,
+        archived = archived,
         rateLabel = defaultSaleRate?.let { rate ->
             String.format(Locale.US, "PKR %,.2f / %s", rate, unit)
         },

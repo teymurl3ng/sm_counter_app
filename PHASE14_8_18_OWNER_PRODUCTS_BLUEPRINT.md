@@ -37,7 +37,7 @@ Authority for product shape:
 - Existing typed domain: `ProductCatalogService` / `ProductCatalogItem` / `ProductCatalogInput`; write path already used by `HybridCommandService.createProduct` / `updateProduct` / `setProductArchived` (permission `MANAGE_MASTER_DATA`)
 - Sibling UI: Owner More menu → sub-screen (Personal security); Cashier list/detail density where helpful
 
-This checkpoint owns **Owner Products** conservatively: active catalog list + read detail under Owner More, plus **create write depth in Phase 14.8.34** and **edit + soft archive in Phase 14.8.35**. Unarchive remains deferred.
+This checkpoint owns **Owner Products** conservatively: active catalog list + read detail under Owner More, plus **create write depth in Phase 14.8.34**, **edit + soft archive in Phase 14.8.35**, and **Active|Archived filter + unarchive in Phase 14.8.38**.
 
 ## What the existing product already guarantees
 
@@ -69,7 +69,7 @@ This checkpoint owns **Owner Products** conservatively: active catalog list + re
 4. List shows active products: name, unit, rate/status labels from catalog fields already available.
 5. Tap a row → read-only detail (or inline facts) for that product: name, unit, default rate, tracking, notes.
 6. Back from detail → Products list. Back from list → Owner More menu. Hardware Back matches that stack.
-7. **Add product** — connected create form in Phase 14.8.34 (`ProductCatalogInput` via typed facade). **Edit / archive** — connected in Phase 14.8.35 from detail (update + soft archive; unarchive deferred).
+7. **Add product** — connected create form in Phase 14.8.34 (`ProductCatalogInput` via typed facade). **Edit / archive** — connected in Phase 14.8.35 from detail (update + soft archive). **Unarchive** — connected in Phase 14.8.38 (Active|Archived filter + restore).
 8. Load failure shows inline error + Retry. Empty catalog shows an honest empty state.
 9. Owner nav remains; no Cashier/Ops bottom nav.
 
@@ -124,7 +124,8 @@ This checkpoint owns **Owner Products** conservatively: active catalog list + re
 - list via `ProductCatalogService.list(includeArchived = false)`;
 - detail from the same catalog item fields — no new accounting formulas;
 - optional create via typed `ProductCatalogService.create` through `NativeOwnerProductsFacade.createProduct` (Phase 14.8.34);
-- optional update/archive via `NativeOwnerProductsFacade.updateProduct` / `archiveProduct` (Phase 14.8.35); unarchive still deferred;
+- optional update/archive via `NativeOwnerProductsFacade.updateProduct` / `archiveProduct` (Phase 14.8.35);
+- optional Active|Archived filter + unarchive via `loadProducts(includeArchived)` / `unarchiveProduct` (Phase 14.8.38);
 - do not change Room schema, RolePermissions, Analytics, or costing engines.
 
 ## Visual / consistency notes
@@ -143,8 +144,8 @@ This checkpoint owns **Owner Products** conservatively: active catalog list + re
 
 ## Verification
 
-- Facade tests: Owner gate, list active products, create then list contains, update then detail, archive then absent from active list, reject non-Owner.
-- Compose contract: Products list + detail + create/edit form tags; Edit/Archive from detail (not deferred notice).
+- Facade tests: Owner gate, list active products, archived-only filter, create then list contains, update then detail, archive then absent from active list, loadDetail archived works, archive then unarchive returns to active list, reject non-Owner.
+- Compose contract: Products list + detail + create/edit form tags; Active|Archived filter; Edit/Archive from active detail; Unarchive from archived detail.
 - Inventory rows with real workflow test names (no `workflow_test=-`).
 - `qaScreen -Pqa.screen=ownermore` extended with Products Foundation/contract coverage.
 - Foundation: Owner chrome ✓, foreign nav ✗, Back → More menu, session intact.
@@ -152,4 +153,4 @@ This checkpoint owns **Owner Products** conservatively: active catalog list + re
 
 ## Accept gate
 
-**AUTO-ACCEPTED FOR NATIVE IMPLEMENTATION.** Connected scope: active list + read detail under Owner More shell; create write depth in Phase 14.8.34; edit + soft archive in Phase 14.8.35; unarchive deferred.
+**AUTO-ACCEPTED FOR NATIVE IMPLEMENTATION.** Connected scope: active list + read detail under Owner More shell; create write depth in Phase 14.8.34; edit + soft archive in Phase 14.8.35; Active|Archived filter + unarchive in Phase 14.8.38.

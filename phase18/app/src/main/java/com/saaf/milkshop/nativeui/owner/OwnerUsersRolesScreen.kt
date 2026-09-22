@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,15 +19,23 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -34,18 +43,24 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
+import com.saaf.milkshop.application.owner.NativeOwnerPendingEnrollment
 import com.saaf.milkshop.application.owner.NativeOwnerUserDetail
 import com.saaf.milkshop.application.owner.NativeOwnerUserRow
+import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
+import java.util.Locale
 
 /**
- * Owner Users & roles — staff login list + read detail under OwnerScaffold.
- * Nested from Owner More; distinct from Employees salary accounts.
+ * Owner Users & roles — staff login list + detail + enroll / enable / role change
+ * under OwnerScaffold. Nested from Owner More; distinct from Employees salary accounts.
  */
 @Composable
 fun OwnerUsersRolesScreen(
@@ -55,26 +70,113 @@ fun OwnerUsersRolesScreen(
     users: List<NativeOwnerUserRow>,
     usersLoading: Boolean,
     userDetail: NativeOwnerUserDetail?,
+    userEnrollOpen: Boolean,
+    userEnrollPending: NativeOwnerPendingEnrollment?,
+    userEnrollBusy: Boolean,
+    userRoleChangeOpen: Boolean,
+    userRoleChanging: Boolean,
+    userEnableConfirmOpen: Boolean,
+    userEnableBusy: Boolean,
+    userReauthOpen: Boolean,
+    userReauthBusy: Boolean,
     usersError: String?,
+    enrollableRoles: List<AppRole>,
     onBackToMenu: () -> Unit,
     onRetry: () -> Unit,
     onOpenUser: (Long) -> Unit,
     onBackFromDetail: () -> Unit,
-    onCreatePreview: () -> Unit,
+    onOpenEnroll: () -> Unit,
+    onBackFromEnroll: () -> Unit,
+    onBeginEnroll: (loginName: String, displayName: String, roleWire: String) -> Unit,
+    onCompleteEnroll: (passphrase: CharArray, confirmation: CharArray) -> Unit,
+    onOpenRoleChange: () -> Unit,
+    onBackFromRoleChange: () -> Unit,
+    onChangeRole: (String) -> Unit,
+    onRequestSetEnabled: (Boolean) -> Unit,
+    onConfirmSetEnabled: () -> Unit,
+    onCancelSetEnabled: () -> Unit,
+    onSubmitReauth: (CharArray) -> Unit,
+    onCancelReauth: () -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (userDetail != null) {
-        OwnerUsersRolesDetailScreen(
-            snackbarHostState = snackbarHostState,
-            identity = identity,
-            context = context,
-            detail = userDetail,
-            onBack = onBackFromDetail,
-            onNavigate = onNavigate,
-            modifier = modifier,
-        )
-        return
+    when {
+        userReauthOpen -> {
+            OwnerUsersRolesReauthDialog(
+                busy = userReauthBusy,
+                error = usersError,
+                onConfirm = onSubmitReauth,
+                onCancel = onCancelReauth,
+            )
+        }
+    }
+
+    when {
+        userEnrollOpen && userEnrollPending != null -> {
+            OwnerUsersRolesEnrollPassphraseScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = context,
+                pending = userEnrollPending,
+                saving = userEnrollBusy,
+                error = usersError,
+                onBack = onBackFromEnroll,
+                onSave = onCompleteEnroll,
+                onNavigate = onNavigate,
+                modifier = modifier,
+            )
+            return
+        }
+        userEnrollOpen -> {
+            OwnerUsersRolesEnrollIdentityScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = context,
+                roles = enrollableRoles,
+                saving = userEnrollBusy,
+                error = usersError,
+                onBack = onBackFromEnroll,
+                onSave = onBeginEnroll,
+                onNavigate = onNavigate,
+                modifier = modifier,
+            )
+            return
+        }
+        userRoleChangeOpen && userDetail != null -> {
+            OwnerUsersRolesRoleChangeScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = context,
+                detail = userDetail,
+                roles = enrollableRoles,
+                saving = userRoleChanging,
+                error = usersError,
+                onBack = onBackFromRoleChange,
+                onSave = onChangeRole,
+                onNavigate = onNavigate,
+                modifier = modifier,
+            )
+            return
+        }
+        userDetail != null -> {
+            OwnerUsersRolesDetailScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = context,
+                detail = userDetail,
+                enableConfirmOpen = userEnableConfirmOpen,
+                enableBusy = userEnableBusy,
+                error = usersError,
+                onBack = onBackFromDetail,
+                onOpenRoleChange = onOpenRoleChange,
+                onRequestSetEnabled = onRequestSetEnabled,
+                onConfirmSetEnabled = onConfirmSetEnabled,
+                onCancelSetEnabled = onCancelSetEnabled,
+                onNavigate = onNavigate,
+                modifier = modifier,
+            )
+            return
+        }
     }
 
     BackHandler(onBack = onBackToMenu)
@@ -141,8 +243,8 @@ fun OwnerUsersRolesScreen(
                                 modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesBack),
                             ) { Text("Back to More") }
                             TextButton(
-                                onClick = onCreatePreview,
-                                modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesCreatePreview),
+                                onClick = onOpenEnroll,
+                                modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesEnroll),
                             ) { Text("Enroll user") }
                         }
                         usersError?.let {
@@ -196,11 +298,18 @@ private fun OwnerUsersRolesDetailScreen(
     identity: NativeSignedInIdentity,
     context: NativeOwnerMoreContext,
     detail: NativeOwnerUserDetail,
+    enableConfirmOpen: Boolean,
+    enableBusy: Boolean,
+    error: String?,
     onBack: () -> Unit,
+    onOpenRoleChange: () -> Unit,
+    onRequestSetEnabled: (Boolean) -> Unit,
+    onConfirmSetEnabled: () -> Unit,
+    onCancelSetEnabled: () -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier,
 ) {
-    BackHandler(onBack = onBack)
+    BackHandler(enabled = !enableBusy, onBack = onBack)
     val row = detail.row
     OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
         Column(
@@ -225,6 +334,7 @@ private fun OwnerUsersRolesDetailScreen(
             ) {
                 TextButton(
                     onClick = onBack,
+                    enabled = !enableBusy,
                     modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesDetailBack),
                 ) { Text("Back to users") }
                 Text(
@@ -243,13 +353,571 @@ private fun OwnerUsersRolesDetailScreen(
                     OwnerUserFact("Disabled at", it)
                 }
                 OwnerUserFact("Employee account", detail.employeeAccountIdLabel)
+                error?.let {
+                    Text(
+                        it,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesError),
+                    )
+                }
+                Button(
+                    onClick = onOpenRoleChange,
+                    enabled = !enableBusy,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(NativeUiTags.OwnerUsersRolesDetailChangeRole),
+                ) { Text("Change role") }
+                if (row.enabled) {
+                    Button(
+                        onClick = { onRequestSetEnabled(false) },
+                        enabled = !enableBusy,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerUsersRolesDetailDisable),
+                    ) { Text(if (enableBusy) "Working…" else "Disable user") }
+                } else {
+                    Button(
+                        onClick = { onRequestSetEnabled(true) },
+                        enabled = !enableBusy,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerUsersRolesDetailEnable),
+                    ) { Text(if (enableBusy) "Working…" else "Enable user") }
+                }
                 Text(
-                    "Read only in this preview. Enrolling or editing users comes next. " +
+                    "Credential reset for this login comes next. " +
                         "This is staff login access, not Employees salary accounts.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesDetailReadOnly),
+                    modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesCredentialResetDeferred),
                 )
+            }
+        }
+    }
+
+    if (enableConfirmOpen) {
+        val enabling = !row.enabled
+        AlertDialog(
+            onDismissRequest = { if (!enableBusy) onCancelSetEnabled() },
+            title = { Text(if (enabling) "Enable this user?" else "Disable this user?") },
+            text = {
+                Text(
+                    if (enabling) {
+                        "They will be able to sign in again with their existing passphrase."
+                    } else {
+                        "They will not be able to sign in until you enable the account again."
+                    },
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = onConfirmSetEnabled,
+                    enabled = !enableBusy,
+                    modifier = Modifier.testTag(
+                        if (enabling) {
+                            NativeUiTags.OwnerUsersRolesEnableConfirm
+                        } else {
+                            NativeUiTags.OwnerUsersRolesDisableConfirm
+                        },
+                    ),
+                ) { Text(if (enabling) "Enable" else "Disable") }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = onCancelSetEnabled,
+                    enabled = !enableBusy,
+                    modifier = Modifier.testTag(
+                        if (enabling) {
+                            NativeUiTags.OwnerUsersRolesEnableCancel
+                        } else {
+                            NativeUiTags.OwnerUsersRolesDisableCancel
+                        },
+                    ),
+                ) { Text("Cancel") }
+            },
+        )
+    }
+}
+
+@Composable
+private fun OwnerUsersRolesEnrollIdentityScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    context: NativeOwnerMoreContext,
+    roles: List<AppRole>,
+    saving: Boolean,
+    error: String?,
+    onBack: () -> Unit,
+    onSave: (loginName: String, displayName: String, roleWire: String) -> Unit,
+    onNavigate: (OwnerSection) -> Unit,
+    modifier: Modifier,
+) {
+    val leaveGuard = rememberEntryLeaveGuard()
+    var loginName by rememberSaveable { mutableStateOf("") }
+    var displayName by rememberSaveable { mutableStateOf("") }
+    var roleWire by rememberSaveable { mutableStateOf(AppRole.CASHIER.wireValue) }
+    var draftTouched by rememberSaveable { mutableStateOf(false) }
+
+    val canSave = loginName.trim().isNotEmpty() && displayName.trim().isNotEmpty() && !saving
+    val dirty = draftTouched && !saving
+
+    LaunchedEffect(dirty) {
+        if (dirty) leaveGuard.markDirty() else leaveGuard.clear()
+    }
+
+    fun requestLeave(action: () -> Unit) {
+        if (saving) return
+        leaveGuard.requestLeave(action)
+    }
+
+    BackHandler { requestLeave(onBack) }
+
+    Box(modifier.fillMaxSize()) {
+        OwnerScaffold(
+            snackbarHostState = snackbarHostState,
+            section = OwnerSection.More,
+            onNavigate = { section -> requestLeave { onNavigate(section) } },
+            modifier = Modifier.fillMaxSize(),
+        ) { padding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .testTag(NativeUiTags.OwnerUsersRolesEnrollForm),
+            ) {
+                CashierScreenHeader(
+                    title = "Users & roles",
+                    displayName = context.shopName,
+                    roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                    businessDate = context.businessDate,
+                    postingOpen = context.postingOpen,
+                )
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .imePadding()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    TextButton(
+                        onClick = { requestLeave(onBack) },
+                        enabled = !saving,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesEnrollBack),
+                    ) { Text("Back to users") }
+                    Text(
+                        "Enroll user",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        "Create the identity, then hand the device to this person so they can privately choose their passphrase.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    OutlinedTextField(
+                        value = loginName,
+                        onValueChange = {
+                            loginName = it
+                            draftTouched = true
+                        },
+                        label = { Text("Login name") },
+                        singleLine = true,
+                        enabled = !saving,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerUsersRolesEnrollLogin),
+                    )
+                    OutlinedTextField(
+                        value = displayName,
+                        onValueChange = {
+                            displayName = it
+                            draftTouched = true
+                        },
+                        label = { Text("Display name") },
+                        singleLine = true,
+                        enabled = !saving,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerUsersRolesEnrollDisplayName),
+                    )
+                    Text(
+                        "Role",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    OwnerRoleChipRow(
+                        roles = roles,
+                        selectedWire = roleWire,
+                        enabled = !saving,
+                        tagForRole = NativeUiTags::ownerUsersRolesEnrollRole,
+                        onSelect = {
+                            roleWire = it
+                            draftTouched = true
+                        },
+                    )
+                    error?.let {
+                        Text(
+                            it,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesError),
+                        )
+                    }
+                    Button(
+                        onClick = { onSave(loginName, displayName, roleWire) },
+                        enabled = canSave,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerUsersRolesEnrollSave),
+                    ) { Text(if (saving) "Saving…" else "Continue") }
+                }
+            }
+        }
+        OwnerUsersRolesDiscardDialog(
+            leaveGuard = leaveGuard,
+            title = "Discard this enrollment?",
+            body = "The draft login details will be lost.",
+            discardTag = NativeUiTags.OwnerUsersRolesEnrollDiscard,
+            keepTag = NativeUiTags.OwnerUsersRolesEnrollKeep,
+        )
+    }
+}
+
+@Composable
+private fun OwnerUsersRolesEnrollPassphraseScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    context: NativeOwnerMoreContext,
+    pending: NativeOwnerPendingEnrollment,
+    saving: Boolean,
+    error: String?,
+    onBack: () -> Unit,
+    onSave: (passphrase: CharArray, confirmation: CharArray) -> Unit,
+    onNavigate: (OwnerSection) -> Unit,
+    modifier: Modifier,
+) {
+    val leaveGuard = rememberEntryLeaveGuard()
+    var passphrase by rememberSaveable { mutableStateOf("") }
+    var confirmation by rememberSaveable { mutableStateOf("") }
+    var draftTouched by rememberSaveable { mutableStateOf(false) }
+    var localError by rememberSaveable { mutableStateOf<String?>(null) }
+
+    val canSave = passphrase.isNotEmpty() && confirmation.isNotEmpty() && !saving
+    val dirty = draftTouched && !saving
+
+    LaunchedEffect(dirty) {
+        if (dirty) leaveGuard.markDirty() else leaveGuard.clear()
+    }
+
+    fun requestLeave(action: () -> Unit) {
+        if (saving) return
+        leaveGuard.requestLeave(action)
+    }
+
+    BackHandler { requestLeave(onBack) }
+
+    Box(modifier.fillMaxSize()) {
+        OwnerScaffold(
+            snackbarHostState = snackbarHostState,
+            section = OwnerSection.More,
+            onNavigate = { section -> requestLeave { onNavigate(section) } },
+            modifier = Modifier.fillMaxSize(),
+        ) { padding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .testTag(NativeUiTags.OwnerUsersRolesEnrollPassphraseForm),
+            ) {
+                CashierScreenHeader(
+                    title = "Users & roles",
+                    displayName = context.shopName,
+                    roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                    businessDate = context.businessDate,
+                    postingOpen = context.postingOpen,
+                )
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .imePadding()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    TextButton(
+                        onClick = { requestLeave(onBack) },
+                        enabled = !saving,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesEnrollPassphraseBack),
+                    ) { Text("Back to users") }
+                    Text(
+                        "Passphrase for ${pending.displayName}",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        "The new user should enter this privately. The administrator must look away and must not record it.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    OutlinedTextField(
+                        value = passphrase,
+                        onValueChange = {
+                            passphrase = it
+                            draftTouched = true
+                            localError = null
+                        },
+                        label = { Text("New passphrase") },
+                        singleLine = true,
+                        enabled = !saving,
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerUsersRolesEnrollPassphrase),
+                    )
+                    OutlinedTextField(
+                        value = confirmation,
+                        onValueChange = {
+                            confirmation = it
+                            draftTouched = true
+                            localError = null
+                        },
+                        label = { Text("Confirm passphrase") },
+                        singleLine = true,
+                        enabled = !saving,
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerUsersRolesEnrollPassphraseConfirm),
+                    )
+                    (localError ?: error)?.let {
+                        Text(
+                            it,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesError),
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            if (passphrase != confirmation) {
+                                localError = "Passphrases do not match"
+                                return@Button
+                            }
+                            val secret = passphrase.toCharArray()
+                            val confirm = confirmation.toCharArray()
+                            passphrase = ""
+                            confirmation = ""
+                            onSave(secret, confirm)
+                        },
+                        enabled = canSave,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerUsersRolesEnrollPassphraseSave),
+                    ) { Text(if (saving) "Saving…" else "Finish enrollment") }
+                }
+            }
+        }
+        OwnerUsersRolesDiscardDialog(
+            leaveGuard = leaveGuard,
+            title = "Leave without finishing?",
+            body = "The login was created but still needs a passphrase. You can finish setup later.",
+            discardTag = NativeUiTags.OwnerUsersRolesEnrollDiscard,
+            keepTag = NativeUiTags.OwnerUsersRolesEnrollKeep,
+        )
+    }
+}
+
+@Composable
+private fun OwnerUsersRolesRoleChangeScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    context: NativeOwnerMoreContext,
+    detail: NativeOwnerUserDetail,
+    roles: List<AppRole>,
+    saving: Boolean,
+    error: String?,
+    onBack: () -> Unit,
+    onSave: (String) -> Unit,
+    onNavigate: (OwnerSection) -> Unit,
+    modifier: Modifier,
+) {
+    val leaveGuard = rememberEntryLeaveGuard()
+    var roleWire by rememberSaveable { mutableStateOf(detail.row.roleWire) }
+    var draftTouched by rememberSaveable { mutableStateOf(false) }
+
+    val dirty = draftTouched && roleWire != detail.row.roleWire && !saving
+    val canSave = roleWire != detail.row.roleWire && !saving
+
+    LaunchedEffect(dirty) {
+        if (dirty) leaveGuard.markDirty() else leaveGuard.clear()
+    }
+
+    fun requestLeave(action: () -> Unit) {
+        if (saving) return
+        leaveGuard.requestLeave(action)
+    }
+
+    BackHandler { requestLeave(onBack) }
+
+    Box(modifier.fillMaxSize()) {
+        OwnerScaffold(
+            snackbarHostState = snackbarHostState,
+            section = OwnerSection.More,
+            onNavigate = { section -> requestLeave { onNavigate(section) } },
+            modifier = Modifier.fillMaxSize(),
+        ) { padding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .testTag(NativeUiTags.OwnerUsersRolesRoleChangeForm),
+            ) {
+                CashierScreenHeader(
+                    title = "Users & roles",
+                    displayName = context.shopName,
+                    roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                    businessDate = context.businessDate,
+                    postingOpen = context.postingOpen,
+                )
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    TextButton(
+                        onClick = { requestLeave(onBack) },
+                        enabled = !saving,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesRoleChangeBack),
+                    ) { Text("Back to user") }
+                    Text(
+                        "Change role",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        detail.row.displayName,
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    OwnerRoleChipRow(
+                        roles = roles,
+                        selectedWire = roleWire,
+                        enabled = !saving,
+                        tagForRole = NativeUiTags::ownerUsersRolesChangeRole,
+                        onSelect = {
+                            roleWire = it
+                            draftTouched = true
+                        },
+                    )
+                    error?.let {
+                        Text(
+                            it,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesError),
+                        )
+                    }
+                    Button(
+                        onClick = { onSave(roleWire) },
+                        enabled = canSave,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerUsersRolesRoleChangeSave),
+                    ) { Text(if (saving) "Saving…" else "Save role") }
+                }
+            }
+        }
+        OwnerUsersRolesDiscardDialog(
+            leaveGuard = leaveGuard,
+            title = "Discard role change?",
+            body = "The selected role will not be saved.",
+            discardTag = NativeUiTags.OwnerUsersRolesRoleChangeDiscard,
+            keepTag = NativeUiTags.OwnerUsersRolesRoleChangeKeep,
+        )
+    }
+}
+
+@Composable
+private fun OwnerUsersRolesReauthDialog(
+    busy: Boolean,
+    error: String?,
+    onConfirm: (CharArray) -> Unit,
+    onCancel: () -> Unit,
+) {
+    var passphrase by rememberSaveable { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = { if (!busy) onCancel() },
+        modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesReauth),
+        title = { Text("Confirm with passphrase") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Enter your full Owner passphrase to continue this sensitive action.")
+                OutlinedTextField(
+                    value = passphrase,
+                    onValueChange = { passphrase = it },
+                    label = { Text("Current full passphrase") },
+                    singleLine = true,
+                    enabled = !busy,
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(NativeUiTags.OwnerUsersRolesReauthPassphrase),
+                )
+                error?.let {
+                    Text(it, color = MaterialTheme.colorScheme.error)
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (passphrase.isBlank()) return@TextButton
+                    val secret = passphrase.toCharArray()
+                    passphrase = ""
+                    onConfirm(secret)
+                },
+                enabled = !busy && passphrase.isNotBlank(),
+                modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesReauthConfirm),
+            ) { Text(if (busy) "Checking…" else "Continue") }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onCancel,
+                enabled = !busy,
+                modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesReauthCancel),
+            ) { Text("Cancel") }
+        },
+    )
+}
+
+@Composable
+private fun OwnerRoleChipRow(
+    roles: List<AppRole>,
+    selectedWire: String,
+    enabled: Boolean,
+    tagForRole: (String) -> String,
+    onSelect: (String) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        roles.chunked(3).forEach { rowRoles ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                rowRoles.forEach { role ->
+                    FilterChip(
+                        selected = role.wireValue == selectedWire,
+                        onClick = { onSelect(role.wireValue) },
+                        enabled = enabled,
+                        label = {
+                            Text(
+                                role.wireValue.replaceFirstChar {
+                                    if (it.isLowerCase()) it.titlecase(Locale.US) else it.toString()
+                                },
+                            )
+                        },
+                        modifier = Modifier.testTag(tagForRole(role.wireValue)),
+                    )
+                }
             }
         }
     }
@@ -304,4 +972,32 @@ private fun OwnerUserFact(label: String, value: String) {
         )
         Text(value, style = MaterialTheme.typography.bodyLarge)
     }
+}
+
+@Composable
+private fun OwnerUsersRolesDiscardDialog(
+    leaveGuard: EntryLeaveGuard,
+    title: String,
+    body: String,
+    discardTag: String,
+    keepTag: String,
+) {
+    if (!leaveGuard.discardConfirmationOpen) return
+    AlertDialog(
+        onDismissRequest = leaveGuard::keepEditing,
+        title = { Text(title) },
+        text = { Text(body) },
+        confirmButton = {
+            TextButton(
+                onClick = leaveGuard::confirmDiscard,
+                modifier = Modifier.testTag(discardTag),
+            ) { Text("Discard") }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = leaveGuard::keepEditing,
+                modifier = Modifier.testTag(keepTag),
+            ) { Text("Keep editing") }
+        },
+    )
 }

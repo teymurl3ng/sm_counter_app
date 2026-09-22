@@ -160,8 +160,65 @@ class NativeOwnerProductsFacadeTest {
         facade.archiveProduct(ownerSession, productId)
         val snapshot = facade.loadProducts(ownerSession)
         assertFalse(snapshot.products.any { it.productId == productId })
-        val detailRejected = runCatching { facade.loadDetail(ownerSession, productId) }
-        assertTrue(detailRejected.isFailure)
+        val archived = facade.loadProducts(ownerSession, includeArchived = true)
+        assertTrue(archived.products.any { it.productId == productId && it.archived })
+        val detail = facade.loadDetail(ownerSession, productId)
+        assertEquals("Archived", detail.row.statusLabel)
+        assertTrue(detail.row.archived)
+    }
+
+    @Test
+    fun loadDetailResolvesArchivedProduct() = runBlocking {
+        val productId = facade.createProduct(
+            ownerSession,
+            ProductCatalogInput("Owner Archived Detail", "Kg", defaultSaleRate = 70.0),
+        )
+        facade.archiveProduct(ownerSession, productId)
+        val detail = facade.loadDetail(ownerSession, productId)
+        assertEquals("Owner Archived Detail", detail.row.name)
+        assertEquals("Archived", detail.row.statusLabel)
+        assertTrue(detail.row.archived)
+    }
+
+    @Test
+    fun archiveThenUnarchiveReturnsToActiveList() = runBlocking {
+        val productId = facade.createProduct(
+            ownerSession,
+            ProductCatalogInput("Owner Unarchive Milk", "Liters", defaultSaleRate = 85.0),
+        )
+        facade.archiveProduct(ownerSession, productId)
+        assertFalse(facade.loadProducts(ownerSession).products.any { it.productId == productId })
+        assertTrue(
+            facade.loadProducts(ownerSession, includeArchived = true)
+                .products.any { it.productId == productId },
+        )
+        facade.unarchiveProduct(ownerSession, productId)
+        val active = facade.loadProducts(ownerSession)
+        assertTrue(active.products.any { it.productId == productId && !it.archived })
+        assertFalse(
+            facade.loadProducts(ownerSession, includeArchived = true)
+                .products.any { it.productId == productId },
+        )
+        val detail = facade.loadDetail(ownerSession, productId)
+        assertEquals("Active", detail.row.statusLabel)
+        assertFalse(detail.row.archived)
+    }
+
+    @Test
+    fun loadProductsArchivedFilterExcludesActive() = runBlocking {
+        val activeId = facade.createProduct(
+            ownerSession,
+            ProductCatalogInput("Owner Active Filter", "Liters"),
+        )
+        val archivedId = facade.createProduct(
+            ownerSession,
+            ProductCatalogInput("Owner Archived Filter", "Kg"),
+        )
+        facade.archiveProduct(ownerSession, archivedId)
+        val archivedOnly = facade.loadProducts(ownerSession, includeArchived = true)
+        assertTrue(archivedOnly.products.all { it.archived })
+        assertTrue(archivedOnly.products.any { it.productId == archivedId })
+        assertFalse(archivedOnly.products.any { it.productId == activeId })
     }
 
     @Test
@@ -199,6 +256,19 @@ class NativeOwnerProductsFacadeTest {
         )
         val rejected = runCatching {
             facade.archiveProduct(cashierSession, productId)
+        }
+        assertTrue(rejected.isFailure)
+    }
+
+    @Test
+    fun unarchiveProductRejectsNonOwner() = runBlocking {
+        val productId = facade.createProduct(
+            ownerSession,
+            ProductCatalogInput("Owner Gate Unarchive", "Kg"),
+        )
+        facade.archiveProduct(ownerSession, productId)
+        val rejected = runCatching {
+            facade.unarchiveProduct(cashierSession, productId)
         }
         assertTrue(rejected.isFailure)
     }

@@ -37,6 +37,7 @@ import com.saaf.milkshop.application.operations.NativeOperationsWorkFacade
 import com.saaf.milkshop.application.operations.NativeReceiveMilkFacade
 import com.saaf.milkshop.application.operations.NativeRecordSpoilageFacade
 import com.saaf.milkshop.application.owner.NativeOwnerBackupFacade
+import com.saaf.milkshop.application.owner.LiveNativeOwnerCloudBackupGateway
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPlansFacade
 import com.saaf.milkshop.application.owner.NativeOwnerCustomersFacade
 import com.saaf.milkshop.application.owner.NativeOwnerEmployeesFacade
@@ -56,6 +57,7 @@ import com.saaf.milkshop.application.sale.NativeSaleFacade
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.UserSecurityService
+import com.saaf.milkshop.cloud.HybridGoogleDriveAuthorization
 import com.saaf.milkshop.nativeui.activity.NativeActivityState
 import com.saaf.milkshop.nativeui.activity.NativeActivityViewModel
 import com.saaf.milkshop.nativeui.auth.NativeAuthenticationHost
@@ -147,6 +149,7 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var ownerUsersRolesFacade: NativeOwnerUsersRolesFacade
     private lateinit var ownerSecurityHistoryFacade: NativeOwnerSecurityHistoryFacade
     private lateinit var ownerBackupFacade: NativeOwnerBackupFacade
+    private var cloudAuthorization: HybridGoogleDriveAuthorization? = null
 
     private val authenticationViewModel by viewModels<NativeAuthenticationViewModel> {
         val app = application as MilkShopApplication
@@ -354,6 +357,13 @@ class NativePreviewActivity : FragmentActivity() {
             database = app.database,
             security = app.userSecurity,
             cloudBackupSettings = app.cloudBackupSettings,
+            backupManager = app.backupManager,
+            cloudGateway = LiveNativeOwnerCloudBackupGateway(
+                app = app,
+                authorization = HybridGoogleDriveAuthorization(this).also {
+                    cloudAuthorization = it
+                },
+            ),
         )
         authenticationViewModel.attachQuickUnlock(quickUnlockFacade)
         val openOperator = intent.getBooleanExtra(EXTRA_OPEN_OPERATOR, false)
@@ -457,6 +467,9 @@ class NativePreviewActivity : FragmentActivity() {
     override fun onDestroy() {
         if (::quickUnlockFacade.isInitialized) authenticationViewModel.detachQuickUnlock(quickUnlockFacade)
         if (::quickUnlockService.isInitialized) quickUnlockService.close()
+        if (::ownerBackupFacade.isInitialized) ownerBackupFacade.close()
+        cloudAuthorization?.close()
+        cloudAuthorization = null
         super.onDestroy()
     }
 }

@@ -83,9 +83,10 @@ This checkpoint owns **Owner Costing & plans** conservatively: costing policy ve
 
 ### Explicit preview / deferred
 
-- Approve / supersede / edit costing policy write UI
+- Approve / supersede costing policy write UI — **connected in Phase 14.8.43**
 - Opening cost basis, yield policy, production-loss assessment UIs
 - Budgets and collections targets planning UIs
+- Free-form in-place edit of an already-approved version (domain is versioned approve — deferred)
 - Shop settings / opening state / expense categories
 - Manager / Admin Costing shells
 
@@ -98,7 +99,7 @@ This checkpoint owns **Owner Costing & plans** conservatively: costing policy ve
 | Back (detail) | Return to list | List restored | Back contract |
 | Back (list) | Return to More menu | Menu restored | Back contract |
 | Retry | Reload list | Ready list | Failure recovery |
-| Approve/edit (preview) | Explicit notice | Stay on Costing | Notice contract |
+| Approve/edit (preview) | Explicit notice | Stay on Costing | **Superseded by 14.8.43 approve form** |
 | Foreign chrome | Must not appear | No Cashier/Ops nav | Foundation |
 
 ## Material states
@@ -109,7 +110,7 @@ This checkpoint owns **Owner Costing & plans** conservatively: costing policy ve
 | Ready list | Policies; empty / incomplete copy when none |
 | Detail | Read-only facts + components |
 | Load failure | Inline error + Retry |
-| Approve deferred | Explicit preview notice |
+| Approve deferred | Explicit preview notice — **replaced by approve form in 14.8.43** |
 | Session expired | Leave via existing auth path |
 
 ## Native data boundary

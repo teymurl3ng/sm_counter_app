@@ -439,19 +439,40 @@ fun OwnerPreviewHost(
                             }
                         }
                         NativeOwnerMoreDestination.CostingPlans -> {
-                            if (ready.costingPolicyDetail != null) {
-                                ownerMoreViewModel.clearCostingPolicyDetail()
-                            } else {
-                                ownerMoreViewModel.backToMenu()
+                            when {
+                                ready.costingReauthOpen ->
+                                    ownerMoreViewModel.cancelCostingReauth()
+                                ready.costingApproveOpen ->
+                                    ownerMoreViewModel.clearCostingApprove()
+                                ready.costingPolicyDetail != null ->
+                                    ownerMoreViewModel.clearCostingPolicyDetail()
+                                else -> ownerMoreViewModel.backToMenu()
                             }
                         }
-                        NativeOwnerMoreDestination.ShopSettings ->
-                            ownerMoreViewModel.backToMenu()
+                        NativeOwnerMoreDestination.ShopSettings -> {
+                            when {
+                                ready.shopSettingsIdentityEditOpen ->
+                                    ownerMoreViewModel.clearShopIdentityEdit()
+                                ready.shopSettingsRatesEditOpen ->
+                                    ownerMoreViewModel.clearShopRatesEdit()
+                                ready.shopSettingsCategoryCreateOpen ->
+                                    ownerMoreViewModel.clearShopCategoryCreate()
+                                ready.shopSettingsCategoryDetail != null ->
+                                    ownerMoreViewModel.clearShopCategoryDetail()
+                                else -> ownerMoreViewModel.backToMenu()
+                            }
+                        }
                         NativeOwnerMoreDestination.UsersRoles -> {
-                            if (ready.userDetail != null) {
-                                ownerMoreViewModel.clearUserDetail()
-                            } else {
-                                ownerMoreViewModel.backToMenu()
+                            when {
+                                ready.userReauthOpen ->
+                                    ownerMoreViewModel.cancelUsersRolesReauth()
+                                ready.userEnrollOpen ->
+                                    ownerMoreViewModel.clearUserEnroll()
+                                ready.userRoleChangeOpen ->
+                                    ownerMoreViewModel.clearUserRoleChange()
+                                ready.userDetail != null ->
+                                    ownerMoreViewModel.clearUserDetail()
+                                else -> ownerMoreViewModel.backToMenu()
                             }
                         }
                         NativeOwnerMoreDestination.SecurityHistory -> {
@@ -462,7 +483,19 @@ fun OwnerPreviewHost(
                             }
                         }
                         NativeOwnerMoreDestination.Backup ->
-                            ownerMoreViewModel.backToMenu()
+                            when {
+                                ready.backupReauthOpen ->
+                                    ownerMoreViewModel.cancelBackupReauth()
+                                ready.backupExportOpen ->
+                                    ownerMoreViewModel.clearBackupExport()
+                                ready.backupRestoreOpen ->
+                                    ownerMoreViewModel.clearBackupRestore()
+                                ready.backupConnectOpen ->
+                                    ownerMoreViewModel.clearBackupConnect()
+                                ready.backupDisconnectConfirmOpen ->
+                                    ownerMoreViewModel.cancelBackupDisconnect()
+                                else -> ownerMoreViewModel.backToMenu()
+                            }
                         else -> onLeaveToWelcome()
                     }
                 }
@@ -560,6 +593,8 @@ fun OwnerPreviewHost(
                     onBackFromProductEdit = ownerMoreViewModel::clearProductEdit,
                     onUpdateProduct = ownerMoreViewModel::updateProduct,
                     onArchiveProduct = ownerMoreViewModel::archiveProduct,
+                    onUnarchiveProduct = ownerMoreViewModel::unarchiveProduct,
+                    onProductsShowArchivedChange = ownerMoreViewModel::setProductsShowArchived,
                     onRetryCustomers = ownerMoreViewModel::refreshCustomers,
                     onOpenCustomer = ownerMoreViewModel::openCustomerDetail,
                     onBackFromCustomerDetail = ownerMoreViewModel::clearCustomerDetail,
@@ -572,44 +607,79 @@ fun OwnerPreviewHost(
                     onRetrySuppliers = ownerMoreViewModel::refreshSuppliers,
                     onOpenSupplier = ownerMoreViewModel::openSupplierDetail,
                     onBackFromSupplierDetail = ownerMoreViewModel::clearSupplierDetail,
-                    onCreateSupplierPreview = {
-                        onShowNotice("Add supplier comes next in the Owner Suppliers family.")
-                    },
+                    onOpenSupplierCreate = ownerMoreViewModel::openSupplierCreate,
+                    onBackFromSupplierCreate = ownerMoreViewModel::clearSupplierCreate,
+                    onCreateSupplier = ownerMoreViewModel::createSupplier,
+                    onOpenSupplierEdit = ownerMoreViewModel::openSupplierEdit,
+                    onBackFromSupplierEdit = ownerMoreViewModel::clearSupplierEdit,
+                    onUpdateSupplier = ownerMoreViewModel::updateSupplier,
                     onRetryEmployees = ownerMoreViewModel::refreshEmployees,
                     onOpenEmployee = ownerMoreViewModel::openEmployeeDetail,
                     onBackFromEmployeeDetail = ownerMoreViewModel::clearEmployeeDetail,
-                    onCreateEmployeePreview = {
-                        onShowNotice("Add employee comes next in the Owner Employees family.")
-                    },
+                    onOpenEmployeeCreate = ownerMoreViewModel::openEmployeeCreate,
+                    onBackFromEmployeeCreate = ownerMoreViewModel::clearEmployeeCreate,
+                    onCreateEmployee = ownerMoreViewModel::createEmployee,
+                    onOpenEmployeeEdit = ownerMoreViewModel::openEmployeeEdit,
+                    onBackFromEmployeeEdit = ownerMoreViewModel::clearEmployeeEdit,
+                    onUpdateEmployee = ownerMoreViewModel::updateEmployee,
                     onRetryCostingPlans = ownerMoreViewModel::refreshCostingPlans,
                     onOpenCostingPolicy = ownerMoreViewModel::openCostingPolicyDetail,
                     onBackFromCostingPolicyDetail = ownerMoreViewModel::clearCostingPolicyDetail,
-                    onApproveCostingPolicyPreview = {
-                        onShowNotice("Approve or edit costing policy comes next in the Owner Costing & plans family.")
-                    },
+                    onOpenCostingApprove = ownerMoreViewModel::openCostingApprove,
+                    onOpenCostingApproveFromDetail = ownerMoreViewModel::openCostingApproveFromDetail,
+                    onBackFromCostingApprove = ownerMoreViewModel::clearCostingApprove,
+                    onApproveCostingPolicy = ownerMoreViewModel::approveCostingPolicy,
+                    onSubmitCostingReauth = ownerMoreViewModel::submitCostingReauth,
+                    onCancelCostingReauth = ownerMoreViewModel::cancelCostingReauth,
                     onRetryShopSettings = ownerMoreViewModel::refreshShopSettings,
-                    onEditShopSettingsPreview = {
-                        onShowNotice("Edit shop settings comes next…")
-                    },
+                    onOpenShopIdentityEdit = ownerMoreViewModel::openShopIdentityEdit,
+                    onBackFromShopIdentityEdit = ownerMoreViewModel::clearShopIdentityEdit,
+                    onSaveShopIdentity = ownerMoreViewModel::saveShopIdentity,
+                    onOpenShopRatesEdit = ownerMoreViewModel::openShopRatesEdit,
+                    onBackFromShopRatesEdit = ownerMoreViewModel::clearShopRatesEdit,
+                    onUpdateShopRates = ownerMoreViewModel::updateShopRates,
+                    onOpenShopCategoryCreate = ownerMoreViewModel::openShopCategoryCreate,
+                    onBackFromShopCategoryCreate = ownerMoreViewModel::clearShopCategoryCreate,
+                    onCreateShopExpenseCategory = ownerMoreViewModel::createShopExpenseCategory,
+                    onOpenShopCategory = ownerMoreViewModel::openShopCategoryDetail,
+                    onBackFromShopCategoryDetail = ownerMoreViewModel::clearShopCategoryDetail,
+                    onSetShopExpenseCategoryArchived = ownerMoreViewModel::setShopExpenseCategoryArchived,
                     onRetryUsersRoles = ownerMoreViewModel::refreshUsersRoles,
                     onOpenUser = ownerMoreViewModel::openUserDetail,
                     onBackFromUserDetail = ownerMoreViewModel::clearUserDetail,
-                    onCreateUserPreview = {
-                        onShowNotice("Enroll or change staff access comes next…")
-                    },
+                    onOpenUserEnroll = ownerMoreViewModel::openUserEnroll,
+                    onBackFromUserEnroll = ownerMoreViewModel::clearUserEnroll,
+                    onBeginUserEnroll = ownerMoreViewModel::beginUserEnroll,
+                    onCompleteUserEnroll = ownerMoreViewModel::completeUserEnroll,
+                    onOpenUserRoleChange = ownerMoreViewModel::openUserRoleChange,
+                    onBackFromUserRoleChange = ownerMoreViewModel::clearUserRoleChange,
+                    onChangeUserRole = ownerMoreViewModel::changeUserRole,
+                    onRequestSetUserEnabled = ownerMoreViewModel::requestSetUserEnabled,
+                    onConfirmSetUserEnabled = ownerMoreViewModel::confirmSetUserEnabled,
+                    onCancelSetUserEnabled = ownerMoreViewModel::cancelSetUserEnabled,
+                    onSubmitUsersRolesReauth = ownerMoreViewModel::submitUsersRolesReauth,
+                    onCancelUsersRolesReauth = ownerMoreViewModel::cancelUsersRolesReauth,
                     onRetrySecurityHistory = ownerMoreViewModel::refreshSecurityHistory,
                     onOpenSecurityAudit = ownerMoreViewModel::openSecurityAuditDetail,
                     onBackFromSecurityAuditDetail = ownerMoreViewModel::clearSecurityAuditDetail,
                     onRetryBackup = ownerMoreViewModel::refreshBackup,
-                    onExportBackupPreview = {
-                        onShowNotice("Export backup comes next in the Owner Backup family.")
-                    },
-                    onRestoreBackupPreview = {
-                        onShowNotice("Restore backup comes next in the Owner Backup family.")
-                    },
-                    onConnectBackupPreview = {
-                        onShowNotice("Connect Drive comes next in the Owner Backup family.")
-                    },
+                    onOpenBackupExport = ownerMoreViewModel::openBackupExport,
+                    onBackFromBackupExport = ownerMoreViewModel::clearBackupExport,
+                    onExportBackup = ownerMoreViewModel::exportBackup,
+                    onOpenBackupRestore = ownerMoreViewModel::openBackupRestore,
+                    onBackFromBackupRestore = ownerMoreViewModel::clearBackupRestore,
+                    onInspectBackupRestore = ownerMoreViewModel::inspectBackupRestore,
+                    onConfirmBackupRestore = ownerMoreViewModel::confirmBackupRestore,
+                    onOpenBackupConnect = ownerMoreViewModel::openBackupConnect,
+                    onBackFromBackupConnect = ownerMoreViewModel::clearBackupConnect,
+                    onConnectDriveBackup = ownerMoreViewModel::connectDriveBackup,
+                    onSetDriveBackupEnabled = ownerMoreViewModel::setDriveBackupEnabled,
+                    onRunDriveBackupNow = ownerMoreViewModel::runDriveBackupNow,
+                    onRequestBackupDisconnect = ownerMoreViewModel::requestBackupDisconnect,
+                    onConfirmBackupDisconnect = ownerMoreViewModel::confirmBackupDisconnect,
+                    onCancelBackupDisconnect = ownerMoreViewModel::cancelBackupDisconnect,
+                    onSubmitBackupReauth = ownerMoreViewModel::submitBackupReauth,
+                    onCancelBackupReauth = ownerMoreViewModel::cancelBackupReauth,
                     onRequestRemoveQuickUnlock = ownerMoreViewModel::requestRemoveQuickUnlock,
                     onCancelRemoveQuickUnlock = ownerMoreViewModel::cancelRemoveQuickUnlock,
                     onRemoveQuickUnlock = ownerMoreViewModel::removeQuickUnlock,

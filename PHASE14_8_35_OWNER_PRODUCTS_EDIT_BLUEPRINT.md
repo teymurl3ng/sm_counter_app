@@ -14,7 +14,7 @@ Authority: `PHASE14_8_15A_SHELL_VS_CONTENT.md` and `.cursor/rules/native-shell-v
 2. **Role-owned shell** — continue using existing Owner Products wrappers under `OwnerScaffold(More)`; hardware Back clears edit → detail → list → More menu; `EntryLeaveGuard` on Back **and** bottom-nav exits while the edit draft is dirty.
 3. **Foundation proof** — existing Owner Products Foundation (host chrome ✓, foreign chrome ✗, Back stack, session intact) still covers the destination; edit/archive are depth on that same entry.
 
-**Forbidden:** mounting another role’s screen, calling JSON bridge from UI, inventing costing/stock editors, changing `ProductCatalog` domain formulas/validation, or shipping unarchive UI in this slice.
+**Forbidden:** mounting another role’s screen, calling JSON bridge from UI, inventing costing/stock editors, changing `ProductCatalog` domain formulas/validation. Unarchive is connected in Phase 14.8.38.
 
 ## Connected (this slice)
 
@@ -52,10 +52,10 @@ Create remains as delivered in Phase 14.8.34.
 
 ## Explicit preview / deferred
 
-- Unarchive / restore archived products UI
+- Unarchive / restore archived products UI — **connected in Phase 14.8.38**
 - Costing, stock on hand, COGS editors
 - Manager / Admin Products shells
 
 ## Accept gate
 
-**AUTO-ACCEPTED.** Connected = Owner Products edit + archive write depth under CORE METHOD; create already in 14.8.34; unarchive deferred.
+**AUTO-ACCEPTED.** Connected = Owner Products edit + archive write depth under CORE METHOD; create already in 14.8.34; unarchive follows in 14.8.38.

@@ -4,6 +4,7 @@ import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.EmployeeManagementService
+import com.saaf.milkshop.domain.EmployeeProfileInput
 import com.saaf.milkshop.domain.EmployeeProfileService
 import com.saaf.milkshop.domain.UserSecurityService
 import java.util.Locale
@@ -19,9 +20,11 @@ data class NativeOwnerEmployeeRow(
 
 data class NativeOwnerEmployeeDetail(
     val row: NativeOwnerEmployeeRow,
+    val referenceSalary: Double?,
     val referenceSalaryLabel: String?,
     val salaryPeriod: String?,
     val joinDate: String?,
+    val active: Boolean,
 )
 
 data class NativeOwnerEmployeesSnapshot(
@@ -29,9 +32,10 @@ data class NativeOwnerEmployeesSnapshot(
 )
 
 /**
- * Owner Employees boundary: Salary-account list + read detail from
- * [EmployeeManagementService] / [EmployeeProfileService]. Does not invent
- * balance formulas or call bridge JSON. Distinct from Users & roles.
+ * Owner Employees boundary: Salary-account list + read detail + create/rename/profile
+ * from [EmployeeManagementService] / [EmployeeProfileService]. Does not invent
+ * balance formulas, salary payments, attendance writes, or call bridge JSON.
+ * Distinct from Users & roles.
  */
 class NativeOwnerEmployeesFacade(
     private val database: MilkShopDatabase,
@@ -60,17 +64,42 @@ class NativeOwnerEmployeesFacade(
         val info = employees.list().firstOrNull { it.accountId == accountId }
             ?: error("This employee is not in the employee list.")
         val profile = profiles.get(accountId)
+        val active = profile?.active ?: true
         val row = info.toRow(
-            active = profile?.active ?: true,
+            active = active,
             role = profile?.role,
             phone = profile?.phone,
         )
         return NativeOwnerEmployeeDetail(
             row = row,
+            referenceSalary = profile?.referenceSalary,
             referenceSalaryLabel = profile?.referenceSalary?.let { formatMoney(it) },
             salaryPeriod = profile?.salaryPeriod,
             joinDate = profile?.joinDate,
+            active = active,
         )
+    }
+
+    suspend fun createEmployee(
+        sessionHandle: String,
+        name: String,
+    ): Long {
+        requireOwnerMasterData(sessionHandle)
+        return employees.create(name)
+    }
+
+    /**
+     * Rename then save profile (auth once). Deactivate is [EmployeeProfileInput.active] = false.
+     */
+    suspend fun updateEmployee(
+        sessionHandle: String,
+        accountId: Long,
+        name: String,
+        profile: EmployeeProfileInput,
+    ) {
+        requireOwnerMasterData(sessionHandle)
+        employees.rename(accountId, name)
+        profiles.save(accountId, profile)
     }
 
     private suspend fun requireOwnerMasterData(sessionHandle: String) {

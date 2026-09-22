@@ -3,18 +3,21 @@ package com.saaf.milkshop
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.owner.NativeOwnerEmployeeDetail
 import com.saaf.milkshop.application.owner.NativeOwnerEmployeeRow
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
 import com.saaf.milkshop.domain.AppRole
+import com.saaf.milkshop.domain.EmployeeProfileInput
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.owner.OwnerEmployeesScreen
@@ -62,23 +65,22 @@ class NativeOwnerEmployeesScreenContractTest {
     }
 
     @Test
-    fun detailShowsFactsAndBack() {
+    fun detailShowsFactsAndEdit() {
         var back = false
+        var editOpened = false
         setScreen(
             employees = listOf(sampleEmployee()),
-            employeeDetail = NativeOwnerEmployeeDetail(
-                row = sampleEmployee(),
-                referenceSalaryLabel = "PKR 35,000.00",
-                salaryPeriod = "monthly",
-                joinDate = "2026-01-15",
-            ),
+            employeeDetail = sampleDetail(),
             onBackFromDetail = { back = true },
+            onOpenEdit = { editOpened = true },
         )
         composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesDetail).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesDetailName).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesDetailReadOnly)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesDetailEdit)
             .performScrollTo()
             .assertIsDisplayed()
+            .performClick()
+        assertTrue(editOpened)
         composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesDetailBack).performClick()
         assertTrue(back)
     }
@@ -95,14 +97,110 @@ class NativeOwnerEmployeesScreenContractTest {
     }
 
     @Test
-    fun createPreviewSurfacesNotice() {
-        var preview = false
+    fun addEmployeeOpensCreateForm() {
+        var opened = false
         setScreen(
             employees = listOf(sampleEmployee()),
-            onCreatePreview = { preview = true },
+            onOpenCreate = { opened = true },
         )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesCreatePreview).performClick()
-        assertTrue(preview)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesCreateOpen).performClick()
+        assertTrue(opened)
+    }
+
+    @Test
+    fun createFormShowsFieldsAndSave() {
+        var saved: String? = null
+        setScreen(
+            employees = listOf(sampleEmployee()),
+            employeeCreateOpen = true,
+            onCreateEmployee = { saved = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesCreateForm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesCreateName)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertDoesNotExist()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesCreateName)
+            .performScrollTo()
+            .performTextReplacement("Fresh Hire")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesCreateSave)
+            .performScrollTo()
+            .assertIsEnabled()
+            .performClick()
+
+        assertEquals("Fresh Hire", saved)
+    }
+
+    @Test
+    fun editFormPrefillsAndSaves() {
+        var savedName: String? = null
+        var savedProfile: EmployeeProfileInput? = null
+        setScreen(
+            employees = listOf(sampleEmployee()),
+            employeeDetail = sampleDetail(),
+            employeeEditOpen = true,
+            onUpdateEmployee = { name, profile ->
+                savedName = name
+                savedProfile = profile
+            },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesEditForm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesEditName)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesEditRole)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesEditPhone)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesEditReferenceSalary)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesEditSalaryPeriod)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesEditJoinDate)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesEditActive)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertDoesNotExist()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesEditName)
+            .performScrollTo()
+            .performTextReplacement("Ayesha Khan Updated")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesEditRole)
+            .performScrollTo()
+            .performTextReplacement("Shop helper")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesEditPhone)
+            .performScrollTo()
+            .performTextReplacement("0311")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesEditReferenceSalary)
+            .performScrollTo()
+            .performTextReplacement("42000")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesEditSalaryPeriod)
+            .performScrollTo()
+            .performTextReplacement("weekly")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesEditJoinDate)
+            .performScrollTo()
+            .performTextReplacement("2026-02-01")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesEditSave)
+            .performScrollTo()
+            .assertIsEnabled()
+            .performClick()
+
+        assertEquals("Ayesha Khan Updated", savedName)
+        assertEquals("Shop helper", savedProfile!!.role)
+        assertEquals("0311", savedProfile!!.phone)
+        assertEquals(42_000.0, savedProfile!!.referenceSalary!!, 0.001)
+        assertEquals("weekly", savedProfile!!.salaryPeriod)
+        assertEquals("2026-02-01", savedProfile!!.joinDate)
+        assertTrue(savedProfile!!.active)
     }
 
     @Test
@@ -121,12 +219,21 @@ class NativeOwnerEmployeesScreenContractTest {
         employees: List<NativeOwnerEmployeeRow>,
         employeesLoading: Boolean = false,
         employeeDetail: NativeOwnerEmployeeDetail? = null,
+        employeeCreateOpen: Boolean = false,
+        employeeCreating: Boolean = false,
+        employeeEditOpen: Boolean = false,
+        employeeUpdating: Boolean = false,
         employeesError: String? = null,
         onBackToMenu: () -> Unit = {},
         onRetry: () -> Unit = {},
         onOpenEmployee: (Long) -> Unit = {},
         onBackFromDetail: () -> Unit = {},
-        onCreatePreview: () -> Unit = {},
+        onOpenCreate: () -> Unit = {},
+        onBackFromCreate: () -> Unit = {},
+        onCreateEmployee: (String) -> Unit = {},
+        onOpenEdit: () -> Unit = {},
+        onBackFromEdit: () -> Unit = {},
+        onUpdateEmployee: (String, EmployeeProfileInput) -> Unit = { _, _ -> },
         onNavigate: (OwnerSection) -> Unit = {},
     ) {
         composeRule.setContent {
@@ -148,12 +255,21 @@ class NativeOwnerEmployeesScreenContractTest {
                     employees = employees,
                     employeesLoading = employeesLoading,
                     employeeDetail = employeeDetail,
+                    employeeCreateOpen = employeeCreateOpen,
+                    employeeCreating = employeeCreating,
+                    employeeEditOpen = employeeEditOpen,
+                    employeeUpdating = employeeUpdating,
                     employeesError = employeesError,
                     onBackToMenu = onBackToMenu,
                     onRetry = onRetry,
                     onOpenEmployee = onOpenEmployee,
                     onBackFromDetail = onBackFromDetail,
-                    onCreatePreview = onCreatePreview,
+                    onOpenCreate = onOpenCreate,
+                    onBackFromCreate = onBackFromCreate,
+                    onCreateEmployee = onCreateEmployee,
+                    onOpenEdit = onOpenEdit,
+                    onBackFromEdit = onBackFromEdit,
+                    onUpdateEmployee = onUpdateEmployee,
                     onNavigate = onNavigate,
                 )
             }
@@ -167,5 +283,14 @@ class NativeOwnerEmployeesScreenContractTest {
         statusLabel = "Active",
         role = "Delivery rider",
         phone = "0300",
+    )
+
+    private fun sampleDetail() = NativeOwnerEmployeeDetail(
+        row = sampleEmployee(),
+        referenceSalary = 35_000.0,
+        referenceSalaryLabel = "PKR 35,000.00",
+        salaryPeriod = "monthly",
+        joinDate = "2026-01-15",
+        active = true,
     )
 }

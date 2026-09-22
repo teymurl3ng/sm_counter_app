@@ -93,6 +93,84 @@ class NativeOwnerSuppliersFacadeTest {
         assertEquals("0301", detail.row.phone)
         assertEquals("Farm Gate", detail.row.location)
         assertEquals("Morning pickups", detail.notes)
+        assertTrue(detail.active)
+    }
+
+    @Test
+    fun createSupplierThenListContains() = runBlocking {
+        val accountId = facade.createSupplier(ownerSession, "Owner Create Dairy")
+        val snapshot = facade.loadSuppliers(ownerSession)
+        assertTrue(
+            snapshot.suppliers.any {
+                it.accountId == accountId && it.name == "Owner Create Dairy"
+            },
+        )
+        val created = snapshot.suppliers.first { it.accountId == accountId }
+        assertEquals("Active", created.statusLabel)
+        assertTrue(created.balanceLabel.contains("PKR"))
+    }
+
+    @Test
+    fun updateSupplierRenamesAndSavesProfile() = runBlocking {
+        val accountId = facade.createSupplier(ownerSession, "Owner Edit Dairy")
+        facade.updateSupplier(
+            ownerSession,
+            accountId,
+            "Owner Edit Dairy Updated",
+            VendorProfileInput(
+                phone = "0322",
+                location = "Side Canal",
+                notes = "Afternoon pickups",
+                active = true,
+            ),
+        )
+        val detail = facade.loadDetail(ownerSession, accountId)
+        assertEquals("Owner Edit Dairy Updated", detail.row.name)
+        assertEquals("0322", detail.row.phone)
+        assertEquals("Side Canal", detail.row.location)
+        assertEquals("Afternoon pickups", detail.notes)
+        assertTrue(detail.active)
+        assertEquals("Active", detail.row.statusLabel)
+    }
+
+    @Test
+    fun updateSupplierCanDeactivateViaActiveFlag() = runBlocking {
+        val accountId = facade.createSupplier(ownerSession, "Owner Deactivate Dairy")
+        facade.updateSupplier(
+            ownerSession,
+            accountId,
+            "Owner Deactivate Dairy",
+            VendorProfileInput(active = false),
+        )
+        val detail = facade.loadDetail(ownerSession, accountId)
+        assertEquals(false, detail.active)
+        assertEquals("Inactive", detail.row.statusLabel)
+        val snapshot = facade.loadSuppliers(ownerSession)
+        assertTrue(
+            snapshot.suppliers.any {
+                it.accountId == accountId && it.statusLabel == "Inactive"
+            },
+        )
+    }
+
+    @Test
+    fun createSupplierRejectsNonOwner() = runBlocking {
+        val rejected = runCatching { facade.createSupplier(cashierSession, "Blocked Supplier") }
+        assertTrue(rejected.isFailure)
+    }
+
+    @Test
+    fun updateSupplierRejectsNonOwner() = runBlocking {
+        val accountId = facade.createSupplier(ownerSession, "Owner Gate Dairy")
+        val rejected = runCatching {
+            facade.updateSupplier(
+                cashierSession,
+                accountId,
+                "Blocked Rename",
+                VendorProfileInput(phone = "0000"),
+            )
+        }
+        assertTrue(rejected.isFailure)
     }
 
     @Test

@@ -42,7 +42,7 @@ Permission: facade `requireOwnerMasterData` (`MANAGE_MASTER_DATA` + Owner) then 
 
 ## Explicit preview / deferred
 
-- Edit product / archive-restore write UI — **connected edit + soft archive in Phase 14.8.35**; unarchive remains deferred
+- Edit product / archive-restore write UI — **connected edit + soft archive in Phase 14.8.35**; **unarchive in Phase 14.8.38**
 - Costing, stock on hand, COGS editors
 - Manager / Admin Products shells
 

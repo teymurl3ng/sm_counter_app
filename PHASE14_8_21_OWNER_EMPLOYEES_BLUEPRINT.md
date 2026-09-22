@@ -20,7 +20,7 @@ Owner Employees is a **leadership More deep destination** for Salary-category em
 - Translating `CashierSection` / `OperationsSection` events inside Owner.
 - Treating callback-only “open Employees” intents as hosted-entry coverage.
 - Confusing Employees (Salary accounts / profiles) with **Users & roles** (staff login accounts) — Users & roles stays deferred under “Your account and staff access”.
-- Inventing salary-payment formulas, attendance write UIs, or profile-write UIs beyond existing typed fields already exposed by `EmployeeManagementService` / `EmployeeProfileService`.
+- Inventing salary-payment formulas or attendance write UIs. Profile create/rename/save write depth is owned by **14.8.40**.
 
 Reuse sibling **patterns** from Owner Suppliers (14.8.20) / Owner Customers (14.8.19) nesting under Owner More. Prefer a dedicated `NativeOwnerEmployeesFacade` + Employees destination under Owner More (same nesting model as Suppliers / Customers / Products / Personal security).
 
@@ -85,9 +85,9 @@ This checkpoint owns **Owner Employees** conservatively: employee (Salary accoun
 - Read detail with profile facts where present.
 - Owner chrome + Back → More menu; inventory + Foundation + `qaScreen` (extend `ownermore`).
 
-### Explicit preview / deferred
+### Explicit preview / deferred (superseded write depth)
 
-- Create / rename / deactivate / profile edit write UI
+- Create / rename / deactivate / profile edit write UI — **connected in Phase 14.8.40**
 - Salary payment posting as admin UI
 - Attendance marking / history as Employees admin UI (Ops Attendance remains separate)
 - Users & roles / staff login accounts

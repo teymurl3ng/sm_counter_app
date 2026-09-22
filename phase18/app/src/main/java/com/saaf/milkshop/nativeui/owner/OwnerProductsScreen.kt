@@ -60,7 +60,7 @@ import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import java.util.Locale
 
 /**
- * Owner Products — active catalog list + detail + create/edit/archive under OwnerScaffold.
+ * Owner Products — active/archived catalog list + detail + create/edit/archive/unarchive under OwnerScaffold.
  * Nested from Owner More; never mounts foreign role chrome.
  */
 @Composable
@@ -70,15 +70,18 @@ fun OwnerProductsScreen(
     context: NativeOwnerMoreContext,
     products: List<NativeOwnerProductRow>,
     productsLoading: Boolean,
+    productsShowArchived: Boolean,
     productDetail: NativeOwnerProductDetail?,
     productCreateOpen: Boolean,
     productCreating: Boolean,
     productEditOpen: Boolean,
     productUpdating: Boolean,
     productArchiving: Boolean,
+    productUnarchiving: Boolean,
     productsError: String?,
     onBackToMenu: () -> Unit,
     onRetry: () -> Unit,
+    onShowArchivedChange: (Boolean) -> Unit,
     onOpenProduct: (Long) -> Unit,
     onBackFromDetail: () -> Unit,
     onOpenCreate: () -> Unit,
@@ -88,6 +91,7 @@ fun OwnerProductsScreen(
     onBackFromEdit: () -> Unit,
     onUpdateProduct: (ProductCatalogInput) -> Unit,
     onArchiveProduct: () -> Unit,
+    onUnarchiveProduct: () -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -132,10 +136,12 @@ fun OwnerProductsScreen(
             context = context,
             detail = productDetail,
             archiving = productArchiving,
+            unarchiving = productUnarchiving,
             error = productsError,
             onBack = onBackFromDetail,
             onOpenEdit = onOpenEdit,
             onArchive = onArchiveProduct,
+            onUnarchive = onUnarchiveProduct,
             onNavigate = onNavigate,
             modifier = modifier,
         )
@@ -205,10 +211,33 @@ fun OwnerProductsScreen(
                                 onClick = onBackToMenu,
                                 modifier = Modifier.testTag(NativeUiTags.OwnerProductsBack),
                             ) { Text("Back to More") }
-                            TextButton(
-                                onClick = onOpenCreate,
-                                modifier = Modifier.testTag(NativeUiTags.OwnerProductsCreateOpen),
-                            ) { Text("Add product") }
+                            if (!productsShowArchived) {
+                                TextButton(
+                                    onClick = onOpenCreate,
+                                    modifier = Modifier.testTag(NativeUiTags.OwnerProductsCreateOpen),
+                                ) { Text("Add product") }
+                            }
+                        }
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            FilterChip(
+                                selected = !productsShowArchived,
+                                onClick = { onShowArchivedChange(false) },
+                                enabled = !productsLoading,
+                                label = { Text("Active") },
+                                modifier = Modifier.testTag(NativeUiTags.OwnerProductsFilterActive),
+                            )
+                            FilterChip(
+                                selected = productsShowArchived,
+                                onClick = { onShowArchivedChange(true) },
+                                enabled = !productsLoading,
+                                label = { Text("Archived") },
+                                modifier = Modifier.testTag(NativeUiTags.OwnerProductsFilterArchived),
+                            )
                         }
                         productsError?.let {
                             Text(
@@ -228,7 +257,11 @@ fun OwnerProductsScreen(
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Text(
-                                    "No active products yet.",
+                                    if (productsShowArchived) {
+                                        "No archived products."
+                                    } else {
+                                        "No active products yet."
+                                    },
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -598,19 +631,23 @@ private fun OwnerProductsDetailScreen(
     context: NativeOwnerMoreContext,
     detail: NativeOwnerProductDetail,
     archiving: Boolean,
+    unarchiving: Boolean,
     error: String?,
     onBack: () -> Unit,
     onOpenEdit: () -> Unit,
     onArchive: () -> Unit,
+    onUnarchive: () -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier,
 ) {
     var archiveConfirmOpen by rememberSaveable { mutableStateOf(false) }
-    BackHandler(enabled = !archiving) {
-        if (archiveConfirmOpen) {
-            archiveConfirmOpen = false
-        } else {
-            onBack()
+    var unarchiveConfirmOpen by rememberSaveable { mutableStateOf(false) }
+    val busy = archiving || unarchiving
+    BackHandler(enabled = !busy) {
+        when {
+            archiveConfirmOpen -> archiveConfirmOpen = false
+            unarchiveConfirmOpen -> unarchiveConfirmOpen = false
+            else -> onBack()
         }
     }
     val row = detail.row
@@ -637,7 +674,7 @@ private fun OwnerProductsDetailScreen(
             ) {
                 TextButton(
                     onClick = onBack,
-                    enabled = !archiving,
+                    enabled = !busy,
                     modifier = Modifier.testTag(NativeUiTags.OwnerProductsDetailBack),
                 ) { Text("Back to products") }
                 Text(
@@ -660,25 +697,44 @@ private fun OwnerProductsDetailScreen(
                         modifier = Modifier.testTag(NativeUiTags.OwnerProductsError),
                     )
                 }
-                Button(
-                    onClick = onOpenEdit,
-                    enabled = !archiving,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag(NativeUiTags.OwnerProductsDetailEdit),
-                ) { Text("Edit product") }
-                TextButton(
-                    onClick = { archiveConfirmOpen = true },
-                    enabled = !archiving,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerProductsDetailArchive),
-                ) {
-                    if (archiving) {
-                        CircularProgressIndicator(
-                            Modifier.height(20.dp),
-                            strokeWidth = 2.dp,
-                        )
-                    } else {
-                        Text("Archive product")
+                if (row.archived) {
+                    Button(
+                        onClick = { unarchiveConfirmOpen = true },
+                        enabled = !busy,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerProductsDetailUnarchive),
+                    ) {
+                        if (unarchiving) {
+                            CircularProgressIndicator(
+                                Modifier.height(20.dp),
+                                strokeWidth = 2.dp,
+                            )
+                        } else {
+                            Text("Restore product")
+                        }
+                    }
+                } else {
+                    Button(
+                        onClick = onOpenEdit,
+                        enabled = !busy,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerProductsDetailEdit),
+                    ) { Text("Edit product") }
+                    TextButton(
+                        onClick = { archiveConfirmOpen = true },
+                        enabled = !busy,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerProductsDetailArchive),
+                    ) {
+                        if (archiving) {
+                            CircularProgressIndicator(
+                                Modifier.height(20.dp),
+                                strokeWidth = 2.dp,
+                            )
+                        } else {
+                            Text("Archive product")
+                        }
                     }
                 }
             }
@@ -687,7 +743,7 @@ private fun OwnerProductsDetailScreen(
     if (archiveConfirmOpen) {
         AlertDialog(
             onDismissRequest = {
-                if (!archiving) archiveConfirmOpen = false
+                if (!busy) archiveConfirmOpen = false
             },
             title = { Text("Archive this product?") },
             text = {
@@ -701,15 +757,45 @@ private fun OwnerProductsDetailScreen(
                         archiveConfirmOpen = false
                         onArchive()
                     },
-                    enabled = !archiving,
+                    enabled = !busy,
                     modifier = Modifier.testTag(NativeUiTags.OwnerProductsArchiveConfirm),
                 ) { Text("Archive") }
             },
             dismissButton = {
                 TextButton(
                     onClick = { archiveConfirmOpen = false },
-                    enabled = !archiving,
+                    enabled = !busy,
                     modifier = Modifier.testTag(NativeUiTags.OwnerProductsArchiveCancel),
+                ) { Text("Cancel") }
+            },
+        )
+    }
+    if (unarchiveConfirmOpen) {
+        AlertDialog(
+            onDismissRequest = {
+                if (!busy) unarchiveConfirmOpen = false
+            },
+            title = { Text("Restore this product?") },
+            text = {
+                Text(
+                    "“${row.name}” will return to the active catalog.",
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        unarchiveConfirmOpen = false
+                        onUnarchive()
+                    },
+                    enabled = !busy,
+                    modifier = Modifier.testTag(NativeUiTags.OwnerProductsUnarchiveConfirm),
+                ) { Text("Restore") }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { unarchiveConfirmOpen = false },
+                    enabled = !busy,
+                    modifier = Modifier.testTag(NativeUiTags.OwnerProductsUnarchiveCancel),
                 ) { Text("Cancel") }
             },
         )

@@ -41,7 +41,7 @@ No business logic, schema, credential behavior, bridge contract, or launcher cha
 | Accounts | `view_full_financial` | balances, account ledger, supplier payment shortcut | financial read service and operations command service | 5 |
 | History | `view_operational`; correction action requires `correction` | event list, event detail, correction | operational reads and `HistoryBridgeCommandService` | 6 |
 | Cash close | `cash_count_and_close`; reopen requires `reopen_day` | count, close, reopen, archive | reconciliation read/command services | 7 |
-| Products | `manage_master_data` | create, update, archive | `HybridCommandService`, identity/master-data reads | 8 |
+| Products | `manage_master_data` | create, update, archive, unarchive | `HybridCommandService`, identity/master-data reads | 8 |
 | Customers | `manage_master_data` | create, rename, profile, enable/disable | `HybridCommandService`, identity/master-data reads | 8 |
 | Suppliers | `manage_master_data` | create, rename, profile, enable/disable | `HybridCommandService`, identity/master-data reads | 8 |
 | Employees | `manage_master_data` or `attendance` | employee profile/status and attendance | employee command service and operational reads | 8 |

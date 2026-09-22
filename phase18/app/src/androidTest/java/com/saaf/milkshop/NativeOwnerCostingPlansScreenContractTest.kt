@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.owner.NativeOwnerCostingComponentRow
@@ -16,12 +17,15 @@ import com.saaf.milkshop.application.owner.NativeOwnerCostingPolicyDetail
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPolicyRow
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
 import com.saaf.milkshop.domain.AppRole
+import com.saaf.milkshop.domain.CostingPolicyInput
+import com.saaf.milkshop.domain.CostingPolicyService
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.owner.OwnerCostingPlansScreen
 import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -67,8 +71,8 @@ class NativeOwnerCostingPlansScreenContractTest {
     }
 
     @Test
-    fun detailShowsFactsAndBack() {
-        var back = false
+    fun detailShowsFactsAndSupersedeForActive() {
+        var supersede = false
         setScreen(
             policies = listOf(samplePolicy()),
             policyDetail = NativeOwnerCostingPolicyDetail(
@@ -79,20 +83,39 @@ class NativeOwnerCostingPlansScreenContractTest {
                 components = listOf(
                     NativeOwnerCostingComponentRow(
                         componentCode = "culture",
+                        sourceAmountPaisa = 1_000L,
                         sourceAmountLabel = "PKR 10.00",
                         basisQuantityKg = "1",
                     ),
                 ),
             ),
-            onBackFromDetail = { back = true },
+            onOpenApproveFromDetail = { supersede = true },
         )
         composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansDetail).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansDetailMonth).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansDetailReadOnly)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansDetailSupersede)
             .performScrollTo()
             .assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansDetailBack).performClick()
-        assertTrue(back)
+            .performClick()
+        assertTrue(supersede)
+    }
+
+    @Test
+    fun supersededDetailShowsDeferredEditNotice() {
+        setScreen(
+            policies = listOf(samplePolicy().copy(statusLabel = "Superseded")),
+            policyDetail = NativeOwnerCostingPolicyDetail(
+                row = samplePolicy().copy(statusLabel = "Superseded"),
+                normalCapacityKg = "100",
+                notes = null,
+                approvedAt = "2026-09-01T10:00:00Z",
+                components = emptyList(),
+            ),
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansDetailDeferredEdit)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansDetailSupersede).assertDoesNotExist()
     }
 
     @Test
@@ -107,14 +130,35 @@ class NativeOwnerCostingPlansScreenContractTest {
     }
 
     @Test
-    fun approvePreviewSurfacesNotice() {
-        var preview = false
+    fun approveOpensFormAndSavesTypedInput() {
+        var saved: CostingPolicyInput? = null
         setScreen(
-            policies = listOf(samplePolicy()),
-            onApprovePreview = { preview = true },
+            policies = emptyList(),
+            approveOpen = true,
+            reviewReasons = CostingPolicyService.REVIEW_REASONS.sorted(),
+            componentCodes = listOf(
+                "culture",
+                "packaging",
+                "variable_energy",
+                "direct_labor",
+                CostingPolicyService.COMPONENT_FIXED_OVERHEAD,
+            ),
+            onApprovePolicy = { saved = it },
         )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansApprovePreview).performClick()
-        assertTrue(preview)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansApproveForm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansApproveMonth).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ownerCostingComponentAmount("culture"))
+            .performScrollTo()
+            .performTextInput("10")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansApproveSave)
+            .performScrollTo()
+            .performClick()
+        assertNotNull(saved)
+        assertEquals("2026-09", saved!!.calendarMonth)
+        assertEquals("monthly", saved!!.reviewReason)
+        assertEquals(5, saved!!.components.size)
+        assertEquals(1_000L, saved!!.components.first { it.code == "culture" }.sourceAmountPaisa)
+        assertEquals(null, saved!!.supersedesPolicyId)
     }
 
     @Test
@@ -129,17 +173,43 @@ class NativeOwnerCostingPlansScreenContractTest {
         assertEquals(1, retries)
     }
 
+    @Test
+    fun reauthDialogIsShownWhenRequired() {
+        var cancelled = false
+        setScreen(
+            policies = emptyList(),
+            approveOpen = true,
+            reauthOpen = true,
+            onCancelReauth = { cancelled = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansReauth).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansReauthCancel).performClick()
+        assertTrue(cancelled)
+    }
+
     private fun setScreen(
         policies: List<NativeOwnerCostingPolicyRow>,
         policiesLoading: Boolean = false,
         policyDetail: NativeOwnerCostingPolicyDetail? = null,
         policiesError: String? = null,
         currentMonthSummary: String? = "Current 2026-09: Active · 1000 paisa/kg",
+        approveOpen: Boolean = false,
+        approveSeed: NativeOwnerCostingPolicyDetail? = null,
+        approving: Boolean = false,
+        reauthOpen: Boolean = false,
+        reauthBusy: Boolean = false,
+        reviewReasons: List<String> = emptyList(),
+        componentCodes: List<String> = emptyList(),
         onBackToMenu: () -> Unit = {},
         onRetry: () -> Unit = {},
         onOpenPolicy: (Long) -> Unit = {},
         onBackFromDetail: () -> Unit = {},
-        onApprovePreview: () -> Unit = {},
+        onOpenApprove: () -> Unit = {},
+        onOpenApproveFromDetail: () -> Unit = {},
+        onBackFromApprove: () -> Unit = {},
+        onApprovePolicy: (CostingPolicyInput) -> Unit = {},
+        onSubmitReauth: (CharArray) -> Unit = { it.fill('\u0000') },
+        onCancelReauth: () -> Unit = {},
         onNavigate: (OwnerSection) -> Unit = {},
     ) {
         composeRule.setContent {
@@ -163,11 +233,23 @@ class NativeOwnerCostingPlansScreenContractTest {
                     policyDetail = policyDetail,
                     policiesError = policiesError,
                     currentMonthSummary = currentMonthSummary,
+                    approveOpen = approveOpen,
+                    approveSeed = approveSeed,
+                    approving = approving,
+                    reauthOpen = reauthOpen,
+                    reauthBusy = reauthBusy,
+                    reviewReasons = reviewReasons,
+                    componentCodes = componentCodes,
                     onBackToMenu = onBackToMenu,
                     onRetry = onRetry,
                     onOpenPolicy = onOpenPolicy,
                     onBackFromDetail = onBackFromDetail,
-                    onApprovePreview = onApprovePreview,
+                    onOpenApprove = onOpenApprove,
+                    onOpenApproveFromDetail = onOpenApproveFromDetail,
+                    onBackFromApprove = onBackFromApprove,
+                    onApprovePolicy = onApprovePolicy,
+                    onSubmitReauth = onSubmitReauth,
+                    onCancelReauth = onCancelReauth,
                     onNavigate = onNavigate,
                 )
             }

@@ -23,17 +23,17 @@ Reuse Owner Employees list+detail nesting. Dedicated `NativeOwnerUsersRolesFacad
 - UsersRoles destination under Owner More.
 - List from `UserSecurityService.listUsers` (fields aligned with administration DTO mapping): login, display, role label, status, setupRequired.
 - Read detail: timestamps + employeeAccountId label when linked.
-- Enroll user: explicit preview notice only.
+- Enroll / disable / role-change writes: **connected in Phase 14.8.42**.
 
 ## Explicit preview / deferred
 
-- Enroll / disable / reset credentials / role-change write UIs
+- Credential reset write UI (deferred in 14.8.42 with explicit detail notice)
 - Manager / Admin Users shells
 
 ## Native data boundary
 
-`NativeOwnerUsersRolesFacade`: Owner + `MANAGE_STAFF_USERS`; list/detail from `listUsers`; never bridge JSON; no Room/schema changes.
+`NativeOwnerUsersRolesFacade`: Owner + `MANAGE_STAFF_USERS`; list/detail from `listUsers`; enroll/enable/role-change via typed `UserSecurityService` (see 14.8.42); never bridge JSON; no Room/schema changes.
 
 ## Accept gate
 
-**AUTO-ACCEPTED.** Connected: Users & roles list + read detail under Owner More; writes deferred with explicit preview.
+**AUTO-ACCEPTED.** Connected: Users & roles list + read detail under Owner More; write depth landed in 14.8.42.

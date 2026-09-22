@@ -39,6 +39,8 @@ class NativeOwnerProductsScreenContractTest {
         setScreen(products = listOf(sampleProduct()))
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsRoot).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsList).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsFilterActive).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsFilterArchived).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.ownerProduct(11L)).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
         composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertDoesNotExist()
@@ -51,6 +53,27 @@ class NativeOwnerProductsScreenContractTest {
         setScreen(products = emptyList())
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsEmpty).assertIsDisplayed()
         composeRule.onNodeWithText("No active products yet.").assertIsDisplayed()
+    }
+
+    @Test
+    fun archivedEmptyStateIsHonest() {
+        setScreen(products = emptyList(), productsShowArchived = true)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsEmpty).assertIsDisplayed()
+        composeRule.onNodeWithText("No archived products.").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsCreateOpen).assertDoesNotExist()
+    }
+
+    @Test
+    fun filterChipsRequestActiveAndArchived() {
+        var showArchived: Boolean? = null
+        setScreen(
+            products = listOf(sampleProduct()),
+            onShowArchivedChange = { showArchived = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsFilterArchived).performClick()
+        assertEquals(true, showArchived)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsFilterActive).performClick()
+        assertEquals(false, showArchived)
     }
 
     @Test
@@ -78,6 +101,7 @@ class NativeOwnerProductsScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailName).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailEdit).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailArchive).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailUnarchive).assertDoesNotExist()
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailEdit).performClick()
         assertTrue(editOpened)
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailArchive).performClick()
@@ -85,6 +109,27 @@ class NativeOwnerProductsScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsArchiveCancel).performClick()
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailBack).performClick()
         assertTrue(back)
+    }
+
+    @Test
+    fun archivedDetailShowsUnarchiveOnly() {
+        var unarchived = false
+        setScreen(
+            products = listOf(sampleArchivedProduct()),
+            productsShowArchived = true,
+            productDetail = NativeOwnerProductDetail(sampleArchivedProduct()),
+            onUnarchiveProduct = { unarchived = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetail).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailUnarchive).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailEdit).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailArchive).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailUnarchive).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsUnarchiveConfirm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsUnarchiveCancel).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailUnarchive).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsUnarchiveConfirm).performClick()
+        assertTrue(unarchived)
     }
 
     @Test
@@ -196,7 +241,7 @@ class NativeOwnerProductsScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsEditName)
             .performScrollTo()
             .performTextReplacement("Cream Updated")
-        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsEditUnitLiters).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsEditUnitKg).assertIsSelected()
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsEditRate)
             .performScrollTo()
             .performTextReplacement("525")
@@ -206,7 +251,7 @@ class NativeOwnerProductsScreenContractTest {
             .performClick()
 
         assertEquals("Cream Updated", saved!!.name)
-        assertEquals("Liters", saved!!.unit)
+        assertEquals("Kg", saved!!.unit)
         assertEquals(525.0, saved!!.defaultSaleRate!!, 0.001)
         assertTrue(saved!!.inventoryTracking)
     }
@@ -226,15 +271,18 @@ class NativeOwnerProductsScreenContractTest {
     private fun setScreen(
         products: List<NativeOwnerProductRow>,
         productsLoading: Boolean = false,
+        productsShowArchived: Boolean = false,
         productDetail: NativeOwnerProductDetail? = null,
         productCreateOpen: Boolean = false,
         productCreating: Boolean = false,
         productEditOpen: Boolean = false,
         productUpdating: Boolean = false,
         productArchiving: Boolean = false,
+        productUnarchiving: Boolean = false,
         productsError: String? = null,
         onBackToMenu: () -> Unit = {},
         onRetry: () -> Unit = {},
+        onShowArchivedChange: (Boolean) -> Unit = {},
         onOpenProduct: (Long) -> Unit = {},
         onBackFromDetail: () -> Unit = {},
         onOpenCreate: () -> Unit = {},
@@ -244,6 +292,7 @@ class NativeOwnerProductsScreenContractTest {
         onBackFromEdit: () -> Unit = {},
         onUpdateProduct: (ProductCatalogInput) -> Unit = {},
         onArchiveProduct: () -> Unit = {},
+        onUnarchiveProduct: () -> Unit = {},
         onNavigate: (OwnerSection) -> Unit = {},
     ) {
         composeRule.setContent {
@@ -264,15 +313,18 @@ class NativeOwnerProductsScreenContractTest {
                     ),
                     products = products,
                     productsLoading = productsLoading,
+                    productsShowArchived = productsShowArchived,
                     productDetail = productDetail,
                     productCreateOpen = productCreateOpen,
                     productCreating = productCreating,
                     productEditOpen = productEditOpen,
                     productUpdating = productUpdating,
                     productArchiving = productArchiving,
+                    productUnarchiving = productUnarchiving,
                     productsError = productsError,
                     onBackToMenu = onBackToMenu,
                     onRetry = onRetry,
+                    onShowArchivedChange = onShowArchivedChange,
                     onOpenProduct = onOpenProduct,
                     onBackFromDetail = onBackFromDetail,
                     onOpenCreate = onOpenCreate,
@@ -282,6 +334,7 @@ class NativeOwnerProductsScreenContractTest {
                     onBackFromEdit = onBackFromEdit,
                     onUpdateProduct = onUpdateProduct,
                     onArchiveProduct = onArchiveProduct,
+                    onUnarchiveProduct = onUnarchiveProduct,
                     onNavigate = onNavigate,
                 )
             }
@@ -294,9 +347,23 @@ class NativeOwnerProductsScreenContractTest {
         unit = "Kg",
         defaultSaleRate = 500.0,
         inventoryTracking = true,
+        archived = false,
         rateLabel = "PKR 500.00 / Kg",
         statusLabel = "Active",
         trackingLabel = "Stock tracked",
         notes = "Fresh",
+    )
+
+    private fun sampleArchivedProduct() = NativeOwnerProductRow(
+        productId = 12L,
+        name = "Old Cream",
+        unit = "Kg",
+        defaultSaleRate = 400.0,
+        inventoryTracking = true,
+        archived = true,
+        rateLabel = "PKR 400.00 / Kg",
+        statusLabel = "Archived",
+        trackingLabel = "Stock tracked",
+        notes = null,
     )
 }

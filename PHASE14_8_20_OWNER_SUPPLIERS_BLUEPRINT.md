@@ -58,7 +58,7 @@ This checkpoint owns **Owner Suppliers** conservatively: supplier (vendor) list 
 | `VendorManagementService.list` | Yes — primary list boundary |
 | `VendorProfileService.get` | Yes — detail facts |
 | Balance from management list / existing accountBalances | Yes — display only; do not invent formulas |
-| Create / rename / profile save write UI | Optional — deferred with explicit preview unless already proven simple |
+| Create / rename / profile save write UI | Yes — Phase 14.8.39 via facade |
 | Bridge JSON / `query.masterData` from Compose | **No** |
 | Customers / Employees / Backup under Suppliers | **No** |
 
@@ -70,7 +70,7 @@ This checkpoint owns **Owner Suppliers** conservatively: supplier (vendor) list 
 4. List shows suppliers: name primary; balance + active/inactive secondary from typed fields.
 5. Tap a row → read-only detail: name, balance, profile facts (phone, location, notes, status).
 6. Back from detail → Suppliers list. Back from list → Owner More menu. Hardware Back matches that stack.
-7. Optional **Add supplier** affordance: if write path is deferred, explicit preview notice only (“comes next”); do not invent a fake form.
+7. **Add supplier** opens name-only create form (Phase 14.8.39). Detail **Edit supplier** opens rename + profile form. Leave-guard while dirty.
 8. Load failure shows inline error + Retry. Empty list shows an honest empty state.
 9. Owner nav remains; no Cashier/Ops bottom nav.
 
@@ -83,9 +83,14 @@ This checkpoint owns **Owner Suppliers** conservatively: supplier (vendor) list 
 - Read detail with profile facts where present.
 - Owner chrome + Back → More menu; inventory + Foundation + `qaScreen` (extend `ownermore`).
 
+### Connected write depth (Phase 14.8.39)
+
+- Name-only create via `VendorManagementService.create`
+- Rename + profile save (phone, location, notes, active) via rename then `VendorProfileService.save`
+- Leave-guard on dirty create/edit drafts
+
 ### Explicit preview / deferred
 
-- Create / rename / deactivate / profile edit write UI
 - Purchase posting, vendor payment, milk-receipt workflows as admin UIs
 - Employees / shop settings / backup
 - Manager / Admin Suppliers shells
@@ -95,11 +100,12 @@ This checkpoint owns **Owner Suppliers** conservatively: supplier (vendor) list 
 | Control | Required workflow | Visible result | Native test obligation |
 |---|---|---|---|
 | Suppliers row | Open Suppliers list | Vendor accounts; Owner nav | Destination + tags |
-| Supplier row | Open detail | Read-only supplier facts | Detail tags |
+| Supplier row | Open detail | Supplier facts + Edit | Detail tags |
 | Back (detail) | Return to list | List restored | Back contract |
 | Back (list) | Return to More menu | Menu restored | Back contract |
 | Retry | Reload list | Ready list | Failure recovery |
-| Add supplier (if preview) | Explicit notice | Stay on Suppliers | Notice contract |
+| Add supplier | Open name-only create form | Create via facade | Create contract |
+| Edit supplier | Rename + profile save | Detail refreshed | Edit contract |
 | Foreign chrome | Must not appear | No Cashier/Ops nav | Foundation |
 
 ## Material states
@@ -108,9 +114,9 @@ This checkpoint owns **Owner Suppliers** conservatively: supplier (vendor) list 
 |---|---|
 | Loading | Owner chrome + progress |
 | Ready list | Suppliers; empty copy when none |
-| Detail | Read-only facts |
+| Detail | Facts + Edit supplier |
+| Create / Edit | Forms with leave-guard while dirty |
 | Load failure | Inline error + Retry |
-| Create deferred | Explicit preview notice |
 | Session expired | Leave via existing auth path |
 
 ## Native data boundary
@@ -118,10 +124,10 @@ This checkpoint owns **Owner Suppliers** conservatively: supplier (vendor) list 
 `NativeOwnerSuppliersFacade` (presentation-neutral) + Owner More ViewModel Suppliers destination:
 
 - require authenticated Owner session;
-- require `MANAGE_MASTER_DATA` for supplier read;
+- require `MANAGE_MASTER_DATA` for supplier read/write;
 - list via `VendorManagementService.list()`;
 - detail via management row + `VendorProfileService.get` — balances only as already returned by management list;
-- optional create/rename only via typed services already defined — never bridge JSON from Compose;
+- create via `VendorManagementService.create`; rename + profile via `rename` then `VendorProfileService.save` — never bridge JSON from Compose;
 - do not change Room schema, RolePermissions, Analytics, or balance engines.
 
 ## Visual / consistency notes
@@ -129,19 +135,18 @@ This checkpoint owns **Owner Suppliers** conservatively: supplier (vendor) list 
 - Nested under Owner More like Customers (Back to More; detail → list).
 - Dense list rows: name primary; balance + status secondary.
 - Detail uses labeled facts, not a Receive Milk dock or payment picker.
-- Deferred create is a real control with explicit notice — not a silent no-op.
+- Create/edit mirror Owner Customers write depth (14.8.36 / 14.8.37).
 
 ## Out of scope
 
-- Full people-master write suite unless explicitly connected above
 - Purchase / payment / receive-milk workflow UIs
 - Foreign role Supplier screens
 - Launcher migration away from `HybridActivity`
 
 ## Verification
 
-- Facade tests: Owner gate, list suppliers with balance/status, reject non-Owner.
-- Compose contract: Suppliers list + detail tags; Suppliers row opens destination (not deferred notice).
+- Facade tests: Owner gate, list suppliers with balance/status, create, rename+profile, deactivate via active=false, reject non-Owner.
+- Compose contract: Suppliers list + detail + create/edit tags; Suppliers row opens destination.
 - Inventory rows with real workflow test names (no `workflow_test=-`).
 - `qaScreen -Pqa.screen=ownermore` extended with Suppliers Foundation/contract coverage.
 - Foundation: Owner chrome ✓, foreign nav ✗, Back → More menu, session intact.
@@ -149,4 +154,4 @@ This checkpoint owns **Owner Suppliers** conservatively: supplier (vendor) list 
 
 ## Accept gate
 
-**AUTO-ACCEPTED FOR NATIVE IMPLEMENTATION.** Connected scope: supplier list + read detail under Owner More shell; create/edit deferred with explicit preview unless write path is already proven in-slice.
+**AUTO-ACCEPTED FOR NATIVE IMPLEMENTATION.** Connected scope: supplier list + read detail under Owner More shell; **create + rename/profile write depth in Phase 14.8.39**.

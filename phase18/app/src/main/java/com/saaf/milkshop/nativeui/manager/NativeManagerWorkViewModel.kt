@@ -17,6 +17,12 @@ import kotlinx.coroutines.withContext
 
 enum class NativeManagerWorkDestination {
     Home,
+    RecordSale,
+    RecordPayment,
+    ReceiveMilk,
+    MakeYogurt,
+    RecordSpoilage,
+    Deliveries,
     RecordExpense,
     PaySupplier,
 }

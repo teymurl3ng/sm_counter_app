@@ -1,4 +1,4 @@
-# Phase 14.8.45 — Manager shell blueprint (M0 + M1 + M2)
+# Phase 14.8.45 — Manager shell blueprint (M0 + M1 + M2 + M3)
 
 Status: **AUTO-ACCEPTED FOR NATIVE IMPLEMENTATION**
 
@@ -10,7 +10,7 @@ Authority: `PHASE14_8_15A_SHELL_VS_CONTENT.md` and `.cursor/rules/native-shell-v
 
 Manager shell is a **leadership role chrome**, not a hosted Owner / Cashier / Ops screen:
 
-1. **Role-neutral content** — Expense / Pay supplier / Cash close / Records list-detail / Products·Customers·Suppliers·Employees bodies stay free of `ManagerSection` / foreign bottom nav (via `HostedScaffold`).
+1. **Role-neutral content** — Expense / Pay supplier / Cash close / Sale / Collect / Receive milk / Make yogurt / Spoilage / Deliveries / Records list-detail / Products·Customers·Suppliers·Employees bodies stay free of `ManagerSection` / foreign bottom nav (via `HostedScaffold` or Manager wrappers).
 2. **Role-owned shell** — `ManagerScaffold` + Manager bottom nav + Manager Back path; session stays Manager-authenticated.
 3. **Foundation proof** — Manager chrome present; Cashier / Owner / Ops / Admin chrome absent; Back on Work stays on Manager Work with session intact; hosted entries Back → Manager Work / Close / More menu.
 
@@ -31,13 +31,13 @@ Manager shell is a **leadership role chrome**, not a hosted Owner / Cashier / Op
 
 | Surface | Status |
 | --- | --- |
-| Manager Work home | **Connected** — Owner Work launcher density under Manager chrome; attention / all-clear strip; Expense + Pay supplier shortcuts; Cash close → Close tab; deliveries gaps display (not hosted) |
+| Manager Work home | **Connected** — Owner Work launcher density under Manager chrome; attention / all-clear strip; Expense + Pay supplier shortcuts; Cash close → Close tab |
 | Manager Close tab | **Connected** — `ManagerCashCloseEntryScreen` hosts role-neutral `CashCloseEntryContent` with `allowReopen=false` + Owner-only reopen notice |
 | Manager Expense entry | **Connected** — `ManagerExpenseEntryScreen` + shared `ExpenseEntryContent` |
 | Manager Pay supplier entry | **Connected** — `ManagerPaySupplierEntryScreen` + shared `VendorPaymentEntryContent` |
 | Facades | `NativeManagerWorkFacade` (MANAGER role); Expense / VendorPayment / CashClose remain permission-gated |
 
-## M2 scope (this checkpoint) — Records + bounded More
+## M2 scope (complete) — Records + bounded More
 
 | Surface | Status |
 | --- | --- |
@@ -47,13 +47,23 @@ Manager shell is a **leadership role chrome**, not a hosted Owner / Cashier / Op
 | Personal security | **Connected** — Manager-owned security screen (Cashier/Owner pattern); reuses More facade Quick unlock |
 | Omitted (no stubs) | Users & roles, Security history, Costing & plans, Shop settings, Backup & restore, Pay salary, Reopen |
 
-## M2 deferred
+## M3 scope (this checkpoint) — Sale / Collect / Ops Work hosts
+
+| Surface | Status |
+| --- | --- |
+| Manager Sale entry | **Connected** — `ManagerSaleEntryScreen` + shared `SaleEntryContent` |
+| Manager Collect / Record payment | **Connected** — `ManagerCollectionEntryScreen` + shared `CollectionEntryContent` |
+| Manager Receive milk | **Connected** — `ManagerReceiveMilkEntryScreen` + shared `ReceiveMilkReadyContent` |
+| Manager Make yogurt | **Connected** — `ManagerMakeYogurtEntryScreen` + shared `MakeYogurtReadyContent` |
+| Manager Record spoilage | **Connected** — `ManagerRecordSpoilageEntryScreen` + shared `RecordSpoilageReadyContent` |
+| Manager Deliveries | **Connected** — `ManagerDeliveriesEntryScreen` + shared `DeliveriesReadyContent` |
+| Work home tiles | **Connected** — Record sale / payment / Receive milk / Expense / Make yogurt / Spoilage / Deliveries / Pay supplier / Cash close |
+
+## Still deferred
 
 - Corrections write UI on Records detail (inspect-only notice remains)
-- Sale / Collect / Record payment hosting
-- Receive milk / Make yogurt / Spoilage / Deliveries entry wrappers
 - Approval queue write UI
-- Reopen remains Owner-only by product IA
+- Pay salary / reopen remain Owner-only by product IA
 
 ## Authority
 
@@ -63,7 +73,7 @@ Manager shell is a **leadership role chrome**, not a hosted Owner / Cashier / Op
 
 ## Gate
 
-- Foundation: M0/M1 + `managerRecords*`, `managerMore*`, `managerProducts*`, `managerCustomers*`, `managerSuppliers*`, `managerEmployees*`
+- Foundation: M0–M3 hosts incl. `managerSale*`, `managerCollection*`, `managerReceiveMilk*`, `managerMakeYogurt*`, `managerRecordSpoilage*`, `managerDeliveries*`, plus M1/M2 suite
 - Contract: `NativeManagerShellScreenContractTest`, `NativeManagerWorkScreenContractTest`
 - `qaScreen -Pqa.screen=managershell` PASS
 - `assembleDebug` + install + launch `open_manager=true`

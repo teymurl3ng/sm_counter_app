@@ -129,6 +129,21 @@ class NativeOwnerUsersRolesFacadeTest {
     }
 
     @Test
+    fun beginCredentialResetReturnsPendingEnrollment() = runBlocking {
+        val snapshot = facade.loadUsers(ownerSession)
+        val cashier = snapshot.users.first { it.loginName == "users.roles.cashier" }
+        facade.reauthenticate(ownerSession, OWNER_PASSPHRASE.toCharArray())
+        val pending = facade.beginCredentialReset(ownerSession, cashier.userId)
+        assertTrue(pending.enrollmentToken.isNotBlank())
+        assertEquals(cashier.loginName, pending.loginName)
+        val secret = NEW_CASHIER_PASSPHRASE.toCharArray()
+        val completed = facade.completeEnroll(pending.enrollmentToken, secret)
+        assertTrue(secret.all { it == '\u0000' })
+        assertEquals(cashier.loginName, completed.loginName)
+        assertFalse(completed.setupRequired)
+    }
+
+    @Test
     fun setEnabledRejectsDisablingSelf() = runBlocking {
         val owner = facade.loadUsers(ownerSession).users.first { it.loginName == "owner.users.roles" }
         facade.reauthenticate(ownerSession, OWNER_PASSPHRASE.toCharArray())

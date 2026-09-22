@@ -868,7 +868,7 @@ private fun NativeFoundationPreview(
         showingAdmin,
     ) {
         if (!showingCashier && !showingOwner && !showingManager) closeCashierShell()
-        if (!showingOperator && !showingOwner) {
+        if (!showingOperator && !showingOwner && !showingManager) {
             operationsWorkViewModel.close()
             receiveMilkViewModel.close()
             makeYogurtViewModel.close()
@@ -991,12 +991,24 @@ private fun NativeFoundationPreview(
                     onManagerSectionChange = { managerSection = it },
                     managerWorkState = managerWorkState,
                     managerWorkViewModel = managerWorkViewModel,
+                    saleState = saleState,
+                    saleViewModel = saleViewModel,
+                    collectionState = collectionState,
+                    collectionViewModel = collectionViewModel,
                     expenseState = expenseState,
                     expenseViewModel = expenseViewModel,
                     vendorPaymentState = vendorPaymentState,
                     vendorPaymentViewModel = vendorPaymentViewModel,
                     cashCloseState = cashCloseState,
                     cashCloseViewModel = cashCloseViewModel,
+                    receiveMilkState = receiveMilkState,
+                    receiveMilkViewModel = receiveMilkViewModel,
+                    makeYogurtState = makeYogurtState,
+                    makeYogurtViewModel = makeYogurtViewModel,
+                    recordSpoilageState = recordSpoilageState,
+                    recordSpoilageViewModel = recordSpoilageViewModel,
+                    deliveriesState = deliveriesState,
+                    deliveriesViewModel = deliveriesViewModel,
                     ownerRecordsState = ownerRecordsState,
                     ownerRecordsViewModel = ownerRecordsViewModel,
                     ownerMoreState = ownerMoreState,

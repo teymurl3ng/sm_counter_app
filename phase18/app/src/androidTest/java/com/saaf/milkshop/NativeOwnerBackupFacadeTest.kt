@@ -182,6 +182,47 @@ class NativeOwnerBackupFacadeTest {
         }
     }
 
+    @Test
+    fun cloudRefreshInspectRestoreWithFakeGateway() = runBlocking {
+        val recovery = BACKUP_PASSPHRASE.toCharArray()
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val manager = BackupManager(context)
+        try {
+            facade.connectDrive(ownerSession, recovery.copyOf(), allowMetered = false)
+            gateway.remotePayloadProvider = {
+                kotlinx.coroutines.runBlocking { manager.buildCompleteSnapshotBytes(database) }
+            }
+            val vaultId = settings.read()!!.vault.vaultId
+            gateway.seedRemoteSnapshot(
+                remoteFileId = "fake-remote-restore",
+                vaultId = vaultId,
+                sizeBytes = 1L,
+            )
+            val refreshed = facade.refreshCloudSnapshots(ownerSession)
+            assertEquals(1, refreshed.remoteSnapshots.size)
+            assertEquals("fake-remote-restore", refreshed.remoteSnapshots.first().remoteFileId)
+
+            val inspection = facade.inspectCloudBackup(
+                ownerSession,
+                "fake-remote-restore",
+                recoveryPassphrase = null,
+            )
+            assertTrue(inspection.containsSecurityState)
+            assertTrue(inspection.restoreTicket.isNotBlank())
+
+            val result = facade.confirmCloudRestore(
+                ownerSession,
+                inspection.restoreTicket,
+                confirmRestore = true,
+            )
+            assertTrue(result.restored)
+            assertTrue(result.sessionsInvalidated)
+            assertFalse(settings.read()!!.enabled)
+        } finally {
+            recovery.fill('\u0000')
+        }
+    }
+
     private class TestProtector : CloudKeyProtector {
         override fun wrap(plaintext: ByteArray, authenticatedData: ByteArray) = WrappedCiphertext(
             nonceBase64 = Base64.getEncoder().encodeToString(ByteArray(12)),

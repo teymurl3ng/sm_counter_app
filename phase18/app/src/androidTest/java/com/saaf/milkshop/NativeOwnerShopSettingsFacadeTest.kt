@@ -149,6 +149,51 @@ class NativeOwnerShopSettingsFacadeTest {
         assertTrue(rejected.isFailure)
     }
 
+    @Test
+    fun recordOpeningAndCorrectOpeningRequireRecentAuth() = runBlocking {
+        facade.saveIdentity(
+            ownerSession,
+            StoreIdentityInput(
+                storeName = "Opening Shop",
+                phone = "03001112222",
+                address = "Opening Street",
+            ),
+        )
+        val ready = facade.load(ownerSession)
+        assertTrue(ready.hasStoreIdentity)
+        assertTrue(ready.canRecordOpening)
+        val product = ready.openingProducts.first()
+        facade.reauthenticate(ownerSession, OWNER_PASSPHRASE.toCharArray())
+        facade.recordOpening(
+            ownerSession,
+            com.saaf.milkshop.domain.OpeningStateInput(
+                openingDate = "2026-01-15",
+                inventoryBalances = listOf(
+                    com.saaf.milkshop.domain.OpeningInventoryBalance(product.productId, 12.5),
+                ),
+                notes = "seed opening",
+            ),
+        )
+        val recorded = facade.load(ownerSession)
+        assertTrue(recorded.openingRecorded)
+        assertFalse(recorded.canRecordOpening)
+        assertEquals("2026-01-15", recorded.openingDate)
+        facade.reauthenticate(ownerSession, OWNER_PASSPHRASE.toCharArray())
+        facade.correctOpening(
+            ownerSession,
+            com.saaf.milkshop.domain.OpeningStateInput(
+                openingDate = "2026-01-16",
+                inventoryBalances = listOf(
+                    com.saaf.milkshop.domain.OpeningInventoryBalance(product.productId, 8.0),
+                ),
+                notes = "corrected",
+            ),
+        )
+        val corrected = facade.load(ownerSession)
+        assertEquals("2026-01-16", corrected.openingDate)
+        assertEquals("corrected", corrected.openingNotes)
+    }
+
     companion object {
         private const val OWNER_PASSPHRASE = "owner shop settings passphrase 2026!!"
         private const val CASHIER_PASSPHRASE = "shop settings cashier passphrase 2026!!"

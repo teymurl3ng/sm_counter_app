@@ -96,6 +96,7 @@ fun OwnerUsersRolesScreen(
     onRequestSetEnabled: (Boolean) -> Unit,
     onConfirmSetEnabled: () -> Unit,
     onCancelSetEnabled: () -> Unit,
+    onBeginCredentialReset: () -> Unit = {},
     onSubmitReauth: (CharArray) -> Unit,
     onCancelReauth: () -> Unit,
     hostedScaffold: HostedScaffold,
@@ -174,6 +175,7 @@ fun OwnerUsersRolesScreen(
                 onRequestSetEnabled = onRequestSetEnabled,
                 onConfirmSetEnabled = onConfirmSetEnabled,
                 onCancelSetEnabled = onCancelSetEnabled,
+                onBeginCredentialReset = onBeginCredentialReset,
                 hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
@@ -308,6 +310,7 @@ private fun OwnerUsersRolesDetailScreen(
     onRequestSetEnabled: (Boolean) -> Unit,
     onConfirmSetEnabled: () -> Unit,
     onCancelSetEnabled: () -> Unit,
+    onBeginCredentialReset: () -> Unit = {},
     hostedScaffold: HostedScaffold,
     modifier: Modifier,
 ) {
@@ -386,12 +389,18 @@ private fun OwnerUsersRolesDetailScreen(
                             .testTag(NativeUiTags.OwnerUsersRolesDetailEnable),
                     ) { Text(if (enableBusy) "Working…" else "Enable user") }
                 }
+                Button(
+                    onClick = onBeginCredentialReset,
+                    enabled = !enableBusy,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(NativeUiTags.OwnerUsersRolesCredentialReset),
+                ) { Text("Reset credentials") }
                 Text(
-                    "Credential reset for this login comes next. " +
+                    "Creates a one-time setup token so this staff login can choose a new passphrase. " +
                         "This is staff login access, not Employees salary accounts.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesCredentialResetDeferred),
                 )
             }
         }

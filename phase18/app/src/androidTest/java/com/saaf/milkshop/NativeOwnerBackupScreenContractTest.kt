@@ -117,6 +117,9 @@ class NativeOwnerBackupScreenContractTest {
             .performScrollTo()
             .performClick()
         assertTrue(disconnectRequested)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupCloudRemotes)
+            .performScrollTo()
+            .assertIsDisplayed()
     }
 
     @Test

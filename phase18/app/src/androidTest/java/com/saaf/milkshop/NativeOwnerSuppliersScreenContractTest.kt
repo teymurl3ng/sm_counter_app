@@ -20,6 +20,7 @@ import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.domain.VendorProfileInput
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.owner.OwnerScaffold
 import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.owner.OwnerSuppliersScreen
 import com.saaf.milkshop.nativeui.theme.SaafTheme
@@ -253,13 +254,15 @@ class NativeOwnerSuppliersScreenContractTest {
                     onOpenEdit = onOpenEdit,
                     onBackFromEdit = onBackFromEdit,
                     onUpdateSupplier = onUpdateSupplier,
-                    hostedScaffold = { snackbar, mod, _, content ->
-                    androidx.compose.material3.Scaffold(
-                        modifier = mod,
-                        snackbarHost = { androidx.compose.material3.SnackbarHost(snackbar) },
-                        content = content,
-                    )
-                },
+                    hostedScaffold = { snackbar, mod, wrapNav, content ->
+                        OwnerScaffold(
+                            snackbarHostState = snackbar,
+                            section = OwnerSection.More,
+                            onNavigate = { section -> wrapNav { onNavigate(section) } },
+                            modifier = mod,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

@@ -21,6 +21,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
@@ -93,9 +94,15 @@ fun OwnerBackupScreen(
     onCancelDisconnect: () -> Unit,
     onSubmitReauth: (CharArray) -> Unit,
     onCancelReauth: () -> Unit,
+    onOpenCloud: () -> Unit = {},
+    onBackFromCloud: () -> Unit = {},
+    onRefreshCloud: () -> Unit = {},
+    onInspectCloud: (String, CharArray?) -> Unit = { _, _ -> },
+    onConfirmCloudRestore: (Boolean) -> Unit = {},
     hostedScaffold: HostedScaffold,
     backToHubLabel: String = "Back to More",
     localExportOnly: Boolean = false,
+    cloudOpen: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val androidContext = LocalContext.current
@@ -139,6 +146,21 @@ fun OwnerBackupScreen(
             hostedScaffold = hostedScaffold,
             modifier = modifier,
         )
+        cloudOpen && !localExportOnly -> OwnerBackupCloudScreen(
+            snackbarHostState = snackbarHostState,
+            identity = identity,
+            context = context,
+            snapshot = snapshot,
+            busy = busy,
+            error = error,
+            inspection = inspection,
+            onBack = onBackFromCloud,
+            onRefresh = onRefreshCloud,
+            onInspect = onInspectCloud,
+            onConfirmRestore = onConfirmCloudRestore,
+            hostedScaffold = hostedScaffold,
+            modifier = modifier,
+        )
         connectOpen && !localExportOnly -> OwnerBackupConnectScreen(
             snackbarHostState = snackbarHostState,
             identity = identity,
@@ -164,6 +186,7 @@ fun OwnerBackupScreen(
             onOpenExport = onOpenExport,
             onOpenRestore = onOpenRestore,
             onOpenConnect = onOpenConnect,
+            onOpenCloud = onOpenCloud,
             onSetDriveEnabled = onSetDriveEnabled,
             onRunDriveNow = onRunDriveNow,
             onRequestDisconnect = onRequestDisconnect,
@@ -192,6 +215,7 @@ private fun OwnerBackupStatusScreen(
     onOpenExport: () -> Unit,
     onOpenRestore: () -> Unit,
     onOpenConnect: () -> Unit,
+    onOpenCloud: () -> Unit = {},
     onSetDriveEnabled: (Boolean) -> Unit,
     onRunDriveNow: () -> Unit,
     onRequestDisconnect: () -> Unit,
@@ -406,6 +430,13 @@ private fun OwnerBackupStatusScreen(
                                         enabled = !busy && snapshot.cloudActionsAvailable,
                                         modifier = Modifier.testTag(NativeUiTags.OwnerBackupDisconnect),
                                     ) { Text("Disconnect Drive") }
+                                    Button(
+                                        onClick = onOpenCloud,
+                                        enabled = !busy && snapshot.cloudActionsAvailable,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .testTag(NativeUiTags.OwnerBackupCloudRemotes),
+                                    ) { Text("Cloud recovery points") }
                                 }
                             }
                         }
@@ -994,6 +1025,202 @@ private fun OwnerBackupFact(label: String, value: String) {
         )
         Text(value, style = MaterialTheme.typography.bodyLarge)
     }
+}
+
+@Composable
+private fun OwnerBackupCloudScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    context: NativeOwnerMoreContext,
+    snapshot: NativeOwnerBackupSnapshot?,
+    busy: Boolean,
+    error: String?,
+    inspection: NativeOwnerBackupInspection?,
+    onBack: () -> Unit,
+    onRefresh: () -> Unit,
+    onInspect: (String, CharArray?) -> Unit,
+    onConfirmRestore: (Boolean) -> Unit,
+    hostedScaffold: HostedScaffold,
+    modifier: Modifier,
+) {
+    val leaveGuard = rememberEntryLeaveGuard()
+    var selectedRemoteId by rememberSaveable { mutableStateOf<String?>(null) }
+    var recoveryPassphrase by rememberSaveable { mutableStateOf("") }
+    var confirmed by rememberSaveable { mutableStateOf(false) }
+    var draftTouched by rememberSaveable { mutableStateOf(false) }
+    val remotes = snapshot?.remoteSnapshots.orEmpty()
+    val needsRecovery = error?.contains("recovery passphrase", ignoreCase = true) == true ||
+        error?.contains("key is unavailable", ignoreCase = true) == true ||
+        error?.contains("key_unavailable", ignoreCase = true) == true
+    val dirty = draftTouched && !busy && (recoveryPassphrase.isNotEmpty() || confirmed)
+
+    LaunchedEffect(dirty) {
+        if (dirty) leaveGuard.markDirty() else leaveGuard.clear()
+    }
+
+    fun requestLeave(action: () -> Unit) {
+        if (busy) return
+        leaveGuard.requestLeave(action)
+    }
+
+    BackHandler { requestLeave(onBack) }
+
+    Box(modifier.fillMaxSize()) {
+        hostedScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
+            { action -> requestLeave(action) },
+        ) { padding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .testTag(NativeUiTags.OwnerBackupCloudForm),
+            ) {
+                CashierScreenHeader(
+                    title = "Cloud recovery",
+                    displayName = context.shopName,
+                    roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                    businessDate = context.businessDate,
+                    postingOpen = context.postingOpen,
+                )
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .imePadding()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    TextButton(
+                        onClick = { requestLeave(onBack) },
+                        enabled = !busy,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerBackupCloudBack),
+                    ) { Text("Back to Backup") }
+                    error?.let {
+                        Text(
+                            it,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.testTag(NativeUiTags.OwnerBackupError),
+                        )
+                    }
+                    Button(
+                        onClick = onRefresh,
+                        enabled = !busy,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerBackupCloudRefresh),
+                    ) { Text(if (busy) "Working…" else "Refresh Drive list") }
+                    if (remotes.isEmpty()) {
+                        Text(
+                            "No remote recovery points listed yet. Refresh after Drive has uploaded a vault snapshot.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    } else {
+                        remotes.forEach { remote ->
+                            Column(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .testTag(NativeUiTags.ownerBackupCloudRemote(remote.remoteFileId)),
+                                verticalArrangement = Arrangement.spacedBy(4.dp),
+                            ) {
+                                Text(remote.name, fontWeight = FontWeight.SemiBold)
+                                Text(
+                                    remote.createdAt,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                Button(
+                                    onClick = {
+                                        selectedRemoteId = remote.remoteFileId
+                                        draftTouched = true
+                                        onInspect(remote.remoteFileId, null)
+                                    },
+                                    enabled = !busy,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .testTag(NativeUiTags.OwnerBackupCloudInspect),
+                                ) { Text("Inspect") }
+                            }
+                            HorizontalDivider()
+                        }
+                    }
+                    if (needsRecovery || selectedRemoteId != null) {
+                        Text(
+                            "If the local vault key is unavailable, enter the Drive recovery passphrase.",
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        OutlinedTextField(
+                            value = recoveryPassphrase,
+                            onValueChange = {
+                                recoveryPassphrase = it
+                                draftTouched = true
+                            },
+                            label = { Text("Recovery passphrase") },
+                            visualTransformation = PasswordVisualTransformation(),
+                            enabled = !busy,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag(NativeUiTags.OwnerBackupCloudRecoveryPassphrase),
+                        )
+                        Button(
+                            onClick = {
+                                val remoteId = selectedRemoteId ?: return@Button
+                                onInspect(remoteId, recoveryPassphrase.toCharArray())
+                                recoveryPassphrase = ""
+                            },
+                            enabled = !busy && selectedRemoteId != null && recoveryPassphrase.isNotEmpty(),
+                            modifier = Modifier.fillMaxWidth(),
+                        ) { Text("Inspect with recovery passphrase") }
+                    }
+                    inspection?.let { inspected ->
+                        Column(
+                            Modifier
+                                .fillMaxWidth()
+                                .testTag(NativeUiTags.OwnerBackupRestoreInspection),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            OwnerBackupFact("File", inspected.fileName)
+                            OwnerBackupFact("Created", inspected.createdAt)
+                            OwnerBackupFact("Format", inspected.formatVersion.toString())
+                            OwnerBackupFact(
+                                "Security state",
+                                if (inspected.containsSecurityState) "Included" else "Missing",
+                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(
+                                    checked = confirmed,
+                                    onCheckedChange = {
+                                        confirmed = it
+                                        draftTouched = true
+                                    },
+                                    enabled = !busy,
+                                    modifier = Modifier.testTag(NativeUiTags.OwnerBackupCloudConfirmCheck),
+                                )
+                                Text("I understand this replaces the current installation")
+                            }
+                            Button(
+                                onClick = { onConfirmRestore(confirmed) },
+                                enabled = !busy && confirmed,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag(NativeUiTags.OwnerBackupCloudConfirmRestore),
+                            ) { Text(if (busy) "Restoring…" else "Restore from Drive") }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    OwnerBackupDiscardDialog(
+        leaveGuard = leaveGuard,
+        title = "Discard cloud restore draft?",
+        body = "Recovery passphrase and confirmations on this screen will be cleared.",
+        discardTag = NativeUiTags.OwnerBackupCloudDiscard,
+        keepTag = NativeUiTags.OwnerBackupCloudKeep,
+    )
 }
 
 @Composable

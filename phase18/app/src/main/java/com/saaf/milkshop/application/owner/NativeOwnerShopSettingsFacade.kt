@@ -7,6 +7,8 @@ import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.BusinessSettings
 import com.saaf.milkshop.domain.BusinessSettingsService
 import com.saaf.milkshop.domain.ExpenseCategoryManagementService
+import com.saaf.milkshop.domain.OpeningStateInput
+import com.saaf.milkshop.domain.OpeningStateService
 import com.saaf.milkshop.domain.StoreIdentityInput
 import com.saaf.milkshop.domain.StoreIdentityService
 import com.saaf.milkshop.domain.UserSecurityService
@@ -21,11 +23,26 @@ data class NativeOwnerExpenseCategoryRow(
     val active: Boolean,
 )
 
+data class NativeOwnerOpeningProductRow(
+    val productId: Long,
+    val name: String,
+    val unitLabel: String,
+    val quantity: Double?,
+)
+
+data class NativeOwnerOpeningAccountRow(
+    val accountId: Long,
+    val name: String,
+    val kindLabel: String,
+    val balance: Double?,
+)
+
 data class NativeOwnerShopSettingsSnapshot(
     val shopName: String,
     val phone: String?,
     val address: String?,
     val currencyCode: String,
+    val hasStoreIdentity: Boolean,
     val vendorMilkRateLabel: String,
     val vendorDeliveryFeeLabel: String,
     val tsStandardLabel: String,
@@ -38,15 +55,22 @@ data class NativeOwnerShopSettingsSnapshot(
     val retailRateMilk: Double,
     val retailRateYogurt: Double,
     val defaultDeliverySurcharge: Double,
+    val openingRecorded: Boolean,
+    val canRecordOpening: Boolean,
+    val openingDate: String?,
     val openingDateLabel: String,
     val openingNotes: String?,
+    val openingInventoryCount: Int,
+    val openingAccountCount: Int,
+    val openingProducts: List<NativeOwnerOpeningProductRow>,
+    val openingAccounts: List<NativeOwnerOpeningAccountRow>,
     val expenseCategories: List<NativeOwnerExpenseCategoryRow>,
 )
 
 /**
  * Owner Shop settings boundary: read store identity, rates, opening state, and
- * expense categories; typed writes for identity, rates, and expense categories.
- * Does not invent rates, call bridge JSON, or implement opening record/correct.
+ * expense categories; typed writes for identity, rates, expense categories, and
+ * opening record/correct after recent full passphrase authentication.
  */
 class NativeOwnerShopSettingsFacade(
     private val database: MilkShopDatabase,
@@ -56,17 +80,87 @@ class NativeOwnerShopSettingsFacade(
     private val businessSettings: BusinessSettingsService = BusinessSettingsService(database),
     private val expenseCategories: ExpenseCategoryManagementService =
         ExpenseCategoryManagementService(database),
+    private val openingState: OpeningStateService = OpeningStateService(database),
 ) {
     suspend fun load(sessionHandle: String): NativeOwnerShopSettingsSnapshot {
         requireOwnerBusinessSettings(sessionHandle)
         val settings = reads.businessSettings(sessionHandle)
         val rates = businessSettings.get()
         val store = settings.store
+        val opening = settings.openingState
+        val hasStoreIdentity = store != null && store.storeName.isNotBlank()
+        val openingRecorded = opening != null
+        val eventCount = database.eventDao().count()
+        val canRecordOpening = hasStoreIdentity && !openingRecorded && eventCount == 0
+
+        val productIds = opening?.inventoryBalances?.map { it.productId }?.toSet().orEmpty()
+        val accountIds = opening?.accountBalances?.map { it.accountId }?.toSet().orEmpty()
+        val inventoryByProduct = opening?.inventoryBalances
+            ?.associate { it.productId to (it.quantity.toDoubleOrNull() ?: 0.0) }
+            .orEmpty()
+        val balanceByAccount = opening?.accountBalances
+            ?.associate {
+                it.accountId to BigDecimal.valueOf(it.balancePaisa).movePointLeft(2).toDouble()
+            }
+            .orEmpty()
+
+        val master = reads.masterData(sessionHandle)
+        val references = reads.transactionReferences(sessionHandle)
+        val openingProducts = master.products
+            .filter { product ->
+                product.inventoryTracking && (!product.archived || product.productId in productIds)
+            }
+            .map { product ->
+                NativeOwnerOpeningProductRow(
+                    productId = product.productId,
+                    name = product.name,
+                    unitLabel = product.unit,
+                    quantity = inventoryByProduct[product.productId],
+                )
+            }
+        val openingAccounts = buildList {
+            references.paymentAccounts.forEach { account ->
+                add(
+                    NativeOwnerOpeningAccountRow(
+                        accountId = account.accountId,
+                        name = account.name,
+                        kindLabel = "Cash or bank",
+                        balance = balanceByAccount[account.accountId],
+                    ),
+                )
+            }
+            master.customers
+                .filter { it.active || it.accountId in accountIds }
+                .forEach { account ->
+                    add(
+                        NativeOwnerOpeningAccountRow(
+                            accountId = account.accountId,
+                            name = account.name,
+                            kindLabel = "Customer owes shop",
+                            balance = balanceByAccount[account.accountId],
+                        ),
+                    )
+                }
+            master.vendors
+                .filter { it.active || it.accountId in accountIds }
+                .forEach { account ->
+                    add(
+                        NativeOwnerOpeningAccountRow(
+                            accountId = account.accountId,
+                            name = account.name,
+                            kindLabel = "Shop owes supplier",
+                            balance = balanceByAccount[account.accountId],
+                        ),
+                    )
+                }
+        }
+
         return NativeOwnerShopSettingsSnapshot(
             shopName = store?.storeName?.takeIf { it.isNotBlank() } ?: "Saaf Milk",
             phone = store?.phone,
             address = store?.address,
             currencyCode = store?.currencyCode?.takeIf { it.isNotBlank() } ?: "PKR",
+            hasStoreIdentity = hasStoreIdentity,
             vendorMilkRateLabel = formatPaisa(settings.vendorMilkRatePaisaPerUnit),
             vendorDeliveryFeeLabel = formatPaisa(settings.vendorDeliveryFeePaisaPerUnit),
             tsStandardLabel = "${settings.tsStandardPercent}%",
@@ -79,9 +173,15 @@ class NativeOwnerShopSettingsFacade(
             retailRateMilk = rates.retailRateMilk,
             retailRateYogurt = rates.retailRateYogurt,
             defaultDeliverySurcharge = rates.defaultDeliverySurcharge,
-            openingDateLabel = settings.openingState?.openingDate
-                ?: "No opening state recorded",
-            openingNotes = settings.openingState?.notes,
+            openingRecorded = openingRecorded,
+            canRecordOpening = canRecordOpening,
+            openingDate = opening?.openingDate,
+            openingDateLabel = opening?.openingDate ?: "No opening state recorded",
+            openingNotes = opening?.notes,
+            openingInventoryCount = opening?.inventoryBalances?.size ?: 0,
+            openingAccountCount = opening?.accountBalances?.size ?: 0,
+            openingProducts = openingProducts,
+            openingAccounts = openingAccounts,
             expenseCategories = settings.expenseCategories.map { category ->
                 NativeOwnerExpenseCategoryRow(
                     accountId = category.accountId,
@@ -142,11 +242,54 @@ class NativeOwnerShopSettingsFacade(
         expenseCategories.setArchived(accountId, archived)
     }
 
-    private suspend fun requireOwnerBusinessSettings(sessionHandle: String) {
+    suspend fun recordOpening(
+        sessionHandle: String,
+        input: OpeningStateInput,
+    ) {
+        requireOwnerBusinessSettings(sessionHandle, recent = true)
+        if (database.openingStateDao().initialCount() != 0) {
+            error("Opening balances have already been recorded")
+        }
+        if (database.eventDao().count() != 0) {
+            error("Opening balances can only be recorded before the first business activity")
+        }
+        openingState.record(input)
+    }
+
+    suspend fun correctOpening(
+        sessionHandle: String,
+        input: OpeningStateInput,
+    ) {
+        requireOwnerBusinessSettings(sessionHandle, recent = true)
+        if (openingState.current() == null) {
+            error("Opening balances have not been recorded")
+        }
+        openingState.correct(input)
+    }
+
+    suspend fun reauthenticate(
+        sessionHandle: String,
+        passphrase: CharArray,
+    ) {
+        try {
+            requireOwnerBusinessSettings(sessionHandle, recent = false)
+            security.reauthenticate(sessionHandle, passphrase)
+        } finally {
+            passphrase.fill('\u0000')
+        }
+    }
+
+    private suspend fun requireOwnerBusinessSettings(
+        sessionHandle: String,
+        recent: Boolean = false,
+    ) {
         val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_BUSINESS_SETTINGS)
         val role = AppRole.parse(actor.role)
         require(role == AppRole.OWNER || role == AppRole.ADMIN) {
             "Shop settings is only available to Owner or Admin."
+        }
+        if (recent) {
+            security.sessionManager().requireRecentAuthentication(sessionHandle)
         }
     }
 

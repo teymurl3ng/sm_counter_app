@@ -174,15 +174,21 @@ class NativeOwnerShopSettingsScreenContractTest {
     }
 
     @Test
-    fun openingSectionKeepsDeferredNotice() {
-        setScreen(snapshot = sampleSnapshot())
+    fun openingSectionShowsRecordActionWhenAllowed() {
+        setScreen(snapshot = sampleSnapshot(canRecordOpening = true))
         composeRule.onNodeWithTag(NativeUiTags.OwnerShopSettingsOpeningSection)
             .performScrollTo()
             .assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerShopSettingsOpeningDeferred)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerShopSettingsOpeningRecord)
             .performScrollTo()
             .assertIsDisplayed()
-        composeRule.onNodeWithText("Recording or correcting opening balances comes next.")
+    }
+
+    @Test
+    fun openingSectionShowsNoticeWhenIdentityMissing() {
+        setScreen(snapshot = sampleSnapshot(hasStoreIdentity = false, canRecordOpening = false))
+        composeRule.onNodeWithTag(NativeUiTags.OwnerShopSettingsOpeningNotice)
+            .performScrollTo()
             .assertIsDisplayed()
     }
 
@@ -315,11 +321,16 @@ class NativeOwnerShopSettingsScreenContractTest {
         active = active,
     )
 
-    private fun sampleSnapshot() = NativeOwnerShopSettingsSnapshot(
+    private fun sampleSnapshot(
+        hasStoreIdentity: Boolean = true,
+        openingRecorded: Boolean = false,
+        canRecordOpening: Boolean = true,
+    ) = NativeOwnerShopSettingsSnapshot(
         shopName = "Saaf Milk",
         phone = "0300",
         address = "Shop Street",
         currencyCode = "PKR",
+        hasStoreIdentity = hasStoreIdentity,
         vendorMilkRateLabel = "PKR 180.00",
         vendorDeliveryFeeLabel = "PKR 5.00",
         tsStandardLabel = "3.5%",
@@ -332,8 +343,15 @@ class NativeOwnerShopSettingsScreenContractTest {
         retailRateMilk = 220.0,
         retailRateYogurt = 250.0,
         defaultDeliverySurcharge = 10.0,
-        openingDateLabel = "2026-01-01",
+        openingRecorded = openingRecorded,
+        canRecordOpening = canRecordOpening,
+        openingDate = if (openingRecorded) "2026-01-01" else null,
+        openingDateLabel = if (openingRecorded) "2026-01-01" else "Not recorded",
         openingNotes = null,
+        openingInventoryCount = 0,
+        openingAccountCount = 0,
+        openingProducts = emptyList(),
+        openingAccounts = emptyList(),
         expenseCategories = listOf(sampleCategory()),
     )
 }

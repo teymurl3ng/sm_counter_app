@@ -8,6 +8,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.manager.NativeManagerWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
@@ -30,10 +31,25 @@ class NativeManagerWorkScreenContractTest {
         setScreen(NativeManagerWorkState.Ready(context = openContext()))
         composeRule.onNodeWithTag(NativeUiTags.ManagerWorkHome).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.ManagerWorkPrimaryActions).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRecordSale).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRecordPayment).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkReceiveMilk).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRecordExpense).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkPaySupplier).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkCashClose).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkDeliveries).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkMakeYogurt)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRecordSpoilage)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkDeliveries)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkPaySupplier)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkCashClose)
+            .performScrollTo()
+            .assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.ManagerNavWork).assertIsSelected()
         composeRule.onNodeWithText("Pay salary").assertDoesNotExist()
         composeRule.onNodeWithTag(NativeUiTags.OwnerWorkPaySalary).assertDoesNotExist()
@@ -66,6 +82,78 @@ class NativeManagerWorkScreenContractTest {
     }
 
     @Test
+    fun saleShortcutOpensDestination() {
+        var opened: NativeManagerWorkDestination? = null
+        setScreen(
+            NativeManagerWorkState.Ready(context = openContext()),
+            onOpenDestination = { opened = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRecordSale).performClick()
+        assertEquals(NativeManagerWorkDestination.RecordSale, opened)
+    }
+
+    @Test
+    fun paymentShortcutOpensDestination() {
+        var opened: NativeManagerWorkDestination? = null
+        setScreen(
+            NativeManagerWorkState.Ready(context = openContext()),
+            onOpenDestination = { opened = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRecordPayment).performClick()
+        assertEquals(NativeManagerWorkDestination.RecordPayment, opened)
+    }
+
+    @Test
+    fun receiveMilkShortcutOpensDestination() {
+        var opened: NativeManagerWorkDestination? = null
+        setScreen(
+            NativeManagerWorkState.Ready(context = openContext()),
+            onOpenDestination = { opened = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkReceiveMilk).performClick()
+        assertEquals(NativeManagerWorkDestination.ReceiveMilk, opened)
+    }
+
+    @Test
+    fun makeYogurtShortcutOpensDestination() {
+        var opened: NativeManagerWorkDestination? = null
+        setScreen(
+            NativeManagerWorkState.Ready(context = openContext()),
+            onOpenDestination = { opened = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkMakeYogurt)
+            .performScrollTo()
+            .performClick()
+        assertEquals(NativeManagerWorkDestination.MakeYogurt, opened)
+    }
+
+    @Test
+    fun spoilageShortcutOpensDestination() {
+        var opened: NativeManagerWorkDestination? = null
+        setScreen(
+            NativeManagerWorkState.Ready(context = openContext()),
+            onOpenDestination = { opened = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRecordSpoilage)
+            .performScrollTo()
+            .performClick()
+        assertEquals(NativeManagerWorkDestination.RecordSpoilage, opened)
+    }
+
+    @Test
+    fun deliveriesShortcutOpensDestination() {
+        var opened: NativeManagerWorkDestination? = null
+        setScreen(
+            NativeManagerWorkState.Ready(context = openContext()),
+            onOpenDestination = { opened = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkDeliveries)
+            .performScrollTo()
+            .performClick()
+        assertEquals(NativeManagerWorkDestination.Deliveries, opened)
+    }
+
+    @Test
     fun expenseShortcutOpensDestination() {
         var opened: NativeManagerWorkDestination? = null
         setScreen(
@@ -83,7 +171,9 @@ class NativeManagerWorkScreenContractTest {
             NativeManagerWorkState.Ready(context = openContext()),
             onOpenDestination = { opened = it },
         )
-        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkPaySupplier).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkPaySupplier)
+            .performScrollTo()
+            .performClick()
         assertEquals(NativeManagerWorkDestination.PaySupplier, opened)
     }
 
@@ -94,7 +184,9 @@ class NativeManagerWorkScreenContractTest {
             NativeManagerWorkState.Ready(context = openContext()),
             onOpenClose = { closeOpened = true },
         )
-        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkCashClose).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkCashClose)
+            .performScrollTo()
+            .performClick()
         assertEquals(true, closeOpened)
     }
 

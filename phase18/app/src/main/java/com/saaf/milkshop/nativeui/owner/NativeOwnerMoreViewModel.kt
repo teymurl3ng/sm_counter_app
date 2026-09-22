@@ -41,6 +41,7 @@ import com.saaf.milkshop.domain.CreateUserInput
 import com.saaf.milkshop.domain.CustomerProfileInput
 import com.saaf.milkshop.domain.ProductCatalogInput
 import com.saaf.milkshop.domain.EmployeeProfileInput
+import com.saaf.milkshop.domain.OpeningStateInput
 import com.saaf.milkshop.domain.StoreIdentityInput
 import com.saaf.milkshop.domain.VendorProfileInput
 import com.saaf.milkshop.domain.SecurityFailure
@@ -134,6 +135,11 @@ sealed interface NativeOwnerMoreState {
         val shopSettingsCategoryDetail: NativeOwnerExpenseCategoryRow? = null,
         val shopSettingsCategoryArchiving: Boolean = false,
         val shopSettingsError: String? = null,
+        val shopSettingsOpeningEditOpen: Boolean = false,
+        val shopSettingsOpeningCorrection: Boolean = false,
+        val shopSettingsOpeningSaving: Boolean = false,
+        val shopSettingsOpeningReauthOpen: Boolean = false,
+        val shopSettingsOpeningReauthBusy: Boolean = false,
         val users: List<NativeOwnerUserRow> = emptyList(),
         val usersLoading: Boolean = false,
         val userDetail: NativeOwnerUserDetail? = null,
@@ -164,6 +170,7 @@ sealed interface NativeOwnerMoreState {
         val backupReauthOpen: Boolean = false,
         val backupReauthBusy: Boolean = false,
         val backupDisconnectConfirmOpen: Boolean = false,
+        val backupCloudOpen: Boolean = false,
         val saving: Boolean = false,
         val confirmRemoveUnlock: Boolean = false,
         val error: String? = null,
@@ -190,12 +197,15 @@ class NativeOwnerMoreViewModel(
     private var pendingUsersAction: PendingUsersRolesAction? = null
     private var pendingCostingApprove: CostingPolicyInput? = null
     private var pendingBackupAction: PendingBackupAction? = null
+    private var pendingOpeningInput: OpeningStateInput? = null
+    private var pendingOpeningCorrection: Boolean = false
     val state: StateFlow<NativeOwnerMoreState> = _state.asStateFlow()
 
     private sealed interface PendingUsersRolesAction {
         data class BeginEnroll(val input: CreateUserInput) : PendingUsersRolesAction
         data class SetEnabled(val userId: Long, val enabled: Boolean) : PendingUsersRolesAction
         data class ChangeRole(val userId: Long, val roleWire: String) : PendingUsersRolesAction
+        data class BeginCredentialReset(val userId: Long) : PendingUsersRolesAction
     }
 
     private sealed interface PendingBackupAction {
@@ -205,6 +215,12 @@ class NativeOwnerMoreViewModel(
         data class Connect(val passphrase: CharArray, val allowMetered: Boolean) : PendingBackupAction
         data class SetPolicy(val enabled: Boolean) : PendingBackupAction
         data object Disconnect : PendingBackupAction
+        data object RefreshCloud : PendingBackupAction
+        data class InspectCloud(
+            val remoteFileId: String,
+            val recoveryPassphrase: CharArray?,
+        ) : PendingBackupAction
+        data class ConfirmCloudRestore(val confirm: Boolean) : PendingBackupAction
     }
 
     fun open(nextSessionHandle: String) {
@@ -1184,6 +1200,11 @@ class NativeOwnerMoreViewModel(
             shopSettingsCategoryDetail = null,
             shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
+            shopSettingsOpeningEditOpen = false,
+            shopSettingsOpeningCorrection = false,
+            shopSettingsOpeningSaving = false,
+            shopSettingsOpeningReauthOpen = false,
+            shopSettingsOpeningReauthBusy = false,
             usersLoading = false,
             userDetail = null,
             usersError = null,
@@ -1201,6 +1222,7 @@ class NativeOwnerMoreViewModel(
             backupReauthOpen = false,
             backupReauthBusy = false,
             backupDisconnectConfirmOpen = false,
+            backupCloudOpen = false,
             confirmRemoveUnlock = false,
             error = null,
             saving = false,
@@ -1455,6 +1477,11 @@ class NativeOwnerMoreViewModel(
             shopSettingsCategoryDetail = null,
             shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
+            shopSettingsOpeningEditOpen = false,
+            shopSettingsOpeningCorrection = false,
+            shopSettingsOpeningSaving = false,
+            shopSettingsOpeningReauthOpen = false,
+            shopSettingsOpeningReauthBusy = false,
             usersLoading = false,
             userDetail = null,
             usersError = null,
@@ -1472,6 +1499,7 @@ class NativeOwnerMoreViewModel(
             backupReauthOpen = false,
             backupReauthBusy = false,
             backupDisconnectConfirmOpen = false,
+            backupCloudOpen = false,
             confirmRemoveUnlock = false,
             error = null,
             saving = false,
@@ -1730,6 +1758,11 @@ class NativeOwnerMoreViewModel(
             shopSettingsCategoryDetail = null,
             shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
+            shopSettingsOpeningEditOpen = false,
+            shopSettingsOpeningCorrection = false,
+            shopSettingsOpeningSaving = false,
+            shopSettingsOpeningReauthOpen = false,
+            shopSettingsOpeningReauthBusy = false,
             productsLoading = false,
             productDetail = null,
             productCreateOpen = false,
@@ -1786,6 +1819,7 @@ class NativeOwnerMoreViewModel(
             backupReauthOpen = false,
             backupReauthBusy = false,
             backupDisconnectConfirmOpen = false,
+            backupCloudOpen = false,
             confirmRemoveUnlock = false,
             error = null,
             saving = false,
@@ -1841,6 +1875,11 @@ class NativeOwnerMoreViewModel(
             shopSettingsCategoryDetail = null,
             shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
+            shopSettingsOpeningEditOpen = false,
+            shopSettingsOpeningCorrection = false,
+            shopSettingsOpeningSaving = false,
+            shopSettingsOpeningReauthOpen = false,
+            shopSettingsOpeningReauthBusy = false,
             shopSettingsLoading = false,
         )
     }
@@ -1897,6 +1936,11 @@ class NativeOwnerMoreViewModel(
             shopSettingsCategoryDetail = null,
             shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
+            shopSettingsOpeningEditOpen = false,
+            shopSettingsOpeningCorrection = false,
+            shopSettingsOpeningSaving = false,
+            shopSettingsOpeningReauthOpen = false,
+            shopSettingsOpeningReauthBusy = false,
             shopSettingsLoading = false,
         )
     }
@@ -1952,6 +1996,11 @@ class NativeOwnerMoreViewModel(
             shopSettingsCategoryDetail = null,
             shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
+            shopSettingsOpeningEditOpen = false,
+            shopSettingsOpeningCorrection = false,
+            shopSettingsOpeningSaving = false,
+            shopSettingsOpeningReauthOpen = false,
+            shopSettingsOpeningReauthBusy = false,
             shopSettingsLoading = false,
         )
     }
@@ -2036,6 +2085,11 @@ class NativeOwnerMoreViewModel(
             shopSettingsCategoryDetail = null,
             shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
+            shopSettingsOpeningEditOpen = false,
+            shopSettingsOpeningCorrection = false,
+            shopSettingsOpeningSaving = false,
+            shopSettingsOpeningReauthOpen = false,
+            shopSettingsOpeningReauthBusy = false,
             shopSettingsLoading = false,
         )
     }
@@ -2069,6 +2123,151 @@ class NativeOwnerMoreViewModel(
                 handleShopSettingsFailure(error)
             }
         }
+    }
+
+
+    fun openOpeningEdit(correction: Boolean) {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.ShopSettings) return
+        if (current.shopSettings == null) return
+        pendingOpeningInput = null
+        pendingOpeningCorrection = correction
+        _state.value = current.copy(
+            shopSettingsOpeningEditOpen = true,
+            shopSettingsOpeningCorrection = correction,
+            shopSettingsOpeningSaving = false,
+            shopSettingsOpeningReauthOpen = false,
+            shopSettingsOpeningReauthBusy = false,
+            shopSettingsIdentityEditOpen = false,
+            shopSettingsRatesEditOpen = false,
+            shopSettingsCategoryCreateOpen = false,
+            shopSettingsCategoryDetail = null,
+            shopSettingsError = null,
+        )
+    }
+
+    fun backFromOpeningEdit() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        pendingOpeningInput = null
+        pendingOpeningCorrection = false
+        _state.value = current.copy(
+            shopSettingsOpeningEditOpen = false,
+            shopSettingsOpeningCorrection = false,
+            shopSettingsOpeningSaving = false,
+            shopSettingsOpeningReauthOpen = false,
+            shopSettingsOpeningReauthBusy = false,
+            shopSettingsError = null,
+        )
+    }
+
+    fun saveOpening(input: OpeningStateInput) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.ShopSettings) return
+        if (!current.shopSettingsOpeningEditOpen || current.shopSettingsOpeningSaving) return
+        val correction = current.shopSettingsOpeningCorrection
+        _state.value = current.copy(shopSettingsOpeningSaving = true, shopSettingsError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    if (correction) {
+                        shopSettingsFacade.correctOpening(session, input)
+                    } else {
+                        shopSettingsFacade.recordOpening(session, input)
+                    }
+                }
+                val snapshot = withContext(Dispatchers.IO) { shopSettingsFacade.load(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.ShopSettings) return@launch
+                pendingOpeningInput = null
+                pendingOpeningCorrection = false
+                _state.value = latest.copy(
+                    shopSettings = snapshot,
+                    shopSettingsOpeningEditOpen = false,
+                    shopSettingsOpeningCorrection = false,
+                    shopSettingsOpeningSaving = false,
+                    shopSettingsOpeningReauthOpen = false,
+                    shopSettingsOpeningReauthBusy = false,
+                    shopSettingsError = null,
+                    shopSettingsLoading = false,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.RecentAuthenticationRequired) {
+                    pendingOpeningInput = input
+                    pendingOpeningCorrection = correction
+                    val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    _state.value = latest.copy(
+                        shopSettingsOpeningSaving = false,
+                        shopSettingsOpeningReauthOpen = true,
+                        shopSettingsOpeningReauthBusy = false,
+                        shopSettingsError = null,
+                    )
+                } else {
+                    handleShopSettingsFailure(error)
+                }
+            }
+        }
+    }
+
+    fun submitOpeningReauth(passphrase: CharArray) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (!current.shopSettingsOpeningReauthOpen || current.shopSettingsOpeningReauthBusy) {
+            passphrase.fill('\u0000')
+            return
+        }
+        val pending = pendingOpeningInput
+        if (pending == null) {
+            passphrase.fill('\u0000')
+            _state.value = current.copy(
+                shopSettingsOpeningReauthOpen = false,
+                shopSettingsOpeningReauthBusy = false,
+            )
+            return
+        }
+        val correction = pendingOpeningCorrection
+        _state.value = current.copy(shopSettingsOpeningReauthBusy = true, shopSettingsError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    shopSettingsFacade.reauthenticate(session, passphrase)
+                }
+                withContext(Dispatchers.IO) {
+                    if (correction) {
+                        shopSettingsFacade.correctOpening(session, pending)
+                    } else {
+                        shopSettingsFacade.recordOpening(session, pending)
+                    }
+                }
+                val snapshot = withContext(Dispatchers.IO) { shopSettingsFacade.load(session) }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                pendingOpeningInput = null
+                pendingOpeningCorrection = false
+                _state.value = latest.copy(
+                    shopSettings = snapshot,
+                    shopSettingsOpeningEditOpen = false,
+                    shopSettingsOpeningCorrection = false,
+                    shopSettingsOpeningSaving = false,
+                    shopSettingsOpeningReauthOpen = false,
+                    shopSettingsOpeningReauthBusy = false,
+                    shopSettingsError = null,
+                    shopSettingsLoading = false,
+                )
+            } catch (error: Throwable) {
+                handleShopSettingsFailure(error)
+            }
+        }
+    }
+
+    fun cancelOpeningReauth() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        pendingOpeningInput = null
+        _state.value = current.copy(
+            shopSettingsOpeningReauthOpen = false,
+            shopSettingsOpeningReauthBusy = false,
+            shopSettingsOpeningSaving = false,
+            shopSettingsError = null,
+        )
     }
 
     fun openUsersRoles() {
@@ -2141,6 +2340,11 @@ class NativeOwnerMoreViewModel(
             shopSettingsCategoryDetail = null,
             shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
+            shopSettingsOpeningEditOpen = false,
+            shopSettingsOpeningCorrection = false,
+            shopSettingsOpeningSaving = false,
+            shopSettingsOpeningReauthOpen = false,
+            shopSettingsOpeningReauthBusy = false,
             securityHistoryLoading = false,
             securityAuditDetail = null,
             securityHistoryError = null,
@@ -2155,6 +2359,7 @@ class NativeOwnerMoreViewModel(
             backupReauthOpen = false,
             backupReauthBusy = false,
             backupDisconnectConfirmOpen = false,
+            backupCloudOpen = false,
             confirmRemoveUnlock = false,
             error = null,
             saving = false,
@@ -2537,6 +2742,47 @@ class NativeOwnerMoreViewModel(
         }
     }
 
+
+    fun beginCredentialReset() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val detail = current.userDetail ?: return
+        if (current.destination != NativeOwnerMoreDestination.UsersRoles || current.userEnrollBusy) return
+        _state.value = current.copy(userEnrollBusy = true, usersError = null)
+        scope.launch {
+            try {
+                val pending = withContext(Dispatchers.IO) {
+                    usersRolesFacade.beginCredentialReset(session, detail.row.userId)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.UsersRoles) return@launch
+                pendingUsersAction = null
+                _state.value = latest.copy(
+                    userEnrollOpen = true,
+                    userEnrollPending = pending,
+                    userEnrollBusy = false,
+                    userReauthOpen = false,
+                    usersError = null,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.RecentAuthenticationRequired) {
+                    pendingUsersAction = PendingUsersRolesAction.BeginCredentialReset(
+                        userId = detail.row.userId,
+                    )
+                    val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    _state.value = latest.copy(
+                        userEnrollBusy = false,
+                        userReauthOpen = true,
+                        userReauthBusy = false,
+                        usersError = null,
+                    )
+                } else {
+                    handleUsersRolesFailure(error)
+                }
+            }
+        }
+    }
+
     fun submitUsersRolesReauth(passphrase: CharArray) {
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
@@ -2591,6 +2837,21 @@ class NativeOwnerMoreViewModel(
                             userDetail = refreshed,
                             userEnableConfirmOpen = false,
                             userEnableBusy = false,
+                            userReauthOpen = false,
+                            userReauthBusy = false,
+                            usersError = null,
+                        )
+                    }
+                    is PendingUsersRolesAction.BeginCredentialReset -> {
+                        val resetPending = withContext(Dispatchers.IO) {
+                            usersRolesFacade.beginCredentialReset(session, pending.userId)
+                        }
+                        val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                        pendingUsersAction = null
+                        _state.value = latest.copy(
+                            userEnrollOpen = true,
+                            userEnrollPending = resetPending,
+                            userEnrollBusy = false,
                             userReauthOpen = false,
                             userReauthBusy = false,
                             usersError = null,
@@ -2698,6 +2959,11 @@ class NativeOwnerMoreViewModel(
             shopSettingsCategoryDetail = null,
             shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
+            shopSettingsOpeningEditOpen = false,
+            shopSettingsOpeningCorrection = false,
+            shopSettingsOpeningSaving = false,
+            shopSettingsOpeningReauthOpen = false,
+            shopSettingsOpeningReauthBusy = false,
             usersLoading = false,
             userDetail = null,
             usersError = null,
@@ -2712,6 +2978,7 @@ class NativeOwnerMoreViewModel(
             backupReauthOpen = false,
             backupReauthBusy = false,
             backupDisconnectConfirmOpen = false,
+            backupCloudOpen = false,
             confirmRemoveUnlock = false,
             error = null,
             saving = false,
@@ -2797,7 +3064,10 @@ class NativeOwnerMoreViewModel(
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         clearPendingBackupSecrets()
-        current.backupInspection?.restoreTicket?.let(backupFacade::cancelRestoreTicket)
+        current.backupInspection?.restoreTicket?.let { ticket ->
+            backupFacade.cancelRestoreTicket(ticket)
+            backupFacade.cancelCloudRestoreTicket(ticket)
+        }
         _state.value = current.copy(
             destination = NativeOwnerMoreDestination.Backup,
             backupLoading = true,
@@ -2811,6 +3081,7 @@ class NativeOwnerMoreViewModel(
             backupReauthOpen = false,
             backupReauthBusy = false,
             backupDisconnectConfirmOpen = false,
+            backupCloudOpen = false,
             productsLoading = false,
             productDetail = null,
             productCreateOpen = false,
@@ -2861,6 +3132,11 @@ class NativeOwnerMoreViewModel(
             shopSettingsCategoryDetail = null,
             shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
+            shopSettingsOpeningEditOpen = false,
+            shopSettingsOpeningCorrection = false,
+            shopSettingsOpeningSaving = false,
+            shopSettingsOpeningReauthOpen = false,
+            shopSettingsOpeningReauthBusy = false,
             usersLoading = false,
             userDetail = null,
             usersError = null,
@@ -2921,6 +3197,7 @@ class NativeOwnerMoreViewModel(
             backupReauthOpen = false,
             backupReauthBusy = false,
             backupDisconnectConfirmOpen = false,
+            backupCloudOpen = false,
             backupError = null,
         )
     }
@@ -2988,7 +3265,10 @@ class NativeOwnerMoreViewModel(
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.Backup) return
         clearPendingBackupSecrets()
-        current.backupInspection?.restoreTicket?.let(backupFacade::cancelRestoreTicket)
+        current.backupInspection?.restoreTicket?.let { ticket ->
+            backupFacade.cancelRestoreTicket(ticket)
+            backupFacade.cancelCloudRestoreTicket(ticket)
+        }
         _state.value = current.copy(
             backupRestoreOpen = true,
             backupExportOpen = false,
@@ -2998,6 +3278,7 @@ class NativeOwnerMoreViewModel(
             backupReauthOpen = false,
             backupReauthBusy = false,
             backupDisconnectConfirmOpen = false,
+            backupCloudOpen = false,
             backupError = null,
         )
     }
@@ -3005,7 +3286,10 @@ class NativeOwnerMoreViewModel(
     fun clearBackupRestore() {
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         clearPendingBackupSecrets()
-        current.backupInspection?.restoreTicket?.let(backupFacade::cancelRestoreTicket)
+        current.backupInspection?.restoreTicket?.let { ticket ->
+            backupFacade.cancelRestoreTicket(ticket)
+            backupFacade.cancelCloudRestoreTicket(ticket)
+        }
         _state.value = current.copy(
             backupRestoreOpen = false,
             backupInspection = null,
@@ -3110,6 +3394,7 @@ class NativeOwnerMoreViewModel(
             backupReauthOpen = false,
             backupReauthBusy = false,
             backupDisconnectConfirmOpen = false,
+            backupCloudOpen = false,
             backupError = null,
         )
     }
@@ -3250,6 +3535,7 @@ class NativeOwnerMoreViewModel(
         _state.value = current.copy(
             backupBusy = true,
             backupDisconnectConfirmOpen = false,
+            backupCloudOpen = false,
             backupError = null,
         )
         scope.launch {
@@ -3269,6 +3555,127 @@ class NativeOwnerMoreViewModel(
             } catch (error: Throwable) {
                 if (error is SecurityFailure.RecentAuthenticationRequired) {
                     pendingBackupAction = PendingBackupAction.Disconnect
+                    val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    _state.value = latest.copy(
+                        backupBusy = false,
+                        backupReauthOpen = true,
+                        backupReauthBusy = false,
+                        backupError = null,
+                    )
+                } else {
+                    handleBackupFailure(error)
+                }
+            }
+        }
+    }
+
+
+    fun openBackupCloud() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Backup) return
+        current.backupInspection?.restoreTicket?.let(backupFacade::cancelCloudRestoreTicket)
+        _state.value = current.copy(
+            backupCloudOpen = true,
+            backupExportOpen = false,
+            backupRestoreOpen = false,
+            backupConnectOpen = false,
+            backupInspection = null,
+            backupError = null,
+        )
+    }
+
+    fun backFromBackupCloud() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        current.backupInspection?.restoreTicket?.let(backupFacade::cancelCloudRestoreTicket)
+        _state.value = current.copy(
+            backupCloudOpen = false,
+            backupInspection = null,
+            backupBusy = false,
+            backupError = null,
+        )
+    }
+
+    fun refreshCloudBackups() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Backup || current.backupBusy) return
+        _state.value = current.copy(backupBusy = true, backupError = null)
+        scope.launch {
+            try {
+                val snapshot = withContext(Dispatchers.IO) {
+                    backupFacade.refreshCloudSnapshots(session)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Backup) return@launch
+                _state.value = latest.copy(
+                    backup = snapshot,
+                    backupBusy = false,
+                    backupError = null,
+                )
+            } catch (error: Throwable) {
+                handleBackupFailure(error)
+            }
+        }
+    }
+
+    fun inspectCloudBackup(remoteFileId: String, recoveryPassphrase: CharArray?) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Backup || current.backupBusy) {
+            recoveryPassphrase?.fill('\u0000')
+            return
+        }
+        current.backupInspection?.restoreTicket?.let(backupFacade::cancelCloudRestoreTicket)
+        _state.value = current.copy(backupBusy = true, backupError = null, backupInspection = null)
+        scope.launch {
+            try {
+                val inspection = withContext(Dispatchers.IO) {
+                    backupFacade.inspectCloudBackup(session, remoteFileId, recoveryPassphrase)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Backup) return@launch
+                _state.value = latest.copy(
+                    backupInspection = inspection,
+                    backupBusy = false,
+                    backupReauthOpen = false,
+                    backupError = null,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.RecentAuthenticationRequired) {
+                    pendingBackupAction = PendingBackupAction.InspectCloud(
+                        remoteFileId = remoteFileId,
+                        recoveryPassphrase = recoveryPassphrase,
+                    )
+                    val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    _state.value = latest.copy(
+                        backupBusy = false,
+                        backupReauthOpen = true,
+                        backupReauthBusy = false,
+                        backupError = null,
+                    )
+                } else {
+                    recoveryPassphrase?.fill('\u0000')
+                    handleBackupFailure(error)
+                }
+            }
+        }
+    }
+
+    fun confirmCloudBackupRestore(confirm: Boolean) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val ticket = current.backupInspection?.restoreTicket ?: return
+        if (current.destination != NativeOwnerMoreDestination.Backup || current.backupBusy) return
+        _state.value = current.copy(backupBusy = true, backupError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    backupFacade.confirmCloudRestore(session, ticket, confirm)
+                }
+                onSessionExpired()
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.RecentAuthenticationRequired) {
+                    pendingBackupAction = PendingBackupAction.ConfirmCloudRestore(confirm)
                     val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                     _state.value = latest.copy(
                         backupBusy = false,
@@ -3334,6 +3741,18 @@ class NativeOwnerMoreViewModel(
                         pendingBackupAction = null
                         confirmBackupDisconnect()
                     }
+                    is PendingBackupAction.InspectCloud -> {
+                        pendingBackupAction = null
+                        inspectCloudBackup(retryAction.remoteFileId, retryAction.recoveryPassphrase)
+                    }
+                    is PendingBackupAction.ConfirmCloudRestore -> {
+                        pendingBackupAction = null
+                        confirmCloudBackupRestore(retryAction.confirm)
+                    }
+                    PendingBackupAction.RefreshCloud -> {
+                        pendingBackupAction = null
+                        refreshCloudBackups()
+                    }
                 }
             } catch (error: Throwable) {
                 passphrase.fill('\u0000')
@@ -3358,6 +3777,7 @@ class NativeOwnerMoreViewModel(
             is PendingBackupAction.Export -> pending.passphrase.fill('\u0000')
             is PendingBackupAction.Inspect -> pending.passphrase.fill('\u0000')
             is PendingBackupAction.Connect -> pending.passphrase.fill('\u0000')
+            is PendingBackupAction.InspectCloud -> pending.recoveryPassphrase?.fill('\u0000')
             else -> Unit
         }
         pendingBackupAction = null
@@ -3367,7 +3787,10 @@ class NativeOwnerMoreViewModel(
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         pendingUsersAction = null
         clearPendingBackupSecrets()
-        current.backupInspection?.restoreTicket?.let(backupFacade::cancelRestoreTicket)
+        current.backupInspection?.restoreTicket?.let { ticket ->
+            backupFacade.cancelRestoreTicket(ticket)
+            backupFacade.cancelCloudRestoreTicket(ticket)
+        }
         _state.value = current.copy(
             destination = NativeOwnerMoreDestination.Menu,
             confirmRemoveUnlock = false,
@@ -3424,6 +3847,11 @@ class NativeOwnerMoreViewModel(
             shopSettingsCategoryDetail = null,
             shopSettingsCategoryArchiving = false,
             shopSettingsError = null,
+            shopSettingsOpeningEditOpen = false,
+            shopSettingsOpeningCorrection = false,
+            shopSettingsOpeningSaving = false,
+            shopSettingsOpeningReauthOpen = false,
+            shopSettingsOpeningReauthBusy = false,
             usersLoading = false,
             userDetail = null,
             userEnrollOpen = false,
@@ -3450,6 +3878,7 @@ class NativeOwnerMoreViewModel(
             backupReauthOpen = false,
             backupReauthBusy = false,
             backupDisconnectConfirmOpen = false,
+            backupCloudOpen = false,
         )
     }
 
@@ -3671,6 +4100,8 @@ class NativeOwnerMoreViewModel(
             shopSettingsRatesSaving = false,
             shopSettingsCategoryCreating = false,
             shopSettingsCategoryArchiving = false,
+                    shopSettingsOpeningSaving = false,
+                    shopSettingsOpeningReauthBusy = false,
             shopSettingsError = publicMessage(error),
         )
     }

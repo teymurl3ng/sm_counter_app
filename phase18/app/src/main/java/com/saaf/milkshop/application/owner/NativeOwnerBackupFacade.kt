@@ -24,6 +24,14 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+data class NativeOwnerCloudRemoteSnapshotRow(
+    val remoteFileId: String,
+    val snapshotId: String,
+    val createdAt: String,
+    val sizeBytes: Long,
+    val name: String,
+)
+
 data class NativeOwnerBackupSnapshot(
     val configured: Boolean,
     val enabled: Boolean,
@@ -37,6 +45,7 @@ data class NativeOwnerBackupSnapshot(
     val statusHeadline: String,
     val allowMetered: Boolean = false,
     val cloudActionsAvailable: Boolean = false,
+    val remoteSnapshots: List<NativeOwnerCloudRemoteSnapshotRow> = emptyList(),
 )
 
 data class NativeOwnerBackupExportResult(
@@ -77,6 +86,19 @@ interface NativeOwnerCloudBackupGateway {
     suspend fun runNow()
 
     suspend fun disconnect(confirmRevoke: Boolean)
+
+    suspend fun refreshSnapshots(): List<com.saaf.milkshop.cloud.CloudRemoteSnapshot>
+
+    /**
+     * Download and decrypt a remote Drive backup. When [recoveryPassphrase] is null,
+     * attempts the local device key first (mirrors bridge).
+     */
+    suspend fun downloadAndDecrypt(
+        remoteFileId: String,
+        recoveryPassphrase: CharArray?,
+    ): com.saaf.milkshop.cloud.DecryptedCloudSnapshot
+
+    fun disableAfterRestore()
 }
 
 /**
@@ -96,10 +118,12 @@ class NativeOwnerBackupFacade(
         val token: String,
         val sessionId: String,
         val actorUserId: Long,
-        val uri: Uri,
-        val passphrase: CharArray,
+        val uri: Uri?,
+        val remoteFileId: String?,
+        val passphrase: CharArray?,
         val inspection: BackupManager.EncryptedBackupInspection,
         val expiresAtEpochMs: Long,
+        val cloud: Boolean,
     )
 
     private val tickets = ConcurrentHashMap<String, RestoreTicket>()
@@ -163,7 +187,7 @@ class NativeOwnerBackupFacade(
             clearExpiredTickets()
             tickets.entries.removeIf { entry ->
                 val remove = entry.value.sessionId == sessionHandle
-                if (remove) entry.value.passphrase.fill('\u0000')
+                if (remove) entry.value.passphrase?.fill('\u0000')
                 remove
             }
             val token = UUID.randomUUID().toString()
@@ -172,9 +196,11 @@ class NativeOwnerBackupFacade(
                 sessionId = sessionHandle,
                 actorUserId = actor.userId,
                 uri = uri,
+                remoteFileId = null,
                 passphrase = passphrase,
                 inspection = inspection,
                 expiresAtEpochMs = nowEpochMs() + TICKET_LIFETIME_MS,
+                cloud = false,
             )
             expiryScope.launch {
                 delay(TICKET_LIFETIME_MS)
@@ -225,6 +251,12 @@ class NativeOwnerBackupFacade(
                     "Inspect the backup again before restoring",
                 )
             }
+            if (ticket.cloud || ticket.uri == null || ticket.passphrase == null) {
+                throw NativeOwnerBackupFailure(
+                    "restore_ticket_expired",
+                    "Inspect the backup again before restoring",
+                )
+            }
             manager.restoreEncryptedReplacing(
                 database,
                 ticket.uri,
@@ -238,11 +270,11 @@ class NativeOwnerBackupFacade(
                 security.sessionManager(),
             ).getOrElse(::throwRestoreFailure)
             auditRestore(actor.displayName, actor.role, ticket.inspection.meta.formatVersion)
-            tickets.values.forEach { it.passphrase.fill('\u0000') }
+            tickets.values.forEach { it.passphrase?.fill('\u0000') }
             tickets.clear()
             NativeOwnerBackupRestoreResult(restored = true, sessionsInvalidated = true)
         } finally {
-            ticket.passphrase.fill('\u0000')
+            ticket.passphrase?.fill('\u0000')
         }
     }
 
@@ -250,6 +282,8 @@ class NativeOwnerBackupFacade(
         if (restoreTicket.isNullOrBlank()) return
         tickets.remove(restoreTicket)?.passphrase?.fill('\u0000')
     }
+
+    fun cancelCloudRestoreTicket(restoreTicket: String?) = cancelRestoreTicket(restoreTicket)
 
     suspend fun reauthenticate(
         sessionHandle: String,
@@ -360,8 +394,149 @@ class NativeOwnerBackupFacade(
         }
     }
 
+    suspend fun refreshCloudSnapshots(sessionHandle: String): NativeOwnerBackupSnapshot {
+        val gateway = requireCloudGateway()
+        return try {
+            requireOwnerExport(sessionHandle, recent = false)
+            gateway.refreshSnapshots()
+            snapshotFromSettings()
+        } catch (error: Throwable) {
+            throwCloudFailure(error)
+        }
+    }
+
+    suspend fun inspectCloudBackup(
+        sessionHandle: String,
+        remoteFileId: String,
+        recoveryPassphrase: CharArray?,
+    ): NativeOwnerBackupInspection {
+        val gateway = requireCloudGateway()
+        val manager = requireBackupManager()
+        var retained = false
+        var passphrase = recoveryPassphrase
+        return try {
+            val actor = requireOwnerRestore(sessionHandle, recent = true, allowQuickPin = true)
+            val decrypted = gateway.downloadAndDecrypt(remoteFileId, passphrase)
+            val inspection = try {
+                manager.inspectCompleteSnapshotBytes(
+                    decrypted.payload,
+                    "Google Drive cloud backup",
+                )
+            } finally {
+                decrypted.payload.fill(0)
+            }
+            if (!inspection.containsSecurityState) {
+                throw NativeOwnerBackupFailure(
+                    "backup_incompatible",
+                    "This cloud backup contains no application users",
+                )
+            }
+            clearExpiredTickets()
+            tickets.entries.removeIf { entry ->
+                val remove = entry.value.sessionId == sessionHandle
+                if (remove) entry.value.passphrase?.fill('\u0000')
+                remove
+            }
+            val token = UUID.randomUUID().toString()
+            tickets[token] = RestoreTicket(
+                token = token,
+                sessionId = sessionHandle,
+                actorUserId = actor.userId,
+                uri = null,
+                remoteFileId = remoteFileId,
+                passphrase = passphrase,
+                inspection = inspection,
+                expiresAtEpochMs = nowEpochMs() + TICKET_LIFETIME_MS,
+                cloud = true,
+            )
+            expiryScope.launch {
+                delay(TICKET_LIFETIME_MS)
+                tickets.remove(token)?.passphrase?.fill('\u0000')
+            }
+            retained = true
+            passphrase = null
+            NativeOwnerBackupInspection(
+                restoreTicket = token,
+                createdAt = inspection.meta.createdAt,
+                formatVersion = inspection.meta.formatVersion,
+                containsSecurityState = inspection.containsSecurityState,
+                fileName = inspection.meta.fileName,
+            )
+        } catch (error: Throwable) {
+            throwCloudFailure(error)
+        } finally {
+            if (!retained) passphrase?.fill('\u0000')
+        }
+    }
+
+    suspend fun confirmCloudRestore(
+        sessionHandle: String,
+        restoreTicket: String,
+        confirmRestore: Boolean,
+    ): NativeOwnerBackupRestoreResult {
+        if (!confirmRestore) {
+            throw NativeOwnerBackupFailure(
+                "validation_failed",
+                "Confirm restore before replacing this installation",
+            )
+        }
+        val gateway = requireCloudGateway()
+        val manager = requireBackupManager()
+        clearExpiredTickets()
+        val ticket = tickets.remove(restoreTicket)
+            ?: throw NativeOwnerBackupFailure(
+                "restore_ticket_expired",
+                "Inspect the cloud backup again before restoring",
+            )
+        return try {
+            if (!ticket.cloud ||
+                ticket.remoteFileId.isNullOrBlank() ||
+                ticket.sessionId != sessionHandle ||
+                ticket.expiresAtEpochMs <= nowEpochMs()
+            ) {
+                throw NativeOwnerBackupFailure(
+                    "restore_ticket_expired",
+                    "Inspect the cloud backup again before restoring",
+                )
+            }
+            val actor = requireOwnerRestore(sessionHandle, recent = true, allowQuickPin = false)
+            if (actor.userId != ticket.actorUserId) {
+                throw NativeOwnerBackupFailure(
+                    "restore_ticket_expired",
+                    "Inspect the cloud backup again before restoring",
+                )
+            }
+            val decrypted = gateway.downloadAndDecrypt(ticket.remoteFileId, ticket.passphrase)
+            try {
+                manager.restoreCompleteSnapshotReplacing(
+                    database = database,
+                    bytes = decrypted.payload,
+                    sessions = security.sessionManager(),
+                    fileName = ticket.inspection.meta.fileName,
+                ).getOrElse(::throwRestoreFailure)
+            } finally {
+                decrypted.payload.fill(0)
+            }
+            gateway.disableAfterRestore()
+            audit(
+                "restore_cloud_backup",
+                null,
+                actor.displayName,
+                actor.role,
+                "sessions_invalidated=true",
+            )
+            tickets.values.forEach { it.passphrase?.fill('\u0000') }
+            tickets.clear()
+            NativeOwnerBackupRestoreResult(restored = true, sessionsInvalidated = true)
+        } catch (error: Throwable) {
+            throwCloudFailure(error)
+        } finally {
+            ticket.passphrase?.fill('\u0000')
+        }
+    }
+
     override fun close() {
-        tickets.values.forEach { it.passphrase.fill('\u0000') }
+        tickets.values.forEach { it.passphrase?.fill('\u0000') }
         tickets.clear()
         expiryScope.cancel()
     }
@@ -382,6 +557,7 @@ class NativeOwnerBackupFacade(
                 statusHeadline = "Backup not configured",
                 allowMetered = false,
                 cloudActionsAvailable = cloudGateway != null,
+                remoteSnapshots = emptyList(),
             )
         }
         val stale = isStale(state, now)
@@ -399,6 +575,19 @@ class NativeOwnerBackupFacade(
             statusHeadline = statusHeadline(state, stale, pending),
             allowMetered = state.allowMetered,
             cloudActionsAvailable = cloudGateway != null,
+            remoteSnapshots = state.snapshots
+                .sortedByDescending {
+                    runCatching { Instant.parse(it.createdAt) }.getOrElse { Instant.EPOCH }
+                }
+                .map { remote ->
+                    NativeOwnerCloudRemoteSnapshotRow(
+                        remoteFileId = remote.remoteFileId,
+                        snapshotId = remote.snapshotId,
+                        createdAt = remote.createdAt,
+                        sizeBytes = remote.sizeBytes,
+                        name = remote.name,
+                    )
+                },
         )
     }
 
@@ -510,7 +699,7 @@ class NativeOwnerBackupFacade(
         val now = nowEpochMs()
         tickets.entries.removeIf { entry ->
             val expired = entry.value.expiresAtEpochMs <= now
-            if (expired) entry.value.passphrase.fill('\u0000')
+            if (expired) entry.value.passphrase?.fill('\u0000')
             expired
         }
     }
@@ -568,6 +757,11 @@ class NativeOwnerBackupFacade(
     private fun throwCloudFailure(error: Throwable): Nothing = when (error) {
         is NativeOwnerBackupFailure -> throw error
         is SecurityFailure -> throw error
+        is CloudBackupFailure.KeyUnavailable -> throw NativeOwnerBackupFailure(
+            "key_unavailable",
+            error.message
+                ?: "Enter the cloud recovery passphrase to decrypt this Drive backup.",
+        )
         is CloudBackupFailure.NotConfigured -> throw NativeOwnerBackupFailure(
             "not_configured",
             error.message ?: "Google Drive vault is not configured on this device.",

@@ -427,6 +427,118 @@ class NativeFoundationUiTest {
     }
 
     @Test
+    fun managerSaleOpensUnderManagerChrome() {
+        openManagerSale()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerSaleEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavWork).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSaleEntryRoot).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavSell).assertDoesNotExist()
+    }
+
+    @Test
+    fun managerSaleHardwareBackReturnsToWorkHome() {
+        openManagerSale()
+        pressHardwareBack()
+        assertReturnedToManagerWorkHome()
+    }
+
+    @Test
+    fun managerCollectionOpensUnderManagerChrome() {
+        openManagerCollection()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerCollectionEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CollectCustomerSelector)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavWork).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCollectionEntryRoot).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavCollect).assertDoesNotExist()
+    }
+
+    @Test
+    fun managerCollectionHardwareBackReturnsToWorkHome() {
+        openManagerCollection()
+        pressHardwareBack()
+        assertReturnedToManagerWorkHome()
+    }
+
+    @Test
+    fun managerReceiveMilkOpensUnderManagerChrome() {
+        openManagerReceiveMilk()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerReceiveMilkEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkForm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavWork).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerReceiveMilkEntryRoot).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavWork).assertDoesNotExist()
+    }
+
+    @Test
+    fun managerReceiveMilkHardwareBackReturnsToWorkHome() {
+        openManagerReceiveMilk()
+        pressHardwareBack()
+        assertReturnedToManagerWorkHome()
+    }
+
+    @Test
+    fun managerMakeYogurtOpensUnderManagerChrome() {
+        openManagerMakeYogurt()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerMakeYogurtEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsMakeYogurtForm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavWork).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMakeYogurtEntryRoot).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavWork).assertDoesNotExist()
+    }
+
+    @Test
+    fun managerMakeYogurtHardwareBackReturnsToWorkHome() {
+        openManagerMakeYogurt()
+        pressHardwareBack()
+        assertReturnedToManagerWorkHome()
+    }
+
+    @Test
+    fun managerRecordSpoilageOpensUnderManagerChrome() {
+        openManagerRecordSpoilage()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerRecordSpoilageEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilageForm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavWork).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordSpoilageEntryRoot).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavWork).assertDoesNotExist()
+    }
+
+    @Test
+    fun managerRecordSpoilageHardwareBackReturnsToWorkHome() {
+        openManagerRecordSpoilage()
+        pressHardwareBack()
+        assertReturnedToManagerWorkHome()
+    }
+
+    @Test
+    fun managerDeliveriesOpensUnderManagerChrome() {
+        openManagerDeliveries()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerDeliveriesEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavWork).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerDeliveriesEntryRoot).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavDeliveries).assertDoesNotExist()
+    }
+
+    @Test
+    fun managerDeliveriesHardwareBackReturnsToWorkHome() {
+        openManagerDeliveries()
+        pressHardwareBack()
+        assertReturnedToManagerWorkHome()
+    }
+
+    @Test
     fun managerPaySupplierOpensUnderManagerChrome() {
         openManagerPaySupplier()
         composeRule.onNodeWithTag(NativeUiTags.ManagerPaySupplierEntryRoot).assertIsDisplayed()
@@ -2824,7 +2936,9 @@ class NativeFoundationUiTest {
 
     private fun openManagerExpense() {
         openManagerWork()
-        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRecordExpense).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRecordExpense)
+            .performScrollTo()
+            .performClick()
         composeRule.waitUntil(timeoutMillis = 15_000) {
             runCatching {
                 composeRule.onNodeWithTag(NativeUiTags.ExpenseCategorySelector).fetchSemanticsNode()
@@ -2833,9 +2947,89 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithTag(NativeUiTags.ManagerExpenseEntryRoot).assertIsDisplayed()
     }
 
+    private fun openManagerSale() {
+        openManagerWork()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRecordSale)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerSaleEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openManagerCollection() {
+        openManagerWork()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRecordPayment)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.CollectCustomerSelector).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerCollectionEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openManagerReceiveMilk() {
+        openManagerWork()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkReceiveMilk)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkForm).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerReceiveMilkEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openManagerMakeYogurt() {
+        openManagerWork()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkMakeYogurt)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsMakeYogurtForm).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerMakeYogurtEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openManagerRecordSpoilage() {
+        openManagerWork()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRecordSpoilage)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilageForm).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerRecordSpoilageEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openManagerDeliveries() {
+        openManagerWork()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkDeliveries)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerDeliveriesEntryRoot).assertIsDisplayed()
+    }
+
     private fun openManagerPaySupplier() {
         openManagerWork()
-        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkPaySupplier).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkPaySupplier)
+            .performScrollTo()
+            .performClick()
         composeRule.waitUntil(timeoutMillis = 15_000) {
             runCatching {
                 composeRule.onNodeWithTag(NativeUiTags.VendorPaymentVendorSelector).fetchSemanticsNode()

@@ -41,8 +41,9 @@ data class NativeOwnerPendingEnrollment(
 
 /**
  * Owner Users & roles boundary: staff login accounts from
- * [UserSecurityService.listUsers] plus enroll / enable / role-change writes.
- * Distinct from Employees salary accounts. Never calls bridge JSON.
+ * [UserSecurityService.listUsers] plus enroll / enable / role-change /
+ * credential-reset writes. Distinct from Employees salary accounts.
+ * Never calls bridge JSON.
  */
 class NativeOwnerUsersRolesFacade(
     private val database: MilkShopDatabase,
@@ -130,6 +131,23 @@ class NativeOwnerUsersRolesFacade(
             "Administrator cannot assign Owner or Administrator roles."
         }
         security.changeRole(sessionHandle, userId, newRoleValue)
+    }
+
+    /**
+     * Begin credential reset for [targetUserId]. Requires recent auth (domain).
+     * Complete via [completeEnroll] with the returned enrollment token.
+     */
+    suspend fun beginCredentialReset(
+        sessionHandle: String,
+        targetUserId: Long,
+    ): NativeOwnerPendingEnrollment {
+        requireStaffUsersAccess(sessionHandle)
+        val detail = loadDetail(sessionHandle, targetUserId)
+        val allowed = enrollableRoles(sessionHandle).map { it.wireValue }.toSet()
+        require(detail.row.roleWire.trim().lowercase() in allowed) {
+            "Administrator cannot reset Owner or Administrator credentials."
+        }
+        return security.beginCredentialReset(sessionHandle, targetUserId).toNative()
     }
 
     /**

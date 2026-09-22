@@ -21,6 +21,7 @@ import com.saaf.milkshop.domain.EmployeeProfileInput
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.owner.OwnerEmployeesScreen
+import com.saaf.milkshop.nativeui.owner.OwnerScaffold
 import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertEquals
@@ -270,13 +271,15 @@ class NativeOwnerEmployeesScreenContractTest {
                     onOpenEdit = onOpenEdit,
                     onBackFromEdit = onBackFromEdit,
                     onUpdateEmployee = onUpdateEmployee,
-                    hostedScaffold = { snackbar, mod, _, content ->
-                    androidx.compose.material3.Scaffold(
-                        modifier = mod,
-                        snackbarHost = { androidx.compose.material3.SnackbarHost(snackbar) },
-                        content = content,
-                    )
-                },
+                    hostedScaffold = { snackbar, mod, wrapNav, content ->
+                        OwnerScaffold(
+                            snackbarHostState = snackbar,
+                            section = OwnerSection.More,
+                            onNavigate = { section -> wrapNav { onNavigate(section) } },
+                            modifier = mod,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

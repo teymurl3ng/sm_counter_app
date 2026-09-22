@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -31,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,12 +43,18 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.owner.NativeOwnerExpenseCategoryRow
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
+import com.saaf.milkshop.application.owner.NativeOwnerOpeningAccountRow
+import com.saaf.milkshop.application.owner.NativeOwnerOpeningProductRow
 import com.saaf.milkshop.application.owner.NativeOwnerShopSettingsSnapshot
 import com.saaf.milkshop.domain.BusinessSettings
+import com.saaf.milkshop.domain.OpeningAccountBalance
+import com.saaf.milkshop.domain.OpeningInventoryBalance
+import com.saaf.milkshop.domain.OpeningStateInput
 import com.saaf.milkshop.domain.StoreIdentityInput
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.HostedScaffold
@@ -54,11 +62,12 @@ import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
+import java.time.LocalDate
 import java.util.Locale
 
 /**
- * Owner Shop settings — read panel + identity/rates/category write depth under OwnerScaffold.
- * Nested from Owner More; never mounts foreign role chrome. Opening writes stay deferred.
+ * Owner Shop settings — read panel + identity/rates/category/opening write depth under OwnerScaffold.
+ * Nested from Owner More; never mounts foreign role chrome.
  */
 @Composable
 fun OwnerShopSettingsScreen(
@@ -76,6 +85,11 @@ fun OwnerShopSettingsScreen(
     categoryCreating: Boolean,
     categoryDetail: NativeOwnerExpenseCategoryRow?,
     categoryArchiving: Boolean,
+    openingEditOpen: Boolean = false,
+    openingCorrection: Boolean = false,
+    openingSaving: Boolean = false,
+    openingReauthOpen: Boolean = false,
+    openingReauthBusy: Boolean = false,
     onBackToMenu: () -> Unit,
     onRetry: () -> Unit,
     onOpenIdentityEdit: () -> Unit,
@@ -90,10 +104,47 @@ fun OwnerShopSettingsScreen(
     onOpenCategory: (Long) -> Unit,
     onBackFromCategoryDetail: () -> Unit,
     onSetCategoryArchived: (Boolean) -> Unit,
+    onOpenOpeningEdit: (correction: Boolean) -> Unit = {},
+    onBackFromOpeningEdit: () -> Unit = {},
+    onSaveOpening: (OpeningStateInput) -> Unit = {},
+    onSubmitOpeningReauth: (CharArray) -> Unit = {},
+    onCancelOpeningReauth: () -> Unit = {},
     hostedScaffold: HostedScaffold,
     backToHubLabel: String = "Back to More",
     modifier: Modifier = Modifier,
 ) {
+    if (openingReauthOpen) {
+        OpeningReauthScreen(
+            snackbarHostState = snackbarHostState,
+            identity = identity,
+            context = context,
+            busy = openingReauthBusy,
+            error = error,
+            onConfirm = onSubmitOpeningReauth,
+            onCancel = onCancelOpeningReauth,
+            hostedScaffold = hostedScaffold,
+            modifier = modifier,
+        )
+        return
+    }
+
+    if (openingEditOpen && snapshot != null) {
+        OpeningFormScreen(
+            snackbarHostState = snackbarHostState,
+            identity = identity,
+            context = context,
+            snapshot = snapshot,
+            correction = openingCorrection,
+            saving = openingSaving,
+            error = error,
+            onBack = onBackFromOpeningEdit,
+            onSave = onSaveOpening,
+            hostedScaffold = hostedScaffold,
+            modifier = modifier,
+        )
+        return
+    }
+
     if (identityEditOpen && snapshot != null) {
         OwnerShopSettingsIdentityEditScreen(
             snackbarHostState = snackbarHostState,
@@ -285,12 +336,58 @@ fun OwnerShopSettingsScreen(
                             snapshot.openingNotes?.takeIf { it.isNotBlank() }?.let {
                                 OwnerShopSettingsFact("Opening notes", it)
                             }
-                            Text(
-                                "Recording or correcting opening balances comes next.",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsOpeningDeferred),
-                            )
+                            when {
+                                !snapshot.hasStoreIdentity -> {
+                                    Text(
+                                        "Save shop identity first. Opening balances need a store name before they can be recorded.",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsOpeningNotice),
+                                    )
+                                }
+                                snapshot.openingRecorded -> {
+                                    OwnerShopSettingsFact(
+                                        "Stock items",
+                                        snapshot.openingInventoryCount.toString(),
+                                    )
+                                    OwnerShopSettingsFact(
+                                        "Account balances",
+                                        snapshot.openingAccountCount.toString(),
+                                    )
+                                    Text(
+                                        "A correction creates a new history record. It does not erase the original.",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                    Button(
+                                        onClick = { onOpenOpeningEdit(true) },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .testTag(NativeUiTags.OwnerShopSettingsOpeningCorrect),
+                                    ) { Text("Correct opening balances") }
+                                }
+                                snapshot.canRecordOpening -> {
+                                    Text(
+                                        "Optional starting picture for stock and money already in the shop when this installation began.",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                    Button(
+                                        onClick = { onOpenOpeningEdit(false) },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .testTag(NativeUiTags.OwnerShopSettingsOpeningRecord),
+                                    ) { Text("Record opening balances") }
+                                }
+                                else -> {
+                                    Text(
+                                        "Opening balances can no longer be recorded because business activity already exists.",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsOpeningNotice),
+                                    )
+                                }
+                            }
 
                             Row(
                                 Modifier.fillMaxWidth(),
@@ -1046,3 +1143,409 @@ private fun OwnerShopSettingsDiscardDialog(
 
 private fun formatDoubleForEdit(value: Double): String =
     String.format(Locale.US, "%s", value)
+@Composable
+private fun OpeningFormScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    context: NativeOwnerMoreContext,
+    snapshot: NativeOwnerShopSettingsSnapshot,
+    correction: Boolean,
+    saving: Boolean,
+    error: String?,
+    onBack: () -> Unit,
+    onSave: (OpeningStateInput) -> Unit,
+    hostedScaffold: HostedScaffold,
+    modifier: Modifier,
+) {
+    val leaveGuard = rememberEntryLeaveGuard()
+    val products = snapshot.openingProducts
+    val accounts = snapshot.openingAccounts
+    var openingDate by rememberSaveable {
+        mutableStateOf(snapshot.openingDate ?: LocalDate.now().toString())
+    }
+    var notes by rememberSaveable { mutableStateOf(snapshot.openingNotes.orEmpty()) }
+    var confirmed by rememberSaveable { mutableStateOf(false) }
+    var draftTouched by rememberSaveable { mutableStateOf(false) }
+    var localError by rememberSaveable { mutableStateOf<String?>(null) }
+    val productQuantities = remember {
+        mutableStateOf(
+            products.associate { product ->
+                product.productId to (product.quantity?.let(::formatDoubleForEdit).orEmpty())
+            }.toMutableMap(),
+        )
+    }
+    val accountBalances = remember {
+        mutableStateOf(
+            accounts.associate { account ->
+                account.accountId to (account.balance?.let(::formatDoubleForEdit).orEmpty())
+            }.toMutableMap(),
+        )
+    }
+
+    val dirty = draftTouched && !saving
+    LaunchedEffect(dirty) {
+        if (dirty) leaveGuard.markDirty() else leaveGuard.clear()
+    }
+
+    fun requestLeave(action: () -> Unit) {
+        if (saving) return
+        leaveGuard.requestLeave(action)
+    }
+
+    fun touch() {
+        draftTouched = true
+        localError = null
+    }
+
+    fun buildInputOrNull(): OpeningStateInput? {
+        val date = openingDate.trim()
+        if (date.isEmpty()) {
+            localError = "Choose the date these starting balances belong to."
+            return null
+        }
+        val inventory = mutableListOf<OpeningInventoryBalance>()
+        for (product in products) {
+            val raw = productQuantities.value[product.productId].orEmpty().trim()
+            if (raw.isEmpty()) continue
+            val quantity = raw.toDoubleOrNull()
+            if (quantity == null || !quantity.isFinite() || quantity < 0.0) {
+                localError = "Enter a valid non-negative quantity for ${product.name}."
+                return null
+            }
+            if (quantity != 0.0) {
+                inventory += OpeningInventoryBalance(product.productId, quantity)
+            }
+        }
+        val balances = mutableListOf<OpeningAccountBalance>()
+        for (account in accounts) {
+            val raw = accountBalances.value[account.accountId].orEmpty().trim()
+            if (raw.isEmpty()) continue
+            val balance = raw.toDoubleOrNull()
+            if (balance == null || !balance.isFinite() || balance < 0.0) {
+                localError = "Enter a valid non-negative PKR balance for ${account.name}."
+                return null
+            }
+            if (balance != 0.0) {
+                balances += OpeningAccountBalance(account.accountId, balance)
+            }
+        }
+        if (!correction && inventory.isEmpty() && balances.isEmpty()) {
+            localError = "Enter at least one non-zero opening balance, or leave opening unrecorded."
+            return null
+        }
+        if (!confirmed) {
+            localError = "Tick the confirmation after checking the figures."
+            return null
+        }
+        return OpeningStateInput(
+            openingDate = date,
+            inventoryBalances = inventory,
+            accountBalances = balances,
+            notes = notes.trim().ifBlank { null },
+        )
+    }
+
+    BackHandler { requestLeave(onBack) }
+
+    Box(modifier.fillMaxSize()) {
+        hostedScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
+            { action -> requestLeave(action) },
+        ) { padding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .testTag(NativeUiTags.OwnerShopSettingsOpeningForm),
+            ) {
+                CashierScreenHeader(
+                    title = "Shop settings",
+                    displayName = context.shopName,
+                    roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                    businessDate = context.businessDate,
+                    postingOpen = context.postingOpen,
+                )
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .imePadding()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    TextButton(
+                        onClick = { requestLeave(onBack) },
+                        enabled = !saving,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsOpeningBack),
+                    ) { Text("Back to shop settings") }
+                    Text(
+                        if (correction) "Correct opening balances" else "Enter opening balances",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        if (correction) {
+                            "Enter the complete corrected starting picture—not only what changed. Zero removes an earlier starting amount."
+                        } else {
+                            "Use only amounts that already existed when this installation began. This is optional; if everything was zero, leave it unrecorded."
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    OutlinedTextField(
+                        value = openingDate,
+                        onValueChange = {
+                            openingDate = it
+                            touch()
+                        },
+                        label = { Text("Opening date (YYYY-MM-DD)") },
+                        singleLine = true,
+                        enabled = !saving,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerShopSettingsOpeningDate),
+                    )
+                    Text(
+                        "Stock already in the shop",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    if (products.isEmpty()) {
+                        Text(
+                            "No stock-tracked products are available.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    } else {
+                        products.forEach { product ->
+                            OpeningAmountField(
+                                label = "${product.name} (${product.unitLabel})",
+                                value = productQuantities.value[product.productId].orEmpty(),
+                                onValueChange = {
+                                    productQuantities.value =
+                                        productQuantities.value.toMutableMap().also { map ->
+                                            map[product.productId] = it
+                                        }
+                                    touch()
+                                },
+                                enabled = !saving,
+                                tag = NativeUiTags.ownerShopOpeningProduct(product.productId),
+                            )
+                        }
+                    }
+                    listOf(
+                        "Cash or bank",
+                        "Customer owes shop",
+                        "Shop owes supplier",
+                    ).forEach { kind ->
+                        val rows = accounts.filter { it.kindLabel == kind }
+                        Text(
+                            kind,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        if (rows.isEmpty()) {
+                            Text(
+                                "None available.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        } else {
+                            rows.forEach { account ->
+                                OpeningAmountField(
+                                    label = "${account.name} (PKR)",
+                                    value = accountBalances.value[account.accountId].orEmpty(),
+                                    onValueChange = {
+                                        accountBalances.value =
+                                            accountBalances.value.toMutableMap().also { map ->
+                                                map[account.accountId] = it
+                                            }
+                                        touch()
+                                    },
+                                    enabled = !saving,
+                                    tag = NativeUiTags.ownerShopOpeningAccount(account.accountId),
+                                )
+                            }
+                        }
+                    }
+                    OutlinedTextField(
+                        value = notes,
+                        onValueChange = {
+                            notes = it
+                            touch()
+                        },
+                        label = { Text("Notes (optional)") },
+                        enabled = !saving,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerShopSettingsOpeningNotes),
+                    )
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerShopSettingsOpeningConfirm),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Checkbox(
+                            checked = confirmed,
+                            onCheckedChange = {
+                                confirmed = it
+                                touch()
+                            },
+                            enabled = !saving,
+                        )
+                        Text(
+                            if (correction) {
+                                "I checked these as the complete corrected starting balances. They are not today's sales, purchases, or payments."
+                            } else {
+                                "I checked these as the complete starting balances. They are not today's sales, purchases, or payments."
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                    (localError ?: error)?.let {
+                        Text(
+                            it,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsError),
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            val input = buildInputOrNull() ?: return@Button
+                            onSave(input)
+                        },
+                        enabled = !saving,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerShopSettingsOpeningSave),
+                    ) {
+                        if (saving) {
+                            CircularProgressIndicator(Modifier.height(20.dp), strokeWidth = 2.dp)
+                        } else {
+                            Text(if (correction) "Save correction" else "Record opening balances")
+                        }
+                    }
+                    TextButton(
+                        onClick = { requestLeave(onBack) },
+                        enabled = !saving,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsOpeningCancel),
+                    ) { Text("Cancel") }
+                }
+            }
+        }
+        OwnerShopSettingsDiscardDialog(
+            leaveGuard = leaveGuard,
+            title = if (correction) "Discard opening correction?" else "Discard opening balances?",
+            body = "Edits to opening balances will be cleared.",
+            discardTag = NativeUiTags.OwnerShopSettingsOpeningDiscard,
+            keepTag = NativeUiTags.OwnerShopSettingsOpeningKeep,
+        )
+    }
+}
+
+@Composable
+private fun OpeningReauthScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    context: NativeOwnerMoreContext,
+    busy: Boolean,
+    error: String?,
+    onConfirm: (CharArray) -> Unit,
+    onCancel: () -> Unit,
+    hostedScaffold: HostedScaffold,
+    modifier: Modifier,
+) {
+    var passphrase by rememberSaveable { mutableStateOf("") }
+    BackHandler(onBack = onCancel)
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .testTag(NativeUiTags.OwnerShopSettingsOpeningReauth),
+        ) {
+            CashierScreenHeader(
+                title = "Confirm it is you",
+                displayName = context.shopName,
+                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                businessDate = context.businessDate,
+                postingOpen = context.postingOpen,
+            )
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .imePadding()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                TextButton(
+                    onClick = onCancel,
+                    modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsOpeningReauthCancel),
+                ) { Text("Cancel") }
+                error?.let {
+                    Text(
+                        it,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsError),
+                    )
+                }
+                Text(
+                    "Enter your full Owner passphrase to continue this sensitive opening change.",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                OutlinedTextField(
+                    value = passphrase,
+                    onValueChange = { passphrase = it },
+                    label = { Text("Owner passphrase") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(NativeUiTags.OwnerShopSettingsOpeningReauthPassphrase),
+                )
+                Button(
+                    onClick = {
+                        val chars = passphrase.toCharArray()
+                        passphrase = ""
+                        onConfirm(chars)
+                    },
+                    enabled = !busy && passphrase.isNotEmpty(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(NativeUiTags.OwnerShopSettingsOpeningReauthConfirm),
+                ) {
+                    if (busy) {
+                        CircularProgressIndicator(Modifier.height(20.dp), strokeWidth = 2.dp)
+                    } else {
+                        Text("Continue")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun OpeningAmountField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    enabled: Boolean,
+    tag: String,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        singleLine = true,
+        enabled = enabled,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(tag),
+    )
+}

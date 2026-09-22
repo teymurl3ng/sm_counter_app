@@ -90,7 +90,7 @@ class NativeOwnerUsersRolesScreenContractTest {
             .performScrollTo()
             .performClick()
         assertEquals(false, disableRequested)
-        composeRule.onNodeWithTag(NativeUiTags.OwnerUsersRolesCredentialResetDeferred)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerUsersRolesCredentialReset)
             .performScrollTo()
             .assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerUsersRolesDetailBack)

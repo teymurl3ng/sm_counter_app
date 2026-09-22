@@ -16,11 +16,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBalance
+import androidx.compose.material.icons.outlined.Assignment
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.LocalShipping
 import androidx.compose.material.icons.outlined.Payments
+import androidx.compose.material.icons.outlined.PointOfSale
 import androidx.compose.material.icons.outlined.ReceiptLong
+import androidx.compose.material.icons.outlined.Science
 import androidx.compose.material.icons.outlined.WarningAmber
+import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -42,7 +46,7 @@ import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 /**
  * Manager Work desk — Owner Work launcher density under Manager chrome.
  * Product IA excludes Pay salary, costing, shop settings, users, backup, reopen.
- * Sale / Collect / Ops stock entries are deferred (not mounted).
+ * Sale / Collect / Ops stock entries are hosted via Manager*EntryScreen wrappers.
  */
 @Composable
 fun ManagerWorkScreen(
@@ -143,6 +147,12 @@ private fun ReadyWork(
                 }
             }
         }
+        NativeManagerWorkDestination.RecordSale,
+        NativeManagerWorkDestination.RecordPayment,
+        NativeManagerWorkDestination.ReceiveMilk,
+        NativeManagerWorkDestination.MakeYogurt,
+        NativeManagerWorkDestination.RecordSpoilage,
+        NativeManagerWorkDestination.Deliveries,
         NativeManagerWorkDestination.RecordExpense,
         NativeManagerWorkDestination.PaySupplier,
         -> {
@@ -185,7 +195,11 @@ private fun WorkHomeBody(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        AttentionStrip(context = context, onOpenClose = onOpenClose)
+        AttentionStrip(
+            context = context,
+            onOpenClose = onOpenClose,
+            modifier = Modifier.testTag(NativeUiTags.ManagerWorkAttentionSection),
+        )
 
         Text(
             text = "Daily shortcuts",
@@ -197,46 +211,58 @@ private fun WorkHomeBody(
                 .testTag(NativeUiTags.ManagerWorkPrimaryActions),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            OutlinedButton(
-                onClick = { onOpenDestination(NativeManagerWorkDestination.RecordExpense) },
-                modifier = Modifier
-                    .weight(1f)
-                    .heightIn(min = 72.dp)
-                    .testTag(NativeUiTags.ManagerWorkRecordExpense),
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    Icon(Icons.Outlined.ReceiptLong, contentDescription = null)
-                    Text("Expense")
-                }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                PrimaryAction(
+                    label = "Record sale",
+                    icon = Icons.Outlined.PointOfSale,
+                    tag = NativeUiTags.ManagerWorkRecordSale,
+                    onClick = { onOpenDestination(NativeManagerWorkDestination.RecordSale) },
+                )
+                PrimaryAction(
+                    label = "Record payment",
+                    icon = Icons.Outlined.Payments,
+                    tag = NativeUiTags.ManagerWorkRecordPayment,
+                    onClick = { onOpenDestination(NativeManagerWorkDestination.RecordPayment) },
+                )
             }
-            OutlinedButton(
-                onClick = { onOpenDestination(NativeManagerWorkDestination.PaySupplier) },
-                modifier = Modifier
-                    .weight(1f)
-                    .heightIn(min = 72.dp)
-                    .testTag(NativeUiTags.ManagerWorkPaySupplier),
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    Icon(Icons.Outlined.AccountBalance, contentDescription = null)
-                    Text("Pay supplier")
-                }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                PrimaryAction(
+                    label = "Receive milk",
+                    icon = Icons.Outlined.WaterDrop,
+                    tag = NativeUiTags.ManagerWorkReceiveMilk,
+                    onClick = { onOpenDestination(NativeManagerWorkDestination.ReceiveMilk) },
+                )
+                PrimaryAction(
+                    label = "Expense",
+                    icon = Icons.Outlined.ReceiptLong,
+                    tag = NativeUiTags.ManagerWorkRecordExpense,
+                    onClick = { onOpenDestination(NativeManagerWorkDestination.RecordExpense) },
+                )
             }
         }
 
         Text(
-            text = "Attention and close",
+            text = "Make and move stock",
             style = MaterialTheme.typography.labelLarge,
         )
         Column(
-            Modifier.testTag(NativeUiTags.ManagerWorkAttentionSection),
+            Modifier.testTag(NativeUiTags.ManagerWorkStockSection),
             verticalArrangement = Arrangement.spacedBy(0.dp),
         ) {
+            CommandRow(
+                label = "Make yogurt",
+                detail = "Record Milk used and Yogurt produced",
+                icon = Icons.Outlined.Science,
+                tag = NativeUiTags.ManagerWorkMakeYogurt,
+                onClick = { onOpenDestination(NativeManagerWorkDestination.MakeYogurt) },
+            )
+            CommandRow(
+                label = "Record spoilage",
+                detail = "Physical loss and reason",
+                icon = Icons.Outlined.Assignment,
+                tag = NativeUiTags.ManagerWorkRecordSpoilage,
+                onClick = { onOpenDestination(NativeManagerWorkDestination.RecordSpoilage) },
+            )
             CommandRow(
                 label = "Deliveries",
                 detail = if (context.activeDeliveryCount > 0) {
@@ -247,8 +273,24 @@ private fun WorkHomeBody(
                 icon = Icons.Outlined.LocalShipping,
                 tag = NativeUiTags.ManagerWorkDeliveries,
                 badge = context.activeDeliveryCount.takeIf { it > 0 }?.toString(),
-                onClick = { /* M1 deferred: deliveries hosting */ },
-                enabled = false,
+                onClick = { onOpenDestination(NativeManagerWorkDestination.Deliveries) },
+            )
+        }
+
+        Text(
+            text = "Money and close",
+            style = MaterialTheme.typography.labelLarge,
+        )
+        Column(
+            Modifier.testTag(NativeUiTags.ManagerWorkMoneySection),
+            verticalArrangement = Arrangement.spacedBy(0.dp),
+        ) {
+            CommandRow(
+                label = "Pay supplier",
+                detail = "Supplier balance and payment",
+                icon = Icons.Outlined.AccountBalance,
+                tag = NativeUiTags.ManagerWorkPaySupplier,
+                onClick = { onOpenDestination(NativeManagerWorkDestination.PaySupplier) },
             )
             CommandRow(
                 label = "Cash count and close",
@@ -274,6 +316,7 @@ private fun WorkHomeBody(
 private fun AttentionStrip(
     context: NativeManagerWorkContext,
     onOpenClose: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val items = buildList {
         if (!context.postingOpen) {
@@ -285,46 +328,72 @@ private fun AttentionStrip(
             add("${context.activeDeliveryCount} active deliveries need attention.")
         }
     }
-    if (items.isEmpty()) {
-        Surface(
-            color = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            shape = MaterialTheme.shapes.medium,
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag(NativeUiTags.ManagerWorkAllClear),
-        ) {
-            Text(
-                text = "All clear for now — use the shortcuts below for daily work.",
-                modifier = Modifier.padding(16.dp),
-                style = MaterialTheme.typography.bodyMedium,
-            )
+    Column(modifier) {
+        if (items.isEmpty()) {
+            Surface(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(NativeUiTags.ManagerWorkAllClear),
+            ) {
+                Text(
+                    text = "All clear for now — use the shortcuts below for daily work.",
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+        } else {
+            Surface(
+                color = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(NativeUiTags.ManagerWorkAttention)
+                    .clickable(onClick = onOpenClose),
+            ) {
+                Column(
+                    Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(Icons.Outlined.WarningAmber, contentDescription = null)
+                        Text("Needs attention", style = MaterialTheme.typography.titleMedium)
+                    }
+                    items.forEach { line ->
+                        Text(line, style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+            }
         }
-        return
     }
-    Surface(
-        color = MaterialTheme.colorScheme.errorContainer,
-        contentColor = MaterialTheme.colorScheme.onErrorContainer,
-        shape = MaterialTheme.shapes.medium,
+}
+
+@Composable
+private fun PrimaryAction(
+    label: String,
+    icon: ImageVector,
+    tag: String,
+    onClick: () -> Unit,
+) {
+    OutlinedButton(
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .testTag(NativeUiTags.ManagerWorkAttention)
-            .clickable(onClick = onOpenClose),
+            .heightIn(min = 72.dp)
+            .testTag(tag),
     ) {
         Column(
-            Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(Icons.Outlined.WarningAmber, contentDescription = null)
-                Text("Needs attention", style = MaterialTheme.typography.titleMedium)
-            }
-            items.forEach { line ->
-                Text(line, style = MaterialTheme.typography.bodyMedium)
-            }
+            Icon(icon, contentDescription = null)
+            Text(label)
         }
     }
 }
@@ -337,17 +406,13 @@ private fun CommandRow(
     tag: String,
     onClick: () -> Unit,
     badge: String? = null,
-    enabled: Boolean = true,
 ) {
     Row(
         Modifier
             .fillMaxWidth()
             .heightIn(min = 64.dp)
             .testTag(tag)
-            .then(
-                if (enabled) Modifier.clickable(onClick = onClick)
-                else Modifier,
-            )
+            .clickable(onClick = onClick)
             .padding(vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -356,22 +421,9 @@ private fun CommandRow(
             icon,
             contentDescription = null,
             modifier = Modifier.size(24.dp),
-            tint = if (enabled) {
-                MaterialTheme.colorScheme.onSurface
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            },
         )
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(
-                label,
-                style = MaterialTheme.typography.titleMedium,
-                color = if (enabled) {
-                    MaterialTheme.colorScheme.onSurface
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
-            )
+            Text(label, style = MaterialTheme.typography.titleMedium)
             Text(
                 detail,
                 style = MaterialTheme.typography.bodyMedium,
@@ -392,13 +444,17 @@ private fun CommandRow(
                 )
             }
         }
-        if (enabled) {
-            Icon(Icons.Outlined.ChevronRight, contentDescription = null)
-        }
+        Icon(Icons.Outlined.ChevronRight, contentDescription = null)
     }
 }
 
 private fun openingLabel(destination: NativeManagerWorkDestination): String = when (destination) {
+    NativeManagerWorkDestination.RecordSale -> "Opening record sale…"
+    NativeManagerWorkDestination.RecordPayment -> "Opening record payment…"
+    NativeManagerWorkDestination.ReceiveMilk -> "Opening receive milk…"
+    NativeManagerWorkDestination.MakeYogurt -> "Opening make yogurt…"
+    NativeManagerWorkDestination.RecordSpoilage -> "Opening record spoilage…"
+    NativeManagerWorkDestination.Deliveries -> "Opening deliveries…"
     NativeManagerWorkDestination.RecordExpense -> "Opening record expense…"
     NativeManagerWorkDestination.PaySupplier -> "Opening pay supplier…"
     NativeManagerWorkDestination.Home -> "Opening…"

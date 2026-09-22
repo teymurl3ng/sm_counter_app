@@ -100,8 +100,9 @@ class NativeOwnerProductsFacade(
 
     private suspend fun requireOwnerMasterData(sessionHandle: String) {
         val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_MASTER_DATA)
-        require(AppRole.parse(actor.role) == AppRole.OWNER) {
-            "Owner Products is only available to Owner."
+        val role = AppRole.parse(actor.role)
+        require(role == AppRole.OWNER || role == AppRole.MANAGER || role == AppRole.ADMIN) {
+            "Products is only available to Owner, Manager, or Administrator."
         }
     }
 

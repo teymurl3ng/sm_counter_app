@@ -29,6 +29,8 @@ import com.saaf.milkshop.application.cashclose.NativeCashCloseFacade
 import com.saaf.milkshop.application.collection.NativeCollectionFacade
 import com.saaf.milkshop.application.expense.NativeExpenseFacade
 import com.saaf.milkshop.application.more.NativeMoreFacade
+import com.saaf.milkshop.application.admin.NativeAdminWorkFacade
+import com.saaf.milkshop.application.manager.NativeManagerWorkFacade
 import com.saaf.milkshop.application.operations.NativeAttendanceFacade
 import com.saaf.milkshop.application.operations.NativeDeliveriesFacade
 import com.saaf.milkshop.application.operations.NativeMakeYogurtFacade
@@ -75,6 +77,14 @@ import com.saaf.milkshop.nativeui.vendorpayment.NativeVendorPaymentState
 import com.saaf.milkshop.nativeui.vendorpayment.NativeVendorPaymentViewModel
 import com.saaf.milkshop.nativeui.more.NativeMoreState
 import com.saaf.milkshop.nativeui.more.NativeMoreViewModel
+import com.saaf.milkshop.nativeui.admin.AdminPreviewHost
+import com.saaf.milkshop.nativeui.admin.AdminSection
+import com.saaf.milkshop.nativeui.admin.NativeAdminWorkState
+import com.saaf.milkshop.nativeui.admin.NativeAdminWorkViewModel
+import com.saaf.milkshop.nativeui.manager.ManagerPreviewHost
+import com.saaf.milkshop.nativeui.manager.ManagerSection
+import com.saaf.milkshop.nativeui.manager.NativeManagerWorkState
+import com.saaf.milkshop.nativeui.manager.NativeManagerWorkViewModel
 import com.saaf.milkshop.nativeui.operations.NativeAttendanceState
 import com.saaf.milkshop.nativeui.operations.NativeAttendanceViewModel
 import com.saaf.milkshop.nativeui.operations.NativeDeliveriesState
@@ -138,6 +148,8 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var ownerOverviewFacade: NativeOwnerOverviewFacade
     private lateinit var ownerReportsFacade: NativeOwnerReportsFacade
     private lateinit var ownerWorkFacade: NativeOwnerWorkFacade
+    private lateinit var managerWorkFacade: NativeManagerWorkFacade
+    private lateinit var adminWorkFacade: NativeAdminWorkFacade
     private lateinit var ownerRecordsFacade: NativeOwnerRecordsFacade
     private lateinit var ownerMoreFacade: NativeOwnerMoreFacade
     private lateinit var ownerProductsFacade: NativeOwnerProductsFacade
@@ -285,6 +297,20 @@ class NativePreviewActivity : FragmentActivity() {
         )
     }
 
+    private val managerWorkViewModel by viewModels<NativeManagerWorkViewModel> {
+        NativeManagerWorkViewModel.Factory(
+            facade = managerWorkFacade,
+            onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
+        )
+    }
+
+    private val adminWorkViewModel by viewModels<NativeAdminWorkViewModel> {
+        NativeAdminWorkViewModel.Factory(
+            facade = adminWorkFacade,
+            onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
+        )
+    }
+
     private val ownerRecordsViewModel by viewModels<NativeOwnerRecordsViewModel> {
         NativeOwnerRecordsViewModel.Factory(
             facade = ownerRecordsFacade,
@@ -343,6 +369,8 @@ class NativePreviewActivity : FragmentActivity() {
         )
         ownerReportsFacade = NativeOwnerReportsFacade(app.database, app.userSecurity)
         ownerWorkFacade = NativeOwnerWorkFacade(app.database, app.userSecurity)
+        managerWorkFacade = NativeManagerWorkFacade(app.database, app.userSecurity)
+        adminWorkFacade = NativeAdminWorkFacade(app.database, app.userSecurity)
         ownerRecordsFacade = NativeOwnerRecordsFacade(app.database, app.userSecurity)
         ownerMoreFacade = NativeOwnerMoreFacade(app.database, app.userSecurity, quickUnlockService)
         ownerProductsFacade = NativeOwnerProductsFacade(app.database, app.userSecurity)
@@ -368,6 +396,8 @@ class NativePreviewActivity : FragmentActivity() {
         authenticationViewModel.attachQuickUnlock(quickUnlockFacade)
         val openOperator = intent.getBooleanExtra(EXTRA_OPEN_OPERATOR, false)
         val openOwner = intent.getBooleanExtra(EXTRA_OPEN_OWNER, false)
+        val openManager = intent.getBooleanExtra(EXTRA_OPEN_MANAGER, false)
+        val openAdmin = intent.getBooleanExtra(EXTRA_OPEN_ADMIN, false)
         setContent {
             SaafTheme {
                 val authenticationState by authenticationViewModel.state.collectAsState()
@@ -389,6 +419,8 @@ class NativePreviewActivity : FragmentActivity() {
                 val ownerOverviewState by ownerOverviewViewModel.state.collectAsState()
                 val ownerReportsState by ownerReportsViewModel.state.collectAsState()
                 val ownerWorkState by ownerWorkViewModel.state.collectAsState()
+                val managerWorkState by managerWorkViewModel.state.collectAsState()
+                val adminWorkState by adminWorkViewModel.state.collectAsState()
                 val ownerRecordsState by ownerRecordsViewModel.state.collectAsState()
                 val ownerMoreState by ownerMoreViewModel.state.collectAsState()
                 NativeFoundationPreview(
@@ -435,12 +467,18 @@ class NativePreviewActivity : FragmentActivity() {
                     ownerReportsViewModel = ownerReportsViewModel,
                     ownerWorkState = ownerWorkState,
                     ownerWorkViewModel = ownerWorkViewModel,
+                    managerWorkState = managerWorkState,
+                    managerWorkViewModel = managerWorkViewModel,
+                    adminWorkState = adminWorkState,
+                    adminWorkViewModel = adminWorkViewModel,
                     ownerRecordsState = ownerRecordsState,
                     ownerRecordsViewModel = ownerRecordsViewModel,
                     ownerMoreState = ownerMoreState,
                     ownerMoreViewModel = ownerMoreViewModel,
                     openOperatorOnStart = openOperator,
                     openOwnerOnStart = openOwner,
+                    openManagerOnStart = openManager,
+                    openAdminOnStart = openAdmin,
                 )
             }
         }
@@ -449,6 +487,8 @@ class NativePreviewActivity : FragmentActivity() {
     companion object {
         const val EXTRA_OPEN_OPERATOR = "open_operator"
         const val EXTRA_OPEN_OWNER = "open_owner"
+        const val EXTRA_OPEN_MANAGER = "open_manager"
+        const val EXTRA_OPEN_ADMIN = "open_admin"
     }
 
     override fun onStart() {
@@ -521,16 +561,22 @@ private fun NativeFoundationPreview(
     ownerReportsViewModel: NativeOwnerReportsViewModel,
     ownerWorkState: NativeOwnerWorkState,
     ownerWorkViewModel: NativeOwnerWorkViewModel,
+    managerWorkState: NativeManagerWorkState,
+    managerWorkViewModel: NativeManagerWorkViewModel,
+    adminWorkState: NativeAdminWorkState,
+    adminWorkViewModel: NativeAdminWorkViewModel,
     ownerRecordsState: NativeOwnerRecordsState,
     ownerRecordsViewModel: NativeOwnerRecordsViewModel,
     ownerMoreState: NativeOwnerMoreState,
     ownerMoreViewModel: NativeOwnerMoreViewModel,
     openOperatorOnStart: Boolean = false,
     openOwnerOnStart: Boolean = false,
+    openManagerOnStart: Boolean = false,
+    openAdminOnStart: Boolean = false,
 ) {
     var destination by rememberSaveable {
         mutableStateOf(
-            if (openOperatorOnStart || openOwnerOnStart) {
+            if (openOperatorOnStart || openOwnerOnStart || openManagerOnStart || openAdminOnStart) {
                 PreviewDestination.Access
             } else {
                 PreviewDestination.Welcome
@@ -540,16 +586,32 @@ private fun NativeFoundationPreview(
     var cashierSection by rememberSaveable { mutableStateOf(CashierSection.Sell) }
     var operationsSection by rememberSaveable { mutableStateOf(OperationsSection.Work) }
     var ownerSection by rememberSaveable { mutableStateOf(OwnerSection.Overview) }
+    var managerSection by rememberSaveable { mutableStateOf(ManagerSection.Work) }
+    var adminSection by rememberSaveable { mutableStateOf(AdminSection.Work) }
     var wantOperator by rememberSaveable { mutableStateOf(openOperatorOnStart) }
-    var wantOwner by rememberSaveable { mutableStateOf(openOwnerOnStart && !openOperatorOnStart) }
+    var wantOwner by rememberSaveable {
+        mutableStateOf(openOwnerOnStart && !openOperatorOnStart)
+    }
+    var wantManager by rememberSaveable {
+        mutableStateOf(openManagerOnStart && !openOperatorOnStart && !openOwnerOnStart)
+    }
+    var wantAdmin by rememberSaveable {
+        mutableStateOf(
+            openAdminOnStart && !openOperatorOnStart && !openOwnerOnStart && !openManagerOnStart,
+        )
+    }
     var operatorSwitchInFlight by remember { mutableStateOf(false) }
     var ownerSwitchInFlight by remember { mutableStateOf(false) }
+    var managerSwitchInFlight by remember { mutableStateOf(false) }
+    var adminSwitchInFlight by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val sellNotice = stringResource(R.string.native_nav_sell_notice)
 
     androidx.compose.runtime.LaunchedEffect(authenticationState, wantOwner) {
-        if (!wantOwner || ownerSwitchInFlight || wantOperator) return@LaunchedEffect
+        if (!wantOwner || ownerSwitchInFlight || wantOperator || wantManager || wantAdmin) {
+            return@LaunchedEffect
+        }
         when (val state = authenticationState) {
             is NativeAuthenticationState.Authenticated -> {
                 if (state.identity.role == AppRole.OWNER) {
@@ -632,6 +694,94 @@ private fun NativeFoundationPreview(
         }
     }
 
+    androidx.compose.runtime.LaunchedEffect(authenticationState, wantManager) {
+        if (!wantManager || managerSwitchInFlight || wantOperator || wantOwner || wantAdmin) {
+            return@LaunchedEffect
+        }
+        when (val state = authenticationState) {
+            is NativeAuthenticationState.Authenticated -> {
+                if (state.identity.role == AppRole.MANAGER) {
+                    wantManager = false
+                    destination = PreviewDestination.Access
+                    return@LaunchedEffect
+                }
+                managerSwitchInFlight = true
+                authenticationViewModel.openPreviewManagerWork()
+            }
+            is NativeAuthenticationState.AccountPicker,
+            is NativeAuthenticationState.OwnerSetup,
+            -> {
+                managerSwitchInFlight = true
+                authenticationViewModel.openPreviewManagerWork()
+            }
+            is NativeAuthenticationState.Loading -> Unit
+            is NativeAuthenticationState.RecoveryCode -> {
+                authenticationViewModel.acknowledgeRecoveryCode()
+            }
+            else -> {
+                managerSwitchInFlight = false
+            }
+        }
+    }
+
+    androidx.compose.runtime.LaunchedEffect(authenticationState) {
+        if (authenticationState is NativeAuthenticationState.Authenticated &&
+            authenticationState.identity.role == AppRole.MANAGER
+        ) {
+            managerSwitchInFlight = false
+            wantManager = false
+        }
+        val failedPicker = authenticationState as? NativeAuthenticationState.AccountPicker
+        val failedOwner = authenticationState as? NativeAuthenticationState.OwnerSetup
+        if (failedPicker?.error != null || failedOwner?.error != null) {
+            managerSwitchInFlight = false
+        }
+    }
+
+    androidx.compose.runtime.LaunchedEffect(authenticationState, wantAdmin) {
+        if (!wantAdmin || adminSwitchInFlight || wantOperator || wantOwner || wantManager) {
+            return@LaunchedEffect
+        }
+        when (val state = authenticationState) {
+            is NativeAuthenticationState.Authenticated -> {
+                if (state.identity.role == AppRole.ADMIN) {
+                    wantAdmin = false
+                    destination = PreviewDestination.Access
+                    return@LaunchedEffect
+                }
+                adminSwitchInFlight = true
+                authenticationViewModel.openPreviewAdminWork()
+            }
+            is NativeAuthenticationState.AccountPicker,
+            is NativeAuthenticationState.OwnerSetup,
+            -> {
+                adminSwitchInFlight = true
+                authenticationViewModel.openPreviewAdminWork()
+            }
+            is NativeAuthenticationState.Loading -> Unit
+            is NativeAuthenticationState.RecoveryCode -> {
+                authenticationViewModel.acknowledgeRecoveryCode()
+            }
+            else -> {
+                adminSwitchInFlight = false
+            }
+        }
+    }
+
+    androidx.compose.runtime.LaunchedEffect(authenticationState) {
+        if (authenticationState is NativeAuthenticationState.Authenticated &&
+            authenticationState.identity.role == AppRole.ADMIN
+        ) {
+            adminSwitchInFlight = false
+            wantAdmin = false
+        }
+        val failedPicker = authenticationState as? NativeAuthenticationState.AccountPicker
+        val failedOwner = authenticationState as? NativeAuthenticationState.OwnerSetup
+        if (failedPicker?.error != null || failedOwner?.error != null) {
+            adminSwitchInFlight = false
+        }
+    }
+
     fun showPreviewNotice(message: String) {
         coroutineScope.launch {
             snackbarHostState.currentSnackbarData?.dismiss()
@@ -665,6 +815,8 @@ private fun NativeFoundationPreview(
         ownerOverviewViewModel.close()
         ownerReportsViewModel.close()
         ownerWorkViewModel.close()
+        managerWorkViewModel.close()
+        adminWorkViewModel.close()
         ownerRecordsViewModel.close()
         ownerMoreViewModel.close()
         authenticationViewModel.leaveAuthenticatedArea()
@@ -672,6 +824,8 @@ private fun NativeFoundationPreview(
         cashierSection = CashierSection.Sell
         operationsSection = OperationsSection.Work
         ownerSection = OwnerSection.Overview
+        managerSection = ManagerSection.Work
+        adminSection = AdminSection.Work
     }
 
     fun leaveToAccountPicker() {
@@ -686,10 +840,14 @@ private fun NativeFoundationPreview(
         ownerOverviewViewModel.close()
         ownerReportsViewModel.close()
         ownerWorkViewModel.close()
+        managerWorkViewModel.close()
+        adminWorkViewModel.close()
         ownerRecordsViewModel.close()
         ownerMoreViewModel.close()
         authenticationViewModel.beginAccountSwitch()
         destination = PreviewDestination.Access
+        managerSection = ManagerSection.Work
+        adminSection = AdminSection.Work
     }
 
     val showingAuthenticated = destination == PreviewDestination.Access &&
@@ -698,10 +856,18 @@ private fun NativeFoundationPreview(
         ?.identity?.role
     val showingOperator = showingAuthenticated && authenticatedRole == AppRole.OPERATOR
     val showingOwner = showingAuthenticated && authenticatedRole == AppRole.OWNER
-    val showingCashier = showingAuthenticated && !showingOperator && !showingOwner
+    val showingManager = showingAuthenticated && authenticatedRole == AppRole.MANAGER
+    val showingAdmin = showingAuthenticated && authenticatedRole == AppRole.ADMIN
+    val showingCashier = showingAuthenticated && authenticatedRole == AppRole.CASHIER
 
-    androidx.compose.runtime.LaunchedEffect(showingCashier, showingOperator, showingOwner) {
-        if (!showingCashier && !showingOwner) closeCashierShell()
+    androidx.compose.runtime.LaunchedEffect(
+        showingCashier,
+        showingOperator,
+        showingOwner,
+        showingManager,
+        showingAdmin,
+    ) {
+        if (!showingCashier && !showingOwner && !showingManager) closeCashierShell()
         if (!showingOperator && !showingOwner) {
             operationsWorkViewModel.close()
             receiveMilkViewModel.close()
@@ -715,8 +881,18 @@ private fun NativeFoundationPreview(
             ownerOverviewViewModel.close()
             ownerReportsViewModel.close()
             ownerWorkViewModel.close()
+        }
+        if (!showingOwner && !showingManager) {
             ownerRecordsViewModel.close()
+        }
+        if (!showingOwner && !showingManager && !showingAdmin) {
             ownerMoreViewModel.close()
+        }
+        if (!showingManager) {
+            managerWorkViewModel.close()
+        }
+        if (!showingAdmin) {
+            adminWorkViewModel.close()
         }
     }
 
@@ -801,6 +977,50 @@ private fun NativeFoundationPreview(
                     attendanceViewModel = attendanceViewModel,
                     operationsMoreState = operationsMoreState,
                     operationsMoreViewModel = operationsMoreViewModel,
+                    onLeaveToWelcome = { leaveToWelcome() },
+                    onLeaveToAccountPicker = { leaveToAccountPicker() },
+                    onShowNotice = { showPreviewNotice(it) },
+                )
+            } else if (showingManager) {
+                val authenticated = authenticationState as NativeAuthenticationState.Authenticated
+                ManagerPreviewHost(
+                    sessionHandle = authenticated.sessionHandle,
+                    identity = authenticated.identity,
+                    snackbarHostState = snackbarHostState,
+                    managerSection = managerSection,
+                    onManagerSectionChange = { managerSection = it },
+                    managerWorkState = managerWorkState,
+                    managerWorkViewModel = managerWorkViewModel,
+                    expenseState = expenseState,
+                    expenseViewModel = expenseViewModel,
+                    vendorPaymentState = vendorPaymentState,
+                    vendorPaymentViewModel = vendorPaymentViewModel,
+                    cashCloseState = cashCloseState,
+                    cashCloseViewModel = cashCloseViewModel,
+                    ownerRecordsState = ownerRecordsState,
+                    ownerRecordsViewModel = ownerRecordsViewModel,
+                    ownerMoreState = ownerMoreState,
+                    ownerMoreViewModel = ownerMoreViewModel,
+                    onLeaveToWelcome = { leaveToWelcome() },
+                    onLeaveToAccountPicker = { leaveToAccountPicker() },
+                    onShowNotice = { showPreviewNotice(it) },
+                )
+            } else if (showingAdmin) {
+                val authenticated = authenticationState as NativeAuthenticationState.Authenticated
+                AdminPreviewHost(
+                    sessionHandle = authenticated.sessionHandle,
+                    identity = authenticated.identity,
+                    snackbarHostState = snackbarHostState,
+                    adminSection = adminSection,
+                    onAdminSectionChange = { adminSection = it },
+                    adminWorkState = adminWorkState,
+                    adminWorkViewModel = adminWorkViewModel,
+                    expenseState = expenseState,
+                    expenseViewModel = expenseViewModel,
+                    ownerRecordsState = ownerRecordsState,
+                    ownerRecordsViewModel = ownerRecordsViewModel,
+                    ownerMoreState = ownerMoreState,
+                    ownerMoreViewModel = ownerMoreViewModel,
                     onLeaveToWelcome = { leaveToWelcome() },
                     onLeaveToAccountPicker = { leaveToAccountPicker() },
                     onShowNotice = { showPreviewNotice(it) },

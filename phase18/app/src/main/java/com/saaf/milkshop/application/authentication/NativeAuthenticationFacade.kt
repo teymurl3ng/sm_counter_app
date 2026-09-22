@@ -154,6 +154,16 @@ class NativeAuthenticationFacade(
         return signIn(account, sample.PREVIEW_SHARED_PASSPHRASE.toCharArray())
     }
 
+    suspend fun signInPreviewManager(): NativeAuthenticatedSession {
+        alignPreviewPassphrases()
+        val sample = com.saaf.milkshop.application.preview.NativePreviewSampleData
+        val account = activeAccounts().firstOrNull { it.loginName == sample.PREVIEW_MANAGER_LOGIN }
+            ?: error(
+                "Preview Manager is missing. Sign in as Owner once so the preview can create it, then try again.",
+            )
+        return signIn(account, sample.PREVIEW_SHARED_PASSPHRASE.toCharArray())
+    }
+
     /**
      * Debug/preview helper: bootstrap or sign in as Preview Owner for Overview.
      */

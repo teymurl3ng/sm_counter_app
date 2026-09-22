@@ -140,6 +140,7 @@ internal fun CashCloseEntryContent(
     leaveGuard: EntryLeaveGuard,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
+    allowReopen: Boolean = true,
 ) {
     var countedText by rememberSaveable { mutableStateOf("") }
     var notes by rememberSaveable { mutableStateOf("") }
@@ -242,6 +243,7 @@ internal fun CashCloseEntryContent(
                     onReopenDay(reopenReason.trim(), secret)
                     draftTouched = false
                 },
+                allowReopen = allowReopen,
                 modifier = Modifier.weight(1f),
             )
         }
@@ -267,6 +269,7 @@ private fun CashCloseForm(
     onRecordCount: () -> Unit,
     onCloseDay: () -> Unit,
     onReopenDay: () -> Unit,
+    allowReopen: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
@@ -279,7 +282,8 @@ private fun CashCloseForm(
         activeCount != null &&
         reasonOk &&
         !state.saving
-    val canReopen = !state.context.postingOpen &&
+    val canReopen = allowReopen &&
+        !state.context.postingOpen &&
         reopenReason.trim().isNotEmpty() &&
         reopenPassphrase.isNotBlank() &&
         !state.saving
@@ -292,21 +296,36 @@ private fun CashCloseForm(
         verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         if (!state.context.postingOpen) {
-            StatusPanel(
-                title = "Today is closed",
-                message = "Transactions and cash counts for this date are locked. Reopen with a reason and your full passphrase.",
-                warning = true,
-                tag = NativeUiTags.CashClosePostingClosed,
-            )
-            ReopenPanel(
-                reason = reopenReason,
-                passphrase = reopenPassphrase,
-                saving = state.saving,
-                canReopen = canReopen,
-                onReasonChange = onReopenReasonChange,
-                onPassphraseChange = onReopenPassphraseChange,
-                onReopen = onReopenDay,
-            )
+            if (allowReopen) {
+                StatusPanel(
+                    title = "Today is closed",
+                    message = "Transactions and cash counts for this date are locked. Reopen with a reason and your full passphrase.",
+                    warning = true,
+                    tag = NativeUiTags.CashClosePostingClosed,
+                )
+                ReopenPanel(
+                    reason = reopenReason,
+                    passphrase = reopenPassphrase,
+                    saving = state.saving,
+                    canReopen = canReopen,
+                    onReasonChange = onReopenReasonChange,
+                    onPassphraseChange = onReopenPassphraseChange,
+                    onReopen = onReopenDay,
+                )
+            } else {
+                StatusPanel(
+                    title = "Today is closed",
+                    message = "Transactions and cash counts for this date are locked. Reopening a closed day is Owner-only.",
+                    warning = true,
+                    tag = NativeUiTags.CashClosePostingClosed,
+                )
+                Text(
+                    text = "Ask an Owner to reopen if this date must accept more transactions.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.testTag(NativeUiTags.CashCloseReopenOwnerOnlyNotice),
+                )
+            }
         } else {
             StatusPanel(
                 title = "Open business date",

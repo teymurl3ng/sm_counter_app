@@ -67,8 +67,38 @@ class SaafMilkTestRunner : AndroidJUnitRunner() {
                         TEST_OPERATOR_PASSPHRASE.toCharArray(),
                     )
                 }
+            val manager = app.database.appUserDao().findByLoginName(TEST_MANAGER_LOGIN)
+                ?: app.userSecurity.beginUserEnrollment(
+                    ownerSession.sessionId,
+                    CreateUserInput(
+                        loginName = TEST_MANAGER_LOGIN,
+                        displayName = "Instrumentation Manager",
+                        role = AppRole.MANAGER.wireValue,
+                    ),
+                ).let { pending ->
+                    app.userSecurity.completeUserEnrollment(
+                        pending.enrollmentToken,
+                        TEST_MANAGER_PASSPHRASE.toCharArray(),
+                    )
+                }
+            val admin = app.database.appUserDao().findByLoginName(TEST_ADMIN_LOGIN)
+                ?: app.userSecurity.beginUserEnrollment(
+                    ownerSession.sessionId,
+                    CreateUserInput(
+                        loginName = TEST_ADMIN_LOGIN,
+                        displayName = "Instrumentation Admin",
+                        role = AppRole.ADMIN.wireValue,
+                    ),
+                ).let { pending ->
+                    app.userSecurity.completeUserEnrollment(
+                        pending.enrollmentToken,
+                        TEST_ADMIN_PASSPHRASE.toCharArray(),
+                    )
+                }
             val cashierSession = app.userSecurity.login(cashier.loginName, TEST_CASHIER_PASSPHRASE.toCharArray())
             val operatorSession = app.userSecurity.login(operator.loginName, TEST_OPERATOR_PASSPHRASE.toCharArray())
+            val managerSession = app.userSecurity.login(manager.loginName, TEST_MANAGER_PASSPHRASE.toCharArray())
+            val adminSession = app.userSecurity.login(admin.loginName, TEST_ADMIN_PASSPHRASE.toCharArray())
             ensureCustomer(app, "Ahmed Store")
             ensureCustomer(app, "Bilal Dairy Point")
             ensureVendor(app, "Dawn Dairy Supply")
@@ -85,6 +115,8 @@ class SaafMilkTestRunner : AndroidJUnitRunner() {
                 quickUnlock.close()
                 app.userSecurity.logout(cashierSession.sessionId)
                 app.userSecurity.logout(operatorSession.sessionId)
+                app.userSecurity.logout(managerSession.sessionId)
+                app.userSecurity.logout(adminSession.sessionId)
             }
             app.currentSessionId = ownerSession.sessionId
         }
@@ -101,6 +133,10 @@ class SaafMilkTestRunner : AndroidJUnitRunner() {
         const val TEST_CASHIER_PIN = "731406"
         const val TEST_OPERATOR_LOGIN = "instrumentation.operator"
         const val TEST_OPERATOR_PASSPHRASE = "instrumentation operator passphrase 2026"
+        const val TEST_MANAGER_LOGIN = "instrumentation.manager"
+        const val TEST_MANAGER_PASSPHRASE = "instrumentation manager passphrase 2026"
+        const val TEST_ADMIN_LOGIN = "instrumentation.admin"
+        const val TEST_ADMIN_PASSPHRASE = "instrumentation admin passphrase 2026"
 
         private suspend fun enrollPin(
             quickUnlock: QuickUnlockService,

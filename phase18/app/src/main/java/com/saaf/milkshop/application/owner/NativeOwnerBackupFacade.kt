@@ -420,8 +420,19 @@ class NativeOwnerBackupFacade(
         recent: Boolean,
         allowQuickPin: Boolean,
     ) = security.requirePermission(sessionHandle, permission).also { actor ->
-        require(AppRole.parse(actor.role) == AppRole.OWNER) {
-            "Owner Backup is only available to Owner."
+        val role = AppRole.parse(actor.role)
+        val allowed = when (permission) {
+            // Admin may create a local encrypted export; restore / Drive stay Owner-only.
+            AppPermission.CREATE_EXPORT_BACKUP ->
+                role == AppRole.OWNER || role == AppRole.ADMIN
+            else -> role == AppRole.OWNER
+        }
+        require(allowed) {
+            if (permission == AppPermission.CREATE_EXPORT_BACKUP) {
+                "Encrypted export is only available to Owner or Admin."
+            } else {
+                "Owner Backup restore and Drive controls are only available to Owner."
+            }
         }
         if (recent) {
             security.sessionManager().requireRecentAuthentication(

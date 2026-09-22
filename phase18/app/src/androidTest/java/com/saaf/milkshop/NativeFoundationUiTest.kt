@@ -347,6 +347,718 @@ class NativeFoundationUiTest {
     }
 
     @Test
+    fun managerShellOpensUnderManagerChrome() {
+        openManagerWork()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerShellRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavWork).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+    }
+
+    @Test
+    fun managerShellHardwareBackStaysOnWorkAndKeepsSession() {
+        openManagerWork()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+            activity.onBackPressedDispatcher.onBackPressed()
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavWork).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+    }
+
+    @Test
+    fun managerShellNavSwitchesSectionsUnderManagerChrome() {
+        openManagerWork()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavClose).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ManagerCloseRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavClose).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavRecords).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ManagerRecordsRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavRecords).assertIsSelected()
+
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavMore).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ManagerMoreRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavMore).assertIsSelected()
+
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavWork).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavWork).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+    }
+
+    @Test
+    fun managerExpenseOpensUnderManagerChrome() {
+        openManagerExpense()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerExpenseEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ExpenseCategorySelector)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavWork).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerExpenseEntryRoot).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierExpenseEntryRoot).assertDoesNotExist()
+    }
+
+    @Test
+    fun managerExpenseHardwareBackReturnsToWorkHome() {
+        openManagerExpense()
+        pressHardwareBack()
+        assertReturnedToManagerWorkHome()
+    }
+
+    @Test
+    fun managerPaySupplierOpensUnderManagerChrome() {
+        openManagerPaySupplier()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerPaySupplierEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.VendorPaymentVendorSelector)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavWork).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerPaySupplierEntryRoot).assertDoesNotExist()
+    }
+
+    @Test
+    fun managerPaySupplierHardwareBackReturnsToWorkHome() {
+        openManagerPaySupplier()
+        pressHardwareBack()
+        assertReturnedToManagerWorkHome()
+    }
+
+    @Test
+    fun managerCashCloseOpensUnderManagerChrome() {
+        openManagerCashClose()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerCashCloseEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerCloseRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashCloseAmountInput)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavClose).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCashCloseEntryRoot).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashCloseReopenDay).assertDoesNotExist()
+    }
+
+    @Test
+    fun managerCashCloseHardwareBackReturnsToWorkHome() {
+        openManagerCashClose()
+        pressHardwareBack()
+        assertReturnedToManagerWorkHome()
+    }
+
+    @Test
+    fun managerRecordsOpensUnderManagerChrome() {
+        openManagerRecords()
+
+        composeRule.onNodeWithTag(NativeUiTags.ManagerRecordsRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsSearch).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavRecords).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavRecords).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerShellRoot).assertDoesNotExist()
+    }
+
+    @Test
+    fun managerRecordsHardwareBackReturnsToWorkHome() {
+        openManagerRecords()
+        pressHardwareBack()
+        assertReturnedToManagerWorkHome()
+    }
+
+    @Test
+    fun managerMoreOpensUnderManagerChrome() {
+        openManagerMore()
+
+        composeRule.onNodeWithTag(NativeUiTags.ManagerMoreRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerMoreMenu).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerMoreProducts).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerMorePersonalSecurity)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithText("Costing & plans").assertDoesNotExist()
+        composeRule.onNodeWithText("Shop settings").assertDoesNotExist()
+        composeRule.onNodeWithText("Users & roles").assertDoesNotExist()
+        composeRule.onNodeWithText("Security history").assertDoesNotExist()
+        composeRule.onNodeWithText("Backup & restore").assertDoesNotExist()
+        composeRule.onNodeWithText("Pay salary").assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavMore).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreRoot).assertDoesNotExist()
+    }
+
+    @Test
+    fun managerMoreSignsOutToWelcome() {
+        openManagerMore()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerMoreSignOut)
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.WelcomeContinue).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.WelcomeContinue).assertIsDisplayed()
+    }
+
+    @Test
+    fun managerProductsOpensUnderManagerChrome() {
+        openManagerProducts()
+
+        composeRule.onNodeWithTag(NativeUiTags.ManagerProductsRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavMore).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertDoesNotExist()
+    }
+
+    @Test
+    fun managerProductsHardwareBackReturnsToMoreMenu() {
+        openManagerProducts()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ManagerMoreMenu).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerMoreMenu).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavMore).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
+    fun managerCustomersOpensUnderManagerChrome() {
+        openManagerCustomers()
+
+        composeRule.onNodeWithTag(NativeUiTags.ManagerCustomersRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavMore).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+    }
+
+    @Test
+    fun managerCustomersHardwareBackReturnsToMoreMenu() {
+        openManagerCustomers()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ManagerMoreMenu).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerMoreMenu).assertIsDisplayed()
+        assertManagerShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
+    fun managerSuppliersOpensUnderManagerChrome() {
+        openManagerSuppliers()
+
+        composeRule.onNodeWithTag(NativeUiTags.ManagerSuppliersRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavMore).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+    }
+
+    @Test
+    fun managerSuppliersHardwareBackReturnsToMoreMenu() {
+        openManagerSuppliers()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ManagerMoreMenu).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerMoreMenu).assertIsDisplayed()
+        assertManagerShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
+    fun managerEmployeesOpensUnderManagerChrome() {
+        openManagerEmployees()
+
+        composeRule.onNodeWithTag(NativeUiTags.ManagerEmployeesRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavMore).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+    }
+
+    @Test
+    fun managerEmployeesHardwareBackReturnsToMoreMenu() {
+        openManagerEmployees()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            activity.onBackPressedDispatcher.onBackPressed()
+        }
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ManagerMoreMenu).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerMoreMenu).assertIsDisplayed()
+        assertManagerShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
+    fun adminShellOpensUnderAdminChrome() {
+        openAdminWork()
+        composeRule.onNodeWithTag(NativeUiTags.AdminShellRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminWorkRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavWork).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+    }
+
+    @Test
+    fun adminShellHardwareBackStaysOnWorkAndKeepsSession() {
+        openAdminWork()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+            activity.onBackPressedDispatcher.onBackPressed()
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminWorkRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavWork).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+    }
+
+    @Test
+    fun adminShellNavSwitchesSectionsUnderAdminChrome() {
+        openAdminWork()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavPeople).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminPeopleHub).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminPeopleRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavPeople).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavRecords).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminRecordsHub).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavRecords).assertIsSelected()
+
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavMore).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminMoreMenu).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavMore).assertIsSelected()
+
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavWork).performClick()
+        composeRule.waitUntil(10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminWorkRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavWork).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+    }
+
+    @Test
+    fun adminExpenseOpensUnderAdminChrome() {
+        openAdminExpense()
+        composeRule.onNodeWithTag(NativeUiTags.AdminExpenseEntryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ExpenseCategorySelector)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavWork).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerExpenseEntryRoot).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerExpenseEntryRoot).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierExpenseEntryRoot).assertDoesNotExist()
+    }
+
+    @Test
+    fun adminExpenseHardwareBackReturnsToWorkHome() {
+        openAdminExpense()
+        pressHardwareBack()
+        assertReturnedToAdminWorkHome()
+    }
+
+    @Test
+    fun adminPeopleOpensUnderAdminChrome() {
+        openAdminPeople()
+        composeRule.onNodeWithTag(NativeUiTags.AdminPeopleRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminPeopleHub).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminPeopleUsersRoles).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavPeople).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerShellRoot).assertDoesNotExist()
+    }
+
+    @Test
+    fun adminPeopleHardwareBackReturnsToWorkHome() {
+        openAdminPeople()
+        pressHardwareBack()
+        assertReturnedToAdminWorkHome()
+    }
+
+    @Test
+    fun adminUsersRolesOpensUnderAdminChrome() {
+        openAdminUsersRoles()
+        composeRule.onNodeWithTag(NativeUiTags.AdminUsersRolesRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerUsersRolesRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavPeople).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerShellRoot).assertDoesNotExist()
+    }
+
+    @Test
+    fun adminUsersRolesHardwareBackReturnsToPeopleHub() {
+        openAdminUsersRoles()
+        pressHardwareBack()
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminPeopleHub).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminPeopleHub).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavPeople).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
+    fun adminCustomersOpensUnderAdminChrome() {
+        openAdminCustomers()
+        composeRule.onNodeWithTag(NativeUiTags.AdminCustomersRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavPeople).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+    }
+
+    @Test
+    fun adminCustomersHardwareBackReturnsToPeopleHub() {
+        openAdminCustomers()
+        pressHardwareBack()
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminPeopleHub).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminPeopleHub).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavPeople).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+    }
+
+    @Test
+    fun adminEmployeesOpensUnderAdminChrome() {
+        openAdminEmployees()
+        composeRule.onNodeWithTag(NativeUiTags.AdminEmployeesRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavPeople).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+    }
+
+    @Test
+    fun adminEmployeesHardwareBackReturnsToPeopleHub() {
+        openAdminEmployees()
+        pressHardwareBack()
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminPeopleHub).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminPeopleHub).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavPeople).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+    }
+
+    @Test
+    fun adminSuppliersOpensUnderAdminChrome() {
+        openAdminSuppliers()
+        composeRule.onNodeWithTag(NativeUiTags.AdminSuppliersRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSuppliersRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavPeople).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+    }
+
+    @Test
+    fun adminSuppliersHardwareBackReturnsToPeopleHub() {
+        openAdminSuppliers()
+        pressHardwareBack()
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminPeopleHub).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminPeopleHub).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavPeople).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+    }
+
+    @Test
+    fun adminRecordsOpensUnderAdminChrome() {
+        openAdminRecordsHub()
+        composeRule.onNodeWithTag(NativeUiTags.AdminRecordsRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminRecordsHub).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminRecordsBusiness).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminRecordsSecurityHistory).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavRecords).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerShellRoot).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerShellRoot).assertDoesNotExist()
+    }
+
+    @Test
+    fun adminRecordsHardwareBackReturnsToWorkHome() {
+        openAdminRecordsHub()
+        pressHardwareBack()
+        assertReturnedToAdminWorkHome()
+    }
+
+    @Test
+    fun adminBusinessRecordsOpensUnderAdminChrome() {
+        openAdminBusinessRecords()
+        composeRule.onNodeWithTag(NativeUiTags.AdminBusinessRecordsRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsSearch).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavRecords).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavRecords).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerShellRoot).assertDoesNotExist()
+    }
+
+    @Test
+    fun adminBusinessRecordsHardwareBackReturnsToRecordsHub() {
+        openAdminBusinessRecords()
+        pressHardwareBack()
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminRecordsHub).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminRecordsHub).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavRecords).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
+    fun adminSecurityHistoryOpensUnderAdminChrome() {
+        openAdminSecurityHistory()
+        composeRule.onNodeWithTag(NativeUiTags.AdminSecurityHistoryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSecurityHistoryRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavRecords).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerShellRoot).assertDoesNotExist()
+    }
+
+    @Test
+    fun adminSecurityHistoryHardwareBackReturnsToRecordsHub() {
+        openAdminSecurityHistory()
+        pressHardwareBack()
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminRecordsHub).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminRecordsHub).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavRecords).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
+    fun adminMoreOpensUnderAdminChrome() {
+        openAdminMore()
+        composeRule.onNodeWithTag(NativeUiTags.AdminMoreRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminMoreMenu).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminMoreCosting).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminMoreShopSettings)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminMoreProducts)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminMoreLocalExport)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminMorePersonalSecurity)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithText("Backup & restore").assertDoesNotExist()
+        composeRule.onNodeWithText("Users & roles").assertDoesNotExist()
+        composeRule.onNodeWithText("Security history").assertDoesNotExist()
+        composeRule.onNodeWithText("Connect Drive").assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavMore).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreRoot).assertDoesNotExist()
+    }
+
+    @Test
+    fun adminMoreSignsOutToWelcome() {
+        openAdminMore()
+        composeRule.onNodeWithTag(NativeUiTags.AdminMoreSignOut)
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.WelcomeContinue).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.WelcomeContinue).assertIsDisplayed()
+    }
+
+    @Test
+    fun adminProductsOpensUnderAdminChrome() {
+        openAdminProducts()
+        composeRule.onNodeWithTag(NativeUiTags.AdminProductsRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavMore).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertDoesNotExist()
+    }
+
+    @Test
+    fun adminProductsHardwareBackReturnsToMoreMenu() {
+        openAdminProducts()
+        pressHardwareBack()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminMoreMenu).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminMoreMenu).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavMore).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
+    fun adminCostingPlansOpensUnderAdminChrome() {
+        openAdminCostingPlans()
+        composeRule.onNodeWithTag(NativeUiTags.AdminCostingPlansRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavMore).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+    }
+
+    @Test
+    fun adminCostingPlansHardwareBackReturnsToMoreMenu() {
+        openAdminCostingPlans()
+        pressHardwareBack()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminMoreMenu).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminMoreMenu).assertIsDisplayed()
+        assertAdminShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
+    fun adminShopSettingsOpensUnderAdminChrome() {
+        openAdminShopSettings()
+        composeRule.onNodeWithTag(NativeUiTags.AdminShopSettingsRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerShopSettingsRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavMore).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+    }
+
+    @Test
+    fun adminShopSettingsHardwareBackReturnsToMoreMenu() {
+        openAdminShopSettings()
+        pressHardwareBack()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminMoreMenu).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminMoreMenu).assertIsDisplayed()
+        assertAdminShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
+    fun adminLocalExportOpensUnderAdminChrome() {
+        openAdminLocalExport()
+        composeRule.onNodeWithTag(NativeUiTags.AdminLocalExportRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupExport)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupRestore).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupConnect).assertDoesNotExist()
+        composeRule.onNodeWithText("Connect Drive").assertDoesNotExist()
+        composeRule.onNodeWithText("Restore").assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavMore).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertDoesNotExist()
+    }
+
+    @Test
+    fun adminLocalExportHardwareBackReturnsToMoreMenu() {
+        openAdminLocalExport()
+        pressHardwareBack()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminMoreMenu).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminMoreMenu).assertIsDisplayed()
+        assertAdminShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    @Test
     fun ownerWorkOpensConnectedEntry() {
         openOwnerOverview()
         composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).performClick()
@@ -2045,6 +2757,393 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithTag(NativeUiTags.OpsNavDeliveries).assertDoesNotExist()
         composeRule.onNodeWithTag(NativeUiTags.OpsNavAttendance).assertDoesNotExist()
         composeRule.onNodeWithTag(NativeUiTags.OpsNavMore).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavWork).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavWork).assertDoesNotExist()
+    }
+
+    private fun assertManagerShellWithoutForeignNav() {
+        composeRule.onNodeWithTag(NativeUiTags.ManagerShellRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavSell).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavCollect).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavActivity).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavRecords).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavWork).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavDeliveries).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavAttendance).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavMore).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavWork).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavPeople).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavRecords).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavMore).assertDoesNotExist()
+    }
+
+    private fun assertAdminShellWithoutForeignNav() {
+        composeRule.onNodeWithTag(NativeUiTags.AdminShellRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavSell).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavCollect).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavActivity).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavRecords).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavWork).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavDeliveries).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavAttendance).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavMore).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavWork).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavClose).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavRecords).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavMore).assertDoesNotExist()
+    }
+
+    private fun openManagerWork() {
+        openAccountPicker()
+        composeRule.onNodeWithTag(
+            NativeUiTags.authAccount(SaafMilkTestRunner.TEST_MANAGER_LOGIN),
+        ).performClick()
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput)
+            .performTextReplacement(SaafMilkTestRunner.TEST_MANAGER_PASSPHRASE)
+        composeRule.onNodeWithTag(NativeUiTags.AuthSignIn).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRoot).assertIsDisplayed()
+    }
+
+    private fun openManagerExpense() {
+        openManagerWork()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRecordExpense).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ExpenseCategorySelector).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerExpenseEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openManagerPaySupplier() {
+        openManagerWork()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkPaySupplier).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.VendorPaymentVendorSelector).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerPaySupplierEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openManagerCashClose() {
+        openManagerWork()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkCashClose)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.CashCloseAmountInput).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerCashCloseEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openManagerRecords() {
+        openManagerWork()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavRecords).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ManagerRecordsRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerRecordsRoot).assertIsDisplayed()
+    }
+
+    private fun openManagerMore() {
+        openManagerWork()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavMore).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ManagerMoreRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerMoreRoot).assertIsDisplayed()
+    }
+
+    private fun openManagerProducts() {
+        openManagerMore()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerMoreProducts).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerProductsRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerProductsRoot).assertIsDisplayed()
+    }
+
+    private fun openManagerCustomers() {
+        openManagerMore()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerMoreCustomers)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerCustomersRoot).assertIsDisplayed()
+    }
+
+    private fun openManagerSuppliers() {
+        openManagerMore()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerMoreSuppliers)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerSuppliersRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerSuppliersRoot).assertIsDisplayed()
+    }
+
+    private fun openManagerEmployees() {
+        openManagerMore()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerMoreEmployees)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerEmployeesRoot).assertIsDisplayed()
+    }
+
+    private fun assertReturnedToManagerWorkHome() {
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavWork).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+    }
+
+    private fun openAdminWork() {
+        openAccountPicker()
+        composeRule.onNodeWithTag(
+            NativeUiTags.authAccount(SaafMilkTestRunner.TEST_ADMIN_LOGIN),
+        ).performClick()
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput)
+            .performTextReplacement(SaafMilkTestRunner.TEST_ADMIN_PASSPHRASE)
+        composeRule.onNodeWithTag(NativeUiTags.AuthSignIn).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminWorkRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminWorkRoot).assertIsDisplayed()
+    }
+
+    private fun openAdminExpense() {
+        openAdminWork()
+        composeRule.onNodeWithTag(NativeUiTags.AdminWorkRecordExpense).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ExpenseCategorySelector).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminExpenseEntryRoot).assertIsDisplayed()
+    }
+
+    private fun openAdminPeople() {
+        openAdminWork()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavPeople).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminPeopleHub).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminPeopleRoot).assertIsDisplayed()
+    }
+
+    private fun openAdminUsersRoles() {
+        openAdminPeople()
+        composeRule.onNodeWithTag(NativeUiTags.AdminPeopleUsersRoles)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerUsersRolesRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminUsersRolesRoot).assertIsDisplayed()
+    }
+
+    private fun openAdminCustomers() {
+        openAdminPeople()
+        composeRule.onNodeWithTag(NativeUiTags.AdminPeopleCustomers)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminCustomersRoot).assertIsDisplayed()
+    }
+
+    private fun openAdminEmployees() {
+        openAdminPeople()
+        composeRule.onNodeWithTag(NativeUiTags.AdminPeopleEmployees)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminEmployeesRoot).assertIsDisplayed()
+    }
+
+    private fun openAdminSuppliers() {
+        openAdminPeople()
+        composeRule.onNodeWithTag(NativeUiTags.AdminPeopleSuppliers)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerSuppliersRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminSuppliersRoot).assertIsDisplayed()
+    }
+
+    private fun openAdminRecordsHub() {
+        openAdminWork()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavRecords).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminRecordsHub).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminRecordsRoot).assertIsDisplayed()
+    }
+
+    private fun openAdminBusinessRecords() {
+        openAdminRecordsHub()
+        composeRule.onNodeWithTag(NativeUiTags.AdminRecordsBusiness).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsSearch).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminBusinessRecordsRoot).assertIsDisplayed()
+    }
+
+    private fun openAdminSecurityHistory() {
+        openAdminRecordsHub()
+        composeRule.onNodeWithTag(NativeUiTags.AdminRecordsSecurityHistory).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerSecurityHistoryRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminSecurityHistoryRoot).assertIsDisplayed()
+    }
+
+    private fun openAdminMore() {
+        openAdminWork()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavMore).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminMoreMenu).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminMoreRoot).assertIsDisplayed()
+    }
+
+    private fun openAdminProducts() {
+        openAdminMore()
+        composeRule.onNodeWithTag(NativeUiTags.AdminMoreProducts)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerProductsRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminProductsRoot).assertIsDisplayed()
+    }
+
+    private fun openAdminCostingPlans() {
+        openAdminMore()
+        composeRule.onNodeWithTag(NativeUiTags.AdminMoreCosting).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminCostingPlansRoot).assertIsDisplayed()
+    }
+
+    private fun openAdminShopSettings() {
+        openAdminMore()
+        composeRule.onNodeWithTag(NativeUiTags.AdminMoreShopSettings)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerShopSettingsRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminShopSettingsRoot).assertIsDisplayed()
+    }
+
+    private fun openAdminLocalExport() {
+        openAdminMore()
+        composeRule.onNodeWithTag(NativeUiTags.AdminMoreLocalExport)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerBackupRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminLocalExportRoot).assertIsDisplayed()
+    }
+
+    private fun assertReturnedToAdminWorkHome() {
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.AdminWorkRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.AdminWorkRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AdminNavWork).assertIsSelected()
+        assertAdminShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
     }
 
     private fun openOperationsWork() {

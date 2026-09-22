@@ -104,8 +104,9 @@ class NativeOwnerEmployeesFacade(
 
     private suspend fun requireOwnerMasterData(sessionHandle: String) {
         val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_MASTER_DATA)
-        require(AppRole.parse(actor.role) == AppRole.OWNER) {
-            "Owner Employees is only available to Owner."
+        val role = AppRole.parse(actor.role)
+        require(role == AppRole.OWNER || role == AppRole.MANAGER || role == AppRole.ADMIN) {
+            "Employees is only available to Owner, Manager, or Administrator."
         }
     }
 

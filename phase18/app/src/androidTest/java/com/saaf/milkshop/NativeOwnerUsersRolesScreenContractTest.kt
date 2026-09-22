@@ -20,6 +20,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerUserRow
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.owner.OwnerScaffold
 import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.owner.OwnerUsersRolesScreen
 import com.saaf.milkshop.nativeui.theme.SaafTheme
@@ -270,7 +271,6 @@ class NativeOwnerUsersRolesScreenContractTest {
         onCancelSetEnabled: () -> Unit = {},
         onSubmitReauth: (CharArray) -> Unit = { it.fill('\u0000') },
         onCancelReauth: () -> Unit = {},
-        onNavigate: (OwnerSection) -> Unit = {},
     ) {
         composeRule.setContent {
             SaafTheme(darkTheme = false) {
@@ -318,7 +318,15 @@ class NativeOwnerUsersRolesScreenContractTest {
                     onCancelSetEnabled = onCancelSetEnabled,
                     onSubmitReauth = onSubmitReauth,
                     onCancelReauth = onCancelReauth,
-                    onNavigate = onNavigate,
+                    hostedScaffold = { snackbar, mod, wrapNav, content ->
+                        OwnerScaffold(
+                            snackbarHostState = snackbar,
+                            section = OwnerSection.More,
+                            onNavigate = { section -> wrapNav { } },
+                            modifier = mod,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

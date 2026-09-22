@@ -3,6 +3,7 @@ package com.saaf.milkshop.nativeui.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.saaf.milkshop.application.authentication.NativeAccountSummary
+import com.saaf.milkshop.application.authentication.NativeAuthenticatedSession
 import com.saaf.milkshop.application.authentication.NativeAuthenticationFacade
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.authentication.NativeQuickUnlockFacade
@@ -313,15 +314,21 @@ class NativeAuthenticationViewModel(
      * session when needed), then sign in as that Operator and open Operations Work.
      */
     fun openPreviewOperatorWork() {
-        val privileged = activeSessionHandle
-            ?: (_state.value as? NativeAuthenticationState.Authenticated)?.sessionHandle
-            ?: switchReturn?.sessionHandle
+        openPreviewStaffRole(
+            ensureStaff = true,
+            signIn = { facade.signInPreviewOperator() },
+        )
+    }
+
+    /**
+     * Debug/preview helper: bootstrap or sign in as Preview Owner for Overview.
+     */
+    fun openPreviewOwnerOverview() {
         scope.launch {
             _state.value = NativeAuthenticationState.Loading
             try {
                 val session = withContext(Dispatchers.IO) {
-                    ensurePreviewOperatorReady(privileged)
-                    facade.signInPreviewOperator()
+                    facade.signInPreviewOwner()
                 }
                 acceptSession(session)
             } catch (error: Throwable) {
@@ -343,14 +350,40 @@ class NativeAuthenticationViewModel(
     }
 
     /**
-     * Debug/preview helper: bootstrap or sign in as Preview Owner for Overview.
+     * Debug/preview helper: ensure Preview Manager exists, then sign in to Manager Work.
      */
-    fun openPreviewOwnerOverview() {
+    fun openPreviewManagerWork() {
+        openPreviewStaffRole(
+            ensureStaff = true,
+            signIn = { facade.signInPreviewManager() },
+        )
+    }
+
+    /**
+     * Debug/preview helper: ensure Preview Admin exists, then sign in to Admin Work.
+     */
+    fun openPreviewAdminWork() {
+        openPreviewStaffRole(
+            ensureStaff = true,
+            signIn = { facade.signInPreviewAdmin() },
+        )
+    }
+
+    private fun openPreviewStaffRole(
+        ensureStaff: Boolean,
+        signIn: suspend () -> NativeAuthenticatedSession,
+    ) {
+        val privileged = activeSessionHandle
+            ?: (_state.value as? NativeAuthenticationState.Authenticated)?.sessionHandle
+            ?: switchReturn?.sessionHandle
         scope.launch {
             _state.value = NativeAuthenticationState.Loading
             try {
                 val session = withContext(Dispatchers.IO) {
-                    facade.signInPreviewOwner()
+                    if (ensureStaff) {
+                        ensurePreviewOperatorReady(privileged)
+                    }
+                    signIn()
                 }
                 acceptSession(session)
             } catch (error: Throwable) {

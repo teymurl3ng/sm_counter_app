@@ -253,7 +253,13 @@ class NativeOwnerSuppliersScreenContractTest {
                     onOpenEdit = onOpenEdit,
                     onBackFromEdit = onBackFromEdit,
                     onUpdateSupplier = onUpdateSupplier,
-                    onNavigate = onNavigate,
+                    hostedScaffold = { snackbar, mod, _, content ->
+                    androidx.compose.material3.Scaffold(
+                        modifier = mod,
+                        snackbarHost = { androidx.compose.material3.SnackbarHost(snackbar) },
+                        content = content,
+                    )
+                },
                 )
             }
         }

@@ -21,6 +21,7 @@ import com.saaf.milkshop.domain.BusinessSettings
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.domain.StoreIdentityInput
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.owner.OwnerScaffold
 import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.owner.OwnerShopSettingsScreen
 import com.saaf.milkshop.nativeui.theme.SaafTheme
@@ -293,7 +294,15 @@ class NativeOwnerShopSettingsScreenContractTest {
                     onOpenCategory = onOpenCategory,
                     onBackFromCategoryDetail = onBackFromCategoryDetail,
                     onSetCategoryArchived = onSetCategoryArchived,
-                    onNavigate = onNavigate,
+                    hostedScaffold = { snackbar, mod, wrapNav, content ->
+                        OwnerScaffold(
+                            snackbarHostState = snackbar,
+                            section = OwnerSection.More,
+                            onNavigate = { section -> wrapNav { } },
+                            modifier = mod,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

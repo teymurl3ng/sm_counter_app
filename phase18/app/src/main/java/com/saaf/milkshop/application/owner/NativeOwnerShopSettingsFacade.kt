@@ -144,15 +144,17 @@ class NativeOwnerShopSettingsFacade(
 
     private suspend fun requireOwnerBusinessSettings(sessionHandle: String) {
         val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_BUSINESS_SETTINGS)
-        require(AppRole.parse(actor.role) == AppRole.OWNER) {
-            "Owner Shop settings is only available to Owner."
+        val role = AppRole.parse(actor.role)
+        require(role == AppRole.OWNER || role == AppRole.ADMIN) {
+            "Shop settings is only available to Owner or Admin."
         }
     }
 
     private suspend fun requireOwnerMasterData(sessionHandle: String) {
         val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_MASTER_DATA)
-        require(AppRole.parse(actor.role) == AppRole.OWNER) {
-            "Owner Shop settings is only available to Owner."
+        val role = AppRole.parse(actor.role)
+        require(role == AppRole.OWNER || role == AppRole.ADMIN) {
+            "Shop settings is only available to Owner or Admin."
         }
     }
 

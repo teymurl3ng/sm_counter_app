@@ -40,12 +40,13 @@ import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
 import com.saaf.milkshop.application.owner.NativeOwnerSecurityAuditDetail
 import com.saaf.milkshop.application.owner.NativeOwnerSecurityAuditRow
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 
 /**
- * Owner Security history — audit list + read detail under OwnerScaffold.
- * Nested from Owner More; never mounts foreign role chrome.
+ * Security history content — audit list + read detail under HostedScaffold
+ * (Owner More or Admin Records). Never embeds role bottom nav.
  */
 @Composable
 fun OwnerSecurityHistoryScreen(
@@ -60,7 +61,8 @@ fun OwnerSecurityHistoryScreen(
     onRetry: () -> Unit,
     onOpenAudit: (Long) -> Unit,
     onBackFromDetail: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    backToHubLabel: String = "Back to More",
     modifier: Modifier = Modifier,
 ) {
     if (auditDetail != null) {
@@ -70,14 +72,14 @@ fun OwnerSecurityHistoryScreen(
             context = context,
             detail = auditDetail,
             onBack = onBackFromDetail,
-            onNavigate = onNavigate,
+            hostedScaffold = hostedScaffold,
             modifier = modifier,
         )
         return
     }
 
     BackHandler(onBack = onBackToMenu)
-    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
@@ -123,7 +125,7 @@ fun OwnerSecurityHistoryScreen(
                         TextButton(
                             onClick = onBackToMenu,
                             modifier = Modifier.testTag(NativeUiTags.OwnerSecurityHistoryBack),
-                        ) { Text("Back to More") }
+                        ) { Text(backToHubLabel) }
                     }
                 }
                 else -> {
@@ -133,7 +135,7 @@ fun OwnerSecurityHistoryScreen(
                             modifier = Modifier
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                                 .testTag(NativeUiTags.OwnerSecurityHistoryBack),
-                        ) { Text("Back to More") }
+                        ) { Text(backToHubLabel) }
                         auditsError?.let {
                             Text(
                                 it,
@@ -186,12 +188,12 @@ private fun OwnerSecurityHistoryDetailScreen(
     context: NativeOwnerMoreContext,
     detail: NativeOwnerSecurityAuditDetail,
     onBack: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBack)
     val row = detail.row
-    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()

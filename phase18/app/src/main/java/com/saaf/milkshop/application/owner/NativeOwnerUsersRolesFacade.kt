@@ -48,10 +48,21 @@ class NativeOwnerUsersRolesFacade(
     private val database: MilkShopDatabase,
     private val security: UserSecurityService,
 ) {
-    fun enrollableRoles(): List<AppRole> = AppRole.entries.toList()
+    /**
+     * Roles the signed-in actor may enroll / assign.
+     * Owner: all roles. Admin: Manager / Cashier / Operations only (Owner+Admin remain Owner-only).
+     */
+    suspend fun enrollableRoles(sessionHandle: String): List<AppRole> {
+        val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_STAFF_USERS)
+        return when (AppRole.parse(actor.role)) {
+            AppRole.OWNER -> AppRole.entries.toList()
+            AppRole.ADMIN -> listOf(AppRole.MANAGER, AppRole.CASHIER, AppRole.OPERATOR)
+            else -> emptyList()
+        }
+    }
 
     suspend fun loadUsers(sessionHandle: String): NativeOwnerUsersRolesSnapshot {
-        requireOwnerStaffUsers(sessionHandle)
+        requireStaffUsersAccess(sessionHandle)
         val rows = security.listUsers(sessionHandle)
             .sortedWith(compareBy({ it.displayName.lowercase(Locale.US) }, { it.userId }))
             .map { it.toRow() }
@@ -62,7 +73,7 @@ class NativeOwnerUsersRolesFacade(
         sessionHandle: String,
         userId: Long,
     ): NativeOwnerUserDetail {
-        requireOwnerStaffUsers(sessionHandle)
+        requireStaffUsersAccess(sessionHandle)
         val user = security.listUsers(sessionHandle).firstOrNull { it.userId == userId }
             ?: error("This user is not in the Users & roles list.")
         return NativeOwnerUserDetail(
@@ -78,7 +89,11 @@ class NativeOwnerUsersRolesFacade(
         sessionHandle: String,
         input: CreateUserInput,
     ): NativeOwnerPendingEnrollment {
-        requireOwnerStaffUsers(sessionHandle)
+        requireStaffUsersAccess(sessionHandle)
+        val allowed = enrollableRoles(sessionHandle).map { it.wireValue }.toSet()
+        require(input.role.trim().lowercase() in allowed) {
+            "Administrator cannot enroll Owner or Administrator accounts."
+        }
         val pending = security.beginUserEnrollment(sessionHandle, input)
         return pending.toNative()
     }
@@ -100,7 +115,7 @@ class NativeOwnerUsersRolesFacade(
         userId: Long,
         enabled: Boolean,
     ) {
-        requireOwnerStaffUsers(sessionHandle)
+        requireStaffUsersAccess(sessionHandle)
         security.setUserEnabled(sessionHandle, userId, enabled)
     }
 
@@ -109,7 +124,11 @@ class NativeOwnerUsersRolesFacade(
         userId: Long,
         newRoleValue: String,
     ) {
-        requireOwnerStaffUsers(sessionHandle)
+        requireStaffUsersAccess(sessionHandle)
+        val allowed = enrollableRoles(sessionHandle).map { it.wireValue }.toSet()
+        require(newRoleValue.trim().lowercase() in allowed) {
+            "Administrator cannot assign Owner or Administrator roles."
+        }
         security.changeRole(sessionHandle, userId, newRoleValue)
     }
 
@@ -122,17 +141,19 @@ class NativeOwnerUsersRolesFacade(
         passphrase: CharArray,
     ) {
         try {
-            requireOwnerStaffUsers(sessionHandle)
+            requireStaffUsersAccess(sessionHandle)
             security.reauthenticate(sessionHandle, passphrase)
         } finally {
             passphrase.fill('\u0000')
         }
     }
 
-    private suspend fun requireOwnerStaffUsers(sessionHandle: String) {
+    private suspend fun requireStaffUsersAccess(sessionHandle: String) {
         val actor = security.requirePermission(sessionHandle, AppPermission.MANAGE_STAFF_USERS)
-        require(AppRole.parse(actor.role) == AppRole.OWNER) {
-            "Owner Users & roles is only available to Owner."
+        val role = AppRole.parse(actor.role)
+        // Admin reuses staff-access list/detail under Admin People (no Owner/Admin enroll).
+        require(role == AppRole.OWNER || role == AppRole.ADMIN) {
+            "Users & roles is only available to Owner or Administrator."
         }
     }
 

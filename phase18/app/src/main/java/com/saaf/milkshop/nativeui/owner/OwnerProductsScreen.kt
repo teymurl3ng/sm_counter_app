@@ -54,6 +54,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerProductRow
 import com.saaf.milkshop.domain.ProductCatalogInput
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
@@ -92,7 +93,7 @@ fun OwnerProductsScreen(
     onUpdateProduct: (ProductCatalogInput) -> Unit,
     onArchiveProduct: () -> Unit,
     onUnarchiveProduct: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
     modifier: Modifier = Modifier,
 ) {
     if (productCreateOpen) {
@@ -106,7 +107,7 @@ fun OwnerProductsScreen(
             error = productsError,
             onBack = onBackFromCreate,
             onSave = onCreateProduct,
-            onNavigate = onNavigate,
+            hostedScaffold = hostedScaffold,
             modifier = modifier,
         )
         return
@@ -123,7 +124,7 @@ fun OwnerProductsScreen(
             error = productsError,
             onBack = onBackFromEdit,
             onSave = onUpdateProduct,
-            onNavigate = onNavigate,
+            hostedScaffold = hostedScaffold,
             modifier = modifier,
         )
         return
@@ -142,14 +143,14 @@ fun OwnerProductsScreen(
             onOpenEdit = onOpenEdit,
             onArchive = onArchiveProduct,
             onUnarchive = onUnarchiveProduct,
-            onNavigate = onNavigate,
+            hostedScaffold = hostedScaffold,
             modifier = modifier,
         )
         return
     }
 
     BackHandler(onBack = onBackToMenu)
-    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
@@ -347,7 +348,7 @@ private fun OwnerProductsFormScreen(
     error: String?,
     onBack: () -> Unit,
     onSave: (ProductCatalogInput) -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
     modifier: Modifier,
 ) {
     val tags = mode.tags()
@@ -386,11 +387,10 @@ private fun OwnerProductsFormScreen(
     BackHandler { requestLeave(onBack) }
 
     Box(modifier.fillMaxSize()) {
-        OwnerScaffold(
-            snackbarHostState = snackbarHostState,
-            section = OwnerSection.More,
-            onNavigate = { section -> requestLeave { onNavigate(section) } },
-            modifier = Modifier.fillMaxSize(),
+        hostedScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
+            { action -> requestLeave(action) },
         ) { padding ->
             Column(
                 Modifier
@@ -637,7 +637,7 @@ private fun OwnerProductsDetailScreen(
     onOpenEdit: () -> Unit,
     onArchive: () -> Unit,
     onUnarchive: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
     modifier: Modifier,
 ) {
     var archiveConfirmOpen by rememberSaveable { mutableStateOf(false) }
@@ -651,7 +651,7 @@ private fun OwnerProductsDetailScreen(
         }
     }
     val row = detail.row
-    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()

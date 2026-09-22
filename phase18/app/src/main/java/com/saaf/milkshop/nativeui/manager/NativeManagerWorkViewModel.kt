@@ -1,0 +1,113 @@
+package com.saaf.milkshop.nativeui.manager
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.saaf.milkshop.application.manager.NativeManagerWorkContext
+import com.saaf.milkshop.application.manager.NativeManagerWorkFacade
+import com.saaf.milkshop.domain.SecurityFailure
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+enum class NativeManagerWorkDestination {
+    Home,
+    RecordExpense,
+    PaySupplier,
+}
+
+sealed interface NativeManagerWorkState {
+    data object Idle : NativeManagerWorkState
+    data object Loading : NativeManagerWorkState
+    data class Ready(
+        val context: NativeManagerWorkContext,
+        val destination: NativeManagerWorkDestination = NativeManagerWorkDestination.Home,
+        val error: String? = null,
+    ) : NativeManagerWorkState
+    data class LoadFailure(val message: String) : NativeManagerWorkState
+}
+
+class NativeManagerWorkViewModel(
+    private val facade: NativeManagerWorkFacade,
+    private val onSessionExpired: () -> Unit,
+) : ViewModel() {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private val _state = MutableStateFlow<NativeManagerWorkState>(NativeManagerWorkState.Idle)
+    private var sessionHandle: String? = null
+    val state: StateFlow<NativeManagerWorkState> = _state.asStateFlow()
+
+    fun open(nextSessionHandle: String) {
+        if (sessionHandle == nextSessionHandle &&
+            _state.value is NativeManagerWorkState.Ready
+        ) {
+            return
+        }
+        sessionHandle = nextSessionHandle
+        refresh()
+    }
+
+    fun close() {
+        sessionHandle = null
+        _state.value = NativeManagerWorkState.Idle
+    }
+
+    fun refresh() {
+        val session = sessionHandle ?: return
+        val previousDestination =
+            (_state.value as? NativeManagerWorkState.Ready)?.destination
+                ?: NativeManagerWorkDestination.Home
+        _state.value = NativeManagerWorkState.Loading
+        scope.launch {
+            try {
+                val context = withContext(Dispatchers.IO) { facade.load(session) }
+                _state.value = NativeManagerWorkState.Ready(
+                    context = context,
+                    destination = previousDestination,
+                )
+            } catch (error: Throwable) {
+                handleLoadFailure(error)
+            }
+        }
+    }
+
+    fun openDestination(destination: NativeManagerWorkDestination) {
+        val current = _state.value as? NativeManagerWorkState.Ready ?: return
+        _state.value = current.copy(destination = destination, error = null)
+    }
+
+    fun backToHome() {
+        val current = _state.value as? NativeManagerWorkState.Ready ?: return
+        _state.value = current.copy(destination = NativeManagerWorkDestination.Home, error = null)
+    }
+
+    private fun handleLoadFailure(error: Throwable) {
+        if (error is SecurityFailure.SessionExpired) {
+            onSessionExpired()
+            return
+        }
+        _state.value = NativeManagerWorkState.LoadFailure(
+            error.message ?: "Work could not open. Try again.",
+        )
+    }
+
+    override fun onCleared() {
+        scope.cancel()
+        super.onCleared()
+    }
+
+    class Factory(
+        private val facade: NativeManagerWorkFacade,
+        private val onSessionExpired: () -> Unit,
+    ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            require(modelClass.isAssignableFrom(NativeManagerWorkViewModel::class.java))
+            return NativeManagerWorkViewModel(facade, onSessionExpired) as T
+        }
+    }
+}

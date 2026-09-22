@@ -21,6 +21,7 @@ import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.owner.OwnerBackupScreen
+import com.saaf.milkshop.nativeui.owner.OwnerScaffold
 import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertEquals
@@ -376,7 +377,15 @@ class NativeOwnerBackupScreenContractTest {
                     onCancelDisconnect = onCancelDisconnect,
                     onSubmitReauth = onSubmitReauth,
                     onCancelReauth = onCancelReauth,
-                    onNavigate = onNavigate,
+                    hostedScaffold = { snackbar, mod, wrapNav, content ->
+                        OwnerScaffold(
+                            snackbarHostState = snackbar,
+                            section = OwnerSection.More,
+                            onNavigate = { section -> wrapNav { } },
+                            modifier = mod,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

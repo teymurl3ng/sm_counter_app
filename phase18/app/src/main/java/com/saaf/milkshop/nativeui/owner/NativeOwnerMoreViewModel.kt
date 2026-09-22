@@ -2089,7 +2089,7 @@ class NativeOwnerMoreViewModel(
             userEnableBusy = false,
             userReauthOpen = false,
             userReauthBusy = false,
-            enrollableRoles = usersRolesFacade.enrollableRoles(),
+            enrollableRoles = emptyList(),
             usersError = null,
             productsLoading = false,
             productDetail = null,
@@ -2162,11 +2162,13 @@ class NativeOwnerMoreViewModel(
         scope.launch {
             try {
                 val snapshot = withContext(Dispatchers.IO) { usersRolesFacade.loadUsers(session) }
+                val roles = withContext(Dispatchers.IO) { usersRolesFacade.enrollableRoles(session) }
                 val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (latest.destination != NativeOwnerMoreDestination.UsersRoles) return@launch
                 _state.value = latest.copy(
                     users = snapshot.users,
                     usersLoading = false,
+                    enrollableRoles = roles,
                     usersError = null,
                 )
             } catch (error: Throwable) {
@@ -2197,11 +2199,13 @@ class NativeOwnerMoreViewModel(
         scope.launch {
             try {
                 val snapshot = withContext(Dispatchers.IO) { usersRolesFacade.loadUsers(session) }
+                val roles = withContext(Dispatchers.IO) { usersRolesFacade.enrollableRoles(session) }
                 val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (latest.destination != NativeOwnerMoreDestination.UsersRoles) return@launch
                 _state.value = latest.copy(
                     users = snapshot.users,
                     usersLoading = false,
+                    enrollableRoles = roles,
                     usersError = null,
                 )
             } catch (error: Throwable) {

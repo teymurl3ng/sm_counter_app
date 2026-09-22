@@ -155,7 +155,13 @@ class NativeOwnerRecordsScreenContractTest {
                     onOpenRecord = onOpenRecord,
                     onBackFromDetail = onBackFromDetail,
                     onLeaveConfirmed = {},
-                    onNavigate = onNavigate,
+                    hostedScaffold = { snackbar, mod, _, content ->
+                        androidx.compose.material3.Scaffold(
+                            modifier = mod,
+                            snackbarHost = { androidx.compose.material3.SnackbarHost(snackbar) },
+                            content = content,
+                        )
+                    },
                     onDeferredGroup = onDeferredGroup,
                 )
             }

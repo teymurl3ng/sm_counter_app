@@ -41,7 +41,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.owner.NativeOwnerWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
-import com.saaf.milkshop.nativeui.sale.CashierScreenHeader@Composable
+import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
+
+@Composable
 fun OwnerWorkScreen(
     snackbarHostState: SnackbarHostState,
     state: NativeOwnerWorkState,

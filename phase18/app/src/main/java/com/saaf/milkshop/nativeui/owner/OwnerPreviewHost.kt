@@ -700,7 +700,16 @@ fun OwnerPreviewHost(
                     onOpenRecord = ownerRecordsViewModel::openDetail,
                     onBackFromDetail = ownerRecordsViewModel::clearDetail,
                     onLeaveConfirmed = onLeaveToWelcome,
-                    onNavigate = navigateOwner,
+                    hostedScaffold = { snackbar, mod, wrapNav, content ->
+                        OwnerScaffold(
+                            snackbarHostState = snackbar,
+                            section = OwnerSection.Records,
+                            onNavigate = { section -> wrapNav { navigateOwner(section) } },
+                            modifier = mod,
+                            content = content,
+                        )
+                    },
+                    roleLabel = "Owner",
                     onDeferredGroup = { group ->
                         onShowNotice(
                             "$group comes next in the Owner Records family.",

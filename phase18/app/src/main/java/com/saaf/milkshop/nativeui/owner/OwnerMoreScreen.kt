@@ -301,7 +301,15 @@ fun OwnerMoreScreen(
                 onUpdateProduct = onUpdateProduct,
                 onArchiveProduct = onArchiveProduct,
                 onUnarchiveProduct = onUnarchiveProduct,
-                onNavigate = onNavigate,
+                hostedScaffold = { snackbar, mod, wrapNav, content ->
+                    OwnerScaffold(
+                        snackbarHostState = snackbar,
+                        section = OwnerSection.More,
+                        onNavigate = { section -> wrapNav { onNavigate(section) } },
+                        modifier = mod,
+                        content = content,
+                    )
+                },
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.Customers -> OwnerCustomersScreen(
@@ -326,7 +334,15 @@ fun OwnerMoreScreen(
                 onOpenEdit = onOpenCustomerEdit,
                 onBackFromEdit = onBackFromCustomerEdit,
                 onUpdateCustomer = onUpdateCustomer,
-                onNavigate = onNavigate,
+                hostedScaffold = { snackbar, mod, wrapNav, content ->
+                    OwnerScaffold(
+                        snackbarHostState = snackbar,
+                        section = OwnerSection.More,
+                        onNavigate = { section -> wrapNav { onNavigate(section) } },
+                        modifier = mod,
+                        content = content,
+                    )
+                },
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.Suppliers -> OwnerSuppliersScreen(
@@ -351,7 +367,15 @@ fun OwnerMoreScreen(
                 onOpenEdit = onOpenSupplierEdit,
                 onBackFromEdit = onBackFromSupplierEdit,
                 onUpdateSupplier = onUpdateSupplier,
-                onNavigate = onNavigate,
+                hostedScaffold = { snackbar, mod, wrapNav, content ->
+                    OwnerScaffold(
+                        snackbarHostState = snackbar,
+                        section = OwnerSection.More,
+                        onNavigate = { section -> wrapNav { onNavigate(section) } },
+                        modifier = mod,
+                        content = content,
+                    )
+                },
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.Employees -> OwnerEmployeesScreen(
@@ -376,7 +400,15 @@ fun OwnerMoreScreen(
                 onOpenEdit = onOpenEmployeeEdit,
                 onBackFromEdit = onBackFromEmployeeEdit,
                 onUpdateEmployee = onUpdateEmployee,
-                onNavigate = onNavigate,
+                hostedScaffold = { snackbar, mod, wrapNav, content ->
+                    OwnerScaffold(
+                        snackbarHostState = snackbar,
+                        section = OwnerSection.More,
+                        onNavigate = { section -> wrapNav { onNavigate(section) } },
+                        modifier = mod,
+                        content = content,
+                    )
+                },
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.CostingPlans -> OwnerCostingPlansScreen(
@@ -405,7 +437,15 @@ fun OwnerMoreScreen(
                 onApprovePolicy = onApproveCostingPolicy,
                 onSubmitReauth = onSubmitCostingReauth,
                 onCancelReauth = onCancelCostingReauth,
-                onNavigate = onNavigate,
+                hostedScaffold = { snackbar, mod, wrapNav, content ->
+                    OwnerScaffold(
+                        snackbarHostState = snackbar,
+                        section = OwnerSection.More,
+                        onNavigate = { section -> wrapNav { onNavigate(section) } },
+                        modifier = mod,
+                        content = content,
+                    )
+                },
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.ShopSettings -> OwnerShopSettingsScreen(
@@ -437,7 +477,15 @@ fun OwnerMoreScreen(
                 onOpenCategory = onOpenShopCategory,
                 onBackFromCategoryDetail = onBackFromShopCategoryDetail,
                 onSetCategoryArchived = onSetShopExpenseCategoryArchived,
-                onNavigate = onNavigate,
+                hostedScaffold = { snackbar, mod, wrapNav, content ->
+                    OwnerScaffold(
+                        snackbarHostState = snackbar,
+                        section = OwnerSection.More,
+                        onNavigate = { section -> wrapNav { onNavigate(section) } },
+                        modifier = mod,
+                        content = content,
+                    )
+                },
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.UsersRoles -> OwnerUsersRolesScreen(
@@ -474,7 +522,15 @@ fun OwnerMoreScreen(
                 onCancelSetEnabled = onCancelSetUserEnabled,
                 onSubmitReauth = onSubmitUsersRolesReauth,
                 onCancelReauth = onCancelUsersRolesReauth,
-                onNavigate = onNavigate,
+                hostedScaffold = { snackbar, mod, wrapNav, content ->
+                    OwnerScaffold(
+                        snackbarHostState = snackbar,
+                        section = OwnerSection.More,
+                        onNavigate = { section -> wrapNav { onNavigate(section) } },
+                        modifier = mod,
+                        content = content,
+                    )
+                },
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.SecurityHistory -> OwnerSecurityHistoryScreen(
@@ -489,7 +545,15 @@ fun OwnerMoreScreen(
                 onRetry = onRetrySecurityHistory,
                 onOpenAudit = onOpenSecurityAudit,
                 onBackFromDetail = onBackFromSecurityAuditDetail,
-                onNavigate = onNavigate,
+                hostedScaffold = { snackbar, mod, wrapNav, content ->
+                    OwnerScaffold(
+                        snackbarHostState = snackbar,
+                        section = OwnerSection.More,
+                        onNavigate = { section -> wrapNav { onNavigate(section) } },
+                        modifier = mod,
+                        content = content,
+                    )
+                },
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.Backup -> OwnerBackupScreen(
@@ -526,7 +590,15 @@ fun OwnerMoreScreen(
                 onCancelDisconnect = onCancelBackupDisconnect,
                 onSubmitReauth = onSubmitBackupReauth,
                 onCancelReauth = onCancelBackupReauth,
-                onNavigate = onNavigate,
+                hostedScaffold = { snackbar, mod, wrapNav, content ->
+                    OwnerScaffold(
+                        snackbarHostState = snackbar,
+                        section = OwnerSection.More,
+                        onNavigate = { section -> wrapNav { onNavigate(section) } },
+                        modifier = mod,
+                        content = content,
+                    )
+                },
                 modifier = modifier,
             )
         }

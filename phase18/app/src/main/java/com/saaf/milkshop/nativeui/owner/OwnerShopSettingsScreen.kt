@@ -49,6 +49,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerShopSettingsSnapshot
 import com.saaf.milkshop.domain.BusinessSettings
 import com.saaf.milkshop.domain.StoreIdentityInput
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -89,7 +90,8 @@ fun OwnerShopSettingsScreen(
     onOpenCategory: (Long) -> Unit,
     onBackFromCategoryDetail: () -> Unit,
     onSetCategoryArchived: (Boolean) -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    backToHubLabel: String = "Back to More",
     modifier: Modifier = Modifier,
 ) {
     if (identityEditOpen && snapshot != null) {
@@ -102,7 +104,7 @@ fun OwnerShopSettingsScreen(
             error = error,
             onBack = onBackFromIdentityEdit,
             onSave = onSaveIdentity,
-            onNavigate = onNavigate,
+            hostedScaffold = hostedScaffold,
             modifier = modifier,
         )
         return
@@ -118,7 +120,7 @@ fun OwnerShopSettingsScreen(
             error = error,
             onBack = onBackFromRatesEdit,
             onSave = onUpdateRates,
-            onNavigate = onNavigate,
+            hostedScaffold = hostedScaffold,
             modifier = modifier,
         )
         return
@@ -133,7 +135,7 @@ fun OwnerShopSettingsScreen(
             error = error,
             onBack = onBackFromCategoryCreate,
             onSave = onCreateCategory,
-            onNavigate = onNavigate,
+            hostedScaffold = hostedScaffold,
             modifier = modifier,
         )
         return
@@ -149,14 +151,14 @@ fun OwnerShopSettingsScreen(
             error = error,
             onBack = onBackFromCategoryDetail,
             onSetArchived = onSetCategoryArchived,
-            onNavigate = onNavigate,
+            hostedScaffold = hostedScaffold,
             modifier = modifier,
         )
         return
     }
 
     BackHandler(onBack = onBackToMenu)
-    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
@@ -202,7 +204,7 @@ fun OwnerShopSettingsScreen(
                         TextButton(
                             onClick = onBackToMenu,
                             modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsBack),
-                        ) { Text("Back to More") }
+                        ) { Text(backToHubLabel) }
                     }
                 }
                 snapshot != null -> {
@@ -212,7 +214,7 @@ fun OwnerShopSettingsScreen(
                             modifier = Modifier
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                                 .testTag(NativeUiTags.OwnerShopSettingsBack),
-                        ) { Text("Back to More") }
+                        ) { Text(backToHubLabel) }
                         error?.let {
                             Text(
                                 it,
@@ -366,7 +368,8 @@ private fun OwnerShopSettingsIdentityEditScreen(
     error: String?,
     onBack: () -> Unit,
     onSave: (StoreIdentityInput) -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -391,11 +394,10 @@ private fun OwnerShopSettingsIdentityEditScreen(
     BackHandler { requestLeave(onBack) }
 
     Box(modifier.fillMaxSize()) {
-        OwnerScaffold(
-            snackbarHostState = snackbarHostState,
-            section = OwnerSection.More,
-            onNavigate = { section -> requestLeave { onNavigate(section) } },
-            modifier = Modifier.fillMaxSize(),
+        hostedScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
+            { action -> requestLeave(action) },
         ) { padding ->
             Column(
                 Modifier
@@ -523,7 +525,8 @@ private fun OwnerShopSettingsRatesEditScreen(
     error: String?,
     onBack: () -> Unit,
     onSave: (BusinessSettings) -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -575,11 +578,10 @@ private fun OwnerShopSettingsRatesEditScreen(
     BackHandler { requestLeave(onBack) }
 
     Box(modifier.fillMaxSize()) {
-        OwnerScaffold(
-            snackbarHostState = snackbarHostState,
-            section = OwnerSection.More,
-            onNavigate = { section -> requestLeave { onNavigate(section) } },
-            modifier = Modifier.fillMaxSize(),
+        hostedScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
+            { action -> requestLeave(action) },
         ) { padding ->
             Column(
                 Modifier
@@ -713,7 +715,8 @@ private fun OwnerShopSettingsCategoryCreateScreen(
     error: String?,
     onBack: () -> Unit,
     onSave: (String) -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -736,11 +739,10 @@ private fun OwnerShopSettingsCategoryCreateScreen(
     BackHandler { requestLeave(onBack) }
 
     Box(modifier.fillMaxSize()) {
-        OwnerScaffold(
-            snackbarHostState = snackbarHostState,
-            section = OwnerSection.More,
-            onNavigate = { section -> requestLeave { onNavigate(section) } },
-            modifier = Modifier.fillMaxSize(),
+        hostedScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
+            { action -> requestLeave(action) },
         ) { padding ->
             Column(
                 Modifier
@@ -837,7 +839,8 @@ private fun OwnerShopSettingsCategoryDetailScreen(
     error: String?,
     onBack: () -> Unit,
     onSetArchived: (Boolean) -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     var archiveConfirmOpen by rememberSaveable { mutableStateOf(false) }
@@ -852,7 +855,7 @@ private fun OwnerShopSettingsCategoryDetailScreen(
         }
     }
 
-    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()

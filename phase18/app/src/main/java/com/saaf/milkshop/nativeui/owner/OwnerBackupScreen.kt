@@ -47,15 +47,16 @@ import com.saaf.milkshop.application.owner.NativeOwnerBackupInspection
 import com.saaf.milkshop.application.owner.NativeOwnerBackupSnapshot
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 
 /**
- * Owner Backup — Drive vault status plus local export / restore and Drive
- * connect depth under OwnerScaffold. Passphrase CharArrays are wiped by the
- * ViewModel / facade after submit.
+ * Backup surface — Drive vault + local export/restore under HostedScaffold for Owner,
+ * or local encrypted export only when [localExportOnly] (Admin). Passphrase CharArrays
+ * are wiped by the ViewModel / facade after submit.
  */
 @Composable
 fun OwnerBackupScreen(
@@ -92,7 +93,9 @@ fun OwnerBackupScreen(
     onCancelDisconnect: () -> Unit,
     onSubmitReauth: (CharArray) -> Unit,
     onCancelReauth: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    backToHubLabel: String = "Back to More",
+    localExportOnly: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val androidContext = LocalContext.current
@@ -100,7 +103,7 @@ fun OwnerBackupScreen(
         BackupManager.displayName(androidContext)
     }
     when {
-        reauthOpen -> OwnerBackupReauthScreen(
+        reauthOpen && !localExportOnly -> OwnerBackupReauthScreen(
             snackbarHostState = snackbarHostState,
             identity = identity,
             context = context,
@@ -108,7 +111,7 @@ fun OwnerBackupScreen(
             error = error,
             onConfirm = onSubmitReauth,
             onCancel = onCancelReauth,
-            onNavigate = onNavigate,
+            hostedScaffold = hostedScaffold,
             modifier = modifier,
         )
         exportOpen -> OwnerBackupExportScreen(
@@ -120,10 +123,10 @@ fun OwnerBackupScreen(
             suggestedFileName = exportFileName,
             onBack = onBackFromExport,
             onExport = onExport,
-            onNavigate = onNavigate,
+            hostedScaffold = hostedScaffold,
             modifier = modifier,
         )
-        restoreOpen -> OwnerBackupRestoreScreen(
+        restoreOpen && !localExportOnly -> OwnerBackupRestoreScreen(
             snackbarHostState = snackbarHostState,
             identity = identity,
             context = context,
@@ -133,10 +136,10 @@ fun OwnerBackupScreen(
             onBack = onBackFromRestore,
             onInspect = onInspectRestore,
             onConfirmRestore = onConfirmRestore,
-            onNavigate = onNavigate,
+            hostedScaffold = hostedScaffold,
             modifier = modifier,
         )
-        connectOpen -> OwnerBackupConnectScreen(
+        connectOpen && !localExportOnly -> OwnerBackupConnectScreen(
             snackbarHostState = snackbarHostState,
             identity = identity,
             context = context,
@@ -144,7 +147,7 @@ fun OwnerBackupScreen(
             error = error,
             onBack = onBackFromConnect,
             onConnect = onConnectDrive,
-            onNavigate = onNavigate,
+            hostedScaffold = hostedScaffold,
             modifier = modifier,
         )
         else -> OwnerBackupStatusScreen(
@@ -155,7 +158,7 @@ fun OwnerBackupScreen(
             loading = loading,
             error = error,
             busy = busy,
-            disconnectConfirmOpen = disconnectConfirmOpen,
+            disconnectConfirmOpen = disconnectConfirmOpen && !localExportOnly,
             onBackToMenu = onBackToMenu,
             onRetry = onRetry,
             onOpenExport = onOpenExport,
@@ -166,7 +169,9 @@ fun OwnerBackupScreen(
             onRequestDisconnect = onRequestDisconnect,
             onConfirmDisconnect = onConfirmDisconnect,
             onCancelDisconnect = onCancelDisconnect,
-            onNavigate = onNavigate,
+            hostedScaffold = hostedScaffold,
+            backToHubLabel = backToHubLabel,
+            localExportOnly = localExportOnly,
             modifier = modifier,
         )
     }
@@ -192,11 +197,13 @@ private fun OwnerBackupStatusScreen(
     onRequestDisconnect: () -> Unit,
     onConfirmDisconnect: () -> Unit,
     onCancelDisconnect: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    backToHubLabel: String = "Back to More",
+    localExportOnly: Boolean = false,
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBackToMenu)
-    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
@@ -204,7 +211,7 @@ private fun OwnerBackupStatusScreen(
                 .testTag(NativeUiTags.OwnerBackupRoot),
         ) {
             CashierScreenHeader(
-                title = "Backup & restore",
+                title = if (localExportOnly) "Local export" else "Backup & restore",
                 displayName = context.shopName,
                 roleLabel = formatCashierRoleLabel(identity.role.wireValue),
                 businessDate = context.businessDate,
@@ -242,7 +249,7 @@ private fun OwnerBackupStatusScreen(
                         TextButton(
                             onClick = onBackToMenu,
                             modifier = Modifier.testTag(NativeUiTags.OwnerBackupBack),
-                        ) { Text("Back to More") }
+                        ) { Text(backToHubLabel) }
                     }
                 }
                 snapshot != null -> {
@@ -252,7 +259,7 @@ private fun OwnerBackupStatusScreen(
                             modifier = Modifier
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                                 .testTag(NativeUiTags.OwnerBackupBack),
-                        ) { Text("Back to More") }
+                        ) { Text(backToHubLabel) }
                         error?.let {
                             Text(
                                 it,
@@ -270,115 +277,136 @@ private fun OwnerBackupStatusScreen(
                                 .testTag(NativeUiTags.OwnerBackupContent),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                            Text(
-                                snapshot.statusHeadline,
-                                style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                modifier = Modifier.testTag(NativeUiTags.OwnerBackupStatusHeadline),
-                            )
-                            OwnerBackupFact("Schedule", snapshot.scheduleDescription)
-                            OwnerBackupFact(
-                                "Configured",
-                                if (snapshot.configured) "Yes" else "No",
-                            )
-                            OwnerBackupFact(
-                                "Enabled",
-                                if (snapshot.enabled) "Yes" else "No",
-                            )
-                            OwnerBackupFact(
-                                "Account",
-                                snapshot.accountDisplay ?: "Not linked",
-                            )
-                            OwnerBackupFact(
-                                "Last success",
-                                snapshot.lastSuccessAt ?: "Never",
-                            )
-                            OwnerBackupFact(
-                                "Last attempt",
-                                snapshot.lastAttemptAt ?: "Never",
-                            )
-                            snapshot.lastErrorMessage?.takeIf { it.isNotBlank() }?.let {
-                                OwnerBackupFact("Last error", it)
-                            }
-                            OwnerBackupFact(
-                                "Stale",
-                                if (snapshot.stale) "Yes" else "No",
-                            )
-                            OwnerBackupFact(
-                                "Pending upload",
-                                if (snapshot.pending) "Yes" else "No",
-                            )
-
-                            Spacer(Modifier.height(4.dp))
-                            Text(
-                                "Local encrypted backup",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                            )
-                            Button(
-                                onClick = onOpenExport,
-                                enabled = !busy,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .testTag(NativeUiTags.OwnerBackupExport),
-                            ) { Text("Export backup") }
-                            Button(
-                                onClick = onOpenRestore,
-                                enabled = !busy,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .testTag(NativeUiTags.OwnerBackupRestore),
-                            ) { Text("Restore") }
-
-                            Spacer(Modifier.height(4.dp))
-                            Text(
-                                "Google Drive vault",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                            )
-                            if (!snapshot.configured) {
+                            if (localExportOnly) {
+                                Text(
+                                    "Encrypted local export",
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    modifier = Modifier.testTag(NativeUiTags.OwnerBackupStatusHeadline),
+                                )
+                                Text(
+                                    "Create an encrypted backup file on this phone. Drive connect, restore, and recovery stay Owner-only.",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
                                 Button(
-                                    onClick = onOpenConnect,
-                                    enabled = !busy && snapshot.cloudActionsAvailable,
+                                    onClick = onOpenExport,
+                                    enabled = !busy,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .testTag(NativeUiTags.OwnerBackupConnect),
-                                ) { Text("Connect Drive") }
-                                if (!snapshot.cloudActionsAvailable) {
-                                    Text(
-                                        "Drive connect needs Google authorization on this device.",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
+                                        .testTag(NativeUiTags.OwnerBackupExport),
+                                ) { Text("Export backup") }
                             } else {
-                                if (snapshot.enabled) {
-                                    TextButton(
-                                        onClick = { onSetDriveEnabled(false) },
-                                        enabled = !busy && snapshot.cloudActionsAvailable,
-                                        modifier = Modifier.testTag(NativeUiTags.OwnerBackupPause),
-                                    ) { Text("Pause Drive vault") }
-                                    Button(
-                                        onClick = onRunDriveNow,
-                                        enabled = !busy && snapshot.cloudActionsAvailable,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .testTag(NativeUiTags.OwnerBackupRunNow),
-                                    ) { Text("Run backup now") }
-                                } else {
-                                    Button(
-                                        onClick = { onSetDriveEnabled(true) },
-                                        enabled = !busy && snapshot.cloudActionsAvailable,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .testTag(NativeUiTags.OwnerBackupEnable),
-                                    ) { Text("Enable Drive vault") }
+                                Text(
+                                    snapshot.statusHeadline,
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    modifier = Modifier.testTag(NativeUiTags.OwnerBackupStatusHeadline),
+                                )
+                                OwnerBackupFact("Schedule", snapshot.scheduleDescription)
+                                OwnerBackupFact(
+                                    "Configured",
+                                    if (snapshot.configured) "Yes" else "No",
+                                )
+                                OwnerBackupFact(
+                                    "Enabled",
+                                    if (snapshot.enabled) "Yes" else "No",
+                                )
+                                OwnerBackupFact(
+                                    "Account",
+                                    snapshot.accountDisplay ?: "Not linked",
+                                )
+                                OwnerBackupFact(
+                                    "Last success",
+                                    snapshot.lastSuccessAt ?: "Never",
+                                )
+                                OwnerBackupFact(
+                                    "Last attempt",
+                                    snapshot.lastAttemptAt ?: "Never",
+                                )
+                                snapshot.lastErrorMessage?.takeIf { it.isNotBlank() }?.let {
+                                    OwnerBackupFact("Last error", it)
                                 }
-                                TextButton(
-                                    onClick = onRequestDisconnect,
-                                    enabled = !busy && snapshot.cloudActionsAvailable,
-                                    modifier = Modifier.testTag(NativeUiTags.OwnerBackupDisconnect),
-                                ) { Text("Disconnect Drive") }
+                                OwnerBackupFact(
+                                    "Stale",
+                                    if (snapshot.stale) "Yes" else "No",
+                                )
+                                OwnerBackupFact(
+                                    "Pending upload",
+                                    if (snapshot.pending) "Yes" else "No",
+                                )
+
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    "Local encrypted backup",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                )
+                                Button(
+                                    onClick = onOpenExport,
+                                    enabled = !busy,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .testTag(NativeUiTags.OwnerBackupExport),
+                                ) { Text("Export backup") }
+                                Button(
+                                    onClick = onOpenRestore,
+                                    enabled = !busy,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .testTag(NativeUiTags.OwnerBackupRestore),
+                                ) { Text("Restore") }
+
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    "Google Drive vault",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                )
+                                if (!snapshot.configured) {
+                                    Button(
+                                        onClick = onOpenConnect,
+                                        enabled = !busy && snapshot.cloudActionsAvailable,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .testTag(NativeUiTags.OwnerBackupConnect),
+                                    ) { Text("Connect Drive") }
+                                    if (!snapshot.cloudActionsAvailable) {
+                                        Text(
+                                            "Drive connect needs Google authorization on this device.",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    }
+                                } else {
+                                    if (snapshot.enabled) {
+                                        TextButton(
+                                            onClick = { onSetDriveEnabled(false) },
+                                            enabled = !busy && snapshot.cloudActionsAvailable,
+                                            modifier = Modifier.testTag(NativeUiTags.OwnerBackupPause),
+                                        ) { Text("Pause Drive vault") }
+                                        Button(
+                                            onClick = onRunDriveNow,
+                                            enabled = !busy && snapshot.cloudActionsAvailable,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .testTag(NativeUiTags.OwnerBackupRunNow),
+                                        ) { Text("Run backup now") }
+                                    } else {
+                                        Button(
+                                            onClick = { onSetDriveEnabled(true) },
+                                            enabled = !busy && snapshot.cloudActionsAvailable,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .testTag(NativeUiTags.OwnerBackupEnable),
+                                        ) { Text("Enable Drive vault") }
+                                    }
+                                    TextButton(
+                                        onClick = onRequestDisconnect,
+                                        enabled = !busy && snapshot.cloudActionsAvailable,
+                                        modifier = Modifier.testTag(NativeUiTags.OwnerBackupDisconnect),
+                                    ) { Text("Disconnect Drive") }
+                                }
                             }
                         }
                     }
@@ -421,7 +449,8 @@ private fun OwnerBackupExportScreen(
     suggestedFileName: String,
     onBack: () -> Unit,
     onExport: (Uri, CharArray) -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -447,11 +476,10 @@ private fun OwnerBackupExportScreen(
     }
     BackHandler { requestLeave(onBack) }
     Box(modifier.fillMaxSize()) {
-        OwnerScaffold(
+        hostedScaffold(
             snackbarHostState,
-            OwnerSection.More,
-            onNavigate = { section -> requestLeave { onNavigate(section) } },
-            modifier = Modifier.fillMaxSize(),
+            Modifier.fillMaxSize(),
+            { action -> requestLeave(action) },
         ) { padding ->
             Column(
                 Modifier
@@ -563,7 +591,8 @@ private fun OwnerBackupRestoreScreen(
     onBack: () -> Unit,
     onInspect: (Uri, CharArray) -> Unit,
     onConfirmRestore: (Boolean) -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -588,11 +617,10 @@ private fun OwnerBackupRestoreScreen(
     }
     BackHandler { requestLeave(onBack) }
     Box(modifier.fillMaxSize()) {
-        OwnerScaffold(
+        hostedScaffold(
             snackbarHostState,
-            OwnerSection.More,
-            onNavigate = { section -> requestLeave { onNavigate(section) } },
-            modifier = Modifier.fillMaxSize(),
+            Modifier.fillMaxSize(),
+            { action -> requestLeave(action) },
         ) { padding ->
             Column(
                 Modifier
@@ -732,7 +760,8 @@ private fun OwnerBackupConnectScreen(
     error: String?,
     onBack: () -> Unit,
     onConnect: (CharArray, Boolean) -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -750,11 +779,10 @@ private fun OwnerBackupConnectScreen(
     }
     BackHandler { requestLeave(onBack) }
     Box(modifier.fillMaxSize()) {
-        OwnerScaffold(
+        hostedScaffold(
             snackbarHostState,
-            OwnerSection.More,
-            onNavigate = { section -> requestLeave { onNavigate(section) } },
-            modifier = Modifier.fillMaxSize(),
+            Modifier.fillMaxSize(),
+            { action -> requestLeave(action) },
         ) { padding ->
             Column(
                 Modifier
@@ -878,12 +906,13 @@ private fun OwnerBackupReauthScreen(
     error: String?,
     onConfirm: (CharArray) -> Unit,
     onCancel: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     var passphrase by rememberSaveable { mutableStateOf("") }
     BackHandler(onBack = onCancel)
-    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()

@@ -53,6 +53,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerUserRow
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
@@ -60,7 +61,7 @@ import java.util.Locale
 
 /**
  * Owner Users & roles — staff login list + detail + enroll / enable / role change
- * under OwnerScaffold. Nested from Owner More; distinct from Employees salary accounts.
+ * under HostedScaffold (Owner More or Admin People). distinct from Employees salary accounts.
  */
 @Composable
 fun OwnerUsersRolesScreen(
@@ -97,7 +98,8 @@ fun OwnerUsersRolesScreen(
     onCancelSetEnabled: () -> Unit,
     onSubmitReauth: (CharArray) -> Unit,
     onCancelReauth: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    backToHubLabel: String = "Back to More",
     modifier: Modifier = Modifier,
 ) {
     when {
@@ -122,7 +124,7 @@ fun OwnerUsersRolesScreen(
                 error = usersError,
                 onBack = onBackFromEnroll,
                 onSave = onCompleteEnroll,
-                onNavigate = onNavigate,
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
             return
@@ -137,7 +139,7 @@ fun OwnerUsersRolesScreen(
                 error = usersError,
                 onBack = onBackFromEnroll,
                 onSave = onBeginEnroll,
-                onNavigate = onNavigate,
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
             return
@@ -153,7 +155,7 @@ fun OwnerUsersRolesScreen(
                 error = usersError,
                 onBack = onBackFromRoleChange,
                 onSave = onChangeRole,
-                onNavigate = onNavigate,
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
             return
@@ -172,7 +174,7 @@ fun OwnerUsersRolesScreen(
                 onRequestSetEnabled = onRequestSetEnabled,
                 onConfirmSetEnabled = onConfirmSetEnabled,
                 onCancelSetEnabled = onCancelSetEnabled,
-                onNavigate = onNavigate,
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
             return
@@ -180,7 +182,7 @@ fun OwnerUsersRolesScreen(
     }
 
     BackHandler(onBack = onBackToMenu)
-    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
@@ -226,7 +228,7 @@ fun OwnerUsersRolesScreen(
                         TextButton(
                             onClick = onBackToMenu,
                             modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesBack),
-                        ) { Text("Back to More") }
+                        ) { Text(backToHubLabel) }
                     }
                 }
                 else -> {
@@ -241,7 +243,7 @@ fun OwnerUsersRolesScreen(
                             TextButton(
                                 onClick = onBackToMenu,
                                 modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesBack),
-                            ) { Text("Back to More") }
+                            ) { Text(backToHubLabel) }
                             TextButton(
                                 onClick = onOpenEnroll,
                                 modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesEnroll),
@@ -306,12 +308,12 @@ private fun OwnerUsersRolesDetailScreen(
     onRequestSetEnabled: (Boolean) -> Unit,
     onConfirmSetEnabled: () -> Unit,
     onCancelSetEnabled: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
     modifier: Modifier,
 ) {
     BackHandler(enabled = !enableBusy, onBack = onBack)
     val row = detail.row
-    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
@@ -449,7 +451,7 @@ private fun OwnerUsersRolesEnrollIdentityScreen(
     error: String?,
     onBack: () -> Unit,
     onSave: (loginName: String, displayName: String, roleWire: String) -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -473,11 +475,10 @@ private fun OwnerUsersRolesEnrollIdentityScreen(
     BackHandler { requestLeave(onBack) }
 
     Box(modifier.fillMaxSize()) {
-        OwnerScaffold(
-            snackbarHostState = snackbarHostState,
-            section = OwnerSection.More,
-            onNavigate = { section -> requestLeave { onNavigate(section) } },
-            modifier = Modifier.fillMaxSize(),
+        hostedScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
+            { action -> requestLeave(action) },
         ) { padding ->
             Column(
                 Modifier
@@ -593,7 +594,7 @@ private fun OwnerUsersRolesEnrollPassphraseScreen(
     error: String?,
     onBack: () -> Unit,
     onSave: (passphrase: CharArray, confirmation: CharArray) -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -617,11 +618,10 @@ private fun OwnerUsersRolesEnrollPassphraseScreen(
     BackHandler { requestLeave(onBack) }
 
     Box(modifier.fillMaxSize()) {
-        OwnerScaffold(
-            snackbarHostState = snackbarHostState,
-            section = OwnerSection.More,
-            onNavigate = { section -> requestLeave { onNavigate(section) } },
-            modifier = Modifier.fillMaxSize(),
+        hostedScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
+            { action -> requestLeave(action) },
         ) { padding ->
             Column(
                 Modifier
@@ -737,7 +737,7 @@ private fun OwnerUsersRolesRoleChangeScreen(
     error: String?,
     onBack: () -> Unit,
     onSave: (String) -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -759,11 +759,10 @@ private fun OwnerUsersRolesRoleChangeScreen(
     BackHandler { requestLeave(onBack) }
 
     Box(modifier.fillMaxSize()) {
-        OwnerScaffold(
-            snackbarHostState = snackbarHostState,
-            section = OwnerSection.More,
-            onNavigate = { section -> requestLeave { onNavigate(section) } },
-            modifier = Modifier.fillMaxSize(),
+        hostedScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
+            { action -> requestLeave(action) },
         ) { padding ->
             Column(
                 Modifier

@@ -32,11 +32,11 @@ class NativeOwnerMoreFacade(
         requireOwner(sessionHandle)
         security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
         val businessDate = date.toString()
-        val settings = reads.businessSettings(sessionHandle)
         return NativeOwnerMoreContext(
             businessDate = businessDate,
             postingOpen = !database.dailyCloseDao().isPostingClosed(businessDate),
-            shopName = settings.store?.storeName?.takeIf { it.isNotBlank() } ?: "Saaf Milk",
+            shopName = database.storeProfileDao().get()?.storeName?.takeIf { it.isNotBlank() }
+                ?: "Saaf Milk",
         )
     }
 
@@ -100,8 +100,10 @@ class NativeOwnerMoreFacade(
 
     private suspend fun requireOwner(sessionHandle: String) {
         val actor = security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
-        require(AppRole.parse(actor.role) == AppRole.OWNER) {
-            "Owner More is only available to Owner."
+        val role = AppRole.parse(actor.role)
+        // Manager / Admin reuse shop-tool + staff-directory context under their shells (bounded IA).
+        require(role == AppRole.OWNER || role == AppRole.MANAGER || role == AppRole.ADMIN) {
+            "More context is only available to Owner, Manager, or Administrator."
         }
     }
 }

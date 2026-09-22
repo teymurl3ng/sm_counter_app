@@ -42,6 +42,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerRecordsContext
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsDetail
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsRow
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import java.util.Locale
 
@@ -54,20 +55,23 @@ fun OwnerRecordsScreen(
     onOpenRecord: (Long) -> Unit,
     onBackFromDetail: () -> Unit,
     onLeaveConfirmed: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    roleLabel: String = "Owner",
+    rootTag: String = NativeUiTags.OwnerRecordsRoot,
+    loadingTag: String = NativeUiTags.OwnerRecordsLoading,
     onDeferredGroup: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     when (state) {
         NativeOwnerRecordsState.Idle,
         NativeOwnerRecordsState.Loading,
-        -> OwnerScaffold(snackbarHostState, OwnerSection.Records, onNavigate, modifier) {
+        -> hostedScaffold(snackbarHostState, modifier, { it() }) {
             Column(
                 Modifier
                     .fillMaxSize()
                     .padding(it)
                     .padding(24.dp)
-                    .testTag(NativeUiTags.OwnerRecordsLoading),
+                    .testTag(loadingTag),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -77,15 +81,13 @@ fun OwnerRecordsScreen(
             }
         }
 
-        is NativeOwnerRecordsState.LoadFailure -> OwnerScaffold(
-            snackbarHostState, OwnerSection.Records, onNavigate, modifier,
-        ) { padding ->
+        is NativeOwnerRecordsState.LoadFailure -> hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
             Column(
                 Modifier
                     .fillMaxSize()
                     .padding(padding)
                     .padding(24.dp)
-                    .testTag(NativeUiTags.OwnerRecordsRoot),
+                    .testTag(rootTag),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -105,7 +107,8 @@ fun OwnerRecordsScreen(
                     context = state.snapshot.context,
                     detail = detail,
                     onBack = onBackFromDetail,
-                    onNavigate = onNavigate,
+                    hostedScaffold = hostedScaffold,
+                    roleLabel = roleLabel,
                     modifier = modifier,
                 )
             } else {
@@ -115,7 +118,9 @@ fun OwnerRecordsScreen(
                     onSearchQueryChange = onSearchQueryChange,
                     onOpenRecord = onOpenRecord,
                     onLeaveConfirmed = onLeaveConfirmed,
-                    onNavigate = onNavigate,
+                    hostedScaffold = hostedScaffold,
+                    roleLabel = roleLabel,
+                    rootTag = rootTag,
                     onDeferredGroup = onDeferredGroup,
                     modifier = modifier,
                 )
@@ -131,22 +136,24 @@ private fun RecordsListBody(
     onSearchQueryChange: (String) -> Unit,
     onOpenRecord: (Long) -> Unit,
     onLeaveConfirmed: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    roleLabel: String,
+    rootTag: String,
     onDeferredGroup: (String) -> Unit,
     modifier: Modifier,
 ) {
     BackHandler(onBack = onLeaveConfirmed)
-    OwnerScaffold(snackbarHostState, OwnerSection.Records, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .testTag(NativeUiTags.OwnerRecordsRoot),
+                .testTag(rootTag),
         ) {
             CashierScreenHeader(
                 title = "Records",
                 displayName = state.snapshot.context.shopName,
-                roleLabel = "Owner",
+                roleLabel = roleLabel,
                 businessDate = state.snapshot.context.businessDate,
                 postingOpen = state.snapshot.context.postingOpen,
             )
@@ -284,11 +291,12 @@ private fun RecordsDetailBody(
     context: NativeOwnerRecordsContext,
     detail: NativeOwnerRecordsDetail,
     onBack: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    roleLabel: String,
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBack)
-    OwnerScaffold(snackbarHostState, OwnerSection.Records, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
@@ -298,7 +306,7 @@ private fun RecordsDetailBody(
             CashierScreenHeader(
                 title = "Records",
                 displayName = context.shopName,
-                roleLabel = "Owner",
+                roleLabel = roleLabel,
                 businessDate = context.businessDate,
                 postingOpen = context.postingOpen,
             )

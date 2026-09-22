@@ -219,6 +219,66 @@ val screenClassMap = mapOf(
         "com.saaf.milkshop.NativeFoundationUiTest#ownerBackupOpensUnderOwnerChrome",
         "com.saaf.milkshop.NativeFoundationUiTest#ownerBackupHardwareBackReturnsToMoreMenu",
     ),
+    "managershell" to listOf(
+        "com.saaf.milkshop.NativeManagerShellScreenContractTest",
+        "com.saaf.milkshop.NativeManagerWorkScreenContractTest",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerShellOpensUnderManagerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerShellHardwareBackStaysOnWorkAndKeepsSession",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerShellNavSwitchesSectionsUnderManagerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerExpenseOpensUnderManagerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerExpenseHardwareBackReturnsToWorkHome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerPaySupplierOpensUnderManagerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerPaySupplierHardwareBackReturnsToWorkHome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerCashCloseOpensUnderManagerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerCashCloseHardwareBackReturnsToWorkHome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerRecordsOpensUnderManagerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerRecordsHardwareBackReturnsToWorkHome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerMoreOpensUnderManagerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerMoreSignsOutToWelcome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerProductsOpensUnderManagerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerProductsHardwareBackReturnsToMoreMenu",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerCustomersOpensUnderManagerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerCustomersHardwareBackReturnsToMoreMenu",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerSuppliersOpensUnderManagerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerSuppliersHardwareBackReturnsToMoreMenu",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerEmployeesOpensUnderManagerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerEmployeesHardwareBackReturnsToMoreMenu",
+    ),
+    "adminshell" to listOf(
+        "com.saaf.milkshop.NativeAdminShellScreenContractTest",
+        "com.saaf.milkshop.NativeAdminWorkScreenContractTest",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminShellOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminShellHardwareBackStaysOnWorkAndKeepsSession",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminShellNavSwitchesSectionsUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminExpenseOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminExpenseHardwareBackReturnsToWorkHome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminPeopleOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminPeopleHardwareBackReturnsToWorkHome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminUsersRolesOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminUsersRolesHardwareBackReturnsToPeopleHub",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminCustomersOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminCustomersHardwareBackReturnsToPeopleHub",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminEmployeesOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminEmployeesHardwareBackReturnsToPeopleHub",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminSuppliersOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminSuppliersHardwareBackReturnsToPeopleHub",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminRecordsOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminRecordsHardwareBackReturnsToWorkHome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminBusinessRecordsOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminBusinessRecordsHardwareBackReturnsToRecordsHub",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminSecurityHistoryOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminSecurityHistoryHardwareBackReturnsToRecordsHub",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminMoreOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminMoreSignsOutToWelcome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminProductsOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminProductsHardwareBackReturnsToMoreMenu",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminCostingPlansOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminCostingPlansHardwareBackReturnsToMoreMenu",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminShopSettingsOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminShopSettingsHardwareBackReturnsToMoreMenu",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminLocalExportOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminLocalExportHardwareBackReturnsToMoreMenu",
+    ),
 )
 
 // Apply connected-test filter/sandbox via rootProject.extra (setProjectProperties is not
@@ -239,7 +299,7 @@ if (wantsQaScreen || wantsQaCheckpoint) {
             .distinct()
     } else {
         val screen = qaScreenName.lowercase()
-        require(screen.isNotEmpty()) { "qaScreen requires -Pqa.screen=auth|sale|collect|activity|more|work|receive|yogurt|spoilage|deliveries|attendance|opsmore|owner|ownerwork|ownerrecords|ownermore" }
+        require(screen.isNotEmpty()) { "qaScreen requires -Pqa.screen=auth|sale|collect|activity|more|work|receive|yogurt|spoilage|deliveries|attendance|opsmore|owner|ownerwork|ownerrecords|ownermore|managershell|adminshell" }
         require(screenClassMap.containsKey(screen)) {
             "Unknown qa.screen='$qaScreenName'. Valid: ${screenClassMap.keys.sorted()}"
         }
@@ -334,13 +394,13 @@ val qaFast by tasks.registering {
 
 val qaScreen by tasks.registering {
     group = "qa"
-    description = "Device acceptance for one native screen: -Pqa.screen=auth|sale|collect|activity|more|work|receive|yogurt|spoilage|deliveries|attendance|opsmore|owner|ownerwork|ownerrecords|ownermore (no nested Gradle)."
+    description = "Device acceptance for one native screen: -Pqa.screen=auth|sale|collect|activity|more|work|receive|yogurt|spoilage|deliveries|attendance|opsmore|owner|ownerwork|ownerrecords|ownermore|managershell|adminshell (no nested Gradle)."
     dependsOn(checkUiOnly, checkNativeInventory, devicePreflight, ":app:connectedDebugAndroidTest")
     doFirst {
         val screen = qaScreenName.lowercase()
         if (screen.isEmpty()) {
             println("QA_SCREEN[]: FAIL")
-            throw GradleException("qaScreen requires -Pqa.screen=auth|sale|collect|activity|more|work|receive|yogurt|spoilage|deliveries|attendance|opsmore|owner|ownerwork|ownerrecords|ownermore")
+            throw GradleException("qaScreen requires -Pqa.screen=auth|sale|collect|activity|more|work|receive|yogurt|spoilage|deliveries|attendance|opsmore|owner|ownerwork|ownerrecords|ownermore|managershell|adminshell")
         }
         if (!screenClassMap.containsKey(screen)) {
             println("QA_SCREEN[$screen]: FAIL")

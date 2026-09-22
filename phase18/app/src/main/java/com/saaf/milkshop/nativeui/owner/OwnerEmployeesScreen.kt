@@ -51,6 +51,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
 import com.saaf.milkshop.domain.EmployeeProfileInput
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
@@ -84,7 +85,7 @@ fun OwnerEmployeesScreen(
     onOpenEdit: () -> Unit,
     onBackFromEdit: () -> Unit,
     onUpdateEmployee: (String, EmployeeProfileInput) -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
     modifier: Modifier = Modifier,
 ) {
     if (employeeCreateOpen) {
@@ -96,7 +97,7 @@ fun OwnerEmployeesScreen(
             error = employeesError,
             onBack = onBackFromCreate,
             onSave = onCreateEmployee,
-            onNavigate = onNavigate,
+            hostedScaffold = hostedScaffold,
             modifier = modifier,
         )
         return
@@ -112,7 +113,7 @@ fun OwnerEmployeesScreen(
             error = employeesError,
             onBack = onBackFromEdit,
             onSave = onUpdateEmployee,
-            onNavigate = onNavigate,
+            hostedScaffold = hostedScaffold,
             modifier = modifier,
         )
         return
@@ -127,14 +128,14 @@ fun OwnerEmployeesScreen(
             error = employeesError,
             onBack = onBackFromDetail,
             onOpenEdit = onOpenEdit,
-            onNavigate = onNavigate,
+            hostedScaffold = hostedScaffold,
             modifier = modifier,
         )
         return
     }
 
     BackHandler(onBack = onBackToMenu)
-    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
@@ -255,7 +256,7 @@ private fun OwnerEmployeesCreateScreen(
     error: String?,
     onBack: () -> Unit,
     onSave: (String) -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -278,11 +279,10 @@ private fun OwnerEmployeesCreateScreen(
     BackHandler { requestLeave(onBack) }
 
     Box(modifier.fillMaxSize()) {
-        OwnerScaffold(
-            snackbarHostState = snackbarHostState,
-            section = OwnerSection.More,
-            onNavigate = { section -> requestLeave { onNavigate(section) } },
-            modifier = Modifier.fillMaxSize(),
+        hostedScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
+            { action -> requestLeave(action) },
         ) { padding ->
             Column(
                 Modifier
@@ -382,7 +382,7 @@ private fun OwnerEmployeesEditScreen(
     error: String?,
     onBack: () -> Unit,
     onSave: (String, EmployeeProfileInput) -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -419,11 +419,10 @@ private fun OwnerEmployeesEditScreen(
     BackHandler { requestLeave(onBack) }
 
     Box(modifier.fillMaxSize()) {
-        OwnerScaffold(
-            snackbarHostState = snackbarHostState,
-            section = OwnerSection.More,
-            onNavigate = { section -> requestLeave { onNavigate(section) } },
-            modifier = Modifier.fillMaxSize(),
+        hostedScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
+            { action -> requestLeave(action) },
         ) { padding ->
             Column(
                 Modifier
@@ -653,12 +652,12 @@ private fun OwnerEmployeesDetailScreen(
     error: String?,
     onBack: () -> Unit,
     onOpenEdit: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBack)
     val row = detail.row
-    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()

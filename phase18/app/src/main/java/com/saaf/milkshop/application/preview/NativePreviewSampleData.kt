@@ -38,6 +38,9 @@ object NativePreviewSampleData {
     const val PREVIEW_ADMIN_LOGIN = "preview.admin"
     const val PREVIEW_ADMIN_DISPLAY_NAME = "Preview Admin"
 
+    const val PREVIEW_MANAGER_LOGIN = "preview.manager"
+    const val PREVIEW_MANAGER_DISPLAY_NAME = "Preview Manager"
+
     const val PREVIEW_CASHIER_LOGIN = "preview.cashier"
     const val PREVIEW_CASHIER_DISPLAY_NAME = "Preview Cashier"
 
@@ -61,6 +64,7 @@ object NativePreviewSampleData {
 
     private val previewStaff = listOf(
         PreviewStaffSpec(PREVIEW_ADMIN_LOGIN, PREVIEW_ADMIN_DISPLAY_NAME, AppRole.ADMIN),
+        PreviewStaffSpec(PREVIEW_MANAGER_LOGIN, PREVIEW_MANAGER_DISPLAY_NAME, AppRole.MANAGER),
         PreviewStaffSpec(PREVIEW_CASHIER_LOGIN, PREVIEW_CASHIER_DISPLAY_NAME, AppRole.CASHIER),
         PreviewStaffSpec(PREVIEW_OPERATOR_LOGIN, PREVIEW_OPERATOR_DISPLAY_NAME, AppRole.OPERATOR),
     )
@@ -69,7 +73,7 @@ object NativePreviewSampleData {
         loginName.trim().lowercase().startsWith("preview.")
 
     fun previewAccountsHint(): String =
-        "Preview logins: $PREVIEW_OWNER_LOGIN / $PREVIEW_ADMIN_LOGIN / " +
+        "Preview logins: $PREVIEW_OWNER_LOGIN / $PREVIEW_MANAGER_LOGIN / $PREVIEW_ADMIN_LOGIN / " +
             "$PREVIEW_CASHIER_LOGIN / $PREVIEW_OPERATOR_LOGIN — passphrase: $PREVIEW_SHARED_PASSPHRASE"
 
     private val sampleCustomerNames = listOf(
@@ -295,6 +299,7 @@ object NativePreviewSampleData {
     suspend fun alignPreviewPassphrases(security: UserSecurityService) {
         val logins = listOf(
             PREVIEW_OWNER_LOGIN,
+            PREVIEW_MANAGER_LOGIN,
             PREVIEW_ADMIN_LOGIN,
             PREVIEW_CASHIER_LOGIN,
             PREVIEW_OPERATOR_LOGIN,

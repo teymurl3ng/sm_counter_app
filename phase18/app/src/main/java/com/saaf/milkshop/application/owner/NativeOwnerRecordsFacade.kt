@@ -88,7 +88,6 @@ class NativeOwnerRecordsFacade(
         requireOwner(sessionHandle)
         security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
         val businessDate = date.toString()
-        val settings = reads.businessSettings(sessionHandle)
         val history = reads.eventHistory(sessionHandle)
         val eventsById = database.eventDao().findAllDescending().associateBy { it.eventId }
         val records = history.map { dto ->
@@ -98,7 +97,8 @@ class NativeOwnerRecordsFacade(
             context = NativeOwnerRecordsContext(
                 businessDate = businessDate,
                 postingOpen = !database.dailyCloseDao().isPostingClosed(businessDate),
-                shopName = settings.store?.storeName?.takeIf { it.isNotBlank() } ?: "Saaf Milk",
+                shopName = database.storeProfileDao().get()?.storeName?.takeIf { it.isNotBlank() }
+                    ?: "Saaf Milk",
             ),
             records = records,
         )
@@ -146,8 +146,9 @@ class NativeOwnerRecordsFacade(
 
     private suspend fun requireOwner(sessionHandle: String) {
         val actor = security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
-        require(AppRole.parse(actor.role) == AppRole.OWNER) {
-            "Owner Records is only available to Owner."
+        val role = AppRole.parse(actor.role)
+        require(role == AppRole.OWNER || role == AppRole.MANAGER || role == AppRole.ADMIN) {
+            "Records is only available to Owner or Manager."
         }
     }
 

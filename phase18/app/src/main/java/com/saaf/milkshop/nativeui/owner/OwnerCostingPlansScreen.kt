@@ -57,6 +57,7 @@ import com.saaf.milkshop.domain.ConversionCostComponentInput
 import com.saaf.milkshop.domain.CostingPolicyInput
 import com.saaf.milkshop.domain.CostingPolicyService
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -98,7 +99,8 @@ fun OwnerCostingPlansScreen(
     onApprovePolicy: (CostingPolicyInput) -> Unit,
     onSubmitReauth: (CharArray) -> Unit,
     onCancelReauth: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    backToHubLabel: String = "Back to More",
     modifier: Modifier = Modifier,
 ) {
     when {
@@ -123,7 +125,7 @@ fun OwnerCostingPlansScreen(
                     error = null,
                     onBack = onBackFromApprove,
                     onSave = onApprovePolicy,
-                    onNavigate = onNavigate,
+                    hostedScaffold = hostedScaffold,
                     modifier = modifier,
                 )
             }
@@ -141,7 +143,7 @@ fun OwnerCostingPlansScreen(
                 error = policiesError,
                 onBack = onBackFromApprove,
                 onSave = onApprovePolicy,
-                onNavigate = onNavigate,
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
         }
@@ -153,7 +155,7 @@ fun OwnerCostingPlansScreen(
                 detail = policyDetail,
                 onBack = onBackFromDetail,
                 onOpenApproveFromDetail = onOpenApproveFromDetail,
-                onNavigate = onNavigate,
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
         }
@@ -170,7 +172,7 @@ fun OwnerCostingPlansScreen(
                 onRetry = onRetry,
                 onOpenPolicy = onOpenPolicy,
                 onOpenApprove = onOpenApprove,
-                onNavigate = onNavigate,
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
         }
@@ -190,11 +192,12 @@ private fun OwnerCostingPlansListBody(
     onRetry: () -> Unit,
     onOpenPolicy: (Long) -> Unit,
     onOpenApprove: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBackToMenu)
-    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
@@ -240,7 +243,7 @@ private fun OwnerCostingPlansListBody(
                         TextButton(
                             onClick = onBackToMenu,
                             modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansBack),
-                        ) { Text("Back to More") }
+                        ) { Text(backToHubLabel) }
                     }
                 }
                 else -> {
@@ -255,7 +258,7 @@ private fun OwnerCostingPlansListBody(
                             TextButton(
                                 onClick = onBackToMenu,
                                 modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansBack),
-                            ) { Text("Back to More") }
+                            ) { Text(backToHubLabel) }
                             TextButton(
                                 onClick = onOpenApprove,
                                 modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansApprove),
@@ -324,12 +327,13 @@ private fun OwnerCostingPlansDetailScreen(
     detail: NativeOwnerCostingPolicyDetail,
     onBack: () -> Unit,
     onOpenApproveFromDetail: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBack)
     val row = detail.row
-    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
@@ -417,7 +421,8 @@ private fun OwnerCostingPlansApproveScreen(
     error: String?,
     onBack: () -> Unit,
     onSave: (CostingPolicyInput) -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
+    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -522,11 +527,10 @@ private fun OwnerCostingPlansApproveScreen(
     BackHandler { requestLeave(onBack) }
 
     Box(modifier.fillMaxSize()) {
-        OwnerScaffold(
-            snackbarHostState = snackbarHostState,
-            section = OwnerSection.More,
-            onNavigate = { section -> requestLeave { onNavigate(section) } },
-            modifier = Modifier.fillMaxSize(),
+        hostedScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
+            { action -> requestLeave(action) },
         ) { padding ->
             Column(
                 Modifier

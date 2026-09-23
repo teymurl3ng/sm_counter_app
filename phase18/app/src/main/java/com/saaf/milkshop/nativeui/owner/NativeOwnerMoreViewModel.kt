@@ -226,32 +226,10 @@ class NativeOwnerMoreViewModel(
     private var pendingUsersAction: PendingUsersRolesAction? = null
     private var pendingCostingApprove: CostingPolicyInput? = null
     private var pendingYieldApprove: YieldPolicyInput? = null
-    private var pendingBackupAction: PendingBackupAction? = null
+    private val pendingBackupActions = OwnerPendingBackupActionStore()
     private var pendingOpeningInput: OpeningStateInput? = null
     private var pendingOpeningCorrection: Boolean = false
     val state: StateFlow<NativeOwnerMoreState> = _state.asStateFlow()
-
-    private sealed interface PendingUsersRolesAction {
-        data class BeginEnroll(val input: CreateUserInput) : PendingUsersRolesAction
-        data class SetEnabled(val userId: Long, val enabled: Boolean) : PendingUsersRolesAction
-        data class ChangeRole(val userId: Long, val roleWire: String) : PendingUsersRolesAction
-        data class BeginCredentialReset(val userId: Long) : PendingUsersRolesAction
-    }
-
-    private sealed interface PendingBackupAction {
-        data class Export(val uri: Uri, val passphrase: CharArray) : PendingBackupAction
-        data class Inspect(val uri: Uri, val passphrase: CharArray) : PendingBackupAction
-        data class ConfirmRestore(val confirm: Boolean) : PendingBackupAction
-        data class Connect(val passphrase: CharArray, val allowMetered: Boolean) : PendingBackupAction
-        data class SetPolicy(val enabled: Boolean) : PendingBackupAction
-        data object Disconnect : PendingBackupAction
-        data object RefreshCloud : PendingBackupAction
-        data class InspectCloud(
-            val remoteFileId: String,
-            val recoveryPassphrase: CharArray?,
-        ) : PendingBackupAction
-        data class ConfirmCloudRestore(val confirm: Boolean) : PendingBackupAction
-    }
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle &&
@@ -1767,8 +1745,12 @@ class NativeOwnerMoreViewModel(
     }
 
     fun submitCostingReauth(passphrase: CharArray) {
-        val session = sessionHandle ?: return
-        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val session = sessionHandle
+        val current = _state.value as? NativeOwnerMoreState.Ready
+        if (session == null || current == null) {
+            passphrase.fill('\u0000')
+            return
+        }
         if (current.destination != NativeOwnerMoreDestination.CostingPlans ||
             !current.costingReauthOpen ||
             current.costingReauthBusy
@@ -2546,8 +2528,12 @@ class NativeOwnerMoreViewModel(
     }
 
     fun submitOpeningReauth(passphrase: CharArray) {
-        val session = sessionHandle ?: return
-        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val session = sessionHandle
+        val current = _state.value as? NativeOwnerMoreState.Ready
+        if (session == null || current == null) {
+            passphrase.fill('\u0000')
+            return
+        }
         if (!current.shopSettingsOpeningReauthOpen || current.shopSettingsOpeningReauthBusy) {
             passphrase.fill('\u0000')
             return
@@ -2591,6 +2577,8 @@ class NativeOwnerMoreViewModel(
                 )
             } catch (error: Throwable) {
                 handleShopSettingsFailure(error)
+            } finally {
+                passphrase.fill('\u0000')
             }
         }
     }
@@ -2879,8 +2867,13 @@ class NativeOwnerMoreViewModel(
     }
 
     fun completeUserEnroll(passphrase: CharArray, confirmation: CharArray) {
-        val session = sessionHandle ?: return
-        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val session = sessionHandle
+        val current = _state.value as? NativeOwnerMoreState.Ready
+        if (session == null || current == null) {
+            passphrase.fill('\u0000')
+            confirmation.fill('\u0000')
+            return
+        }
         val pending = current.userEnrollPending
         if (current.destination != NativeOwnerMoreDestination.UsersRoles ||
             pending == null ||
@@ -3120,8 +3113,12 @@ class NativeOwnerMoreViewModel(
     }
 
     fun submitUsersRolesReauth(passphrase: CharArray) {
-        val session = sessionHandle ?: return
-        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val session = sessionHandle
+        val current = _state.value as? NativeOwnerMoreState.Ready
+        if (session == null || current == null) {
+            passphrase.fill('\u0000')
+            return
+        }
         if (current.destination != NativeOwnerMoreDestination.UsersRoles ||
             !current.userReauthOpen ||
             current.userReauthBusy
@@ -3551,8 +3548,12 @@ class NativeOwnerMoreViewModel(
     }
 
     fun exportBackup(uri: Uri, passphrase: CharArray) {
-        val session = sessionHandle ?: return
-        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val session = sessionHandle
+        val current = _state.value as? NativeOwnerMoreState.Ready
+        if (session == null || current == null) {
+            passphrase.fill('\u0000')
+            return
+        }
         if (current.destination != NativeOwnerMoreDestination.Backup ||
             !current.backupExportOpen ||
             current.backupBusy
@@ -3560,6 +3561,8 @@ class NativeOwnerMoreViewModel(
             passphrase.fill('\u0000')
             return
         }
+        val retryPassphrase = passphrase.copyOf()
+        var retryRetained = false
         _state.value = current.copy(backupBusy = true, backupError = null)
         scope.launch {
             try {
@@ -3580,8 +3583,8 @@ class NativeOwnerMoreViewModel(
                 )
             } catch (error: Throwable) {
                 if (error is SecurityFailure.RecentAuthenticationRequired) {
-                    pendingBackupAction = PendingBackupAction.Export(uri, passphrase.copyOf())
-                    passphrase.fill('\u0000')
+                    pendingBackupActions.replace(PendingBackupAction.Export(uri, retryPassphrase))
+                    retryRetained = true
                     val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                     _state.value = latest.copy(
                         backupBusy = false,
@@ -3590,9 +3593,11 @@ class NativeOwnerMoreViewModel(
                         backupError = null,
                     )
                 } else {
-                    passphrase.fill('\u0000')
                     handleBackupFailure(error)
                 }
+            } finally {
+                passphrase.fill('\u0000')
+                if (!retryRetained) retryPassphrase.fill('\u0000')
             }
         }
     }
@@ -3637,8 +3642,12 @@ class NativeOwnerMoreViewModel(
     }
 
     fun inspectBackupRestore(uri: Uri, passphrase: CharArray) {
-        val session = sessionHandle ?: return
-        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val session = sessionHandle
+        val current = _state.value as? NativeOwnerMoreState.Ready
+        if (session == null || current == null) {
+            passphrase.fill('\u0000')
+            return
+        }
         if (current.destination != NativeOwnerMoreDestination.Backup ||
             !current.backupRestoreOpen ||
             current.backupBusy
@@ -3646,6 +3655,8 @@ class NativeOwnerMoreViewModel(
             passphrase.fill('\u0000')
             return
         }
+        val retryPassphrase = passphrase.copyOf()
+        var retryRetained = false
         _state.value = current.copy(backupBusy = true, backupError = null)
         scope.launch {
             try {
@@ -3663,8 +3674,8 @@ class NativeOwnerMoreViewModel(
                 )
             } catch (error: Throwable) {
                 if (error is SecurityFailure.RecentAuthenticationRequired) {
-                    pendingBackupAction = PendingBackupAction.Inspect(uri, passphrase.copyOf())
-                    passphrase.fill('\u0000')
+                    pendingBackupActions.replace(PendingBackupAction.Inspect(uri, retryPassphrase))
+                    retryRetained = true
                     val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                     _state.value = latest.copy(
                         backupBusy = false,
@@ -3673,9 +3684,10 @@ class NativeOwnerMoreViewModel(
                         backupError = null,
                     )
                 } else {
-                    passphrase.fill('\u0000')
                     handleBackupFailure(error)
                 }
+            } finally {
+                if (!retryRetained) retryPassphrase.fill('\u0000')
             }
         }
     }
@@ -3702,7 +3714,7 @@ class NativeOwnerMoreViewModel(
                 onSessionExpired()
             } catch (error: Throwable) {
                 if (error is SecurityFailure.RecentAuthenticationRequired) {
-                    pendingBackupAction = PendingBackupAction.ConfirmRestore(confirm)
+                    pendingBackupActions.replace(PendingBackupAction.ConfirmRestore(confirm))
                     val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                     _state.value = latest.copy(
                         backupBusy = false,
@@ -3748,8 +3760,12 @@ class NativeOwnerMoreViewModel(
     }
 
     fun connectDriveBackup(passphrase: CharArray, allowMetered: Boolean) {
-        val session = sessionHandle ?: return
-        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val session = sessionHandle
+        val current = _state.value as? NativeOwnerMoreState.Ready
+        if (session == null || current == null) {
+            passphrase.fill('\u0000')
+            return
+        }
         if (current.destination != NativeOwnerMoreDestination.Backup ||
             !current.backupConnectOpen ||
             current.backupBusy
@@ -3757,6 +3773,8 @@ class NativeOwnerMoreViewModel(
             passphrase.fill('\u0000')
             return
         }
+        val retryPassphrase = passphrase.copyOf()
+        var retryRetained = false
         _state.value = current.copy(backupBusy = true, backupError = null)
         scope.launch {
             try {
@@ -3776,8 +3794,8 @@ class NativeOwnerMoreViewModel(
                 )
             } catch (error: Throwable) {
                 if (error is SecurityFailure.RecentAuthenticationRequired) {
-                    pendingBackupAction = PendingBackupAction.Connect(passphrase.copyOf(), allowMetered)
-                    passphrase.fill('\u0000')
+                    pendingBackupActions.replace(PendingBackupAction.Connect(retryPassphrase, allowMetered))
+                    retryRetained = true
                     val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                     _state.value = latest.copy(
                         backupBusy = false,
@@ -3786,9 +3804,11 @@ class NativeOwnerMoreViewModel(
                         backupError = null,
                     )
                 } else {
-                    passphrase.fill('\u0000')
                     handleBackupFailure(error)
                 }
+            } finally {
+                passphrase.fill('\u0000')
+                if (!retryRetained) retryPassphrase.fill('\u0000')
             }
         }
     }
@@ -3815,7 +3835,7 @@ class NativeOwnerMoreViewModel(
                 )
             } catch (error: Throwable) {
                 if (error is SecurityFailure.RecentAuthenticationRequired) {
-                    pendingBackupAction = PendingBackupAction.SetPolicy(enabled)
+                    pendingBackupActions.replace(PendingBackupAction.SetPolicy(enabled))
                     val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                     _state.value = latest.copy(
                         backupBusy = false,
@@ -3890,7 +3910,7 @@ class NativeOwnerMoreViewModel(
                 )
             } catch (error: Throwable) {
                 if (error is SecurityFailure.RecentAuthenticationRequired) {
-                    pendingBackupAction = PendingBackupAction.Disconnect
+                    pendingBackupActions.replace(PendingBackupAction.Disconnect)
                     val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                     _state.value = latest.copy(
                         backupBusy = false,
@@ -3955,12 +3975,18 @@ class NativeOwnerMoreViewModel(
     }
 
     fun inspectCloudBackup(remoteFileId: String, recoveryPassphrase: CharArray?) {
-        val session = sessionHandle ?: return
-        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val session = sessionHandle
+        val current = _state.value as? NativeOwnerMoreState.Ready
+        if (session == null || current == null) {
+            recoveryPassphrase?.fill('\u0000')
+            return
+        }
         if (current.destination != NativeOwnerMoreDestination.Backup || current.backupBusy) {
             recoveryPassphrase?.fill('\u0000')
             return
         }
+        val retryPassphrase = recoveryPassphrase?.copyOf()
+        var retryRetained = false
         current.backupInspection?.restoreTicket?.let(backupFacade::cancelCloudRestoreTicket)
         _state.value = current.copy(backupBusy = true, backupError = null, backupInspection = null)
         scope.launch {
@@ -3978,10 +4004,11 @@ class NativeOwnerMoreViewModel(
                 )
             } catch (error: Throwable) {
                 if (error is SecurityFailure.RecentAuthenticationRequired) {
-                    pendingBackupAction = PendingBackupAction.InspectCloud(
+                    pendingBackupActions.replace(PendingBackupAction.InspectCloud(
                         remoteFileId = remoteFileId,
-                        recoveryPassphrase = recoveryPassphrase,
-                    )
+                        recoveryPassphrase = retryPassphrase,
+                    ))
+                    retryRetained = true
                     val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                     _state.value = latest.copy(
                         backupBusy = false,
@@ -3990,9 +4017,10 @@ class NativeOwnerMoreViewModel(
                         backupError = null,
                     )
                 } else {
-                    recoveryPassphrase?.fill('\u0000')
                     handleBackupFailure(error)
                 }
+            } finally {
+                if (!retryRetained) retryPassphrase?.fill('\u0000')
             }
         }
     }
@@ -4011,7 +4039,7 @@ class NativeOwnerMoreViewModel(
                 onSessionExpired()
             } catch (error: Throwable) {
                 if (error is SecurityFailure.RecentAuthenticationRequired) {
-                    pendingBackupAction = PendingBackupAction.ConfirmCloudRestore(confirm)
+                    pendingBackupActions.replace(PendingBackupAction.ConfirmCloudRestore(confirm))
                     val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                     _state.value = latest.copy(
                         backupBusy = false,
@@ -4027,13 +4055,17 @@ class NativeOwnerMoreViewModel(
     }
 
     fun submitBackupReauth(passphrase: CharArray) {
-        val session = sessionHandle ?: return
-        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        val session = sessionHandle
+        val current = _state.value as? NativeOwnerMoreState.Ready
+        if (session == null || current == null) {
+            passphrase.fill('\u0000')
+            return
+        }
         if (!current.backupReauthOpen || current.backupReauthBusy) {
             passphrase.fill('\u0000')
             return
         }
-        val pending = pendingBackupAction
+        val pending = pendingBackupActions.current
         if (pending == null) {
             passphrase.fill('\u0000')
             _state.value = current.copy(backupReauthOpen = false, backupReauthBusy = false)
@@ -4052,47 +4084,40 @@ class NativeOwnerMoreViewModel(
                     backupReauthBusy = false,
                     backupError = null,
                 )
+                pendingBackupActions.take()
                 when (retryAction) {
                     is PendingBackupAction.Export -> {
-                        pendingBackupAction = null
                         exportBackup(retryAction.uri, retryAction.passphrase)
                     }
                     is PendingBackupAction.Inspect -> {
-                        pendingBackupAction = null
                         inspectBackupRestore(retryAction.uri, retryAction.passphrase)
                     }
                     is PendingBackupAction.ConfirmRestore -> {
-                        pendingBackupAction = null
                         confirmBackupRestore(retryAction.confirm)
                     }
                     is PendingBackupAction.Connect -> {
-                        pendingBackupAction = null
                         connectDriveBackup(retryAction.passphrase, retryAction.allowMetered)
                     }
                     is PendingBackupAction.SetPolicy -> {
-                        pendingBackupAction = null
                         setDriveBackupEnabled(retryAction.enabled)
                     }
                     PendingBackupAction.Disconnect -> {
-                        pendingBackupAction = null
                         confirmBackupDisconnect()
                     }
                     is PendingBackupAction.InspectCloud -> {
-                        pendingBackupAction = null
                         inspectCloudBackup(retryAction.remoteFileId, retryAction.recoveryPassphrase)
                     }
                     is PendingBackupAction.ConfirmCloudRestore -> {
-                        pendingBackupAction = null
                         confirmCloudBackupRestore(retryAction.confirm)
                     }
                     PendingBackupAction.RefreshCloud -> {
-                        pendingBackupAction = null
                         refreshCloudBackups()
                     }
                 }
             } catch (error: Throwable) {
-                passphrase.fill('\u0000')
                 handleBackupFailure(error)
+            } finally {
+                passphrase.fill('\u0000')
             }
         }
     }
@@ -4109,14 +4134,7 @@ class NativeOwnerMoreViewModel(
     }
 
     private fun clearPendingBackupSecrets() {
-        when (val pending = pendingBackupAction) {
-            is PendingBackupAction.Export -> pending.passphrase.fill('\u0000')
-            is PendingBackupAction.Inspect -> pending.passphrase.fill('\u0000')
-            is PendingBackupAction.Connect -> pending.passphrase.fill('\u0000')
-            is PendingBackupAction.InspectCloud -> pending.recoveryPassphrase?.fill('\u0000')
-            else -> Unit
-        }
-        pendingBackupAction = null
+        pendingBackupActions.clear()
     }
 
     fun backToMenu() {
@@ -4229,9 +4247,12 @@ class NativeOwnerMoreViewModel(
     }
 
     fun removeQuickUnlock(passphrase: CharArray) {
-        val session = sessionHandle ?: return
-        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
-        if (current.saving) return
+        val session = sessionHandle
+        val current = _state.value as? NativeOwnerMoreState.Ready
+        if (session == null || current == null || current.saving) {
+            passphrase.fill('\u0000')
+            return
+        }
         _state.value = current.copy(saving = true, error = null)
         scope.launch {
             try {
@@ -4254,9 +4275,13 @@ class NativeOwnerMoreViewModel(
     }
 
     fun enrollQuickPin(passphrase: CharArray, pin: CharArray) {
-        val session = sessionHandle ?: return
-        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
-        if (current.saving) return
+        val session = sessionHandle
+        val current = _state.value as? NativeOwnerMoreState.Ready
+        if (session == null || current == null || current.saving) {
+            passphrase.fill('\u0000')
+            pin.fill('\u0000')
+            return
+        }
         _state.value = current.copy(saving = true, error = null)
         scope.launch {
             try {
@@ -4280,9 +4305,13 @@ class NativeOwnerMoreViewModel(
     }
 
     fun enrollPhoneSecurity(passphrase: CharArray, pin: CharArray?) {
-        val session = sessionHandle ?: return
-        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
-        if (current.saving) return
+        val session = sessionHandle
+        val current = _state.value as? NativeOwnerMoreState.Ready
+        if (session == null || current == null || current.saving) {
+            passphrase.fill('\u0000')
+            pin?.fill('\u0000')
+            return
+        }
         if (current.security?.quickPinEnabled == true && (pin == null || pin.size != 4)) {
             _state.value = current.copy(
                 error = "Enter your 4-digit Quick PIN to keep it while enabling phone security.",
@@ -4314,6 +4343,8 @@ class NativeOwnerMoreViewModel(
     }
 
     override fun onCleared() {
+        clearPendingBackupSecrets()
+        sessionHandle = null
         scope.cancel()
         super.onCleared()
     }

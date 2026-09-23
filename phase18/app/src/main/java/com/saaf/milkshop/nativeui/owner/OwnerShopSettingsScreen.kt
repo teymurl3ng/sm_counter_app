@@ -1458,7 +1458,7 @@ private fun OpeningReauthScreen(
     hostedScaffold: HostedScaffold,
     modifier: Modifier,
 ) {
-    var passphrase by rememberSaveable { mutableStateOf("") }
+    var passphrase by remember { mutableStateOf("") }
     BackHandler(onBack = onCancel)
     hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(

@@ -81,9 +81,11 @@ import com.saaf.milkshop.application.collection.NativeCollectionPaymentAccount
 import com.saaf.milkshop.application.collection.NativeCollectionReceipt
 import com.saaf.milkshop.application.collection.NativeCollectionRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierNavigation
+import com.saaf.milkshop.nativeui.sale.CashierNavigationRail
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.CashierSection
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
@@ -200,13 +202,16 @@ private fun CollectionScaffold(
     modifier: Modifier,
     content: @Composable (PaddingValues) -> Unit,
 ) {
-    Scaffold(
+    AdaptiveNavigationScaffold(
+        snackbarHostState = snackbarHostState,
         modifier = modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = {
+        compactNavigation = {
             CashierNavigation(selected = CashierSection.Collect, onNavigate = onNavigate)
+        },
+        expandedNavigation = {
+            CashierNavigationRail(selected = CashierSection.Collect, onNavigate = onNavigate)
         },
         content = content,
     )

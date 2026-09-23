@@ -1,6 +1,6 @@
 # Phase 14.8 native UI — status overview
 
-Date: 2026-09-22  
+Date: 2026-09-23
 Branch: `fix/native-shell-vs-content-owner-work`
 
 ## Snapshot
@@ -14,6 +14,7 @@ Branch: `fix/native-shell-vs-content-owner-work`
 
 ## Done (recent)
 
+- **14.8.50 audit remediation** — debug/native-preview now has an isolated application ID and release-disabled fixtures; authenticated hosts follow system theme; passphrases/PINs no longer use saveable state and are wiped across submission, early-return, retry, cancellation, and ViewModel teardown paths; Cashier/Operations/Owner/Manager/Admin shells switch from bottom navigation to a rail at 600dp; inherited lint errors are closed; pending Owner backup/user workflows are extracted and backup secret ownership is centralized; the frozen-baseline script works in Windows PowerShell 5.1 and PowerShell 7. Gates: `qaFast` PASS; `lintDebug` PASS (`0 errors`, `181 warnings`); debug + release assemble PASS; affected UI contract matrix **51/51 PASS** on SM-A065F, including adaptive-shell boundary **2/2**.
 - **14.8.49** Owner Costing & plans budgets + collections targets + yield policy approve (Owner + Admin host; leave-guard; yield recent-auth). Opening cost basis still deferred. Gates: `ownermore` **213/213 PASS**; `adminshell` **38/38 PASS**. Debug APK with `open_owner=true`.
 - **14.8.48** Native Corrections write UI (Step 1) — typed `NativeOwnerRecordsFacade.correct` (same rules as `HistoryBridgeCommandService.correct`); role-neutral correction editor under Owner/Manager/Admin Records hosts; Corrections group filter connected; leave-guard on dirty draft. **Approval queue still deferred** (no domain API). Gates: `managershell` **50/50 PASS**; `ownermore` **213/213 PASS**. Debug APK with `open_manager=true`.
 - **14.8.47** Owner More residuals — Shop settings opening record/correct (+ recent auth); Users credential reset; Backup cloud remote list/inspect/restore via typed gateway (fake-gateway in CI; live Drive list device-manual). Admin Backup stays `localExportOnly`.
@@ -34,8 +35,9 @@ Branch: `fix/native-shell-vs-content-owner-work`
 
 ## Recommended next
 
-1. Opening cost basis (Costing Step 5)
-2. Approval queue (only when domain API exists)
+1. Continue splitting `NativeOwnerMoreViewModel` by feature coordinator; backup pending-action ownership is extracted, but the broad owner coordinator remains oversized.
+2. Opening cost basis (Costing Step 5)
+3. Approval queue (only when domain API exists)
 
 ## Authority
 

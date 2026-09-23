@@ -1,6 +1,6 @@
 # Saaf Milk — Real Hybrid Rebuild
 
-Status: RECONCILED 2026-09-12 — hybrid Phases 0–14 are complete; Phase 14.8 native UI redesign and migration is active before Phase 15 uncoached shopkeeper QA. Contract v5 exposes 91 native-backed operations. Quick unlock, live Drive, cross-device recovery, Android behavior, accessibility closure, and every recorded Phase 14 defect pass their final gates. The verified hybrid application is retained as the behavioral baseline and temporary fallback while the final presentation moves to Jetpack Compose.
+Status: RECONCILED 2026-09-23 — hybrid Phases 0–14 are complete; Phase 14.8 native UI redesign has reached 14.8.50 audit remediation before Phase 15 uncoached shopkeeper QA. Contract v5 exposes 91 native-backed operations. Quick unlock, live Drive, cross-device recovery, Android behavior, accessibility closure, and every recorded Phase 14 defect pass their final gates. The verified hybrid application is retained as the behavioral baseline and temporary fallback while the final presentation moves to Jetpack Compose.
 
 Latest complete physical-device regression: Phase 14.7 passes 273/273 ordinary tests in the isolated `com.saaf.milkshop.qa.tests` instrumentation package and the separately configured 1/1 blank-install visual audit, with zero skips or failures. Host-side tests pass 7/7. The final OAuth-enabled user-facing `.qa` APK is 16,174,564 bytes with SHA-256 `5581218C0761ED3C33CA9D09877D19E4D2654B5B6DF5AC2790C80B364F223A24`.
 
@@ -84,7 +84,7 @@ SQL blueprint SHA-256:
 
 ## Current phase
 
-**Phase 14.8 — Native UI Redesign and Migration: ACTIVE (14.8.3 Compose authentication and authoritative Sale are hardened and verified on A06; hybrid launcher retained)**
+**Phase 14.8 — Native UI Redesign and Migration: ACTIVE (14.8.50 Cursor-work audit remediation passes host gates, debug/release packaging, lint, and focused A06 adaptive-shell tests; hybrid launcher retained)**
 
 Phase 14 completed the safe `.qa` device baseline, all-five-role authorization matrix, live Drive and real cross-device recovery, Android/accessibility audit, device-bound Quick unlock, defect closure, and complete regression. The final result remains 273/273 ordinary Android tests, the 1/1 visual audit, and 7/7 host tests. The owner then rejected the hybrid interface as the release UX and confirmed native UI as the intended destination. Phase 14.8 redesigns and incrementally migrates the presentation to Compose while retaining the working hybrid build as a behavioral oracle and fallback. Phase 15 will test the native release candidate without coaching.
 

@@ -38,6 +38,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -519,8 +520,8 @@ private fun AdminMorePersonalSecurityScreen(
 ) {
     BackHandler(onBack = onBack)
     val security = state.security
-    var passphrase by rememberSaveable { mutableStateOf("") }
-    var pin by rememberSaveable { mutableStateOf("") }
+    var passphrase by remember { mutableStateOf("") }
+    var pin by remember { mutableStateOf("") }
 
     if (state.confirmRemoveUnlock) {
         AlertDialog(
@@ -530,7 +531,12 @@ private fun AdminMorePersonalSecurityScreen(
                 Text("This clears Quick PIN and phone security for ${identity.displayName} on this phone.")
             },
             confirmButton = {
-                TextButton(onClick = { onRemove(passphrase.toCharArray()) }) { Text("Remove") }
+                TextButton(onClick = {
+                    val secret = passphrase.toCharArray()
+                    passphrase = ""
+                    pin = ""
+                    onRemove(secret)
+                }) { Text("Remove") }
             },
             dismissButton = {
                 TextButton(onClick = onCancelRemove) { Text("Keep") }
@@ -590,7 +596,11 @@ private fun AdminMorePersonalSecurityScreen(
                     Button(
                         onClick = {
                             if (passphrase.isBlank() || pin.length != 4) return@Button
-                            onEnrollPin(passphrase.toCharArray(), pin.toCharArray())
+                            val secret = passphrase.toCharArray()
+                            val quickPin = pin.toCharArray()
+                            passphrase = ""
+                            pin = ""
+                            onEnrollPin(secret, quickPin)
                         },
                         enabled = !state.saving && passphrase.isNotBlank() && pin.length == 4,
                         modifier = Modifier.fillMaxWidth(),
@@ -599,10 +609,11 @@ private fun AdminMorePersonalSecurityScreen(
                         Button(
                             onClick = {
                                 if (passphrase.isBlank()) return@Button
-                                onEnrollPhone(
-                                    passphrase.toCharArray(),
-                                    pin.takeIf { it.length == 4 }?.toCharArray(),
-                                )
+                                val secret = passphrase.toCharArray()
+                                val quickPin = pin.takeIf { it.length == 4 }?.toCharArray()
+                                passphrase = ""
+                                pin = ""
+                                onEnrollPhone(secret, quickPin)
                             },
                             enabled = !state.saving && passphrase.isNotBlank(),
                             modifier = Modifier.fillMaxWidth(),

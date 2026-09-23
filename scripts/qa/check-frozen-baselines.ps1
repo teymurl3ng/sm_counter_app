@@ -18,7 +18,19 @@ foreach ($rel in $expected.Keys) {
         $failed = $true
         continue
     }
-    $hash = (Get-FileHash -Algorithm SHA256 -Path $path).Hash.ToLowerInvariant()
+    # Use the BCL directly so this gate works in Windows PowerShell 5.1 and PowerShell 7.
+    $stream = [System.IO.File]::OpenRead($path)
+    try {
+        $algorithm = [System.Security.Cryptography.SHA256]::Create()
+        try {
+            $hashBytes = $algorithm.ComputeHash($stream)
+        } finally {
+            $algorithm.Dispose()
+        }
+    } finally {
+        $stream.Dispose()
+    }
+    $hash = ([System.BitConverter]::ToString($hashBytes)).Replace("-", "").ToLowerInvariant()
     $want = $expected[$rel].ToLowerInvariant()
     if ($hash -ne $want) {
         Write-Host "Hash drift for $rel"

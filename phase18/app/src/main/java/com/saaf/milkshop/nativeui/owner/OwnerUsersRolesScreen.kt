@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -607,8 +608,8 @@ private fun OwnerUsersRolesEnrollPassphraseScreen(
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
-    var passphrase by rememberSaveable { mutableStateOf("") }
-    var confirmation by rememberSaveable { mutableStateOf("") }
+    var passphrase by remember { mutableStateOf("") }
+    var confirmation by remember { mutableStateOf("") }
     var draftTouched by rememberSaveable { mutableStateOf(false) }
     var localError by rememberSaveable { mutableStateOf<String?>(null) }
 
@@ -851,7 +852,7 @@ private fun OwnerUsersRolesReauthDialog(
     onConfirm: (CharArray) -> Unit,
     onCancel: () -> Unit,
 ) {
-    var passphrase by rememberSaveable { mutableStateOf("") }
+    var passphrase by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = { if (!busy) onCancel() },
         modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesReauth),

@@ -1,5 +1,6 @@
 package com.saaf.milkshop.application.preview
 
+import com.saaf.milkshop.BuildConfig
 import com.saaf.milkshop.application.activity.NativeActivityFacade
 import com.saaf.milkshop.application.collection.NativeCollectionFacade
 import com.saaf.milkshop.application.collection.NativeCollectionRequest
@@ -28,12 +29,14 @@ import java.time.LocalDate
  * re-created or passphrase-reset on later launches.
  */
 object NativePreviewSampleData {
-    /** Shared preview passphrase for every preview.* role account. */
-    const val PREVIEW_SHARED_PASSPHRASE = "1234567890qwert"
+    /** Debug-only shared passphrase for the isolated preview package. Empty in release. */
+    val PREVIEW_SHARED_PASSPHRASE: String
+        get() = BuildConfig.NATIVE_PREVIEW_SHARED_PASSPHRASE
 
     const val PREVIEW_OWNER_LOGIN = "preview.owner"
     const val PREVIEW_OWNER_DISPLAY_NAME = "Preview Owner"
-    const val PREVIEW_OWNER_PASSPHRASE = PREVIEW_SHARED_PASSPHRASE
+    val PREVIEW_OWNER_PASSPHRASE: String
+        get() = PREVIEW_SHARED_PASSPHRASE
 
     const val PREVIEW_ADMIN_LOGIN = "preview.admin"
     const val PREVIEW_ADMIN_DISPLAY_NAME = "Preview Admin"
@@ -46,7 +49,8 @@ object NativePreviewSampleData {
 
     const val PREVIEW_OPERATOR_LOGIN = "preview.operator"
     const val PREVIEW_OPERATOR_DISPLAY_NAME = "Preview Operator"
-    const val PREVIEW_OPERATOR_PASSPHRASE = PREVIEW_SHARED_PASSPHRASE
+    val PREVIEW_OPERATOR_PASSPHRASE: String
+        get() = PREVIEW_SHARED_PASSPHRASE
 
     /** Older preview secrets — migrate once when found, never wipe on launch. */
     private val LEGACY_PREVIEW_PASSPHRASES = listOf(
@@ -69,8 +73,11 @@ object NativePreviewSampleData {
         PreviewStaffSpec(PREVIEW_OPERATOR_LOGIN, PREVIEW_OPERATOR_DISPLAY_NAME, AppRole.OPERATOR),
     )
 
+    val fixturesEnabled: Boolean
+        get() = BuildConfig.ENABLE_NATIVE_PREVIEW_FIXTURES && PREVIEW_SHARED_PASSPHRASE.isNotBlank()
+
     fun isPreviewLogin(loginName: String): Boolean =
-        loginName.trim().lowercase().startsWith("preview.")
+        fixturesEnabled && loginName.trim().lowercase().startsWith("preview.")
 
     fun previewAccountsHint(): String =
         "Preview logins: $PREVIEW_OWNER_LOGIN / $PREVIEW_MANAGER_LOGIN / $PREVIEW_ADMIN_LOGIN / " +
@@ -105,6 +112,7 @@ object NativePreviewSampleData {
         activityFacade: NativeActivityFacade,
         date: LocalDate = LocalDate.now(),
     ): Result {
+        if (!fixturesEnabled) return Result(false, false, 0, false)
         val errors = mutableListOf<String>()
         suspend fun <T> step(label: String, fallback: T, block: suspend () -> T): T =
             try {
@@ -172,6 +180,7 @@ object NativePreviewSampleData {
     )
 
     suspend fun ensureSampleVendor(database: MilkShopDatabase): Boolean {
+        if (!fixturesEnabled) return false
         val exists = database.accountDao().findByCategory("Vendor").any {
             it.name.removePrefix("Vendor: ").trim().equals(PREVIEW_VENDOR_NAME, ignoreCase = true)
         }
@@ -190,6 +199,7 @@ object NativePreviewSampleData {
         database: MilkShopDatabase,
         loginName: String = PREVIEW_OPERATOR_LOGIN,
     ): Boolean {
+        if (!fixturesEnabled) return false
         val user = database.appUserDao().findByLoginName(loginName) ?: return false
         if (user.employeeAccountId != null) return false
         val employeeName = when (loginName) {
@@ -243,6 +253,7 @@ object NativePreviewSampleData {
         security: UserSecurityService,
         sessionHandle: String,
     ): Int {
+        if (!fixturesEnabled) return 0
         try {
             security.requirePermission(sessionHandle, AppPermission.MANAGE_STAFF_USERS)
         } catch (_: Throwable) {
@@ -297,6 +308,7 @@ object NativePreviewSampleData {
      * already works, and never touches non-preview accounts.
      */
     suspend fun alignPreviewPassphrases(security: UserSecurityService) {
+        if (!fixturesEnabled) return
         val logins = listOf(
             PREVIEW_OWNER_LOGIN,
             PREVIEW_MANAGER_LOGIN,

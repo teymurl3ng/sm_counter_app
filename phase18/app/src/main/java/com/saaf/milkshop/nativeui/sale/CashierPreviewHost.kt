@@ -63,10 +63,9 @@ fun CashierPreviewHost(
     onLeaveToAccountPicker: () -> Unit,
     onShowNotice: (String) -> Unit,
 ) {
-    // Counter Ledger Cashier surfaces stay on the approved light palette,
-    // matching authentication and the Collect blueprint. System dark mode
-    // must not invert Sell/Collect into a Material night theme.
-    SaafTheme(darkTheme = false) {
+    // Authentication owns its fixed light boundary; signed-in work follows
+    // the system theme through SaafTheme's light/dark Material color roles.
+    SaafTheme {
         var sampleReady by remember(sessionHandle) { mutableStateOf(false) }
         var lastCashierSession by rememberSaveable { mutableStateOf<String?>(null) }
         var activityReturnSection by rememberSaveable { mutableStateOf(CashierSection.Sell.name) }

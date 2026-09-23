@@ -40,7 +40,7 @@ fun OperationsPreviewHost(
     onLeaveToAccountPicker: () -> Unit,
     onShowNotice: (String) -> Unit,
 ) {
-    SaafTheme(darkTheme = false) {
+    SaafTheme {
         var lastOpsSession by rememberSaveable { mutableStateOf<String?>(null) }
         LaunchedEffect(sessionHandle) {
             if (lastOpsSession != null && lastOpsSession != sessionHandle) {

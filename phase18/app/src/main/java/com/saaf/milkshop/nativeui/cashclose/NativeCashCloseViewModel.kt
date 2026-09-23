@@ -112,9 +112,9 @@ class NativeCashCloseViewModel(
     }
 
     fun reopenDay(reason: String, passphrase: CharArray) {
-        val session = sessionHandle ?: return
-        val current = _state.value as? NativeCashCloseState.Ready ?: return
-        if (current.saving) {
+        val session = sessionHandle
+        val current = _state.value as? NativeCashCloseState.Ready
+        if (session == null || current == null || current.saving) {
             passphrase.fill('\u0000')
             return
         }
@@ -136,6 +136,8 @@ class NativeCashCloseViewModel(
                 } else {
                     _state.value = current.copy(error = publicMessage(error))
                 }
+            } finally {
+                passphrase.fill('\u0000')
             }
         }
     }

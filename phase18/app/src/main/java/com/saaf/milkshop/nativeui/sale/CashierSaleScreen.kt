@@ -51,6 +51,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
@@ -96,6 +98,7 @@ import com.saaf.milkshop.application.sale.NativeSalePaymentKind
 import com.saaf.milkshop.application.sale.NativeSaleProduct
 import com.saaf.milkshop.application.sale.NativeSaleRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.theme.SaafInk
@@ -126,21 +129,16 @@ fun CashierSaleScreen(
     BackHandler {
         if (canLeave) leaveGuard.requestLeave(onLeaveConfirmed)
     }
-    Scaffold(
+    val guardedNavigate: (CashierSection) -> Unit = { section ->
+        if (canLeave) leaveGuard.requestLeave { onNavigate(section) }
+    }
+    AdaptiveNavigationScaffold(
+        snackbarHostState = snackbarHostState,
         modifier = modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = {
-            CashierNavigation(
-                selected = CashierSection.Sell,
-                onNavigate = { section ->
-                    if (canLeave) {
-                        leaveGuard.requestLeave { onNavigate(section) }
-                    }
-                },
-            )
-        },
+        compactNavigation = { CashierNavigation(CashierSection.Sell, guardedNavigate) },
+        expandedNavigation = { CashierNavigationRail(CashierSection.Sell, guardedNavigate) },
     ) { padding ->
         when (state) {
             NativeSaleState.Idle,
@@ -168,6 +166,39 @@ fun CashierSaleScreen(
         }
     }
     SaleDiscardDialog(leaveGuard)
+}
+
+@Composable
+internal fun CashierNavigationRail(
+    selected: CashierSection,
+    onNavigate: (CashierSection) -> Unit,
+) {
+    NavigationRail(
+        modifier = Modifier.fillMaxHeight(),
+        containerColor = MaterialTheme.colorScheme.surface,
+    ) {
+        CashierRailItem(Icons.Outlined.PointOfSale, stringResource(R.string.native_sell), selected == CashierSection.Sell, NativeUiTags.CashierNavSell) { onNavigate(CashierSection.Sell) }
+        CashierRailItem(Icons.Outlined.Payments, stringResource(R.string.native_collect), selected == CashierSection.Collect, NativeUiTags.CashierNavCollect) { onNavigate(CashierSection.Collect) }
+        CashierRailItem(Icons.Outlined.History, stringResource(R.string.native_activity), selected == CashierSection.Activity, NativeUiTags.CashierNavActivity) { onNavigate(CashierSection.Activity) }
+        CashierRailItem(Icons.Outlined.MoreHoriz, stringResource(R.string.native_more), selected == CashierSection.More, NativeUiTags.CashierNavMore) { onNavigate(CashierSection.More) }
+    }
+}
+
+@Composable
+private fun CashierRailItem(
+    icon: ImageVector,
+    label: String,
+    selected: Boolean,
+    tag: String,
+    onClick: () -> Unit,
+) {
+    NavigationRailItem(
+        selected = selected,
+        onClick = onClick,
+        modifier = Modifier.testTag(tag).heightIn(min = 56.dp),
+        icon = { Icon(icon, contentDescription = null) },
+        label = { Text(label, maxLines = 2) },
+    )
 }
 
 @Composable

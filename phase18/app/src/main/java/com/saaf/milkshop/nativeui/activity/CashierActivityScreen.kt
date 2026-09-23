@@ -42,7 +42,9 @@ import com.saaf.milkshop.application.activity.NativeActivityRecordDetail
 import com.saaf.milkshop.application.activity.NativeActivityRecordSummary
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.sale.CashierNavigation
+import com.saaf.milkshop.nativeui.sale.CashierNavigationRail
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.CashierSection
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
@@ -108,12 +110,13 @@ private fun ActivityScaffold(
     rootTag: String,
     content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit,
 ) {
-    Scaffold(
+    AdaptiveNavigationScaffold(
+        snackbarHostState = snackbarHostState,
         modifier = modifier.fillMaxSize().testTag(rootTag),
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = { CashierNavigation(selected = CashierSection.Activity, onNavigate = onNavigate) },
+        compactNavigation = { CashierNavigation(selected = CashierSection.Activity, onNavigate = onNavigate) },
+        expandedNavigation = { CashierNavigationRail(selected = CashierSection.Activity, onNavigate = onNavigate) },
         content = content,
     )
 }

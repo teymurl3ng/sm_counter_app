@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -27,6 +28,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -44,6 +47,7 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.operations.NativeOperationsAttendanceStatus
 import com.saaf.milkshop.application.operations.NativeOperationsWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 
@@ -424,11 +428,45 @@ internal fun WorkScaffold(
     modifier: Modifier = Modifier,
     content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit,
 ) {
-    Scaffold(
+    AdaptiveNavigationScaffold(
+        snackbarHostState = snackbarHostState,
         modifier = modifier.testTag(NativeUiTags.OpsWorkRoot),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = { OperationsNavigation(selected = section, onNavigate = onNavigate) },
+        compactNavigation = { OperationsNavigation(selected = section, onNavigate = onNavigate) },
+        expandedNavigation = { OperationsNavigationRail(selected = section, onNavigate = onNavigate) },
         content = content,
+    )
+}
+
+@Composable
+internal fun OperationsNavigationRail(
+    selected: OperationsSection,
+    onNavigate: (OperationsSection) -> Unit,
+) {
+    NavigationRail(
+        modifier = Modifier.fillMaxHeight(),
+        containerColor = MaterialTheme.colorScheme.surface,
+    ) {
+        OpsRailItem(selected == OperationsSection.Work, "Work", Icons.Outlined.WorkOutline, NativeUiTags.OpsNavWork) { onNavigate(OperationsSection.Work) }
+        OpsRailItem(selected == OperationsSection.Deliveries, "Deliveries", Icons.Outlined.LocalShipping, NativeUiTags.OpsNavDeliveries) { onNavigate(OperationsSection.Deliveries) }
+        OpsRailItem(selected == OperationsSection.Attendance, "Attendance", Icons.Outlined.EventAvailable, NativeUiTags.OpsNavAttendance) { onNavigate(OperationsSection.Attendance) }
+        OpsRailItem(selected == OperationsSection.More, "More", Icons.Outlined.MoreHoriz, NativeUiTags.OpsNavMore) { onNavigate(OperationsSection.More) }
+    }
+}
+
+@Composable
+private fun OpsRailItem(
+    selected: Boolean,
+    label: String,
+    icon: ImageVector,
+    tag: String,
+    onClick: () -> Unit,
+) {
+    NavigationRailItem(
+        selected = selected,
+        onClick = onClick,
+        modifier = Modifier.testTag(tag).heightIn(min = 56.dp),
+        icon = { Icon(icon, contentDescription = label) },
+        label = { Text(label) },
     )
 }
 

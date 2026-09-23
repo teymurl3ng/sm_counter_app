@@ -87,7 +87,7 @@ fun ManagerPreviewHost(
     onLeaveToAccountPicker: () -> Unit,
     onShowNotice: (String) -> Unit,
 ) {
-    SaafTheme(darkTheme = false) {
+    SaafTheme {
         var lastSession by rememberSaveable { mutableStateOf(identity.loginName) }
 
         fun closeEntries() {
@@ -625,7 +625,7 @@ fun ManagerShellChromePreview(
     managerSection: ManagerSection,
     onManagerSectionChange: (ManagerSection) -> Unit,
 ) {
-    SaafTheme(darkTheme = false) {
+    SaafTheme {
         BackHandler {
             when (managerSection) {
                 ManagerSection.Work -> Unit

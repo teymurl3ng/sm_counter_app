@@ -130,9 +130,12 @@ class NativeOperationsMoreViewModel(
     }
 
     fun removeQuickUnlock(passphrase: CharArray) {
-        val session = sessionHandle ?: return
-        val current = _state.value as? NativeOperationsMoreState.Ready ?: return
-        if (current.saving) return
+        val session = sessionHandle
+        val current = _state.value as? NativeOperationsMoreState.Ready
+        if (session == null || current == null || current.saving) {
+            passphrase.fill('\u0000')
+            return
+        }
         _state.value = current.copy(saving = true, error = null)
         scope.launch {
             try {
@@ -155,9 +158,13 @@ class NativeOperationsMoreViewModel(
     }
 
     fun enrollQuickPin(passphrase: CharArray, pin: CharArray) {
-        val session = sessionHandle ?: return
-        val current = _state.value as? NativeOperationsMoreState.Ready ?: return
-        if (current.saving) return
+        val session = sessionHandle
+        val current = _state.value as? NativeOperationsMoreState.Ready
+        if (session == null || current == null || current.saving) {
+            passphrase.fill('\u0000')
+            pin.fill('\u0000')
+            return
+        }
         _state.value = current.copy(saving = true, error = null)
         scope.launch {
             try {
@@ -181,9 +188,13 @@ class NativeOperationsMoreViewModel(
     }
 
     fun enrollPhoneSecurity(passphrase: CharArray, pin: CharArray?) {
-        val session = sessionHandle ?: return
-        val current = _state.value as? NativeOperationsMoreState.Ready ?: return
-        if (current.saving) return
+        val session = sessionHandle
+        val current = _state.value as? NativeOperationsMoreState.Ready
+        if (session == null || current == null || current.saving) {
+            passphrase.fill('\u0000')
+            pin?.fill('\u0000')
+            return
+        }
         if (current.security?.quickPinEnabled == true && (pin == null || pin.size != 4)) {
             _state.value = current.copy(
                 error = "Enter your 4-digit Quick PIN to keep it while enabling phone security.",

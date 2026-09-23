@@ -7,6 +7,7 @@ import android.security.keystore.KeyPermanentlyInvalidatedException
 import android.security.keystore.KeyProperties
 import android.security.keystore.UserNotAuthenticatedException
 import android.util.AtomicFile
+import androidx.annotation.RequiresApi
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
@@ -417,7 +418,18 @@ class AndroidQuickUnlockDeviceGate(
     }
 
     private fun createKey(alias: String, authenticationTypes: Int, invalidateForBiometricChange: Boolean): SecretKey {
-        check(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            throw QuickUnlockFailure.Unavailable()
+        }
+        return createKeyApi30(alias, authenticationTypes, invalidateForBiometricChange)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun createKeyApi30(
+        alias: String,
+        authenticationTypes: Int,
+        invalidateForBiometricChange: Boolean,
+    ): SecretKey {
         val generator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEYSTORE)
         generator.init(
             KeyGenParameterSpec.Builder(

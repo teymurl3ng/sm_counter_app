@@ -92,7 +92,7 @@ fun OwnerPreviewHost(
     onLeaveToAccountPicker: () -> Unit,
     onShowNotice: (String) -> Unit,
 ) {
-    SaafTheme(darkTheme = false) {
+    SaafTheme {
         var lastOwnerSession by rememberSaveable { mutableStateOf<String?>(null) }
         var ownerSampleReady by remember(sessionHandle) { mutableStateOf(false) }
 

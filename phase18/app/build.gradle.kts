@@ -31,6 +31,8 @@ android {
         versionCode = 1
         versionName = "0.1.0"
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$escapedGoogleWebClientId\"")
+        buildConfigField("boolean", "ENABLE_NATIVE_PREVIEW_FIXTURES", "false")
+        buildConfigField("String", "NATIVE_PREVIEW_SHARED_PASSPHRASE", "\"\"")
 
         testInstrumentationRunner = "com.saaf.milkshop.SaafMilkTestRunner"
         if (!qaClassFilter.isNullOrBlank()) {
@@ -46,13 +48,25 @@ android {
 
     buildTypes {
         debug {
-            if (instrumentationSandbox) {
-                applicationIdSuffix = ".qa.tests"
-                versionNameSuffix = "-qa-tests"
-            } else if (isolatedQaData) {
-                applicationIdSuffix = ".qa"
-                versionNameSuffix = "-qa"
+            // A debug/native-preview APK must never share the production package/database.
+            // Instrumentation and isolated-QA retain their established identities; an
+            // ordinary assembleDebug now installs as a dedicated preview application.
+            applicationIdSuffix = when {
+                instrumentationSandbox -> ".qa.tests"
+                isolatedQaData -> ".qa"
+                else -> ".preview"
             }
+            versionNameSuffix = when {
+                instrumentationSandbox -> "-qa-tests"
+                isolatedQaData -> "-qa"
+                else -> "-preview"
+            }
+            buildConfigField("boolean", "ENABLE_NATIVE_PREVIEW_FIXTURES", "true")
+            buildConfigField(
+                "String",
+                "NATIVE_PREVIEW_SHARED_PASSPHRASE",
+                "\"1234567890qwert\"",
+            )
         }
         release {
             isMinifyEnabled = false

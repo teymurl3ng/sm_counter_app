@@ -38,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -146,7 +147,7 @@ internal fun CashCloseEntryContent(
     var notes by rememberSaveable { mutableStateOf("") }
     var varianceReason by rememberSaveable { mutableStateOf("") }
     var reopenReason by rememberSaveable { mutableStateOf("") }
-    var reopenPassphrase by rememberSaveable { mutableStateOf("") }
+    var reopenPassphrase by remember { mutableStateOf("") }
     var draftTouched by rememberSaveable { mutableStateOf(false) }
     val countedPaisa = parsePaisa(countedText)
     val activeCount = state.lastRecordedCount ?: state.context.latestCount

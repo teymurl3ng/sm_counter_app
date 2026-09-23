@@ -69,8 +69,8 @@ Yogurt produced: %3$s kg</string>
     <string name="purchase_error_no_vendor">Select or create a vendor first.</string>
     <string name="purchase_error_raw_liters">Enter raw liters.</string>
     <string name="purchase_error_raw_liters_positive">Raw liters must be greater than zero.</string>
-    <string name="purchase_error_fat">Enter Fat %.</string>
-    <string name="purchase_error_fat_negative">Fat % cannot be negative.</string>
+    <string name="purchase_error_fat">Enter Fat %%.</string>
+    <string name="purchase_error_fat_negative">Fat %% cannot be negative.</string>
     <string name="purchase_error_lr">Enter LR.</string>
     <string name="purchase_error_lr_positive">LR must be greater than zero.</string>
     <string name="purchase_error_prefix">Could not save purchase: %1$s</string>
@@ -210,8 +210,8 @@ Yogurt produced: %3$s kg</string>
     <string name="correction_error_generic">Could not save correction. Nothing was saved.</string>
     <string name="correction_error_purchase_raw">Enter corrected raw liters.</string>
     <string name="correction_error_purchase_raw_positive">Corrected raw liters must be greater than zero.</string>
-    <string name="correction_error_purchase_fat">Enter corrected Fat %.</string>
-    <string name="correction_error_purchase_fat_negative">Corrected Fat % cannot be negative.</string>
+    <string name="correction_error_purchase_fat">Enter corrected Fat %%.</string>
+    <string name="correction_error_purchase_fat_negative">Corrected Fat %% cannot be negative.</string>
     <string name="correction_error_purchase_lr">Enter corrected LR.</string>
     <string name="correction_error_purchase_lr_positive">Corrected LR must be greater than zero.</string>
     <string name="correction_error_production_milk">Enter corrected milk liters used.</string>

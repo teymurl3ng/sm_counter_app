@@ -1,6 +1,7 @@
 package com.saaf.milkshop.nativeui.admin
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.History
@@ -12,8 +13,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +23,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 
 @Composable
 internal fun AdminScaffold(
@@ -31,13 +33,49 @@ internal fun AdminScaffold(
     modifier: Modifier = Modifier,
     content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit,
 ) {
-    Scaffold(
+    AdaptiveNavigationScaffold(
+        snackbarHostState = snackbarHostState,
         modifier = modifier.testTag(NativeUiTags.AdminShellRoot),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = {
+        compactNavigation = {
             AdminNavigation(selected = section, onNavigate = onNavigate)
         },
+        expandedNavigation = {
+            AdminNavigationRail(selected = section, onNavigate = onNavigate)
+        },
         content = content,
+    )
+}
+
+@Composable
+private fun AdminNavigationRail(
+    selected: AdminSection,
+    onNavigate: (AdminSection) -> Unit,
+) {
+    NavigationRail(
+        modifier = Modifier.fillMaxHeight(),
+        containerColor = MaterialTheme.colorScheme.surface,
+    ) {
+        AdminRailItem(selected == AdminSection.Work, NativeUiTags.AdminNavWork, { onNavigate(AdminSection.Work) }, Icons.Outlined.WorkOutline, "Work")
+        AdminRailItem(selected == AdminSection.People, NativeUiTags.AdminNavPeople, { onNavigate(AdminSection.People) }, Icons.Outlined.People, "People")
+        AdminRailItem(selected == AdminSection.Records, NativeUiTags.AdminNavRecords, { onNavigate(AdminSection.Records) }, Icons.Outlined.History, "Records")
+        AdminRailItem(selected == AdminSection.More, NativeUiTags.AdminNavMore, { onNavigate(AdminSection.More) }, Icons.Outlined.MoreHoriz, "More")
+    }
+}
+
+@Composable
+private fun AdminRailItem(
+    selected: Boolean,
+    tag: String,
+    onClick: () -> Unit,
+    icon: ImageVector,
+    label: String,
+) {
+    NavigationRailItem(
+        selected = selected,
+        onClick = onClick,
+        modifier = Modifier.testTag(tag).heightIn(min = 56.dp),
+        icon = { Icon(icon, contentDescription = null) },
+        label = { Text(label) },
     )
 }
 

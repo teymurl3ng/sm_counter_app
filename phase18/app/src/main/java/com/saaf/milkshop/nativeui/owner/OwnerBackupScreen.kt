@@ -485,8 +485,8 @@ private fun OwnerBackupExportScreen(
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
-    var passphrase by rememberSaveable { mutableStateOf("") }
-    var confirm by rememberSaveable { mutableStateOf("") }
+    var passphrase by remember { mutableStateOf("") }
+    var confirm by remember { mutableStateOf("") }
     var draftTouched by rememberSaveable { mutableStateOf(false) }
     val dirty = draftTouched && !busy
     LaunchedEffect(dirty) {
@@ -627,7 +627,7 @@ private fun OwnerBackupRestoreScreen(
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
-    var passphrase by rememberSaveable { mutableStateOf("") }
+    var passphrase by remember { mutableStateOf("") }
     var confirmed by rememberSaveable { mutableStateOf(false) }
     var draftTouched by rememberSaveable { mutableStateOf(false) }
     val dirty = draftTouched && !busy
@@ -796,8 +796,8 @@ private fun OwnerBackupConnectScreen(
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
-    var passphrase by rememberSaveable { mutableStateOf("") }
-    var confirm by rememberSaveable { mutableStateOf("") }
+    var passphrase by remember { mutableStateOf("") }
+    var confirm by remember { mutableStateOf("") }
     var allowMetered by rememberSaveable { mutableStateOf(false) }
     var draftTouched by rememberSaveable { mutableStateOf(false) }
     val dirty = draftTouched && !busy
@@ -941,7 +941,7 @@ private fun OwnerBackupReauthScreen(
     backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
-    var passphrase by rememberSaveable { mutableStateOf("") }
+    var passphrase by remember { mutableStateOf("") }
     BackHandler(onBack = onCancel)
     hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
@@ -1045,7 +1045,7 @@ private fun OwnerBackupCloudScreen(
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
     var selectedRemoteId by rememberSaveable { mutableStateOf<String?>(null) }
-    var recoveryPassphrase by rememberSaveable { mutableStateOf("") }
+    var recoveryPassphrase by remember { mutableStateOf("") }
     var confirmed by rememberSaveable { mutableStateOf(false) }
     var draftTouched by rememberSaveable { mutableStateOf(false) }
     val remotes = snapshot?.remoteSnapshots.orEmpty()
@@ -1167,8 +1167,9 @@ private fun OwnerBackupCloudScreen(
                         Button(
                             onClick = {
                                 val remoteId = selectedRemoteId ?: return@Button
-                                onInspect(remoteId, recoveryPassphrase.toCharArray())
+                                val secret = recoveryPassphrase.toCharArray()
                                 recoveryPassphrase = ""
+                                onInspect(remoteId, secret)
                             },
                             enabled = !busy && selectedRemoteId != null && recoveryPassphrase.isNotEmpty(),
                             modifier = Modifier.fillMaxWidth(),

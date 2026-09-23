@@ -54,7 +54,7 @@ fun AdminPreviewHost(
     onLeaveToAccountPicker: () -> Unit,
     onShowNotice: (String) -> Unit,
 ) {
-    SaafTheme(darkTheme = false) {
+    SaafTheme {
         var lastSession by rememberSaveable { mutableStateOf(identity.loginName) }
         var recordsDestination by rememberSaveable { mutableStateOf(AdminRecordsDestination.Hub) }
 
@@ -452,7 +452,7 @@ fun AdminShellChromePreview(
     adminSection: AdminSection,
     onAdminSectionChange: (AdminSection) -> Unit,
 ) {
-    SaafTheme(darkTheme = false) {
+    SaafTheme {
         BackHandler {
             when (adminSection) {
                 AdminSection.Work -> Unit

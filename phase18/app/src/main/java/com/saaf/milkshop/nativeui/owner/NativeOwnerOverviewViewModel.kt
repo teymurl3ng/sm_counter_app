@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.saaf.milkshop.application.owner.NativeOwnerOverviewFacade
 import com.saaf.milkshop.application.owner.NativeOwnerOverviewSnapshot
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.SessionRequestGate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -34,11 +35,13 @@ class NativeOwnerOverviewViewModel(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val _state = MutableStateFlow<NativeOwnerOverviewState>(NativeOwnerOverviewState.Idle)
     private var sessionHandle: String? = null
+    private val loadGate = SessionRequestGate()
     val state: StateFlow<NativeOwnerOverviewState> = _state.asStateFlow()
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle &&
-            _state.value is NativeOwnerOverviewState.Ready
+            (_state.value is NativeOwnerOverviewState.Ready ||
+                _state.value is NativeOwnerOverviewState.Loading)
         ) {
             return
         }
@@ -47,18 +50,22 @@ class NativeOwnerOverviewViewModel(
     }
 
     fun close() {
+        loadGate.invalidate()
         sessionHandle = null
         _state.value = NativeOwnerOverviewState.Idle
     }
 
     fun refresh() {
         val session = sessionHandle ?: return
+        val request = loadGate.begin(session)
         _state.value = NativeOwnerOverviewState.Loading
         scope.launch {
             try {
                 val snapshot = withContext(Dispatchers.IO) { facade.load(session) }
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 _state.value = NativeOwnerOverviewState.Ready(snapshot = snapshot)
             } catch (error: Throwable) {
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 handleLoadFailure(error)
             }
         }

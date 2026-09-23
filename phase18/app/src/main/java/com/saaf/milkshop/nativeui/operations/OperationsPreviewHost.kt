@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.nativeui.theme.SaafTheme
@@ -45,6 +46,13 @@ fun OperationsPreviewHost(
         LaunchedEffect(sessionHandle) {
             if (lastOpsSession != null && lastOpsSession != sessionHandle) {
                 onOperationsSectionChange(OperationsSection.Work)
+                operationsWorkViewModel.close()
+                deliveriesViewModel.close()
+                attendanceViewModel.close()
+                operationsMoreViewModel.close()
+                receiveMilkViewModel.close()
+                makeYogurtViewModel.close()
+                recordSpoilageViewModel.close()
             }
             lastOpsSession = sessionHandle
         }
@@ -53,39 +61,10 @@ fun OperationsPreviewHost(
             operationsSection,
         ) {
             when (operationsSection) {
-                OperationsSection.Work -> {
-                    deliveriesViewModel.close()
-                    attendanceViewModel.close()
-                    operationsMoreViewModel.close()
-                    operationsWorkViewModel.open(sessionHandle)
-                }
-                OperationsSection.Deliveries -> {
-                    receiveMilkViewModel.close()
-                    makeYogurtViewModel.close()
-                    recordSpoilageViewModel.close()
-                    attendanceViewModel.close()
-                    operationsMoreViewModel.close()
-                    operationsWorkViewModel.backToHome()
-                    deliveriesViewModel.open(sessionHandle)
-                }
-                OperationsSection.Attendance -> {
-                    receiveMilkViewModel.close()
-                    makeYogurtViewModel.close()
-                    recordSpoilageViewModel.close()
-                    deliveriesViewModel.close()
-                    operationsMoreViewModel.close()
-                    operationsWorkViewModel.backToHome()
-                    attendanceViewModel.open(sessionHandle)
-                }
-                OperationsSection.More -> {
-                    receiveMilkViewModel.close()
-                    makeYogurtViewModel.close()
-                    recordSpoilageViewModel.close()
-                    deliveriesViewModel.close()
-                    attendanceViewModel.close()
-                    operationsWorkViewModel.backToHome()
-                    operationsMoreViewModel.open(sessionHandle)
-                }
+                OperationsSection.Work -> operationsWorkViewModel.open(sessionHandle)
+                OperationsSection.Deliveries -> deliveriesViewModel.open(sessionHandle)
+                OperationsSection.Attendance -> attendanceViewModel.open(sessionHandle)
+                OperationsSection.More -> operationsMoreViewModel.open(sessionHandle)
             }
         }
         LaunchedEffect(
@@ -154,7 +133,6 @@ fun OperationsPreviewHost(
                     ) {
                         operationsMoreViewModel.backToMenu()
                     } else {
-                        operationsMoreViewModel.close()
                         onOperationsSectionChange(OperationsSection.Work)
                     }
                 }
@@ -174,24 +152,19 @@ fun OperationsPreviewHost(
                 OperationsSection.Attendance,
                 OperationsSection.More,
                 -> {
-                    receiveMilkViewModel.close()
-                    makeYogurtViewModel.close()
-                    recordSpoilageViewModel.close()
-                    if (section != OperationsSection.Deliveries) {
-                        deliveriesViewModel.close()
+                    if (operationsSection == OperationsSection.Work) {
+                        receiveMilkViewModel.close()
+                        makeYogurtViewModel.close()
+                        recordSpoilageViewModel.close()
+                        operationsWorkViewModel.backToHome()
                     }
-                    if (section != OperationsSection.Attendance) {
-                        attendanceViewModel.close()
-                    }
-                    if (section != OperationsSection.More) {
-                        operationsMoreViewModel.close()
-                    }
-                    operationsWorkViewModel.backToHome()
                     onOperationsSectionChange(section)
                 }
             }
         }
         val workReady = operationsWorkState as? NativeOperationsWorkState.Ready
+        val sectionStateHolder = rememberSaveableStateHolder()
+        sectionStateHolder.SaveableStateProvider("$sessionHandle:${operationsSection.name}") {
         when {
             operationsSection == OperationsSection.Deliveries -> {
                 DeliveriesScreen(
@@ -317,6 +290,7 @@ fun OperationsPreviewHost(
                     onNavigate = navigateOps,
                 )
             }
+        }
         }
     }
 }

@@ -203,6 +203,7 @@ sealed interface NativeOwnerMoreState {
     data class Ready(
         val context: NativeOwnerMoreContext,
         val destination: NativeOwnerMoreDestination = NativeOwnerMoreDestination.Menu,
+        val loadedDestinations: Set<NativeOwnerMoreDestination> = emptySet(),
         val security: NativeMoreSecurityStatus? = null,
         val personalSecurity: OwnerPersonalSecurityState = OwnerPersonalSecurityState(),
         val productsState: OwnerProductsState = OwnerProductsState(),
@@ -580,6 +581,7 @@ sealed interface NativeOwnerMoreState {
 internal fun NativeOwnerMoreState.Ready.copy(
     context: NativeOwnerMoreContext = this.context,
     destination: NativeOwnerMoreDestination = this.destination,
+    loadedDestinations: Set<NativeOwnerMoreDestination> = this.loadedDestinations,
     security: NativeMoreSecurityStatus? = this.security,
     products: List<NativeOwnerProductRow> = this.products,
     productsLoading: Boolean = this.productsLoading,
@@ -703,6 +705,7 @@ internal fun NativeOwnerMoreState.Ready.copy(
     copy(
         context = context,
         destination = destination,
+        loadedDestinations = loadedDestinations,
         security = security,
         personalSecurity = personalSecurity.copy(
             saving = saving,

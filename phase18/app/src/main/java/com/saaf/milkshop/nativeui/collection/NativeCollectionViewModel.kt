@@ -8,6 +8,7 @@ import com.saaf.milkshop.application.collection.NativeCollectionFacade
 import com.saaf.milkshop.application.collection.NativeCollectionReceipt
 import com.saaf.milkshop.application.collection.NativeCollectionRequest
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.SessionRequestGate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -40,6 +41,7 @@ class NativeCollectionViewModel(
     private val _state = MutableStateFlow<NativeCollectionState>(NativeCollectionState.Idle)
     private var sessionHandle: String? = null
     private var selectionGeneration = 0L
+    private val loadGate = SessionRequestGate()
     val state: StateFlow<NativeCollectionState> = _state.asStateFlow()
 
     fun open(nextSessionHandle: String) {
@@ -50,12 +52,16 @@ class NativeCollectionViewModel(
 
     fun refresh() {
         val session = sessionHandle ?: return
+        val request = loadGate.begin(session)
         selectionGeneration += 1L
         _state.value = NativeCollectionState.Loading
         scope.launch {
             try {
-                _state.value = NativeCollectionState.Ready(withContext(Dispatchers.IO) { facade.load(session) })
+                val context = withContext(Dispatchers.IO) { facade.load(session) }
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
+                _state.value = NativeCollectionState.Ready(context)
             } catch (error: Throwable) {
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 handleLoadFailure(error)
             }
         }
@@ -132,6 +138,7 @@ class NativeCollectionViewModel(
     }
 
     fun close() {
+        loadGate.invalidate()
         selectionGeneration += 1L
         sessionHandle = null
         _state.value = NativeCollectionState.Idle

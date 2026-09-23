@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import com.saaf.milkshop.application.activity.NativeActivityFacade
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
@@ -177,39 +178,13 @@ fun OwnerPreviewHost(
             if (!ownerSampleReady) return@LaunchedEffect
             when (ownerSection) {
                 OwnerSection.Overview -> {
-                    closeOwnerWorkEntries()
-                    ownerWorkViewModel.close()
-                    ownerRecordsViewModel.close()
-                    ownerMoreViewModel.close()
                     if (ownerReportsState is NativeOwnerReportsState.Idle) {
-                        ownerOverviewViewModel.close()
                         ownerOverviewViewModel.open(sessionHandle)
-                        ownerOverviewViewModel.refresh()
                     }
                 }
-                OwnerSection.Work -> {
-                    ownerOverviewViewModel.close()
-                    ownerReportsViewModel.close()
-                    ownerRecordsViewModel.close()
-                    ownerMoreViewModel.close()
-                    ownerWorkViewModel.open(sessionHandle)
-                }
-                OwnerSection.Records -> {
-                    closeOwnerWorkEntries()
-                    ownerWorkViewModel.close()
-                    ownerOverviewViewModel.close()
-                    ownerReportsViewModel.close()
-                    ownerMoreViewModel.close()
-                    ownerRecordsViewModel.open(sessionHandle)
-                }
-                OwnerSection.More -> {
-                    closeOwnerWorkEntries()
-                    ownerWorkViewModel.close()
-                    ownerOverviewViewModel.close()
-                    ownerReportsViewModel.close()
-                    ownerRecordsViewModel.close()
-                    ownerMoreViewModel.open(sessionHandle)
-                }
+                OwnerSection.Work -> ownerWorkViewModel.open(sessionHandle)
+                OwnerSection.Records -> ownerRecordsViewModel.open(sessionHandle)
+                OwnerSection.More -> ownerMoreViewModel.open(sessionHandle)
             }
         }
         LaunchedEffect(
@@ -511,6 +486,9 @@ fun OwnerPreviewHost(
             }
         }
         val navigateOwner: (OwnerSection) -> Unit = { section ->
+            if (ownerSection == OwnerSection.Work && section != OwnerSection.Work) {
+                returnOwnerWorkHome()
+            }
             when (section) {
                 OwnerSection.Overview -> {
                     if (ownerSection == OwnerSection.Overview) {
@@ -520,11 +498,6 @@ fun OwnerPreviewHost(
                             onShowNotice("Overview is already open.")
                         }
                     } else {
-                        closeOwnerWorkEntries()
-                        ownerWorkViewModel.close()
-                        ownerRecordsViewModel.close()
-                        ownerMoreViewModel.close()
-                        ownerReportsViewModel.close()
                         onOwnerSectionChange(OwnerSection.Overview)
                     }
                 }
@@ -534,19 +507,13 @@ fun OwnerPreviewHost(
                     ) {
                         onShowNotice("Work is already open.")
                     } else {
-                        closeOwnerWorkEntries()
-                        ownerRecordsViewModel.close()
-                        ownerMoreViewModel.close()
-                        ownerReportsViewModel.close()
-                        ownerWorkViewModel.backToHome()
+                        if (ownerSection == OwnerSection.Work) {
+                            returnOwnerWorkHome()
+                        }
                         onOwnerSectionChange(OwnerSection.Work)
                     }
                 }
                 OwnerSection.Records -> {
-                    closeOwnerWorkEntries()
-                    ownerWorkViewModel.close()
-                    ownerMoreViewModel.close()
-                    ownerReportsViewModel.close()
                     val recordsReady = ownerRecordsState as? NativeOwnerRecordsState.Ready
                     if (ownerSection == OwnerSection.Records &&
                         recordsReady?.detail == null &&
@@ -554,15 +521,13 @@ fun OwnerPreviewHost(
                     ) {
                         onShowNotice("Records is already open.")
                     } else {
-                        ownerRecordsViewModel.clearDetail()
+                        if (ownerSection == OwnerSection.Records) {
+                            ownerRecordsViewModel.clearDetail()
+                        }
                         onOwnerSectionChange(OwnerSection.Records)
                     }
                 }
                 OwnerSection.More -> {
-                    closeOwnerWorkEntries()
-                    ownerWorkViewModel.close()
-                    ownerRecordsViewModel.close()
-                    ownerReportsViewModel.close()
                     if (ownerSection == OwnerSection.More &&
                         (ownerMoreState as? NativeOwnerMoreState.Ready)?.destination ==
                         NativeOwnerMoreDestination.Menu
@@ -570,12 +535,16 @@ fun OwnerPreviewHost(
                         onShowNotice("More is already open.")
                     } else {
                         snackbarHostState.currentSnackbarData?.dismiss()
-                        ownerMoreViewModel.backToMenu()
+                        if (ownerSection == OwnerSection.More) {
+                            ownerMoreViewModel.backToMenu()
+                        }
                         onOwnerSectionChange(OwnerSection.More)
                     }
                 }
             }
         }
+        val sectionStateHolder = rememberSaveableStateHolder()
+        sectionStateHolder.SaveableStateProvider("$sessionHandle:${ownerSection.name}") {
         when {
             ownerSection == OwnerSection.More -> {
                 OwnerMoreScreen(
@@ -924,6 +893,7 @@ fun OwnerPreviewHost(
                     )
                 }
             }
+        }
         }
     }
 }

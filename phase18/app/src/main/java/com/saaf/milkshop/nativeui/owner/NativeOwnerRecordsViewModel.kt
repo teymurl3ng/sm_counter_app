@@ -9,6 +9,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerRecordsRow
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsSnapshot
 import com.saaf.milkshop.application.owner.NativeRecordsGroup
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.SessionRequestGate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -67,11 +68,13 @@ class NativeOwnerRecordsViewModel(
     private val _state = MutableStateFlow<NativeOwnerRecordsState>(NativeOwnerRecordsState.Idle)
     private var sessionHandle: String? = null
     private var detailGeneration = 0L
+    private val loadGate = SessionRequestGate()
     val state: StateFlow<NativeOwnerRecordsState> = _state.asStateFlow()
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle &&
-            _state.value is NativeOwnerRecordsState.Ready
+            (_state.value is NativeOwnerRecordsState.Ready ||
+                _state.value is NativeOwnerRecordsState.Loading)
         ) {
             return
         }
@@ -80,6 +83,7 @@ class NativeOwnerRecordsViewModel(
     }
 
     fun close() {
+        loadGate.invalidate()
         detailGeneration += 1L
         sessionHandle = null
         _state.value = NativeOwnerRecordsState.Idle
@@ -87,6 +91,7 @@ class NativeOwnerRecordsViewModel(
 
     fun refresh() {
         val session = sessionHandle ?: return
+        val request = loadGate.begin(session)
         val previous = _state.value as? NativeOwnerRecordsState.Ready
         val previousQuery = previous?.searchQuery.orEmpty()
         val previousGroup = previous?.activeGroup ?: NativeRecordsGroup.Recent
@@ -95,6 +100,7 @@ class NativeOwnerRecordsViewModel(
         scope.launch {
             try {
                 val snapshot = withContext(Dispatchers.IO) { facade.loadHistory(session) }
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 _state.value = NativeOwnerRecordsState.Ready(
                     snapshot = snapshot,
                     searchQuery = previousQuery,
@@ -102,6 +108,7 @@ class NativeOwnerRecordsViewModel(
                     visibleRecords = facade.filterRecords(snapshot.records, previousQuery, previousGroup),
                 )
             } catch (error: Throwable) {
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 handleLoadFailure(error)
             }
         }

@@ -12,6 +12,8 @@ import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.domain.YieldPolicyInput
 import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -33,26 +35,15 @@ internal class OwnerCostingController(
         pendingOpeningCost = null
         runtime.state.value = current.copy(
             destination = NativeOwnerMoreDestination.CostingPlans,
-            costingPoliciesLoading = true,
+            costingPoliciesLoading = NativeOwnerMoreDestination.CostingPlans !in current.loadedDestinations,
             costingPolicyDetail = null,
             costingPoliciesError = null,
-            costingCurrentMonthSummary = null,
-            costingSection = NativeOwnerCostingSection.Policies,
-            costingBudgets = emptyList(),
-            costingTargets = emptyList(),
             costingBudgetEditorOpen = false,
             costingBudgetSaving = false,
             costingCollectionsEditorOpen = false,
             costingCollectionsSaving = false,
-            costingOpeningCosts = emptyList(),
-            costingOpeningSummary = null,
-            costingOpeningBasisKinds = emptyList(),
             costingOpeningEditor = null,
             costingOpeningSaving = false,
-            costingYieldPolicies = emptyList(),
-            costingYieldBatches = emptyList(),
-            costingYieldActivePolicyId = null,
-            costingYieldSummary = null,
             costingYieldApproveOpen = false,
             costingYieldApproving = false,
             costingApproveOpen = false,
@@ -91,7 +82,6 @@ internal class OwnerCostingController(
             employeeUpdating = false,
             employeesError = null,
             shopSettingsLoading = false,
-            shopSettings = null,
             shopSettingsIdentityEditOpen = false,
             shopSettingsIdentitySaving = false,
             shopSettingsRatesEditOpen = false,
@@ -113,7 +103,6 @@ internal class OwnerCostingController(
             securityAuditDetail = null,
             securityHistoryError = null,
             backupLoading = false,
-            backup = null,
             backupError = null,
             backupExportOpen = false,
             backupRestoreOpen = false,
@@ -151,6 +140,7 @@ internal class OwnerCostingController(
                     costingYieldBatches = load.yield.batches,
                     costingYieldActivePolicyId = load.yield.activePolicyId,
                     costingYieldSummary = load.yield.activeSummary,
+                    loadedDestinations = latest.loadedDestinations + NativeOwnerMoreDestination.CostingPlans,
                 )
             } catch (error: Throwable) {
                 handleFailure(token, error)
@@ -802,12 +792,16 @@ internal class OwnerCostingController(
     }
 
     private suspend fun loadAll(session: String, businessDate: String): OwnerCostingLoad =
-        withContext(Dispatchers.IO) {
+        coroutineScope {
+            val policies = async(Dispatchers.IO) { facade.loadPolicies(session, businessDate) }
+            val planning = async(Dispatchers.IO) { facade.loadPlanning(session) }
+            val opening = async(Dispatchers.IO) { facade.loadOpeningCosts(session) }
+            val yield = async(Dispatchers.IO) { facade.loadYieldContext(session) }
             OwnerCostingLoad(
-                policies = facade.loadPolicies(session, businessDate),
-                planning = facade.loadPlanning(session),
-                opening = facade.loadOpeningCosts(session),
-                yield = facade.loadYieldContext(session),
+                policies = policies.await(),
+                planning = planning.await(),
+                opening = opening.await(),
+                yield = yield.await(),
             )
         }
 }

@@ -43,6 +43,10 @@ class OwnerMoreRuntimeTest {
                 shopName = "Saaf Milk",
             ),
             destination = NativeOwnerMoreDestination.Backup,
+            loadedDestinations = setOf(
+                NativeOwnerMoreDestination.Products,
+                NativeOwnerMoreDestination.Backup,
+            ),
             personalSecurity = OwnerPersonalSecurityState(
                 confirmRemoveUnlock = true,
                 saving = true,
@@ -88,6 +92,9 @@ class OwnerMoreRuntimeTest {
         assertFalse(reset.backupReauthOpen)
         assertFalse(reset.backupReauthBusy)
         assertNull(reset.backupError)
+        assertEquals(ready.loadedDestinations, reset.loadedDestinations)
+        assertTrue(reset.products.isEmpty())
+        assertTrue(NativeOwnerMoreDestination.Products in reset.loadedDestinations)
     }
 
     @Test

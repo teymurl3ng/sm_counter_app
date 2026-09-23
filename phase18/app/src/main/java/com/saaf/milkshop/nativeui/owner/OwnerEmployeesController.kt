@@ -17,7 +17,7 @@ internal class OwnerEmployeesController(
         val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
         runtime.state.value = current.copy(
             destination = NativeOwnerMoreDestination.Employees,
-            employeesLoading = true,
+            employeesLoading = NativeOwnerMoreDestination.Employees !in current.loadedDestinations,
             employeeDetail = null,
             employeeCreateOpen = false,
             employeeCreating = false,
@@ -50,14 +50,12 @@ internal class OwnerEmployeesController(
             costingPoliciesLoading = false,
             costingPolicyDetail = null,
             costingPoliciesError = null,
-            costingCurrentMonthSummary = null,
             costingApproveOpen = false,
             costingApproveSeed = null,
             costingApproving = false,
             costingReauthOpen = false,
             costingReauthBusy = false,
             shopSettingsLoading = false,
-            shopSettings = null,
             shopSettingsIdentityEditOpen = false,
             shopSettingsIdentitySaving = false,
             shopSettingsRatesEditOpen = false,
@@ -79,7 +77,6 @@ internal class OwnerEmployeesController(
             securityAuditDetail = null,
             securityHistoryError = null,
             backupLoading = false,
-            backup = null,
             backupError = null,
             backupExportOpen = false,
             backupRestoreOpen = false,
@@ -104,6 +101,7 @@ internal class OwnerEmployeesController(
                     employees = snapshot.employees,
                     employeesLoading = false,
                     employeesError = null,
+                    loadedDestinations = latest.loadedDestinations + NativeOwnerMoreDestination.Employees,
                 )
             } catch (error: Throwable) {
                 handleFailure(token, error)

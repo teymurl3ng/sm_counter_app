@@ -16,7 +16,7 @@ internal class OwnerSecurityHistoryController(
         val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
         runtime.state.value = current.copy(
             destination = NativeOwnerMoreDestination.SecurityHistory,
-            securityHistoryLoading = true,
+            securityHistoryLoading = NativeOwnerMoreDestination.SecurityHistory !in current.loadedDestinations,
             securityAuditDetail = null,
             securityHistoryError = null,
             productsLoading = false,
@@ -52,14 +52,12 @@ internal class OwnerSecurityHistoryController(
             costingPoliciesLoading = false,
             costingPolicyDetail = null,
             costingPoliciesError = null,
-            costingCurrentMonthSummary = null,
             costingApproveOpen = false,
             costingApproveSeed = null,
             costingApproving = false,
             costingReauthOpen = false,
             costingReauthBusy = false,
             shopSettingsLoading = false,
-            shopSettings = null,
             shopSettingsIdentityEditOpen = false,
             shopSettingsIdentitySaving = false,
             shopSettingsRatesEditOpen = false,
@@ -78,7 +76,6 @@ internal class OwnerSecurityHistoryController(
             userDetail = null,
             usersError = null,
             backupLoading = false,
-            backup = null,
             backupError = null,
             backupExportOpen = false,
             backupRestoreOpen = false,
@@ -105,6 +102,7 @@ internal class OwnerSecurityHistoryController(
                     securityAudits = snapshot.audits,
                     securityHistoryLoading = false,
                     securityHistoryError = null,
+                    loadedDestinations = latest.loadedDestinations + NativeOwnerMoreDestination.SecurityHistory,
                 )
             } catch (error: Throwable) {
                 handleFailure(token, error)

@@ -6,6 +6,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerReportsFacade
 import com.saaf.milkshop.application.owner.NativeOwnerReportsPreset
 import com.saaf.milkshop.application.owner.NativeOwnerReportsSnapshot
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.SessionRequestGate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -35,15 +36,24 @@ class NativeOwnerReportsViewModel(
     private val _state = MutableStateFlow<NativeOwnerReportsState>(NativeOwnerReportsState.Idle)
     private var sessionHandle: String? = null
     private var preset: NativeOwnerReportsPreset = NativeOwnerReportsPreset.ThisMonth
+    private val loadGate = SessionRequestGate()
     val state: StateFlow<NativeOwnerReportsState> = _state.asStateFlow()
 
     fun open(nextSessionHandle: String, today: LocalDate = LocalDate.now()) {
+        if (
+            sessionHandle == nextSessionHandle &&
+            (_state.value is NativeOwnerReportsState.Ready ||
+                _state.value is NativeOwnerReportsState.Loading)
+        ) {
+            return
+        }
         sessionHandle = nextSessionHandle
         preset = NativeOwnerReportsPreset.ThisMonth
         refresh(today)
     }
 
     fun close() {
+        loadGate.invalidate()
         sessionHandle = null
         preset = NativeOwnerReportsPreset.ThisMonth
         _state.value = NativeOwnerReportsState.Idle
@@ -57,6 +67,7 @@ class NativeOwnerReportsViewModel(
 
     fun refresh(today: LocalDate = LocalDate.now()) {
         val session = sessionHandle ?: return
+        val request = loadGate.begin(session)
         _state.value = NativeOwnerReportsState.Loading
         scope.launch {
             try {
@@ -64,8 +75,10 @@ class NativeOwnerReportsViewModel(
                 val snapshot = withContext(Dispatchers.IO) {
                     facade.load(session, start, end, preset, today)
                 }
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 _state.value = NativeOwnerReportsState.Ready(snapshot = snapshot)
             } catch (error: Throwable) {
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 handleLoadFailure(error)
             }
         }

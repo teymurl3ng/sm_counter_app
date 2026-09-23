@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import com.saaf.milkshop.application.activity.NativeActivityFacade
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
@@ -72,6 +73,11 @@ fun CashierPreviewHost(
         LaunchedEffect(sessionHandle) {
             if (lastCashierSession != null && lastCashierSession != sessionHandle) {
                 onCashierSectionChange(CashierSection.Sell)
+                saleViewModel.close()
+                collectionViewModel.close()
+                activityViewModel.close()
+                moreViewModel.close()
+                expenseViewModel.close()
             }
             lastCashierSession = sessionHandle
             sampleReady = false
@@ -159,7 +165,6 @@ fun CashierPreviewHost(
                     } else if (ready != null && ready.destination != NativeMoreDestination.Menu) {
                         moreViewModel.backToMenu()
                     } else {
-                        moreViewModel.close()
                         expenseViewModel.close()
                         onCashierSectionChange(CashierSection.Sell)
                     }
@@ -199,6 +204,8 @@ fun CashierPreviewHost(
                 }
             }
         }
+        val sectionStateHolder = rememberSaveableStateHolder()
+        sectionStateHolder.SaveableStateProvider("$sessionHandle:${cashierSection.name}") {
         when (cashierSection) {
             CashierSection.Sell -> CashierSaleScreen(
                 snackbarHostState = snackbarHostState,
@@ -298,6 +305,7 @@ fun CashierPreviewHost(
                     )
                 }
             }
+        }
         }
     }
 }

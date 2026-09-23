@@ -7,10 +7,13 @@ import com.saaf.milkshop.application.more.NativeMoreContext
 import com.saaf.milkshop.application.more.NativeMoreFacade
 import com.saaf.milkshop.application.more.NativeMoreSecurityStatus
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.SessionRequestGate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,22 +49,35 @@ class NativeMoreViewModel(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val _state = MutableStateFlow<NativeMoreState>(NativeMoreState.Idle)
     private var sessionHandle: String? = null
+    private val loadGate = SessionRequestGate()
     val state: StateFlow<NativeMoreState> = _state.asStateFlow()
 
     fun open(nextSessionHandle: String) {
+        if (
+            sessionHandle == nextSessionHandle &&
+            (_state.value is NativeMoreState.Ready || _state.value is NativeMoreState.Loading)
+        ) {
+            return
+        }
         sessionHandle = nextSessionHandle
         refresh()
     }
 
     fun refresh() {
         val session = sessionHandle ?: return
+        val request = loadGate.begin(session)
         _state.value = NativeMoreState.Loading
         scope.launch {
             try {
-                val context = withContext(Dispatchers.IO) { facade.load(session) }
-                val security = withContext(Dispatchers.IO) { facade.loadSecurity(session) }
+                val (context, security) = coroutineScope {
+                    val contextRequest = async(Dispatchers.IO) { facade.load(session) }
+                    val securityRequest = async(Dispatchers.IO) { facade.loadSecurity(session) }
+                    contextRequest.await() to securityRequest.await()
+                }
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 _state.value = NativeMoreState.Ready(context = context, security = security)
             } catch (error: Throwable) {
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 handleLoadFailure(error)
             }
         }
@@ -253,6 +269,7 @@ class NativeMoreViewModel(
     }
 
     fun close() {
+        loadGate.invalidate()
         sessionHandle = null
         _state.value = NativeMoreState.Idle
     }

@@ -25,8 +25,7 @@ internal class OwnerBackupController(
         }
         runtime.state.value = current.copy(
             destination = NativeOwnerMoreDestination.Backup,
-            backupLoading = true,
-            backup = null,
+            backupLoading = NativeOwnerMoreDestination.Backup !in current.loadedDestinations,
             backupError = null,
             backupExportOpen = false,
             backupRestoreOpen = false,
@@ -70,14 +69,12 @@ internal class OwnerBackupController(
             costingPoliciesLoading = false,
             costingPolicyDetail = null,
             costingPoliciesError = null,
-            costingCurrentMonthSummary = null,
             costingApproveOpen = false,
             costingApproveSeed = null,
             costingApproving = false,
             costingReauthOpen = false,
             costingReauthBusy = false,
             shopSettingsLoading = false,
-            shopSettings = null,
             shopSettingsIdentityEditOpen = false,
             shopSettingsIdentitySaving = false,
             shopSettingsRatesEditOpen = false,
@@ -112,6 +109,7 @@ internal class OwnerBackupController(
                     backup = snapshot,
                     backupLoading = false,
                     backupError = null,
+                    loadedDestinations = latest.loadedDestinations + NativeOwnerMoreDestination.Backup,
                 )
             } catch (error: Throwable) {
                 handleFailure(token, error)

@@ -17,7 +17,7 @@ internal class OwnerCustomersController(
         val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
         runtime.state.value = current.copy(
             destination = NativeOwnerMoreDestination.Customers,
-            customersLoading = true,
+            customersLoading = NativeOwnerMoreDestination.Customers !in current.loadedDestinations,
             customerDetail = null,
             customerCreateOpen = false,
             customerCreating = false,
@@ -61,6 +61,7 @@ internal class OwnerCustomersController(
                     customers = snapshot.customers,
                     customersLoading = false,
                     customersError = null,
+                    loadedDestinations = latest.loadedDestinations + NativeOwnerMoreDestination.Customers,
                 )
             } catch (error: Throwable) {
                 handleFailure(token, error)

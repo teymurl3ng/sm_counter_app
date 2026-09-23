@@ -10,6 +10,7 @@ import com.saaf.milkshop.application.cashclose.NativeCashCloseFacade
 import com.saaf.milkshop.application.cashclose.NativeCashCloseReceipt
 import com.saaf.milkshop.application.cashclose.NativeCashCloseReopenSubmission
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.SessionRequestGate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -41,6 +42,7 @@ class NativeCashCloseViewModel(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val _state = MutableStateFlow<NativeCashCloseState>(NativeCashCloseState.Idle)
     private var sessionHandle: String? = null
+    private val loadGate = SessionRequestGate()
     val state: StateFlow<NativeCashCloseState> = _state.asStateFlow()
 
     fun open(nextSessionHandle: String) {
@@ -51,13 +53,15 @@ class NativeCashCloseViewModel(
 
     fun refresh() {
         val session = sessionHandle ?: return
+        val request = loadGate.begin(session)
         _state.value = NativeCashCloseState.Loading
         scope.launch {
             try {
-                _state.value = NativeCashCloseState.Ready(
-                    withContext(Dispatchers.IO) { facade.load(session) },
-                )
+                val context = withContext(Dispatchers.IO) { facade.load(session) }
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
+                _state.value = NativeCashCloseState.Ready(context)
             } catch (error: Throwable) {
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 handleLoadFailure(error)
             }
         }
@@ -153,6 +157,7 @@ class NativeCashCloseViewModel(
     }
 
     fun close() {
+        loadGate.invalidate()
         sessionHandle = null
         _state.value = NativeCashCloseState.Idle
     }

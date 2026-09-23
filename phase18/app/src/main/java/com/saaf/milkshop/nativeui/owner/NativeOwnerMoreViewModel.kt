@@ -30,7 +30,9 @@ import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -68,7 +70,8 @@ class NativeOwnerMoreViewModel internal constructor(
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle &&
-            _state.value is NativeOwnerMoreState.Ready
+            (_state.value is NativeOwnerMoreState.Ready ||
+                _state.value is NativeOwnerMoreState.Loading)
         ) {
             return
         }
@@ -92,8 +95,15 @@ class NativeOwnerMoreViewModel internal constructor(
         _state.value = NativeOwnerMoreState.Loading
         scope.launch {
             try {
-                val context = withContext(Dispatchers.IO) { dependencies.more.load(token.handle) }
-                val security = withContext(Dispatchers.IO) { dependencies.more.loadSecurity(token.handle) }
+                val (context, security) = coroutineScope {
+                    val contextRequest = async(Dispatchers.IO) {
+                        dependencies.more.load(token.handle)
+                    }
+                    val securityRequest = async(Dispatchers.IO) {
+                        dependencies.more.loadSecurity(token.handle)
+                    }
+                    contextRequest.await() to securityRequest.await()
+                }
                 if (!runtime.isCurrent(token)) return@launch
                 _state.value = NativeOwnerMoreState.Ready(context = context, security = security)
             } catch (error: Throwable) {

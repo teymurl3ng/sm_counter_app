@@ -1435,6 +1435,40 @@ class NativeFoundationUiTest {
     }
 
     @Test
+    fun ownerProductsRemainWarmAcrossPrimaryNavigation() {
+        openOwnerProducts()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerProductsLoading).fetchSemanticsNode()
+            }.isFailure
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsFilterArchived).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerProductsLoading).fetchSemanticsNode()
+            }.isFailure
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsFilterArchived).assertIsSelected()
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerProductsRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsLoading).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsFilterArchived).assertIsSelected()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
+    }
+
+    @Test
     fun ownerProductsHardwareBackReturnsToMoreMenu() {
         openOwnerProducts()
         composeRule.activityRule.scenario.onActivity { activity ->

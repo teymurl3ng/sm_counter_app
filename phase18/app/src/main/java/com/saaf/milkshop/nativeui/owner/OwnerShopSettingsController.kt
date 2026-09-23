@@ -23,8 +23,7 @@ internal class OwnerShopSettingsController(
         val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
         runtime.state.value = current.copy(
             destination = NativeOwnerMoreDestination.ShopSettings,
-            shopSettingsLoading = true,
-            shopSettings = null,
+            shopSettingsLoading = NativeOwnerMoreDestination.ShopSettings !in current.loadedDestinations,
             shopSettingsIdentityEditOpen = false,
             shopSettingsIdentitySaving = false,
             shopSettingsRatesEditOpen = false,
@@ -72,7 +71,6 @@ internal class OwnerShopSettingsController(
             costingPoliciesLoading = false,
             costingPolicyDetail = null,
             costingPoliciesError = null,
-            costingCurrentMonthSummary = null,
             costingApproveOpen = false,
             costingApproveSeed = null,
             costingApproving = false,
@@ -85,7 +83,6 @@ internal class OwnerShopSettingsController(
             securityAuditDetail = null,
             securityHistoryError = null,
             backupLoading = false,
-            backup = null,
             backupError = null,
             backupExportOpen = false,
             backupRestoreOpen = false,
@@ -110,6 +107,7 @@ internal class OwnerShopSettingsController(
                     shopSettings = snapshot,
                     shopSettingsLoading = false,
                     shopSettingsError = null,
+                    loadedDestinations = latest.loadedDestinations + NativeOwnerMoreDestination.ShopSettings,
                 )
             } catch (error: Throwable) {
                 handleFailure(token, error)

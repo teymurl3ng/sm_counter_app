@@ -201,6 +201,7 @@ val screenClassMap = mapOf(
         "com.saaf.milkshop.NativeFoundationUiTest#ownerMoreOpensUnderOwnerChrome",
         "com.saaf.milkshop.NativeFoundationUiTest#ownerMoreSignsOutToWelcome",
         "com.saaf.milkshop.NativeFoundationUiTest#ownerProductsOpensUnderOwnerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#ownerProductsRemainWarmAcrossPrimaryNavigation",
         "com.saaf.milkshop.NativeFoundationUiTest#ownerProductsHardwareBackReturnsToMoreMenu",
         "com.saaf.milkshop.NativeFoundationUiTest#ownerCustomersOpensUnderOwnerChrome",
         "com.saaf.milkshop.NativeFoundationUiTest#ownerCustomersHardwareBackReturnsToMoreMenu",

@@ -6,6 +6,7 @@ import com.saaf.milkshop.application.activity.NativeActivityDay
 import com.saaf.milkshop.application.activity.NativeActivityFacade
 import com.saaf.milkshop.application.activity.NativeActivityRecordDetail
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.SessionRequestGate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -36,22 +37,32 @@ class NativeActivityViewModel(
     private val _state = MutableStateFlow<NativeActivityState>(NativeActivityState.Idle)
     private var sessionHandle: String? = null
     private var detailGeneration = 0L
+    private val loadGate = SessionRequestGate()
     val state: StateFlow<NativeActivityState> = _state.asStateFlow()
 
     fun open(nextSessionHandle: String) {
+        if (
+            sessionHandle == nextSessionHandle &&
+            (_state.value is NativeActivityState.Ready || _state.value is NativeActivityState.Loading)
+        ) {
+            return
+        }
         sessionHandle = nextSessionHandle
         refresh()
     }
 
     fun refresh() {
         val session = sessionHandle ?: return
+        val request = loadGate.begin(session)
         detailGeneration += 1L
         _state.value = NativeActivityState.Loading
         scope.launch {
             try {
                 val day = withContext(Dispatchers.IO) { facade.loadToday(session) }
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 _state.value = NativeActivityState.Ready(day = day)
             } catch (error: Throwable) {
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 handleLoadFailure(error)
             }
         }
@@ -77,14 +88,17 @@ class NativeActivityViewModel(
 
     fun openDetailFromCollect(session: String, eventId: Long) {
         sessionHandle = session
+        val request = loadGate.begin(session)
         detailGeneration += 1L
         _state.value = NativeActivityState.Loading
         scope.launch {
             try {
                 val day = withContext(Dispatchers.IO) { facade.loadToday(session) }
                 val detail = withContext(Dispatchers.IO) { facade.loadDetail(session, eventId) }
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 _state.value = NativeActivityState.Ready(day = day, detail = detail)
             } catch (error: Throwable) {
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 handleLoadFailure(error)
             }
         }
@@ -97,6 +111,7 @@ class NativeActivityViewModel(
     }
 
     fun close() {
+        loadGate.invalidate()
         detailGeneration += 1L
         sessionHandle = null
         _state.value = NativeActivityState.Idle

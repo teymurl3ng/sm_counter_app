@@ -7,10 +7,13 @@ import com.saaf.milkshop.application.operations.NativeOperationsMoreContext
 import com.saaf.milkshop.application.operations.NativeOperationsMoreFacade
 import com.saaf.milkshop.application.operations.NativeOperationsWorkRecord
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.SessionRequestGate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,6 +48,7 @@ class NativeOperationsMoreViewModel(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val _state = MutableStateFlow<NativeOperationsMoreState>(NativeOperationsMoreState.Idle)
     private var sessionHandle: String? = null
+    private val loadGate = SessionRequestGate()
     val state: StateFlow<NativeOperationsMoreState> = _state.asStateFlow()
 
     fun open(nextSessionHandle: String) {
@@ -55,13 +59,19 @@ class NativeOperationsMoreViewModel(
 
     fun refresh() {
         val session = sessionHandle ?: return
+        val request = loadGate.begin(session)
         _state.value = NativeOperationsMoreState.Loading
         scope.launch {
             try {
-                val context = withContext(Dispatchers.IO) { facade.load(session) }
-                val security = withContext(Dispatchers.IO) { facade.loadSecurity(session) }
+                val (context, security) = coroutineScope {
+                    val contextRequest = async(Dispatchers.IO) { facade.load(session) }
+                    val securityRequest = async(Dispatchers.IO) { facade.loadSecurity(session) }
+                    contextRequest.await() to securityRequest.await()
+                }
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 _state.value = NativeOperationsMoreState.Ready(context = context, security = security)
             } catch (error: Throwable) {
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 handleLoadFailure(error)
             }
         }
@@ -226,6 +236,7 @@ class NativeOperationsMoreViewModel(
     }
 
     fun close() {
+        loadGate.invalidate()
         sessionHandle = null
         _state.value = NativeOperationsMoreState.Idle
     }

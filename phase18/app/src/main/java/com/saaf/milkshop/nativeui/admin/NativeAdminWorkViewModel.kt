@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.saaf.milkshop.application.admin.NativeAdminWorkContext
 import com.saaf.milkshop.application.admin.NativeAdminWorkFacade
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.SessionRequestGate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -38,11 +39,13 @@ class NativeAdminWorkViewModel(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val _state = MutableStateFlow<NativeAdminWorkState>(NativeAdminWorkState.Idle)
     private var sessionHandle: String? = null
+    private val loadGate = SessionRequestGate()
     val state: StateFlow<NativeAdminWorkState> = _state.asStateFlow()
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle &&
-            _state.value is NativeAdminWorkState.Ready
+            (_state.value is NativeAdminWorkState.Ready ||
+                _state.value is NativeAdminWorkState.Loading)
         ) {
             return
         }
@@ -51,12 +54,14 @@ class NativeAdminWorkViewModel(
     }
 
     fun close() {
+        loadGate.invalidate()
         sessionHandle = null
         _state.value = NativeAdminWorkState.Idle
     }
 
     fun refresh() {
         val session = sessionHandle ?: return
+        val request = loadGate.begin(session)
         val previousDestination =
             (_state.value as? NativeAdminWorkState.Ready)?.destination
                 ?: NativeAdminWorkDestination.Home
@@ -64,11 +69,13 @@ class NativeAdminWorkViewModel(
         scope.launch {
             try {
                 val context = withContext(Dispatchers.IO) { facade.load(session) }
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 _state.value = NativeAdminWorkState.Ready(
                     context = context,
                     destination = previousDestination,
                 )
             } catch (error: Throwable) {
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 handleLoadFailure(error)
             }
         }

@@ -22,7 +22,7 @@ internal class OwnerUsersRolesController(
         pendingUsersAction = null
         runtime.state.value = current.copy(
             destination = NativeOwnerMoreDestination.UsersRoles,
-            usersLoading = true,
+            usersLoading = NativeOwnerMoreDestination.UsersRoles !in current.loadedDestinations,
             userDetail = null,
             userEnrollOpen = false,
             userEnrollPending = null,
@@ -34,7 +34,6 @@ internal class OwnerUsersRolesController(
             userEnableBusy = false,
             userReauthOpen = false,
             userReauthBusy = false,
-            enrollableRoles = emptyList(),
             usersError = null,
             productsLoading = false,
             productDetail = null,
@@ -69,14 +68,12 @@ internal class OwnerUsersRolesController(
             costingPoliciesLoading = false,
             costingPolicyDetail = null,
             costingPoliciesError = null,
-            costingCurrentMonthSummary = null,
             costingApproveOpen = false,
             costingApproveSeed = null,
             costingApproving = false,
             costingReauthOpen = false,
             costingReauthBusy = false,
             shopSettingsLoading = false,
-            shopSettings = null,
             shopSettingsIdentityEditOpen = false,
             shopSettingsIdentitySaving = false,
             shopSettingsRatesEditOpen = false,
@@ -95,7 +92,6 @@ internal class OwnerUsersRolesController(
             securityAuditDetail = null,
             securityHistoryError = null,
             backupLoading = false,
-            backup = null,
             backupError = null,
             backupExportOpen = false,
             backupRestoreOpen = false,
@@ -122,6 +118,7 @@ internal class OwnerUsersRolesController(
                     usersLoading = false,
                     enrollableRoles = roles,
                     usersError = null,
+                    loadedDestinations = latest.loadedDestinations + NativeOwnerMoreDestination.UsersRoles,
                 )
             } catch (error: Throwable) {
                 handleFailure(token, error)

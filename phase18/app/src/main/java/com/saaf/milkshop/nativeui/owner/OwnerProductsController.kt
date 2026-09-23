@@ -19,7 +19,7 @@ internal class OwnerProductsController(
         runtime.updateReady { current ->
             current.copy(
                 destination = NativeOwnerMoreDestination.Products,
-                productsLoading = true,
+                productsLoading = NativeOwnerMoreDestination.Products !in current.loadedDestinations,
                 productsShowArchived = false,
                 productDetail = null,
                 productCreateOpen = false,
@@ -372,6 +372,7 @@ internal class OwnerProductsController(
                         products = snapshot.products,
                         productsLoading = false,
                         productsError = null,
+                        loadedDestinations = it.loadedDestinations + NativeOwnerMoreDestination.Products,
                     )
                 }
             } catch (error: Throwable) {

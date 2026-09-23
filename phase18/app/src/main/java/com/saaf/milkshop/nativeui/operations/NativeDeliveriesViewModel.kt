@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.saaf.milkshop.application.operations.NativeDeliveriesContext
 import com.saaf.milkshop.application.operations.NativeDeliveriesFacade
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.SessionRequestGate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -34,6 +35,7 @@ class NativeDeliveriesViewModel(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val _state = MutableStateFlow<NativeDeliveriesState>(NativeDeliveriesState.Idle)
     private var sessionHandle: String? = null
+    private val loadGate = SessionRequestGate()
     val state: StateFlow<NativeDeliveriesState> = _state.asStateFlow()
 
     fun open(nextSessionHandle: String) {
@@ -44,13 +46,15 @@ class NativeDeliveriesViewModel(
 
     fun refresh() {
         val session = sessionHandle ?: return
+        val request = loadGate.begin(session)
         _state.value = NativeDeliveriesState.Loading
         scope.launch {
             try {
-                _state.value = NativeDeliveriesState.Ready(
-                    withContext(Dispatchers.IO) { facade.load(session) },
-                )
+                val context = withContext(Dispatchers.IO) { facade.load(session) }
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
+                _state.value = NativeDeliveriesState.Ready(context)
             } catch (error: Throwable) {
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 handleLoadFailure(error)
             }
         }
@@ -83,6 +87,7 @@ class NativeDeliveriesViewModel(
     }
 
     fun close() {
+        loadGate.invalidate()
         sessionHandle = null
         _state.value = NativeDeliveriesState.Idle
     }

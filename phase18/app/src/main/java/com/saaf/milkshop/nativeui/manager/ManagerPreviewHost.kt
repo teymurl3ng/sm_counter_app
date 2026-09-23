@@ -13,6 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -88,7 +89,7 @@ fun ManagerPreviewHost(
     onShowNotice: (String) -> Unit,
 ) {
     SaafTheme {
-        var lastSession by rememberSaveable { mutableStateOf(identity.loginName) }
+        var lastSession by rememberSaveable { mutableStateOf<String?>(null) }
 
         fun closeEntries() {
             saleViewModel.close()
@@ -107,51 +108,23 @@ fun ManagerPreviewHost(
             managerWorkViewModel.backToHome()
         }
 
-        LaunchedEffect(identity.loginName) {
-            if (lastSession != identity.loginName) {
+        LaunchedEffect(sessionHandle) {
+            if (lastSession != null && lastSession != sessionHandle) {
                 onManagerSectionChange(ManagerSection.Work)
                 managerWorkViewModel.close()
                 ownerRecordsViewModel.close()
                 ownerMoreViewModel.close()
                 closeEntries()
             }
-            lastSession = identity.loginName
+            lastSession = sessionHandle
         }
 
         LaunchedEffect(sessionHandle, managerSection) {
             when (managerSection) {
-                ManagerSection.Work -> {
-                    cashCloseViewModel.close()
-                    ownerRecordsViewModel.close()
-                    ownerMoreViewModel.close()
-                    managerWorkViewModel.open(sessionHandle)
-                }
-                ManagerSection.Close -> {
-                    saleViewModel.close()
-                    collectionViewModel.close()
-                    expenseViewModel.close()
-                    vendorPaymentViewModel.close()
-                    receiveMilkViewModel.close()
-                    makeYogurtViewModel.close()
-                    recordSpoilageViewModel.close()
-                    deliveriesViewModel.close()
-                    ownerRecordsViewModel.close()
-                    ownerMoreViewModel.close()
-                    managerWorkViewModel.backToHome()
-                    cashCloseViewModel.open(sessionHandle)
-                }
-                ManagerSection.Records -> {
-                    managerWorkViewModel.close()
-                    closeEntries()
-                    ownerMoreViewModel.close()
-                    ownerRecordsViewModel.open(sessionHandle)
-                }
-                ManagerSection.More -> {
-                    managerWorkViewModel.close()
-                    closeEntries()
-                    ownerRecordsViewModel.close()
-                    ownerMoreViewModel.open(sessionHandle)
-                }
+                ManagerSection.Work -> managerWorkViewModel.open(sessionHandle)
+                ManagerSection.Close -> cashCloseViewModel.open(sessionHandle)
+                ManagerSection.Records -> ownerRecordsViewModel.open(sessionHandle)
+                ManagerSection.More -> ownerMoreViewModel.open(sessionHandle)
             }
         }
 
@@ -315,20 +288,17 @@ fun ManagerPreviewHost(
         }
 
         val navigate: (ManagerSection) -> Unit = { section ->
-            if (section != ManagerSection.Work) {
+            if (managerSection == ManagerSection.Work && section != ManagerSection.Work) {
                 returnManagerWorkHome()
             }
-            if (section != ManagerSection.Records) {
-                ownerRecordsViewModel.close()
-            }
-            if (section != ManagerSection.More) {
-                ownerMoreViewModel.close()
-            } else {
+            if (managerSection == ManagerSection.More && section == ManagerSection.More) {
                 ownerMoreViewModel.backToMenu()
             }
             onManagerSectionChange(section)
         }
 
+        val sectionStateHolder = rememberSaveableStateHolder()
+        sectionStateHolder.SaveableStateProvider("$sessionHandle:${managerSection.name}") {
         when {
             managerSection == ManagerSection.Work &&
                 workDestination == NativeManagerWorkDestination.RecordSale -> {
@@ -572,6 +542,7 @@ fun ManagerPreviewHost(
                     onNavigate = navigate,
                 )
             }
+        }
         }
     }
 }

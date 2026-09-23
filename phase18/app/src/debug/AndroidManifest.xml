@@ -13,7 +13,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".hybrid.HybridActivity">
+        <activity
+            android:name=".hybrid.HybridActivity"
+            android:exported="true"
+            tools:replace="android:exported">
             <intent-filter tools:node="remove">
                 <action android:name="android.intent.action.MAIN" />
 

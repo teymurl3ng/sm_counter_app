@@ -13,6 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -55,7 +56,7 @@ fun AdminPreviewHost(
     onShowNotice: (String) -> Unit,
 ) {
     SaafTheme {
-        var lastSession by rememberSaveable { mutableStateOf(identity.loginName) }
+        var lastSession by rememberSaveable { mutableStateOf<String?>(null) }
         var recordsDestination by rememberSaveable { mutableStateOf(AdminRecordsDestination.Hub) }
 
         fun closeExpense() {
@@ -69,11 +70,10 @@ fun AdminPreviewHost(
 
         fun resetRecordsHub() {
             recordsDestination = AdminRecordsDestination.Hub
-            ownerRecordsViewModel.close()
         }
 
-        LaunchedEffect(identity.loginName) {
-            if (lastSession != identity.loginName) {
+        LaunchedEffect(sessionHandle) {
+            if (lastSession != null && lastSession != sessionHandle) {
                 onAdminSectionChange(AdminSection.Work)
                 adminWorkViewModel.close()
                 ownerRecordsViewModel.close()
@@ -81,38 +81,16 @@ fun AdminPreviewHost(
                 closeExpense()
                 recordsDestination = AdminRecordsDestination.Hub
             }
-            lastSession = identity.loginName
+            lastSession = sessionHandle
         }
 
         LaunchedEffect(sessionHandle, adminSection) {
             when (adminSection) {
-                AdminSection.Work -> {
-                    ownerRecordsViewModel.close()
-                    ownerMoreViewModel.close()
-                    recordsDestination = AdminRecordsDestination.Hub
-                    adminWorkViewModel.open(sessionHandle)
-                }
-                AdminSection.People -> {
-                    adminWorkViewModel.close()
-                    closeExpense()
-                    ownerRecordsViewModel.close()
-                    recordsDestination = AdminRecordsDestination.Hub
-                    ownerMoreViewModel.open(sessionHandle)
-                }
-                AdminSection.Records -> {
-                    adminWorkViewModel.close()
-                    closeExpense()
-                    ownerMoreViewModel.close()
-                    ownerRecordsViewModel.close()
-                    recordsDestination = AdminRecordsDestination.Hub
-                }
-                AdminSection.More -> {
-                    adminWorkViewModel.close()
-                    closeExpense()
-                    ownerRecordsViewModel.close()
-                    recordsDestination = AdminRecordsDestination.Hub
-                    ownerMoreViewModel.open(sessionHandle)
-                }
+                AdminSection.Work -> adminWorkViewModel.open(sessionHandle)
+                AdminSection.People,
+                AdminSection.More,
+                -> ownerMoreViewModel.open(sessionHandle)
+                AdminSection.Records -> Unit
             }
         }
 
@@ -135,18 +113,9 @@ fun AdminPreviewHost(
         LaunchedEffect(sessionHandle, adminSection, recordsDestination) {
             if (adminSection != AdminSection.Records) return@LaunchedEffect
             when (recordsDestination) {
-                AdminRecordsDestination.Hub -> {
-                    ownerRecordsViewModel.close()
-                    ownerMoreViewModel.close()
-                }
-                AdminRecordsDestination.Business -> {
-                    ownerMoreViewModel.close()
-                    ownerRecordsViewModel.open(sessionHandle)
-                }
-                AdminRecordsDestination.SecurityHistory -> {
-                    ownerRecordsViewModel.close()
-                    ownerMoreViewModel.open(sessionHandle)
-                }
+                AdminRecordsDestination.Hub -> Unit
+                AdminRecordsDestination.Business -> ownerRecordsViewModel.open(sessionHandle)
+                AdminRecordsDestination.SecurityHistory -> ownerMoreViewModel.open(sessionHandle)
             }
         }
 
@@ -215,21 +184,21 @@ fun AdminPreviewHost(
         }
 
         val navigate: (AdminSection) -> Unit = { section ->
-            if (section != AdminSection.Work) {
+            if (adminSection == AdminSection.Work && section != AdminSection.Work) {
                 returnAdminWorkHome()
             }
-            if (section != AdminSection.Records) {
-                resetRecordsHub()
-            }
-            if (section != AdminSection.People && section != AdminSection.More) {
-                ownerMoreViewModel.close()
-            } else {
+            if (
+                section in setOf(AdminSection.People, AdminSection.More) &&
+                adminSection != section
+            ) {
                 ownerMoreViewModel.backToMenu()
             }
             onAdminSectionChange(section)
         }
 
         val businessDate = LocalDate.now().toString()
+        val sectionStateHolder = rememberSaveableStateHolder()
+        sectionStateHolder.SaveableStateProvider("$sessionHandle:${adminSection.name}") {
         when {
             adminSection == AdminSection.Work &&
                 workDestination == NativeAdminWorkDestination.RecordExpense -> {
@@ -399,6 +368,7 @@ fun AdminPreviewHost(
                     onNavigate = navigate,
                 )
             }
+        }
         }
     }
 }

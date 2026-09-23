@@ -1,6 +1,6 @@
 # Phase 14.8 — Native UI redesign and migration
 
-Status: **ACTIVE — checkpoint 14.8.3 Compose authentication and hardened authoritative Sale verified; hybrid launcher retained**
+Status: **ACTIVE — checkpoint 14.8.5 screen-family migration substantially implemented; release cutover and full native regression pending**
 
 Date started: 2026-09-12
 
@@ -150,3 +150,9 @@ The owner accepted the [refined original Welcome, Cashier New sale, and Owner Ov
 Phase 14.8.3 now has a device-verified authentication-to-Sale vertical slice. The Compose compiler, compatible stable dependencies, accepted theme tokens, bundled Manrope weights, debug-only native entry activity, Welcome/access flows, authoritative Sale reads/writes, lifecycle session revalidation, draft recreation, large-text reflow, IME behavior, TalkBack semantics, dark theme, landscape, long customer lists, and explicit blocked states are implemented beside the working hybrid application. The isolated QA APK builds and runs on A06; the hardened Sale checkpoint passes 28/28, with the separate Sale load-retry contract passing 1/1. See `PHASE14_8_3_COMPOSE_FOUNDATION.md` and `phase14-evidence/saaf-native-*-a06.png`.
 
 The current gate is selection and implementation of the next role-specific native destination under `NATIVE_INTERACTION_CONTRACT.md`. `HybridActivity` remains the launcher. No WebView or bridge retirement begins until native callers replace every retained capability and their parity gates pass.
+
+### Current gate update — 2026-09-23
+
+Native migration has progressed through the Cashier and Operations families, the comprehensive Owner shell and write-depth, Manager M0–M3, and Administrator M0–A2. Corrections write, Owner planning writes, Shop opening, credential reset, and cloud-restore depth are connected through typed Kotlin boundaries. Cursor-work audit findings are remediated, and the oversized Owner More coordinator is now split by feature.
+
+The isolated debug `.preview` build launches `NativePreviewActivity`; the production manifest deliberately continues to launch `HybridActivity` until Phase 14.8.6. The active implementation queue is opening cost basis, remaining Records groups, Cashier Deliveries-from-More, custom report dates, and production-loss assessment. Approval queue work remains blocked on an authoritative domain API. After those decisions close, run endpoint-ownership closure, retire WebView/bridge only at zero retained callers, and execute the full 14.8.7 native regression before Phase 15.

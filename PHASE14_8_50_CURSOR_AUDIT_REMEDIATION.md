@@ -39,3 +39,7 @@ The first connected-test invocation correctly failed closed because the required
 - Split `NativeOwnerMoreViewModel` into feature coordinators (catalog, people, costing, shop settings, users/security, and backup). The current extraction establishes the secret-ownership boundary but does not by itself make the 4,570-line coordinator small.
 - The 181 lint warnings are non-blocking inherited/deprecation and hygiene items. They no longer hide any lint errors and should be reduced incrementally.
 - Product-depth deferrals remain unchanged: approval queue requires a domain API; opening cost basis, Cashier Deliveries-from-More, custom report ranges, and additional record groups are separate roadmap work rather than audit regressions.
+
+## Follow-up closure — 2026-09-23
+
+The coordinator-split debt above is now closed on `codex/owner-more-modularization`: `NativeOwnerMoreViewModel` is reduced from 4,570 to roughly 470 lines and delegates to feature-owned catalog, people, costing, settings, users/security, and backup controllers plus explicit state/navigation/runtime boundaries. The remaining two bullets continue to apply. The isolated debug manifest was also corrected so the `.preview` application launches `NativePreviewActivity`; the production launcher remains hybrid until the explicit Phase 14.8.6 cutover.

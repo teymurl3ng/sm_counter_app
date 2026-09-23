@@ -612,6 +612,7 @@ object NativeUiTags {
     const val OwnerCostingPlansReauthCancel = "owner_costing_plans_reauth_cancel"
     const val OwnerCostingSectionPolicies = "owner_costing_section_policies"
     const val OwnerCostingSectionPlans = "owner_costing_section_plans"
+    const val OwnerCostingSectionOpening = "owner_costing_section_opening"
     const val OwnerCostingSectionYield = "owner_costing_section_yield"
     const val OwnerCostingPlansHub = "owner_costing_plans_hub"
     const val OwnerCostingBudgetList = "owner_costing_budget_list"
@@ -636,6 +637,21 @@ object NativeUiTags {
     const val OwnerCostingTargetBack = "owner_costing_target_back"
     const val OwnerCostingTargetDiscard = "owner_costing_target_discard"
     const val OwnerCostingTargetKeep = "owner_costing_target_keep"
+    const val OwnerCostingOpeningSummary = "owner_costing_opening_summary"
+    const val OwnerCostingOpeningList = "owner_costing_opening_list"
+    const val OwnerCostingOpeningEmpty = "owner_costing_opening_empty"
+    const val OwnerCostingOpeningOpenShopSettings = "owner_costing_opening_open_shop_settings"
+    const val OwnerCostingOpeningForm = "owner_costing_opening_form"
+    const val OwnerCostingOpeningBack = "owner_costing_opening_back"
+    const val OwnerCostingOpeningSupersedeHint = "owner_costing_opening_supersede_hint"
+    const val OwnerCostingOpeningQuantity = "owner_costing_opening_quantity"
+    const val OwnerCostingOpeningTotal = "owner_costing_opening_total"
+    const val OwnerCostingOpeningTotalError = "owner_costing_opening_total_error"
+    const val OwnerCostingOpeningEvidence = "owner_costing_opening_evidence"
+    const val OwnerCostingOpeningEvidenceError = "owner_costing_opening_evidence_error"
+    const val OwnerCostingOpeningSave = "owner_costing_opening_save"
+    const val OwnerCostingOpeningDiscard = "owner_costing_opening_discard"
+    const val OwnerCostingOpeningKeep = "owner_costing_opening_keep"
     const val OwnerCostingYieldSummary = "owner_costing_yield_summary"
     const val OwnerCostingYieldList = "owner_costing_yield_list"
     const val OwnerCostingYieldEmpty = "owner_costing_yield_empty"
@@ -661,6 +677,12 @@ object NativeUiTags {
     fun ownerCostingBudget(budgetId: Long): String = "owner_costing_budget_$budgetId"
 
     fun ownerCostingTarget(targetId: Long): String = "owner_costing_target_$targetId"
+
+    fun ownerCostingOpeningRow(productId: Long): String = "owner_costing_opening_row_$productId"
+
+    fun ownerCostingOpeningEdit(productId: Long): String = "owner_costing_opening_edit_$productId"
+
+    fun ownerCostingOpeningKind(code: String): String = "owner_costing_opening_kind_$code"
 
     fun ownerCostingYieldPolicy(yieldPolicyId: Long): String = "owner_costing_yield_policy_$yieldPolicyId"
 

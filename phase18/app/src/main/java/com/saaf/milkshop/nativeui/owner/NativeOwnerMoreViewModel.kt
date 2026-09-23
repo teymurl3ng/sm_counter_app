@@ -16,6 +16,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerUsersRolesFacade
 import com.saaf.milkshop.domain.BusinessSettings
 import com.saaf.milkshop.domain.BudgetPlanInput
 import com.saaf.milkshop.domain.CostingPolicyInput
+import com.saaf.milkshop.domain.OpeningCostBasisInput
 import com.saaf.milkshop.domain.CustomerProfileInput
 import com.saaf.milkshop.domain.EmployeeProfileInput
 import com.saaf.milkshop.domain.OpeningStateInput
@@ -231,6 +232,14 @@ class NativeOwnerMoreViewModel internal constructor(
 
     fun upsertCostingCollectionsTarget(weekStart: LocalDate, amount: Double) =
         costingController.upsertCostingCollectionsTarget(weekStart, amount)
+
+    fun openCostingOpeningEditor(productId: Long) =
+        costingController.openCostingOpeningEditor(productId)
+
+    fun clearCostingOpeningEditor() = costingController.clearCostingOpeningEditor()
+
+    fun saveCostingOpeningCost(input: OpeningCostBasisInput) =
+        costingController.saveCostingOpeningCost(input)
 
     fun openCostingYieldApprove() = costingController.openCostingYieldApprove()
 

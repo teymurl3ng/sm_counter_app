@@ -1,9 +1,12 @@
 package com.saaf.milkshop
 
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -12,6 +15,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
+import androidx.compose.ui.unit.Density
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.owner.NativeOwnerBudgetRow
@@ -20,12 +24,14 @@ import com.saaf.milkshop.application.owner.NativeOwnerCostingComponentRow
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPolicyDetail
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPolicyRow
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
+import com.saaf.milkshop.application.owner.NativeOwnerOpeningCostRow
 import com.saaf.milkshop.application.owner.NativeOwnerYieldBatchRow
 import com.saaf.milkshop.application.owner.NativeOwnerYieldPolicyRow
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.BudgetPlanInput
 import com.saaf.milkshop.domain.CostingPolicyInput
 import com.saaf.milkshop.domain.CostingPolicyService
+import com.saaf.milkshop.domain.OpeningCostBasisInput
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.domain.YieldPolicyInput
 import com.saaf.milkshop.nativeui.NativeUiTags
@@ -298,6 +304,129 @@ class NativeOwnerCostingPlansScreenContractTest {
     }
 
     @Test
+    fun openingSectionShowsCoverageAndOpensProductEditor() {
+        var opened: Long? = null
+        setScreen(
+            policies = emptyList(),
+            section = NativeOwnerCostingSection.Opening,
+            openingCosts = listOf(sampleOpeningCost()),
+            openingSummary = "0 of 1 opening stock items have a cost basis.",
+            onOpenOpeningEditor = { opened = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingSectionOpening).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningSummary).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ownerCostingOpeningRow(4L)).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ownerCostingOpeningEdit(4L)).performClick()
+        assertEquals(4L, opened)
+    }
+
+    @Test
+    fun openingEmptyStateOpensShopSettings() {
+        var opened = false
+        setScreen(
+            policies = emptyList(),
+            section = NativeOwnerCostingSection.Opening,
+            openingSummary = "No opening stock exists yet. Add it in Shop settings.",
+            onOpenShopSettings = { opened = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningEmpty).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningOpenShopSettings)
+            .performClick()
+        assertTrue(opened)
+    }
+
+    @Test
+    fun costingSectionsRemainReachableAtLargeFontScale() {
+        setScreen(
+            policies = listOf(samplePolicy()),
+            fontScale = 1.3f,
+        )
+        listOf(
+            NativeUiTags.OwnerCostingSectionPolicies,
+            NativeUiTags.OwnerCostingSectionPlans,
+            NativeUiTags.OwnerCostingSectionOpening,
+            NativeUiTags.OwnerCostingSectionYield,
+        ).forEach { tag ->
+            composeRule.onNodeWithTag(tag).performScrollTo().assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun openingEditorRequiresEstimateEvidenceAndSavesCorrection() {
+        var saved: OpeningCostBasisInput? = null
+        setScreen(
+            policies = emptyList(),
+            section = NativeOwnerCostingSection.Opening,
+            openingEditor = sampleOpeningCost().copy(
+                basisId = 9L,
+                totalCostPaisa = 150_000L,
+                totalCostLabel = "PKR 1,500.00",
+                totalCostInput = "1500",
+            ),
+            openingBasisKinds = listOf("documented_historical", "owner_estimate"),
+            onSaveOpeningCost = { saved = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningForm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningQuantity).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningTotal)
+            .performTextReplacement("0")
+        composeRule.onNodeWithTag(
+            NativeUiTags.OwnerCostingOpeningTotalError,
+            useUnmergedTree = true,
+        )
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningTotal)
+            .performTextReplacement("1600")
+        composeRule.onNodeWithTag(NativeUiTags.ownerCostingOpeningKind("owner_estimate"))
+            .performScrollTo()
+            .performClick()
+        composeRule.onNodeWithTag(
+            NativeUiTags.OwnerCostingOpeningEvidenceError,
+            useUnmergedTree = true,
+        )
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningSave)
+            .performScrollTo()
+            .assertIsNotEnabled()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningEvidence)
+            .performScrollTo()
+            .performTextInput("Reconstructed from the opening-day purchase rate")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningSave)
+            .performScrollTo()
+            .assertIsEnabled()
+            .performClick()
+        assertNotNull(saved)
+        assertEquals(14L, saved!!.openingEventId)
+        assertEquals(4L, saved!!.productId)
+        assertEquals(160_000L, saved!!.totalCostPaisa)
+        assertEquals("owner_estimate", saved!!.basisKind)
+        assertEquals(9L, saved!!.supersedesBasisId)
+    }
+
+    @Test
+    fun openingEditorGuardsDirtyDraftBeforeLeaving() {
+        var backed = false
+        setScreen(
+            policies = emptyList(),
+            section = NativeOwnerCostingSection.Opening,
+            openingEditor = sampleOpeningCost(),
+            openingBasisKinds = listOf("documented_historical", "owner_estimate"),
+            onBackFromOpeningEditor = { backed = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningTotal)
+            .performTextInput("1500")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningBack).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningDiscard).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningKeep).performClick()
+        assertTrue(!backed)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningBack).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningDiscard).performClick()
+        assertTrue(backed)
+    }
+
+    @Test
     fun yieldSectionShowsApproveForm() {
         var opened = false
         setScreen(
@@ -356,6 +485,10 @@ class NativeOwnerCostingPlansScreenContractTest {
         defaultOperatingMonthStart: String = "2026-10-01",
         budgetEditorOpen: Boolean = false,
         collectionsEditorOpen: Boolean = false,
+        openingCosts: List<NativeOwnerOpeningCostRow> = emptyList(),
+        openingSummary: String? = null,
+        openingBasisKinds: List<String> = emptyList(),
+        openingEditor: NativeOwnerOpeningCostRow? = null,
         yieldPolicies: List<NativeOwnerYieldPolicyRow> = emptyList(),
         yieldBatches: List<NativeOwnerYieldBatchRow> = emptyList(),
         yieldSummary: String? = null,
@@ -379,78 +512,96 @@ class NativeOwnerCostingPlansScreenContractTest {
         onOpenBudgetEditor: () -> Unit = {},
         onSaveBudget: (BudgetPlanInput) -> Unit = {},
         onSaveCollectionsTarget: (java.time.LocalDate, Double) -> Unit = { _, _ -> },
+        onOpenOpeningEditor: (Long) -> Unit = {},
+        onOpenShopSettings: () -> Unit = {},
+        onBackFromOpeningEditor: () -> Unit = {},
+        onSaveOpeningCost: (OpeningCostBasisInput) -> Unit = {},
         onOpenYieldApprove: () -> Unit = {},
         onApproveYieldPolicy: (YieldPolicyInput) -> Unit = {},
         onSubmitReauth: (CharArray) -> Unit = { it.fill('\u0000') },
         onCancelReauth: () -> Unit = {},
         onNavigate: (OwnerSection) -> Unit = {},
+        fontScale: Float = 1f,
     ) {
         composeRule.setContent {
-            SaafTheme(darkTheme = false) {
-                OwnerCostingPlansScreen(
-                    snackbarHostState = remember { SnackbarHostState() },
-                    identity = NativeSignedInIdentity(
-                        userId = 1L,
-                        loginName = "owner",
-                        displayName = "Owner",
-                        role = AppRole.OWNER,
-                        effectivePermissions = RolePermissions.permissions(AppRole.OWNER),
-                    ),
-                    context = NativeOwnerMoreContext(
-                        businessDate = "2026-09-21",
-                        postingOpen = true,
-                        shopName = "Saaf Milk",
-                    ),
-                    policies = policies,
-                    policiesLoading = policiesLoading,
-                    policyDetail = policyDetail,
-                    policiesError = policiesError,
-                    currentMonthSummary = currentMonthSummary,
-                    section = section,
-                    budgets = budgets,
-                    targets = targets,
-                    budgetCategories = budgetCategories,
-                    defaultMilkWeekStart = defaultMilkWeekStart,
-                    defaultOperatingMonthStart = defaultOperatingMonthStart,
-                    budgetEditorOpen = budgetEditorOpen,
-                    collectionsEditorOpen = collectionsEditorOpen,
-                    yieldPolicies = yieldPolicies,
-                    yieldBatches = yieldBatches,
-                    yieldSummary = yieldSummary,
-                    yieldApproveOpen = yieldApproveOpen,
-                    approveOpen = approveOpen,
-                    approveSeed = approveSeed,
-                    approving = approving,
-                    reauthOpen = reauthOpen,
-                    reauthBusy = reauthBusy,
-                    reviewReasons = reviewReasons,
-                    componentCodes = componentCodes,
-                    onBackToMenu = onBackToMenu,
-                    onRetry = onRetry,
-                    onSectionChange = onSectionChange,
-                    onOpenPolicy = onOpenPolicy,
-                    onBackFromDetail = onBackFromDetail,
-                    onOpenApprove = onOpenApprove,
-                    onOpenApproveFromDetail = onOpenApproveFromDetail,
-                    onBackFromApprove = onBackFromApprove,
-                    onApprovePolicy = onApprovePolicy,
-                    onOpenBudgetEditor = onOpenBudgetEditor,
-                    onSaveBudget = onSaveBudget,
-                    onSaveCollectionsTarget = onSaveCollectionsTarget,
-                    onOpenYieldApprove = onOpenYieldApprove,
-                    onApproveYieldPolicy = onApproveYieldPolicy,
-                    onSubmitReauth = onSubmitReauth,
-                    onCancelReauth = onCancelReauth,
-                    hostedScaffold = { snackbar, mod, wrapNav, content ->
-                        OwnerScaffold(
-                            snackbarHostState = snackbar,
-                            section = OwnerSection.More,
-                            onNavigate = { section -> wrapNav { } },
-                            modifier = mod,
-                            content = content,
-                        )
-                    },
-                )
+            val currentDensity = LocalDensity.current
+            CompositionLocalProvider(
+                LocalDensity provides Density(currentDensity.density, fontScale),
+            ) {
+                SaafTheme(darkTheme = false) {
+                    OwnerCostingPlansScreen(
+                        snackbarHostState = remember { SnackbarHostState() },
+                        identity = NativeSignedInIdentity(
+                            userId = 1L,
+                            loginName = "owner",
+                            displayName = "Owner",
+                            role = AppRole.OWNER,
+                            effectivePermissions = RolePermissions.permissions(AppRole.OWNER),
+                        ),
+                        context = NativeOwnerMoreContext(
+                            businessDate = "2026-09-21",
+                            postingOpen = true,
+                            shopName = "Saaf Milk",
+                        ),
+                        policies = policies,
+                        policiesLoading = policiesLoading,
+                        policyDetail = policyDetail,
+                        policiesError = policiesError,
+                        currentMonthSummary = currentMonthSummary,
+                        section = section,
+                        budgets = budgets,
+                        targets = targets,
+                        budgetCategories = budgetCategories,
+                        defaultMilkWeekStart = defaultMilkWeekStart,
+                        defaultOperatingMonthStart = defaultOperatingMonthStart,
+                        budgetEditorOpen = budgetEditorOpen,
+                        collectionsEditorOpen = collectionsEditorOpen,
+                        openingCosts = openingCosts,
+                        openingSummary = openingSummary,
+                        openingBasisKinds = openingBasisKinds,
+                        openingEditor = openingEditor,
+                        yieldPolicies = yieldPolicies,
+                        yieldBatches = yieldBatches,
+                        yieldSummary = yieldSummary,
+                        yieldApproveOpen = yieldApproveOpen,
+                        approveOpen = approveOpen,
+                        approveSeed = approveSeed,
+                        approving = approving,
+                        reauthOpen = reauthOpen,
+                        reauthBusy = reauthBusy,
+                        reviewReasons = reviewReasons,
+                        componentCodes = componentCodes,
+                        onBackToMenu = onBackToMenu,
+                        onRetry = onRetry,
+                        onSectionChange = onSectionChange,
+                        onOpenPolicy = onOpenPolicy,
+                        onBackFromDetail = onBackFromDetail,
+                        onOpenApprove = onOpenApprove,
+                        onOpenApproveFromDetail = onOpenApproveFromDetail,
+                        onBackFromApprove = onBackFromApprove,
+                        onApprovePolicy = onApprovePolicy,
+                        onOpenBudgetEditor = onOpenBudgetEditor,
+                        onSaveBudget = onSaveBudget,
+                        onSaveCollectionsTarget = onSaveCollectionsTarget,
+                        onOpenOpeningEditor = onOpenOpeningEditor,
+                        onOpenShopSettings = onOpenShopSettings,
+                        onBackFromOpeningEditor = onBackFromOpeningEditor,
+                        onSaveOpeningCost = onSaveOpeningCost,
+                        onOpenYieldApprove = onOpenYieldApprove,
+                        onApproveYieldPolicy = onApproveYieldPolicy,
+                        onSubmitReauth = onSubmitReauth,
+                        onCancelReauth = onCancelReauth,
+                        hostedScaffold = { snackbar, mod, wrapNav, content ->
+                            OwnerScaffold(
+                                snackbarHostState = snackbar,
+                                section = OwnerSection.More,
+                                onNavigate = { section -> wrapNav { } },
+                                modifier = mod,
+                                content = content,
+                            )
+                        },
+                    )
+                }
             }
         }
     }
@@ -461,5 +612,20 @@ class NativeOwnerCostingPlansScreenContractTest {
         statusLabel = "Active",
         conversionCostLabel = "1000 paisa/kg",
         reviewReason = "monthly",
+    )
+
+    private fun sampleOpeningCost() = NativeOwnerOpeningCostRow(
+        openingEventId = 14L,
+        productId = 4L,
+        productName = "Milk",
+        unit = "L",
+        quantity = "10",
+        basisId = null,
+        totalCostPaisa = null,
+        totalCostLabel = null,
+        totalCostInput = "",
+        basisKindCode = "documented_historical",
+        basisKindLabel = "Documented bill or historical record",
+        evidenceNotes = null,
     )
 }

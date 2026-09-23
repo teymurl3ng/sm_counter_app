@@ -1,7 +1,7 @@
 # Phase 14.8 native UI — status overview
 
 Date: 2026-09-23
-Branch: `codex/owner-more-modularization`
+Branch: `codex/opening-cost-basis`
 
 ## Snapshot
 
@@ -9,11 +9,12 @@ Branch: `codex/owner-more-modularization`
 |---|---|
 | Cashier (`Sell / Collect / Activity / More` + Expense host) | **Done** |
 | Operations | **Done** |
-| Owner primary nav + Work entries + More deep dirs + Month reports + Reopen day + Products create/edit/archive/unarchive + Customers create/edit + Suppliers create/edit + Employees create/edit + Shop settings identity/rates/categories/**opening** + Users enroll/disable/role-change/**credential reset** + Costing policy approve + **budgets / collections / yield** + Backup export/restore/Drive/**cloud remote restore** + Records **corrections write** | **Done** |
+| Owner primary nav + Work entries + More deep dirs + Month reports + Reopen day + Products create/edit/archive/unarchive + Customers create/edit + Suppliers create/edit + Employees create/edit + Shop settings identity/rates/categories/**opening** + Users enroll/disable/role-change/**credential reset** + Costing policy approve + **budgets / collections / opening cost basis / yield** + Backup export/restore/Drive/**cloud remote restore** + Records **corrections write** | **Done** |
 | Manager·Admin shells | **Manager M3 Sale/Collect/Ops hosts + Records corrections write Done**; **Admin A2 Records + system More Done** (M0–A2 foundation depth) |
 
 ## Done (recent)
 
+- **14.8.51 Owner opening stock cost basis** — Owner and Administrator Costing & plans now expose the effective positive Milk/Yogurt opening quantities, missing valuation coverage, typed initial/corrected cost-basis capture, documented-vs-estimate evidence, explicit validation, append-only supersession, recent-auth retry, dirty-draft protection, large-font-safe tabs, and direct Shop settings recovery. No schema or accounting rule changed. Gates: `qaFast` PASS (`966` inventory rows, `0` untested/orphans); focused device suite **34/34 PASS** on SM-A065F; forced-fresh debug + release assembly PASS; installed native-preview verification PASS; independent finish review APPROVED.
 - **Owner More modularization + native-preview launcher correction** — the 4,570-line `NativeOwnerMoreViewModel` is now a roughly 470-line coordinator over feature-owned catalog, people, costing, settings, users/security, backup, navigation, state, and runtime boundaries. Focused unit/device gates, `qaFast`, lint, Kotlin compilation, and debug/release assembly pass. The isolated `.preview` launcher now resolves to `NativePreviewActivity`; release continues to retain the hybrid launcher until the Phase 14.8.6 cutover gate.
 - **14.8.50 audit remediation** — debug/native-preview now has an isolated application ID and release-disabled fixtures; authenticated hosts follow system theme; passphrases/PINs no longer use saveable state and are wiped across submission, early-return, retry, cancellation, and ViewModel teardown paths; Cashier/Operations/Owner/Manager/Admin shells switch from bottom navigation to a rail at 600dp; inherited lint errors are closed; pending Owner backup/user workflows are extracted and backup secret ownership is centralized; the frozen-baseline script works in Windows PowerShell 5.1 and PowerShell 7. Gates: `qaFast` PASS; `lintDebug` PASS (`0 errors`, `181 warnings`); debug + release assemble PASS; affected UI contract matrix **51/51 PASS** on SM-A065F, including adaptive-shell boundary **2/2**.
 - **14.8.49** Owner Costing & plans budgets + collections targets + yield policy approve (Owner + Admin host; leave-guard; yield recent-auth). Opening cost basis still deferred. Gates: `ownermore` **213/213 PASS**; `adminshell` **38/38 PASS**. Debug APK with `open_owner=true`.
@@ -31,18 +32,17 @@ Branch: `codex/owner-more-modularization`
 ## Deferred depth
 
 - Approval queue write UI (no domain API — do not invent)
-- Costing opening-basis; production-loss assessment write UI; Cashier Deliveries-from-More; custom report date range
+- Production-loss assessment write UI; Cashier Deliveries-from-More; custom report date range
 - Records Balances & ledgers / Closing history groups
 
 ## Recommended next
 
-1. Opening cost basis (Costing Step 5)
-2. Records Balances & ledgers / Closing history groups
-3. Cashier Deliveries-from-More, custom report date range, and production-loss assessment write depth
-4. Approval queue only after an authoritative domain API exists
-5. Native endpoint-ownership closure before WebView/bridge retirement and the full 14.8.7 regression
+1. Records Balances & ledgers / Closing history groups
+2. Cashier Deliveries-from-More, custom report date range, and production-loss assessment write depth
+3. Approval queue only after an authoritative domain API exists
+4. Native endpoint-ownership closure before WebView/bridge retirement and the full 14.8.7 regression
 
 ## Authority
 
-- Owner/Cashier blueprints through `PHASE14_8_49`; Manager M3 `PHASE14_8_45`; Admin A2 `PHASE14_8_46`
+- Owner/Cashier blueprints through `PHASE14_8_51`; Manager M3 `PHASE14_8_45`; Admin A2 `PHASE14_8_46`
 - `.cursor/rules/native-shell-vs-content.mdc`

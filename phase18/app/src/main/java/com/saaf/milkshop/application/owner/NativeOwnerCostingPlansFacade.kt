@@ -16,6 +16,9 @@ import com.saaf.milkshop.domain.CollectionsTargetResult
 import com.saaf.milkshop.domain.CostingPolicyInput
 import com.saaf.milkshop.domain.CostingPolicyService
 import com.saaf.milkshop.domain.OPERATING_BUDGET_CATEGORIES
+import com.saaf.milkshop.domain.OpeningCostBasisInput
+import com.saaf.milkshop.domain.OpeningCostBasisService
+import com.saaf.milkshop.domain.OpeningStateService
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.domain.YieldPolicyInput
 import com.saaf.milkshop.domain.YieldPolicyService
@@ -82,6 +85,27 @@ data class NativeOwnerPlanningSnapshot(
     val defaultOperatingMonthStart: String,
 )
 
+data class NativeOwnerOpeningCostRow(
+    val openingEventId: Long,
+    val productId: Long,
+    val productName: String,
+    val unit: String,
+    val quantity: String,
+    val basisId: Long?,
+    val totalCostPaisa: Long?,
+    val totalCostLabel: String?,
+    val totalCostInput: String,
+    val basisKindCode: String,
+    val basisKindLabel: String,
+    val evidenceNotes: String?,
+)
+
+data class NativeOwnerOpeningCostSnapshot(
+    val rows: List<NativeOwnerOpeningCostRow>,
+    val summary: String,
+    val basisKinds: List<String>,
+)
+
 data class NativeOwnerYieldPolicyRow(
     val yieldPolicyId: Long,
     val sampleStartDate: String,
@@ -120,6 +144,8 @@ class NativeOwnerCostingPlansFacade(
     private val policies: CostingPolicyService = CostingPolicyService(database, security),
     private val budgets: BudgetManagementService = BudgetManagementService(database),
     private val yields: YieldPolicyService = YieldPolicyService(database, security),
+    private val openingState: OpeningStateService = OpeningStateService(database),
+    private val openingCosts: OpeningCostBasisService = OpeningCostBasisService(database, security),
 ) {
     fun reviewReasons(): List<String> = CostingPolicyService.REVIEW_REASONS.sorted()
 
@@ -290,6 +316,57 @@ class NativeOwnerCostingPlansFacade(
         return budgets.createOrReviseCollectionsTarget(weekStart, amount)
     }
 
+    suspend fun loadOpeningCosts(sessionHandle: String): NativeOwnerOpeningCostSnapshot {
+        requireOwnerBusinessSettings(sessionHandle)
+        val opening = openingState.current()
+            ?: return NativeOwnerOpeningCostSnapshot(
+                rows = emptyList(),
+                summary = "Record opening balances in Shop settings before adding opening stock costs.",
+                basisKinds = openingBasisKinds(),
+            )
+        val rows = opening.inventoryBalances.mapNotNull { balance ->
+            val product = database.productDao().findById(balance.productId) ?: return@mapNotNull null
+            if (balance.quantity <= 0.0 || product.name !in setOf("Milk", "Yogurt")) {
+                return@mapNotNull null
+            }
+            val active = database.inventoryCostBasisDao().active(opening.eventId, product.productId)
+            NativeOwnerOpeningCostRow(
+                openingEventId = opening.eventId,
+                productId = product.productId,
+                productName = product.name,
+                unit = product.unit,
+                quantity = trimNumber(balance.quantity),
+                basisId = active?.basisId,
+                totalCostPaisa = active?.totalCostPaisa,
+                totalCostLabel = active?.totalCostPaisa?.let(::formatPaisa),
+                totalCostInput = active?.totalCostPaisa?.let(::paisaInput).orEmpty(),
+                basisKindCode = active?.basisKind ?: "documented_historical",
+                basisKindLabel = openingBasisKindLabel(active?.basisKind ?: "documented_historical"),
+                evidenceNotes = active?.evidenceNotes,
+            )
+        }.sortedBy { it.productName }
+        val covered = rows.count { it.basisId != null }
+        val summary = when {
+            rows.isEmpty() -> "The current opening record has no positive Milk or Yogurt stock that needs a cost basis."
+            covered == rows.size -> "All supported opening stock has an active cost basis."
+            else -> "$covered of ${rows.size} opening stock items have a cost basis. Missing costs limit valuation coverage."
+        }
+        return NativeOwnerOpeningCostSnapshot(
+            rows = rows,
+            summary = summary,
+            basisKinds = openingBasisKinds(),
+        )
+    }
+
+    suspend fun recordOpeningCostBasis(
+        sessionHandle: String,
+        input: OpeningCostBasisInput,
+    ): NativeOwnerOpeningCostSnapshot {
+        requireOwnerBusinessSettings(sessionHandle)
+        openingCosts.record(sessionHandle, input)
+        return loadOpeningCosts(sessionHandle)
+    }
+
     suspend fun loadYieldContext(sessionHandle: String): NativeOwnerYieldContext {
         requireOwnerBusinessSettings(sessionHandle)
         val versions = database.yieldPolicyDao().all()
@@ -452,4 +529,16 @@ class NativeOwnerCostingPlansFacade(
 
     private fun trimNumber(value: Double): String =
         BigDecimal.valueOf(value).stripTrailingZeros().toPlainString()
+
+    private fun paisaInput(paisa: Long): String =
+        BigDecimal.valueOf(paisa).movePointLeft(2).stripTrailingZeros().toPlainString()
+
+    private fun openingBasisKinds(): List<String> =
+        listOf("documented_historical", "owner_estimate")
+
+    private fun openingBasisKindLabel(code: String): String = when (code) {
+        "documented_historical" -> "Documented bill or historical record"
+        "owner_estimate" -> "Owner estimate"
+        else -> code.replace('_', ' ')
+    }
 }

@@ -2,6 +2,7 @@ package com.saaf.milkshop.nativeui.owner
 
 import com.saaf.milkshop.domain.BudgetPlanInput
 import com.saaf.milkshop.domain.CostingPolicyInput
+import com.saaf.milkshop.domain.OpeningCostBasisInput
 import com.saaf.milkshop.domain.YieldPolicyInput
 import java.time.LocalDate
 
@@ -25,6 +26,9 @@ data class OwnerCostingPlansActions(
     val onOpenCollectionsEditor: () -> Unit = {},
     val onBackFromCollectionsEditor: () -> Unit = {},
     val onSaveCollectionsTarget: (LocalDate, Double) -> Unit = { _, _ -> },
+    val onOpenOpeningEditor: (Long) -> Unit = {},
+    val onBackFromOpeningEditor: () -> Unit = {},
+    val onSaveOpeningCost: (OpeningCostBasisInput) -> Unit = {},
     val onOpenYieldApprove: () -> Unit = {},
     val onBackFromYieldApprove: () -> Unit = {},
     val onApproveYieldPolicy: (YieldPolicyInput) -> Unit = {},
@@ -49,6 +53,9 @@ fun NativeOwnerMoreViewModel.costingPlansActions(): OwnerCostingPlansActions =
         onOpenCollectionsEditor = ::openCostingCollectionsEditor,
         onBackFromCollectionsEditor = ::clearCostingCollectionsEditor,
         onSaveCollectionsTarget = ::upsertCostingCollectionsTarget,
+        onOpenOpeningEditor = ::openCostingOpeningEditor,
+        onBackFromOpeningEditor = ::clearCostingOpeningEditor,
+        onSaveOpeningCost = ::saveCostingOpeningCost,
         onOpenYieldApprove = ::openCostingYieldApprove,
         onBackFromYieldApprove = ::clearCostingYieldApprove,
         onApproveYieldPolicy = ::approveCostingYieldPolicy,

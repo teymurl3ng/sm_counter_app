@@ -54,6 +54,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerCollectionsTargetRow
 import com.saaf.milkshop.application.owner.NativeOwnerCostingComponentRow
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPolicyDetail
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPolicyRow
+import com.saaf.milkshop.application.owner.NativeOwnerOpeningCostRow
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
 import com.saaf.milkshop.application.owner.NativeOwnerYieldBatchRow
 import com.saaf.milkshop.application.owner.NativeOwnerYieldPolicyRow
@@ -62,6 +63,7 @@ import com.saaf.milkshop.domain.BudgetPlanInput
 import com.saaf.milkshop.domain.ConversionCostComponentInput
 import com.saaf.milkshop.domain.CostingPolicyInput
 import com.saaf.milkshop.domain.CostingPolicyService
+import com.saaf.milkshop.domain.OpeningCostBasisInput
 import com.saaf.milkshop.domain.YieldPolicyInput
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.HostedScaffold
@@ -100,6 +102,11 @@ fun OwnerCostingPlansScreen(
     budgetSaving: Boolean = false,
     collectionsEditorOpen: Boolean = false,
     collectionsSaving: Boolean = false,
+    openingCosts: List<NativeOwnerOpeningCostRow> = emptyList(),
+    openingSummary: String? = null,
+    openingBasisKinds: List<String> = emptyList(),
+    openingEditor: NativeOwnerOpeningCostRow? = null,
+    openingSaving: Boolean = false,
     yieldPolicies: List<NativeOwnerYieldPolicyRow> = emptyList(),
     yieldBatches: List<NativeOwnerYieldBatchRow> = emptyList(),
     yieldActivePolicyId: Long? = null,
@@ -129,6 +136,10 @@ fun OwnerCostingPlansScreen(
     onOpenCollectionsEditor: () -> Unit = {},
     onBackFromCollectionsEditor: () -> Unit = {},
     onSaveCollectionsTarget: (LocalDate, Double) -> Unit = { _, _ -> },
+    onOpenOpeningEditor: (Long) -> Unit = {},
+    onOpenShopSettings: () -> Unit = {},
+    onBackFromOpeningEditor: () -> Unit = {},
+    onSaveOpeningCost: (OpeningCostBasisInput) -> Unit = {},
     onOpenYieldApprove: () -> Unit = {},
     onBackFromYieldApprove: () -> Unit = {},
     onApproveYieldPolicy: (YieldPolicyInput) -> Unit = {},
@@ -176,6 +187,20 @@ fun OwnerCostingPlansScreen(
                     error = null,
                     onBack = onBackFromYieldApprove,
                     onSave = onApproveYieldPolicy,
+                    hostedScaffold = hostedScaffold,
+                    modifier = modifier,
+                )
+            } else if (openingEditor != null) {
+                OwnerOpeningCostBasisEditorScreen(
+                    snackbarHostState = snackbarHostState,
+                    identity = identity,
+                    context = context,
+                    row = openingEditor,
+                    basisKinds = openingBasisKinds,
+                    saving = openingSaving || reauthBusy,
+                    error = null,
+                    onBack = onBackFromOpeningEditor,
+                    onSave = onSaveOpeningCost,
                     hostedScaffold = hostedScaffold,
                     modifier = modifier,
                 )
@@ -245,6 +270,21 @@ fun OwnerCostingPlansScreen(
                 modifier = modifier,
             )
         }
+        openingEditor != null -> {
+            OwnerOpeningCostBasisEditorScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = context,
+                row = openingEditor,
+                basisKinds = openingBasisKinds,
+                saving = openingSaving,
+                error = policiesError,
+                onBack = onBackFromOpeningEditor,
+                onSave = onSaveOpeningCost,
+                hostedScaffold = hostedScaffold,
+                modifier = modifier,
+            )
+        }
         policyDetail != null -> {
             OwnerCostingPlansDetailScreen(
                 snackbarHostState = snackbarHostState,
@@ -269,6 +309,8 @@ fun OwnerCostingPlansScreen(
                 currentMonthSummary = currentMonthSummary,
                 budgets = budgets,
                 targets = targets,
+                openingCosts = openingCosts,
+                openingSummary = openingSummary,
                 yieldPolicies = yieldPolicies,
                 yieldSummary = yieldSummary,
                 onBackToMenu = onBackToMenu,
@@ -278,6 +320,8 @@ fun OwnerCostingPlansScreen(
                 onOpenApprove = onOpenApprove,
                 onOpenBudgetEditor = onOpenBudgetEditor,
                 onOpenCollectionsEditor = onOpenCollectionsEditor,
+                onOpenOpeningEditor = onOpenOpeningEditor,
+                onOpenShopSettings = onOpenShopSettings,
                 onOpenYieldApprove = onOpenYieldApprove,
                 hostedScaffold = hostedScaffold,
                 backToHubLabel = backToHubLabel,
@@ -299,6 +343,8 @@ private fun OwnerCostingPlansListBody(
     currentMonthSummary: String?,
     budgets: List<NativeOwnerBudgetRow>,
     targets: List<NativeOwnerCollectionsTargetRow>,
+    openingCosts: List<NativeOwnerOpeningCostRow>,
+    openingSummary: String?,
     yieldPolicies: List<NativeOwnerYieldPolicyRow>,
     yieldSummary: String?,
     onBackToMenu: () -> Unit,
@@ -308,6 +354,8 @@ private fun OwnerCostingPlansListBody(
     onOpenApprove: () -> Unit,
     onOpenBudgetEditor: () -> Unit,
     onOpenCollectionsEditor: () -> Unit,
+    onOpenOpeningEditor: (Long) -> Unit,
+    onOpenShopSettings: () -> Unit,
     onOpenYieldApprove: () -> Unit,
     hostedScaffold: HostedScaffold,
     backToHubLabel: String = "Back to More",
@@ -415,6 +463,21 @@ private fun OwnerCostingPlansListBody(
                 header = {
                     HubHeader()
                 },
+            )
+        }
+        section == NativeOwnerCostingSection.Opening -> {
+            OwnerOpeningCostBasisBody(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = context,
+                rows = openingCosts,
+                summary = openingSummary,
+                error = policiesError,
+                onOpenEditor = onOpenOpeningEditor,
+                onOpenShopSettings = onOpenShopSettings,
+                hostedScaffold = hostedScaffold,
+                modifier = modifier.testTag(NativeUiTags.OwnerCostingPlansRoot),
+                header = { HubHeader() },
             )
         }
         section == NativeOwnerCostingSection.Yield -> {
@@ -946,7 +1009,7 @@ private fun OwnerCostingPlansReauthDialog(
         title = { Text("Confirm with passphrase") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Enter your passphrase again to approve this costing policy.")
+                Text("Enter your passphrase again to approve this costing change.")
                 OutlinedTextField(
                     value = passphrase,
                     onValueChange = { passphrase = it },

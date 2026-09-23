@@ -2,6 +2,7 @@ package com.saaf.milkshop.nativeui.owner
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -66,6 +67,7 @@ internal fun OwnerCostingPlansSectionTabs(
     Row(
         modifier
             .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
             .padding(horizontal = 12.dp, vertical = 4.dp)
             .testTag(NativeUiTags.OwnerCostingPlansHub),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -81,6 +83,12 @@ internal fun OwnerCostingPlansSectionTabs(
             onClick = { onSectionChange(NativeOwnerCostingSection.Plans) },
             label = { Text("Plans") },
             modifier = Modifier.testTag(NativeUiTags.OwnerCostingSectionPlans),
+        )
+        FilterChip(
+            selected = section == NativeOwnerCostingSection.Opening,
+            onClick = { onSectionChange(NativeOwnerCostingSection.Opening) },
+            label = { Text("Opening") },
+            modifier = Modifier.testTag(NativeUiTags.OwnerCostingSectionOpening),
         )
         FilterChip(
             selected = section == NativeOwnerCostingSection.Yield,

@@ -13,6 +13,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerEmployeeDetail
 import com.saaf.milkshop.application.owner.NativeOwnerEmployeeRow
 import com.saaf.milkshop.application.owner.NativeOwnerExpenseCategoryRow
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
+import com.saaf.milkshop.application.owner.NativeOwnerOpeningCostRow
 import com.saaf.milkshop.application.owner.NativeOwnerPendingEnrollment
 import com.saaf.milkshop.application.owner.NativeOwnerProductDetail
 import com.saaf.milkshop.application.owner.NativeOwnerProductRow
@@ -44,6 +45,7 @@ enum class NativeOwnerMoreDestination {
 enum class NativeOwnerCostingSection {
     Policies,
     Plans,
+    Opening,
     Yield,
 }
 
@@ -116,6 +118,11 @@ data class OwnerCostingState(
     val costingBudgetSaving: Boolean = false,
     val costingCollectionsEditorOpen: Boolean = false,
     val costingCollectionsSaving: Boolean = false,
+    val costingOpeningCosts: List<NativeOwnerOpeningCostRow> = emptyList(),
+    val costingOpeningSummary: String? = null,
+    val costingOpeningBasisKinds: List<String> = emptyList(),
+    val costingOpeningEditor: NativeOwnerOpeningCostRow? = null,
+    val costingOpeningSaving: Boolean = false,
     val costingYieldPolicies: List<NativeOwnerYieldPolicyRow> = emptyList(),
     val costingYieldBatches: List<NativeOwnerYieldBatchRow> = emptyList(),
     val costingYieldActivePolicyId: Long? = null,
@@ -357,6 +364,21 @@ sealed interface NativeOwnerMoreState {
 
         val costingCollectionsSaving: Boolean
             get() = costingState.costingCollectionsSaving
+
+        val costingOpeningCosts: List<NativeOwnerOpeningCostRow>
+            get() = costingState.costingOpeningCosts
+
+        val costingOpeningSummary: String?
+            get() = costingState.costingOpeningSummary
+
+        val costingOpeningBasisKinds: List<String>
+            get() = costingState.costingOpeningBasisKinds
+
+        val costingOpeningEditor: NativeOwnerOpeningCostRow?
+            get() = costingState.costingOpeningEditor
+
+        val costingOpeningSaving: Boolean
+            get() = costingState.costingOpeningSaving
 
         val costingYieldPolicies: List<NativeOwnerYieldPolicyRow>
             get() = costingState.costingYieldPolicies
@@ -609,6 +631,11 @@ internal fun NativeOwnerMoreState.Ready.copy(
     costingBudgetSaving: Boolean = this.costingBudgetSaving,
     costingCollectionsEditorOpen: Boolean = this.costingCollectionsEditorOpen,
     costingCollectionsSaving: Boolean = this.costingCollectionsSaving,
+    costingOpeningCosts: List<NativeOwnerOpeningCostRow> = this.costingOpeningCosts,
+    costingOpeningSummary: String? = this.costingOpeningSummary,
+    costingOpeningBasisKinds: List<String> = this.costingOpeningBasisKinds,
+    costingOpeningEditor: NativeOwnerOpeningCostRow? = this.costingOpeningEditor,
+    costingOpeningSaving: Boolean = this.costingOpeningSaving,
     costingYieldPolicies: List<NativeOwnerYieldPolicyRow> = this.costingYieldPolicies,
     costingYieldBatches: List<NativeOwnerYieldBatchRow> = this.costingYieldBatches,
     costingYieldActivePolicyId: Long? = this.costingYieldActivePolicyId,
@@ -741,6 +768,11 @@ internal fun NativeOwnerMoreState.Ready.copy(
             costingBudgetSaving = costingBudgetSaving,
             costingCollectionsEditorOpen = costingCollectionsEditorOpen,
             costingCollectionsSaving = costingCollectionsSaving,
+            costingOpeningCosts = costingOpeningCosts,
+            costingOpeningSummary = costingOpeningSummary,
+            costingOpeningBasisKinds = costingOpeningBasisKinds,
+            costingOpeningEditor = costingOpeningEditor,
+            costingOpeningSaving = costingOpeningSaving,
             costingYieldPolicies = costingYieldPolicies,
             costingYieldBatches = costingYieldBatches,
             costingYieldActivePolicyId = costingYieldActivePolicyId,

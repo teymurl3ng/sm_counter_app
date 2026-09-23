@@ -447,6 +447,8 @@ fun OwnerPreviewHost(
                                     ownerMoreViewModel.clearCostingApprove()
                                 ready.costingYieldApproveOpen ->
                                     ownerMoreViewModel.clearCostingYieldApprove()
+                                ready.costingOpeningEditor != null ->
+                                    ownerMoreViewModel.clearCostingOpeningEditor()
                                 ready.costingBudgetEditorOpen ->
                                     ownerMoreViewModel.clearCostingBudgetEditor()
                                 ready.costingCollectionsEditorOpen ->

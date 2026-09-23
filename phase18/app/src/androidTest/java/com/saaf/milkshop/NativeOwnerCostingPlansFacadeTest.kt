@@ -9,7 +9,14 @@ import com.saaf.milkshop.domain.BudgetPlanInput
 import com.saaf.milkshop.domain.ConversionCostComponentInput
 import com.saaf.milkshop.domain.CostingPolicyInput
 import com.saaf.milkshop.domain.CreateUserInput
+import com.saaf.milkshop.domain.OpeningCostBasisInput
+import com.saaf.milkshop.domain.OpeningInventoryBalance
+import com.saaf.milkshop.domain.OpeningStateInput
+import com.saaf.milkshop.domain.OpeningStateService
+import com.saaf.milkshop.domain.NativeSessionManager
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.domain.StoreIdentityInput
+import com.saaf.milkshop.domain.StoreIdentityService
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.domain.YieldPolicyInput
 import java.math.BigDecimal
@@ -29,11 +36,14 @@ class NativeOwnerCostingPlansFacadeTest {
     private lateinit var facade: NativeOwnerCostingPlansFacade
     private lateinit var ownerSession: String
     private lateinit var cashierSession: String
+    private var nowEpochMs: Long = 4_000_000L
 
     @Before
     fun setUp() = runBlocking {
         database = MilkShopDatabase.createInMemory()
-        security = UserSecurityService(database)
+        nowEpochMs = 4_000_000L
+        val sessions = NativeSessionManager { nowEpochMs }
+        security = UserSecurityService(database, sessions = sessions, nowEpochMs = { nowEpochMs })
         facade = NativeOwnerCostingPlansFacade(database, security)
         ownerSession = security.bootstrapOwner(
             "owner.costing",
@@ -245,6 +255,96 @@ class NativeOwnerCostingPlansFacadeTest {
     @Test
     fun planningRejectsNonOwner() = runBlocking {
         assertTrue(runCatching { facade.loadPlanning(cashierSession) }.isFailure)
+    }
+
+    @Test
+    fun openingCostsReadRecordAndCorrectWithoutErasingHistory() = runBlocking {
+        StoreIdentityService(database).save(StoreIdentityInput("Saaf Milk"))
+        val milk = database.productDao().findByName("Milk")!!
+        val opening = OpeningStateService(database).record(
+            OpeningStateInput(
+                openingDate = "2026-09-01",
+                inventoryBalances = listOf(OpeningInventoryBalance(milk.productId, 10.0)),
+            ),
+        )
+
+        val empty = facade.loadOpeningCosts(ownerSession)
+        assertEquals(1, empty.rows.size)
+        assertEquals(null, empty.rows.single().basisId)
+        assertTrue(empty.summary.contains("0 of 1"))
+
+        val firstSnapshot = facade.recordOpeningCostBasis(
+            ownerSession,
+            OpeningCostBasisInput(
+                openingEventId = opening.eventId,
+                productId = milk.productId,
+                quantity = BigDecimal("10"),
+                totalCostPaisa = 150_000L,
+                basisKind = "documented_historical",
+                evidenceNotes = "Supplier bill retained",
+            ),
+        )
+        val first = firstSnapshot.rows.single()
+        assertNotNull(first.basisId)
+        assertEquals("PKR 1,500.00", first.totalCostLabel)
+        assertTrue(firstSnapshot.summary.contains("All supported"))
+
+        val correctedSnapshot = facade.recordOpeningCostBasis(
+            ownerSession,
+            OpeningCostBasisInput(
+                openingEventId = opening.eventId,
+                productId = milk.productId,
+                quantity = BigDecimal("10"),
+                totalCostPaisa = 160_000L,
+                basisKind = "owner_estimate",
+                evidenceNotes = "Reconstructed from the opening-day purchase rate",
+                supersedesBasisId = first.basisId,
+            ),
+        )
+        val corrected = correctedSnapshot.rows.single()
+        assertTrue(corrected.basisId != first.basisId)
+        assertEquals("Owner estimate", corrected.basisKindLabel)
+        assertEquals(2, database.inventoryCostBasisDao().all().size)
+        assertNotNull(database.inventoryCostBasisDao().find(first.basisId!!))
+        assertEquals(
+            corrected.basisId,
+            database.inventoryCostBasisDao().active(opening.eventId, milk.productId)!!.basisId,
+        )
+    }
+
+    @Test
+    fun openingCostsRejectNonOwner() = runBlocking {
+        val rejected = runCatching { facade.loadOpeningCosts(cashierSession) }.exceptionOrNull()
+        assertTrue(rejected is SecurityFailure.PermissionDenied || rejected != null)
+    }
+
+    @Test
+    fun openingCostSaveRequiresRecentFullAuthentication() = runBlocking {
+        StoreIdentityService(database).save(StoreIdentityInput("Saaf Milk"))
+        val milk = database.productDao().findByName("Milk")!!
+        val opening = OpeningStateService(database).record(
+            OpeningStateInput(
+                openingDate = "2026-09-01",
+                inventoryBalances = listOf(OpeningInventoryBalance(milk.productId, 10.0)),
+            ),
+        )
+        nowEpochMs += NativeSessionManager.RECENT_AUTH_TIMEOUT_MS
+
+        val rejected = runCatching {
+            facade.recordOpeningCostBasis(
+                ownerSession,
+                OpeningCostBasisInput(
+                    openingEventId = opening.eventId,
+                    productId = milk.productId,
+                    quantity = BigDecimal("10"),
+                    totalCostPaisa = 150_000L,
+                    basisKind = "documented_historical",
+                ),
+            )
+        }.exceptionOrNull()
+
+        assertTrue(rejected is SecurityFailure.RecentAuthenticationRequired)
+        assertTrue(database.inventoryCostBasisDao().all().isEmpty())
     }
 
     private suspend fun seedThirtyProductions() {

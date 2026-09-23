@@ -1,0 +1,9 @@
+﻿{
+    "currentRunPresent":  true,
+    "evidence":  1,
+    "unreviewed":  0,
+    "reviewedPass":  1,
+    "reviewedFail":  0,
+    "missingSidecar":  0,
+    "visualAcceptance":  "PASS"
+}

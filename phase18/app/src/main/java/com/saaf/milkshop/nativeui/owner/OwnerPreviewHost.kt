@@ -362,9 +362,10 @@ fun OwnerPreviewHost(
                 NativeOwnerWorkDestination.RecordSpoilage,
                 NativeOwnerWorkDestination.Deliveries,
             )
+        val ownerRecordsReady = ownerRecordsState as? NativeOwnerRecordsState.Ready
         val ownerRecordsOwnsBack =
             ownerSection == OwnerSection.Records &&
-                (ownerRecordsState as? NativeOwnerRecordsState.Ready)?.detail != null
+                (ownerRecordsReady?.detail != null || ownerRecordsReady?.correction != null)
         val ownerMoreOwnsBack =
             ownerSection == OwnerSection.More &&
                 (ownerMoreState as? NativeOwnerMoreState.Ready)?.destination in setOf(
@@ -399,10 +400,10 @@ fun OwnerPreviewHost(
                 }
                 OwnerSection.Records -> {
                     val ready = ownerRecordsState as? NativeOwnerRecordsState.Ready
-                    if (ready?.detail != null) {
-                        ownerRecordsViewModel.clearDetail()
-                    } else {
-                        onLeaveToWelcome()
+                    when {
+                        ready?.correction != null -> ownerRecordsViewModel.clearCorrection()
+                        ready?.detail != null -> ownerRecordsViewModel.clearDetail()
+                        else -> onLeaveToWelcome()
                     }
                 }
                 OwnerSection.More -> {
@@ -444,6 +445,12 @@ fun OwnerPreviewHost(
                                     ownerMoreViewModel.cancelCostingReauth()
                                 ready.costingApproveOpen ->
                                     ownerMoreViewModel.clearCostingApprove()
+                                ready.costingYieldApproveOpen ->
+                                    ownerMoreViewModel.clearCostingYieldApprove()
+                                ready.costingBudgetEditorOpen ->
+                                    ownerMoreViewModel.clearCostingBudgetEditor()
+                                ready.costingCollectionsEditorOpen ->
+                                    ownerMoreViewModel.clearCostingCollectionsEditor()
                                 ready.costingPolicyDetail != null ->
                                     ownerMoreViewModel.clearCostingPolicyDetail()
                                 else -> ownerMoreViewModel.backToMenu()
@@ -538,8 +545,10 @@ fun OwnerPreviewHost(
                     ownerWorkViewModel.close()
                     ownerMoreViewModel.close()
                     ownerReportsViewModel.close()
+                    val recordsReady = ownerRecordsState as? NativeOwnerRecordsState.Ready
                     if (ownerSection == OwnerSection.Records &&
-                        (ownerRecordsState as? NativeOwnerRecordsState.Ready)?.detail == null
+                        recordsReady?.detail == null &&
+                        recordsReady?.correction == null
                     ) {
                         onShowNotice("Records is already open.")
                     } else {
@@ -622,15 +631,7 @@ fun OwnerPreviewHost(
                     onOpenEmployeeEdit = ownerMoreViewModel::openEmployeeEdit,
                     onBackFromEmployeeEdit = ownerMoreViewModel::clearEmployeeEdit,
                     onUpdateEmployee = ownerMoreViewModel::updateEmployee,
-                    onRetryCostingPlans = ownerMoreViewModel::refreshCostingPlans,
-                    onOpenCostingPolicy = ownerMoreViewModel::openCostingPolicyDetail,
-                    onBackFromCostingPolicyDetail = ownerMoreViewModel::clearCostingPolicyDetail,
-                    onOpenCostingApprove = ownerMoreViewModel::openCostingApprove,
-                    onOpenCostingApproveFromDetail = ownerMoreViewModel::openCostingApproveFromDetail,
-                    onBackFromCostingApprove = ownerMoreViewModel::clearCostingApprove,
-                    onApproveCostingPolicy = ownerMoreViewModel::approveCostingPolicy,
-                    onSubmitCostingReauth = ownerMoreViewModel::submitCostingReauth,
-                    onCancelCostingReauth = ownerMoreViewModel::cancelCostingReauth,
+                    costingActions = ownerMoreViewModel.costingPlansActions(),
                     onRetryShopSettings = ownerMoreViewModel::refreshShopSettings,
                     onOpenShopIdentityEdit = ownerMoreViewModel::openShopIdentityEdit,
                     onBackFromShopIdentityEdit = ownerMoreViewModel::clearShopIdentityEdit,
@@ -726,6 +727,11 @@ fun OwnerPreviewHost(
                             "$group comes next in the Owner Records family.",
                         )
                     },
+                    onSelectGroup = ownerRecordsViewModel::setActiveGroup,
+                    onOpenCorrection = ownerRecordsViewModel::openCorrection,
+                    onBackFromCorrection = ownerRecordsViewModel::clearCorrection,
+                    onUpdateCorrection = ownerRecordsViewModel::updateCorrection,
+                    onSaveCorrection = ownerRecordsViewModel::saveCorrection,
                 )
             }
             ownerSection == OwnerSection.Work &&

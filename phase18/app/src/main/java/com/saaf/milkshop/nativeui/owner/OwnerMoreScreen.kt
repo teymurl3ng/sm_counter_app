@@ -59,7 +59,9 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.more.NativeMoreSecurityStatus
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
 import com.saaf.milkshop.domain.BusinessSettings
+import com.saaf.milkshop.domain.BudgetPlanInput
 import com.saaf.milkshop.domain.CostingPolicyInput
+import com.saaf.milkshop.domain.YieldPolicyInput
 import com.saaf.milkshop.domain.CustomerProfileInput
 import com.saaf.milkshop.domain.EmployeeProfileInput
 import com.saaf.milkshop.domain.ProductCatalogInput
@@ -130,15 +132,7 @@ fun OwnerMoreScreen(
     onOpenEmployeeEdit: () -> Unit,
     onBackFromEmployeeEdit: () -> Unit,
     onUpdateEmployee: (String, EmployeeProfileInput) -> Unit,
-    onRetryCostingPlans: () -> Unit,
-    onOpenCostingPolicy: (Long) -> Unit,
-    onBackFromCostingPolicyDetail: () -> Unit,
-    onOpenCostingApprove: () -> Unit,
-    onOpenCostingApproveFromDetail: () -> Unit,
-    onBackFromCostingApprove: () -> Unit,
-    onApproveCostingPolicy: (CostingPolicyInput) -> Unit,
-    onSubmitCostingReauth: (CharArray) -> Unit,
-    onCancelCostingReauth: () -> Unit,
+    costingActions: OwnerCostingPlansActions = OwnerCostingPlansActions(),
     onRetryShopSettings: () -> Unit,
     onOpenShopIdentityEdit: () -> Unit,
     onBackFromShopIdentityEdit: () -> Unit,
@@ -431,6 +425,22 @@ fun OwnerMoreScreen(
                 policyDetail = state.costingPolicyDetail,
                 policiesError = state.costingPoliciesError,
                 currentMonthSummary = state.costingCurrentMonthSummary,
+                section = state.costingSection,
+                budgets = state.costingBudgets,
+                targets = state.costingTargets,
+                budgetCategories = state.costingBudgetCategories,
+                defaultMilkWeekStart = state.costingDefaultMilkWeekStart,
+                defaultOperatingMonthStart = state.costingDefaultOperatingMonthStart,
+                budgetEditorOpen = state.costingBudgetEditorOpen,
+                budgetSaving = state.costingBudgetSaving,
+                collectionsEditorOpen = state.costingCollectionsEditorOpen,
+                collectionsSaving = state.costingCollectionsSaving,
+                yieldPolicies = state.costingYieldPolicies,
+                yieldBatches = state.costingYieldBatches,
+                yieldActivePolicyId = state.costingYieldActivePolicyId,
+                yieldSummary = state.costingYieldSummary,
+                yieldApproveOpen = state.costingYieldApproveOpen,
+                yieldApproving = state.costingYieldApproving,
                 approveOpen = state.costingApproveOpen,
                 approveSeed = state.costingApproveSeed,
                 approving = state.costingApproving,
@@ -439,15 +449,34 @@ fun OwnerMoreScreen(
                 reviewReasons = state.costingReviewReasons,
                 componentCodes = state.costingComponentCodes,
                 onBackToMenu = onBackToMenu,
-                onRetry = onRetryCostingPlans,
-                onOpenPolicy = onOpenCostingPolicy,
-                onBackFromDetail = onBackFromCostingPolicyDetail,
-                onOpenApprove = onOpenCostingApprove,
-                onOpenApproveFromDetail = onOpenCostingApproveFromDetail,
-                onBackFromApprove = onBackFromCostingApprove,
-                onApprovePolicy = onApproveCostingPolicy,
-                onSubmitReauth = onSubmitCostingReauth,
-                onCancelReauth = onCancelCostingReauth,
+                onRetry = costingActions.onRetry,
+                onSectionChange = costingActions.onSectionChange,
+                onOpenPolicy = costingActions.onOpenPolicy,
+                onBackFromDetail = costingActions.onBackFromDetail,
+                onOpenApprove = costingActions.onOpenApprove,
+                onOpenApproveFromDetail = costingActions.onOpenApproveFromDetail,
+                onBackFromApprove = costingActions.onBackFromApprove,
+                onApprovePolicy = costingActions.onApprovePolicy,
+                onOpenBudgetEditor = costingActions.onOpenBudgetEditor,
+                onBackFromBudgetEditor = costingActions.onBackFromBudgetEditor,
+                onSaveBudget = costingActions.onSaveBudget,
+                onCopyPreviousBudget = costingActions.onCopyPreviousBudget,
+                onOpenCollectionsEditor = costingActions.onOpenCollectionsEditor,
+                onBackFromCollectionsEditor = costingActions.onBackFromCollectionsEditor,
+                onSaveCollectionsTarget = costingActions.onSaveCollectionsTarget,
+                onOpenYieldApprove = costingActions.onOpenYieldApprove,
+                onBackFromYieldApprove = costingActions.onBackFromYieldApprove,
+                onApproveYieldPolicy = costingActions.onApproveYieldPolicy,
+                onSubmitReauth = costingActions.onSubmitReauth,
+                onCancelReauth = costingActions.onCancelReauth,
+                periodEndExclusive = { category, start ->
+                    // Matches BudgetManagementService period rules.
+                    if (category == com.saaf.milkshop.domain.BUDGET_CATEGORY_MILK_PURCHASES) {
+                        start.plusDays(7)
+                    } else {
+                        start.plusMonths(1)
+                    }
+                },
                 hostedScaffold = { snackbar, mod, wrapNav, content ->
                     OwnerScaffold(
                         snackbarHostState = snackbar,

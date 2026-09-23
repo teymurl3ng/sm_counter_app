@@ -3,6 +3,7 @@ package com.saaf.milkshop
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -10,17 +11,25 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
+import com.saaf.milkshop.application.owner.NativeOwnerBudgetRow
+import com.saaf.milkshop.application.owner.NativeOwnerCollectionsTargetRow
 import com.saaf.milkshop.application.owner.NativeOwnerCostingComponentRow
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPolicyDetail
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPolicyRow
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
+import com.saaf.milkshop.application.owner.NativeOwnerYieldBatchRow
+import com.saaf.milkshop.application.owner.NativeOwnerYieldPolicyRow
 import com.saaf.milkshop.domain.AppRole
+import com.saaf.milkshop.domain.BudgetPlanInput
 import com.saaf.milkshop.domain.CostingPolicyInput
 import com.saaf.milkshop.domain.CostingPolicyService
 import com.saaf.milkshop.domain.RolePermissions
+import com.saaf.milkshop.domain.YieldPolicyInput
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.owner.NativeOwnerCostingSection
 import com.saaf.milkshop.nativeui.owner.OwnerCostingPlansScreen
 import com.saaf.milkshop.nativeui.owner.OwnerScaffold
 import com.saaf.milkshop.nativeui.owner.OwnerSection
@@ -188,12 +197,169 @@ class NativeOwnerCostingPlansScreenContractTest {
         assertTrue(cancelled)
     }
 
+    @Test
+    fun plansSectionShowsBudgetsAndOpensEditor() {
+        var opened = false
+        setScreen(
+            policies = emptyList(),
+            section = NativeOwnerCostingSection.Plans,
+            budgets = listOf(
+                NativeOwnerBudgetRow(
+                    budgetId = 3L,
+                    category = "Milk purchases",
+                    periodStart = "2026-09-22",
+                    periodEndExclusive = "2026-09-29",
+                    plannedLitersLabel = "100 L",
+                    plannedAmountLabel = "PKR 28,000.00",
+                    salesTargetLabel = "PKR 40,000.00",
+                    archived = false,
+                ),
+            ),
+            onOpenBudgetEditor = { opened = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingSectionPlans).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ownerCostingBudget(3L)).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingBudgetOpen).performClick()
+        assertTrue(opened)
+    }
+
+    @Test
+    fun budgetEditorShowsFieldsAndSavesTypedInput() {
+        var saved: BudgetPlanInput? = null
+        setScreen(
+            policies = emptyList(),
+            section = NativeOwnerCostingSection.Plans,
+            budgetEditorOpen = true,
+            budgetCategories = listOf("Milk purchases", "Rent"),
+            defaultMilkWeekStart = "2026-09-21",
+            defaultOperatingMonthStart = "2026-10-01",
+            onSaveBudget = { saved = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingBudgetForm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingBudgetPeriodStart)
+            .performScrollTo()
+            .performTextReplacement("2026-09-21")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingBudgetPlannedValue)
+            .performScrollTo()
+            .performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingBudgetPlannedValue)
+            .performTextReplacement("50")
+        composeRule.waitForIdle()
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerCostingBudgetSave)
+                    .assertIsEnabled()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingBudgetSave)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 5_000) { saved != null }
+        assertEquals("Milk purchases", saved!!.category)
+        assertEquals(50.0, saved!!.plannedLiters!!, 1e-9)
+    }
+
+    @Test
+    fun collectionsEditorShowsFieldsAndSavesTypedInput() {
+        var week: String? = null
+        var amount: Double? = null
+        setScreen(
+            policies = emptyList(),
+            section = NativeOwnerCostingSection.Plans,
+            collectionsEditorOpen = true,
+            defaultMilkWeekStart = "2026-09-21",
+            onSaveCollectionsTarget = { start, value ->
+                week = start.toString()
+                amount = value
+            },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingTargetForm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingTargetWeekStart)
+            .performScrollTo()
+            .performTextReplacement("2026-09-21")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingTargetAmount)
+            .performScrollTo()
+            .performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingTargetAmount)
+            .performTextReplacement("250000")
+        composeRule.waitForIdle()
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerCostingTargetSave)
+                    .assertIsEnabled()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingTargetSave)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 5_000) { week != null }
+        assertEquals("2026-09-21", week)
+        assertEquals(250000.0, amount!!, 1e-9)
+    }
+
+    @Test
+    fun yieldSectionShowsApproveForm() {
+        var opened = false
+        setScreen(
+            policies = emptyList(),
+            section = NativeOwnerCostingSection.Yield,
+            yieldSummary = "No yield baseline approved yet.",
+            onOpenYieldApprove = { opened = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingYieldSummary).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingYieldApprove).performClick()
+        assertTrue(opened)
+    }
+
+    @Test
+    fun yieldApproveFormRequiresThirtyBatches() {
+        var saved: YieldPolicyInput? = null
+        setScreen(
+            policies = emptyList(),
+            section = NativeOwnerCostingSection.Yield,
+            yieldApproveOpen = true,
+            yieldBatches = (1L..30L).map {
+                NativeOwnerYieldBatchRow(
+                    productionEventId = it,
+                    yieldRatioLabel = "0.85 kg/L",
+                    statusCode = "calibration_pending",
+                    statusLabel = "Calibration not ready",
+                )
+            },
+            onApproveYieldPolicy = { saved = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingYieldForm).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingYieldSelectAll)
+            .performScrollTo()
+            .assertIsEnabled()
+            .performClick()
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingYieldSave)
+            .performScrollTo()
+            .assertIsEnabled()
+            .performClick()
+        assertNotNull(saved)
+        assertEquals(30, saved!!.acceptedProductionEventIds.size)
+    }
+
     private fun setScreen(
         policies: List<NativeOwnerCostingPolicyRow>,
         policiesLoading: Boolean = false,
         policyDetail: NativeOwnerCostingPolicyDetail? = null,
         policiesError: String? = null,
         currentMonthSummary: String? = "Current 2026-09: Active · 1000 paisa/kg",
+        section: NativeOwnerCostingSection = NativeOwnerCostingSection.Policies,
+        budgets: List<NativeOwnerBudgetRow> = emptyList(),
+        targets: List<NativeOwnerCollectionsTargetRow> = emptyList(),
+        budgetCategories: List<String> = emptyList(),
+        defaultMilkWeekStart: String = "2026-09-22",
+        defaultOperatingMonthStart: String = "2026-10-01",
+        budgetEditorOpen: Boolean = false,
+        collectionsEditorOpen: Boolean = false,
+        yieldPolicies: List<NativeOwnerYieldPolicyRow> = emptyList(),
+        yieldBatches: List<NativeOwnerYieldBatchRow> = emptyList(),
+        yieldSummary: String? = null,
+        yieldApproveOpen: Boolean = false,
         approveOpen: Boolean = false,
         approveSeed: NativeOwnerCostingPolicyDetail? = null,
         approving: Boolean = false,
@@ -203,12 +369,18 @@ class NativeOwnerCostingPlansScreenContractTest {
         componentCodes: List<String> = emptyList(),
         onBackToMenu: () -> Unit = {},
         onRetry: () -> Unit = {},
+        onSectionChange: (NativeOwnerCostingSection) -> Unit = {},
         onOpenPolicy: (Long) -> Unit = {},
         onBackFromDetail: () -> Unit = {},
         onOpenApprove: () -> Unit = {},
         onOpenApproveFromDetail: () -> Unit = {},
         onBackFromApprove: () -> Unit = {},
         onApprovePolicy: (CostingPolicyInput) -> Unit = {},
+        onOpenBudgetEditor: () -> Unit = {},
+        onSaveBudget: (BudgetPlanInput) -> Unit = {},
+        onSaveCollectionsTarget: (java.time.LocalDate, Double) -> Unit = { _, _ -> },
+        onOpenYieldApprove: () -> Unit = {},
+        onApproveYieldPolicy: (YieldPolicyInput) -> Unit = {},
         onSubmitReauth: (CharArray) -> Unit = { it.fill('\u0000') },
         onCancelReauth: () -> Unit = {},
         onNavigate: (OwnerSection) -> Unit = {},
@@ -234,6 +406,18 @@ class NativeOwnerCostingPlansScreenContractTest {
                     policyDetail = policyDetail,
                     policiesError = policiesError,
                     currentMonthSummary = currentMonthSummary,
+                    section = section,
+                    budgets = budgets,
+                    targets = targets,
+                    budgetCategories = budgetCategories,
+                    defaultMilkWeekStart = defaultMilkWeekStart,
+                    defaultOperatingMonthStart = defaultOperatingMonthStart,
+                    budgetEditorOpen = budgetEditorOpen,
+                    collectionsEditorOpen = collectionsEditorOpen,
+                    yieldPolicies = yieldPolicies,
+                    yieldBatches = yieldBatches,
+                    yieldSummary = yieldSummary,
+                    yieldApproveOpen = yieldApproveOpen,
                     approveOpen = approveOpen,
                     approveSeed = approveSeed,
                     approving = approving,
@@ -243,12 +427,18 @@ class NativeOwnerCostingPlansScreenContractTest {
                     componentCodes = componentCodes,
                     onBackToMenu = onBackToMenu,
                     onRetry = onRetry,
+                    onSectionChange = onSectionChange,
                     onOpenPolicy = onOpenPolicy,
                     onBackFromDetail = onBackFromDetail,
                     onOpenApprove = onOpenApprove,
                     onOpenApproveFromDetail = onOpenApproveFromDetail,
                     onBackFromApprove = onBackFromApprove,
                     onApprovePolicy = onApprovePolicy,
+                    onOpenBudgetEditor = onOpenBudgetEditor,
+                    onSaveBudget = onSaveBudget,
+                    onSaveCollectionsTarget = onSaveCollectionsTarget,
+                    onOpenYieldApprove = onOpenYieldApprove,
+                    onApproveYieldPolicy = onApproveYieldPolicy,
                     onSubmitReauth = onSubmitReauth,
                     onCancelReauth = onCancelReauth,
                     hostedScaffold = { snackbar, mod, wrapNav, content ->

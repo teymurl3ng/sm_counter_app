@@ -1,13 +1,25 @@
 package com.saaf.milkshop.application.owner
 
+import com.saaf.milkshop.data.BudgetPlanEntity
+import com.saaf.milkshop.data.CollectionsTargetEntity
 import com.saaf.milkshop.data.CostingPolicyComponentEntity
 import com.saaf.milkshop.data.CostingPolicyVersionEntity
 import com.saaf.milkshop.data.MilkShopDatabase
+import com.saaf.milkshop.data.YieldPolicyVersionEntity
 import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.AppRole
+import com.saaf.milkshop.domain.BUDGET_CATEGORY_MILK_PURCHASES
+import com.saaf.milkshop.domain.BudgetManagementService
+import com.saaf.milkshop.domain.BudgetPlanInput
+import com.saaf.milkshop.domain.BudgetPlanResult
+import com.saaf.milkshop.domain.CollectionsTargetResult
 import com.saaf.milkshop.domain.CostingPolicyInput
 import com.saaf.milkshop.domain.CostingPolicyService
+import com.saaf.milkshop.domain.OPERATING_BUDGET_CATEGORIES
 import com.saaf.milkshop.domain.UserSecurityService
+import com.saaf.milkshop.domain.YieldPolicyInput
+import com.saaf.milkshop.domain.YieldPolicyService
+import com.saaf.milkshop.domain.YogurtProductionService
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -43,15 +55,71 @@ data class NativeOwnerCostingPlansSnapshot(
     val currentMonthSummary: String,
 )
 
+data class NativeOwnerBudgetRow(
+    val budgetId: Long,
+    val category: String,
+    val periodStart: String,
+    val periodEndExclusive: String,
+    val plannedLitersLabel: String?,
+    val plannedAmountLabel: String,
+    val salesTargetLabel: String?,
+    val archived: Boolean,
+)
+
+data class NativeOwnerCollectionsTargetRow(
+    val targetId: Long,
+    val weekStart: String,
+    val weekEndExclusive: String,
+    val targetAmountLabel: String,
+    val archived: Boolean,
+)
+
+data class NativeOwnerPlanningSnapshot(
+    val budgets: List<NativeOwnerBudgetRow>,
+    val collectionTargets: List<NativeOwnerCollectionsTargetRow>,
+    val budgetCategories: List<String>,
+    val defaultMilkWeekStart: String,
+    val defaultOperatingMonthStart: String,
+)
+
+data class NativeOwnerYieldPolicyRow(
+    val yieldPolicyId: Long,
+    val sampleStartDate: String,
+    val sampleEndDate: String,
+    val acceptedBatchCount: Int,
+    val medianYieldRatio: String,
+    val lowerAlertLimit: String,
+    val upperAlertLimit: String,
+    val effectiveFrom: String,
+    val approvedAt: String,
+    val statusLabel: String,
+)
+
+data class NativeOwnerYieldBatchRow(
+    val productionEventId: Long,
+    val yieldRatioLabel: String,
+    val statusCode: String,
+    val statusLabel: String,
+)
+
+data class NativeOwnerYieldContext(
+    val policies: List<NativeOwnerYieldPolicyRow>,
+    val batches: List<NativeOwnerYieldBatchRow>,
+    val activePolicyId: Long?,
+    val activeSummary: String,
+)
+
 /**
- * Owner Costing & plans boundary: read approved policy versions + components
- * and approve new/superseding versions via [CostingPolicyService]. Does not
- * invent rates or call bridge JSON.
+ * Owner Costing & plans boundary: read approved policy versions + components,
+ * approve costing/yield policies, and upsert budgets / collections targets via
+ * typed domain services. Does not invent rates or call bridge JSON.
  */
 class NativeOwnerCostingPlansFacade(
     private val database: MilkShopDatabase,
     private val security: UserSecurityService,
     private val policies: CostingPolicyService = CostingPolicyService(database, security),
+    private val budgets: BudgetManagementService = BudgetManagementService(database),
+    private val yields: YieldPolicyService = YieldPolicyService(database, security),
 ) {
     fun reviewReasons(): List<String> = CostingPolicyService.REVIEW_REASONS.sorted()
 
@@ -68,6 +136,16 @@ class NativeOwnerCostingPlansFacade(
                 }
             },
         )
+
+    fun budgetCategories(): List<String> =
+        listOf(BUDGET_CATEGORY_MILK_PURCHASES) + OPERATING_BUDGET_CATEGORIES
+
+    fun periodEndExclusive(category: String, periodStart: LocalDate): LocalDate =
+        if (category == BUDGET_CATEGORY_MILK_PURCHASES) {
+            periodStart.plusDays(7)
+        } else {
+            periodStart.plusMonths(1)
+        }
 
     suspend fun loadPolicies(
         sessionHandle: String,
@@ -154,8 +232,121 @@ class NativeOwnerCostingPlansFacade(
         )
     }
 
+    suspend fun loadPlanning(sessionHandle: String): NativeOwnerPlanningSnapshot {
+        requireOwnerBusinessSettings(sessionHandle)
+        val categories = budgetCategories()
+        val budgetRows = buildList {
+            categories.forEach { category ->
+                addAll(database.budgetPlanDao().findAllForCategory(category))
+            }
+        }
+            .sortedWith(
+                compareByDescending<BudgetPlanEntity> { it.periodStart }
+                    .thenByDescending { it.budgetId },
+            )
+            .map { it.toBudgetRow() }
+        val targets = database.collectionsTargetDao().findAll()
+            .sortedWith(
+                compareByDescending<CollectionsTargetEntity> { it.weekStart }
+                    .thenByDescending { it.targetId },
+            )
+            .map { it.toTargetRow() }
+        return NativeOwnerPlanningSnapshot(
+            budgets = budgetRows,
+            collectionTargets = targets,
+            budgetCategories = categories,
+            defaultMilkWeekStart = budgets.currentWeekStart().toString(),
+            defaultOperatingMonthStart = budgets.currentMonthStart().toString(),
+        )
+    }
+
+    suspend fun upsertBudget(
+        sessionHandle: String,
+        input: BudgetPlanInput,
+    ): BudgetPlanResult {
+        requireOwnerBusinessSettings(sessionHandle)
+        return budgets.createOrRevise(input)
+    }
+
+    suspend fun copyPreviousBudget(
+        sessionHandle: String,
+        category: String,
+        periodStart: LocalDate,
+        periodEndExclusive: LocalDate,
+    ): BudgetPlanResult {
+        requireOwnerBusinessSettings(sessionHandle)
+        if (database.budgetPlanDao().findLatestBefore(category, periodStart.toString()) == null) {
+            error("No previous budget exists for this category")
+        }
+        return budgets.copyPreviousPeriod(category, periodStart, periodEndExclusive)
+    }
+
+    suspend fun createOrReviseCollectionsTarget(
+        sessionHandle: String,
+        weekStart: LocalDate,
+        amount: Double,
+    ): CollectionsTargetResult {
+        requireOwnerBusinessSettings(sessionHandle)
+        return budgets.createOrReviseCollectionsTarget(weekStart, amount)
+    }
+
+    suspend fun loadYieldContext(sessionHandle: String): NativeOwnerYieldContext {
+        requireOwnerBusinessSettings(sessionHandle)
+        val versions = database.yieldPolicyDao().all()
+        val supersededIds = versions.mapNotNull { it.supersedesYieldPolicyId }.toSet()
+        val policyRows = versions
+            .sortedWith(
+                compareByDescending<YieldPolicyVersionEntity> { it.effectiveFrom }
+                    .thenByDescending { it.yieldPolicyId },
+            )
+            .map { version ->
+                version.toYieldRow(superseded = version.yieldPolicyId in supersededIds)
+            }
+        val active = policyRows.firstOrNull { it.statusLabel == "Active" }
+        val productionEvents = database.inventoryCostProjectionDao().effectiveEvents()
+            .filter { it.eventType == YogurtProductionService.EVENT_TYPE_PRODUCTION }
+            .sortedByDescending { it.eventId }
+        val batches = productionEvents.map { event ->
+            val assessment = yields.assess(event.eventId)
+            NativeOwnerYieldBatchRow(
+                productionEventId = event.eventId,
+                yieldRatioLabel = assessment.yieldRatio
+                    .setScale(4, RoundingMode.HALF_UP)
+                    .stripTrailingZeros()
+                    .toPlainString() + " kg/L",
+                statusCode = assessment.status,
+                statusLabel = yieldStatusLabel(assessment.status),
+            )
+        }
+        val activeSummary = when {
+            active != null ->
+                "Current baseline: ${active.lowerAlertLimit}–${active.upperAlertLimit} kg/L · " +
+                    "${active.acceptedBatchCount} batches · from ${active.effectiveFrom}"
+            else -> "No yield baseline approved yet. Select at least 30 batches spanning 28 days."
+        }
+        return NativeOwnerYieldContext(
+            policies = policyRows,
+            batches = batches,
+            activePolicyId = active?.yieldPolicyId,
+            activeSummary = activeSummary,
+        )
+    }
+
     /**
-     * Full passphrase re-authentication for costing policy approve.
+     * Approves a new or superseding yield policy via typed domain input.
+     * Requires recent authentication (caller handles reauth + retry).
+     */
+    suspend fun approveYieldPolicy(
+        sessionHandle: String,
+        input: YieldPolicyInput,
+    ): NativeOwnerYieldPolicyRow {
+        requireOwnerBusinessSettings(sessionHandle)
+        val version = yields.approve(sessionHandle, input)
+        return version.toYieldRow(superseded = false)
+    }
+
+    /**
+     * Full passphrase re-authentication for costing / yield policy approve.
      * Wipes [passphrase] before returning.
      */
     suspend fun reauthenticate(
@@ -197,6 +388,55 @@ class NativeOwnerCostingPlansFacade(
             basisQuantityKg = basisQuantityKg,
         )
 
+    private fun BudgetPlanEntity.toBudgetRow(): NativeOwnerBudgetRow {
+        val salesTarget = if (category == BUDGET_CATEGORY_MILK_PURCHASES) {
+            val liters = plannedLiters
+            val rate = retailRateSnapshot
+            if (liters != null && rate != null) formatPkr(liters * rate) else null
+        } else {
+            null
+        }
+        return NativeOwnerBudgetRow(
+            budgetId = budgetId,
+            category = category,
+            periodStart = periodStart,
+            periodEndExclusive = periodEndExclusive,
+            plannedLitersLabel = plannedLiters?.let { trimNumber(it) + " L" },
+            plannedAmountLabel = plannedAmount?.let { formatPkr(it) } ?: "—",
+            salesTargetLabel = salesTarget,
+            archived = archived,
+        )
+    }
+
+    private fun CollectionsTargetEntity.toTargetRow(): NativeOwnerCollectionsTargetRow =
+        NativeOwnerCollectionsTargetRow(
+            targetId = targetId,
+            weekStart = weekStart,
+            weekEndExclusive = weekEndExclusive,
+            targetAmountLabel = formatPkr(targetAmount),
+            archived = archived,
+        )
+
+    private fun YieldPolicyVersionEntity.toYieldRow(superseded: Boolean): NativeOwnerYieldPolicyRow =
+        NativeOwnerYieldPolicyRow(
+            yieldPolicyId = yieldPolicyId,
+            sampleStartDate = sampleStartDate,
+            sampleEndDate = sampleEndDate,
+            acceptedBatchCount = acceptedBatchCount,
+            medianYieldRatio = medianYieldRatio,
+            lowerAlertLimit = lowerAlertLimit,
+            upperAlertLimit = upperAlertLimit,
+            effectiveFrom = effectiveFrom,
+            approvedAt = approvedAt,
+            statusLabel = if (superseded) "Superseded" else "Active",
+        )
+
+    private fun yieldStatusLabel(status: String): String = when (status) {
+        "within_expected_range" -> "Within expected range"
+        "review_required" -> "Review this batch"
+        else -> "Calibration not ready"
+    }
+
     private fun formatPaisaPerKg(rate: BigDecimal): String {
         val scaled = rate.setScale(4, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
         return "$scaled paisa/kg"
@@ -206,4 +446,10 @@ class NativeOwnerCostingPlansFacade(
         val pkr = BigDecimal.valueOf(paisa).movePointLeft(2).setScale(2, RoundingMode.HALF_UP)
         return String.format(Locale.US, "PKR %,.2f", pkr)
     }
+
+    private fun formatPkr(amount: Double): String =
+        String.format(Locale.US, "PKR %,.2f", amount)
+
+    private fun trimNumber(value: Double): String =
+        BigDecimal.valueOf(value).stripTrailingZeros().toPlainString()
 }

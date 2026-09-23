@@ -32,8 +32,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
+import com.saaf.milkshop.application.owner.NativeCorrectionPrefill
+import com.saaf.milkshop.application.owner.NativeRecordsGroup
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.HostedScaffold
+import com.saaf.milkshop.nativeui.owner.NativeCorrectionEditorState
 import com.saaf.milkshop.nativeui.owner.NativeOwnerMoreState
 import com.saaf.milkshop.nativeui.owner.NativeOwnerRecordsState
 import com.saaf.milkshop.nativeui.owner.OwnerRecordsScreen
@@ -70,6 +73,11 @@ fun AdminRecordsScreen(
     onBackFromSecurityAuditDetail: () -> Unit,
     onLeaveConfirmed: () -> Unit,
     onDeferredGroup: (String) -> Unit,
+    onSelectGroup: (NativeRecordsGroup) -> Unit = {},
+    onOpenCorrection: (NativeCorrectionPrefill) -> Unit = {},
+    onBackFromCorrection: () -> Unit = {},
+    onUpdateCorrection: ((NativeCorrectionEditorState) -> NativeCorrectionEditorState) -> Unit = {},
+    onSaveCorrection: () -> Unit = {},
     onNavigate: (AdminSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -110,6 +118,11 @@ fun AdminRecordsScreen(
                 rootTag = NativeUiTags.AdminRecordsRoot,
                 loadingTag = NativeUiTags.AdminRecordsLoading,
                 onDeferredGroup = onDeferredGroup,
+                onSelectGroup = onSelectGroup,
+                onOpenCorrection = onOpenCorrection,
+                onBackFromCorrection = onBackFromCorrection,
+                onUpdateCorrection = onUpdateCorrection,
+                onSaveCorrection = onSaveCorrection,
                 modifier = modifier,
             )
         }

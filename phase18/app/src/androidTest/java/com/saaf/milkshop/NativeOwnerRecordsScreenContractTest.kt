@@ -11,17 +11,24 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.saaf.milkshop.application.owner.NativeCorrectionKind
+import com.saaf.milkshop.application.owner.NativeCorrectionPrefill
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsContext
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsDetail
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsRow
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsSnapshot
+import com.saaf.milkshop.application.owner.NativeRecordsGroup
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.owner.NativeCorrectionEditorState
 import com.saaf.milkshop.nativeui.owner.NativeOwnerRecordsState
 import com.saaf.milkshop.nativeui.owner.OwnerRecordsScreen
 import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,7 +58,7 @@ class NativeOwnerRecordsScreenContractTest {
             onOpenRecord = { eventId ->
                 openedId = eventId
                 state = (state as NativeOwnerRecordsState.Ready).copy(
-                    detail = detail(row(eventId)),
+                    detail = detail(row(eventId), canCorrect = true),
                 )
             },
             onBackFromDetail = {
@@ -64,9 +71,88 @@ class NativeOwnerRecordsScreenContractTest {
         assertEquals(41L, openedId)
         composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetail).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetailEventId).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetailReadOnly).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetailCorrect).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetailBack).performClick()
         composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsList).assertIsDisplayed()
+    }
+
+    @Test
+    fun correctableDetailOpensEditorAndBackClearsIt() {
+        val record = row(55L)
+        val prefill = monetaryPrefill(record)
+        var state by mutableStateOf<NativeOwnerRecordsState>(
+            NativeOwnerRecordsState.Ready(
+                snapshot = snapshotWith(record),
+                detail = detail(record, canCorrect = true, prefill = prefill),
+            ),
+        )
+        setScreen(
+            stateProvider = { state },
+            onOpenCorrection = { prefill ->
+                state = (state as NativeOwnerRecordsState.Ready).copy(
+                    correction = NativeCorrectionEditorState(prefill = prefill),
+                )
+            },
+            onBackFromCorrection = {
+                state = (state as NativeOwnerRecordsState.Ready).copy(correction = null)
+            },
+        )
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetailCorrect).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionMonetaryAmount).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionSave).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionBack).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetail).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionRoot).assertDoesNotExist()
+    }
+
+    @Test
+    fun dirtyCorrectionLeaveGuardRequiresConfirm() {
+        val record = row(77L)
+        val prefill = monetaryPrefill(record)
+        var state by mutableStateOf<NativeOwnerRecordsState>(
+            NativeOwnerRecordsState.Ready(
+                snapshot = snapshotWith(record),
+                detail = detail(record, canCorrect = true, prefill = prefill),
+                correction = NativeCorrectionEditorState(prefill = prefill),
+            ),
+        )
+        var cleared = false
+        setScreen(
+            stateProvider = { state },
+            onUpdateCorrection = { transform ->
+                val ready = state as NativeOwnerRecordsState.Ready
+                state = ready.copy(correction = transform(ready.correction!!))
+            },
+            onBackFromCorrection = {
+                cleared = true
+                state = (state as NativeOwnerRecordsState.Ready).copy(correction = null)
+            },
+        )
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionMonetaryAmount)
+            .performTextReplacement("199.50")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionBack).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionDiscardDialog).assertIsDisplayed()
+        assertTrue(!cleared)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionDiscardConfirm).performClick()
+        assertTrue(cleared)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetail).assertIsDisplayed()
+    }
+
+    @Test
+    fun correctionsGroupSelectsWithoutDeferredNotice() {
+        var selected: NativeRecordsGroup? = null
+        var deferred: String? = null
+        setScreen(
+            NativeOwnerRecordsState.Ready(snapshot = emptySnapshot()),
+            onSelectGroup = { selected = it },
+            onDeferredGroup = { deferred = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsGroupCorrections).performClick()
+        assertEquals(NativeRecordsGroup.Corrections, selected)
+        assertNull(deferred)
     }
 
     @Test
@@ -123,6 +209,11 @@ class NativeOwnerRecordsScreenContractTest {
         onOpenRecord: (Long) -> Unit = {},
         onBackFromDetail: () -> Unit = {},
         onDeferredGroup: (String) -> Unit = {},
+        onSelectGroup: (NativeRecordsGroup) -> Unit = {},
+        onOpenCorrection: (NativeCorrectionPrefill) -> Unit = {},
+        onBackFromCorrection: () -> Unit = {},
+        onUpdateCorrection: ((NativeCorrectionEditorState) -> NativeCorrectionEditorState) -> Unit = {},
+        onSaveCorrection: () -> Unit = {},
         onNavigate: (OwnerSection) -> Unit = {},
     ) {
         setScreen(
@@ -132,6 +223,11 @@ class NativeOwnerRecordsScreenContractTest {
             onOpenRecord = onOpenRecord,
             onBackFromDetail = onBackFromDetail,
             onDeferredGroup = onDeferredGroup,
+            onSelectGroup = onSelectGroup,
+            onOpenCorrection = onOpenCorrection,
+            onBackFromCorrection = onBackFromCorrection,
+            onUpdateCorrection = onUpdateCorrection,
+            onSaveCorrection = onSaveCorrection,
             onNavigate = onNavigate,
         )
     }
@@ -143,6 +239,11 @@ class NativeOwnerRecordsScreenContractTest {
         onOpenRecord: (Long) -> Unit = {},
         onBackFromDetail: () -> Unit = {},
         onDeferredGroup: (String) -> Unit = {},
+        onSelectGroup: (NativeRecordsGroup) -> Unit = {},
+        onOpenCorrection: (NativeCorrectionPrefill) -> Unit = {},
+        onBackFromCorrection: () -> Unit = {},
+        onUpdateCorrection: ((NativeCorrectionEditorState) -> NativeCorrectionEditorState) -> Unit = {},
+        onSaveCorrection: () -> Unit = {},
         onNavigate: (OwnerSection) -> Unit = {},
     ) {
         composeRule.setContent {
@@ -155,14 +256,21 @@ class NativeOwnerRecordsScreenContractTest {
                     onOpenRecord = onOpenRecord,
                     onBackFromDetail = onBackFromDetail,
                     onLeaveConfirmed = {},
-                    hostedScaffold = { snackbar, mod, _, content ->
-                        androidx.compose.material3.Scaffold(
+                    hostedScaffold = { snackbar, mod, wrapNav, content ->
+                        com.saaf.milkshop.nativeui.owner.OwnerScaffold(
+                            snackbarHostState = snackbar,
+                            section = OwnerSection.Records,
+                            onNavigate = { section -> wrapNav { onNavigate(section) } },
                             modifier = mod,
-                            snackbarHost = { androidx.compose.material3.SnackbarHost(snackbar) },
                             content = content,
                         )
                     },
                     onDeferredGroup = onDeferredGroup,
+                    onSelectGroup = onSelectGroup,
+                    onOpenCorrection = onOpenCorrection,
+                    onBackFromCorrection = onBackFromCorrection,
+                    onUpdateCorrection = onUpdateCorrection,
+                    onSaveCorrection = onSaveCorrection,
                 )
             }
         }
@@ -203,11 +311,27 @@ class NativeOwnerRecordsScreenContractTest {
         correctsEventId = null,
     )
 
-    private fun detail(row: NativeOwnerRecordsRow) = NativeOwnerRecordsDetail(
+    private fun monetaryPrefill(row: NativeOwnerRecordsRow) = NativeCorrectionPrefill(
+        kind = NativeCorrectionKind.Monetary,
+        originalEventId = row.eventId,
+        occurredAt = row.occurredAt,
+        taskLabel = row.taskLabel,
+        identityLabel = row.identityLabel,
+        notes = row.notes.orEmpty(),
+        monetaryAmount = "250",
+    )
+
+    private fun detail(
+        row: NativeOwnerRecordsRow,
+        canCorrect: Boolean = false,
+        prefill: NativeCorrectionPrefill? = null,
+    ) = NativeOwnerRecordsDetail(
         row = row,
         inventoryMovements = emptyList(),
         financialMovements = emptyList(),
         originalValueLines = emptyList(),
         notes = row.notes,
+        canCorrect = canCorrect,
+        correctionPrefill = prefill,
     )
 }

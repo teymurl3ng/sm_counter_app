@@ -84,11 +84,12 @@ This checkpoint owns **Owner Costing & plans** conservatively: costing policy ve
 ### Explicit preview / deferred
 
 - Approve / supersede costing policy write UI — **connected in Phase 14.8.43**
-- Opening cost basis, yield policy, production-loss assessment UIs
-- Budgets and collections targets planning UIs
+- Budgets and collections targets planning UIs — **connected in Phase 14.8.49** (`ownermore` **213/213 PASS**; `adminshell` **38/38 PASS**)
+- Yield policy approve — **connected in Phase 14.8.49**
+- Opening cost basis, production-loss assessment UIs
 - Free-form in-place edit of an already-approved version (domain is versioned approve — deferred)
 - Shop settings / opening state / expense categories
-- Manager / Admin Costing shells
+- Manager / Admin Costing shells — Admin hosts Costing under Admin More (14.8.46+); Manager stays deferred
 
 ## Control contract
 

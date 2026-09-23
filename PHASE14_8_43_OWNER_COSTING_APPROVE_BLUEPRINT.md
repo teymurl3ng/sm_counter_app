@@ -53,12 +53,12 @@ While the approve draft is dirty, `EntryLeaveGuard` on hardware Back and bottom-
 
 ## Explicit preview / deferred
 
-- Budget upsert / collections targets
-- Yield policy approve
+- Budget upsert / collections targets — **connected in Phase 14.8.49** (ownermore **213/213**; adminshell **38/38**)
+- Yield policy approve — **connected in Phase 14.8.49** (same Costing destination + recent-auth mirror)
 - Opening cost basis editors
 - Free-form “edit” of an already-approved version without approve/supersede (domain is versioned approve — do not invent mutate-in-place)
-- Manager / Admin Costing shells
+- Manager Costing shells
 
 ## Accept gate
 
-**AUTO-ACCEPTED.** Connected = Owner Costing & plans approve new/superseding policy write depth under CORE METHOD; budgets, yield, opening basis, and in-place edit remain deferred.
+**AUTO-ACCEPTED.** Connected = Owner Costing & plans approve new/superseding policy write depth under CORE METHOD; budgets / yield / opening basis connected or deferred per later slices.

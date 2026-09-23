@@ -288,8 +288,9 @@ fun ManagerPreviewHost(
                 NativeManagerWorkDestination.PaySupplier,
             )
         val closeOwnsBack = managerSection == ManagerSection.Close
+        val recordsReady = ownerRecordsState as? NativeOwnerRecordsState.Ready
         val recordsDetailOwnsBack = managerSection == ManagerSection.Records &&
-            (ownerRecordsState as? NativeOwnerRecordsState.Ready)?.detail != null
+            (recordsReady?.detail != null || recordsReady?.correction != null)
         val moreDestinationOwnsBack = managerSection == ManagerSection.More &&
             (ownerMoreState as? NativeOwnerMoreState.Ready)?.destination in setOf(
                 NativeOwnerMoreDestination.PersonalSecurity,
@@ -500,9 +501,14 @@ fun ManagerPreviewHost(
                     loadingTag = NativeUiTags.ManagerRecordsLoading,
                     onDeferredGroup = { group ->
                         onShowNotice(
-                            "$group write UI comes next. Corrections stay deferred for Manager.",
+                            "$group comes next in the Manager Records family.",
                         )
                     },
+                    onSelectGroup = ownerRecordsViewModel::setActiveGroup,
+                    onOpenCorrection = ownerRecordsViewModel::openCorrection,
+                    onBackFromCorrection = ownerRecordsViewModel::clearCorrection,
+                    onUpdateCorrection = ownerRecordsViewModel::updateCorrection,
+                    onSaveCorrection = ownerRecordsViewModel::saveCorrection,
                 )
             }
             else -> {

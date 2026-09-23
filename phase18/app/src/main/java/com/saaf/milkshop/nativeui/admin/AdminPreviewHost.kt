@@ -24,6 +24,7 @@ import com.saaf.milkshop.nativeui.expense.NativeExpenseViewModel
 import com.saaf.milkshop.nativeui.owner.NativeOwnerMoreDestination
 import com.saaf.milkshop.nativeui.owner.NativeOwnerMoreState
 import com.saaf.milkshop.nativeui.owner.NativeOwnerMoreViewModel
+import com.saaf.milkshop.nativeui.owner.costingPlansActions
 import com.saaf.milkshop.nativeui.owner.NativeOwnerRecordsState
 import com.saaf.milkshop.nativeui.owner.NativeOwnerRecordsViewModel
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -175,12 +176,14 @@ fun AdminPreviewHost(
                 NativeOwnerMoreDestination.Suppliers,
                 NativeOwnerMoreDestination.Employees,
             )
+        val recordsReady = ownerRecordsState as? NativeOwnerRecordsState.Ready
         val recordsDetailOwnsBack = adminSection == AdminSection.Records &&
             recordsDestination == AdminRecordsDestination.Business &&
-            (ownerRecordsState as? NativeOwnerRecordsState.Ready)?.detail != null
+            (recordsReady?.detail != null || recordsReady?.correction != null)
         val recordsBusinessListOwnsBack = adminSection == AdminSection.Records &&
             recordsDestination == AdminRecordsDestination.Business &&
-            (ownerRecordsState as? NativeOwnerRecordsState.Ready)?.detail == null
+            recordsReady?.detail == null &&
+            recordsReady?.correction == null
         val recordsSecurityOwnsBack = adminSection == AdminSection.Records &&
             recordsDestination == AdminRecordsDestination.SecurityHistory
         val moreDestinationOwnsBack = adminSection == AdminSection.More &&
@@ -333,9 +336,14 @@ fun AdminPreviewHost(
                     onLeaveConfirmed = { onAdminSectionChange(AdminSection.Work) },
                     onDeferredGroup = { group ->
                         onShowNotice(
-                            "$group write UI comes next. Corrections stay deferred for Admin.",
+                            "$group comes next in the Admin Records family.",
                         )
                     },
+                    onSelectGroup = ownerRecordsViewModel::setActiveGroup,
+                    onOpenCorrection = ownerRecordsViewModel::openCorrection,
+                    onBackFromCorrection = ownerRecordsViewModel::clearCorrection,
+                    onUpdateCorrection = ownerRecordsViewModel::updateCorrection,
+                    onSaveCorrection = ownerRecordsViewModel::saveCorrection,
                     onNavigate = navigate,
                 )
             }
@@ -363,15 +371,7 @@ fun AdminPreviewHost(
                     onArchiveProduct = ownerMoreViewModel::archiveProduct,
                     onUnarchiveProduct = ownerMoreViewModel::unarchiveProduct,
                     onProductsShowArchivedChange = ownerMoreViewModel::setProductsShowArchived,
-                    onRetryCostingPlans = ownerMoreViewModel::refreshCostingPlans,
-                    onOpenCostingPolicy = ownerMoreViewModel::openCostingPolicyDetail,
-                    onBackFromCostingPolicyDetail = ownerMoreViewModel::clearCostingPolicyDetail,
-                    onOpenCostingApprove = ownerMoreViewModel::openCostingApprove,
-                    onOpenCostingApproveFromDetail = ownerMoreViewModel::openCostingApproveFromDetail,
-                    onBackFromCostingApprove = ownerMoreViewModel::clearCostingApprove,
-                    onApproveCostingPolicy = ownerMoreViewModel::approveCostingPolicy,
-                    onSubmitCostingReauth = ownerMoreViewModel::submitCostingReauth,
-                    onCancelCostingReauth = ownerMoreViewModel::cancelCostingReauth,
+                    costingActions = ownerMoreViewModel.costingPlansActions(),
                     onRetryShopSettings = ownerMoreViewModel::refreshShopSettings,
                     onOpenShopIdentityEdit = ownerMoreViewModel::openShopIdentityEdit,
                     onBackFromShopIdentityEdit = ownerMoreViewModel::clearShopIdentityEdit,

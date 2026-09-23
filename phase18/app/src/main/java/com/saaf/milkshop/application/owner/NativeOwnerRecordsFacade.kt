@@ -1,5 +1,6 @@
 package com.saaf.milkshop.application.owner
 
+import com.saaf.milkshop.application.bridge.HistoryBridgeCommandService
 import com.saaf.milkshop.application.readmodels.EventHistoryDto
 import com.saaf.milkshop.application.readmodels.FinancialMovementDto
 import com.saaf.milkshop.application.readmodels.HybridReadModelService
@@ -9,8 +10,11 @@ import com.saaf.milkshop.data.EventEntity
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.AppRole
+import com.saaf.milkshop.domain.CorrectionInput
+import com.saaf.milkshop.domain.CorrectionResult
 import com.saaf.milkshop.domain.CreditCollectionService
 import com.saaf.milkshop.domain.ExpenseService
+import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.domain.SalaryPaymentService
 import com.saaf.milkshop.domain.SaleService
 import com.saaf.milkshop.domain.SpoilageService
@@ -63,29 +67,69 @@ data class NativeOwnerRecordsFinancialLine(
     val amountLabel: String,
 )
 
+enum class NativeRecordsGroup {
+    Recent,
+    Corrections,
+}
+
+enum class NativeCorrectionKind {
+    Purchase,
+    Production,
+    Sale,
+    Monetary,
+    Spoilage,
+}
+
+data class NativeCorrectionPrefill(
+    val kind: NativeCorrectionKind,
+    val originalEventId: Long,
+    val occurredAt: String,
+    val taskLabel: String,
+    val identityLabel: String,
+    val notes: String,
+    val purchaseRawLiters: String = "",
+    val purchaseFat: String = "",
+    val purchaseLr: String = "",
+    val productionMilk: String = "",
+    val productionYogurt: String = "",
+    val saleRate: String = "",
+    val saleSurcharge: String = "",
+    val saleQuantity: String = "",
+    val saleValue: String = "",
+    val saleChannel: String = "retail",
+    val monetaryAmount: String = "",
+    val spoilageQuantity: String = "",
+    val spoilageReason: String = "",
+)
+
 data class NativeOwnerRecordsDetail(
     val row: NativeOwnerRecordsRow,
     val inventoryMovements: List<NativeOwnerRecordsInventoryLine>,
     val financialMovements: List<NativeOwnerRecordsFinancialLine>?,
     val originalValueLines: List<Pair<String, String>>,
     val notes: String?,
+    val canCorrect: Boolean,
+    val correctionPrefill: NativeCorrectionPrefill?,
 )
 
 /**
- * Owner Records boundary: shop-wide event history + read-only detail.
+ * Owner / Manager / Admin Records boundary: shop-wide event history, detail,
+ * and typed corrections write (same rules as HistoryBridgeCommandService.correct).
  * Does not use [com.saaf.milkshop.application.activity.NativeActivityFacade]
- * and does not invent accounting formulas or correction write UI.
+ * and never calls bridge JSON.
  */
 class NativeOwnerRecordsFacade(
     private val database: MilkShopDatabase,
     private val security: UserSecurityService,
     private val reads: HybridReadModelService = HybridReadModelService(database, security),
 ) {
+    private val commands = HistoryBridgeCommandService(database, security)
+
     suspend fun loadHistory(
         sessionHandle: String,
         date: LocalDate = LocalDate.now(),
     ): NativeOwnerRecordsSnapshot {
-        requireOwner(sessionHandle)
+        requireRecordsHost(sessionHandle)
         security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
         val businessDate = date.toString()
         val history = reads.eventHistory(sessionHandle)
@@ -108,27 +152,54 @@ class NativeOwnerRecordsFacade(
         sessionHandle: String,
         eventId: Long,
     ): NativeOwnerRecordsDetail {
-        requireOwner(sessionHandle)
-        security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
+        requireRecordsHost(sessionHandle)
+        val actor = security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
         val detail = reads.eventDetail(sessionHandle, eventId)
         val entity = database.eventDao().findById(eventId)
         val row = toRow(detail.event, entity)
+        val canCorrectPermission = RolePermissions.allows(
+            AppRole.parse(actor.role),
+            AppPermission.CORRECTION,
+        )
+        val alreadyReplaced = database.eventDao().findAllDescending()
+            .any { it.correctsEventId == eventId }
+        val prefill = entity?.let { buildCorrectionPrefill(it, row) }
+        val canCorrect = canCorrectPermission && !alreadyReplaced && prefill != null && !row.isSuperseded
         return NativeOwnerRecordsDetail(
             row = row,
             inventoryMovements = detail.inventoryMovements.map { it.toLine() },
             financialMovements = detail.financialMovements?.map { it.toLine() },
             originalValueLines = detail.originalValues?.toLines().orEmpty(),
             notes = detail.event.notes?.trim()?.takeIf { it.isNotEmpty() },
+            canCorrect = canCorrect,
+            correctionPrefill = prefill.takeIf { canCorrect },
         )
+    }
+
+    /**
+     * Same auth / day-closed / already-replaced rules as
+     * [HistoryBridgeCommandService.correct]. Typed Kotlin only — no bridge JSON.
+     */
+    suspend fun correct(
+        sessionHandle: String,
+        input: CorrectionInput,
+    ): CorrectionResult {
+        requireRecordsHost(sessionHandle)
+        return commands.correct(sessionHandle, input)
     }
 
     fun filterRecords(
         records: List<NativeOwnerRecordsRow>,
         query: String,
+        group: NativeRecordsGroup = NativeRecordsGroup.Recent,
     ): List<NativeOwnerRecordsRow> {
+        val grouped = when (group) {
+            NativeRecordsGroup.Recent -> records
+            NativeRecordsGroup.Corrections -> records.filter { it.isCorrection || it.isSuperseded }
+        }
         val needle = query.trim().lowercase(Locale.US)
-        if (needle.isEmpty()) return records
-        return records.filter { row ->
+        if (needle.isEmpty()) return grouped
+        return grouped.filter { row ->
             listOfNotNull(
                 row.eventId.toString(),
                 row.identityLabel,
@@ -144,12 +215,216 @@ class NativeOwnerRecordsFacade(
         }
     }
 
-    private suspend fun requireOwner(sessionHandle: String) {
+    fun buildCorrectionInput(
+        prefill: NativeCorrectionPrefill,
+        notes: String?,
+        purchaseRawLiters: String,
+        purchaseFat: String,
+        purchaseLr: String,
+        productionMilk: String,
+        productionYogurt: String,
+        saleRate: String,
+        saleSurcharge: String,
+        saleQuantityMode: Boolean,
+        saleQuantity: String,
+        saleValue: String,
+        saleChannel: String?,
+        monetaryAmount: String,
+        spoilageQuantity: String,
+        spoilageReason: String,
+    ): CorrectionInput {
+        val cleanedNotes = notes?.trim()?.takeIf { it.isNotEmpty() }
+        return when (prefill.kind) {
+            NativeCorrectionKind.Purchase -> {
+                val raw = purchaseRawLiters.toDoubleOrNull()
+                    ?: error("Enter corrected raw liters.")
+                val fat = purchaseFat.toDoubleOrNull()
+                    ?: error("Enter corrected fat percent.")
+                val lr = purchaseLr.toDoubleOrNull()
+                    ?: error("Enter corrected LR reading.")
+                require(raw > 0.0) { "Raw liters must be greater than zero." }
+                require(fat >= 0.0) { "Fat percent cannot be negative." }
+                require(lr > 0.0) { "LR reading must be greater than zero." }
+                CorrectionInput.Purchase(
+                    originalEventId = prefill.originalEventId,
+                    occurredAt = prefill.occurredAt,
+                    rawLiters = raw,
+                    fatPercentage = fat,
+                    lrReading = lr,
+                    notes = cleanedNotes,
+                )
+            }
+            NativeCorrectionKind.Production -> {
+                val milk = productionMilk.toDoubleOrNull()
+                    ?: error("Enter corrected milk liters used.")
+                val yogurt = productionYogurt.toDoubleOrNull()
+                    ?: error("Enter corrected yogurt produced.")
+                require(milk > 0.0) { "Milk liters must be greater than zero." }
+                require(yogurt > 0.0) { "Yogurt produced must be greater than zero." }
+                CorrectionInput.Production(
+                    originalEventId = prefill.originalEventId,
+                    occurredAt = prefill.occurredAt,
+                    milkLitersUsed = milk,
+                    yogurtKgProduced = yogurt,
+                    notes = cleanedNotes,
+                )
+            }
+            NativeCorrectionKind.Sale -> {
+                val rate = saleRate.toDoubleOrNull()
+                    ?: error("Enter corrected unit rate.")
+                val surcharge = saleSurcharge.toDoubleOrNull()
+                    ?: error("Enter corrected surcharge.")
+                require(rate > 0.0) { "Unit rate must be greater than zero." }
+                require(surcharge >= 0.0) { "Surcharge cannot be negative." }
+                val channel = saleChannel?.trim()?.takeIf { it.isNotEmpty() }
+                if (saleQuantityMode) {
+                    val quantity = saleQuantity.toDoubleOrNull()
+                        ?: error("Enter corrected quantity.")
+                    require(quantity > 0.0) { "Quantity must be greater than zero." }
+                    CorrectionInput.Sale(
+                        originalEventId = prefill.originalEventId,
+                        occurredAt = prefill.occurredAt,
+                        unitRate = rate,
+                        quantity = quantity,
+                        value = null,
+                        surchargeAmount = surcharge,
+                        channel = channel,
+                        notes = cleanedNotes,
+                    )
+                } else {
+                    val value = saleValue.toDoubleOrNull()
+                        ?: error("Enter corrected sale value.")
+                    require(value > 0.0) { "Sale value must be greater than zero." }
+                    CorrectionInput.Sale(
+                        originalEventId = prefill.originalEventId,
+                        occurredAt = prefill.occurredAt,
+                        unitRate = rate,
+                        quantity = null,
+                        value = value,
+                        surchargeAmount = surcharge,
+                        channel = channel,
+                        notes = cleanedNotes,
+                    )
+                }
+            }
+            NativeCorrectionKind.Monetary -> {
+                val amount = monetaryAmount.toDoubleOrNull()
+                    ?: error("Enter corrected amount.")
+                require(amount > 0.0) { "Amount must be greater than zero." }
+                CorrectionInput.Monetary(
+                    originalEventId = prefill.originalEventId,
+                    occurredAt = prefill.occurredAt,
+                    amount = amount,
+                    notes = cleanedNotes,
+                )
+            }
+            NativeCorrectionKind.Spoilage -> {
+                val quantity = spoilageQuantity.toDoubleOrNull()
+                    ?: error("Enter corrected spoilage quantity.")
+                val reason = spoilageReason.trim()
+                require(quantity > 0.0) { "Spoilage quantity must be greater than zero." }
+                require(reason.isNotEmpty()) { "Enter a corrected spoilage reason." }
+                CorrectionInput.Spoilage(
+                    originalEventId = prefill.originalEventId,
+                    occurredAt = prefill.occurredAt,
+                    quantity = quantity,
+                    reason = reason,
+                    notes = cleanedNotes,
+                )
+            }
+        }
+    }
+
+    private suspend fun requireRecordsHost(sessionHandle: String) {
         val actor = security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
         val role = AppRole.parse(actor.role)
         require(role == AppRole.OWNER || role == AppRole.MANAGER || role == AppRole.ADMIN) {
             "Records is only available to Owner or Manager."
         }
+    }
+
+    private suspend fun buildCorrectionPrefill(
+        entity: EventEntity,
+        row: NativeOwnerRecordsRow,
+    ): NativeCorrectionPrefill? {
+        val kind = correctionKind(entity.eventType) ?: return null
+        val notes = entity.notes.orEmpty()
+        return when (kind) {
+            NativeCorrectionKind.Purchase -> NativeCorrectionPrefill(
+                kind = kind,
+                originalEventId = entity.eventId,
+                occurredAt = entity.occurredAt,
+                taskLabel = row.taskLabel,
+                identityLabel = row.identityLabel,
+                notes = notes,
+                purchaseRawLiters = formatField(entity.rawLiters),
+                purchaseFat = formatField(entity.fatPercentage),
+                purchaseLr = formatField(entity.lrReading),
+            )
+            NativeCorrectionKind.Production -> NativeCorrectionPrefill(
+                kind = kind,
+                originalEventId = entity.eventId,
+                occurredAt = entity.occurredAt,
+                taskLabel = row.taskLabel,
+                identityLabel = row.identityLabel,
+                notes = notes,
+                productionMilk = formatField(entity.milkLitersUsed),
+                productionYogurt = formatField(entity.yogurtKgProduced),
+            )
+            NativeCorrectionKind.Sale -> NativeCorrectionPrefill(
+                kind = kind,
+                originalEventId = entity.eventId,
+                occurredAt = entity.occurredAt,
+                taskLabel = row.taskLabel,
+                identityLabel = row.identityLabel,
+                notes = notes,
+                saleRate = formatField(entity.unitRate),
+                saleSurcharge = formatField(entity.surchargeApplied),
+                saleQuantity = formatField(entity.saleQuantity),
+                saleValue = formatField(entity.saleValue),
+                saleChannel = entity.channel?.takeIf { it.isNotBlank() } ?: "retail",
+            )
+            NativeCorrectionKind.Monetary -> NativeCorrectionPrefill(
+                kind = kind,
+                originalEventId = entity.eventId,
+                occurredAt = entity.occurredAt,
+                taskLabel = row.taskLabel,
+                identityLabel = row.identityLabel,
+                notes = notes,
+                monetaryAmount = formatField(entity.amount),
+            )
+            NativeCorrectionKind.Spoilage -> {
+                val spoilage = database.spoilageDao().findByEventId(entity.eventId)
+                NativeCorrectionPrefill(
+                    kind = kind,
+                    originalEventId = entity.eventId,
+                    occurredAt = entity.occurredAt,
+                    taskLabel = row.taskLabel,
+                    identityLabel = row.identityLabel,
+                    notes = notes,
+                    spoilageQuantity = formatField(spoilage?.quantity),
+                    spoilageReason = spoilage?.reason.orEmpty(),
+                )
+            }
+        }
+    }
+
+    private fun correctionKind(eventType: String): NativeCorrectionKind? = when (eventType) {
+        VendorPurchaseService.EVENT_TYPE_PURCHASE_RECEIPT -> NativeCorrectionKind.Purchase
+        YogurtProductionService.EVENT_TYPE_PRODUCTION -> NativeCorrectionKind.Production
+        SaleService.EVENT_TYPE_SALE -> NativeCorrectionKind.Sale
+        CreditCollectionService.EVENT_TYPE_CREDIT_COLLECTION,
+        ExpenseService.EVENT_TYPE_EXPENSE,
+        SalaryPaymentService.EVENT_TYPE_SALARY_PAYMENT,
+        VendorPaymentService.EVENT_TYPE_VENDOR_PAYMENT,
+        -> NativeCorrectionKind.Monetary
+        SpoilageService.EVENT_TYPE_SPOILAGE -> NativeCorrectionKind.Spoilage
+        else -> null
+    }
+
+    private fun formatField(value: Double?): String {
+        value ?: return ""
+        return BigDecimal.valueOf(value).stripTrailingZeros().toPlainString()
     }
 
     private fun toRow(dto: EventHistoryDto, entity: EventEntity?): NativeOwnerRecordsRow {

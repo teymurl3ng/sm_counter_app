@@ -31,6 +31,8 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.domain.SettingKeys
 import com.saaf.milkshop.domain.AnalyticsService
 import com.saaf.milkshop.domain.CustomerManagementService
+import com.saaf.milkshop.domain.ExpenseInput
+import com.saaf.milkshop.domain.ExpenseService
 import com.saaf.milkshop.domain.VendorManagementService
 import com.saaf.milkshop.domain.VendorPurchaseInput
 import com.saaf.milkshop.domain.VendorPurchaseService
@@ -595,6 +597,126 @@ class NativeFoundationUiTest {
         openManagerRecords()
         pressHardwareBack()
         assertReturnedToManagerWorkHome()
+    }
+
+    @Test
+    fun managerRecordsCorrectionOpensUnderManagerChrome() = runBlocking {
+        val app = app()
+        val cash = app.database.accountDao().findByCategory("Cash/Bank").single { it.name == "Cash" }
+        val expense = ExpenseService(app.database).record(
+            ExpenseInput(
+                category = "Fuel",
+                paymentAccountId = cash.accountId,
+                amount = 55.0,
+                occurredAt = LocalDate.now().toString(),
+                notes = "Manager correction foundation seed",
+            ),
+        )
+
+        openManagerRecords()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ownerRecordsRecord(expense.eventId))
+                    .fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ownerRecordsRecord(expense.eventId))
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetailCorrect).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetailCorrect)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitForIdle()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionMonetaryAmount).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavRecords).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerShellRoot).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavRecords).assertDoesNotExist()
+
+        pressHardwareBack()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetail).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetail).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionRoot).assertDoesNotExist()
+        assertManagerShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+        Unit
+    }
+
+    @Test
+    fun managerRecordsCorrectionHardwareBackReturnsToDetailThenList() = runBlocking {
+        val app = app()
+        val cash = app.database.accountDao().findByCategory("Cash/Bank").single { it.name == "Cash" }
+        val expense = ExpenseService(app.database).record(
+            ExpenseInput(
+                category = "Fuel",
+                paymentAccountId = cash.accountId,
+                amount = 40.0,
+                occurredAt = LocalDate.now().toString(),
+                notes = "Manager correction back seed",
+            ),
+        )
+
+        openManagerRecords()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ownerRecordsRecord(expense.eventId))
+                    .fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ownerRecordsRecord(expense.eventId))
+            .performScrollTo()
+            .performClick()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetailCorrect).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetailCorrect)
+            .performScrollTo()
+            .performClick()
+        composeRule.waitForIdle()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        pressHardwareBack()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetail).fetchSemanticsNode()
+            }.isSuccess
+        }
+        pressHardwareBack()
+        composeRule.waitUntil(timeoutMillis = 15_000) {
+            runCatching {
+                composeRule.onNodeWithTag(NativeUiTags.ManagerRecordsRoot).fetchSemanticsNode()
+            }.isSuccess
+        }
+        composeRule.onNodeWithTag(NativeUiTags.ManagerRecordsRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.ManagerNavRecords).assertIsSelected()
+        assertManagerShellWithoutForeignNav()
+        composeRule.activityRule.scenario.onActivity { activity ->
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
+        }
+        Unit
     }
 
     @Test

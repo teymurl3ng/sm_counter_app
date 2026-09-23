@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,6 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
@@ -30,6 +32,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -38,13 +41,20 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.saaf.milkshop.application.owner.NativeCorrectionKind
+import com.saaf.milkshop.application.owner.NativeCorrectionPrefill
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsContext
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsDetail
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsRow
+import com.saaf.milkshop.application.owner.NativeRecordsGroup
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.HostedScaffold
+import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import java.util.Locale
+
+private val SALE_CHANNELS = listOf("retail", "wholesale", "credit-retail", "credit-wholesale")
 
 @Composable
 fun OwnerRecordsScreen(
@@ -60,6 +70,11 @@ fun OwnerRecordsScreen(
     rootTag: String = NativeUiTags.OwnerRecordsRoot,
     loadingTag: String = NativeUiTags.OwnerRecordsLoading,
     onDeferredGroup: (String) -> Unit = {},
+    onSelectGroup: (NativeRecordsGroup) -> Unit = {},
+    onOpenCorrection: (NativeCorrectionPrefill) -> Unit = {},
+    onBackFromCorrection: () -> Unit = {},
+    onUpdateCorrection: ((NativeCorrectionEditorState) -> NativeCorrectionEditorState) -> Unit = {},
+    onSaveCorrection: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     when (state) {
@@ -100,19 +115,30 @@ fun OwnerRecordsScreen(
         }
 
         is NativeOwnerRecordsState.Ready -> {
-            val detail = state.detail
-            if (detail != null) {
-                RecordsDetailBody(
+            val correction = state.correction
+            when {
+                correction != null -> RecordsCorrectionBody(
                     snackbarHostState = snackbarHostState,
                     context = state.snapshot.context,
-                    detail = detail,
-                    onBack = onBackFromDetail,
+                    editor = correction,
+                    onBack = onBackFromCorrection,
+                    onUpdate = onUpdateCorrection,
+                    onSave = onSaveCorrection,
                     hostedScaffold = hostedScaffold,
                     roleLabel = roleLabel,
                     modifier = modifier,
                 )
-            } else {
-                RecordsListBody(
+                state.detail != null -> RecordsDetailBody(
+                    snackbarHostState = snackbarHostState,
+                    context = state.snapshot.context,
+                    detail = state.detail,
+                    onBack = onBackFromDetail,
+                    onOpenCorrection = onOpenCorrection,
+                    hostedScaffold = hostedScaffold,
+                    roleLabel = roleLabel,
+                    modifier = modifier,
+                )
+                else -> RecordsListBody(
                     snackbarHostState = snackbarHostState,
                     state = state,
                     onSearchQueryChange = onSearchQueryChange,
@@ -122,6 +148,7 @@ fun OwnerRecordsScreen(
                     roleLabel = roleLabel,
                     rootTag = rootTag,
                     onDeferredGroup = onDeferredGroup,
+                    onSelectGroup = onSelectGroup,
                     modifier = modifier,
                 )
             }
@@ -140,6 +167,7 @@ private fun RecordsListBody(
     roleLabel: String,
     rootTag: String,
     onDeferredGroup: (String) -> Unit,
+    onSelectGroup: (NativeRecordsGroup) -> Unit,
     modifier: Modifier,
 ) {
     BackHandler(onBack = onLeaveConfirmed)
@@ -181,8 +209,8 @@ private fun RecordsListBody(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     FilterChip(
-                        selected = true,
-                        onClick = {},
+                        selected = state.activeGroup == NativeRecordsGroup.Recent,
+                        onClick = { onSelectGroup(NativeRecordsGroup.Recent) },
                         label = { Text("Recent") },
                         modifier = Modifier.testTag(NativeUiTags.OwnerRecordsGroupRecent),
                     )
@@ -199,8 +227,8 @@ private fun RecordsListBody(
                         modifier = Modifier.testTag(NativeUiTags.OwnerRecordsGroupClosing),
                     )
                     FilterChip(
-                        selected = false,
-                        onClick = { onDeferredGroup("Corrections") },
+                        selected = state.activeGroup == NativeRecordsGroup.Corrections,
+                        onClick = { onSelectGroup(NativeRecordsGroup.Corrections) },
                         label = { Text("Corrections") },
                         modifier = Modifier.testTag(NativeUiTags.OwnerRecordsGroupCorrections),
                     )
@@ -213,7 +241,7 @@ private fun RecordsListBody(
                             CircularProgressIndicator()
                         }
                     }
-                    state.snapshot.records.isEmpty() -> {
+                    state.snapshot.records.isEmpty() && state.activeGroup == NativeRecordsGroup.Recent -> {
                         Column(
                             Modifier
                                 .fillMaxSize()
@@ -245,12 +273,24 @@ private fun RecordsListBody(
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
-                                "No matches",
+                                if (state.activeGroup == NativeRecordsGroup.Corrections &&
+                                    state.searchQuery.isBlank()
+                                ) {
+                                    "No corrections yet"
+                                } else {
+                                    "No matches"
+                                },
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.SemiBold,
                             )
                             Text(
-                                "Nothing matches this search. Clear the query to see recent activity.",
+                                if (state.activeGroup == NativeRecordsGroup.Corrections &&
+                                    state.searchQuery.isBlank()
+                                ) {
+                                    "Corrected and superseded records will appear here."
+                                } else {
+                                    "Nothing matches this search. Clear the query to see recent activity."
+                                },
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(top = 8.dp),
@@ -291,6 +331,7 @@ private fun RecordsDetailBody(
     context: NativeOwnerRecordsContext,
     detail: NativeOwnerRecordsDetail,
     onBack: () -> Unit,
+    onOpenCorrection: (NativeCorrectionPrefill) -> Unit,
     hostedScaffold: HostedScaffold,
     roleLabel: String,
     modifier: Modifier,
@@ -359,15 +400,355 @@ private fun RecordsDetailBody(
                         LabeledValue(label, value)
                     }
                 }
-                Text(
-                    "Corrections write UI comes next. This screen is inspect-only.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerRecordsDetailReadOnly),
-                )
+                val correctionPrefill = detail.correctionPrefill
+                if (detail.canCorrect && correctionPrefill != null) {
+                    Button(
+                        onClick = { onOpenCorrection(correctionPrefill) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerRecordsDetailCorrect),
+                    ) { Text("Correct this record") }
+                } else if (detail.row.isSuperseded) {
+                    Text(
+                        "This record was already replaced. Open its latest correction to correct further.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerRecordsDetailReadOnly),
+                    )
+                } else {
+                    Text(
+                        "This record type cannot be corrected here.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerRecordsDetailReadOnly),
+                    )
+                }
             }
         }
     }
+}
+
+@Composable
+private fun RecordsCorrectionBody(
+    snackbarHostState: SnackbarHostState,
+    context: NativeOwnerRecordsContext,
+    editor: NativeCorrectionEditorState,
+    onBack: () -> Unit,
+    onUpdate: ((NativeCorrectionEditorState) -> NativeCorrectionEditorState) -> Unit,
+    onSave: () -> Unit,
+    hostedScaffold: HostedScaffold,
+    roleLabel: String,
+    modifier: Modifier,
+) {
+    val leaveGuard = rememberEntryLeaveGuard()
+    val canLeave = !editor.saving
+
+    LaunchedEffect(editor.dirty) {
+        if (editor.dirty) leaveGuard.markDirty() else leaveGuard.clear()
+    }
+
+    fun requestLeave(action: () -> Unit) {
+        if (!canLeave) return
+        leaveGuard.requestLeave(action)
+    }
+
+    BackHandler { requestLeave(onBack) }
+
+    Box(modifier.fillMaxSize()) {
+        hostedScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
+            { action -> requestLeave(action) },
+        ) { padding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .testTag(NativeUiTags.OwnerRecordsCorrectionRoot),
+            ) {
+                CashierScreenHeader(
+                    title = "Records",
+                    displayName = context.shopName,
+                    roleLabel = roleLabel,
+                    businessDate = context.businessDate,
+                    postingOpen = context.postingOpen,
+                )
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .imePadding()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    TextButton(
+                        onClick = { requestLeave(onBack) },
+                        enabled = canLeave,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerRecordsCorrectionBack),
+                    ) { Text("Back to detail") }
+                    Text(
+                        "Correct ${editor.prefill.taskLabel}",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        editor.prefill.identityLabel,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        "Business day ${editor.prefill.occurredAt}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    when (editor.prefill.kind) {
+                        NativeCorrectionKind.Purchase -> {
+                            CorrectionField(
+                                value = editor.purchaseRawLiters,
+                                label = "Raw liters",
+                                tag = NativeUiTags.OwnerRecordsCorrectionPurchaseRaw,
+                                enabled = canLeave,
+                                onChange = { value ->
+                                    onUpdate { it.copy(purchaseRawLiters = value) }
+                                },
+                            )
+                            CorrectionField(
+                                value = editor.purchaseFat,
+                                label = "Fat %",
+                                tag = NativeUiTags.OwnerRecordsCorrectionPurchaseFat,
+                                enabled = canLeave,
+                                onChange = { value ->
+                                    onUpdate { it.copy(purchaseFat = value) }
+                                },
+                            )
+                            CorrectionField(
+                                value = editor.purchaseLr,
+                                label = "LR reading",
+                                tag = NativeUiTags.OwnerRecordsCorrectionPurchaseLr,
+                                enabled = canLeave,
+                                onChange = { value ->
+                                    onUpdate { it.copy(purchaseLr = value) }
+                                },
+                            )
+                        }
+                        NativeCorrectionKind.Production -> {
+                            CorrectionField(
+                                value = editor.productionMilk,
+                                label = "Milk liters used",
+                                tag = NativeUiTags.OwnerRecordsCorrectionProductionMilk,
+                                enabled = canLeave,
+                                onChange = { value ->
+                                    onUpdate { it.copy(productionMilk = value) }
+                                },
+                            )
+                            CorrectionField(
+                                value = editor.productionYogurt,
+                                label = "Yogurt kg produced",
+                                tag = NativeUiTags.OwnerRecordsCorrectionProductionYogurt,
+                                enabled = canLeave,
+                                onChange = { value ->
+                                    onUpdate { it.copy(productionYogurt = value) }
+                                },
+                            )
+                        }
+                        NativeCorrectionKind.Sale -> {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                FilterChip(
+                                    selected = editor.saleQuantityMode,
+                                    onClick = {
+                                        if (canLeave) {
+                                            onUpdate { it.copy(saleQuantityMode = true) }
+                                        }
+                                    },
+                                    label = { Text("By quantity") },
+                                    modifier = Modifier.testTag(
+                                        NativeUiTags.OwnerRecordsCorrectionSaleQuantityMode,
+                                    ),
+                                )
+                                FilterChip(
+                                    selected = !editor.saleQuantityMode,
+                                    onClick = {
+                                        if (canLeave) {
+                                            onUpdate { it.copy(saleQuantityMode = false) }
+                                        }
+                                    },
+                                    label = { Text("By value") },
+                                    modifier = Modifier.testTag(
+                                        NativeUiTags.OwnerRecordsCorrectionSaleValueMode,
+                                    ),
+                                )
+                            }
+                            CorrectionField(
+                                value = editor.saleRate,
+                                label = "Unit rate (PKR)",
+                                tag = NativeUiTags.OwnerRecordsCorrectionSaleRate,
+                                enabled = canLeave,
+                                onChange = { value ->
+                                    onUpdate { it.copy(saleRate = value) }
+                                },
+                            )
+                            if (editor.saleQuantityMode) {
+                                CorrectionField(
+                                    value = editor.saleQuantity,
+                                    label = "Quantity",
+                                    tag = NativeUiTags.OwnerRecordsCorrectionSaleQuantity,
+                                    enabled = canLeave,
+                                    onChange = { value ->
+                                        onUpdate { it.copy(saleQuantity = value) }
+                                    },
+                                )
+                            } else {
+                                CorrectionField(
+                                    value = editor.saleValue,
+                                    label = "Sale value (PKR)",
+                                    tag = NativeUiTags.OwnerRecordsCorrectionSaleValue,
+                                    enabled = canLeave,
+                                    onChange = { value ->
+                                        onUpdate { it.copy(saleValue = value) }
+                                    },
+                                )
+                            }
+                            CorrectionField(
+                                value = editor.saleSurcharge,
+                                label = "Surcharge (PKR)",
+                                tag = NativeUiTags.OwnerRecordsCorrectionSaleSurcharge,
+                                enabled = canLeave,
+                                onChange = { value ->
+                                    onUpdate { it.copy(saleSurcharge = value) }
+                                },
+                            )
+                            Text(
+                                "Channel",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .horizontalScroll(rememberScrollState())
+                                    .testTag(NativeUiTags.OwnerRecordsCorrectionSaleChannel),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                SALE_CHANNELS.forEach { channel ->
+                                    FilterChip(
+                                        selected = editor.saleChannel == channel,
+                                        onClick = {
+                                            if (canLeave) {
+                                                onUpdate { it.copy(saleChannel = channel) }
+                                            }
+                                        },
+                                        label = { Text(channel) },
+                                    )
+                                }
+                            }
+                        }
+                        NativeCorrectionKind.Monetary -> {
+                            CorrectionField(
+                                value = editor.monetaryAmount,
+                                label = "Amount (PKR)",
+                                tag = NativeUiTags.OwnerRecordsCorrectionMonetaryAmount,
+                                enabled = canLeave,
+                                onChange = { value ->
+                                    onUpdate { it.copy(monetaryAmount = value) }
+                                },
+                            )
+                        }
+                        NativeCorrectionKind.Spoilage -> {
+                            CorrectionField(
+                                value = editor.spoilageQuantity,
+                                label = "Quantity",
+                                tag = NativeUiTags.OwnerRecordsCorrectionSpoilageQuantity,
+                                enabled = canLeave,
+                                onChange = { value ->
+                                    onUpdate { it.copy(spoilageQuantity = value) }
+                                },
+                            )
+                            CorrectionField(
+                                value = editor.spoilageReason,
+                                label = "Reason",
+                                tag = NativeUiTags.OwnerRecordsCorrectionSpoilageReason,
+                                enabled = canLeave,
+                                onChange = { value ->
+                                    onUpdate { it.copy(spoilageReason = value) }
+                                },
+                            )
+                        }
+                    }
+                    CorrectionField(
+                        value = editor.notes,
+                        label = "Notes (optional)",
+                        tag = NativeUiTags.OwnerRecordsCorrectionNotes,
+                        enabled = canLeave,
+                        singleLine = false,
+                        onChange = { value ->
+                            onUpdate { it.copy(notes = value) }
+                        },
+                    )
+                    editor.error?.let { message ->
+                        Text(
+                            message,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.testTag(NativeUiTags.OwnerRecordsCorrectionError),
+                        )
+                    }
+                    Button(
+                        onClick = onSave,
+                        enabled = canLeave,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerRecordsCorrectionSave),
+                    ) {
+                        Text(if (editor.saving) "Saving…" else "Save correction")
+                    }
+                }
+            }
+        }
+        RecordsCorrectionDiscardDialog(leaveGuard)
+    }
+}
+
+@Composable
+private fun CorrectionField(
+    value: String,
+    label: String,
+    tag: String,
+    enabled: Boolean,
+    onChange: (String) -> Unit,
+    singleLine: Boolean = true,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onChange,
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(tag),
+        enabled = enabled,
+        singleLine = singleLine,
+        label = { Text(label) },
+    )
+}
+
+@Composable
+private fun RecordsCorrectionDiscardDialog(leaveGuard: EntryLeaveGuard) {
+    if (!leaveGuard.discardConfirmationOpen) return
+    AlertDialog(
+        onDismissRequest = leaveGuard::keepEditing,
+        modifier = Modifier.testTag(NativeUiTags.OwnerRecordsCorrectionDiscardDialog),
+        title = { Text("Discard correction?") },
+        text = { Text("Your unsaved correction draft will be lost.") },
+        confirmButton = {
+            TextButton(
+                onClick = leaveGuard::confirmDiscard,
+                modifier = Modifier.testTag(NativeUiTags.OwnerRecordsCorrectionDiscardConfirm),
+            ) { Text("Discard") }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = leaveGuard::keepEditing,
+                modifier = Modifier.testTag(NativeUiTags.OwnerRecordsCorrectionDiscardKeep),
+            ) { Text("Keep editing") }
+        },
+    )
 }
 
 @Composable

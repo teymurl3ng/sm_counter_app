@@ -9,37 +9,35 @@ Branch: `fix/native-shell-vs-content-owner-work`
 |---|---|
 | Cashier (`Sell / Collect / Activity / More` + Expense host) | **Done** |
 | Operations | **Done** |
-| Owner primary nav + Work entries + More deep dirs + Month reports + Reopen day + Products create/edit/archive/unarchive + Customers create/edit + Suppliers create/edit + Employees create/edit + Shop settings identity/rates/categories/**opening** + Users enroll/disable/role-change/**credential reset** + Costing policy approve + Backup export/restore/Drive/**cloud remote restore** | **Done** |
-| Manager·Admin shells | **Manager M3 Sale/Collect/Ops hosts Done**; **Admin A2 Records + system More Done** (M0–A2 foundation depth) |
+| Owner primary nav + Work entries + More deep dirs + Month reports + Reopen day + Products create/edit/archive/unarchive + Customers create/edit + Suppliers create/edit + Employees create/edit + Shop settings identity/rates/categories/**opening** + Users enroll/disable/role-change/**credential reset** + Costing policy approve + **budgets / collections / yield** + Backup export/restore/Drive/**cloud remote restore** + Records **corrections write** | **Done** |
+| Manager·Admin shells | **Manager M3 Sale/Collect/Ops hosts + Records corrections write Done**; **Admin A2 Records + system More Done** (M0–A2 foundation depth) |
 
 ## Done (recent)
 
-- **14.8.47** Owner More residuals — Shop settings opening record/correct (+ recent auth); Users credential reset; Backup cloud remote list/inspect/restore via typed gateway (fake-gateway in CI; live Drive list device-manual). Admin Backup stays `localExportOnly`. Gates: `qaScreen -Pqa.screen=ownermore` **204/204 PASS**; `qaScreen -Pqa.screen=managershell` **48/48 PASS**; debug APK installed with `open_owner=true`.
-- **14.8.45 M3** Manager Sale / Collect / Ops Work hosts — `ManagerSaleEntryScreen` / `ManagerCollectionEntryScreen` / Receive milk / Make yogurt / Spoilage / Deliveries CORE METHOD wrappers under Manager Work; Pay salary + reopen still excluded; `qaScreen -Pqa.screen=managershell` **48/48 PASS**
-- **14.8.46 A2** Admin Records + system More — Records hub; More system tools (local export only — Drive/restore omitted)
+- **14.8.49** Owner Costing & plans budgets + collections targets + yield policy approve (Owner + Admin host; leave-guard; yield recent-auth). Opening cost basis still deferred. Gates: `ownermore` **213/213 PASS**; `adminshell` **38/38 PASS**. Debug APK with `open_owner=true`.
+- **14.8.48** Native Corrections write UI (Step 1) — typed `NativeOwnerRecordsFacade.correct` (same rules as `HistoryBridgeCommandService.correct`); role-neutral correction editor under Owner/Manager/Admin Records hosts; Corrections group filter connected; leave-guard on dirty draft. **Approval queue still deferred** (no domain API). Gates: `managershell` **50/50 PASS**; `ownermore` **213/213 PASS**. Debug APK with `open_manager=true`.
+- **14.8.47** Owner More residuals — Shop settings opening record/correct (+ recent auth); Users credential reset; Backup cloud remote list/inspect/restore via typed gateway (fake-gateway in CI; live Drive list device-manual). Admin Backup stays `localExportOnly`.
+- **14.8.45 M3** Manager Sale / Collect / Ops Work hosts
+- **14.8.46 A2** Admin Records + system More
 - **14.8.46 A1** Admin Work desk + People
 - **14.8.45 M2** Manager Records + bounded More
 - **14.8.45 M1** Manager Work desk + Close host
 - **14.8.46** Admin shell M0
 - **14.8.45 M0** Manager shell chrome
-- **14.8.44** Owner Backup export / restore / Drive connect — cloud remote list/inspect/restore **connected in 14.8.47** (fake-gateway tests; live Google list device-manual)
-- **14.8.43** Owner Costing & plans policy approve — budgets / yield / opening basis / in-place edit still deferred
-- **14.8.42** Owner Users & roles enroll + disable/enable + role change — credential reset **connected in 14.8.47**
-- **14.8.41** Owner Shop settings identity + rates + expense categories — opening record/correct **connected in 14.8.47**
-- **14.8.40…34** Employees / Suppliers / Products / Customers write depth
-- **14.8.33…17** Owner Reopen / Month / Work money / More deep dirs
+- **14.8.44…17** Owner Backup / Costing / Users / Shop settings / Employees / Suppliers / Products / Customers / Reopen / Month / Work money / More
 
 ## Deferred depth
 
-- Manager Corrections write UI; Approval queue write UI
-- Costing budgets · yield · opening-basis; Cashier Deliveries-from-More; custom report date range
+- Approval queue write UI (no domain API — do not invent)
+- Costing opening-basis; Cashier Deliveries-from-More; custom report date range
+- Records Balances & ledgers / Closing history groups
 
 ## Recommended next
 
-1. Manager Corrections write UI / Approval queue
-2. Costing budgets / yield / opening cost basis
+1. Opening cost basis (Costing Step 5)
+2. Approval queue (only when domain API exists)
 
 ## Authority
 
-- Owner/Cashier blueprints through `PHASE14_8_47`; Manager M3 `PHASE14_8_45`; Admin A2 `PHASE14_8_46`
+- Owner/Cashier blueprints through `PHASE14_8_49`; Manager M3 `PHASE14_8_45`; Admin A2 `PHASE14_8_46`
 - `.cursor/rules/native-shell-vs-content.mdc`

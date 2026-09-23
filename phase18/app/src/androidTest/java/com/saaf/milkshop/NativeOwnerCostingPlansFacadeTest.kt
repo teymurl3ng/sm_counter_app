@@ -4,11 +4,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPlansFacade
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppRole
+import com.saaf.milkshop.domain.BUDGET_CATEGORY_MILK_PURCHASES
+import com.saaf.milkshop.domain.BudgetPlanInput
 import com.saaf.milkshop.domain.ConversionCostComponentInput
 import com.saaf.milkshop.domain.CostingPolicyInput
 import com.saaf.milkshop.domain.CreateUserInput
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.domain.UserSecurityService
+import com.saaf.milkshop.domain.YieldPolicyInput
 import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -188,6 +191,88 @@ class NativeOwnerCostingPlansFacadeTest {
             )
         }.exceptionOrNull()
         assertTrue(rejected is SecurityFailure.PermissionDenied || rejected != null)
+    }
+
+    @Test
+    fun upsertBudgetCreatesMilkPlan() = runBlocking {
+        val week = facade.loadPlanning(ownerSession).defaultMilkWeekStart
+        val start = java.time.LocalDate.parse(week)
+        val result = facade.upsertBudget(
+            ownerSession,
+            BudgetPlanInput(
+                category = BUDGET_CATEGORY_MILK_PURCHASES,
+                periodStart = start,
+                periodEndExclusive = start.plusDays(7),
+                plannedLiters = 120.0,
+            ),
+        )
+        assertTrue(result.budgetId > 0L)
+        val planning = facade.loadPlanning(ownerSession)
+        assertTrue(planning.budgets.any { it.budgetId == result.budgetId && !it.archived })
+    }
+
+    @Test
+    fun createOrReviseCollectionsTargetSavesWeek() = runBlocking {
+        val week = java.time.LocalDate.parse(facade.loadPlanning(ownerSession).defaultMilkWeekStart)
+        val result = facade.createOrReviseCollectionsTarget(ownerSession, week, 400_000.0)
+        assertEquals(400_000.0, result.targetAmount, 1e-9)
+        val planning = facade.loadPlanning(ownerSession)
+        assertTrue(planning.collectionTargets.any { it.targetId == result.targetId && !it.archived })
+    }
+
+    @Test
+    fun approveYieldPolicyFromThirtyBatches() = runBlocking {
+        seedThirtyProductions()
+        val context = facade.loadYieldContext(ownerSession)
+        assertEquals(30, context.batches.size)
+        val ids = context.batches.map { it.productionEventId }
+        val end = database.inventoryCostProjectionDao().effectiveEvents()
+            .filter { it.eventId in ids }
+            .maxOf { java.time.LocalDate.parse(it.occurredAt) }
+        val approved = facade.approveYieldPolicy(
+            ownerSession,
+            YieldPolicyInput(
+                acceptedProductionEventIds = ids,
+                effectiveFrom = end.plusDays(1).toString(),
+            ),
+        )
+        assertEquals("Active", approved.statusLabel)
+        assertEquals(30, approved.acceptedBatchCount)
+        val refreshed = facade.loadYieldContext(ownerSession)
+        assertEquals(approved.yieldPolicyId, refreshed.activePolicyId)
+    }
+
+    @Test
+    fun planningRejectsNonOwner() = runBlocking {
+        assertTrue(runCatching { facade.loadPlanning(cashierSession) }.isFailure)
+    }
+
+    private suspend fun seedThirtyProductions() {
+        val vendorId = database.accountDao().insert(
+            com.saaf.milkshop.data.AccountEntity(
+                name = "Vendor: Yield seed",
+                type = "Liability",
+                category = "Vendor",
+            ),
+        )
+        com.saaf.milkshop.domain.VendorPurchaseService(database).record(
+            com.saaf.milkshop.domain.VendorPurchaseInput(
+                vendorId,
+                "2026-07-01",
+                100.0,
+                4.0,
+                28.0,
+            ),
+        )
+        repeat(30) { offset ->
+            com.saaf.milkshop.domain.YogurtProductionService(database).record(
+                com.saaf.milkshop.domain.YogurtProductionInput(
+                    java.time.LocalDate.parse("2026-07-01").plusDays(offset.toLong()).toString(),
+                    1.0,
+                    0.85,
+                ),
+            )
+        }
     }
 
     private fun simpleComponents(capacity: BigDecimal = BigDecimal("100")) = listOf(

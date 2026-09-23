@@ -245,6 +245,8 @@ val screenClassMap = mapOf(
         "com.saaf.milkshop.NativeFoundationUiTest#managerCashCloseHardwareBackReturnsToWorkHome",
         "com.saaf.milkshop.NativeFoundationUiTest#managerRecordsOpensUnderManagerChrome",
         "com.saaf.milkshop.NativeFoundationUiTest#managerRecordsHardwareBackReturnsToWorkHome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerRecordsCorrectionOpensUnderManagerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerRecordsCorrectionHardwareBackReturnsToDetailThenList",
         "com.saaf.milkshop.NativeFoundationUiTest#managerMoreOpensUnderManagerChrome",
         "com.saaf.milkshop.NativeFoundationUiTest#managerMoreSignsOutToWelcome",
         "com.saaf.milkshop.NativeFoundationUiTest#managerProductsOpensUnderManagerChrome",

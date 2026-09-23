@@ -7,9 +7,13 @@ import com.saaf.milkshop.application.owner.NativeOwnerBackupFacade
 import com.saaf.milkshop.application.owner.NativeOwnerBackupFailure
 import com.saaf.milkshop.application.owner.NativeOwnerBackupInspection
 import com.saaf.milkshop.application.owner.NativeOwnerBackupSnapshot
+import com.saaf.milkshop.application.owner.NativeOwnerBudgetRow
+import com.saaf.milkshop.application.owner.NativeOwnerCollectionsTargetRow
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPolicyDetail
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPolicyRow
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPlansFacade
+import com.saaf.milkshop.application.owner.NativeOwnerYieldBatchRow
+import com.saaf.milkshop.application.owner.NativeOwnerYieldPolicyRow
 import com.saaf.milkshop.application.owner.NativeOwnerCustomerDetail
 import com.saaf.milkshop.application.owner.NativeOwnerCustomerRow
 import com.saaf.milkshop.application.owner.NativeOwnerCustomersFacade
@@ -36,7 +40,10 @@ import com.saaf.milkshop.application.owner.NativeOwnerUserRow
 import com.saaf.milkshop.application.owner.NativeOwnerUsersRolesFacade
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.BusinessSettings
+import com.saaf.milkshop.domain.BudgetPlanInput
 import com.saaf.milkshop.domain.CostingPolicyInput
+import com.saaf.milkshop.domain.YieldPolicyInput
+import java.time.LocalDate
 import com.saaf.milkshop.domain.CreateUserInput
 import com.saaf.milkshop.domain.CustomerProfileInput
 import com.saaf.milkshop.domain.ProductCatalogInput
@@ -68,6 +75,12 @@ enum class NativeOwnerMoreDestination {
     UsersRoles,
     SecurityHistory,
     Backup,
+}
+
+enum class NativeOwnerCostingSection {
+    Policies,
+    Plans,
+    Yield,
 }
 
 sealed interface NativeOwnerMoreState {
@@ -117,6 +130,22 @@ sealed interface NativeOwnerMoreState {
         val costingPolicyDetail: NativeOwnerCostingPolicyDetail? = null,
         val costingPoliciesError: String? = null,
         val costingCurrentMonthSummary: String? = null,
+        val costingSection: NativeOwnerCostingSection = NativeOwnerCostingSection.Policies,
+        val costingBudgets: List<NativeOwnerBudgetRow> = emptyList(),
+        val costingTargets: List<NativeOwnerCollectionsTargetRow> = emptyList(),
+        val costingBudgetCategories: List<String> = emptyList(),
+        val costingDefaultMilkWeekStart: String = "",
+        val costingDefaultOperatingMonthStart: String = "",
+        val costingBudgetEditorOpen: Boolean = false,
+        val costingBudgetSaving: Boolean = false,
+        val costingCollectionsEditorOpen: Boolean = false,
+        val costingCollectionsSaving: Boolean = false,
+        val costingYieldPolicies: List<NativeOwnerYieldPolicyRow> = emptyList(),
+        val costingYieldBatches: List<NativeOwnerYieldBatchRow> = emptyList(),
+        val costingYieldActivePolicyId: Long? = null,
+        val costingYieldSummary: String? = null,
+        val costingYieldApproveOpen: Boolean = false,
+        val costingYieldApproving: Boolean = false,
         val costingApproveOpen: Boolean = false,
         val costingApproveSeed: NativeOwnerCostingPolicyDetail? = null,
         val costingApproving: Boolean = false,
@@ -196,6 +225,7 @@ class NativeOwnerMoreViewModel(
     private var sessionHandle: String? = null
     private var pendingUsersAction: PendingUsersRolesAction? = null
     private var pendingCostingApprove: CostingPolicyInput? = null
+    private var pendingYieldApprove: YieldPolicyInput? = null
     private var pendingBackupAction: PendingBackupAction? = null
     private var pendingOpeningInput: OpeningStateInput? = null
     private var pendingOpeningCorrection: Boolean = false
@@ -1425,12 +1455,26 @@ class NativeOwnerMoreViewModel(
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         pendingCostingApprove = null
+        pendingYieldApprove = null
         _state.value = current.copy(
             destination = NativeOwnerMoreDestination.CostingPlans,
             costingPoliciesLoading = true,
             costingPolicyDetail = null,
             costingPoliciesError = null,
             costingCurrentMonthSummary = null,
+            costingSection = NativeOwnerCostingSection.Policies,
+            costingBudgets = emptyList(),
+            costingTargets = emptyList(),
+            costingBudgetEditorOpen = false,
+            costingBudgetSaving = false,
+            costingCollectionsEditorOpen = false,
+            costingCollectionsSaving = false,
+            costingYieldPolicies = emptyList(),
+            costingYieldBatches = emptyList(),
+            costingYieldActivePolicyId = null,
+            costingYieldSummary = null,
+            costingYieldApproveOpen = false,
+            costingYieldApproving = false,
             costingApproveOpen = false,
             costingApproveSeed = null,
             costingApproving = false,
@@ -1506,8 +1550,12 @@ class NativeOwnerMoreViewModel(
         )
         scope.launch {
             try {
-                val snapshot = withContext(Dispatchers.IO) {
-                    costingPlansFacade.loadPolicies(session, current.context.businessDate)
+                val (snapshot, planning, yieldContext) = withContext(Dispatchers.IO) {
+                    Triple(
+                        costingPlansFacade.loadPolicies(session, current.context.businessDate),
+                        costingPlansFacade.loadPlanning(session),
+                        costingPlansFacade.loadYieldContext(session),
+                    )
                 }
                 val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
@@ -1516,6 +1564,15 @@ class NativeOwnerMoreViewModel(
                     costingPoliciesLoading = false,
                     costingPoliciesError = null,
                     costingCurrentMonthSummary = snapshot.currentMonthSummary,
+                    costingBudgets = planning.budgets,
+                    costingTargets = planning.collectionTargets,
+                    costingBudgetCategories = planning.budgetCategories,
+                    costingDefaultMilkWeekStart = planning.defaultMilkWeekStart,
+                    costingDefaultOperatingMonthStart = planning.defaultOperatingMonthStart,
+                    costingYieldPolicies = yieldContext.policies,
+                    costingYieldBatches = yieldContext.batches,
+                    costingYieldActivePolicyId = yieldContext.activePolicyId,
+                    costingYieldSummary = yieldContext.activeSummary,
                 )
             } catch (error: Throwable) {
                 handleCostingPlansFailure(error)
@@ -1534,8 +1591,12 @@ class NativeOwnerMoreViewModel(
         )
         scope.launch {
             try {
-                val snapshot = withContext(Dispatchers.IO) {
-                    costingPlansFacade.loadPolicies(session, current.context.businessDate)
+                val (snapshot, planning, yieldContext) = withContext(Dispatchers.IO) {
+                    Triple(
+                        costingPlansFacade.loadPolicies(session, current.context.businessDate),
+                        costingPlansFacade.loadPlanning(session),
+                        costingPlansFacade.loadYieldContext(session),
+                    )
                 }
                 val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
@@ -1544,11 +1605,35 @@ class NativeOwnerMoreViewModel(
                     costingPoliciesLoading = false,
                     costingPoliciesError = null,
                     costingCurrentMonthSummary = snapshot.currentMonthSummary,
+                    costingBudgets = planning.budgets,
+                    costingTargets = planning.collectionTargets,
+                    costingBudgetCategories = planning.budgetCategories,
+                    costingDefaultMilkWeekStart = planning.defaultMilkWeekStart,
+                    costingDefaultOperatingMonthStart = planning.defaultOperatingMonthStart,
+                    costingYieldPolicies = yieldContext.policies,
+                    costingYieldBatches = yieldContext.batches,
+                    costingYieldActivePolicyId = yieldContext.activePolicyId,
+                    costingYieldSummary = yieldContext.activeSummary,
                 )
             } catch (error: Throwable) {
                 handleCostingPlansFailure(error)
             }
         }
+    }
+
+    fun setCostingSection(section: NativeOwnerCostingSection) {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.CostingPlans) return
+        if (current.costingApproveOpen ||
+            current.costingReauthOpen ||
+            current.costingBudgetEditorOpen ||
+            current.costingCollectionsEditorOpen ||
+            current.costingYieldApproveOpen ||
+            current.costingPolicyDetail != null
+        ) {
+            return
+        }
+        _state.value = current.copy(costingSection = section, costingPoliciesError = null)
     }
 
     fun openCostingPolicyDetail(policyId: Long) {
@@ -1691,8 +1776,9 @@ class NativeOwnerMoreViewModel(
             passphrase.fill('\u0000')
             return
         }
-        val pending = pendingCostingApprove
-        if (pending == null) {
+        val pendingPolicy = pendingCostingApprove
+        val pendingYield = pendingYieldApprove
+        if (pendingPolicy == null && pendingYield == null) {
             passphrase.fill('\u0000')
             _state.value = current.copy(costingReauthOpen = false, costingPoliciesError = null)
             return
@@ -1703,27 +1789,52 @@ class NativeOwnerMoreViewModel(
                 withContext(Dispatchers.IO) {
                     costingPlansFacade.reauthenticate(session, passphrase)
                 }
-                withContext(Dispatchers.IO) {
-                    costingPlansFacade.approvePolicy(session, pending)
+                if (pendingPolicy != null) {
+                    withContext(Dispatchers.IO) {
+                        costingPlansFacade.approvePolicy(session, pendingPolicy)
+                    }
+                    val snapshot = withContext(Dispatchers.IO) {
+                        costingPlansFacade.loadPolicies(session, current.context.businessDate)
+                    }
+                    val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
+                    pendingCostingApprove = null
+                    pendingYieldApprove = null
+                    _state.value = latest.copy(
+                        costingPolicies = snapshot.policies,
+                        costingCurrentMonthSummary = snapshot.currentMonthSummary,
+                        costingPolicyDetail = null,
+                        costingApproveOpen = false,
+                        costingApproveSeed = null,
+                        costingApproving = false,
+                        costingReauthOpen = false,
+                        costingReauthBusy = false,
+                        costingPoliciesLoading = false,
+                        costingPoliciesError = null,
+                    )
+                } else if (pendingYield != null) {
+                    withContext(Dispatchers.IO) {
+                        costingPlansFacade.approveYieldPolicy(session, pendingYield)
+                    }
+                    val yieldContext = withContext(Dispatchers.IO) {
+                        costingPlansFacade.loadYieldContext(session)
+                    }
+                    val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
+                    pendingCostingApprove = null
+                    pendingYieldApprove = null
+                    _state.value = latest.copy(
+                        costingYieldPolicies = yieldContext.policies,
+                        costingYieldBatches = yieldContext.batches,
+                        costingYieldActivePolicyId = yieldContext.activePolicyId,
+                        costingYieldSummary = yieldContext.activeSummary,
+                        costingYieldApproveOpen = false,
+                        costingYieldApproving = false,
+                        costingReauthOpen = false,
+                        costingReauthBusy = false,
+                        costingPoliciesError = null,
+                    )
                 }
-                val snapshot = withContext(Dispatchers.IO) {
-                    costingPlansFacade.loadPolicies(session, current.context.businessDate)
-                }
-                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
-                if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
-                pendingCostingApprove = null
-                _state.value = latest.copy(
-                    costingPolicies = snapshot.policies,
-                    costingCurrentMonthSummary = snapshot.currentMonthSummary,
-                    costingPolicyDetail = null,
-                    costingApproveOpen = false,
-                    costingApproveSeed = null,
-                    costingApproving = false,
-                    costingReauthOpen = false,
-                    costingReauthBusy = false,
-                    costingPoliciesLoading = false,
-                    costingPoliciesError = null,
-                )
             } catch (error: Throwable) {
                 handleCostingPlansFailure(error)
             } finally {
@@ -1735,11 +1846,236 @@ class NativeOwnerMoreViewModel(
     fun cancelCostingReauth() {
         val current = _state.value as? NativeOwnerMoreState.Ready ?: return
         pendingCostingApprove = null
+        pendingYieldApprove = null
         _state.value = current.copy(
             costingReauthOpen = false,
             costingReauthBusy = false,
             costingApproving = false,
+            costingYieldApproving = false,
         )
+    }
+
+    fun openCostingBudgetEditor() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.CostingPlans) return
+        _state.value = current.copy(
+            costingSection = NativeOwnerCostingSection.Plans,
+            costingBudgetEditorOpen = true,
+            costingBudgetSaving = false,
+            costingPoliciesError = null,
+        )
+    }
+
+    fun clearCostingBudgetEditor() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            costingBudgetEditorOpen = false,
+            costingBudgetSaving = false,
+            costingPoliciesError = null,
+        )
+    }
+
+    fun upsertCostingBudget(input: BudgetPlanInput) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.CostingPlans ||
+            !current.costingBudgetEditorOpen ||
+            current.costingBudgetSaving
+        ) {
+            return
+        }
+        _state.value = current.copy(costingBudgetSaving = true, costingPoliciesError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    costingPlansFacade.upsertBudget(session, input)
+                }
+                val planning = withContext(Dispatchers.IO) {
+                    costingPlansFacade.loadPlanning(session)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
+                _state.value = latest.copy(
+                    costingBudgets = planning.budgets,
+                    costingTargets = planning.collectionTargets,
+                    costingBudgetCategories = planning.budgetCategories,
+                    costingDefaultMilkWeekStart = planning.defaultMilkWeekStart,
+                    costingDefaultOperatingMonthStart = planning.defaultOperatingMonthStart,
+                    costingBudgetEditorOpen = false,
+                    costingBudgetSaving = false,
+                    costingPoliciesError = null,
+                )
+            } catch (error: Throwable) {
+                handleCostingPlansFailure(error)
+            }
+        }
+    }
+
+    fun copyPreviousCostingBudget(category: String, periodStart: LocalDate, periodEndExclusive: LocalDate) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.CostingPlans ||
+            !current.costingBudgetEditorOpen ||
+            current.costingBudgetSaving
+        ) {
+            return
+        }
+        _state.value = current.copy(costingBudgetSaving = true, costingPoliciesError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    costingPlansFacade.copyPreviousBudget(session, category, periodStart, periodEndExclusive)
+                }
+                val planning = withContext(Dispatchers.IO) {
+                    costingPlansFacade.loadPlanning(session)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
+                _state.value = latest.copy(
+                    costingBudgets = planning.budgets,
+                    costingTargets = planning.collectionTargets,
+                    costingBudgetCategories = planning.budgetCategories,
+                    costingDefaultMilkWeekStart = planning.defaultMilkWeekStart,
+                    costingDefaultOperatingMonthStart = planning.defaultOperatingMonthStart,
+                    costingBudgetEditorOpen = false,
+                    costingBudgetSaving = false,
+                    costingPoliciesError = null,
+                )
+            } catch (error: Throwable) {
+                handleCostingPlansFailure(error)
+            }
+        }
+    }
+
+    fun openCostingCollectionsEditor() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.CostingPlans) return
+        _state.value = current.copy(
+            costingSection = NativeOwnerCostingSection.Plans,
+            costingCollectionsEditorOpen = true,
+            costingCollectionsSaving = false,
+            costingPoliciesError = null,
+        )
+    }
+
+    fun clearCostingCollectionsEditor() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        _state.value = current.copy(
+            costingCollectionsEditorOpen = false,
+            costingCollectionsSaving = false,
+            costingPoliciesError = null,
+        )
+    }
+
+    fun upsertCostingCollectionsTarget(weekStart: LocalDate, amount: Double) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.CostingPlans ||
+            !current.costingCollectionsEditorOpen ||
+            current.costingCollectionsSaving
+        ) {
+            return
+        }
+        _state.value = current.copy(costingCollectionsSaving = true, costingPoliciesError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    costingPlansFacade.createOrReviseCollectionsTarget(session, weekStart, amount)
+                }
+                val planning = withContext(Dispatchers.IO) {
+                    costingPlansFacade.loadPlanning(session)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
+                _state.value = latest.copy(
+                    costingBudgets = planning.budgets,
+                    costingTargets = planning.collectionTargets,
+                    costingBudgetCategories = planning.budgetCategories,
+                    costingDefaultMilkWeekStart = planning.defaultMilkWeekStart,
+                    costingDefaultOperatingMonthStart = planning.defaultOperatingMonthStart,
+                    costingCollectionsEditorOpen = false,
+                    costingCollectionsSaving = false,
+                    costingPoliciesError = null,
+                )
+            } catch (error: Throwable) {
+                handleCostingPlansFailure(error)
+            }
+        }
+    }
+
+    fun openCostingYieldApprove() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.CostingPlans) return
+        pendingYieldApprove = null
+        _state.value = current.copy(
+            costingSection = NativeOwnerCostingSection.Yield,
+            costingYieldApproveOpen = true,
+            costingYieldApproving = false,
+            costingReauthOpen = false,
+            costingReauthBusy = false,
+            costingPoliciesError = null,
+        )
+    }
+
+    fun clearCostingYieldApprove() {
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        pendingYieldApprove = null
+        _state.value = current.copy(
+            costingYieldApproveOpen = false,
+            costingYieldApproving = false,
+            costingReauthOpen = false,
+            costingReauthBusy = false,
+            costingPoliciesError = null,
+        )
+    }
+
+    fun approveCostingYieldPolicy(input: YieldPolicyInput) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.CostingPlans ||
+            !current.costingYieldApproveOpen ||
+            current.costingYieldApproving
+        ) {
+            return
+        }
+        _state.value = current.copy(costingYieldApproving = true, costingPoliciesError = null)
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    costingPlansFacade.approveYieldPolicy(session, input)
+                }
+                val yieldContext = withContext(Dispatchers.IO) {
+                    costingPlansFacade.loadYieldContext(session)
+                }
+                val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
+                pendingYieldApprove = null
+                _state.value = latest.copy(
+                    costingYieldPolicies = yieldContext.policies,
+                    costingYieldBatches = yieldContext.batches,
+                    costingYieldActivePolicyId = yieldContext.activePolicyId,
+                    costingYieldSummary = yieldContext.activeSummary,
+                    costingYieldApproveOpen = false,
+                    costingYieldApproving = false,
+                    costingReauthOpen = false,
+                    costingReauthBusy = false,
+                    costingPoliciesError = null,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.RecentAuthenticationRequired) {
+                    pendingYieldApprove = input
+                    val latest = _state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    _state.value = latest.copy(
+                        costingYieldApproving = false,
+                        costingReauthOpen = true,
+                        costingReauthBusy = false,
+                        costingPoliciesError = null,
+                    )
+                } else {
+                    handleCostingPlansFailure(error)
+                }
+            }
+        }
     }
 
     fun openShopSettings() {
@@ -4073,6 +4409,7 @@ class NativeOwnerMoreViewModel(
         if (error is SecurityFailure.SessionExpired) {
             sessionHandle = null
             pendingCostingApprove = null
+            pendingYieldApprove = null
             _state.value = NativeOwnerMoreState.Idle
             onSessionExpired()
             return
@@ -4082,6 +4419,9 @@ class NativeOwnerMoreViewModel(
             costingPoliciesLoading = false,
             costingApproving = false,
             costingReauthBusy = false,
+            costingBudgetSaving = false,
+            costingCollectionsSaving = false,
+            costingYieldApproving = false,
             costingPoliciesError = publicMessage(error),
         )
     }

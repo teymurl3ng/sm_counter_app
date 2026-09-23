@@ -49,13 +49,20 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
+import com.saaf.milkshop.application.owner.NativeOwnerBudgetRow
+import com.saaf.milkshop.application.owner.NativeOwnerCollectionsTargetRow
 import com.saaf.milkshop.application.owner.NativeOwnerCostingComponentRow
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPolicyDetail
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPolicyRow
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
+import com.saaf.milkshop.application.owner.NativeOwnerYieldBatchRow
+import com.saaf.milkshop.application.owner.NativeOwnerYieldPolicyRow
+import com.saaf.milkshop.domain.BUDGET_CATEGORY_MILK_PURCHASES
+import com.saaf.milkshop.domain.BudgetPlanInput
 import com.saaf.milkshop.domain.ConversionCostComponentInput
 import com.saaf.milkshop.domain.CostingPolicyInput
 import com.saaf.milkshop.domain.CostingPolicyService
+import com.saaf.milkshop.domain.YieldPolicyInput
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
@@ -69,8 +76,9 @@ import java.time.YearMonth
 import java.util.Locale
 
 /**
- * Owner Costing & plans — policy list, read detail, and approve/supersede
- * under OwnerScaffold. Nested from Owner More; never mounts foreign chrome.
+ * Owner Costing & plans — policy list, planning budgets/targets, yield approve,
+ * and costing policy approve/supersede under OwnerScaffold. Nested from Owner More;
+ * never mounts foreign chrome.
  */
 @Composable
 fun OwnerCostingPlansScreen(
@@ -82,23 +90,53 @@ fun OwnerCostingPlansScreen(
     policyDetail: NativeOwnerCostingPolicyDetail?,
     policiesError: String?,
     currentMonthSummary: String?,
-    approveOpen: Boolean,
-    approveSeed: NativeOwnerCostingPolicyDetail?,
-    approving: Boolean,
-    reauthOpen: Boolean,
-    reauthBusy: Boolean,
-    reviewReasons: List<String>,
-    componentCodes: List<String>,
+    section: NativeOwnerCostingSection = NativeOwnerCostingSection.Policies,
+    budgets: List<NativeOwnerBudgetRow> = emptyList(),
+    targets: List<NativeOwnerCollectionsTargetRow> = emptyList(),
+    budgetCategories: List<String> = emptyList(),
+    defaultMilkWeekStart: String = "",
+    defaultOperatingMonthStart: String = "",
+    budgetEditorOpen: Boolean = false,
+    budgetSaving: Boolean = false,
+    collectionsEditorOpen: Boolean = false,
+    collectionsSaving: Boolean = false,
+    yieldPolicies: List<NativeOwnerYieldPolicyRow> = emptyList(),
+    yieldBatches: List<NativeOwnerYieldBatchRow> = emptyList(),
+    yieldActivePolicyId: Long? = null,
+    yieldSummary: String? = null,
+    yieldApproveOpen: Boolean = false,
+    yieldApproving: Boolean = false,
+    approveOpen: Boolean = false,
+    approveSeed: NativeOwnerCostingPolicyDetail? = null,
+    approving: Boolean = false,
+    reauthOpen: Boolean = false,
+    reauthBusy: Boolean = false,
+    reviewReasons: List<String> = emptyList(),
+    componentCodes: List<String> = emptyList(),
     onBackToMenu: () -> Unit,
     onRetry: () -> Unit,
+    onSectionChange: (NativeOwnerCostingSection) -> Unit = {},
     onOpenPolicy: (Long) -> Unit,
     onBackFromDetail: () -> Unit,
     onOpenApprove: () -> Unit,
     onOpenApproveFromDetail: () -> Unit,
     onBackFromApprove: () -> Unit,
     onApprovePolicy: (CostingPolicyInput) -> Unit,
+    onOpenBudgetEditor: () -> Unit = {},
+    onBackFromBudgetEditor: () -> Unit = {},
+    onSaveBudget: (BudgetPlanInput) -> Unit = {},
+    onCopyPreviousBudget: (String, LocalDate, LocalDate) -> Unit = { _, _, _ -> },
+    onOpenCollectionsEditor: () -> Unit = {},
+    onBackFromCollectionsEditor: () -> Unit = {},
+    onSaveCollectionsTarget: (LocalDate, Double) -> Unit = { _, _ -> },
+    onOpenYieldApprove: () -> Unit = {},
+    onBackFromYieldApprove: () -> Unit = {},
+    onApproveYieldPolicy: (YieldPolicyInput) -> Unit = {},
     onSubmitReauth: (CharArray) -> Unit,
     onCancelReauth: () -> Unit,
+    periodEndExclusive: (String, LocalDate) -> LocalDate = { category, start ->
+        if (category == BUDGET_CATEGORY_MILK_PURCHASES) start.plusDays(7) else start.plusMonths(1)
+    },
     hostedScaffold: HostedScaffold,
     backToHubLabel: String = "Back to More",
     modifier: Modifier = Modifier,
@@ -111,7 +149,6 @@ fun OwnerCostingPlansScreen(
                 onConfirm = onSubmitReauth,
                 onCancel = onCancelReauth,
             )
-            // Keep underlying approve form mounted under the dialog.
             if (approveOpen) {
                 OwnerCostingPlansApproveScreen(
                     snackbarHostState = snackbarHostState,
@@ -125,6 +162,20 @@ fun OwnerCostingPlansScreen(
                     error = null,
                     onBack = onBackFromApprove,
                     onSave = onApprovePolicy,
+                    hostedScaffold = hostedScaffold,
+                    modifier = modifier,
+                )
+            } else if (yieldApproveOpen) {
+                OwnerCostingYieldApproveScreen(
+                    snackbarHostState = snackbarHostState,
+                    identity = identity,
+                    context = context,
+                    batches = yieldBatches,
+                    activePolicyId = yieldActivePolicyId,
+                    saving = yieldApproving || reauthBusy,
+                    error = null,
+                    onBack = onBackFromYieldApprove,
+                    onSave = onApproveYieldPolicy,
                     hostedScaffold = hostedScaffold,
                     modifier = modifier,
                 )
@@ -147,6 +198,53 @@ fun OwnerCostingPlansScreen(
                 modifier = modifier,
             )
         }
+        yieldApproveOpen -> {
+            OwnerCostingYieldApproveScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = context,
+                batches = yieldBatches,
+                activePolicyId = yieldActivePolicyId,
+                saving = yieldApproving,
+                error = policiesError,
+                onBack = onBackFromYieldApprove,
+                onSave = onApproveYieldPolicy,
+                hostedScaffold = hostedScaffold,
+                modifier = modifier,
+            )
+        }
+        budgetEditorOpen -> {
+            OwnerCostingBudgetEditorScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = context,
+                categories = budgetCategories,
+                defaultMilkWeekStart = defaultMilkWeekStart,
+                defaultOperatingMonthStart = defaultOperatingMonthStart,
+                periodEndExclusive = periodEndExclusive,
+                saving = budgetSaving,
+                error = policiesError,
+                onBack = onBackFromBudgetEditor,
+                onSave = onSaveBudget,
+                onCopyPrevious = onCopyPreviousBudget,
+                hostedScaffold = hostedScaffold,
+                modifier = modifier,
+            )
+        }
+        collectionsEditorOpen -> {
+            OwnerCostingCollectionsEditorScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = context,
+                defaultWeekStart = defaultMilkWeekStart,
+                saving = collectionsSaving,
+                error = policiesError,
+                onBack = onBackFromCollectionsEditor,
+                onSave = onSaveCollectionsTarget,
+                hostedScaffold = hostedScaffold,
+                modifier = modifier,
+            )
+        }
         policyDetail != null -> {
             OwnerCostingPlansDetailScreen(
                 snackbarHostState = snackbarHostState,
@@ -164,15 +262,25 @@ fun OwnerCostingPlansScreen(
                 snackbarHostState = snackbarHostState,
                 identity = identity,
                 context = context,
+                section = section,
                 policies = policies,
                 policiesLoading = policiesLoading,
                 policiesError = policiesError,
                 currentMonthSummary = currentMonthSummary,
+                budgets = budgets,
+                targets = targets,
+                yieldPolicies = yieldPolicies,
+                yieldSummary = yieldSummary,
                 onBackToMenu = onBackToMenu,
                 onRetry = onRetry,
+                onSectionChange = onSectionChange,
                 onOpenPolicy = onOpenPolicy,
                 onOpenApprove = onOpenApprove,
+                onOpenBudgetEditor = onOpenBudgetEditor,
+                onOpenCollectionsEditor = onOpenCollectionsEditor,
+                onOpenYieldApprove = onOpenYieldApprove,
                 hostedScaffold = hostedScaffold,
+                backToHubLabel = backToHubLabel,
                 modifier = modifier,
             )
         }
@@ -184,35 +292,68 @@ private fun OwnerCostingPlansListBody(
     snackbarHostState: SnackbarHostState,
     identity: NativeSignedInIdentity,
     context: NativeOwnerMoreContext,
+    section: NativeOwnerCostingSection,
     policies: List<NativeOwnerCostingPolicyRow>,
     policiesLoading: Boolean,
     policiesError: String?,
     currentMonthSummary: String?,
+    budgets: List<NativeOwnerBudgetRow>,
+    targets: List<NativeOwnerCollectionsTargetRow>,
+    yieldPolicies: List<NativeOwnerYieldPolicyRow>,
+    yieldSummary: String?,
     onBackToMenu: () -> Unit,
     onRetry: () -> Unit,
+    onSectionChange: (NativeOwnerCostingSection) -> Unit,
     onOpenPolicy: (Long) -> Unit,
     onOpenApprove: () -> Unit,
+    onOpenBudgetEditor: () -> Unit,
+    onOpenCollectionsEditor: () -> Unit,
+    onOpenYieldApprove: () -> Unit,
     hostedScaffold: HostedScaffold,
     backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBackToMenu)
-    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
-        Column(
+
+    @Composable
+    fun HubHeader(extraActions: @Composable () -> Unit = {}) {
+        CashierScreenHeader(
+            title = "Costing & plans",
+            displayName = context.shopName,
+            roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+            businessDate = context.businessDate,
+            postingOpen = context.postingOpen,
+        )
+        Row(
             Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .testTag(NativeUiTags.OwnerCostingPlansRoot),
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            CashierScreenHeader(
-                title = "Costing & plans",
-                displayName = context.shopName,
-                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                businessDate = context.businessDate,
-                postingOpen = context.postingOpen,
-            )
-            when {
-                policiesLoading && policies.isEmpty() && policiesError == null -> {
+            TextButton(
+                onClick = onBackToMenu,
+                modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansBack),
+            ) { Text(backToHubLabel) }
+            extraActions()
+        }
+        OwnerCostingPlansSectionTabs(
+            section = section,
+            onSectionChange = onSectionChange,
+        )
+    }
+
+    when {
+        policiesLoading && policies.isEmpty() && policiesError == null &&
+            budgets.isEmpty() && yieldPolicies.isEmpty() -> {
+            hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .testTag(NativeUiTags.OwnerCostingPlansRoot),
+                ) {
+                    HubHeader()
                     Box(
                         Modifier
                             .fillMaxSize()
@@ -222,7 +363,18 @@ private fun OwnerCostingPlansListBody(
                         CircularProgressIndicator()
                     }
                 }
-                policiesError != null && policies.isEmpty() -> {
+            }
+        }
+        policiesError != null && policies.isEmpty() && budgets.isEmpty() &&
+            section == NativeOwnerCostingSection.Policies -> {
+            hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .testTag(NativeUiTags.OwnerCostingPlansRoot),
+                ) {
+                    HubHeader()
                     Column(
                         Modifier
                             .fillMaxSize()
@@ -246,70 +398,102 @@ private fun OwnerCostingPlansListBody(
                         ) { Text(backToHubLabel) }
                     }
                 }
-                else -> {
-                    Column(Modifier.fillMaxSize()) {
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp, vertical = 4.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            TextButton(
-                                onClick = onBackToMenu,
-                                modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansBack),
-                            ) { Text(backToHubLabel) }
+            }
+        }
+        section == NativeOwnerCostingSection.Plans -> {
+            OwnerCostingPlansBody(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = context,
+                budgets = budgets,
+                targets = targets,
+                error = policiesError,
+                onOpenBudgetEditor = onOpenBudgetEditor,
+                onOpenCollectionsEditor = onOpenCollectionsEditor,
+                hostedScaffold = hostedScaffold,
+                modifier = modifier.testTag(NativeUiTags.OwnerCostingPlansRoot),
+                header = {
+                    HubHeader()
+                },
+            )
+        }
+        section == NativeOwnerCostingSection.Yield -> {
+            OwnerCostingYieldBody(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = context,
+                policies = yieldPolicies,
+                summary = yieldSummary,
+                error = policiesError,
+                onOpenApprove = onOpenYieldApprove,
+                hostedScaffold = hostedScaffold,
+                modifier = modifier.testTag(NativeUiTags.OwnerCostingPlansRoot),
+                header = {
+                    HubHeader()
+                },
+            )
+        }
+        else -> {
+            hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .testTag(NativeUiTags.OwnerCostingPlansRoot),
+                ) {
+                    HubHeader(
+                        extraActions = {
                             TextButton(
                                 onClick = onOpenApprove,
                                 modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansApprove),
                             ) { Text("Approve policy") }
-                        }
-                        currentMonthSummary?.let { summary ->
+                        },
+                    )
+                    currentMonthSummary?.let { summary ->
+                        Text(
+                            summary,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp, vertical = 4.dp)
+                                .testTag(NativeUiTags.OwnerCostingPlansSummary),
+                        )
+                    }
+                    policiesError?.let {
+                        Text(
+                            it,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .testTag(NativeUiTags.OwnerCostingPlansError),
+                        )
+                    }
+                    if (policies.isEmpty()) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .padding(24.dp)
+                                .testTag(NativeUiTags.OwnerCostingPlansEmpty),
+                            contentAlignment = Alignment.Center,
+                        ) {
                             Text(
-                                summary,
-                                style = MaterialTheme.typography.bodyMedium,
+                                "No costing policies yet.",
+                                style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp, vertical = 4.dp)
-                                    .testTag(NativeUiTags.OwnerCostingPlansSummary),
                             )
                         }
-                        policiesError?.let {
-                            Text(
-                                it,
-                                color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp)
-                                    .testTag(NativeUiTags.OwnerCostingPlansError),
-                            )
-                        }
-                        if (policies.isEmpty()) {
-                            Box(
-                                Modifier
-                                    .fillMaxSize()
-                                    .padding(24.dp)
-                                    .testTag(NativeUiTags.OwnerCostingPlansEmpty),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Text(
-                                    "No costing policies yet.",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    } else {
+                        LazyColumn(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag(NativeUiTags.OwnerCostingPlansList),
+                        ) {
+                            items(policies, key = { it.policyId }) { policy ->
+                                OwnerCostingPolicyRow(
+                                    policy = policy,
+                                    onClick = { onOpenPolicy(policy.policyId) },
                                 )
-                            }
-                        } else {
-                            LazyColumn(
-                                Modifier
-                                    .fillMaxSize()
-                                    .testTag(NativeUiTags.OwnerCostingPlansList),
-                            ) {
-                                items(policies, key = { it.policyId }) { policy ->
-                                    OwnerCostingPolicyRow(
-                                        policy = policy,
-                                        onClick = { onOpenPolicy(policy.policyId) },
-                                    )
-                                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                                }
+                                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                             }
                         }
                     }
@@ -802,7 +986,7 @@ private fun OwnerCostingPlansReauthDialog(
 }
 
 @Composable
-private fun OwnerCostingPlansDiscardDialog(
+internal fun OwnerCostingPlansDiscardDialog(
     leaveGuard: EntryLeaveGuard,
     title: String,
     body: String,

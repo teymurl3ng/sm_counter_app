@@ -26,13 +26,13 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -45,6 +45,7 @@ import com.saaf.milkshop.application.owner.NativeCorrectionKind
 import com.saaf.milkshop.application.owner.NativeCorrectionPrefill
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsContext
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsDetail
+import com.saaf.milkshop.application.owner.NativeOwnerAccountLedgerDetail
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsRow
 import com.saaf.milkshop.application.owner.NativeRecordsGroup
 import com.saaf.milkshop.nativeui.NativeUiTags
@@ -64,6 +65,8 @@ fun OwnerRecordsScreen(
     onSearchQueryChange: (String) -> Unit,
     onOpenRecord: (Long) -> Unit,
     onBackFromDetail: () -> Unit,
+    onOpenLedger: (Long) -> Unit = {},
+    onBackFromLedger: () -> Unit = {},
     onLeaveConfirmed: () -> Unit,
     hostedScaffold: HostedScaffold,
     roleLabel: String = "Owner",
@@ -138,11 +141,21 @@ fun OwnerRecordsScreen(
                     roleLabel = roleLabel,
                     modifier = modifier,
                 )
+                state.ledger != null -> RecordsLedgerBody(
+                    snackbarHostState = snackbarHostState,
+                    context = state.snapshot.context,
+                    ledger = state.ledger,
+                    onBack = onBackFromLedger,
+                    hostedScaffold = hostedScaffold,
+                    roleLabel = roleLabel,
+                    modifier = modifier,
+                )
                 else -> RecordsListBody(
                     snackbarHostState = snackbarHostState,
                     state = state,
                     onSearchQueryChange = onSearchQueryChange,
                     onOpenRecord = onOpenRecord,
+                    onOpenLedger = onOpenLedger,
                     onLeaveConfirmed = onLeaveConfirmed,
                     hostedScaffold = hostedScaffold,
                     roleLabel = roleLabel,
@@ -162,6 +175,7 @@ private fun RecordsListBody(
     state: NativeOwnerRecordsState.Ready,
     onSearchQueryChange: (String) -> Unit,
     onOpenRecord: (Long) -> Unit,
+    onOpenLedger: (Long) -> Unit,
     onLeaveConfirmed: () -> Unit,
     hostedScaffold: HostedScaffold,
     roleLabel: String,
@@ -198,8 +212,12 @@ private fun RecordsListBody(
                         .fillMaxWidth()
                         .testTag(NativeUiTags.OwnerRecordsSearch),
                     singleLine = true,
-                    label = { Text("Search records") },
-                    placeholder = { Text("Id, type, actor, notes…") },
+                    label = {
+                        Text(if (state.activeGroup == NativeRecordsGroup.Balances) "Search accounts" else "Search records")
+                    },
+                    placeholder = {
+                        Text(if (state.activeGroup == NativeRecordsGroup.Balances) "Customer or supplier" else "Id, type, actor, notes…")
+                    },
                 )
                 Row(
                     Modifier
@@ -215,14 +233,14 @@ private fun RecordsListBody(
                         modifier = Modifier.testTag(NativeUiTags.OwnerRecordsGroupRecent),
                     )
                     FilterChip(
-                        selected = false,
-                        onClick = { onDeferredGroup("Balances & ledgers") },
+                        selected = state.activeGroup == NativeRecordsGroup.Balances,
+                        onClick = { onSelectGroup(NativeRecordsGroup.Balances) },
                         label = { Text("Balances") },
                         modifier = Modifier.testTag(NativeUiTags.OwnerRecordsGroupBalances),
                     )
                     FilterChip(
-                        selected = false,
-                        onClick = { onDeferredGroup("Closing history") },
+                        selected = state.activeGroup == NativeRecordsGroup.Closing,
+                        onClick = { onSelectGroup(NativeRecordsGroup.Closing) },
                         label = { Text("Closing") },
                         modifier = Modifier.testTag(NativeUiTags.OwnerRecordsGroupClosing),
                     )
@@ -234,12 +252,21 @@ private fun RecordsListBody(
                     )
                 }
             }
+            if (state.refreshing) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
             Box(Modifier.fillMaxSize()) {
                 when {
                     state.loadingDetail -> {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             CircularProgressIndicator()
                         }
+                    }
+                    state.activeGroup == NativeRecordsGroup.Balances -> {
+                        RecordsBalancesBody(state = state, onOpenLedger = onOpenLedger)
+                    }
+                    state.activeGroup == NativeRecordsGroup.Closing -> {
+                        RecordsClosingBody(state = state)
                     }
                     state.snapshot.records.isEmpty() && state.activeGroup == NativeRecordsGroup.Recent -> {
                         Column(
@@ -319,6 +346,149 @@ private fun RecordsListBody(
                             .padding(16.dp)
                             .testTag(NativeUiTags.OwnerRecordsError),
                     )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RecordsBalancesBody(
+    state: NativeOwnerRecordsState.Ready,
+    onOpenLedger: (Long) -> Unit,
+) {
+    val needle = state.searchQuery.trim().lowercase(Locale.US)
+    val rows = state.snapshot.balances.filter { row ->
+        needle.isEmpty() || row.displayName.lowercase(Locale.US).contains(needle) ||
+            row.categoryLabel.lowercase(Locale.US).contains(needle)
+    }
+    if (rows.isEmpty()) {
+        Column(
+            Modifier.fillMaxSize().padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(if (needle.isEmpty()) "No customer or supplier balances" else "No matching accounts")
+        }
+        return
+    }
+    LazyColumn(Modifier.fillMaxSize()) {
+        items(rows, key = { it.accountId }) { row ->
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 64.dp)
+                    .clickable(onClick = { onOpenLedger(row.accountId) })
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(row.displayName, style = MaterialTheme.typography.titleMedium)
+                    Text(row.categoryLabel, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Text(row.balanceLabel, fontWeight = FontWeight.SemiBold)
+                Icon(Icons.Outlined.ChevronRight, contentDescription = null)
+            }
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        }
+    }
+}
+
+@Composable
+private fun RecordsClosingBody(state: NativeOwnerRecordsState.Ready) {
+    val rows = state.snapshot.closeActions
+    if (rows.isEmpty()) {
+        Column(
+            Modifier.fillMaxSize().padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text("No day-closing history yet", style = MaterialTheme.typography.titleLarge)
+            Text(
+                "Close and reopen actions will appear here.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+        }
+        return
+    }
+    LazyColumn(Modifier.fillMaxSize()) {
+        items(rows, key = { it.actionId }) { row ->
+            Column(
+                Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("${row.actionLabel} · ${row.businessDate}", fontWeight = FontWeight.SemiBold)
+                    Text("#${row.actionId}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Text(row.actorLabel, style = MaterialTheme.typography.bodyMedium)
+                Text(row.createdAtLabel, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                row.reason?.let { Text("Reason: $it", style = MaterialTheme.typography.bodyMedium) }
+            }
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        }
+    }
+}
+
+@Composable
+private fun RecordsLedgerBody(
+    snackbarHostState: SnackbarHostState,
+    context: NativeOwnerRecordsContext,
+    ledger: NativeOwnerAccountLedgerDetail,
+    onBack: () -> Unit,
+    hostedScaffold: HostedScaffold,
+    roleLabel: String,
+    modifier: Modifier,
+) {
+    BackHandler(onBack = onBack)
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
+        Column(Modifier.fillMaxSize().padding(padding)) {
+            CashierScreenHeader(
+                title = ledger.displayName,
+                displayName = context.shopName,
+                roleLabel = roleLabel,
+                businessDate = context.businessDate,
+                postingOpen = context.postingOpen,
+            )
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TextButton(onClick = onBack) { Text("Back to balances") }
+                Text(ledger.currentBalanceLabel, fontWeight = FontWeight.Bold)
+            }
+            Text(
+                "${ledger.categoryLabel} ledger",
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            if (ledger.entries.isEmpty()) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("No ledger movements yet")
+                }
+            } else {
+                LazyColumn(Modifier.fillMaxSize()) {
+                    items(ledger.entries, key = { it.logId }) { entry ->
+                        Column(
+                            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                Text(entry.taskLabel, fontWeight = FontWeight.SemiBold)
+                                Text(entry.movementLabel, fontWeight = FontWeight.SemiBold)
+                            }
+                            Text("Balance after: ${entry.balanceAfterLabel}")
+                            Text(
+                                "${entry.occurredAt} · Event #${entry.eventId} · ${entry.stateLabel}",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            entry.notes?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                        }
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    }
                 }
             }
         }
@@ -443,12 +613,12 @@ private fun RecordsCorrectionBody(
     val leaveGuard = rememberEntryLeaveGuard()
     val canLeave = !editor.saving
 
-    LaunchedEffect(editor.dirty) {
-        if (editor.dirty) leaveGuard.markDirty() else leaveGuard.clear()
-    }
-
     fun requestLeave(action: () -> Unit) {
         if (!canLeave) return
+        // Read the editor's current state at the moment the user leaves. Keeping
+        // this synchronous prevents a quick edit-then-back gesture from racing a
+        // composition effect and bypassing the unsaved-changes confirmation.
+        if (editor.dirty) leaveGuard.markDirty() else leaveGuard.clear()
         leaveGuard.requestLeave(action)
     }
 

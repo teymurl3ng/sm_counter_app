@@ -682,6 +682,8 @@ fun OwnerPreviewHost(
                     onSearchQueryChange = ownerRecordsViewModel::setSearchQuery,
                     onOpenRecord = ownerRecordsViewModel::openDetail,
                     onBackFromDetail = ownerRecordsViewModel::clearDetail,
+                    onOpenLedger = ownerRecordsViewModel::openLedger,
+                    onBackFromLedger = ownerRecordsViewModel::clearLedger,
                     onLeaveConfirmed = onLeaveToWelcome,
                     hostedScaffold = { snackbar, mod, wrapNav, content ->
                         OwnerScaffold(
@@ -693,11 +695,6 @@ fun OwnerPreviewHost(
                         )
                     },
                     roleLabel = "Owner",
-                    onDeferredGroup = { group ->
-                        onShowNotice(
-                            "$group comes next in the Owner Records family.",
-                        )
-                    },
                     onSelectGroup = ownerRecordsViewModel::setActiveGroup,
                     onOpenCorrection = ownerRecordsViewModel::openCorrection,
                     onBackFromCorrection = ownerRecordsViewModel::clearCorrection,
@@ -871,9 +868,8 @@ fun OwnerPreviewHost(
                         onBackToOverview = ownerReportsViewModel::close,
                         onRetry = ownerReportsViewModel::refresh,
                         onSelectPreset = ownerReportsViewModel::selectPreset,
-                        onCustomRangePreview = {
-                            onShowNotice("Custom date range comes next in this preview.")
-                        },
+                        onCustomRangePreview = {},
+                        onSelectCustomRange = ownerReportsViewModel::selectCustomRange,
                         onNavigate = navigateOwner,
                     )
                 } else {

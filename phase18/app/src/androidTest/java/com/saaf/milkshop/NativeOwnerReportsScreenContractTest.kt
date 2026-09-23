@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.owner.NativeOwnerReportsCoverageKind
@@ -80,6 +81,29 @@ class NativeOwnerReportsScreenContractTest {
     }
 
     @Test
+    fun customRangeAppliesInclusiveDates() {
+        var applied: Pair<String, String>? = null
+        setScreen(
+            NativeOwnerReportsState.Ready(snapshot = sampleSnapshot()),
+            onSelectCustomRange = { start, end -> applied = start to end },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerReportsCustomPreview).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerReportsCustomStart)
+            .performTextReplacement("2026-08-10")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerReportsCustomEnd)
+            .performTextReplacement("2026-08-20")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerReportsCustomApply).performClick()
+        assertEquals("2026-08-10" to "2026-08-20", applied)
+    }
+
+    @Test
+    fun warmRefreshKeepsReportVisible() {
+        setScreen(NativeOwnerReportsState.Ready(snapshot = sampleSnapshot(), refreshing = true))
+        composeRule.onNodeWithTag(NativeUiTags.OwnerReportsContent).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerReportsRefreshing).assertIsDisplayed()
+    }
+
+    @Test
     fun loadFailureOffersRetry() {
         var retries = 0
         setScreen(
@@ -112,6 +136,7 @@ class NativeOwnerReportsScreenContractTest {
         onRetry: () -> Unit = {},
         onSelectPreset: (NativeOwnerReportsPreset) -> Unit = {},
         onCustomRangePreview: () -> Unit = {},
+        onSelectCustomRange: (String, String) -> Unit = { _, _ -> },
         onNavigate: (OwnerSection) -> Unit = {},
     ) {
         composeRule.setContent {
@@ -130,6 +155,7 @@ class NativeOwnerReportsScreenContractTest {
                     onRetry = onRetry,
                     onSelectPreset = onSelectPreset,
                     onCustomRangePreview = onCustomRangePreview,
+                    onSelectCustomRange = onSelectCustomRange,
                     onNavigate = onNavigate,
                 )
             }

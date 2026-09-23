@@ -129,6 +129,9 @@ data class OwnerCostingState(
     val costingYieldSummary: String? = null,
     val costingYieldApproveOpen: Boolean = false,
     val costingYieldApproving: Boolean = false,
+    val costingLossSaving: Boolean = false,
+    val costingLossClassifications: List<String> = emptyList(),
+    val costingLossReasons: List<String> = emptyList(),
     val costingApproveOpen: Boolean = false,
     val costingApproveSeed: NativeOwnerCostingPolicyDetail? = null,
     val costingApproving: Boolean = false,
@@ -399,6 +402,15 @@ sealed interface NativeOwnerMoreState {
         val costingYieldApproving: Boolean
             get() = costingState.costingYieldApproving
 
+        val costingLossSaving: Boolean
+            get() = costingState.costingLossSaving
+
+        val costingLossClassifications: List<String>
+            get() = costingState.costingLossClassifications
+
+        val costingLossReasons: List<String>
+            get() = costingState.costingLossReasons
+
         val costingApproveOpen: Boolean
             get() = costingState.costingApproveOpen
 
@@ -644,6 +656,9 @@ internal fun NativeOwnerMoreState.Ready.copy(
     costingYieldSummary: String? = this.costingYieldSummary,
     costingYieldApproveOpen: Boolean = this.costingYieldApproveOpen,
     costingYieldApproving: Boolean = this.costingYieldApproving,
+    costingLossSaving: Boolean = this.costingLossSaving,
+    costingLossClassifications: List<String> = this.costingLossClassifications,
+    costingLossReasons: List<String> = this.costingLossReasons,
     costingApproveOpen: Boolean = this.costingApproveOpen,
     costingApproveSeed: NativeOwnerCostingPolicyDetail? = this.costingApproveSeed,
     costingApproving: Boolean = this.costingApproving,
@@ -782,6 +797,9 @@ internal fun NativeOwnerMoreState.Ready.copy(
             costingYieldSummary = costingYieldSummary,
             costingYieldApproveOpen = costingYieldApproveOpen,
             costingYieldApproving = costingYieldApproving,
+            costingLossSaving = costingLossSaving,
+            costingLossClassifications = costingLossClassifications,
+            costingLossReasons = costingLossReasons,
             costingApproveOpen = costingApproveOpen,
             costingApproveSeed = costingApproveSeed,
             costingApproving = costingApproving,

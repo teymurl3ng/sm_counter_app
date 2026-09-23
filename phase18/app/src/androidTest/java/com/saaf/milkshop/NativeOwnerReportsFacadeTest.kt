@@ -78,6 +78,20 @@ class NativeOwnerReportsFacadeTest {
     }
 
     @Test
+    fun customRangeConvertsInclusiveEndToExclusiveBoundary() {
+        assertEquals(
+            "2026-08-10" to "2026-08-21",
+            facade.validateRange("2026-08-10", "2026-08-20"),
+        )
+    }
+
+    @Test
+    fun customRangeRejectsReversedAndOversizedRanges() {
+        assertTrue(runCatching { facade.validateRange("2026-08-20", "2026-08-10") }.isFailure)
+        assertTrue(runCatching { facade.validateRange("2025-01-01", "2026-01-02") }.isFailure)
+    }
+
+    @Test
     fun loadRejectsNonOwner() = runBlocking {
         val (start, end) = facade.rangeForPreset(NativeOwnerReportsPreset.ThisMonth, TODAY)
         val rejected = runCatching {

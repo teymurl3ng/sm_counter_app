@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.saaf.milkshop.application.owner.NativeCorrectionPrefill
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsDetail
+import com.saaf.milkshop.application.owner.NativeOwnerAccountLedgerDetail
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsFacade
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsRow
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsSnapshot
@@ -53,8 +54,10 @@ sealed interface NativeOwnerRecordsState {
         val activeGroup: NativeRecordsGroup = NativeRecordsGroup.Recent,
         val visibleRecords: List<NativeOwnerRecordsRow> = snapshot.records,
         val detail: NativeOwnerRecordsDetail? = null,
+        val ledger: NativeOwnerAccountLedgerDetail? = null,
         val correction: NativeCorrectionEditorState? = null,
         val loadingDetail: Boolean = false,
+        val refreshing: Boolean = false,
         val error: String? = null,
     ) : NativeOwnerRecordsState
     data class LoadFailure(val message: String) : NativeOwnerRecordsState
@@ -96,7 +99,8 @@ class NativeOwnerRecordsViewModel(
         val previousQuery = previous?.searchQuery.orEmpty()
         val previousGroup = previous?.activeGroup ?: NativeRecordsGroup.Recent
         detailGeneration += 1L
-        _state.value = NativeOwnerRecordsState.Loading
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeOwnerRecordsState.Loading
         scope.launch {
             try {
                 val snapshot = withContext(Dispatchers.IO) { facade.loadHistory(session) }
@@ -106,10 +110,18 @@ class NativeOwnerRecordsViewModel(
                     searchQuery = previousQuery,
                     activeGroup = previousGroup,
                     visibleRecords = facade.filterRecords(snapshot.records, previousQuery, previousGroup),
+                    refreshing = false,
                 )
             } catch (error: Throwable) {
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired || previous == null) {
+                    handleLoadFailure(error)
+                } else {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: "Records could not refresh. Try again.",
+                    )
+                }
             }
         }
     }
@@ -129,8 +141,33 @@ class NativeOwnerRecordsViewModel(
         _state.value = current.copy(
             activeGroup = group,
             visibleRecords = facade.filterRecords(current.snapshot.records, current.searchQuery, group),
+            detail = null,
+            ledger = null,
             error = null,
         )
+    }
+
+    fun openLedger(accountId: Long) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerRecordsState.Ready ?: return
+        val generation = ++detailGeneration
+        _state.value = current.copy(loadingDetail = true, error = null, detail = null)
+        scope.launch {
+            try {
+                val ledger = withContext(Dispatchers.IO) { facade.loadLedger(session, accountId) }
+                if (generation != detailGeneration) return@launch
+                val latest = _state.value as? NativeOwnerRecordsState.Ready ?: return@launch
+                _state.value = latest.copy(ledger = ledger, loadingDetail = false)
+            } catch (error: Throwable) {
+                if (generation == detailGeneration) handleDetailFailure(current, error)
+            }
+        }
+    }
+
+    fun clearLedger() {
+        val current = _state.value as? NativeOwnerRecordsState.Ready ?: return
+        detailGeneration += 1L
+        _state.value = current.copy(ledger = null, loadingDetail = false, error = null)
     }
 
     fun openDetail(eventId: Long) {

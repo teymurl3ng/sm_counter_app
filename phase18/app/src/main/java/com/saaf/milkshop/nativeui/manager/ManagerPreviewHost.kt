@@ -456,6 +456,8 @@ fun ManagerPreviewHost(
                     onSearchQueryChange = ownerRecordsViewModel::setSearchQuery,
                     onOpenRecord = ownerRecordsViewModel::openDetail,
                     onBackFromDetail = ownerRecordsViewModel::clearDetail,
+                    onOpenLedger = ownerRecordsViewModel::openLedger,
+                    onBackFromLedger = ownerRecordsViewModel::clearLedger,
                     onLeaveConfirmed = { onManagerSectionChange(ManagerSection.Work) },
                     hostedScaffold = { snackbar, mod, wrapNav, content ->
                         ManagerScaffold(
@@ -469,11 +471,6 @@ fun ManagerPreviewHost(
                     roleLabel = "Manager",
                     rootTag = NativeUiTags.ManagerRecordsRoot,
                     loadingTag = NativeUiTags.ManagerRecordsLoading,
-                    onDeferredGroup = { group ->
-                        onShowNotice(
-                            "$group comes next in the Manager Records family.",
-                        )
-                    },
                     onSelectGroup = ownerRecordsViewModel::setActiveGroup,
                     onOpenCorrection = ownerRecordsViewModel::openCorrection,
                     onBackFromCorrection = ownerRecordsViewModel::clearCorrection,

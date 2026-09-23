@@ -19,6 +19,8 @@ import com.saaf.milkshop.domain.OPERATING_BUDGET_CATEGORIES
 import com.saaf.milkshop.domain.OpeningCostBasisInput
 import com.saaf.milkshop.domain.OpeningCostBasisService
 import com.saaf.milkshop.domain.OpeningStateService
+import com.saaf.milkshop.domain.ProductionLossAssessmentInput
+import com.saaf.milkshop.domain.ProductionLossAssessmentService
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.domain.YieldPolicyInput
 import com.saaf.milkshop.domain.YieldPolicyService
@@ -121,9 +123,16 @@ data class NativeOwnerYieldPolicyRow(
 
 data class NativeOwnerYieldBatchRow(
     val productionEventId: Long,
+    val milkInputLabel: String = "",
     val yieldRatioLabel: String,
     val statusCode: String,
     val statusLabel: String,
+    val assessmentId: Long? = null,
+    val assessmentLabel: String = "Not assessed",
+    val classificationCode: String? = null,
+    val abnormalMilkLiters: String = "0",
+    val reasonCode: String? = null,
+    val assessmentNotes: String? = null,
 )
 
 data class NativeOwnerYieldContext(
@@ -131,6 +140,8 @@ data class NativeOwnerYieldContext(
     val batches: List<NativeOwnerYieldBatchRow>,
     val activePolicyId: Long?,
     val activeSummary: String,
+    val lossClassifications: List<String> = emptyList(),
+    val lossReasons: List<String> = emptyList(),
 )
 
 /**
@@ -146,6 +157,7 @@ class NativeOwnerCostingPlansFacade(
     private val yields: YieldPolicyService = YieldPolicyService(database, security),
     private val openingState: OpeningStateService = OpeningStateService(database),
     private val openingCosts: OpeningCostBasisService = OpeningCostBasisService(database, security),
+    private val productionLosses: ProductionLossAssessmentService = ProductionLossAssessmentService(database, security),
 ) {
     fun reviewReasons(): List<String> = CostingPolicyService.REVIEW_REASONS.sorted()
 
@@ -165,6 +177,10 @@ class NativeOwnerCostingPlansFacade(
 
     fun budgetCategories(): List<String> =
         listOf(BUDGET_CATEGORY_MILK_PURCHASES) + OPERATING_BUDGET_CATEGORIES
+
+    fun lossClassifications(): List<String> = ProductionLossAssessmentService.CLASSIFICATIONS.sorted()
+
+    fun lossReasons(): List<String> = ProductionLossAssessmentService.REASON_CODES.sorted()
 
     fun periodEndExclusive(category: String, periodStart: LocalDate): LocalDate =
         if (category == BUDGET_CATEGORY_MILK_PURCHASES) {
@@ -385,14 +401,27 @@ class NativeOwnerCostingPlansFacade(
             .sortedByDescending { it.eventId }
         val batches = productionEvents.map { event ->
             val assessment = yields.assess(event.eventId)
+            val loss = database.productionLossAssessmentDao().activeForEvent(event.eventId)
             NativeOwnerYieldBatchRow(
                 productionEventId = event.eventId,
+                milkInputLabel = BigDecimal.valueOf(requireNotNull(event.milkLitersUsed))
+                    .stripTrailingZeros().toPlainString() + " L Milk",
                 yieldRatioLabel = assessment.yieldRatio
                     .setScale(4, RoundingMode.HALF_UP)
                     .stripTrailingZeros()
                     .toPlainString() + " kg/L",
                 statusCode = assessment.status,
                 statusLabel = yieldStatusLabel(assessment.status),
+                assessmentId = loss?.assessmentId,
+                assessmentLabel = when (loss?.classification) {
+                    "ordinary" -> "Ordinary production loss"
+                    "abnormal" -> "Abnormal loss · ${loss.abnormalMilkLiters} L Milk"
+                    else -> "Not assessed"
+                },
+                classificationCode = loss?.classification,
+                abnormalMilkLiters = loss?.abnormalMilkLiters ?: "0",
+                reasonCode = loss?.reasonCode,
+                assessmentNotes = loss?.notes,
             )
         }
         val activeSummary = when {
@@ -406,7 +435,18 @@ class NativeOwnerCostingPlansFacade(
             batches = batches,
             activePolicyId = active?.yieldPolicyId,
             activeSummary = activeSummary,
+            lossClassifications = lossClassifications(),
+            lossReasons = lossReasons(),
         )
+    }
+
+    suspend fun recordProductionLossAssessment(
+        sessionHandle: String,
+        input: ProductionLossAssessmentInput,
+    ): NativeOwnerYieldContext {
+        requireOwnerBusinessSettings(sessionHandle)
+        productionLosses.record(sessionHandle, input)
+        return loadYieldContext(sessionHandle)
     }
 
     /**

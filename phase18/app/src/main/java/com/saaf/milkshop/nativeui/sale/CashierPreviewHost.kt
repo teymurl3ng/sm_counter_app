@@ -27,10 +27,13 @@ import com.saaf.milkshop.nativeui.collection.NativeCollectionViewModel
 import com.saaf.milkshop.nativeui.expense.NativeExpenseState
 import com.saaf.milkshop.nativeui.expense.NativeExpenseViewModel
 import com.saaf.milkshop.nativeui.more.CashierExpenseEntryScreen
+import com.saaf.milkshop.nativeui.more.CashierDeliveriesEntryScreen
 import com.saaf.milkshop.nativeui.more.CashierMoreScreen
 import com.saaf.milkshop.nativeui.more.NativeMoreDestination
 import com.saaf.milkshop.nativeui.more.NativeMoreState
 import com.saaf.milkshop.nativeui.more.NativeMoreViewModel
+import com.saaf.milkshop.nativeui.operations.NativeDeliveriesState
+import com.saaf.milkshop.nativeui.operations.NativeDeliveriesViewModel
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 
 /**
@@ -60,6 +63,8 @@ fun CashierPreviewHost(
     moreViewModel: NativeMoreViewModel,
     expenseState: NativeExpenseState,
     expenseViewModel: NativeExpenseViewModel,
+    deliveriesState: NativeDeliveriesState,
+    deliveriesViewModel: NativeDeliveriesViewModel,
     onLeaveToWelcome: () -> Unit,
     onLeaveToAccountPicker: () -> Unit,
     onShowNotice: (String) -> Unit,
@@ -78,6 +83,7 @@ fun CashierPreviewHost(
                 activityViewModel.close()
                 moreViewModel.close()
                 expenseViewModel.close()
+                deliveriesViewModel.close()
             }
             lastCashierSession = sessionHandle
             sampleReady = false
@@ -136,6 +142,11 @@ fun CashierPreviewHost(
             } else {
                 expenseViewModel.close()
             }
+            if (destination == NativeMoreDestination.Deliveries) {
+                deliveriesViewModel.open(sessionHandle)
+            } else {
+                deliveriesViewModel.close()
+            }
         }
         BackHandler {
             when (cashierSection) {
@@ -162,6 +173,9 @@ fun CashierPreviewHost(
                     val ready = moreState as? NativeMoreState.Ready
                     if (ready != null && ready.destination == NativeMoreDestination.Expense) {
                         // CashierExpenseEntryScreen owns Back + leave-guard.
+                    } else if (ready != null && ready.destination == NativeMoreDestination.Deliveries) {
+                        deliveriesViewModel.close()
+                        moreViewModel.backToMenu()
                     } else if (ready != null && ready.destination != NativeMoreDestination.Menu) {
                         moreViewModel.backToMenu()
                     } else {
@@ -277,6 +291,23 @@ fun CashierPreviewHost(
                             navigateCashier(section)
                         },
                     )
+                } else if (moreReady?.destination == NativeMoreDestination.Deliveries) {
+                    CashierDeliveriesEntryScreen(
+                        snackbarHostState = snackbarHostState,
+                        identity = identity,
+                        state = deliveriesState,
+                        onRetry = deliveriesViewModel::refresh,
+                        onMarkDelivered = deliveriesViewModel::markDelivered,
+                        onBackToMore = {
+                            deliveriesViewModel.close()
+                            moreViewModel.backToMenu()
+                        },
+                        onNavigate = { section ->
+                            deliveriesViewModel.close()
+                            moreViewModel.backToMenu()
+                            navigateCashier(section)
+                        },
+                    )
                 } else {
                     CashierMoreScreen(
                         snackbarHostState = snackbarHostState,
@@ -287,6 +318,10 @@ fun CashierPreviewHost(
                         onOpenExpense = {
                             moreViewModel.openExpense()
                             expenseViewModel.open(sessionHandle)
+                        },
+                        onOpenDeliveries = {
+                            moreViewModel.openDeliveries()
+                            deliveriesViewModel.open(sessionHandle)
                         },
                         onOpenPersonalSecurity = moreViewModel::openPersonalSecurity,
                         onBackToMenu = {

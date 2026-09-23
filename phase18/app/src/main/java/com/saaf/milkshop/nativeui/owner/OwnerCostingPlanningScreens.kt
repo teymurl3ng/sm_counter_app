@@ -20,6 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
@@ -49,6 +50,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerYieldBatchRow
 import com.saaf.milkshop.application.owner.NativeOwnerYieldPolicyRow
 import com.saaf.milkshop.domain.BUDGET_CATEGORY_MILK_PURCHASES
 import com.saaf.milkshop.domain.BudgetPlanInput
+import com.saaf.milkshop.domain.ProductionLossAssessmentInput
 import com.saaf.milkshop.domain.YieldPolicyInput
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
@@ -57,6 +59,7 @@ import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import java.time.LocalDate
+import java.math.BigDecimal
 
 @Composable
 internal fun OwnerCostingPlansSectionTabs(
@@ -584,13 +587,19 @@ internal fun OwnerCostingYieldBody(
     identity: NativeSignedInIdentity,
     context: NativeOwnerMoreContext,
     policies: List<NativeOwnerYieldPolicyRow>,
+    batches: List<NativeOwnerYieldBatchRow>,
     summary: String?,
     error: String?,
     onOpenApprove: () -> Unit,
+    savingAssessment: Boolean,
+    classifications: List<String>,
+    reasons: List<String>,
+    onSaveAssessment: (ProductionLossAssessmentInput) -> Unit,
     hostedScaffold: HostedScaffold,
     modifier: Modifier = Modifier,
     header: @Composable () -> Unit,
 ) {
+    var assessmentBatch by remember { mutableStateOf<NativeOwnerYieldBatchRow?>(null) }
     hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
@@ -677,8 +686,158 @@ internal fun OwnerCostingYieldBody(
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     }
                 }
+                item {
+                    Text(
+                        "Production loss review",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(top = 20.dp, bottom = 8.dp),
+                    )
+                    Text(
+                        "Classify each batch loss so abnormal incidents stay separate from normal conversion loss.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                if (batches.isEmpty()) {
+                    item {
+                        Text(
+                            "No production batches to assess yet.",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(vertical = 12.dp),
+                        )
+                    }
+                } else {
+                    items(batches, key = { "loss-${it.productionEventId}" }) { batch ->
+                        Row(
+                            Modifier.fillMaxWidth().padding(vertical = 10.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                                Text("Batch #${batch.productionEventId}", fontWeight = FontWeight.SemiBold)
+                                Text("${batch.milkInputLabel} · ${batch.yieldRatioLabel}")
+                                Text(
+                                    batch.assessmentLabel,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                            }
+                            TextButton(
+                                onClick = { assessmentBatch = batch },
+                                enabled = !savingAssessment,
+                                modifier = Modifier.testTag(
+                                    NativeUiTags.ownerCostingLossAssess(batch.productionEventId),
+                                ),
+                            ) { Text(if (batch.assessmentId == null) "Assess" else "Revise") }
+                        }
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    }
+                }
             }
         }
+    }
+    assessmentBatch?.let { batch ->
+        var classification by remember(batch.productionEventId) {
+            mutableStateOf(batch.classificationCode ?: classifications.firstOrNull() ?: "ordinary")
+        }
+        var reason by remember(batch.productionEventId) {
+            mutableStateOf(batch.reasonCode ?: reasons.firstOrNull() ?: "spill")
+        }
+        var abnormalLiters by remember(batch.productionEventId) {
+            mutableStateOf(batch.abnormalMilkLiters)
+        }
+        var notes by remember(batch.productionEventId) { mutableStateOf(batch.assessmentNotes.orEmpty()) }
+        val abnormalValue = abnormalLiters.toBigDecimalOrNull()
+        val canSave = !savingAssessment && classification.isNotBlank() && reason.isNotBlank() &&
+            (classification != "abnormal" || (abnormalValue != null && abnormalValue > BigDecimal.ZERO)) &&
+            (reason != "other" || notes.isNotBlank())
+        AlertDialog(
+            onDismissRequest = { if (!savingAssessment) assessmentBatch = null },
+            title = { Text("Assess batch #${batch.productionEventId}") },
+            text = {
+                Column(
+                    Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    Text("${batch.milkInputLabel} · ${batch.yieldRatioLabel}")
+                    Text("Classification", fontWeight = FontWeight.SemiBold)
+                    Row(
+                        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        classifications.forEach { code ->
+                            FilterChip(
+                                selected = classification == code,
+                                onClick = {
+                                    classification = code
+                                    if (code == "ordinary") abnormalLiters = "0"
+                                },
+                                label = { Text(code.replace('_', ' ').replaceFirstChar { it.uppercase() }) },
+                            )
+                        }
+                    }
+                    if (classification == "abnormal") {
+                        OutlinedTextField(
+                            value = abnormalLiters,
+                            onValueChange = { abnormalLiters = it },
+                            label = { Text("Abnormal Milk quantity (L)") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.OwnerCostingLossQuantity),
+                        )
+                    }
+                    Text("What physically happened?", fontWeight = FontWeight.SemiBold)
+                    Row(
+                        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        reasons.forEach { code ->
+                            FilterChip(
+                                selected = reason == code,
+                                onClick = { reason = code },
+                                label = { Text(code.replace('_', ' ').replaceFirstChar { it.uppercase() }) },
+                            )
+                        }
+                    }
+                    OutlinedTextField(
+                        value = notes,
+                        onValueChange = { notes = it },
+                        label = { Text(if (reason == "other") "Incident explanation" else "Notes (optional)") },
+                        modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.OwnerCostingLossNotes),
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onSaveAssessment(
+                            ProductionLossAssessmentInput(
+                                productionEventId = batch.productionEventId,
+                                classification = classification,
+                                abnormalMilkLiters = if (classification == "ordinary") {
+                                    BigDecimal.ZERO
+                                } else {
+                                    abnormalValue ?: BigDecimal.ZERO
+                                },
+                                reasonCode = reason,
+                                notes = notes.trim().takeIf { it.isNotEmpty() },
+                                supersedesAssessmentId = batch.assessmentId,
+                            ),
+                        )
+                        assessmentBatch = null
+                    },
+                    enabled = canSave,
+                    modifier = Modifier.testTag(NativeUiTags.OwnerCostingLossSave),
+                ) { Text(if (savingAssessment) "Saving…" else "Save assessment") }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { assessmentBatch = null },
+                    enabled = !savingAssessment,
+                ) { Text("Cancel") }
+            },
+        )
     }
 }
 

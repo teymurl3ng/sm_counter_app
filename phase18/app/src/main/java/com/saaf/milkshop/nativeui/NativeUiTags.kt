@@ -154,6 +154,7 @@ object NativeUiTags {
     const val MoreCountCash = "more_count_cash"
     const val MoreExpense = "more_expense"
     const val MorePersonalSecurity = "more_personal_security"
+    const val MoreDeliveries = "more_deliveries"
     const val CashierExpenseEntryRoot = "cashier_expense_entry_root"
     const val MoreSwitchAccount = "more_switch_account"
     const val MoreSignOut = "more_sign_out"
@@ -315,6 +316,10 @@ object NativeUiTags {
     const val OwnerReportsProductsEmpty = "owner_reports_products_empty"
     const val OwnerReportsCustomPreview = "owner_reports_custom_preview"
     const val OwnerReportsCustomNotice = "owner_reports_custom_notice"
+    const val OwnerReportsRefreshing = "owner_reports_refreshing"
+    const val OwnerReportsCustomStart = "owner_reports_custom_start"
+    const val OwnerReportsCustomEnd = "owner_reports_custom_end"
+    const val OwnerReportsCustomApply = "owner_reports_custom_apply"
 
     fun ownerReportsProduct(productId: Long): String = "owner_reports_product_$productId"
     const val OwnerWorkHome = "owner_work_home"
@@ -665,6 +670,9 @@ object NativeUiTags {
     const val OwnerCostingYieldDiscard = "owner_costing_yield_discard"
     const val OwnerCostingYieldKeep = "owner_costing_yield_keep"
     const val OwnerCostingYieldSupersedeHint = "owner_costing_yield_supersede_hint"
+    const val OwnerCostingLossQuantity = "owner_costing_loss_quantity"
+    const val OwnerCostingLossNotes = "owner_costing_loss_notes"
+    const val OwnerCostingLossSave = "owner_costing_loss_save"
 
     fun ownerCostingPolicy(policyId: Long): String = "owner_costing_policy_$policyId"
 
@@ -685,6 +693,7 @@ object NativeUiTags {
     fun ownerCostingOpeningKind(code: String): String = "owner_costing_opening_kind_$code"
 
     fun ownerCostingYieldPolicy(yieldPolicyId: Long): String = "owner_costing_yield_policy_$yieldPolicyId"
+    fun ownerCostingLossAssess(eventId: Long): String = "owner_costing_loss_assess_$eventId"
 
     fun ownerCostingYieldBatch(eventId: Long): String = "owner_costing_yield_batch_$eventId"
 

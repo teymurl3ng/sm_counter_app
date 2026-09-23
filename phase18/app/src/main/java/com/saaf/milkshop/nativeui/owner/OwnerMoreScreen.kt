@@ -69,6 +69,7 @@ import com.saaf.milkshop.domain.ProductCatalogInput
 import com.saaf.milkshop.domain.StoreIdentityInput
 import com.saaf.milkshop.domain.VendorProfileInput
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 
@@ -246,7 +247,8 @@ fun OwnerMoreScreen(
             }
         }
 
-        is NativeOwnerMoreState.Ready -> when (state.destination) {
+        is NativeOwnerMoreState.Ready -> NativeSecondaryTransition(state.destination) { destination ->
+            when (destination) {
             NativeOwnerMoreDestination.Menu -> OwnerMoreMenuScreen(
                 snackbarHostState = snackbarHostState,
                 identity = identity,
@@ -447,6 +449,9 @@ fun OwnerMoreScreen(
                 yieldSummary = state.costingYieldSummary,
                 yieldApproveOpen = state.costingYieldApproveOpen,
                 yieldApproving = state.costingYieldApproving,
+                lossSaving = state.costingLossSaving,
+                lossClassifications = state.costingLossClassifications,
+                lossReasons = state.costingLossReasons,
                 approveOpen = state.costingApproveOpen,
                 approveSeed = state.costingApproveSeed,
                 approving = state.costingApproving,
@@ -477,6 +482,7 @@ fun OwnerMoreScreen(
                 onOpenYieldApprove = costingActions.onOpenYieldApprove,
                 onBackFromYieldApprove = costingActions.onBackFromYieldApprove,
                 onApproveYieldPolicy = costingActions.onApproveYieldPolicy,
+                onRecordProductionLoss = costingActions.onRecordProductionLoss,
                 onSubmitReauth = costingActions.onSubmitReauth,
                 onCancelReauth = costingActions.onCancelReauth,
                 periodEndExclusive = { category, start ->
@@ -668,6 +674,7 @@ fun OwnerMoreScreen(
                 },
                 modifier = modifier,
             )
+            }
         }
     }
 }

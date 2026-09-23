@@ -32,6 +32,7 @@ import com.saaf.milkshop.domain.BudgetPlanInput
 import com.saaf.milkshop.domain.CostingPolicyInput
 import com.saaf.milkshop.domain.CostingPolicyService
 import com.saaf.milkshop.domain.OpeningCostBasisInput
+import com.saaf.milkshop.domain.ProductionLossAssessmentInput
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.domain.YieldPolicyInput
 import com.saaf.milkshop.nativeui.NativeUiTags
@@ -471,6 +472,37 @@ class NativeOwnerCostingPlansScreenContractTest {
         assertEquals(30, saved!!.acceptedProductionEventIds.size)
     }
 
+    @Test
+    fun productionLossAssessmentCapturesAbnormalBatch() {
+        var saved: ProductionLossAssessmentInput? = null
+        setScreen(
+            policies = emptyList(),
+            section = NativeOwnerCostingSection.Yield,
+            yieldBatches = listOf(
+                NativeOwnerYieldBatchRow(
+                    productionEventId = 44L,
+                    milkInputLabel = "20 L Milk",
+                    yieldRatioLabel = "0.7 kg/L",
+                    statusCode = "below_range",
+                    statusLabel = "Below baseline",
+                ),
+            ),
+            lossClassifications = listOf("ordinary", "abnormal"),
+            lossReasons = listOf("spill", "other"),
+            onRecordProductionLoss = { saved = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.ownerCostingLossAssess(44L)).performClick()
+        composeRule.onNodeWithText("Abnormal").performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingLossQuantity)
+            .performTextReplacement("1.5")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingLossNotes)
+            .performTextInput("Observed spill")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingLossSave).performClick()
+        assertNotNull(saved)
+        assertEquals("abnormal", saved!!.classification)
+        assertEquals("1.5", saved!!.abnormalMilkLiters.toPlainString())
+    }
+
     private fun setScreen(
         policies: List<NativeOwnerCostingPolicyRow>,
         policiesLoading: Boolean = false,
@@ -493,6 +525,8 @@ class NativeOwnerCostingPlansScreenContractTest {
         yieldBatches: List<NativeOwnerYieldBatchRow> = emptyList(),
         yieldSummary: String? = null,
         yieldApproveOpen: Boolean = false,
+        lossClassifications: List<String> = emptyList(),
+        lossReasons: List<String> = emptyList(),
         approveOpen: Boolean = false,
         approveSeed: NativeOwnerCostingPolicyDetail? = null,
         approving: Boolean = false,
@@ -518,6 +552,7 @@ class NativeOwnerCostingPlansScreenContractTest {
         onSaveOpeningCost: (OpeningCostBasisInput) -> Unit = {},
         onOpenYieldApprove: () -> Unit = {},
         onApproveYieldPolicy: (YieldPolicyInput) -> Unit = {},
+        onRecordProductionLoss: (ProductionLossAssessmentInput) -> Unit = {},
         onSubmitReauth: (CharArray) -> Unit = { it.fill('\u0000') },
         onCancelReauth: () -> Unit = {},
         onNavigate: (OwnerSection) -> Unit = {},
@@ -564,6 +599,8 @@ class NativeOwnerCostingPlansScreenContractTest {
                         yieldBatches = yieldBatches,
                         yieldSummary = yieldSummary,
                         yieldApproveOpen = yieldApproveOpen,
+                        lossClassifications = lossClassifications,
+                        lossReasons = lossReasons,
                         approveOpen = approveOpen,
                         approveSeed = approveSeed,
                         approving = approving,
@@ -589,6 +626,7 @@ class NativeOwnerCostingPlansScreenContractTest {
                         onSaveOpeningCost = onSaveOpeningCost,
                         onOpenYieldApprove = onOpenYieldApprove,
                         onApproveYieldPolicy = onApproveYieldPolicy,
+                        onRecordProductionLoss = onRecordProductionLoss,
                         onSubmitReauth = onSubmitReauth,
                         onCancelReauth = onCancelReauth,
                         hostedScaffold = { snackbar, mod, wrapNav, content ->

@@ -55,6 +55,43 @@ data class NativeOwnerRecordsRow(
 data class NativeOwnerRecordsSnapshot(
     val context: NativeOwnerRecordsContext,
     val records: List<NativeOwnerRecordsRow>,
+    val balances: List<NativeOwnerAccountBalanceRow> = emptyList(),
+    val closeActions: List<NativeOwnerCloseActionRow> = emptyList(),
+)
+
+data class NativeOwnerAccountBalanceRow(
+    val accountId: Long,
+    val displayName: String,
+    val categoryLabel: String,
+    val balanceLabel: String,
+)
+
+data class NativeOwnerAccountLedgerEntryRow(
+    val logId: Long,
+    val eventId: Long,
+    val occurredAt: String,
+    val taskLabel: String,
+    val movementLabel: String,
+    val balanceAfterLabel: String,
+    val stateLabel: String,
+    val notes: String?,
+)
+
+data class NativeOwnerAccountLedgerDetail(
+    val accountId: Long,
+    val displayName: String,
+    val categoryLabel: String,
+    val currentBalanceLabel: String,
+    val entries: List<NativeOwnerAccountLedgerEntryRow>,
+)
+
+data class NativeOwnerCloseActionRow(
+    val actionId: Long,
+    val businessDate: String,
+    val actionLabel: String,
+    val actorLabel: String,
+    val createdAtLabel: String,
+    val reason: String?,
 )
 
 data class NativeOwnerRecordsInventoryLine(
@@ -69,6 +106,8 @@ data class NativeOwnerRecordsFinancialLine(
 
 enum class NativeRecordsGroup {
     Recent,
+    Balances,
+    Closing,
     Corrections,
 }
 
@@ -137,6 +176,36 @@ class NativeOwnerRecordsFacade(
         val records = history.map { dto ->
             toRow(dto, eventsById[dto.eventId])
         }
+        val balances = database.readModelDao().accountBalances()
+            .filter { it.category == "Customer" || it.category == "Vendor" }
+            .map { balance ->
+                NativeOwnerAccountBalanceRow(
+                    accountId = balance.accountId,
+                    displayName = balance.name
+                        .removePrefix("Customer: ")
+                        .removePrefix("Vendor: ")
+                        .trim(),
+                    categoryLabel = balance.category,
+                    balanceLabel = formatPaisa(money(balance.balance)),
+                )
+            }
+            .sortedWith(compareBy<NativeOwnerAccountBalanceRow> { it.categoryLabel }.thenBy { it.displayName })
+        val closeActions = reads.reconciliationArchive(sessionHandle).closeActions.map { action ->
+            NativeOwnerCloseActionRow(
+                actionId = action.actionId,
+                businessDate = action.businessDate,
+                actionLabel = when (action.actionCode) {
+                    "close" -> "Closed"
+                    "reopen" -> "Reopened"
+                    else -> action.actionCode.replace('_', ' ').replaceFirstChar { it.uppercase() }
+                },
+                actorLabel = listOfNotNull(action.actor.displayName, action.actor.roleCode)
+                    .joinToString(" · ")
+                    .ifBlank { "Unknown user" },
+                createdAtLabel = formatDateTime(action.createdAt),
+                reason = action.reason?.trim()?.takeIf { it.isNotEmpty() },
+            )
+        }
         return NativeOwnerRecordsSnapshot(
             context = NativeOwnerRecordsContext(
                 businessDate = businessDate,
@@ -145,6 +214,38 @@ class NativeOwnerRecordsFacade(
                     ?: "Saaf Milk",
             ),
             records = records,
+            balances = balances,
+            closeActions = closeActions,
+        )
+    }
+
+    suspend fun loadLedger(
+        sessionHandle: String,
+        accountId: Long,
+    ): NativeOwnerAccountLedgerDetail {
+        requireRecordsHost(sessionHandle)
+        val ledger = reads.accountLedger(sessionHandle, accountId)
+        return NativeOwnerAccountLedgerDetail(
+            accountId = ledger.accountId,
+            displayName = ledger.displayName,
+            categoryLabel = ledger.categoryCode,
+            currentBalanceLabel = formatPaisa(ledger.currentBalancePaisa),
+            entries = ledger.entries.asReversed().map { entry ->
+                NativeOwnerAccountLedgerEntryRow(
+                    logId = entry.logId,
+                    eventId = entry.eventId,
+                    occurredAt = entry.occurredAt,
+                    taskLabel = taskLabel(entry.eventTypeCode),
+                    movementLabel = formatPaisa(entry.movementPaisa),
+                    balanceAfterLabel = formatPaisa(entry.balanceAfterPaisa),
+                    stateLabel = when {
+                        entry.isCorrection -> "Correction"
+                        entry.isSuperseded -> "Corrected"
+                        else -> "Recorded"
+                    },
+                    notes = entry.notes?.trim()?.takeIf { it.isNotEmpty() },
+                )
+            },
         )
     }
 
@@ -195,6 +296,9 @@ class NativeOwnerRecordsFacade(
     ): List<NativeOwnerRecordsRow> {
         val grouped = when (group) {
             NativeRecordsGroup.Recent -> records
+            NativeRecordsGroup.Balances,
+            NativeRecordsGroup.Closing,
+            -> emptyList()
             NativeRecordsGroup.Corrections -> records.filter { it.isCorrection || it.isSuperseded }
         }
         val needle = query.trim().lowercase(Locale.US)
@@ -532,6 +636,12 @@ class NativeOwnerRecordsFacade(
 
     private fun formatMoney(paisa: Long): String =
         String.format(Locale.US, "%,.2f", paisa / 100.0)
+
+    private fun formatPaisa(paisa: Long): String = "PKR ${formatMoney(paisa)}"
+
+    private fun formatDateTime(value: String): String = runCatching {
+        OffsetDateTime.parse(value).format(DateTimeFormatter.ofPattern("yyyy-MM-dd · h:mm a", Locale.US))
+    }.getOrDefault(value)
 
     private fun formatQuantity(value: Double): String =
         BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()

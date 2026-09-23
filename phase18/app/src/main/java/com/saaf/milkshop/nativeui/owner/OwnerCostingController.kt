@@ -8,6 +8,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerYieldContext
 import com.saaf.milkshop.domain.BudgetPlanInput
 import com.saaf.milkshop.domain.CostingPolicyInput
 import com.saaf.milkshop.domain.OpeningCostBasisInput
+import com.saaf.milkshop.domain.ProductionLossAssessmentInput
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.domain.YieldPolicyInput
 import java.time.LocalDate
@@ -25,6 +26,7 @@ internal class OwnerCostingController(
     private var pendingCostingApprove: CostingPolicyInput? = null
     private var pendingYieldApprove: YieldPolicyInput? = null
     private var pendingOpeningCost: OpeningCostBasisInput? = null
+    private var pendingProductionLoss: ProductionLossAssessmentInput? = null
 
     fun openCostingPlans() {
         val token = runtime.captureSession() ?: return
@@ -33,6 +35,7 @@ internal class OwnerCostingController(
         pendingCostingApprove = null
         pendingYieldApprove = null
         pendingOpeningCost = null
+        pendingProductionLoss = null
         runtime.state.value = current.copy(
             destination = NativeOwnerMoreDestination.CostingPlans,
             costingPoliciesLoading = NativeOwnerMoreDestination.CostingPlans !in current.loadedDestinations,
@@ -46,6 +49,7 @@ internal class OwnerCostingController(
             costingOpeningSaving = false,
             costingYieldApproveOpen = false,
             costingYieldApproving = false,
+            costingLossSaving = false,
             costingApproveOpen = false,
             costingApproveSeed = null,
             costingApproving = false,
@@ -140,6 +144,8 @@ internal class OwnerCostingController(
                     costingYieldBatches = load.yield.batches,
                     costingYieldActivePolicyId = load.yield.activePolicyId,
                     costingYieldSummary = load.yield.activeSummary,
+                    costingLossClassifications = load.yield.lossClassifications,
+                    costingLossReasons = load.yield.lossReasons,
                     loadedDestinations = latest.loadedDestinations + NativeOwnerMoreDestination.CostingPlans,
                 )
             } catch (error: Throwable) {
@@ -181,6 +187,8 @@ internal class OwnerCostingController(
                     costingYieldBatches = load.yield.batches,
                     costingYieldActivePolicyId = load.yield.activePolicyId,
                     costingYieldSummary = load.yield.activeSummary,
+                    costingLossClassifications = load.yield.lossClassifications,
+                    costingLossReasons = load.yield.lossReasons,
                 )
             } catch (error: Throwable) {
                 handleFailure(token, error)
@@ -357,7 +365,8 @@ internal class OwnerCostingController(
         val pendingPolicy = pendingCostingApprove
         val pendingYield = pendingYieldApprove
         val pendingOpening = pendingOpeningCost
-        if (pendingPolicy == null && pendingYield == null && pendingOpening == null) {
+        val pendingLoss = pendingProductionLoss
+        if (pendingPolicy == null && pendingYield == null && pendingOpening == null && pendingLoss == null) {
             passphrase.fill('\u0000')
             runtime.state.value = current.copy(costingReauthOpen = false, costingPoliciesError = null)
             return
@@ -381,6 +390,7 @@ internal class OwnerCostingController(
                     pendingCostingApprove = null
                     pendingYieldApprove = null
                     pendingOpeningCost = null
+                    pendingProductionLoss = null
                     runtime.state.value = latest.copy(
                         costingPolicies = snapshot.policies,
                         costingCurrentMonthSummary = snapshot.currentMonthSummary,
@@ -406,6 +416,7 @@ internal class OwnerCostingController(
                     pendingCostingApprove = null
                     pendingYieldApprove = null
                     pendingOpeningCost = null
+                    pendingProductionLoss = null
                     runtime.state.value = latest.copy(
                         costingYieldPolicies = yieldContext.policies,
                         costingYieldBatches = yieldContext.batches,
@@ -427,12 +438,36 @@ internal class OwnerCostingController(
                     pendingCostingApprove = null
                     pendingYieldApprove = null
                     pendingOpeningCost = null
+                    pendingProductionLoss = null
                     runtime.state.value = latest.copy(
                         costingOpeningCosts = opening.rows,
                         costingOpeningSummary = opening.summary,
                         costingOpeningBasisKinds = opening.basisKinds,
                         costingOpeningEditor = null,
                         costingOpeningSaving = false,
+                        costingReauthOpen = false,
+                        costingReauthBusy = false,
+                        costingPoliciesError = null,
+                    )
+                } else if (pendingLoss != null) {
+                    val yieldContext = withContext(Dispatchers.IO) {
+                        facade.recordProductionLossAssessment(session, pendingLoss)
+                    }
+                    val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    if (!runtime.isCurrent(token)) return@launch
+                    if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
+                    pendingCostingApprove = null
+                    pendingYieldApprove = null
+                    pendingOpeningCost = null
+                    pendingProductionLoss = null
+                    runtime.state.value = latest.copy(
+                        costingYieldPolicies = yieldContext.policies,
+                        costingYieldBatches = yieldContext.batches,
+                        costingYieldActivePolicyId = yieldContext.activePolicyId,
+                        costingYieldSummary = yieldContext.activeSummary,
+                        costingLossClassifications = yieldContext.lossClassifications,
+                        costingLossReasons = yieldContext.lossReasons,
+                        costingLossSaving = false,
                         costingReauthOpen = false,
                         costingReauthBusy = false,
                         costingPoliciesError = null,
@@ -451,12 +486,14 @@ internal class OwnerCostingController(
         pendingCostingApprove = null
         pendingYieldApprove = null
         pendingOpeningCost = null
+        pendingProductionLoss = null
         runtime.state.value = current.copy(
             costingReauthOpen = false,
             costingReauthBusy = false,
             costingApproving = false,
             costingYieldApproving = false,
             costingOpeningSaving = false,
+            costingLossSaving = false,
         )
     }
 
@@ -769,11 +806,57 @@ internal class OwnerCostingController(
         }
     }
 
+    fun recordProductionLossAssessment(input: ProductionLossAssessmentInput) {
+        val token = runtime.captureSession() ?: return
+        val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.CostingPlans || current.costingLossSaving) return
+        runtime.state.value = current.copy(costingLossSaving = true, costingPoliciesError = null)
+        runtime.scope.launch {
+            try {
+                val yieldContext = withContext(Dispatchers.IO) {
+                    facade.recordProductionLossAssessment(token.handle, input)
+                }
+                val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (!runtime.isCurrent(token) || latest.destination != NativeOwnerMoreDestination.CostingPlans) {
+                    return@launch
+                }
+                pendingProductionLoss = null
+                runtime.state.value = latest.copy(
+                    costingYieldPolicies = yieldContext.policies,
+                    costingYieldBatches = yieldContext.batches,
+                    costingYieldActivePolicyId = yieldContext.activePolicyId,
+                    costingYieldSummary = yieldContext.activeSummary,
+                    costingLossClassifications = yieldContext.lossClassifications,
+                    costingLossReasons = yieldContext.lossReasons,
+                    costingLossSaving = false,
+                    costingReauthOpen = false,
+                    costingReauthBusy = false,
+                    costingPoliciesError = null,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.RecentAuthenticationRequired) {
+                    pendingProductionLoss = input
+                    val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    if (!runtime.isCurrent(token)) return@launch
+                    runtime.state.value = latest.copy(
+                        costingLossSaving = false,
+                        costingReauthOpen = true,
+                        costingReauthBusy = false,
+                        costingPoliciesError = null,
+                    )
+                } else {
+                    handleFailure(token, error)
+                }
+            }
+        }
+    }
+
 
     fun resetPending() {
         pendingCostingApprove = null
         pendingYieldApprove = null
         pendingOpeningCost = null
+        pendingProductionLoss = null
     }
 
     private fun handleFailure(token: OwnerSessionToken, error: Throwable) {
@@ -786,6 +869,7 @@ internal class OwnerCostingController(
                 costingCollectionsSaving = false,
                 costingOpeningSaving = false,
                 costingYieldApproving = false,
+                costingLossSaving = false,
                 costingPoliciesError = message,
             )
         }

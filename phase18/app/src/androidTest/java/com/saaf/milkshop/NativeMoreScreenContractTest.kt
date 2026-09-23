@@ -119,6 +119,17 @@ class NativeMoreScreenContractTest {
     }
 
     @Test
+    fun menuOpensDeliveriesFromMore() {
+        var opened = false
+        setScreen(
+            NativeMoreState.Ready(context = openContext()),
+            onOpenDeliveries = { opened = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.MoreDeliveries).performClick()
+        assertTrue(opened)
+    }
+
+    @Test
     fun switchAccountAndSignOutFireFromMenu() {
         var switched = false
         var signedOut = false
@@ -167,6 +178,7 @@ class NativeMoreScreenContractTest {
         onRetry: () -> Unit = {},
         onOpenCountCash: () -> Unit = {},
         onOpenExpense: () -> Unit = {},
+        onOpenDeliveries: () -> Unit = {},
         onRecordCashCount: (Long, String?) -> Unit = { _, _ -> },
         onSwitchAccount: () -> Unit = {},
         onSignOut: () -> Unit = {},
@@ -176,6 +188,7 @@ class NativeMoreScreenContractTest {
             onRetry = onRetry,
             onOpenCountCash = onOpenCountCash,
             onOpenExpense = onOpenExpense,
+            onOpenDeliveries = onOpenDeliveries,
             onRecordCashCount = onRecordCashCount,
             onSwitchAccount = onSwitchAccount,
             onSignOut = onSignOut,
@@ -187,6 +200,7 @@ class NativeMoreScreenContractTest {
         onRetry: () -> Unit = {},
         onOpenCountCash: () -> Unit = {},
         onOpenExpense: () -> Unit = {},
+        onOpenDeliveries: () -> Unit = {},
         onRecordCashCount: (Long, String?) -> Unit = { _, _ -> },
         onSwitchAccount: () -> Unit = {},
         onSignOut: () -> Unit = {},
@@ -201,6 +215,7 @@ class NativeMoreScreenContractTest {
                     onRetry = onRetry,
                     onOpenCountCash = onOpenCountCash,
                     onOpenExpense = onOpenExpense,
+                    onOpenDeliveries = onOpenDeliveries,
                     onOpenPersonalSecurity = {},
                     onBackToMenu = {},
                     onRecordCashCount = onRecordCashCount,

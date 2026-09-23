@@ -64,6 +64,7 @@ import com.saaf.milkshop.domain.ConversionCostComponentInput
 import com.saaf.milkshop.domain.CostingPolicyInput
 import com.saaf.milkshop.domain.CostingPolicyService
 import com.saaf.milkshop.domain.OpeningCostBasisInput
+import com.saaf.milkshop.domain.ProductionLossAssessmentInput
 import com.saaf.milkshop.domain.YieldPolicyInput
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.HostedScaffold
@@ -113,6 +114,9 @@ fun OwnerCostingPlansScreen(
     yieldSummary: String? = null,
     yieldApproveOpen: Boolean = false,
     yieldApproving: Boolean = false,
+    lossSaving: Boolean = false,
+    lossClassifications: List<String> = emptyList(),
+    lossReasons: List<String> = emptyList(),
     approveOpen: Boolean = false,
     approveSeed: NativeOwnerCostingPolicyDetail? = null,
     approving: Boolean = false,
@@ -143,6 +147,7 @@ fun OwnerCostingPlansScreen(
     onOpenYieldApprove: () -> Unit = {},
     onBackFromYieldApprove: () -> Unit = {},
     onApproveYieldPolicy: (YieldPolicyInput) -> Unit = {},
+    onRecordProductionLoss: (ProductionLossAssessmentInput) -> Unit = {},
     onSubmitReauth: (CharArray) -> Unit,
     onCancelReauth: () -> Unit,
     periodEndExclusive: (String, LocalDate) -> LocalDate = { category, start ->
@@ -312,7 +317,11 @@ fun OwnerCostingPlansScreen(
                 openingCosts = openingCosts,
                 openingSummary = openingSummary,
                 yieldPolicies = yieldPolicies,
+                yieldBatches = yieldBatches,
                 yieldSummary = yieldSummary,
+                lossSaving = lossSaving,
+                lossClassifications = lossClassifications,
+                lossReasons = lossReasons,
                 onBackToMenu = onBackToMenu,
                 onRetry = onRetry,
                 onSectionChange = onSectionChange,
@@ -323,6 +332,7 @@ fun OwnerCostingPlansScreen(
                 onOpenOpeningEditor = onOpenOpeningEditor,
                 onOpenShopSettings = onOpenShopSettings,
                 onOpenYieldApprove = onOpenYieldApprove,
+                onRecordProductionLoss = onRecordProductionLoss,
                 hostedScaffold = hostedScaffold,
                 backToHubLabel = backToHubLabel,
                 modifier = modifier,
@@ -346,7 +356,11 @@ private fun OwnerCostingPlansListBody(
     openingCosts: List<NativeOwnerOpeningCostRow>,
     openingSummary: String?,
     yieldPolicies: List<NativeOwnerYieldPolicyRow>,
+    yieldBatches: List<NativeOwnerYieldBatchRow>,
     yieldSummary: String?,
+    lossSaving: Boolean,
+    lossClassifications: List<String>,
+    lossReasons: List<String>,
     onBackToMenu: () -> Unit,
     onRetry: () -> Unit,
     onSectionChange: (NativeOwnerCostingSection) -> Unit,
@@ -357,6 +371,7 @@ private fun OwnerCostingPlansListBody(
     onOpenOpeningEditor: (Long) -> Unit,
     onOpenShopSettings: () -> Unit,
     onOpenYieldApprove: () -> Unit,
+    onRecordProductionLoss: (ProductionLossAssessmentInput) -> Unit,
     hostedScaffold: HostedScaffold,
     backToHubLabel: String = "Back to More",
     modifier: Modifier,
@@ -486,9 +501,14 @@ private fun OwnerCostingPlansListBody(
                 identity = identity,
                 context = context,
                 policies = yieldPolicies,
+                batches = yieldBatches,
                 summary = yieldSummary,
                 error = policiesError,
                 onOpenApprove = onOpenYieldApprove,
+                savingAssessment = lossSaving,
+                classifications = lossClassifications,
+                reasons = lossReasons,
+                onSaveAssessment = onRecordProductionLoss,
                 hostedScaffold = hostedScaffold,
                 modifier = modifier.testTag(NativeUiTags.OwnerCostingPlansRoot),
                 header = {

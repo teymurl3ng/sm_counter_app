@@ -299,6 +299,8 @@ fun AdminPreviewHost(
                     onSearchQueryChange = ownerRecordsViewModel::setSearchQuery,
                     onOpenRecord = ownerRecordsViewModel::openDetail,
                     onBackFromRecordDetail = ownerRecordsViewModel::clearDetail,
+                    onOpenLedger = ownerRecordsViewModel::openLedger,
+                    onBackFromLedger = ownerRecordsViewModel::clearLedger,
                     onRetrySecurityHistory = ownerMoreViewModel::refreshSecurityHistory,
                     onOpenSecurityAudit = ownerMoreViewModel::openSecurityAuditDetail,
                     onBackFromSecurityAuditDetail = ownerMoreViewModel::clearSecurityAuditDetail,

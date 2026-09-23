@@ -24,6 +24,7 @@ enum class NativeMoreDestination {
     Menu,
     CountCash,
     Expense,
+    Deliveries,
     PersonalSecurity,
 }
 
@@ -97,6 +98,17 @@ class NativeMoreViewModel(
         val current = _state.value as? NativeMoreState.Ready ?: return
         _state.value = current.copy(
             destination = NativeMoreDestination.Expense,
+            countReceipt = null,
+            confirmRemoveUnlock = false,
+            error = null,
+            saving = false,
+        )
+    }
+
+    fun openDeliveries() {
+        val current = _state.value as? NativeMoreState.Ready ?: return
+        _state.value = current.copy(
+            destination = NativeMoreDestination.Deliveries,
             countReceipt = null,
             confirmRemoveUnlock = false,
             error = null,

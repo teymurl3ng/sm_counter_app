@@ -22,6 +22,7 @@ enum class NativeOwnerReportsCoverageKind {
 enum class NativeOwnerReportsPreset {
     ThisMonth,
     LastMonth,
+    Custom,
 }
 
 data class NativeOwnerReportsProductRow(
@@ -49,7 +50,7 @@ data class NativeOwnerReportsSnapshot(
     val salaryPaymentsLabel: String,
     val estimatedResultLabel: String?,
     val products: List<NativeOwnerReportsProductRow>,
-    val customRangeDeferredNotice: String,
+    val customRangeDeferredNotice: String = "",
 )
 
 /**
@@ -92,7 +93,18 @@ class NativeOwnerReportsFacade(
                 val last = month.minusMonths(1)
                 last.atDay(1).toString() to month.atDay(1).toString()
             }
+            NativeOwnerReportsPreset.Custom -> error("Custom ranges must be supplied explicitly")
         }
+    }
+
+    fun validateRange(startInclusive: String, endInclusive: String): Pair<String, String> {
+        val start = runCatching { LocalDate.parse(startInclusive.trim()) }
+            .getOrElse { throw IllegalArgumentException("Enter the start date as YYYY-MM-DD") }
+        val end = runCatching { LocalDate.parse(endInclusive.trim()) }
+            .getOrElse { throw IllegalArgumentException("Enter the end date as YYYY-MM-DD") }
+        require(!end.isBefore(start)) { "End date must be on or after the start date" }
+        require(!end.isAfter(start.plusYears(1))) { "Choose a range of one year or less" }
+        return start.toString() to end.plusDays(1).toString()
     }
 
     private fun mapReport(
@@ -119,7 +131,6 @@ class NativeOwnerReportsFacade(
             salaryPaymentsLabel = formatPaisa(report.recordedSalaryPaymentsPaisa),
             estimatedResultLabel = report.estimatedRecordedResultPaisa?.let(::formatPaisa),
             products = report.products.map(::mapProduct),
-            customRangeDeferredNotice = "Custom date range comes next in this preview.",
         )
     }
 

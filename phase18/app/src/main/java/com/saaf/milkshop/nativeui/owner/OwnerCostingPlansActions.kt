@@ -3,6 +3,7 @@ package com.saaf.milkshop.nativeui.owner
 import com.saaf.milkshop.domain.BudgetPlanInput
 import com.saaf.milkshop.domain.CostingPolicyInput
 import com.saaf.milkshop.domain.OpeningCostBasisInput
+import com.saaf.milkshop.domain.ProductionLossAssessmentInput
 import com.saaf.milkshop.domain.YieldPolicyInput
 import java.time.LocalDate
 
@@ -32,6 +33,7 @@ data class OwnerCostingPlansActions(
     val onOpenYieldApprove: () -> Unit = {},
     val onBackFromYieldApprove: () -> Unit = {},
     val onApproveYieldPolicy: (YieldPolicyInput) -> Unit = {},
+    val onRecordProductionLoss: (ProductionLossAssessmentInput) -> Unit = {},
     val onSubmitReauth: (CharArray) -> Unit = { it.fill('\u0000') },
     val onCancelReauth: () -> Unit = {},
 )
@@ -59,6 +61,7 @@ fun NativeOwnerMoreViewModel.costingPlansActions(): OwnerCostingPlansActions =
         onOpenYieldApprove = ::openCostingYieldApprove,
         onBackFromYieldApprove = ::clearCostingYieldApprove,
         onApproveYieldPolicy = ::approveCostingYieldPolicy,
+        onRecordProductionLoss = ::recordProductionLossAssessment,
         onSubmitReauth = ::submitCostingReauth,
         onCancelReauth = ::cancelCostingReauth,
     )

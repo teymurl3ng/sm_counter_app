@@ -23,6 +23,7 @@ sealed interface NativeOwnerReportsState {
     data object Loading : NativeOwnerReportsState
     data class Ready(
         val snapshot: NativeOwnerReportsSnapshot,
+        val refreshing: Boolean = false,
         val error: String? = null,
     ) : NativeOwnerReportsState
     data class LoadFailure(val message: String) : NativeOwnerReportsState
@@ -65,13 +66,40 @@ class NativeOwnerReportsViewModel(
         refresh(today)
     }
 
+    fun selectCustomRange(
+        startInclusive: String,
+        endInclusive: String,
+        today: LocalDate = LocalDate.now(),
+    ) {
+        val range = try {
+            facade.validateRange(startInclusive, endInclusive)
+        } catch (error: IllegalArgumentException) {
+            val current = _state.value as? NativeOwnerReportsState.Ready ?: return
+            _state.value = current.copy(error = error.message ?: "Check the custom date range")
+            return
+        }
+        preset = NativeOwnerReportsPreset.Custom
+        load(range.first, range.second, today)
+    }
+
     fun refresh(today: LocalDate = LocalDate.now()) {
+        val current = _state.value as? NativeOwnerReportsState.Ready
+        if (preset == NativeOwnerReportsPreset.Custom && current != null) {
+            load(current.snapshot.startInclusive, current.snapshot.endExclusive, today)
+        } else {
+            val (start, end) = facade.rangeForPreset(preset, today)
+            load(start, end, today)
+        }
+    }
+
+    private fun load(start: String, end: String, today: LocalDate) {
         val session = sessionHandle ?: return
         val request = loadGate.begin(session)
-        _state.value = NativeOwnerReportsState.Loading
+        val previous = _state.value as? NativeOwnerReportsState.Ready
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeOwnerReportsState.Loading
         scope.launch {
             try {
-                val (start, end) = facade.rangeForPreset(preset, today)
                 val snapshot = withContext(Dispatchers.IO) {
                     facade.load(session, start, end, preset, today)
                 }
@@ -79,7 +107,16 @@ class NativeOwnerReportsViewModel(
                 _state.value = NativeOwnerReportsState.Ready(snapshot = snapshot)
             } catch (error: Throwable) {
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired) {
+                    handleLoadFailure(error)
+                } else if (previous != null) {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: "Month reports could not refresh. Try again.",
+                    )
+                } else {
+                    handleLoadFailure(error)
+                }
             }
         }
     }

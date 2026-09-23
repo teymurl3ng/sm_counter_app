@@ -21,6 +21,7 @@ import com.saaf.milkshop.domain.CustomerProfileInput
 import com.saaf.milkshop.domain.EmployeeProfileInput
 import com.saaf.milkshop.domain.OpeningStateInput
 import com.saaf.milkshop.domain.ProductCatalogInput
+import com.saaf.milkshop.domain.ProductionLossAssessmentInput
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.domain.StoreIdentityInput
 import com.saaf.milkshop.domain.VendorProfileInput
@@ -257,6 +258,9 @@ class NativeOwnerMoreViewModel internal constructor(
 
     fun approveCostingYieldPolicy(input: YieldPolicyInput) =
         costingController.approveCostingYieldPolicy(input)
+
+    fun recordProductionLossAssessment(input: ProductionLossAssessmentInput) =
+        costingController.recordProductionLossAssessment(input)
 
     fun openShopSettings() = shopSettingsController.openShopSettings()
 

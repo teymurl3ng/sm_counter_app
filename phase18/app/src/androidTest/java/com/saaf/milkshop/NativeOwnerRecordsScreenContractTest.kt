@@ -57,8 +57,13 @@ class NativeOwnerRecordsScreenContractTest {
             stateProvider = { state },
             onOpenRecord = { eventId ->
                 openedId = eventId
+                val selected = row(eventId)
                 state = (state as NativeOwnerRecordsState.Ready).copy(
-                    detail = detail(row(eventId), canCorrect = true),
+                    detail = detail(
+                        selected,
+                        canCorrect = true,
+                        prefill = monetaryPrefill(selected),
+                    ),
                 )
             },
             onBackFromDetail = {
@@ -123,7 +128,13 @@ class NativeOwnerRecordsScreenContractTest {
             stateProvider = { state },
             onUpdateCorrection = { transform ->
                 val ready = state as NativeOwnerRecordsState.Ready
-                state = ready.copy(correction = transform(ready.correction!!))
+                // Mirror NativeOwnerRecordsViewModel.updateCorrection so the
+                // contract test exercises the production dirty-draft path.
+                state = ready.copy(
+                    correction = transform(
+                        ready.correction!!.copy(draftTouched = true, error = null),
+                    ),
+                )
             },
             onBackFromCorrection = {
                 cleared = true
@@ -133,6 +144,7 @@ class NativeOwnerRecordsScreenContractTest {
 
         composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionMonetaryAmount)
             .performTextReplacement("199.50")
+        composeRule.waitForIdle()
         composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionBack).performClick()
         composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionDiscardDialog).assertIsDisplayed()
         assertTrue(!cleared)
@@ -181,14 +193,15 @@ class NativeOwnerRecordsScreenContractTest {
     }
 
     @Test
-    fun deferredGroupChipSurfacesNotice() {
-        var notice: String? = null
+    fun balancesAndClosingGroupsSelectRealViews() {
+        val selected = mutableListOf<NativeRecordsGroup>()
         setScreen(
             NativeOwnerRecordsState.Ready(snapshot = emptySnapshot()),
-            onDeferredGroup = { notice = it },
+            onSelectGroup = { selected += it },
         )
         composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsGroupBalances).performClick()
-        assertEquals("Balances & ledgers", notice)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsGroupClosing).performClick()
+        assertEquals(listOf(NativeRecordsGroup.Balances, NativeRecordsGroup.Closing), selected)
     }
 
     @Test

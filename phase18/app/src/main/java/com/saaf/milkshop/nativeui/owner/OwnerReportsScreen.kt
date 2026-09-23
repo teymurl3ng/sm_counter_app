@@ -13,15 +13,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -51,9 +58,13 @@ fun OwnerReportsScreen(
     onRetry: () -> Unit,
     onSelectPreset: (NativeOwnerReportsPreset) -> Unit,
     onCustomRangePreview: () -> Unit,
+    onSelectCustomRange: (String, String) -> Unit = { _, _ -> },
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var customRangeOpen by remember { mutableStateOf(false) }
+    var customStart by remember { mutableStateOf("") }
+    var customEnd by remember { mutableStateOf("") }
     BackHandler(onBack = onBackToOverview)
     OwnerScaffold(snackbarHostState, OwnerSection.Overview, onNavigate, modifier) { padding ->
         Column(
@@ -134,9 +145,23 @@ fun OwnerReportsScreen(
                             modifier = Modifier.testTag(NativeUiTags.OwnerReportsBack),
                         ) { Text("Back to Overview") }
                         TextButton(
-                            onClick = onCustomRangePreview,
+                            onClick = {
+                                customStart = snapshot.startInclusive
+                                customEnd = runCatching {
+                                    java.time.LocalDate.parse(snapshot.endExclusive).minusDays(1).toString()
+                                }.getOrDefault(snapshot.endExclusive)
+                                customRangeOpen = true
+                                onCustomRangePreview()
+                            },
                             modifier = Modifier.testTag(NativeUiTags.OwnerReportsCustomPreview),
                         ) { Text("Custom range") }
+                    }
+                    if (state.refreshing) {
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag(NativeUiTags.OwnerReportsRefreshing),
+                        )
                     }
                     state.error?.let {
                         Text(
@@ -173,6 +198,19 @@ fun OwnerReportsScreen(
                                 label = { Text("Last month") },
                                 modifier = Modifier.testTag(NativeUiTags.OwnerReportsPresetLastMonth),
                             )
+                            if (snapshot.preset == NativeOwnerReportsPreset.Custom) {
+                                FilterChip(
+                                    selected = true,
+                                    onClick = {
+                                        customStart = snapshot.startInclusive
+                                        customEnd = java.time.LocalDate.parse(snapshot.endExclusive)
+                                            .minusDays(1)
+                                            .toString()
+                                        customRangeOpen = true
+                                    },
+                                    label = { Text("Custom") },
+                                )
+                            }
                         }
                         Text(
                             snapshot.periodLabel,
@@ -222,17 +260,47 @@ fun OwnerReportsScreen(
                                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                             }
                         }
-
-                        Text(
-                            snapshot.customRangeDeferredNotice,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerReportsCustomNotice),
-                        )
                     }
                 }
             }
         }
+    }
+    if (customRangeOpen) {
+        AlertDialog(
+            onDismissRequest = { customRangeOpen = false },
+            title = { Text("Custom report range") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Use calendar dates in YYYY-MM-DD format.")
+                    OutlinedTextField(
+                        value = customStart,
+                        onValueChange = { customStart = it },
+                        label = { Text("Start date") },
+                        singleLine = true,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerReportsCustomStart),
+                    )
+                    OutlinedTextField(
+                        value = customEnd,
+                        onValueChange = { customEnd = it },
+                        label = { Text("End date") },
+                        singleLine = true,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerReportsCustomEnd),
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        customRangeOpen = false
+                        onSelectCustomRange(customStart, customEnd)
+                    },
+                    modifier = Modifier.testTag(NativeUiTags.OwnerReportsCustomApply),
+                ) { Text("Apply") }
+            },
+            dismissButton = {
+                TextButton(onClick = { customRangeOpen = false }) { Text("Cancel") }
+            },
+        )
     }
 }
 

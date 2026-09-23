@@ -21,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.LocalShipping
 import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material.icons.outlined.ReceiptLong
@@ -60,11 +61,16 @@ import com.saaf.milkshop.application.more.NativeMoreContext
 import com.saaf.milkshop.application.more.NativeMoreSecurityStatus
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
+import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
 import com.saaf.milkshop.nativeui.sale.CashierNavigation
 import com.saaf.milkshop.nativeui.sale.CashierNavigationRail
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.CashierSection
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
+import com.saaf.milkshop.nativeui.operations.NativeDeliveriesState
+import com.saaf.milkshop.nativeui.operations.DeliveriesLoadingBody
+import com.saaf.milkshop.nativeui.operations.DeliveriesLoadFailureBody
+import com.saaf.milkshop.nativeui.operations.DeliveriesReadyContent
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.Locale
@@ -77,6 +83,7 @@ fun CashierMoreScreen(
     onRetry: () -> Unit,
     onOpenCountCash: () -> Unit,
     onOpenExpense: () -> Unit,
+    onOpenDeliveries: () -> Unit = {},
     onOpenPersonalSecurity: () -> Unit,
     onBackToMenu: () -> Unit,
     onRecordCashCount: (Long, String?) -> Unit,
@@ -104,13 +111,15 @@ fun CashierMoreScreen(
         )
 
         is NativeMoreState.Ready -> {
-            when (state.destination) {
+            NativeSecondaryTransition(targetState = state.destination) { destination ->
+            when (destination) {
                 NativeMoreDestination.Menu -> MoreMenuScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
                     state = state,
                     onOpenCountCash = onOpenCountCash,
                     onOpenExpense = onOpenExpense,
+                    onOpenDeliveries = onOpenDeliveries,
                     onOpenPersonalSecurity = onOpenPersonalSecurity,
                     onSwitchAccount = onSwitchAccount,
                     onSignOut = onSignOut,
@@ -130,6 +139,10 @@ fun CashierMoreScreen(
                     // Hosted by CashierPreviewHost via CashierExpenseEntryScreen.
                     MoreLoadingScreen(snackbarHostState, onNavigate, modifier)
                 }
+                NativeMoreDestination.Deliveries -> {
+                    // Hosted by CashierPreviewHost with the shared typed deliveries state.
+                    MoreLoadingScreen(snackbarHostState, onNavigate, modifier)
+                }
                 NativeMoreDestination.PersonalSecurity -> MorePersonalSecurityScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -144,6 +157,39 @@ fun CashierMoreScreen(
                     modifier = modifier,
                 )
             }
+            }
+        }
+    }
+}
+
+@Composable
+fun CashierDeliveriesEntryScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    state: NativeDeliveriesState,
+    onRetry: () -> Unit,
+    onMarkDelivered: (Long) -> Unit,
+    onBackToMore: () -> Unit,
+    onNavigate: (CashierSection) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    BackHandler(onBack = onBackToMore)
+    MoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.MoreRoot) { padding ->
+        when (state) {
+            NativeDeliveriesState.Idle,
+            NativeDeliveriesState.Loading,
+            -> DeliveriesLoadingBody(Modifier.padding(padding))
+            is NativeDeliveriesState.LoadFailure -> DeliveriesLoadFailureBody(
+                message = state.message,
+                onRetry = onRetry,
+                modifier = Modifier.padding(padding),
+            )
+            is NativeDeliveriesState.Ready -> DeliveriesReadyContent(
+                identity = identity,
+                state = state,
+                onMarkDelivered = onMarkDelivered,
+                contentPadding = padding,
+            )
         }
     }
 }
@@ -213,6 +259,7 @@ private fun MoreMenuScreen(
     state: NativeMoreState.Ready,
     onOpenCountCash: () -> Unit,
     onOpenExpense: () -> Unit,
+    onOpenDeliveries: () -> Unit,
     onOpenPersonalSecurity: () -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
@@ -252,6 +299,14 @@ private fun MoreMenuScreen(
                     enabled = state.context.postingOpen,
                     tag = NativeUiTags.MoreCountCash,
                     onClick = onOpenCountCash,
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                MoreMenuRow(
+                    icon = Icons.Outlined.LocalShipping,
+                    title = "Deliveries",
+                    subtitle = "Review active deliveries and mark completed drop-offs",
+                    tag = NativeUiTags.MoreDeliveries,
+                    onClick = onOpenDeliveries,
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 MoreMenuRow(

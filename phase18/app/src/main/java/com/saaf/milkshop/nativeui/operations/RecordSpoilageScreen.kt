@@ -61,6 +61,8 @@ import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.theme.SaafYellow
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 import java.util.Locale
 
 @Composable
@@ -135,18 +137,10 @@ fun RecordSpoilageScreen(
 internal fun RecordSpoilageLoadingBody(
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier
-            .fillMaxSize()
-            .padding(24.dp)
-            .testTag(NativeUiTags.OpsRecordSpoilageLoading),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        CircularProgressIndicator()
-        Spacer(Modifier.height(12.dp))
-        Text("Loading record spoilage…")
-    }
+    NativeColdLoadingPane(
+        label = "Loading record spoilage…",
+        modifier = modifier.testTag(NativeUiTags.OpsRecordSpoilageLoading),
+    )
 }
 
 @Composable
@@ -156,22 +150,7 @@ internal fun RecordSpoilageLoadFailureBody(
     onBackToHome: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Text(message, style = MaterialTheme.typography.bodyLarge)
-        Button(
-            onClick = onRetry,
-            modifier = Modifier.testTag(NativeUiTags.OpsRecordSpoilageRetryLoad),
-        ) { Text("Try again") }
-        TextButton(
-            onClick = onBackToHome,
-            modifier = Modifier.testTag(NativeUiTags.OpsWorkBack),
-        ) { Text("Back to Work") }
-    }
+    NativeLoadFailurePane(message = message, onRetry = onRetry, modifier = modifier)
 }
 
 @Composable

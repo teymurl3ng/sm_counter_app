@@ -49,6 +49,7 @@ import com.saaf.milkshop.nativeui.sale.CashierNavigationRail
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.CashierSection
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 import java.util.Locale
 
 @Composable
@@ -151,21 +152,12 @@ private fun ActivityLoadFailureScreen(
     modifier: Modifier,
 ) {
     ActivityScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.ActivityRoot) { padding ->
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .statusBarsPadding()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(message, style = MaterialTheme.typography.bodyLarge)
-            Button(
-                onClick = onRetry,
-                modifier = Modifier.testTag(NativeUiTags.ActivityRetryLoad),
-            ) { Text("Try again") }
-        }
+        NativeLoadFailurePane(
+            message = message,
+            onRetry = onRetry,
+            modifier = Modifier.fillMaxSize().padding(padding).statusBarsPadding(),
+            retryTestTag = NativeUiTags.ActivityRetryLoad,
+        )
     }
 }
 

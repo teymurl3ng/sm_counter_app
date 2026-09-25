@@ -72,6 +72,7 @@ import com.saaf.milkshop.nativeui.operations.NativeDeliveriesState
 import com.saaf.milkshop.nativeui.operations.DeliveriesLoadingBody
 import com.saaf.milkshop.nativeui.operations.DeliveriesLoadFailureBody
 import com.saaf.milkshop.nativeui.operations.DeliveriesReadyContent
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.Locale
@@ -239,17 +240,12 @@ private fun MoreLoadFailureScreen(
     modifier: Modifier,
 ) {
     MoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.MoreRoot) { padding ->
-        Column(
-            Modifier.fillMaxSize().padding(padding).statusBarsPadding().padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(message, style = MaterialTheme.typography.bodyLarge)
-            Spacer(Modifier.height(16.dp))
-            Button(onClick = onRetry, modifier = Modifier.testTag(NativeUiTags.MoreRetryLoad)) {
-                Text("Try again")
-            }
-        }
+        NativeLoadFailurePane(
+            message = message,
+            onRetry = onRetry,
+            modifier = Modifier.fillMaxSize().padding(padding).statusBarsPadding(),
+            retryTestTag = NativeUiTags.MoreRetryLoad,
+        )
     }
 }
 

@@ -104,6 +104,8 @@ import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import java.util.Locale
 
 private enum class EntryMode { Quantity, Amount }
@@ -525,16 +527,7 @@ internal fun SaleEntryContent(
 internal fun SaleLoadingBody(
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            CircularProgressIndicator()
-            Spacer(Modifier.height(12.dp))
-            Text("Loading today’s sale details…")
-        }
-    }
+    NativeColdLoadingPane(label = "Loading today’s sale details…", modifier = modifier)
 }
 
 @Composable

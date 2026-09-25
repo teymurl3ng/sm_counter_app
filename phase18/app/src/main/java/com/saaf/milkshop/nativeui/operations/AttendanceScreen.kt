@@ -38,6 +38,8 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.theme.SaafYellow
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 
 @Composable
 fun AttendanceScreen(
@@ -85,19 +87,10 @@ private fun AttendanceLoading(
 ) {
     BackHandler(onBack = onLeaveConfirmed)
     WorkScaffold(snackbarHostState, OperationsSection.Attendance, onNavigate, modifier) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(it)
-                .padding(24.dp)
-                .testTag(NativeUiTags.OpsAttendanceLoading),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            CircularProgressIndicator()
-            Spacer(Modifier.height(12.dp))
-            Text("Loading attendance…")
-        }
+        NativeColdLoadingPane(
+            label = "Loading attendance…",
+            modifier = Modifier.fillMaxSize().padding(it).testTag(NativeUiTags.OpsAttendanceLoading),
+        )
     }
 }
 
@@ -112,19 +105,12 @@ private fun AttendanceLoadFailure(
 ) {
     BackHandler(onBack = onLeaveConfirmed)
     WorkScaffold(snackbarHostState, OperationsSection.Attendance, onNavigate, modifier) { padding ->
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(message, style = MaterialTheme.typography.bodyLarge)
-            Button(
-                onClick = onRetry,
-                modifier = Modifier.testTag(NativeUiTags.OpsAttendanceRetryLoad),
-            ) { Text("Try again") }
-        }
+        NativeLoadFailurePane(
+            message = message,
+            onRetry = onRetry,
+            modifier = Modifier.fillMaxSize().padding(padding),
+            retryTestTag = NativeUiTags.OpsAttendanceRetryLoad,
+        )
     }
 }
 

@@ -63,6 +63,7 @@ import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 
 /**
  * Operations More — same shell layout as Cashier More (green header, menu rows,
@@ -192,17 +193,12 @@ private fun OpsMoreLoadFailureScreen(
     modifier: Modifier,
 ) {
     OpsMoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.OpsMoreRoot) { padding ->
-        Column(
-            Modifier.fillMaxSize().padding(padding).statusBarsPadding().padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(message, style = MaterialTheme.typography.bodyLarge)
-            Spacer(Modifier.height(16.dp))
-            Button(onClick = onRetry, modifier = Modifier.testTag(NativeUiTags.OpsMoreRetryLoad)) {
-                Text("Try again")
-            }
-        }
+        NativeLoadFailurePane(
+            message = message,
+            onRetry = onRetry,
+            modifier = Modifier.fillMaxSize().padding(padding).statusBarsPadding(),
+            retryTestTag = NativeUiTags.OpsMoreRetryLoad,
+        )
     }
 }
 

@@ -92,6 +92,8 @@ import com.saaf.milkshop.nativeui.sale.CashierSection
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.Locale
@@ -163,16 +165,7 @@ fun CashierCollectionScreen(
 internal fun CollectionLoadingBody(
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            CircularProgressIndicator()
-            Spacer(Modifier.height(12.dp))
-            Text("Loading customer payments…")
-        }
-    }
+    NativeColdLoadingPane(label = "Loading customer payments…", modifier = modifier)
 }
 
 @Composable

@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 
 private const val SECONDARY_TRANSITION_BASE_MILLIS = 180
@@ -45,6 +46,7 @@ fun NativeLoadFailurePane(
     message: String,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
+    retryTestTag: String? = null,
 ) {
     Column(
         modifier.fillMaxSize().padding(24.dp),
@@ -53,7 +55,10 @@ fun NativeLoadFailurePane(
     ) {
         Text(message, style = MaterialTheme.typography.bodyLarge)
         Spacer(Modifier.height(16.dp))
-        Button(onClick = onRetry) { Text("Try again") }
+        Button(
+            onClick = onRetry,
+            modifier = retryTestTag?.let { Modifier.testTag(it) } ?: Modifier,
+        ) { Text("Try again") }
     }
 }
 

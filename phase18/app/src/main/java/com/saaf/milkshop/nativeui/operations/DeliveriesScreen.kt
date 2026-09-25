@@ -38,6 +38,8 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.theme.SaafYellow
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 
 @Composable
 fun DeliveriesScreen(
@@ -84,18 +86,10 @@ fun DeliveriesScreen(
 internal fun DeliveriesLoadingBody(
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier
-            .fillMaxSize()
-            .padding(24.dp)
-            .testTag(NativeUiTags.OpsDeliveriesLoading),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        CircularProgressIndicator()
-        Spacer(Modifier.height(12.dp))
-        Text("Loading deliveries…")
-    }
+    NativeColdLoadingPane(
+        label = "Loading deliveries…",
+        modifier = modifier.testTag(NativeUiTags.OpsDeliveriesLoading),
+    )
 }
 
 @Composable
@@ -104,18 +98,7 @@ internal fun DeliveriesLoadFailureBody(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Text(message, style = MaterialTheme.typography.bodyLarge)
-        Button(
-            onClick = onRetry,
-            modifier = Modifier.testTag(NativeUiTags.OpsDeliveriesRetryLoad),
-        ) { Text("Try again") }
-    }
+    NativeLoadFailurePane(message = message, onRetry = onRetry, modifier = modifier)
 }
 
 @Composable

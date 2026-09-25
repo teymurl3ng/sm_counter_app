@@ -67,6 +67,8 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.Locale
@@ -76,16 +78,7 @@ import kotlin.math.abs
 internal fun CashCloseLoadingBody(
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            CircularProgressIndicator()
-            Spacer(Modifier.height(12.dp))
-            Text("Loading cash count and close…")
-        }
-    }
+    NativeColdLoadingPane(label = "Loading cash count and close…", modifier = modifier)
 }
 
 @Composable

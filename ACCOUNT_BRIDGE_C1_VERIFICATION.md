@@ -125,7 +125,7 @@ The in-flight remediation was completed, applied to DEV, verified, and pushed. C
 **Gate items still open (C1 remains gated until all nine pass):**
 
 1. PROD application of `c1_1`–`c1_5` plus the non-destructive PROD smoke suite (owner-approved step; PROD has not been touched).
-2. Deployment of the hardened Viewer and recording of the exact deployed commit + applied migration versions. Note: the Vercel account authorized for the MCP integration reports **zero teams/projects**, so the earlier "latest UI deployed to Vercel PROD" claim remains unverified and may belong to a different account.
+2. Deployment of the hardened Viewer (commit `7d78298`) and re-recording of the deployed commit + applied migration versions. The prior "latest UI deployed to Vercel PROD" claim is now **VERIFIED** via the Vercel MCP: account `teimurkasumov` (the owner's single account), project `sm-server-view` (`prj_x3nKY8gE7Qllsl5Dvf0oyoivjIsR`), current production deployment READY from GitHub commit `dd2708e` on `main` — i.e., the deployed tree is the pre-hardening `origin/main` head, and the C1 hardening is not yet live. (An earlier draft of this addendum wrongly inferred "no deployments / different account" from an empty Vercel `list_teams` response; personal-account projects appear under `list_projects`, not `list_teams`.)
 3. `README.md`/`SECURITY-REVIEW.md` of both server projects still describe a read-only product and must be rewritten for the write-enabled system.
 
 Until these close, Android continues to depend only on the public Auth + `my_profile` contract per `ACCOUNT_BRIDGE_PHASE1_SPEC.md` §5/§9.

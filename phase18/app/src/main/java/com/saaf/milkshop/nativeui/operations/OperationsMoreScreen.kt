@@ -59,6 +59,7 @@ import com.saaf.milkshop.application.operations.NativeOperationsMoreContext
 import com.saaf.milkshop.application.operations.NativeOperationsWorkRecord
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
+import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 
@@ -99,39 +100,44 @@ fun OperationsMoreScreen(
             modifier = modifier,
         )
 
-        is NativeOperationsMoreState.Ready -> when (state.destination) {
-            NativeOperationsMoreDestination.Menu -> OpsMoreMenuScreen(
-                snackbarHostState = snackbarHostState,
-                identity = identity,
-                state = state,
-                onOpenTodayWork = onOpenTodayWork,
-                onOpenPersonalSecurity = onOpenPersonalSecurity,
-                onSwitchAccount = onSwitchAccount,
-                onSignOut = onSignOut,
-                onNavigate = onNavigate,
-                modifier = modifier,
-            )
-            NativeOperationsMoreDestination.TodayWork -> OpsMoreTodayWorkScreen(
-                snackbarHostState = snackbarHostState,
-                identity = identity,
-                state = state,
-                onBack = onBackToMenu,
-                onNavigate = onNavigate,
-                modifier = modifier,
-            )
-            NativeOperationsMoreDestination.PersonalSecurity -> OpsMorePersonalSecurityScreen(
-                snackbarHostState = snackbarHostState,
-                identity = identity,
-                state = state,
-                onBack = onBackToMenu,
-                onRequestRemove = onRequestRemoveQuickUnlock,
-                onCancelRemove = onCancelRemoveQuickUnlock,
-                onRemove = onRemoveQuickUnlock,
-                onEnrollPin = onEnrollQuickPin,
-                onEnrollPhone = onEnrollPhoneSecurity,
-                onNavigate = onNavigate,
-                modifier = modifier,
-            )
+        is NativeOperationsMoreState.Ready -> NativeSecondaryTransition(
+            targetState = state.destination,
+            modifier = modifier,
+        ) { destination ->
+            when (destination) {
+                NativeOperationsMoreDestination.Menu -> OpsMoreMenuScreen(
+                    snackbarHostState = snackbarHostState,
+                    identity = identity,
+                    state = state,
+                    onOpenTodayWork = onOpenTodayWork,
+                    onOpenPersonalSecurity = onOpenPersonalSecurity,
+                    onSwitchAccount = onSwitchAccount,
+                    onSignOut = onSignOut,
+                    onNavigate = onNavigate,
+                    modifier = modifier,
+                )
+                NativeOperationsMoreDestination.TodayWork -> OpsMoreTodayWorkScreen(
+                    snackbarHostState = snackbarHostState,
+                    identity = identity,
+                    state = state,
+                    onBack = onBackToMenu,
+                    onNavigate = onNavigate,
+                    modifier = modifier,
+                )
+                NativeOperationsMoreDestination.PersonalSecurity -> OpsMorePersonalSecurityScreen(
+                    snackbarHostState = snackbarHostState,
+                    identity = identity,
+                    state = state,
+                    onBack = onBackToMenu,
+                    onRequestRemove = onRequestRemoveQuickUnlock,
+                    onCancelRemove = onCancelRemoveQuickUnlock,
+                    onRemove = onRemoveQuickUnlock,
+                    onEnrollPin = onEnrollQuickPin,
+                    onEnrollPhone = onEnrollPhoneSecurity,
+                    onNavigate = onNavigate,
+                    modifier = modifier,
+                )
+            }
         }
     }
 }

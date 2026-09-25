@@ -116,6 +116,8 @@ internal fun OwnerCostingPlansBody(
     modifier: Modifier = Modifier,
     header: @Composable () -> Unit,
 ) {
+    val visibleBudgets = remember(budgets) { budgets.filter { !it.archived } }
+    val visibleTargets = remember(targets) { targets.filter { !it.archived } }
     hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
@@ -167,7 +169,7 @@ internal fun OwnerCostingPlansBody(
                         )
                     }
                 } else {
-                    items(budgets.filter { !it.archived }, key = { "b-${it.budgetId}" }) { budget ->
+                    items(visibleBudgets, key = { "b-${it.budgetId}" }) { budget ->
                         Column(
                             Modifier
                                 .fillMaxWidth()
@@ -228,7 +230,7 @@ internal fun OwnerCostingPlansBody(
                         )
                     }
                 } else {
-                    items(targets.filter { !it.archived }, key = { "t-${it.targetId}" }) { target ->
+                    items(visibleTargets, key = { "t-${it.targetId}" }) { target ->
                         Column(
                             Modifier
                                 .fillMaxWidth()

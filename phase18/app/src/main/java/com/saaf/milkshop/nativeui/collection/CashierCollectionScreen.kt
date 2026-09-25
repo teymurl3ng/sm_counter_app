@@ -708,9 +708,11 @@ private fun CustomerPickerDialog(
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
-    val matches = customers.filter {
-        it.name.contains(query.trim(), ignoreCase = true) ||
-            (it.phone?.contains(query.trim(), ignoreCase = true) == true)
+    val matches = remember(customers, query) {
+        customers.filter {
+            it.name.contains(query.trim(), ignoreCase = true) ||
+                (it.phone?.contains(query.trim(), ignoreCase = true) == true)
+        }
     }
     AlertDialog(
         onDismissRequest = onDismiss,

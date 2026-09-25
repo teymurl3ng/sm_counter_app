@@ -456,6 +456,14 @@ class UserSecurityService(
             audit(actor, ACTION_PERMISSION_DENIED, RESULT_FAILURE, permission.name, actor.userId)
             throw SecurityFailure.PermissionDenied()
         }
+        // Account Bridge offline grace (frozen 7 days): a linked user whose
+        // verified server entitlement has expired may read but not write.
+        // Unbound installations and non-verified link states are unaffected.
+        val serverLink = database.serverAccountDao().findIdentityLink(actor.userId)
+        if (serverLink != null && ServerAccountPolicy.linkWriteBlocked(serverLink, nowEpochMs())) {
+            audit(actor, ACTION_SERVER_VERIFICATION_EXPIRED, RESULT_FAILURE, ServerAccountPolicy.REASON_SERVER_GRACE_EXPIRED, actor.userId)
+            throw SecurityFailure.PermissionDenied()
+        }
         return actor
     }
 
@@ -784,5 +792,14 @@ class UserSecurityService(
         const val ACTION_RESET_CREDENTIAL = "reset_credential"
         const val ACTION_CHANGE_CREDENTIAL = "change_credential"
         const val ACTION_RECOVER_OWNER = "recover_owner"
+        const val ACTION_SERVER_ENROLLMENT = "server_enrollment"
+        const val ACTION_SERVER_LINK = "server_link"
+        const val ACTION_SERVER_UNLINK = "server_unlink"
+        const val ACTION_SERVER_VERIFICATION = "server_verification"
+        const val ACTION_SERVER_VERIFICATION_EXPIRED = "server_verification_expired"
+        const val ACTION_SERVER_ENVIRONMENT_MISMATCH = "server_environment_mismatch"
+        const val ACTION_SERVER_REMOTE_DISABLED = "server_remote_disabled"
+        const val ACTION_SERVER_RESTORED_UNVERIFIED = "server_restored_unverified"
+        const val ACTION_SERVER_SESSION_CLEARED = "server_session_cleared"
     }
 }

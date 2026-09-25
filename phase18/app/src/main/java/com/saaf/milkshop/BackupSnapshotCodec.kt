@@ -158,6 +158,22 @@ internal fun productionLossAssessmentJson(v: ProductionLossAssessmentEntity) = J
     put("assessed_at", v.assessedAt); put("assessed_by_user_id", v.assessedByUserId)
     putNullable("supersedes_assessment_id", v.supersedesAssessmentId)
 }
+internal fun installationBindingJson(v: AccountInstallationBindingEntity) = JSONObject().apply {
+    put("binding_id", v.bindingId); put("environment", v.environment); put("business_id", v.businessId)
+    put("shop_id", v.shopId); put("shop_name_snapshot", v.shopNameSnapshot); put("status", v.status)
+    putNullable("verified_at_epoch_ms", v.verifiedAtEpochMs); putNullable("contract_version", v.contractVersion)
+    put("created_at", v.createdAt); put("updated_at", v.updatedAt)
+}
+internal fun identityLinkJson(v: ServerIdentityLinkEntity) = JSONObject().apply {
+    put("local_user_id", v.localUserId); put("server_staff_id", v.serverStaffId); put("business_id", v.businessId)
+    putNullable("username_snapshot", v.usernameSnapshot); putNullable("role_snapshot", v.roleSnapshot); put("status", v.status)
+    putNullable("verified_at_epoch_ms", v.verifiedAtEpochMs); putNullable("server_changed_at_epoch_ms", v.serverChangedAtEpochMs)
+    putNullable("last_error_code", v.lastErrorCode)
+}
+internal fun serverShopSnapshotJson(v: ServerShopSnapshotEntity) = JSONObject().apply {
+    put("snapshot_id", v.snapshotId); put("server_shop_id", v.serverShopId); put("shop_name_snapshot", v.shopNameSnapshot)
+    put("observed_at_epoch_ms", v.observedAtEpochMs); put("local_user_id", v.localUserId)
+}
 
 internal fun JSONObject.putNullable(key: String, value: Any?) { put(key, value ?: JSONObject.NULL) }
 
@@ -309,4 +325,27 @@ internal fun readProductionLossAssessments(a: JSONArray?): List<ProductionLossAs
 internal fun JSONObject.optStringOrNull(key: String): String? = if (!has(key) || isNull(key)) null else getString(key)
 internal fun JSONObject.optLongOrNull(key: String): Long? = if (!has(key) || isNull(key)) null else getLong(key)
 internal fun JSONObject.optDoubleOrNull(key: String): Double? = if (!has(key) || isNull(key)) null else getDouble(key)
+
+internal fun readInstallationBindings(a: JSONArray?): List<AccountInstallationBindingEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
+    AccountInstallationBindingEntity(
+        bindingId = it.getLong("binding_id"), environment = it.getString("environment"), businessId = it.getString("business_id"),
+        shopId = it.getString("shop_id"), shopNameSnapshot = it.getString("shop_name_snapshot"), status = it.getString("status"),
+        verifiedAtEpochMs = it.optLongOrNull("verified_at_epoch_ms"), contractVersion = it.optStringOrNull("contract_version"),
+        createdAt = it.getString("created_at"), updatedAt = it.getString("updated_at")
+    )
+} }
+internal fun readIdentityLinks(a: JSONArray?): List<ServerIdentityLinkEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
+    ServerIdentityLinkEntity(
+        localUserId = it.getLong("local_user_id"), serverStaffId = it.getString("server_staff_id"), businessId = it.getString("business_id"),
+        usernameSnapshot = it.optStringOrNull("username_snapshot"), roleSnapshot = it.optStringOrNull("role_snapshot"), status = it.getString("status"),
+        verifiedAtEpochMs = it.optLongOrNull("verified_at_epoch_ms"), serverChangedAtEpochMs = it.optLongOrNull("server_changed_at_epoch_ms"),
+        lastErrorCode = it.optStringOrNull("last_error_code")
+    )
+} }
+internal fun readServerShopSnapshots(a: JSONArray?): List<ServerShopSnapshotEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
+    ServerShopSnapshotEntity(
+        snapshotId = it.getLong("snapshot_id"), serverShopId = it.getString("server_shop_id"), shopNameSnapshot = it.getString("shop_name_snapshot"),
+        observedAtEpochMs = it.getLong("observed_at_epoch_ms"), localUserId = it.getLong("local_user_id")
+    )
+} }
 internal fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }

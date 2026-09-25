@@ -8,7 +8,7 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import androidx.sqlite.execSQL
 
 @Database(
-    version = 8,
+    version = 9,
     exportSchema = true,
     entities = [
         ProductEntity::class,
@@ -46,6 +46,9 @@ import androidx.sqlite.execSQL
         ProductionLossAssessmentEntity::class,
         InventoryCostMovementEntity::class,
         CostProjectionStateEntity::class,
+        AccountInstallationBindingEntity::class,
+        ServerIdentityLinkEntity::class,
+        ServerShopSnapshotEntity::class,
     ],
     views = [
         CurrentStockView::class,
@@ -88,6 +91,7 @@ abstract class MilkShopDatabase : RoomDatabase() {
     abstract fun yieldPolicyDao(): YieldPolicyDao
     abstract fun productionLossAssessmentDao(): ProductionLossAssessmentDao
     abstract fun inventoryCostProjectionDao(): InventoryCostProjectionDao
+    abstract fun serverAccountDao(): ServerAccountDao
 
     companion object {
         private const val DATABASE_NAME = "milk_shop.db"
@@ -191,13 +195,19 @@ abstract class MilkShopDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_8_9 = object : androidx.room3.migration.Migration(8, 9) {
+            override suspend fun migrate(connection: androidx.sqlite.SQLiteConnection) {
+                Phase3AccountBridgeMigrationSql.createStatements.forEach(connection::execSQL)
+            }
+        }
+
         fun create(context: Context): MilkShopDatabase =
             Room.databaseBuilder<MilkShopDatabase>(
                 context = context.applicationContext,
                 name = DATABASE_NAME,
             )
                 .setDriver(BundledSQLiteDriver())
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9)
                 .addCallback(DatabaseCallback())
                 .build()
 
@@ -205,7 +215,7 @@ abstract class MilkShopDatabase : RoomDatabase() {
         fun createInMemory(): MilkShopDatabase =
             Room.inMemoryDatabaseBuilder<MilkShopDatabase>()
                 .setDriver(BundledSQLiteDriver())
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9)
                 .addCallback(DatabaseCallback())
                 .build()
     }

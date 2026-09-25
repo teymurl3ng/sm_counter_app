@@ -112,3 +112,20 @@ The verdict above is unchanged: **C1 remains gated.** For honesty of record, rem
 - `saaf-milk-admin-viewer` on branch `fix/c1-hardening` (2 local commits ahead of `main`: C1 hardening and build fixes), with 11 modified files plus new untracked `src/app/api/admin/reconcile-auth/`, `src/lib/admin-security.ts` (+test), and `src/lib/reconciliation.ts`.
 
 The gate in this document still governs: until its nine acceptance items pass with committed, pushed, reproducible evidence, the Android Account Bridge treats C1 as unavailable.
+
+## Addendum — 2026-09-25 hardening completed on DEV
+
+The in-flight remediation was completed, applied to DEV, verified, and pushed. Current evidence:
+
+- **Server** (`saaf-milk-account-server`, branch `fix/c1-hardening`, commit `4434136`): migrations `c1_1`–`c1_5` committed, including `c1_4` (durable auth-reconciliation state machine) and `c1_5` (error-semantics correction — the original `P0002`/`P0004` codes surface as HTTP 500 on this PostgREST deployment; probed mapping confirmed `42P01`→404 and `22023`→400, and the final write RPC definitions now raise those). All five original release-blocking findings have committed fixes; a CLI-linked `supabase/migrations/` layout records applied versions (20260925120001–120005 on DEV; earlier pre-CLI versions are aligned with annotated empty placeholders).
+- **Server contract suite**: `test_contract.py` **77/77 PASS** on DEV (`saafmilk-dev`), verdict PASS — including the real concurrent last-owner test (20.4), invalid/anonymous denial (20.7), and cross-business isolation (20.8). Credential create/reset/old-credential-rejection verified in-suite.
+- **Viewer** (`sm-server-view`, branch `fix/c1-hardening`, commit `7d78298`): fresh per-request authorization on every mutation route, safe RPC error mapping for both c1.5-standard and legacy codes, reconciliation route, tests **104/104 PASS**, `next build` passes.
+- A DEV probe fixture `probe_phase1` (owner) was created for the Account Bridge probes; its credential is in the gitignored `dev probe credentials.txt` of the server working copy.
+
+**Gate items still open (C1 remains gated until all nine pass):**
+
+1. PROD application of `c1_1`–`c1_5` plus the non-destructive PROD smoke suite (owner-approved step; PROD has not been touched).
+2. Deployment of the hardened Viewer and recording of the exact deployed commit + applied migration versions. Note: the Vercel account authorized for the MCP integration reports **zero teams/projects**, so the earlier "latest UI deployed to Vercel PROD" claim remains unverified and may belong to a different account.
+3. `README.md`/`SECURITY-REVIEW.md` of both server projects still describe a read-only product and must be rewritten for the write-enabled system.
+
+Until these close, Android continues to depend only on the public Auth + `my_profile` contract per `ACCOUNT_BRIDGE_PHASE1_SPEC.md` §5/§9.

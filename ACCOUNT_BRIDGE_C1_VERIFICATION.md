@@ -103,3 +103,12 @@ C1 may be called complete only when all of the following are true:
 9. Security, runbook, environment, and recovery documentation match the write-enabled system.
 
 Until this gate passes, Android must depend only on the previously tested public Auth + `my_profile` contract, never on C1 write routes.
+
+## Addendum — 2026-09-25 status note
+
+The verdict above is unchanged: **C1 remains gated.** For honesty of record, remediation work is now visibly in flight in both local working copies, none of it merged or pushed to `main`:
+
+- `SM Admin Server` on branch `fix/c1-hardening` (2 local commits ahead of `main`: C1 hardening migrations and Group 20 contract tests), with uncommitted modifications to `admin.py`, the three C1 migrations, `test_contract.py`, and a new untracked `migration_c1_4_reconciliation.sql`.
+- `saaf-milk-admin-viewer` on branch `fix/c1-hardening` (2 local commits ahead of `main`: C1 hardening and build fixes), with 11 modified files plus new untracked `src/app/api/admin/reconcile-auth/`, `src/lib/admin-security.ts` (+test), and `src/lib/reconciliation.ts`.
+
+The gate in this document still governs: until its nine acceptance items pass with committed, pushed, reproducible evidence, the Android Account Bridge treats C1 as unavailable.

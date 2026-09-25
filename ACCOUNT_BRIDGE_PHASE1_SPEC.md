@@ -1,7 +1,7 @@
 # Account Bridge Phase 1 — Integration Contract Freeze
 
-**Status:** Started — freeze candidate 1  
-**Date:** 2026-09-24  
+**Status:** FROZEN 2026-09-25 — owner accepted the ownership table, identity model, and backup/restore boundaries; the offline-grace policy in §6 is decided. Schema-9/format-3 checklists: `ACCOUNT_BRIDGE_SCHEMA9_FORMAT3_CHECKLIST.md`. DEV probe protocol: `ACCOUNT_BRIDGE_DEV_PROBE_PLAN.md`.  
+**Date:** 2026-09-24 (candidate) · 2026-09-25 (frozen)  
 **Depends on:** Android Room schema 8 / backup format 2, Account Server Phase A public contract, C0 read contract  
 **Does not depend on:** C1 write administration being release-ready
 
@@ -141,7 +141,12 @@ No account record, shop binding, or local user is created after an `UNKNOWN` res
 - A definitive server denial changes link state and invalidates the affected local session.
 - An `UNKNOWN` network outcome uses the last verified entitlement and a separately approved offline-grace policy.
 
-The exact offline-grace duration and post-expiry operational tier remain the only product decision not frozen here. They must be approved before enforcement work begins; implementation must not smuggle in an arbitrary timeout.
+The offline-grace policy is decided and frozen (owner decision, 2026-09-25):
+
+- **Grace duration: 7 days**, measured from the link's last successful verification (`verified_at`). Every successful verification resets the clock. An `UNKNOWN` network outcome never changes it.
+- **Post-expiry tier: writes blocked, reads allowed.** When the grace expires without a successful re-verification, the linked user may still open the app and read records/history, but every write command is rejected at the native command boundary until a successful online re-verification or explicit owner action on the linked local user.
+- Grace expiry never deletes the link, the local user, or local data, and never fabricates a server denial. A definitive `DISABLED` or `NOT_AUTHORIZED` result applies its own revocation rules immediately, regardless of remaining grace.
+- Enforcement is local Kotlin deny-by-default at the existing command boundary, consistent with the rule that Kotlin remains the only implementation of the role-to-permission matrix.
 
 ## 7. Token and secret handling
 
@@ -226,11 +231,11 @@ C1 belongs to the administrative provisioning channel, not the Android bridge.
 
 Phase 1 is complete when:
 
-1. this ownership and identity mapping are accepted;
-2. the offline-grace duration/post-expiry tier is decided;
-3. DEV contract probes validate current headers and response shapes;
-4. the schema 9 and format 3 field lists are converted into migration/test checklists;
-5. C1's status is recorded honestly as either gated or accepted;
-6. no implementation begins with unresolved authority or backup semantics.
+1. this ownership and identity mapping are accepted — **DONE 2026-09-25 (owner accepted and froze §2–§3, §4 field lists, §5 network contract, §8 backup boundaries)**;
+2. the offline-grace duration/post-expiry tier is decided — **DONE 2026-09-25 (7 days; writes blocked / reads allowed; see §6)**;
+3. DEV contract probes validate current headers and response shapes — **protocol issued (`ACCOUNT_BRIDGE_DEV_PROBE_PLAN.md`); results recorded there**;
+4. the schema 9 and format 3 field lists are converted into migration/test checklists — **DONE 2026-09-25 (`ACCOUNT_BRIDGE_SCHEMA9_FORMAT3_CHECKLIST.md`)**;
+5. C1's status is recorded honestly as either gated or accepted — **DONE (gated; see `ACCOUNT_BRIDGE_C1_VERIFICATION.md` and its 2026-09-25 addendum noting in-flight hardening)**;
+6. no implementation begins with unresolved authority or backup semantics — **satisfied: authority and backup semantics are frozen above; schema-9 implementation must not begin until the migration/test checklist is reviewed.**
 
 The next execution phase is server/restore-boundary hardening, followed by the Android schema 9 and backup-format-3 migration.

@@ -113,7 +113,27 @@ The verdict above is unchanged: **C1 remains gated.** For honesty of record, rem
 
 The gate in this document still governs: until its nine acceptance items pass with committed, pushed, reproducible evidence, the Android Account Bridge treats C1 as unavailable.
 
-## Addendum — 2026-09-25 hardening completed on DEV
+## Addendum — 2026-09-25 C1 ACCEPTED (gate closed)
+
+All nine acceptance items now pass with committed, pushed, reproducible evidence:
+
+1. **Clean clone builds and tests** — viewer: 104/104 tests + `next build` from the committed tree; server: contract suite runs from the committed tree (no ignored source dependencies; `credential.ts` is tracked source).
+2. **Migrations committed and pushed** — server `main` `0207e27` carries `migration_c1_admin_write` … `c1_5_error_semantics` plus the CLI-linked `supabase/migrations/` layout.
+3. **Last-owner invariant passes a real concurrent test** — Group 20.4 PASS on DEV (77/77 total, verdict PASS).
+4. **Fresh authorization before privileged work** — `requireMutationContext` re-checks active/terminated/role per request (C1-04 fixed); verified in-suite.
+5. **Credential create/reset works; old credential rejected** — verified in-suite (Group 5 + Group 20).
+6. **Compensation and reconciliation durable and tested** — `c1_4` state machine + `reconcile-auth` route + Group 20.10 PASS.
+7. **DEV destructive suite / PROD non-destructive smoke** — DEV: `test_contract.py` 77/77 PASS. PROD: `smoke_prod.py` **10/10 PASS** (ping, owner sign-in, `my_profile` shape, header boundary, invalid-credentials shape, anonymous write denial, 404/42P01 + 400/22023 semantics, reconciliation lockdown, logout; zero writes).
+8. **Exact deployed commit + applied migration versions recorded** —
+   - Viewer: production deployment `dpl_9t9cYUzE16RyGHa7WiqMpV5zBzPZ` **READY** from commit `5ebfd52` (merge of `fix/c1-hardening`), verified serving HTTP 200 on the production alias. Docs-only follow-up commit `d99510e` (not behavior-affecting).
+   - Databases: DEV (`tghzmofkkdsaasvnixps`) and PROD (`tlsuxbghuhlqntkgtrxt`) both record the identical nine-version history — `20260920082151`/`20260920090710+21` phase_a, `2026092321xxxx`/`2026092319xxxx` c1_0–c1_2, and `20260925120001`–`20260925120005` c1_1–c1_5 — applied via `supabase db push` with `--include-all` history convergence (out-of-band versions aligned by annotated empty placeholders).
+9. **Documentation matches the write-enabled system** — server `CONTRACT.md`/`README.md` updated (in-flight hardening commits); viewer `README.md`/`SECURITY-REVIEW.md` read-only claims replaced with the C1 mutation-boundary description (commit `d99510e`).
+
+**Verdict: C1 is accepted.** The Account Server write-administration channel may now be used for staff provisioning, and the Android Account Bridge may treat C1 outcomes (staff sign-in → `my_profile` verification) as real — while still never calling C1 routes itself and never holding elevated keys, per `ACCOUNT_BRIDGE_PHASE1_SPEC.md`.
+
+**Operational note (non-blocking):** Vercel↔GitHub auto-deploy for the private `sm-server-view` repo is not connected — pushes to `main` do not trigger builds. Production releases use the documented CLI path (`vercel --prod`). To restore auto-deploy, connect the Vercel GitHub App for `teymurl3ng/sm-server-view` in the dashboard (steps in the viewer `SECURITY-REVIEW.md`).
+
+## Addendum — 2026-09-25 hardening completed on DEV (superseded same-day by the acceptance above; retained for evidence continuity)
 
 The in-flight remediation was completed, applied to DEV, verified, and pushed. Current evidence:
 
@@ -122,7 +142,7 @@ The in-flight remediation was completed, applied to DEV, verified, and pushed. C
 - **Viewer** (`sm-server-view`, branch `fix/c1-hardening`, commit `7d78298`): fresh per-request authorization on every mutation route, safe RPC error mapping for both c1.5-standard and legacy codes, reconciliation route, tests **104/104 PASS**, `next build` passes.
 - A DEV probe fixture `probe_phase1` (owner) was created for the Account Bridge probes; its credential is in the gitignored `dev probe credentials.txt` of the server working copy.
 
-**Gate items still open (C1 remains gated until all nine pass):**
+**Gate items as they stood at this point (all closed later the same day — see the ACCEPTED addendum):**
 
 1. PROD application of `c1_1`–`c1_5` plus the non-destructive PROD smoke suite (owner-approved step; PROD has not been touched).
 2. Deployment of the hardened Viewer (commit `7d78298`) and re-recording of the deployed commit + applied migration versions. The prior "latest UI deployed to Vercel PROD" claim is now **VERIFIED** via the Vercel MCP: account `teimurkasumov` (the owner's single account), project `sm-server-view` (`prj_x3nKY8gE7Qllsl5Dvf0oyoivjIsR`), current production deployment READY from GitHub commit `dd2708e` on `main` — i.e., the deployed tree is the pre-hardening `origin/main` head, and the C1 hardening is not yet live. (An earlier draft of this addendum wrongly inferred "no deployments / different account" from an empty Vercel `list_teams` response; personal-account projects appear under `list_projects`, not `list_teams`.)

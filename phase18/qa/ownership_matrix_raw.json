@@ -1,0 +1,2378 @@
+{
+ "command.approveCostingPolicy": {
+  "ids": [
+   "approveCostingPolicy",
+   "optionalString",
+   "requiredDecimal",
+   "requiredObjectArray",
+   "requiredPaisa"
+  ],
+  "native_files": [
+   "nativeui/owner/NativeOwnerMoreViewModel.kt",
+   "nativeui/owner/OwnerCostingController.kt"
+  ]
+ },
+ "command.approveYieldPolicy": {
+  "ids": [
+   "approveYieldPolicy",
+   "get",
+   "matches",
+   "requiredArray",
+   "requiredDate",
+   "toLongOrNull"
+  ],
+  "native_files": [
+   "application/admin/NativeAdminWorkFacade.kt",
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/manager/NativeManagerWorkFacade.kt",
+   "application/operations/NativeDeliveriesFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerCustomersFacade.kt",
+   "application/owner/NativeOwnerEmployeesFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerRecordsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerSuppliersFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "application/readmodels/HybridFinancialReadService.kt",
+   "application/readmodels/HybridIdentityReadService.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/common/EntryLeaveGuard.kt",
+   "nativeui/expense/ExpenseEntryScreen.kt",
+   "nativeui/owner/NativeOwnerMoreState.kt",
+   "nativeui/owner/NativeOwnerMoreViewModel.kt",
+   "nativeui/owner/NativeOwnerRecordsViewModel.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/salarypayment/SalaryPaymentEntryScreen.kt",
+   "nativeui/theme/SaafTheme.kt",
+   "nativeui/vendorpayment/VendorPaymentEntryScreen.kt"
+  ]
+ },
+ "command.archiveDelivery": {
+  "ids": [
+   "archive",
+   "create",
+   "linkSale",
+   "optionalString",
+   "requiredDate",
+   "requiredDecimal",
+   "requiredNullableId",
+   "signum",
+   "strictPayload",
+   "transition"
+  ],
+  "native_files": [
+   "application/operations/NativeDeliveriesFacade.kt",
+   "application/owner/NativeOwnerCustomersFacade.kt",
+   "application/owner/NativeOwnerEmployeesFacade.kt",
+   "application/owner/NativeOwnerProductsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerSuppliersFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "nativeui/activity/NativeActivityViewModel.kt",
+   "nativeui/admin/NativeAdminWorkViewModel.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/collection/NativeCollectionViewModel.kt",
+   "nativeui/expense/NativeExpenseViewModel.kt",
+   "nativeui/manager/NativeManagerWorkViewModel.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeAttendanceViewModel.kt",
+   "nativeui/operations/NativeDeliveriesViewModel.kt",
+   "nativeui/operations/NativeMakeYogurtViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsWorkViewModel.kt",
+   "nativeui/operations/NativeReceiveMilkViewModel.kt",
+   "nativeui/operations/NativeRecordSpoilageViewModel.kt",
+   "nativeui/owner/NativeOwnerMoreViewModel.kt",
+   "nativeui/owner/NativeOwnerOverviewViewModel.kt",
+   "nativeui/owner/NativeOwnerRecordsViewModel.kt",
+   "nativeui/owner/NativeOwnerReportsViewModel.kt",
+   "nativeui/owner/NativeOwnerWorkViewModel.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerProductsController.kt",
+   "nativeui/salarypayment/NativeSalaryPaymentViewModel.kt",
+   "nativeui/sale/NativeSaleViewModel.kt",
+   "nativeui/vendorpayment/NativeVendorPaymentViewModel.kt"
+  ]
+ },
+ "command.auth.beginCredentialReset": {
+  "ids": [
+   "audit",
+   "beginCredentialReset",
+   "beginEnrollment",
+   "beginReset",
+   "changeRole",
+   "completeEnrollment",
+   "fill",
+   "matches",
+   "resumeEnrollment",
+   "securityAudit",
+   "setEnabled",
+   "strictPayload",
+   "toCharArray",
+   "toLongOrNull",
+   "users"
+  ],
+  "native_files": [
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "application/readmodels/HybridReadModelService.kt",
+   "application/readmodels/HybridSecurityReadService.kt",
+   "nativeui/admin/AdminMoreScreen.kt",
+   "nativeui/auth/NativeAuthenticationScreens.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/expense/ExpenseEntryScreen.kt",
+   "nativeui/manager/ManagerMoreScreen.kt",
+   "nativeui/more/CashierMoreScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/OperationsMoreScreen.kt",
+   "nativeui/owner/NativeOwnerMoreViewModel.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerMoreScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt",
+   "nativeui/salarypayment/SalaryPaymentEntryScreen.kt",
+   "nativeui/vendorpayment/VendorPaymentEntryScreen.kt"
+  ]
+ },
+ "command.auth.beginUserEnrollment": {
+  "ids": [
+   "beginEnrollment"
+  ],
+  "native_files": []
+ },
+ "command.auth.bootstrapOwner": {
+  "ids": [
+   "bootstrapOwner",
+   "clearAll",
+   "currentSession",
+   "fill",
+   "needsOwnerBootstrap",
+   "toCharArray"
+  ],
+  "native_files": [
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "application/readmodels/HybridIdentityReadService.kt",
+   "application/readmodels/HybridReadModelService.kt",
+   "nativeui/admin/AdminMoreScreen.kt",
+   "nativeui/auth/NativeAuthenticationScreens.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/manager/ManagerMoreScreen.kt",
+   "nativeui/more/CashierMoreScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/OperationsMoreScreen.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerMoreScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt"
+  ]
+ },
+ "command.auth.changeOwnPassphrase": {
+  "ids": [
+   "changeOwnPassphrase",
+   "fill",
+   "invalidateUser",
+   "require",
+   "sessionManager",
+   "toCharArray"
+  ],
+  "native_files": [
+   "application/admin/NativeAdminWorkFacade.kt",
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/manager/NativeManagerWorkFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeMakeYogurtFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/operations/NativeReceiveMilkFacade.kt",
+   "application/operations/NativeRecordSpoilageFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCloudBackupGateway.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerCustomersFacade.kt",
+   "application/owner/NativeOwnerEmployeesFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerOverviewFacade.kt",
+   "application/owner/NativeOwnerProductsFacade.kt",
+   "application/owner/NativeOwnerRecordsFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerSecurityHistoryFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerSuppliersFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/owner/NativeOwnerWorkFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "application/readmodels/HybridReadFormatting.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/sale/NativeSaleFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/activity/NativeActivityViewModel.kt",
+   "nativeui/admin/AdminMoreScreen.kt",
+   "nativeui/admin/NativeAdminWorkViewModel.kt",
+   "nativeui/auth/NativeAuthenticationScreens.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/collection/NativeCollectionViewModel.kt",
+   "nativeui/expense/NativeExpenseViewModel.kt",
+   "nativeui/manager/ManagerMoreScreen.kt",
+   "nativeui/manager/NativeManagerWorkViewModel.kt",
+   "nativeui/more/CashierMoreScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeAttendanceViewModel.kt",
+   "nativeui/operations/NativeDeliveriesViewModel.kt",
+   "nativeui/operations/NativeMakeYogurtViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsWorkViewModel.kt",
+   "nativeui/operations/NativeReceiveMilkViewModel.kt",
+   "nativeui/operations/NativeRecordSpoilageViewModel.kt",
+   "nativeui/operations/OperationsMoreScreen.kt",
+   "nativeui/owner/NativeOwnerMoreViewModel.kt",
+   "nativeui/owner/NativeOwnerOverviewViewModel.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/NativeOwnerRecordsViewModel.kt",
+   "nativeui/owner/NativeOwnerReportsViewModel.kt",
+   "nativeui/owner/NativeOwnerWorkViewModel.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerMoreScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt",
+   "nativeui/salarypayment/NativeSalaryPaymentViewModel.kt",
+   "nativeui/sale/NativeSaleViewModel.kt",
+   "nativeui/vendorpayment/NativeVendorPaymentViewModel.kt"
+  ]
+ },
+ "command.auth.changeUserRole": {
+  "ids": [
+   "changeRole"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt"
+  ]
+ },
+ "command.auth.completeEnrollment": {
+  "ids": [
+   "completeEnrollment",
+   "fill",
+   "toCharArray"
+  ],
+  "native_files": [
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "nativeui/admin/AdminMoreScreen.kt",
+   "nativeui/auth/NativeAuthenticationScreens.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/manager/ManagerMoreScreen.kt",
+   "nativeui/more/CashierMoreScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/OperationsMoreScreen.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerMoreScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt"
+  ]
+ },
+ "command.auth.enrollQuickUnlock": {
+  "ids": [
+   "enroll",
+   "fill",
+   "toCharArray"
+  ],
+  "native_files": [
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "nativeui/admin/AdminMoreScreen.kt",
+   "nativeui/auth/NativeAuthenticationScreens.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/manager/ManagerMoreScreen.kt",
+   "nativeui/more/CashierMoreScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/OperationsMoreScreen.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerMoreScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt"
+  ]
+ },
+ "command.auth.login": {
+  "ids": [
+   "currentSession",
+   "fill",
+   "fullPassphraseAccepted",
+   "login",
+   "toCharArray"
+  ],
+  "native_files": [
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "application/readmodels/HybridIdentityReadService.kt",
+   "application/readmodels/HybridReadModelService.kt",
+   "nativeui/admin/AdminMoreScreen.kt",
+   "nativeui/auth/NativeAuthenticationScreens.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/manager/ManagerMoreScreen.kt",
+   "nativeui/more/CashierMoreScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/OperationsMoreScreen.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerMoreScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt"
+  ]
+ },
+ "command.auth.logout": {
+  "ids": [
+   "logout"
+  ],
+  "native_files": [
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/preview/NativePreviewSampleData.kt"
+  ]
+ },
+ "command.auth.quickLogin": {
+  "ids": [
+   "currentSession",
+   "fill",
+   "login",
+   "toCharArray"
+  ],
+  "native_files": [
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "application/readmodels/HybridIdentityReadService.kt",
+   "application/readmodels/HybridReadModelService.kt",
+   "nativeui/admin/AdminMoreScreen.kt",
+   "nativeui/auth/NativeAuthenticationScreens.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/manager/ManagerMoreScreen.kt",
+   "nativeui/more/CashierMoreScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/OperationsMoreScreen.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerMoreScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt"
+  ]
+ },
+ "command.auth.quickReauthenticate": {
+  "ids": [
+   "currentSession",
+   "enroll",
+   "fill",
+   "login",
+   "reauthenticate",
+   "remove",
+   "status",
+   "strictPayload",
+   "toCharArray"
+  ],
+  "native_files": [
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "application/readmodels/HybridIdentityReadService.kt",
+   "application/readmodels/HybridReadModelService.kt",
+   "nativeui/admin/AdminMoreScreen.kt",
+   "nativeui/auth/NativeAuthenticationScreens.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/manager/ManagerMoreScreen.kt",
+   "nativeui/more/CashierMoreScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/OperationsMoreScreen.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerMoreScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt"
+  ]
+ },
+ "command.auth.reauthenticate": {
+  "ids": [
+   "fill",
+   "fullPassphraseAccepted",
+   "reauthenticate",
+   "require",
+   "sessionManager",
+   "toCharArray"
+  ],
+  "native_files": [
+   "application/admin/NativeAdminWorkFacade.kt",
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/manager/NativeManagerWorkFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeMakeYogurtFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/operations/NativeReceiveMilkFacade.kt",
+   "application/operations/NativeRecordSpoilageFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCloudBackupGateway.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerCustomersFacade.kt",
+   "application/owner/NativeOwnerEmployeesFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerOverviewFacade.kt",
+   "application/owner/NativeOwnerProductsFacade.kt",
+   "application/owner/NativeOwnerRecordsFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerSecurityHistoryFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerSuppliersFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/owner/NativeOwnerWorkFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "application/readmodels/HybridReadFormatting.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/sale/NativeSaleFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/activity/NativeActivityViewModel.kt",
+   "nativeui/admin/AdminMoreScreen.kt",
+   "nativeui/admin/NativeAdminWorkViewModel.kt",
+   "nativeui/auth/NativeAuthenticationScreens.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/collection/NativeCollectionViewModel.kt",
+   "nativeui/expense/NativeExpenseViewModel.kt",
+   "nativeui/manager/ManagerMoreScreen.kt",
+   "nativeui/manager/NativeManagerWorkViewModel.kt",
+   "nativeui/more/CashierMoreScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeAttendanceViewModel.kt",
+   "nativeui/operations/NativeDeliveriesViewModel.kt",
+   "nativeui/operations/NativeMakeYogurtViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsWorkViewModel.kt",
+   "nativeui/operations/NativeReceiveMilkViewModel.kt",
+   "nativeui/operations/NativeRecordSpoilageViewModel.kt",
+   "nativeui/operations/OperationsMoreScreen.kt",
+   "nativeui/owner/NativeOwnerMoreViewModel.kt",
+   "nativeui/owner/NativeOwnerOverviewViewModel.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/NativeOwnerRecordsViewModel.kt",
+   "nativeui/owner/NativeOwnerReportsViewModel.kt",
+   "nativeui/owner/NativeOwnerWorkViewModel.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerMoreScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt",
+   "nativeui/salarypayment/NativeSalaryPaymentViewModel.kt",
+   "nativeui/sale/NativeSaleViewModel.kt",
+   "nativeui/vendorpayment/NativeVendorPaymentViewModel.kt"
+  ]
+ },
+ "command.auth.recoverOwner": {
+  "ids": [
+   "currentSession",
+   "fill",
+   "invalidateUser",
+   "recoverOwner",
+   "toCharArray"
+  ],
+  "native_files": [
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "application/readmodels/HybridIdentityReadService.kt",
+   "application/readmodels/HybridReadModelService.kt",
+   "nativeui/admin/AdminMoreScreen.kt",
+   "nativeui/auth/NativeAuthenticationScreens.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/manager/ManagerMoreScreen.kt",
+   "nativeui/more/CashierMoreScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/OperationsMoreScreen.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerMoreScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt"
+  ]
+ },
+ "command.auth.removeQuickUnlock": {
+  "ids": [
+   "fill",
+   "remove",
+   "toCharArray"
+  ],
+  "native_files": [
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "nativeui/admin/AdminMoreScreen.kt",
+   "nativeui/auth/NativeAuthenticationScreens.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/manager/ManagerMoreScreen.kt",
+   "nativeui/more/CashierMoreScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/OperationsMoreScreen.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerMoreScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt"
+  ]
+ },
+ "command.auth.resumeUserEnrollment": {
+  "ids": [
+   "resumeEnrollment"
+  ],
+  "native_files": []
+ },
+ "command.auth.setUserEnabled": {
+  "ids": [
+   "setEnabled"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt"
+  ]
+ },
+ "command.closeBusinessDate": {
+  "ids": [
+   "closeDate",
+   "optionalString",
+   "requiredDate"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt"
+  ]
+ },
+ "command.copyPreviousBudget": {
+  "ids": [
+   "copyPreviousBudget",
+   "requiredDate"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "nativeui/owner/OwnerCostingController.kt"
+  ]
+ },
+ "command.correctEvent": {
+  "ids": [
+   "correct",
+   "correctEvent",
+   "eventDetail",
+   "eventHistory",
+   "movePointLeft",
+   "nonNegativeDecimal",
+   "optionalDecimal",
+   "optionalPaisa",
+   "optionalString",
+   "positiveDecimal",
+   "positivePaisa",
+   "requiredDate",
+   "requiredPaisa",
+   "saleCorrection",
+   "strictObject",
+   "strictPayload"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerRecordsFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/readmodels/HybridOperationalReadService.kt",
+   "application/readmodels/HybridReadModelService.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/owner/NativeOwnerRecordsViewModel.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt"
+  ]
+ },
+ "command.correctOpeningState": {
+  "ids": [
+   "correctOpeningState",
+   "isFinite",
+   "mapObjects",
+   "movePointLeft",
+   "openingState",
+   "optionalString",
+   "recordOpeningState",
+   "requiredArray",
+   "requiredDate",
+   "requiredDecimal",
+   "requiredPaisa",
+   "updateBusinessSettings"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeMakeYogurtFacade.kt",
+   "application/operations/NativeReceiveMilkFacade.kt",
+   "application/operations/NativeRecordSpoilageFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/readmodels/HybridReadFormatting.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/sale/NativeSaleFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/operations/MakeYogurtScreen.kt",
+   "nativeui/operations/ReceiveMilkScreen.kt",
+   "nativeui/operations/RecordSpoilageScreen.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt"
+  ]
+ },
+ "command.createCustomer": {
+  "ids": [
+   "createCustomer",
+   "strictPayload"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerCustomersFacade.kt",
+   "nativeui/owner/NativeOwnerMoreViewModel.kt",
+   "nativeui/owner/OwnerCustomersController.kt"
+  ]
+ },
+ "command.createDelivery": {
+  "ids": [
+   "create",
+   "optionalString",
+   "requiredDate",
+   "requiredDecimal",
+   "requiredNullableId",
+   "signum"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerCustomersFacade.kt",
+   "application/owner/NativeOwnerEmployeesFacade.kt",
+   "application/owner/NativeOwnerProductsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerSuppliersFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "nativeui/activity/NativeActivityViewModel.kt",
+   "nativeui/admin/NativeAdminWorkViewModel.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/collection/NativeCollectionViewModel.kt",
+   "nativeui/expense/NativeExpenseViewModel.kt",
+   "nativeui/manager/NativeManagerWorkViewModel.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeAttendanceViewModel.kt",
+   "nativeui/operations/NativeDeliveriesViewModel.kt",
+   "nativeui/operations/NativeMakeYogurtViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsWorkViewModel.kt",
+   "nativeui/operations/NativeReceiveMilkViewModel.kt",
+   "nativeui/operations/NativeRecordSpoilageViewModel.kt",
+   "nativeui/owner/NativeOwnerMoreViewModel.kt",
+   "nativeui/owner/NativeOwnerOverviewViewModel.kt",
+   "nativeui/owner/NativeOwnerRecordsViewModel.kt",
+   "nativeui/owner/NativeOwnerReportsViewModel.kt",
+   "nativeui/owner/NativeOwnerWorkViewModel.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerProductsController.kt",
+   "nativeui/salarypayment/NativeSalaryPaymentViewModel.kt",
+   "nativeui/sale/NativeSaleViewModel.kt",
+   "nativeui/vendorpayment/NativeVendorPaymentViewModel.kt"
+  ]
+ },
+ "command.createEmployee": {
+  "ids": [
+   "createEmployee",
+   "strictPayload"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerEmployeesFacade.kt",
+   "nativeui/owner/NativeOwnerMoreViewModel.kt",
+   "nativeui/owner/OwnerEmployeesController.kt"
+  ]
+ },
+ "command.createExpenseCategory": {
+  "ids": [
+   "createExpenseCategory",
+   "strictPayload"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt"
+  ]
+ },
+ "command.createProduct": {
+  "ids": [
+   "createProduct"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerProductsFacade.kt",
+   "nativeui/owner/NativeOwnerMoreViewModel.kt",
+   "nativeui/owner/OwnerProductsController.kt"
+  ]
+ },
+ "command.createVendor": {
+  "ids": [
+   "createVendor",
+   "strictPayload"
+  ],
+  "native_files": []
+ },
+ "command.linkDeliverySale": {
+  "ids": [
+   "linkSale"
+  ],
+  "native_files": []
+ },
+ "command.recordAttendance": {
+  "ids": [
+   "movePointLeft",
+   "nullableDate",
+   "nullablePaisa",
+   "optionalString",
+   "recordAttendance",
+   "requiredDate",
+   "saveEmployeeProfile"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeAttendanceFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt"
+  ]
+ },
+ "command.recordCreditCollection": {
+  "ids": [
+   "movePointLeft",
+   "optionalString",
+   "paymentInput",
+   "recordCreditCollection",
+   "requiredDate",
+   "requiredPaisa"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/transactions/TransactionOperationRepository.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt"
+  ]
+ },
+ "command.recordExpense": {
+  "ids": [
+   "movePointLeft",
+   "optionalString",
+   "recordExpense",
+   "requiredDate",
+   "requiredPaisa"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/transactions/TransactionOperationRepository.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt"
+  ]
+ },
+ "command.recordOpeningCostBasis": {
+  "ids": [
+   "optionalString",
+   "recordOpeningCostBasis",
+   "requiredDecimal",
+   "requiredPaisa"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "nativeui/owner/OwnerCostingController.kt"
+  ]
+ },
+ "command.recordOpeningState": {
+  "ids": [
+   "correctOpeningState",
+   "mapObjects",
+   "movePointLeft",
+   "openingState",
+   "optionalString",
+   "recordOpeningState",
+   "requiredArray",
+   "requiredDate",
+   "requiredDecimal",
+   "requiredPaisa"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt"
+  ]
+ },
+ "command.recordPhysicalCashCount": {
+  "ids": [
+   "movePointLeft",
+   "optionalString",
+   "recordCount",
+   "requiredDate",
+   "requiredPaisa"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt"
+  ]
+ },
+ "command.recordProduction": {
+  "ids": [
+   "optionalString",
+   "recordProduction",
+   "requiredDate"
+  ],
+  "native_files": [
+   "application/operations/NativeMakeYogurtFacade.kt",
+   "application/transactions/TransactionOperationRepository.kt"
+  ]
+ },
+ "command.recordProductionLossAssessment": {
+  "ids": [
+   "approveCostingPolicy",
+   "copyPreviousBudget",
+   "costingManagement",
+   "movePointLeft",
+   "nullableDecimal",
+   "nullablePaisa",
+   "optionalString",
+   "planning",
+   "recordProductionLossAssessment",
+   "requiredDate",
+   "requiredDecimal",
+   "requiredObjectArray",
+   "requiredPaisa",
+   "strictPayload",
+   "upsertBudget",
+   "upsertCollectionsTarget"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/readmodels/HybridCostingPlanningReadService.kt",
+   "application/readmodels/HybridReadModelService.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/owner/NativeOwnerMoreViewModel.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt"
+  ]
+ },
+ "command.recordPurchase": {
+  "ids": [
+   "optionalString",
+   "positiveDecimal",
+   "recordPurchase",
+   "requiredDate",
+   "requiredDecimal",
+   "toFiniteDouble"
+  ],
+  "native_files": [
+   "application/operations/NativeReceiveMilkFacade.kt",
+   "application/transactions/TransactionOperationRepository.kt"
+  ]
+ },
+ "command.recordSalaryPayment": {
+  "ids": [
+   "movePointLeft",
+   "optionalString",
+   "paymentInput",
+   "recordSalaryPayment",
+   "requiredDate",
+   "requiredPaisa"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/transactions/TransactionOperationRepository.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt"
+  ]
+ },
+ "command.recordSale": {
+  "ids": [
+   "movePointLeft",
+   "nullableDecimal",
+   "nullableId",
+   "nullablePaisa",
+   "optionalString",
+   "recordSale",
+   "requiredDate",
+   "requiredPaisa",
+   "toFiniteDouble"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/sale/NativeSaleFacade.kt",
+   "application/transactions/TransactionOperationRepository.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt"
+  ]
+ },
+ "command.recordSpoilage": {
+  "ids": [
+   "cashierSummary",
+   "dashboard",
+   "dateRange",
+   "financialOverview",
+   "isAfter",
+   "movePointLeft",
+   "nullableDecimal",
+   "nullableId",
+   "nullablePaisa",
+   "optionalString",
+   "positiveDecimal",
+   "profitabilityReport",
+   "recordPurchase",
+   "recordSale",
+   "recordSpoilage",
+   "requiredDate",
+   "requiredDecimal",
+   "requiredPaisa",
+   "spoilageHistory",
+   "strictPayload",
+   "toFiniteDouble"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeReceiveMilkFacade.kt",
+   "application/operations/NativeRecordSpoilageFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerOverviewFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/readmodels/HybridFinancialReadService.kt",
+   "application/readmodels/HybridOperationalReadService.kt",
+   "application/readmodels/HybridReadModelService.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/sale/NativeSaleFacade.kt",
+   "application/transactions/TransactionOperationRepository.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt"
+  ]
+ },
+ "command.recordVendorPayment": {
+  "ids": [
+   "movePointLeft",
+   "optionalString",
+   "paymentInput",
+   "recordVendorPayment",
+   "requiredDate",
+   "requiredPaisa"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/transactions/TransactionOperationRepository.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt"
+  ]
+ },
+ "command.renameCustomer": {
+  "ids": [
+   "renameCustomer",
+   "strictPayload"
+  ],
+  "native_files": []
+ },
+ "command.renameEmployee": {
+  "ids": [
+   "renameEmployee",
+   "strictPayload"
+  ],
+  "native_files": []
+ },
+ "command.renameVendor": {
+  "ids": [
+   "renameVendor",
+   "strictPayload"
+  ],
+  "native_files": []
+ },
+ "command.reopenBusinessDate": {
+  "ids": [
+   "archive",
+   "closeDate",
+   "movePointLeft",
+   "optionalString",
+   "reconciliationArchive",
+   "recordCount",
+   "reopenDate",
+   "requiredDate",
+   "requiredPaisa",
+   "strictPayload"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerOverviewFacade.kt",
+   "application/owner/NativeOwnerRecordsFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/readmodels/HybridOperationalReadService.kt",
+   "application/readmodels/HybridReadModelService.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/owner/NativeOwnerMoreViewModel.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerProductsController.kt"
+  ]
+ },
+ "command.saveCustomerProfile": {
+  "ids": [
+   "movePointLeft",
+   "nullableDecimal",
+   "nullablePaisa",
+   "saveCustomerProfile"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt"
+  ]
+ },
+ "command.saveEmployeeProfile": {
+  "ids": [
+   "movePointLeft",
+   "nullableDate",
+   "nullablePaisa",
+   "saveEmployeeProfile"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt"
+  ]
+ },
+ "command.saveStoreIdentity": {
+  "ids": [
+   "saveStoreIdentity",
+   "strictPayload"
+  ],
+  "native_files": []
+ },
+ "command.saveVendorProfile": {
+  "ids": [
+   "movePointLeft",
+   "nullableDecimal",
+   "nullablePaisa",
+   "saveCustomerProfile",
+   "saveVendorProfile",
+   "strictPayload"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt"
+  ]
+ },
+ "command.setExpenseCategoryArchived": {
+  "ids": [
+   "setExpenseCategoryArchived",
+   "strictPayload"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt"
+  ]
+ },
+ "command.setProductArchived": {
+  "ids": [
+   "setProductArchived",
+   "strictPayload"
+  ],
+  "native_files": []
+ },
+ "command.transitionDelivery": {
+  "ids": [
+   "optionalString",
+   "transition"
+  ],
+  "native_files": [
+   "application/operations/NativeDeliveriesFacade.kt"
+  ]
+ },
+ "command.updateBusinessSettings": {
+  "ids": [
+   "isFinite",
+   "movePointLeft",
+   "requiredDecimal",
+   "requiredPaisa",
+   "updateBusinessSettings"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeMakeYogurtFacade.kt",
+   "application/operations/NativeReceiveMilkFacade.kt",
+   "application/operations/NativeRecordSpoilageFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/readmodels/HybridReadFormatting.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/sale/NativeSaleFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/operations/MakeYogurtScreen.kt",
+   "nativeui/operations/ReceiveMilkScreen.kt",
+   "nativeui/operations/RecordSpoilageScreen.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt"
+  ]
+ },
+ "command.updateProduct": {
+  "ids": [
+   "updateProduct"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerProductsFacade.kt",
+   "nativeui/owner/NativeOwnerMoreViewModel.kt",
+   "nativeui/owner/OwnerProductsController.kt"
+  ]
+ },
+ "command.upsertBudget": {
+  "ids": [
+   "movePointLeft",
+   "nullableDecimal",
+   "nullablePaisa",
+   "requiredDate",
+   "upsertBudget"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt"
+  ]
+ },
+ "command.upsertCollectionsTarget": {
+  "ids": [
+   "movePointLeft",
+   "requiredDate",
+   "requiredPaisa",
+   "upsertCollectionsTarget"
+  ],
+  "native_files": [
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt"
+  ]
+ },
+ "query.accountLedger": {
+  "ids": [
+   "accountLedger",
+   "strictPayload"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerRecordsFacade.kt",
+   "application/readmodels/HybridFinancialReadService.kt",
+   "application/readmodels/HybridReadModelService.kt"
+  ]
+ },
+ "query.attendance": {
+  "ids": [
+   "attendance",
+   "requiredDate",
+   "strictPayload"
+  ],
+  "native_files": [
+   "application/readmodels/HybridOperationalReadService.kt",
+   "application/readmodels/HybridReadModelService.kt"
+  ]
+ },
+ "query.bootstrapStatus": {
+  "ids": [
+   "bootstrapStatus"
+  ],
+  "native_files": [
+   "application/readmodels/HybridIdentityReadService.kt",
+   "application/readmodels/HybridReadModelService.kt"
+  ]
+ },
+ "query.businessSettings": {
+  "ids": [
+   "businessSettings",
+   "strictPayload"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerOverviewFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerWorkFacade.kt",
+   "application/readmodels/HybridIdentityReadService.kt",
+   "application/readmodels/HybridReadModelService.kt"
+  ]
+ },
+ "query.cashierSummary": {
+  "ids": [
+   "cashierSummary",
+   "dateRange"
+  ],
+  "native_files": [
+   "application/readmodels/HybridOperationalReadService.kt",
+   "application/readmodels/HybridReadModelService.kt",
+   "application/sale/NativeSaleFacade.kt"
+  ]
+ },
+ "query.costingManagement": {
+  "ids": [
+   "costingManagement"
+  ],
+  "native_files": [
+   "application/readmodels/HybridCostingPlanningReadService.kt",
+   "application/readmodels/HybridReadModelService.kt"
+  ]
+ },
+ "query.currentSession": {
+  "ids": [
+   "bootstrapOwner",
+   "changeOwnPassphrase",
+   "clearAll",
+   "currentSession",
+   "fill",
+   "fullPassphraseAccepted",
+   "invalidateUser",
+   "login",
+   "logout",
+   "needsOwnerBootstrap",
+   "reauthenticate",
+   "recoverOwner",
+   "require",
+   "sessionManager",
+   "strictPayload",
+   "toCharArray"
+  ],
+  "native_files": [
+   "application/admin/NativeAdminWorkFacade.kt",
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/manager/NativeManagerWorkFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeMakeYogurtFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/operations/NativeReceiveMilkFacade.kt",
+   "application/operations/NativeRecordSpoilageFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCloudBackupGateway.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerCustomersFacade.kt",
+   "application/owner/NativeOwnerEmployeesFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerOverviewFacade.kt",
+   "application/owner/NativeOwnerProductsFacade.kt",
+   "application/owner/NativeOwnerRecordsFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerSecurityHistoryFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerSuppliersFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/owner/NativeOwnerWorkFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "application/readmodels/HybridIdentityReadService.kt",
+   "application/readmodels/HybridReadFormatting.kt",
+   "application/readmodels/HybridReadModelService.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/sale/NativeSaleFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/activity/NativeActivityViewModel.kt",
+   "nativeui/admin/AdminMoreScreen.kt",
+   "nativeui/admin/NativeAdminWorkViewModel.kt",
+   "nativeui/auth/NativeAuthenticationScreens.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/collection/NativeCollectionViewModel.kt",
+   "nativeui/expense/NativeExpenseViewModel.kt",
+   "nativeui/manager/ManagerMoreScreen.kt",
+   "nativeui/manager/NativeManagerWorkViewModel.kt",
+   "nativeui/more/CashierMoreScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeAttendanceViewModel.kt",
+   "nativeui/operations/NativeDeliveriesViewModel.kt",
+   "nativeui/operations/NativeMakeYogurtViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsWorkViewModel.kt",
+   "nativeui/operations/NativeReceiveMilkViewModel.kt",
+   "nativeui/operations/NativeRecordSpoilageViewModel.kt",
+   "nativeui/operations/OperationsMoreScreen.kt",
+   "nativeui/owner/NativeOwnerMoreViewModel.kt",
+   "nativeui/owner/NativeOwnerOverviewViewModel.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/NativeOwnerRecordsViewModel.kt",
+   "nativeui/owner/NativeOwnerReportsViewModel.kt",
+   "nativeui/owner/NativeOwnerWorkViewModel.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerMoreScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt",
+   "nativeui/salarypayment/NativeSalaryPaymentViewModel.kt",
+   "nativeui/sale/NativeSaleViewModel.kt",
+   "nativeui/vendorpayment/NativeVendorPaymentViewModel.kt"
+  ]
+ },
+ "query.dashboard": {
+  "ids": [
+   "dashboard",
+   "dateRange"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerOverviewFacade.kt",
+   "application/readmodels/HybridOperationalReadService.kt",
+   "application/readmodels/HybridReadModelService.kt",
+   "application/sale/NativeSaleFacade.kt"
+  ]
+ },
+ "query.deliveries": {
+  "ids": [
+   "deliveries",
+   "strictPayload"
+  ],
+  "native_files": [
+   "application/readmodels/HybridOperationalReadService.kt",
+   "application/readmodels/HybridReadModelService.kt"
+  ]
+ },
+ "query.eventDetail": {
+  "ids": [
+   "eventDetail"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerRecordsFacade.kt",
+   "application/readmodels/HybridOperationalReadService.kt",
+   "application/readmodels/HybridReadModelService.kt"
+  ]
+ },
+ "query.eventHistory": {
+  "ids": [
+   "eventHistory"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerRecordsFacade.kt",
+   "application/readmodels/HybridOperationalReadService.kt",
+   "application/readmodels/HybridReadModelService.kt"
+  ]
+ },
+ "query.financialOverview": {
+  "ids": [
+   "dateRange",
+   "financialOverview"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerOverviewFacade.kt",
+   "application/readmodels/HybridFinancialReadService.kt",
+   "application/readmodels/HybridReadModelService.kt"
+  ]
+ },
+ "query.masterData": {
+  "ids": [
+   "masterData",
+   "strictPayload"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/readmodels/HybridIdentityReadService.kt",
+   "application/readmodels/HybridReadModelService.kt"
+  ]
+ },
+ "query.planning": {
+  "ids": [
+   "planning"
+  ],
+  "native_files": [
+   "application/readmodels/HybridCostingPlanningReadService.kt",
+   "application/readmodels/HybridReadModelService.kt"
+  ]
+ },
+ "query.profitabilityReport": {
+  "ids": [
+   "isAfter",
+   "profitabilityReport",
+   "requiredDate"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerOverviewFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/readmodels/HybridFinancialReadService.kt",
+   "application/readmodels/HybridReadModelService.kt"
+  ]
+ },
+ "query.reconciliationArchive": {
+  "ids": [
+   "archive",
+   "reconciliationArchive"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerOverviewFacade.kt",
+   "application/owner/NativeOwnerRecordsFacade.kt",
+   "application/readmodels/HybridOperationalReadService.kt",
+   "application/readmodels/HybridReadModelService.kt",
+   "nativeui/owner/NativeOwnerMoreViewModel.kt",
+   "nativeui/owner/OwnerProductsController.kt"
+  ]
+ },
+ "query.securityAudit": {
+  "ids": [
+   "audit",
+   "securityAudit"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/readmodels/HybridReadModelService.kt",
+   "application/readmodels/HybridSecurityReadService.kt"
+  ]
+ },
+ "query.spoilageHistory": {
+  "ids": [
+   "spoilageHistory"
+  ],
+  "native_files": [
+   "application/readmodels/HybridOperationalReadService.kt",
+   "application/readmodels/HybridReadModelService.kt"
+  ]
+ },
+ "query.transactionReferences": {
+  "ids": [
+   "strictPayload",
+   "transactionReferences"
+  ],
+  "native_files": [
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/readmodels/HybridOperationalReadService.kt",
+   "application/readmodels/HybridReadModelService.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/sale/NativeSaleFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt"
+  ]
+ },
+ "query.users": {
+  "ids": [
+   "users"
+  ],
+  "native_files": [
+   "application/readmodels/HybridReadModelService.kt",
+   "application/readmodels/HybridSecurityReadService.kt"
+  ]
+ },
+ "system.bridgeInfo": {
+  "ids": [],
+  "native_files": []
+ },
+ "system.cloudBackupStatus": {
+  "ids": [
+   "authorizeOwner",
+   "requireRecentAuthentication",
+   "status"
+  ],
+  "native_files": [
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt"
+  ]
+ },
+ "system.configureCloudBackup": {
+  "ids": [
+   "apply",
+   "authorizeOwner",
+   "configure",
+   "requireRecentAuthentication",
+   "status",
+   "updatePolicy"
+  ],
+  "native_files": [
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCloudBackupGateway.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt"
+  ]
+ },
+ "system.connectCloudBackup": {
+  "ids": [
+   "apply",
+   "authorizeOwner",
+   "configure",
+   "connect",
+   "equals",
+   "fill",
+   "isNotBlank",
+   "read",
+   "requestNewRecoveryPassphrase",
+   "requestNotificationPermission",
+   "requireRecentAuthentication",
+   "runNow",
+   "status",
+   "updatePolicy"
+  ],
+  "native_files": [
+   "application/admin/NativeAdminWorkFacade.kt",
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/manager/NativeManagerWorkFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCloudBackupGateway.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerOverviewFacade.kt",
+   "application/owner/NativeOwnerRecordsFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerSecurityHistoryFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/owner/NativeOwnerWorkFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/sale/NativeSaleFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/admin/AdminMoreScreen.kt",
+   "nativeui/auth/NativeAuthenticationScreens.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/manager/ManagerMoreScreen.kt",
+   "nativeui/more/CashierMoreScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/MakeYogurtScreen.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/OperationsMoreScreen.kt",
+   "nativeui/operations/ReceiveMilkScreen.kt",
+   "nativeui/operations/RecordSpoilageScreen.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlanningScreens.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerCustomersScreen.kt",
+   "nativeui/owner/OwnerEmployeesScreen.kt",
+   "nativeui/owner/OwnerMoreScreen.kt",
+   "nativeui/owner/OwnerOpeningCostBasisScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerSecurityHistoryScreen.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerSuppliersScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt"
+  ]
+ },
+ "system.disconnectCloudBackup": {
+  "ids": [
+   "apply",
+   "authorizeOwner",
+   "cancelAll",
+   "configure",
+   "connect",
+   "disconnect",
+   "disconnectLocal",
+   "equals",
+   "fill",
+   "isNotBlank",
+   "read",
+   "requestNewRecoveryPassphrase",
+   "requestNotificationPermission",
+   "requireRecentAuthentication",
+   "revokeSelectedAccount",
+   "runNow",
+   "status",
+   "strictPayload",
+   "updatePolicy"
+  ],
+  "native_files": [
+   "application/admin/NativeAdminWorkFacade.kt",
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/manager/NativeManagerWorkFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCloudBackupGateway.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerOverviewFacade.kt",
+   "application/owner/NativeOwnerRecordsFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerSecurityHistoryFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/owner/NativeOwnerWorkFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/sale/NativeSaleFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/admin/AdminMoreScreen.kt",
+   "nativeui/auth/NativeAuthenticationScreens.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/manager/ManagerMoreScreen.kt",
+   "nativeui/more/CashierMoreScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/MakeYogurtScreen.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/OperationsMoreScreen.kt",
+   "nativeui/operations/ReceiveMilkScreen.kt",
+   "nativeui/operations/RecordSpoilageScreen.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlanningScreens.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerCustomersScreen.kt",
+   "nativeui/owner/OwnerEmployeesScreen.kt",
+   "nativeui/owner/OwnerMoreScreen.kt",
+   "nativeui/owner/OwnerOpeningCostBasisScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerSecurityHistoryScreen.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerSuppliersScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt"
+  ]
+ },
+ "system.exportEncryptedBackup": {
+  "ids": [
+   "also",
+   "createDocument",
+   "export",
+   "exportEncryptedSnapshot",
+   "fill",
+   "getOrElse",
+   "optionalString",
+   "strictObject",
+   "takeIf",
+   "toCharArray",
+   "trim"
+  ],
+  "native_files": [
+   "application/activity/NativeActivityFacade.kt",
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeAttendanceFacade.kt",
+   "application/operations/NativeDeliveriesFacade.kt",
+   "application/operations/NativeMakeYogurtFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/operations/NativeReceiveMilkFacade.kt",
+   "application/operations/NativeRecordSpoilageFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerOverviewFacade.kt",
+   "application/owner/NativeOwnerRecordsFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerSecurityHistoryFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "application/readmodels/HybridFinancialReadService.kt",
+   "application/readmodels/HybridIdentityReadService.kt",
+   "application/readmodels/HybridOperationalReadService.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/sale/NativeSaleFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/NativeUiTags.kt",
+   "nativeui/admin/AdminMoreScreen.kt",
+   "nativeui/auth/NativeAuthenticationScreens.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/manager/ManagerMoreScreen.kt",
+   "nativeui/more/CashierMoreScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/OperationsMoreScreen.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlanningScreens.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerCustomersScreen.kt",
+   "nativeui/owner/OwnerEmployeesScreen.kt",
+   "nativeui/owner/OwnerMoreScreen.kt",
+   "nativeui/owner/OwnerOpeningCostBasisScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerProductsScreen.kt",
+   "nativeui/owner/OwnerRecordsScreen.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerSuppliersScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt"
+  ]
+ },
+ "system.inspectCloudBackup": {
+  "ids": [
+   "downloadAndDecrypt",
+   "downloadAndDecryptWithLocalKey",
+   "fill",
+   "inspect",
+   "inspectCompleteSnapshotBytes",
+   "remove",
+   "requestRecoveryPassphrase"
+  ],
+  "native_files": [
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCloudBackupGateway.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt"
+  ]
+ },
+ "system.inspectEncryptedBackup": {
+  "ids": [
+   "fill",
+   "getOrElse",
+   "inspect",
+   "inspectEncryptedSnapshot",
+   "openDocument",
+   "remove",
+   "toCharArray"
+  ],
+  "native_files": [
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "nativeui/admin/AdminMoreScreen.kt",
+   "nativeui/auth/NativeAuthenticationScreens.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/manager/ManagerMoreScreen.kt",
+   "nativeui/more/CashierMoreScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/OperationsMoreScreen.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerMoreScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt"
+  ]
+ },
+ "system.quickUnlockStatus": {
+  "ids": [
+   "status"
+  ],
+  "native_files": [
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt"
+  ]
+ },
+ "system.refreshCloudBackups": {
+  "ids": [
+   "authorizeOwner",
+   "refresh",
+   "refreshSnapshots",
+   "requireRecentAuthentication",
+   "status"
+  ],
+  "native_files": [
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCloudBackupGateway.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "nativeui/activity/NativeActivityViewModel.kt",
+   "nativeui/admin/NativeAdminWorkViewModel.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/collection/NativeCollectionViewModel.kt",
+   "nativeui/expense/NativeExpenseViewModel.kt",
+   "nativeui/manager/NativeManagerWorkViewModel.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/NativeAttendanceViewModel.kt",
+   "nativeui/operations/NativeDeliveriesViewModel.kt",
+   "nativeui/operations/NativeMakeYogurtViewModel.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/NativeOperationsWorkViewModel.kt",
+   "nativeui/operations/NativeReceiveMilkViewModel.kt",
+   "nativeui/operations/NativeRecordSpoilageViewModel.kt",
+   "nativeui/owner/NativeOwnerMoreViewModel.kt",
+   "nativeui/owner/NativeOwnerOverviewViewModel.kt",
+   "nativeui/owner/NativeOwnerRecordsViewModel.kt",
+   "nativeui/owner/NativeOwnerReportsViewModel.kt",
+   "nativeui/owner/NativeOwnerWorkViewModel.kt",
+   "nativeui/owner/OwnerProductsController.kt",
+   "nativeui/salarypayment/NativeSalaryPaymentViewModel.kt",
+   "nativeui/sale/NativeSaleViewModel.kt",
+   "nativeui/vendorpayment/NativeVendorPaymentViewModel.kt"
+  ]
+ },
+ "system.restoreInspectedBackup": {
+  "ids": [
+   "also",
+   "clear",
+   "createDocument",
+   "export",
+   "exportEncryptedSnapshot",
+   "fill",
+   "getOrElse",
+   "inspect",
+   "inspectEncryptedSnapshot",
+   "openDocument",
+   "optionalString",
+   "remove",
+   "restore",
+   "restoreEncryptedReplacing",
+   "sessionManager",
+   "strictObject",
+   "strictPayload",
+   "takeIf",
+   "toCharArray",
+   "trim"
+  ],
+  "native_files": [
+   "application/activity/NativeActivityFacade.kt",
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/collection/NativeCollectionFacade.kt",
+   "application/expense/NativeExpenseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeAttendanceFacade.kt",
+   "application/operations/NativeDeliveriesFacade.kt",
+   "application/operations/NativeMakeYogurtFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/operations/NativeReceiveMilkFacade.kt",
+   "application/operations/NativeRecordSpoilageFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCloudBackupGateway.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerOverviewFacade.kt",
+   "application/owner/NativeOwnerRecordsFacade.kt",
+   "application/owner/NativeOwnerReportsFacade.kt",
+   "application/owner/NativeOwnerSecurityHistoryFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "application/readmodels/HybridFinancialReadService.kt",
+   "application/readmodels/HybridIdentityReadService.kt",
+   "application/readmodels/HybridOperationalReadService.kt",
+   "application/salarypayment/NativeSalaryPaymentFacade.kt",
+   "application/sale/NativeSaleFacade.kt",
+   "application/vendorpayment/NativeVendorPaymentFacade.kt",
+   "nativeui/NativeUiTags.kt",
+   "nativeui/admin/AdminExpenseEntryScreen.kt",
+   "nativeui/admin/AdminMoreScreen.kt",
+   "nativeui/auth/NativeAuthenticationScreens.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/common/EntryLeaveGuard.kt",
+   "nativeui/expense/ExpenseEntryScreen.kt",
+   "nativeui/manager/ManagerCashCloseEntryScreen.kt",
+   "nativeui/manager/ManagerCollectionEntryScreen.kt",
+   "nativeui/manager/ManagerExpenseEntryScreen.kt",
+   "nativeui/manager/ManagerMakeYogurtEntryScreen.kt",
+   "nativeui/manager/ManagerMoreScreen.kt",
+   "nativeui/manager/ManagerPaySupplierEntryScreen.kt",
+   "nativeui/manager/ManagerReceiveMilkEntryScreen.kt",
+   "nativeui/manager/ManagerRecordSpoilageEntryScreen.kt",
+   "nativeui/manager/ManagerSaleEntryScreen.kt",
+   "nativeui/more/CashierExpenseEntryScreen.kt",
+   "nativeui/more/CashierMoreScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/MakeYogurtScreen.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/OperationsMoreScreen.kt",
+   "nativeui/operations/ReceiveMilkScreen.kt",
+   "nativeui/operations/RecordSpoilageScreen.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCashCloseEntryScreen.kt",
+   "nativeui/owner/OwnerCollectionEntryScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlanningScreens.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerCustomersScreen.kt",
+   "nativeui/owner/OwnerEmployeesScreen.kt",
+   "nativeui/owner/OwnerExpenseEntryScreen.kt",
+   "nativeui/owner/OwnerMakeYogurtEntryScreen.kt",
+   "nativeui/owner/OwnerMoreScreen.kt",
+   "nativeui/owner/OwnerOpeningCostBasisScreen.kt",
+   "nativeui/owner/OwnerPaySalaryEntryScreen.kt",
+   "nativeui/owner/OwnerPaySupplierEntryScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerProductsScreen.kt",
+   "nativeui/owner/OwnerReceiveMilkEntryScreen.kt",
+   "nativeui/owner/OwnerRecordSpoilageEntryScreen.kt",
+   "nativeui/owner/OwnerRecordsScreen.kt",
+   "nativeui/owner/OwnerSaleEntryScreen.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerSuppliersScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt",
+   "nativeui/salarypayment/SalaryPaymentEntryScreen.kt",
+   "nativeui/sale/CashierSaleScreen.kt",
+   "nativeui/vendorpayment/VendorPaymentEntryScreen.kt"
+  ]
+ },
+ "system.restoreInspectedCloudBackup": {
+  "ids": [
+   "cancelAll",
+   "clear",
+   "disableAfterRestore",
+   "downloadAndDecrypt",
+   "downloadAndDecryptWithLocalKey",
+   "fill",
+   "remove",
+   "restore",
+   "restoreCompleteSnapshotReplacing"
+  ],
+  "native_files": [
+   "application/authentication/NativeAuthenticationFacade.kt",
+   "application/cashclose/NativeCashCloseFacade.kt",
+   "application/more/NativeMoreFacade.kt",
+   "application/operations/NativeOperationsMoreFacade.kt",
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCloudBackupGateway.kt",
+   "application/owner/NativeOwnerCostingPlansFacade.kt",
+   "application/owner/NativeOwnerMoreFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt",
+   "application/owner/NativeOwnerUsersRolesFacade.kt",
+   "application/preview/NativePreviewSampleData.kt",
+   "nativeui/admin/AdminExpenseEntryScreen.kt",
+   "nativeui/auth/NativeAuthenticationViewModel.kt",
+   "nativeui/cashclose/CashCloseEntryScreen.kt",
+   "nativeui/cashclose/NativeCashCloseViewModel.kt",
+   "nativeui/collection/CashierCollectionScreen.kt",
+   "nativeui/common/EntryLeaveGuard.kt",
+   "nativeui/expense/ExpenseEntryScreen.kt",
+   "nativeui/manager/ManagerCashCloseEntryScreen.kt",
+   "nativeui/manager/ManagerCollectionEntryScreen.kt",
+   "nativeui/manager/ManagerExpenseEntryScreen.kt",
+   "nativeui/manager/ManagerMakeYogurtEntryScreen.kt",
+   "nativeui/manager/ManagerPaySupplierEntryScreen.kt",
+   "nativeui/manager/ManagerReceiveMilkEntryScreen.kt",
+   "nativeui/manager/ManagerRecordSpoilageEntryScreen.kt",
+   "nativeui/manager/ManagerSaleEntryScreen.kt",
+   "nativeui/more/CashierExpenseEntryScreen.kt",
+   "nativeui/more/NativeMoreViewModel.kt",
+   "nativeui/operations/MakeYogurtScreen.kt",
+   "nativeui/operations/NativeOperationsMoreViewModel.kt",
+   "nativeui/operations/ReceiveMilkScreen.kt",
+   "nativeui/operations/RecordSpoilageScreen.kt",
+   "nativeui/owner/NativeOwnerPendingActions.kt",
+   "nativeui/owner/OwnerBackupController.kt",
+   "nativeui/owner/OwnerBackupScreen.kt",
+   "nativeui/owner/OwnerCashCloseEntryScreen.kt",
+   "nativeui/owner/OwnerCollectionEntryScreen.kt",
+   "nativeui/owner/OwnerCostingController.kt",
+   "nativeui/owner/OwnerCostingPlanningScreens.kt",
+   "nativeui/owner/OwnerCostingPlansActions.kt",
+   "nativeui/owner/OwnerCostingPlansScreen.kt",
+   "nativeui/owner/OwnerCustomersScreen.kt",
+   "nativeui/owner/OwnerEmployeesScreen.kt",
+   "nativeui/owner/OwnerExpenseEntryScreen.kt",
+   "nativeui/owner/OwnerMakeYogurtEntryScreen.kt",
+   "nativeui/owner/OwnerPaySalaryEntryScreen.kt",
+   "nativeui/owner/OwnerPaySupplierEntryScreen.kt",
+   "nativeui/owner/OwnerPersonalSecurityController.kt",
+   "nativeui/owner/OwnerProductsScreen.kt",
+   "nativeui/owner/OwnerReceiveMilkEntryScreen.kt",
+   "nativeui/owner/OwnerRecordSpoilageEntryScreen.kt",
+   "nativeui/owner/OwnerRecordsScreen.kt",
+   "nativeui/owner/OwnerSaleEntryScreen.kt",
+   "nativeui/owner/OwnerShopSettingsController.kt",
+   "nativeui/owner/OwnerShopSettingsScreen.kt",
+   "nativeui/owner/OwnerSuppliersScreen.kt",
+   "nativeui/owner/OwnerUsersRolesController.kt",
+   "nativeui/owner/OwnerUsersRolesScreen.kt",
+   "nativeui/salarypayment/SalaryPaymentEntryScreen.kt",
+   "nativeui/sale/CashierSaleScreen.kt",
+   "nativeui/vendorpayment/VendorPaymentEntryScreen.kt"
+  ]
+ },
+ "system.runCloudBackupNow": {
+  "ids": [
+   "authorizeOwner",
+   "read",
+   "requireRecentAuthentication",
+   "runNow"
+  ],
+  "native_files": [
+   "application/owner/NativeOwnerBackupFacade.kt",
+   "application/owner/NativeOwnerCloudBackupGateway.kt",
+   "application/owner/NativeOwnerOverviewFacade.kt",
+   "application/owner/NativeOwnerShopSettingsFacade.kt"
+  ]
+ }
+}

@@ -39,6 +39,7 @@ sealed interface NativeMoreState {
         val saving: Boolean = false,
         val confirmRemoveUnlock: Boolean = false,
         val error: String? = null,
+        val refreshing: Boolean = false,
     ) : NativeMoreState
     data class LoadFailure(val message: String) : NativeMoreState
 }
@@ -67,7 +68,9 @@ class NativeMoreViewModel(
     fun refresh() {
         val session = sessionHandle ?: return
         val request = loadGate.begin(session)
-        _state.value = NativeMoreState.Loading
+        val previous = _state.value as? NativeMoreState.Ready
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeMoreState.Loading
         scope.launch {
             try {
                 val (context, security) = coroutineScope {
@@ -76,10 +79,21 @@ class NativeMoreViewModel(
                     contextRequest.await() to securityRequest.await()
                 }
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                _state.value = NativeMoreState.Ready(context = context, security = security)
+                _state.value = NativeMoreState.Ready(
+                    context = context,
+                    security = security,
+                    refreshing = false,
+                )
             } catch (error: Throwable) {
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired || previous == null) {
+                    handleLoadFailure(error)
+                } else {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: "More could not be refreshed. Try again.",
+                    )
+                }
             }
         }
     }

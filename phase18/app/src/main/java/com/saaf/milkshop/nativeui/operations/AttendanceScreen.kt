@@ -21,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -145,6 +146,9 @@ private fun AttendanceReady(
                 .padding(padding)
                 .testTag(NativeUiTags.OpsAttendanceRoot),
         ) {
+            if (state.refreshing) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
             CashierScreenHeader(
                 title = "My attendance",
                 displayName = identity.displayName,

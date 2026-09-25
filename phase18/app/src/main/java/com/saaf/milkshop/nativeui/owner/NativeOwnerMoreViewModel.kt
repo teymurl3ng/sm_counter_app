@@ -93,7 +93,8 @@ class NativeOwnerMoreViewModel internal constructor(
 
     fun refresh() {
         val token = runtime.restartSession() ?: return
-        _state.value = NativeOwnerMoreState.Loading
+        val previous = _state.value as? NativeOwnerMoreState.Ready
+        _state.value = previous?.copy(refreshing = true) ?: NativeOwnerMoreState.Loading
         scope.launch {
             try {
                 val (context, security) = coroutineScope {
@@ -106,9 +107,21 @@ class NativeOwnerMoreViewModel internal constructor(
                     contextRequest.await() to securityRequest.await()
                 }
                 if (!runtime.isCurrent(token)) return@launch
-                _state.value = NativeOwnerMoreState.Ready(context = context, security = security)
+                _state.value = NativeOwnerMoreState.Ready(
+                    context = context,
+                    security = security,
+                    refreshing = false,
+                )
             } catch (error: Throwable) {
-                handleLoadFailure(token, error)
+                if (previous != null && error !is SecurityFailure.SessionExpired) {
+                    if (!runtime.isCurrent(token)) return@launch
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = publicMessage(error),
+                    )
+                } else {
+                    handleLoadFailure(token, error)
+                }
             }
         }
     }

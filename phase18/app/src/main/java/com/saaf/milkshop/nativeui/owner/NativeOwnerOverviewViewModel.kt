@@ -23,6 +23,7 @@ sealed interface NativeOwnerOverviewState {
     data object Loading : NativeOwnerOverviewState
     data class Ready(
         val snapshot: NativeOwnerOverviewSnapshot,
+        val refreshing: Boolean = false,
         val error: String? = null,
     ) : NativeOwnerOverviewState
     data class LoadFailure(val message: String) : NativeOwnerOverviewState
@@ -58,15 +59,27 @@ class NativeOwnerOverviewViewModel(
     fun refresh() {
         val session = sessionHandle ?: return
         val request = loadGate.begin(session)
-        _state.value = NativeOwnerOverviewState.Loading
+        val previous = _state.value as? NativeOwnerOverviewState.Ready
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeOwnerOverviewState.Loading
         scope.launch {
             try {
                 val snapshot = withContext(Dispatchers.IO) { facade.load(session) }
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                _state.value = NativeOwnerOverviewState.Ready(snapshot = snapshot)
+                _state.value = NativeOwnerOverviewState.Ready(
+                    snapshot = snapshot,
+                    refreshing = false,
+                )
             } catch (error: Throwable) {
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired || previous == null) {
+                    handleLoadFailure(error)
+                } else {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: "Overview could not open. Try again.",
+                    )
+                }
             }
         }
     }

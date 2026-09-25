@@ -25,6 +25,7 @@ sealed interface NativeSalaryPaymentState {
         val saving: Boolean = false,
         val receipt: NativeSalaryPaymentReceipt? = null,
         val error: String? = null,
+        val refreshing: Boolean = false,
     ) : NativeSalaryPaymentState
     data class LoadFailure(val message: String) : NativeSalaryPaymentState
 }
@@ -46,14 +47,24 @@ class NativeSalaryPaymentViewModel(
 
     fun refresh() {
         val session = sessionHandle ?: return
-        _state.value = NativeSalaryPaymentState.Loading
+        val previous = _state.value as? NativeSalaryPaymentState.Ready
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeSalaryPaymentState.Loading
         scope.launch {
             try {
                 _state.value = NativeSalaryPaymentState.Ready(
                     withContext(Dispatchers.IO) { facade.load(session) },
+                    refreshing = false,
                 )
             } catch (error: Throwable) {
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired || previous == null) {
+                    handleLoadFailure(error)
+                } else {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: "The salary payment could not be refreshed. Try again.",
+                    )
+                }
             }
         }
     }

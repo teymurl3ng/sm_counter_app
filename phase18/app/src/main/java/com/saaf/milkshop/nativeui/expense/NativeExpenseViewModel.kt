@@ -25,6 +25,7 @@ sealed interface NativeExpenseState {
         val saving: Boolean = false,
         val receipt: NativeExpenseReceipt? = null,
         val error: String? = null,
+        val refreshing: Boolean = false,
     ) : NativeExpenseState
     data class LoadFailure(val message: String) : NativeExpenseState
 }
@@ -46,12 +47,24 @@ class NativeExpenseViewModel(
 
     fun refresh() {
         val session = sessionHandle ?: return
-        _state.value = NativeExpenseState.Loading
+        val previous = _state.value as? NativeExpenseState.Ready
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeExpenseState.Loading
         scope.launch {
             try {
-                _state.value = NativeExpenseState.Ready(withContext(Dispatchers.IO) { facade.load(session) })
+                _state.value = NativeExpenseState.Ready(
+                    withContext(Dispatchers.IO) { facade.load(session) },
+                    refreshing = false,
+                )
             } catch (error: Throwable) {
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired || previous == null) {
+                    handleLoadFailure(error)
+                } else {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: "The expense could not be refreshed. Try again.",
+                    )
+                }
             }
         }
     }

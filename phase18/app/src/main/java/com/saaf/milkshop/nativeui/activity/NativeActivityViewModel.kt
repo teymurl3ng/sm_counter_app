@@ -25,6 +25,7 @@ sealed interface NativeActivityState {
         val detail: NativeActivityRecordDetail? = null,
         val loadingDetail: Boolean = false,
         val error: String? = null,
+        val refreshing: Boolean = false,
     ) : NativeActivityState
     data class LoadFailure(val message: String) : NativeActivityState
 }
@@ -54,16 +55,25 @@ class NativeActivityViewModel(
     fun refresh() {
         val session = sessionHandle ?: return
         val request = loadGate.begin(session)
+        val previous = _state.value as? NativeActivityState.Ready
         detailGeneration += 1L
-        _state.value = NativeActivityState.Loading
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeActivityState.Loading
         scope.launch {
             try {
                 val day = withContext(Dispatchers.IO) { facade.loadToday(session) }
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                _state.value = NativeActivityState.Ready(day = day)
+                _state.value = NativeActivityState.Ready(day = day, refreshing = false)
             } catch (error: Throwable) {
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired || previous == null) {
+                    handleLoadFailure(error)
+                } else {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: "Activity could not be refreshed. Try again.",
+                    )
+                }
             }
         }
     }

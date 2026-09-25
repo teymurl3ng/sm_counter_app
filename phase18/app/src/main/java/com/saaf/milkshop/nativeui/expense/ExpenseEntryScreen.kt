@@ -34,6 +34,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -212,6 +213,9 @@ internal fun ExpenseEntryContent(
             .padding(contentPadding)
             .imePadding(),
     ) {
+        if (state.refreshing) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        }
         CashierScreenHeader(
             title = "Record expense",
             displayName = identity.displayName,

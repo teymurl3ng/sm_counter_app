@@ -22,6 +22,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -83,6 +84,7 @@ fun CashierActivityScreen(
                     identity = identity,
                     context = state.day.context,
                     detail = detail,
+                    refreshing = state.refreshing,
                     onBack = onBackFromDetail,
                     onNavigate = onNavigate,
                     modifier = modifier,
@@ -184,6 +186,9 @@ private fun ActivityListScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) {
+            if (state.refreshing) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
             CashierScreenHeader(
                 title = "Today’s activity",
                 displayName = identity.displayName,
@@ -254,6 +259,7 @@ private fun ActivityDetailScreen(
     identity: NativeSignedInIdentity,
     context: NativeActivityContext,
     detail: NativeActivityRecordDetail,
+    refreshing: Boolean,
     onBack: () -> Unit,
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier,
@@ -265,6 +271,9 @@ private fun ActivityDetailScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) {
+            if (refreshing) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
             CashierScreenHeader(
                 title = "Today’s activity",
                 displayName = identity.displayName,

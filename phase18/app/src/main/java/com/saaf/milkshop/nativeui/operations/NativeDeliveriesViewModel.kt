@@ -24,6 +24,7 @@ sealed interface NativeDeliveriesState {
         val markingDeliveryId: Long? = null,
         val lastDeliveredId: Long? = null,
         val error: String? = null,
+        val refreshing: Boolean = false,
     ) : NativeDeliveriesState
     data class LoadFailure(val message: String) : NativeDeliveriesState
 }
@@ -47,15 +48,24 @@ class NativeDeliveriesViewModel(
     fun refresh() {
         val session = sessionHandle ?: return
         val request = loadGate.begin(session)
-        _state.value = NativeDeliveriesState.Loading
+        val previous = _state.value as? NativeDeliveriesState.Ready
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeDeliveriesState.Loading
         scope.launch {
             try {
                 val context = withContext(Dispatchers.IO) { facade.load(session) }
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                _state.value = NativeDeliveriesState.Ready(context)
+                _state.value = NativeDeliveriesState.Ready(context, refreshing = false)
             } catch (error: Throwable) {
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired || previous == null) {
+                    handleLoadFailure(error)
+                } else {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: publicMessage(error),
+                    )
+                }
             }
         }
     }

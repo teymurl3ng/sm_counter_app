@@ -31,6 +31,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -268,6 +269,12 @@ private fun MoreMenuScreen(
 ) {
     MoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.MoreRoot) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
+            if (state.refreshing) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
+            state.error?.let {
+                Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+            }
             MoreHeader(identity, state.context)
             Column(
                 Modifier
@@ -364,6 +371,9 @@ private fun MoreCountCashScreen(
                 .padding(padding)
                 .imePadding(),
         ) {
+            if (state.refreshing) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
             MoreHeader(identity, state.context)
             Column(
                 Modifier
@@ -473,6 +483,9 @@ private fun MorePersonalSecurityScreen(
                 .padding(padding)
                 .imePadding(),
         ) {
+            if (state.refreshing) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
             MoreHeader(identity, state.context)
             Column(
                 Modifier

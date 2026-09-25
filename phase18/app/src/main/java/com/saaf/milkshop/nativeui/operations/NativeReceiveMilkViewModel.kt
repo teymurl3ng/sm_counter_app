@@ -29,6 +29,7 @@ sealed interface NativeReceiveMilkState {
         val saving: Boolean = false,
         val receipt: NativeReceiveMilkReceipt? = null,
         val error: String? = null,
+        val refreshing: Boolean = false,
     ) : NativeReceiveMilkState
     data class LoadFailure(val message: String) : NativeReceiveMilkState
 }
@@ -50,14 +51,24 @@ class NativeReceiveMilkViewModel(
 
     fun refresh() {
         val session = sessionHandle ?: return
-        _state.value = NativeReceiveMilkState.Loading
+        val previous = _state.value as? NativeReceiveMilkState.Ready
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeReceiveMilkState.Loading
         scope.launch {
             try {
                 _state.value = NativeReceiveMilkState.Ready(
                     withContext(Dispatchers.IO) { facade.load(session) },
+                    refreshing = false,
                 )
             } catch (error: Throwable) {
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired || previous == null) {
+                    handleLoadFailure(error)
+                } else {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: publicMessage(error),
+                    )
+                }
             }
         }
     }

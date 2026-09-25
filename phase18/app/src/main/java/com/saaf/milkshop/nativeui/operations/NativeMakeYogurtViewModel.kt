@@ -25,6 +25,7 @@ sealed interface NativeMakeYogurtState {
         val saving: Boolean = false,
         val receipt: NativeMakeYogurtReceipt? = null,
         val error: String? = null,
+        val refreshing: Boolean = false,
     ) : NativeMakeYogurtState
     data class LoadFailure(val message: String) : NativeMakeYogurtState
 }
@@ -46,14 +47,24 @@ class NativeMakeYogurtViewModel(
 
     fun refresh() {
         val session = sessionHandle ?: return
-        _state.value = NativeMakeYogurtState.Loading
+        val previous = _state.value as? NativeMakeYogurtState.Ready
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeMakeYogurtState.Loading
         scope.launch {
             try {
                 _state.value = NativeMakeYogurtState.Ready(
                     withContext(Dispatchers.IO) { facade.load(session) },
+                    refreshing = false,
                 )
             } catch (error: Throwable) {
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired || previous == null) {
+                    handleLoadFailure(error)
+                } else {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: publicMessage(error),
+                    )
+                }
             }
         }
     }

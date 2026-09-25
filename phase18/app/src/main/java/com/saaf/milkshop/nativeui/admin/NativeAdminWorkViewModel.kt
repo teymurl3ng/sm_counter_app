@@ -27,6 +27,7 @@ sealed interface NativeAdminWorkState {
     data class Ready(
         val context: NativeAdminWorkContext,
         val destination: NativeAdminWorkDestination = NativeAdminWorkDestination.Home,
+        val refreshing: Boolean = false,
         val error: String? = null,
     ) : NativeAdminWorkState
     data class LoadFailure(val message: String) : NativeAdminWorkState
@@ -62,10 +63,11 @@ class NativeAdminWorkViewModel(
     fun refresh() {
         val session = sessionHandle ?: return
         val request = loadGate.begin(session)
+        val previous = _state.value as? NativeAdminWorkState.Ready
         val previousDestination =
-            (_state.value as? NativeAdminWorkState.Ready)?.destination
-                ?: NativeAdminWorkDestination.Home
-        _state.value = NativeAdminWorkState.Loading
+            previous?.destination ?: NativeAdminWorkDestination.Home
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeAdminWorkState.Loading
         scope.launch {
             try {
                 val context = withContext(Dispatchers.IO) { facade.load(session) }
@@ -73,10 +75,18 @@ class NativeAdminWorkViewModel(
                 _state.value = NativeAdminWorkState.Ready(
                     context = context,
                     destination = previousDestination,
+                    refreshing = false,
                 )
             } catch (error: Throwable) {
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired || previous == null) {
+                    handleLoadFailure(error)
+                } else {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: "Work could not open. Try again.",
+                    )
+                }
             }
         }
     }

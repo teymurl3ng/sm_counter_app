@@ -32,6 +32,7 @@ sealed interface NativeOperationsWorkState {
         val context: NativeOperationsWorkContext,
         val destination: NativeOperationsWorkDestination = NativeOperationsWorkDestination.Home,
         val error: String? = null,
+        val refreshing: Boolean = false,
     ) : NativeOperationsWorkState
     data class LoadFailure(val message: String) : NativeOperationsWorkState
 }
@@ -66,10 +67,11 @@ class NativeOperationsWorkViewModel(
     fun refresh() {
         val session = sessionHandle ?: return
         val request = loadGate.begin(session)
+        val previous = _state.value as? NativeOperationsWorkState.Ready
         val previousDestination =
-            (_state.value as? NativeOperationsWorkState.Ready)?.destination
-                ?: NativeOperationsWorkDestination.Home
-        _state.value = NativeOperationsWorkState.Loading
+            previous?.destination ?: NativeOperationsWorkDestination.Home
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeOperationsWorkState.Loading
         scope.launch {
             try {
                 val context = withContext(Dispatchers.IO) { facade.load(session) }
@@ -77,10 +79,18 @@ class NativeOperationsWorkViewModel(
                 _state.value = NativeOperationsWorkState.Ready(
                     context = context,
                     destination = previousDestination,
+                    refreshing = false,
                 )
             } catch (error: Throwable) {
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired || previous == null) {
+                    handleLoadFailure(error)
+                } else {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: "Work could not open. Try again.",
+                    )
+                }
             }
         }
     }

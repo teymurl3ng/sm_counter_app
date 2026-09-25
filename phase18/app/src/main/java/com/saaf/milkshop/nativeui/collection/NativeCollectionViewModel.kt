@@ -29,6 +29,7 @@ sealed interface NativeCollectionState {
         val saving: Boolean = false,
         val receipt: NativeCollectionReceipt? = null,
         val error: String? = null,
+        val refreshing: Boolean = false,
     ) : NativeCollectionState
     data class LoadFailure(val message: String) : NativeCollectionState
 }
@@ -53,16 +54,25 @@ class NativeCollectionViewModel(
     fun refresh() {
         val session = sessionHandle ?: return
         val request = loadGate.begin(session)
+        val previous = _state.value as? NativeCollectionState.Ready
         selectionGeneration += 1L
-        _state.value = NativeCollectionState.Loading
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeCollectionState.Loading
         scope.launch {
             try {
                 val context = withContext(Dispatchers.IO) { facade.load(session) }
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                _state.value = NativeCollectionState.Ready(context)
+                _state.value = NativeCollectionState.Ready(context, refreshing = false)
             } catch (error: Throwable) {
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired || previous == null) {
+                    handleLoadFailure(error)
+                } else {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: "Collection could not be refreshed. Try again.",
+                    )
+                }
             }
         }
     }

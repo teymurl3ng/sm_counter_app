@@ -31,6 +31,7 @@ sealed interface NativeRecordSpoilageState {
         val saving: Boolean = false,
         val receipt: NativeRecordSpoilageReceipt? = null,
         val error: String? = null,
+        val refreshing: Boolean = false,
     ) : NativeRecordSpoilageState
     data class LoadFailure(val message: String) : NativeRecordSpoilageState
 }
@@ -52,14 +53,24 @@ class NativeRecordSpoilageViewModel(
 
     fun refresh() {
         val session = sessionHandle ?: return
-        _state.value = NativeRecordSpoilageState.Loading
+        val previous = _state.value as? NativeRecordSpoilageState.Ready
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeRecordSpoilageState.Loading
         scope.launch {
             try {
                 _state.value = NativeRecordSpoilageState.Ready(
                     withContext(Dispatchers.IO) { facade.load(session) },
+                    refreshing = false,
                 )
             } catch (error: Throwable) {
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired || previous == null) {
+                    handleLoadFailure(error)
+                } else {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: publicMessage(error),
+                    )
+                }
             }
         }
     }

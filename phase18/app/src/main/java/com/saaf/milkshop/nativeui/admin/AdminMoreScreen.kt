@@ -602,7 +602,7 @@ private fun AdminMorePersonalSecurityScreen(
                         singleLine = true,
                         enabled = !state.saving,
                     )
-                    state.error?.let {
+                    state.personalSecurity.error?.let {
                         Text(it, color = MaterialTheme.colorScheme.error)
                     }
                     Button(

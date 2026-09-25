@@ -26,6 +26,7 @@ sealed interface NativeSaleState {
         val saving: Boolean = false,
         val receipt: NativeSaleReceipt? = null,
         val error: String? = null,
+        val refreshing: Boolean = false,
     ) : NativeSaleState
     data class LoadFailure(val message: String) : NativeSaleState
 }
@@ -49,15 +50,24 @@ class NativeSaleViewModel(
     fun refresh() {
         val session = sessionHandle ?: return
         val request = loadGate.begin(session)
-        _state.value = NativeSaleState.Loading
+        val previous = _state.value as? NativeSaleState.Ready
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeSaleState.Loading
         scope.launch {
             try {
                 val context = withContext(Dispatchers.IO) { facade.load(session) }
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                _state.value = NativeSaleState.Ready(context)
+                _state.value = NativeSaleState.Ready(context, refreshing = false)
             } catch (error: Throwable) {
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired || previous == null) {
+                    handleLoadFailure(error)
+                } else {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: "The sale could not be refreshed. Check it and try again.",
+                    )
+                }
             }
         }
     }

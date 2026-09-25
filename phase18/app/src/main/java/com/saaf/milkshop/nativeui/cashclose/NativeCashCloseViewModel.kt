@@ -31,6 +31,7 @@ sealed interface NativeCashCloseState {
         val receipt: NativeCashCloseReceipt? = null,
         val reopenSuccess: NativeCashCloseReopenSubmission? = null,
         val error: String? = null,
+        val refreshing: Boolean = false,
     ) : NativeCashCloseState
     data class LoadFailure(val message: String) : NativeCashCloseState
 }
@@ -54,15 +55,24 @@ class NativeCashCloseViewModel(
     fun refresh() {
         val session = sessionHandle ?: return
         val request = loadGate.begin(session)
-        _state.value = NativeCashCloseState.Loading
+        val previous = _state.value as? NativeCashCloseState.Ready
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeCashCloseState.Loading
         scope.launch {
             try {
                 val context = withContext(Dispatchers.IO) { facade.load(session) }
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                _state.value = NativeCashCloseState.Ready(context)
+                _state.value = NativeCashCloseState.Ready(context, refreshing = false)
             } catch (error: Throwable) {
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired || previous == null) {
+                    handleLoadFailure(error)
+                } else {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: "Cash count and close could not be refreshed. Try again.",
+                    )
+                }
             }
         }
     }

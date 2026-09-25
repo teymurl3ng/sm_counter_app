@@ -29,6 +29,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -104,39 +105,44 @@ fun OperationsMoreScreen(
             targetState = state.destination,
             modifier = modifier,
         ) { destination ->
-            when (destination) {
-                NativeOperationsMoreDestination.Menu -> OpsMoreMenuScreen(
-                    snackbarHostState = snackbarHostState,
-                    identity = identity,
-                    state = state,
-                    onOpenTodayWork = onOpenTodayWork,
-                    onOpenPersonalSecurity = onOpenPersonalSecurity,
-                    onSwitchAccount = onSwitchAccount,
-                    onSignOut = onSignOut,
-                    onNavigate = onNavigate,
-                    modifier = modifier,
-                )
-                NativeOperationsMoreDestination.TodayWork -> OpsMoreTodayWorkScreen(
-                    snackbarHostState = snackbarHostState,
-                    identity = identity,
-                    state = state,
-                    onBack = onBackToMenu,
-                    onNavigate = onNavigate,
-                    modifier = modifier,
-                )
-                NativeOperationsMoreDestination.PersonalSecurity -> OpsMorePersonalSecurityScreen(
-                    snackbarHostState = snackbarHostState,
-                    identity = identity,
-                    state = state,
-                    onBack = onBackToMenu,
-                    onRequestRemove = onRequestRemoveQuickUnlock,
-                    onCancelRemove = onCancelRemoveQuickUnlock,
-                    onRemove = onRemoveQuickUnlock,
-                    onEnrollPin = onEnrollQuickPin,
-                    onEnrollPhone = onEnrollPhoneSecurity,
-                    onNavigate = onNavigate,
-                    modifier = modifier,
-                )
+            Column {
+                if (state.refreshing) {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                }
+                when (destination) {
+                    NativeOperationsMoreDestination.Menu -> OpsMoreMenuScreen(
+                        snackbarHostState = snackbarHostState,
+                        identity = identity,
+                        state = state,
+                        onOpenTodayWork = onOpenTodayWork,
+                        onOpenPersonalSecurity = onOpenPersonalSecurity,
+                        onSwitchAccount = onSwitchAccount,
+                        onSignOut = onSignOut,
+                        onNavigate = onNavigate,
+                        modifier = modifier,
+                    )
+                    NativeOperationsMoreDestination.TodayWork -> OpsMoreTodayWorkScreen(
+                        snackbarHostState = snackbarHostState,
+                        identity = identity,
+                        state = state,
+                        onBack = onBackToMenu,
+                        onNavigate = onNavigate,
+                        modifier = modifier,
+                    )
+                    NativeOperationsMoreDestination.PersonalSecurity -> OpsMorePersonalSecurityScreen(
+                        snackbarHostState = snackbarHostState,
+                        identity = identity,
+                        state = state,
+                        onBack = onBackToMenu,
+                        onRequestRemove = onRequestRemoveQuickUnlock,
+                        onCancelRemove = onCancelRemoveQuickUnlock,
+                        onRemove = onRemoveQuickUnlock,
+                        onEnrollPin = onEnrollQuickPin,
+                        onEnrollPhone = onEnrollPhoneSecurity,
+                        onNavigate = onNavigate,
+                        modifier = modifier,
+                    )
+                }
             }
         }
     }

@@ -25,6 +25,7 @@ sealed interface NativeVendorPaymentState {
         val saving: Boolean = false,
         val receipt: NativeVendorPaymentReceipt? = null,
         val error: String? = null,
+        val refreshing: Boolean = false,
     ) : NativeVendorPaymentState
     data class LoadFailure(val message: String) : NativeVendorPaymentState
 }
@@ -46,14 +47,24 @@ class NativeVendorPaymentViewModel(
 
     fun refresh() {
         val session = sessionHandle ?: return
-        _state.value = NativeVendorPaymentState.Loading
+        val previous = _state.value as? NativeVendorPaymentState.Ready
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeVendorPaymentState.Loading
         scope.launch {
             try {
                 _state.value = NativeVendorPaymentState.Ready(
                     withContext(Dispatchers.IO) { facade.load(session) },
+                    refreshing = false,
                 )
             } catch (error: Throwable) {
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired || previous == null) {
+                    handleLoadFailure(error)
+                } else {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: "The supplier payment could not be refreshed. Try again.",
+                    )
+                }
             }
         }
     }

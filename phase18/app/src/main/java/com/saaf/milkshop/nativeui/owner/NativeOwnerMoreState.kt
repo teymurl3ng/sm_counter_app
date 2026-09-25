@@ -218,6 +218,8 @@ sealed interface NativeOwnerMoreState {
         val usersRolesState: OwnerUsersRolesState = OwnerUsersRolesState(),
         val securityHistoryState: OwnerSecurityHistoryState = OwnerSecurityHistoryState(),
         val backupState: OwnerBackupState = OwnerBackupState(),
+        val refreshing: Boolean = false,
+        val error: String? = null,
     ) : NativeOwnerMoreState {
         val products: List<NativeOwnerProductRow>
             get() = productsState.products
@@ -578,9 +580,6 @@ sealed interface NativeOwnerMoreState {
 
         val confirmRemoveUnlock: Boolean
             get() = personalSecurity.confirmRemoveUnlock
-
-        val error: String?
-            get() = personalSecurity.error
     }
     data class LoadFailure(val message: String) : NativeOwnerMoreState
 }
@@ -715,7 +714,7 @@ internal fun NativeOwnerMoreState.Ready.copy(
     backupCloudOpen: Boolean = this.backupCloudOpen,
     saving: Boolean = this.saving,
     confirmRemoveUnlock: Boolean = this.confirmRemoveUnlock,
-    error: String? = this.error,
+    error: String? = this.personalSecurity.error,
 ): NativeOwnerMoreState.Ready =
     copy(
         context = context,

@@ -34,6 +34,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
@@ -713,6 +714,16 @@ private fun OwnerMoreMenuScreen(
                     .verticalScroll(rememberScrollState())
                     .testTag(NativeUiTags.OwnerMoreMenu),
             ) {
+                if (state.refreshing) {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                }
+                state.error?.let {
+                    Text(
+                        it,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
                 OwnerMoreSectionLabel("Things you sell")
                 OwnerMoreMenuRow(
                     icon = Icons.Outlined.Inventory2,
@@ -918,7 +929,7 @@ private fun OwnerMorePersonalSecurityScreen(
                         singleLine = true,
                         enabled = !state.saving,
                     )
-                    state.error?.let {
+                    state.personalSecurity.error?.let {
                         Text(
                             it,
                             color = MaterialTheme.colorScheme.error,

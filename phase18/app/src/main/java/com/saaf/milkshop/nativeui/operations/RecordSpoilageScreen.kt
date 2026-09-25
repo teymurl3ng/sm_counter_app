@@ -27,6 +27,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
@@ -231,6 +232,9 @@ internal fun RecordSpoilageReadyContent(
                 .imePadding()
                 .testTag(NativeUiTags.OpsRecordSpoilageForm),
         ) {
+            if (state.refreshing) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
             CashierScreenHeader(
                 title = "Record spoilage",
                 displayName = identity.displayName,

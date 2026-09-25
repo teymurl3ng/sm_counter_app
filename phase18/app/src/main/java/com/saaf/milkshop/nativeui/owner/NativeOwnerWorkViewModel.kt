@@ -36,6 +36,7 @@ sealed interface NativeOwnerWorkState {
     data class Ready(
         val context: NativeOwnerWorkContext,
         val destination: NativeOwnerWorkDestination = NativeOwnerWorkDestination.Home,
+        val refreshing: Boolean = false,
         val error: String? = null,
     ) : NativeOwnerWorkState
     data class LoadFailure(val message: String) : NativeOwnerWorkState
@@ -71,10 +72,11 @@ class NativeOwnerWorkViewModel(
     fun refresh() {
         val session = sessionHandle ?: return
         val request = loadGate.begin(session)
+        val previous = _state.value as? NativeOwnerWorkState.Ready
         val previousDestination =
-            (_state.value as? NativeOwnerWorkState.Ready)?.destination
-                ?: NativeOwnerWorkDestination.Home
-        _state.value = NativeOwnerWorkState.Loading
+            previous?.destination ?: NativeOwnerWorkDestination.Home
+        _state.value = previous?.copy(refreshing = true, error = null)
+            ?: NativeOwnerWorkState.Loading
         scope.launch {
             try {
                 val context = withContext(Dispatchers.IO) { facade.load(session) }
@@ -82,10 +84,18 @@ class NativeOwnerWorkViewModel(
                 _state.value = NativeOwnerWorkState.Ready(
                     context = context,
                     destination = previousDestination,
+                    refreshing = false,
                 )
             } catch (error: Throwable) {
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                handleLoadFailure(error)
+                if (error is SecurityFailure.SessionExpired || previous == null) {
+                    handleLoadFailure(error)
+                } else {
+                    _state.value = previous.copy(
+                        refreshing = false,
+                        error = error.message ?: "Work could not open. Try again.",
+                    )
+                }
             }
         }
     }

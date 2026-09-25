@@ -28,7 +28,7 @@ class Phase3MigrationTest {
         databaseFactory = {
             Room.databaseBuilder<MilkShopDatabase>(context, databaseName)
                 .setDriver(BundledSQLiteDriver())
-                .addMigrations(MilkShopDatabase.MIGRATION_3_4, MilkShopDatabase.MIGRATION_4_5, MilkShopDatabase.MIGRATION_5_6, MilkShopDatabase.MIGRATION_6_7, MilkShopDatabase.MIGRATION_7_8)
+                .addMigrations(MilkShopDatabase.MIGRATION_3_4, MilkShopDatabase.MIGRATION_4_5, MilkShopDatabase.MIGRATION_5_6, MilkShopDatabase.MIGRATION_6_7, MilkShopDatabase.MIGRATION_7_8, MilkShopDatabase.MIGRATION_8_9)
                 .build()
         },
         autoMigrationSpecs = emptyList(),
@@ -161,6 +161,39 @@ class Phase3MigrationTest {
                 immutable = true
             }
             assertEquals(true, immutable)
+        }
+    }
+
+    @Test
+    fun migration8To9_isAdditive_preservesRows_andCreatesNoServerIdentityState() = runBlocking {
+        context.deleteDatabase(databaseName)
+        helper.createDatabase(8).apply {
+            execSQL("INSERT INTO products(product_id, name, unit) VALUES (1, 'Milk', 'Liters')")
+            execSQL(
+                """
+                INSERT INTO app_users(login_name, display_name, role, status, credential_setup_required, created_at, updated_at)
+                VALUES ('migration.owner', 'Migration Owner', 'owner', 'active', 0, '2026-08-27T00:00:00Z', '2026-08-27T00:00:00Z')
+                """.trimIndent()
+            )
+            close()
+        }
+
+        helper.runMigrationsAndValidate(9, listOf(MilkShopDatabase.MIGRATION_8_9)).use { connection ->
+            // Every schema-8 row survives the migration untouched.
+            assertEquals(1L, connection.scalarLong("SELECT COUNT(*) FROM products"))
+            assertEquals(1L, connection.scalarLong("SELECT COUNT(*) FROM app_users"))
+            // The new Account Bridge tables start empty: an upgraded installation
+            // is unbound and must invent no server identity state.
+            assertEquals(0L, connection.scalarLong("SELECT COUNT(*) FROM account_installation_binding"))
+            assertEquals(0L, connection.scalarLong("SELECT COUNT(*) FROM server_identity_links"))
+            assertEquals(0L, connection.scalarLong("SELECT COUNT(*) FROM server_shop_snapshots"))
+            // The identity link is FK-bound to the preserved user row.
+            connection.execSQL(
+                """
+                INSERT INTO server_identity_links(local_user_id, server_staff_id, business_id, status)
+                VALUES (1, '11111111-1111-4111-8111-111111111111', '22222222-2222-4222-8222-222222222222', 'pending')
+                """.trimIndent()
+            )
         }
     }
 

@@ -50,8 +50,8 @@ class BackupManager(
 
     companion object {
         const val LEGACY_FORMAT_VERSION = 1
-        const val FORMAT_VERSION = 2
-        const val CURRENT_SCHEMA_VERSION = 8
+        const val FORMAT_VERSION = 3
+        const val CURRENT_SCHEMA_VERSION = 9
         const val FULL_GROUP = "business"
         const val PLANNING_GROUP = "planning"
         const val PREFERENCES_GROUP = "preferences"
@@ -462,6 +462,9 @@ class BackupManager(
                 put("inventory_cost_basis_entries", JSONArray(costBases.map(::inventoryCostBasisJson)))
                 put("yield_policy_versions", JSONArray(yieldPolicies.map(::yieldPolicyVersionJson)))
                 put("production_loss_assessments", JSONArray(lossAssessments.map(::productionLossAssessmentJson)))
+                put("server_account_binding", JSONArray(database.serverAccountDao().bindings().map(::installationBindingJson)))
+                put("server_identity_links", JSONArray(database.serverAccountDao().identityLinks().map(::identityLinkJson)))
+                put("server_shop_snapshots", JSONArray(database.serverAccountDao().serverShopSnapshots().map(::serverShopSnapshotJson)))
             }
         })
         val unsigned = root.toString()

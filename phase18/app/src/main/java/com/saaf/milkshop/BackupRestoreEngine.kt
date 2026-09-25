@@ -3,6 +3,7 @@ package com.saaf.milkshop
 import androidx.room3.executeSQL
 import androidx.room3.withWriteTransaction
 import com.saaf.milkshop.data.*
+import com.saaf.milkshop.domain.ServerAccountPolicy
 import org.json.JSONObject
 
 internal class BackupRestoreEngine(
@@ -44,6 +45,10 @@ internal class BackupRestoreEngine(
                         backupDao.deleteSecurityAuditEntries()
                         backupDao.deleteSavedRecoveryCodes()
                         backupDao.deleteUserCredentials()
+                        val serverAccountDao = database.serverAccountDao()
+                        serverAccountDao.deleteServerShopSnapshots()
+                        serverAccountDao.deleteIdentityLinks()
+                        serverAccountDao.deleteBindings()
                         backupDao.deleteAppUsers()
                     }
                     backupDao.deleteOpeningAccountEntries()
@@ -97,6 +102,19 @@ internal class BackupRestoreEngine(
                         backupDao.updateAppUsers(users)
                         backupDao.insertUserCredentials(readUserCredentials(data.getJSONArray("user_credentials")))
                         backupDao.insertSavedRecoveryCodes(readSavedRecoveryCodes(data.getJSONArray("saved_recovery_codes")))
+                        // Account Bridge state (format 3; absent in legacy backups):
+                        // stable server IDs are preserved, but every binding/link
+                        // becomes restored_unverified regardless of its backed-up
+                        // value — re-verification is required before server-derived
+                        // entitlements are trusted again.
+                        val serverAccountDao = database.serverAccountDao()
+                        readInstallationBindings(data.optJSONArray("server_account_binding")).forEach { binding ->
+                            serverAccountDao.insertBinding(binding.copy(status = ServerAccountPolicy.BindingStatus.RESTORED_UNVERIFIED))
+                        }
+                        readIdentityLinks(data.optJSONArray("server_identity_links")).forEach { link ->
+                            serverAccountDao.insertIdentityLink(link.copy(status = ServerAccountPolicy.LinkStatus.RESTORED_UNVERIFIED))
+                        }
+                        serverAccountDao.insertServerShopSnapshots(readServerShopSnapshots(data.optJSONArray("server_shop_snapshots")))
                         backupDao.insertCostingPolicyVersions(readCostingPolicyVersions(data.optJSONArray("costing_policy_versions")))
                         backupDao.insertCostingPolicyComponents(readCostingPolicyComponents(data.optJSONArray("costing_policy_components")))
                         backupDao.insertInventoryCostBasisEntries(readInventoryCostBasisEntries(data.optJSONArray("inventory_cost_basis_entries")))

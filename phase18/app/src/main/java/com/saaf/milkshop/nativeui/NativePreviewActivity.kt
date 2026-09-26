@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
@@ -122,6 +123,8 @@ import com.saaf.milkshop.nativeui.welcome.WelcomeScreen
 import com.saaf.milkshop.quickunlock.AndroidQuickUnlockDeviceGate
 import com.saaf.milkshop.quickunlock.AndroidQuickUnlockRecordStore
 import com.saaf.milkshop.quickunlock.QuickUnlockService
+import com.saaf.milkshop.nativeui.common.LocalDayStatusAction
+import com.saaf.milkshop.nativeui.owner.NativeOwnerWorkDestination
 import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.launch
 
@@ -908,6 +911,17 @@ private fun NativeFoundationPreview(
             onContinue = { destination = PreviewDestination.Access },
         )
         PreviewDestination.Access -> {
+        val dayStatusAction: (() -> Unit)? = {
+            when {
+                showingOwner -> {
+                    ownerSection = OwnerSection.Work
+                    ownerWorkViewModel.openDestination(NativeOwnerWorkDestination.CashCountAndClose)
+                }
+                showingManager -> managerSection = ManagerSection.Close
+                else -> Unit
+            }
+        }
+        CompositionLocalProvider(LocalDayStatusAction provides dayStatusAction) {
             if (showingOwner) {
                 val authenticated = authenticationState as NativeAuthenticationState.Authenticated
                 OwnerPreviewHost(
@@ -1118,7 +1132,8 @@ private fun NativeFoundationPreview(
                     onAcknowledgeRecoveryCode = authenticationViewModel::acknowledgeRecoveryCode,
                 )
             }
-        }
+        
+        }}
     }
 }
 

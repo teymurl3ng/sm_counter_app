@@ -53,7 +53,7 @@ private fun ManagerNavigationRail(
 ) {
     NavigationRail(
         modifier = Modifier.fillMaxHeight(),
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.background,
     ) {
         ManagerRailItem(selected == ManagerSection.Work, NativeUiTags.ManagerNavWork, { onNavigate(ManagerSection.Work) }, Icons.Outlined.WorkOutline, "Work")
         ManagerRailItem(selected == ManagerSection.Close, NativeUiTags.ManagerNavClose, { onNavigate(ManagerSection.Close) }, Icons.Outlined.Lock, "Close")
@@ -85,7 +85,7 @@ internal fun ManagerNavigation(
     onNavigate: (ManagerSection) -> Unit,
 ) {
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.background,
         tonalElevation = 0.dp,
     ) {
         ManagerNavItem(

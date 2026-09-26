@@ -53,7 +53,7 @@ private fun AdminNavigationRail(
 ) {
     NavigationRail(
         modifier = Modifier.fillMaxHeight(),
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.background,
     ) {
         AdminRailItem(selected == AdminSection.Work, NativeUiTags.AdminNavWork, { onNavigate(AdminSection.Work) }, Icons.Outlined.WorkOutline, "Work")
         AdminRailItem(selected == AdminSection.People, NativeUiTags.AdminNavPeople, { onNavigate(AdminSection.People) }, Icons.Outlined.People, "People")
@@ -85,7 +85,7 @@ internal fun AdminNavigation(
     onNavigate: (AdminSection) -> Unit,
 ) {
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.background,
         tonalElevation = 0.dp,
     ) {
         AdminNavItem(

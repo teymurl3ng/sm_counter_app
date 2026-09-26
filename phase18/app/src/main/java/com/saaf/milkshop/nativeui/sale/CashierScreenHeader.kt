@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.nativeui.theme.SaafInk
+import com.saaf.milkshop.nativeui.common.LocalDayStatusAction
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -36,6 +37,7 @@ fun CashierScreenHeader(
     modifier: Modifier = Modifier,
     onDayStatusClick: (() -> Unit)? = null,
 ) {
+    val dayStatusAction = onDayStatusClick ?: LocalDayStatusAction.current
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.primary,
@@ -69,8 +71,8 @@ fun CashierScreenHeader(
                     )
                 }
                 Surface(
-                    onClick = { onDayStatusClick?.invoke() },
-                    enabled = onDayStatusClick != null,
+                    onClick = { dayStatusAction?.invoke() },
+                    enabled = dayStatusAction != null,
                     color = if (postingOpen) SaafYellow else MaterialTheme.colorScheme.error,
                     contentColor = if (postingOpen) SaafInk else MaterialTheme.colorScheme.onError,
                     shape = RoundedCornerShape(999.dp),

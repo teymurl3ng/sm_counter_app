@@ -56,7 +56,7 @@ private fun OwnerNavigationRail(
 ) {
     NavigationRail(
         modifier = Modifier.fillMaxHeight(),
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.background,
     ) {
         OwnerRailItem(selected == OwnerSection.Overview, NativeUiTags.OwnerNavOverview, { onNavigate(OwnerSection.Overview) }, Icons.Outlined.GridView, "Overview")
         OwnerRailItem(selected == OwnerSection.Work, NativeUiTags.OwnerNavWork, { onNavigate(OwnerSection.Work) }, Icons.Outlined.WorkOutline, "Work")
@@ -88,7 +88,7 @@ internal fun OwnerNavigation(
     onNavigate: (OwnerSection) -> Unit,
 ) {
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.background,
         tonalElevation = 0.dp,
     ) {
         OwnerNavItem(

@@ -178,7 +178,7 @@ internal fun CashierNavigationRail(
 ) {
     NavigationRail(
         modifier = Modifier.fillMaxHeight(),
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.background,
     ) {
         CashierRailItem(Icons.Outlined.PointOfSale, stringResource(R.string.native_sell), selected == CashierSection.Sell, NativeUiTags.CashierNavSell) { onNavigate(CashierSection.Sell) }
         CashierRailItem(Icons.Outlined.Payments, stringResource(R.string.native_collect), selected == CashierSection.Collect, NativeUiTags.CashierNavCollect) { onNavigate(CashierSection.Collect) }
@@ -1358,7 +1358,7 @@ internal fun CashierNavigation(
     onNavigate: (CashierSection) -> Unit,
 ) {
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.background,
         tonalElevation = 0.dp,
         modifier = Modifier.navigationBarsPadding(),
     ) {

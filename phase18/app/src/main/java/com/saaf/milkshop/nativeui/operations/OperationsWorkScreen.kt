@@ -451,7 +451,7 @@ internal fun OperationsNavigationRail(
 ) {
     NavigationRail(
         modifier = Modifier.fillMaxHeight(),
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.background,
     ) {
         OpsRailItem(selected == OperationsSection.Work, "Work", Icons.Outlined.WorkOutline, NativeUiTags.OpsNavWork) { onNavigate(OperationsSection.Work) }
         OpsRailItem(selected == OperationsSection.Deliveries, "Deliveries", Icons.Outlined.LocalShipping, NativeUiTags.OpsNavDeliveries) { onNavigate(OperationsSection.Deliveries) }

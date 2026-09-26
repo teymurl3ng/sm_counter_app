@@ -883,9 +883,8 @@ fun OwnerPreviewHost(
                         onLeaveConfirmed = onLeaveToWelcome,
                         onNavigate = navigateOwner,
                         onAttentionReview = {
-                            onShowNotice(
-                                "Close, Records, and Backup destinations come next in the Owner family.",
-                            )
+                            onOwnerSectionChange(OwnerSection.Work)
+                            ownerWorkViewModel.openDestination(NativeOwnerWorkDestination.CashCountAndClose)
                         },
                         onOpenMonthReports = { ownerReportsViewModel.open(sessionHandle) },
                     )

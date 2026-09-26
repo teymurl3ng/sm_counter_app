@@ -1,12 +1,16 @@
+@file:OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+
 package com.saaf.milkshop.nativeui.owner
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -320,7 +324,6 @@ internal fun OwnerCostingBudgetEditorScreen(
                 .padding(padding)
                 .imePadding()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 12.dp)
                 .testTag(NativeUiTags.OwnerCostingBudgetForm),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
@@ -331,6 +334,10 @@ internal fun OwnerCostingBudgetEditorScreen(
                 businessDate = context.businessDate,
                 postingOpen = context.postingOpen,
             )
+            Column(
+                Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
             TextButton(
                 onClick = { requestLeave(onBack) },
                 enabled = !saving,
@@ -347,7 +354,7 @@ internal fun OwnerCostingBudgetEditorScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text("What are you planning?", style = MaterialTheme.typography.labelLarge)
-            Row(
+            FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.testTag(NativeUiTags.OwnerCostingBudgetCategory),
             ) {
@@ -459,6 +466,7 @@ internal fun OwnerCostingBudgetEditorScreen(
                     .fillMaxWidth()
                     .testTag(NativeUiTags.OwnerCostingBudgetSave),
             ) { Text(if (saving) "Saving…" else "Save plan") }
+            }
         }
     }
     OwnerCostingPlansDiscardDialog(
@@ -511,7 +519,6 @@ internal fun OwnerCostingCollectionsEditorScreen(
                 .padding(padding)
                 .imePadding()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 12.dp)
                 .testTag(NativeUiTags.OwnerCostingTargetForm),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
@@ -522,6 +529,10 @@ internal fun OwnerCostingCollectionsEditorScreen(
                 businessDate = context.businessDate,
                 postingOpen = context.postingOpen,
             )
+            Column(
+                Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
             TextButton(
                 onClick = { requestLeave(onBack) },
                 enabled = !saving,
@@ -580,6 +591,7 @@ internal fun OwnerCostingCollectionsEditorScreen(
                     .fillMaxWidth()
                     .testTag(NativeUiTags.OwnerCostingTargetSave),
             ) { Text(if (saving) "Saving…" else "Save collection target") }
+            }
         }
     }
     OwnerCostingPlansDiscardDialog(

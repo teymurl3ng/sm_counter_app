@@ -6,6 +6,7 @@
     android:height="36dp"
     android:viewportWidth="36"
     android:viewportHeight="36">
+    <group android:translateY="1.5">
     <!-- Pot lid -->
     <path
         android:fillColor="#F4F1E8"
@@ -38,4 +39,5 @@
     <path
         android:fillColor="#F2C85B"
         android:pathData="M25,16.5 C25,16.5 27.5,19.8 27.5,21.6 C27.5,23.2 26.4,24.3 25,24.3 C23.6,24.3 22.5,23.2 22.5,21.6 C22.5,19.8 25,16.5 25,16.5 Z" />
+    </group>
 </vector>

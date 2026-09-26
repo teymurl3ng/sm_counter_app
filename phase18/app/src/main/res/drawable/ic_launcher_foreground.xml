@@ -8,6 +8,7 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <group android:translateY="3.375">
     <!-- Squircle tile 240x240 rx64 -->
     <path
         android:fillColor="#173F32"
@@ -57,4 +58,5 @@
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
         android:pathData="M69.609375,68.34375 L71.0859375,69.8203125 L73.828125,66.65625" />
+    </group>
 </vector>

@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 sealed interface NativeDeliveriesState {
@@ -104,6 +105,7 @@ class NativeDeliveriesViewModel(
                     context = refreshed,
                     lastDeliveredId = deliveryId,
                 )
+                autoDismissSuccess("delivered", deliveryId)
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
@@ -130,6 +132,7 @@ class NativeDeliveriesViewModel(
                     context = refreshed,
                     lastLinkedId = deliveryId,
                 )
+                autoDismissSuccess("linked", deliveryId)
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
@@ -189,11 +192,13 @@ class NativeDeliveriesViewModel(
                         ),
                     )
                 }
+                val createdId = refreshed.today.firstOrNull()?.deliveryId
+                    ?: refreshed.earlier.firstOrNull()?.deliveryId
                 _state.value = NativeDeliveriesState.Ready(
                     context = refreshed,
-                    lastCreatedId = refreshed.today.firstOrNull()?.deliveryId
-                        ?: refreshed.earlier.firstOrNull()?.deliveryId,
+                    lastCreatedId = createdId,
                 )
+                createdId?.let { autoDismissSuccess("created", it) }
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
@@ -227,6 +232,35 @@ class NativeDeliveriesViewModel(
                 }
             }
         }
+    }
+
+
+    /**
+     * Auto-dismisses the success banner after [feedbackMillis] unless a newer
+     * success has replaced it (guarded per field).
+     */
+    private fun autoDismissSuccess(field: String, value: Long) {
+        scope.launch {
+            delay(feedbackMillis)
+            val current = _state.value as? NativeDeliveriesState.Ready ?: return@launch
+            val stillShowing = when (field) {
+                "delivered" -> current.lastDeliveredId == value
+                "linked" -> current.lastLinkedId == value
+                "created" -> current.lastCreatedId == value
+                else -> false
+            }
+            if (stillShowing) {
+                _state.value = current.copy(
+                    lastDeliveredId = if (field == "delivered") null else current.lastDeliveredId,
+                    lastLinkedId = if (field == "linked") null else current.lastLinkedId,
+                    lastCreatedId = if (field == "created") null else current.lastCreatedId,
+                )
+            }
+        }
+    }
+
+    private companion object {
+        const val feedbackMillis = 4_000L
     }
 
     fun close() {

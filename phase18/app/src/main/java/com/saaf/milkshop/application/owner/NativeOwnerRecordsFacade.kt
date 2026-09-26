@@ -173,9 +173,15 @@ class NativeOwnerRecordsFacade(
         val businessDate = date.toString()
         val history = reads.eventHistory(sessionHandle)
         val eventsById = database.eventDao().findAllDescending().associateBy { it.eventId }
+        // Recent-ordering follows the recording time (created_at), not the
+        // business date: a just-recorded entry must be the first thing the
+        // owner sees, even when seeded/history rows share the business date.
         val records = history.map { dto ->
             toRow(dto, eventsById[dto.eventId])
-        }
+        }.sortedWith(
+            compareByDescending<NativeOwnerRecordsRow> { it.createdAt }
+                .thenByDescending { it.eventId },
+        )
         val balances = database.readModelDao().accountBalances()
             .filter { it.category == "Customer" || it.category == "Vendor" }
             .map { balance ->

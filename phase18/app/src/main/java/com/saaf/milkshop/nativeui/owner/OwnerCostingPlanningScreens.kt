@@ -3,6 +3,7 @@ package com.saaf.milkshop.nativeui.owner
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -307,7 +308,11 @@ internal fun OwnerCostingBudgetEditorScreen(
         leaveGuard.requestLeave(action)
     }
     BackHandler { requestLeave(onBack) }
-    Box(modifier.fillMaxSize()) {
+    Box(
+        modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+    ) {
     hostedScaffold(snackbarHostState, Modifier.fillMaxSize(), { action -> requestLeave(action) }) { padding ->
         Column(
             Modifier
@@ -494,7 +499,11 @@ internal fun OwnerCostingCollectionsEditorScreen(
         leaveGuard.requestLeave(action)
     }
     BackHandler { requestLeave(onBack) }
-    Box(modifier.fillMaxSize()) {
+    Box(
+        modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+    ) {
     hostedScaffold(snackbarHostState, Modifier.fillMaxSize(), { action -> requestLeave(action) }) { padding ->
         Column(
             Modifier
@@ -873,7 +882,11 @@ internal fun OwnerCostingYieldApproveScreen(
         leaveGuard.requestLeave(action)
     }
     BackHandler { requestLeave(onBack) }
-    Box(modifier.fillMaxSize()) {
+    Box(
+        modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+    ) {
     hostedScaffold(snackbarHostState, Modifier.fillMaxSize(), { action -> requestLeave(action) }) { padding ->
         Column(
             Modifier

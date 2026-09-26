@@ -787,7 +787,7 @@ private fun NativeFoundationPreview(
             snackbarHostState.currentSnackbarData?.dismiss()
             snackbarHostState.showSnackbar(
                 message = message,
-                duration = SnackbarDuration.Indefinite,
+                duration = SnackbarDuration.Long,
             )
         }
     }

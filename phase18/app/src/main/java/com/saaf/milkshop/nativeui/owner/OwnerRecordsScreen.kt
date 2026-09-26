@@ -50,6 +50,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerAccountLedgerDetail
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsRow
 import com.saaf.milkshop.application.owner.NativeRecordsGroup
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.formatRecordTimestamp
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
@@ -485,7 +486,7 @@ private fun RecordsLedgerBody(
                             }
                             Text("Balance after: ${entry.balanceAfterLabel}")
                             Text(
-                                "${entry.occurredAt} · Event #${entry.eventId} · ${entry.stateLabel}",
+                                "${formatRecordTimestamp(entry.occurredAt)} · Event #${entry.eventId} · ${entry.stateLabel}",
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             entry.notes?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }

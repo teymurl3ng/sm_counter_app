@@ -222,6 +222,7 @@ class NativeAuthenticationViewModel(
                 val session = withContext(Dispatchers.IO) {
                     quick.signIn(current.account, NativeQuickUnlockMethod.PIN, pin)
                 }
+                runCatching { withContext(Dispatchers.IO) { facade.ensurePreviewVendor() } }
                 acceptSession(session)
             } catch (error: Throwable) {
                 _state.value = current.copy(error = publicMessage(error, current.account))
@@ -244,6 +245,7 @@ class NativeAuthenticationViewModel(
         scope.launch {
             try {
                 val session = withContext(Dispatchers.IO) { facade.signIn(current.account, passphrase) }
+                runCatching { withContext(Dispatchers.IO) { facade.ensurePreviewVendor() } }
                 try {
                     withContext(Dispatchers.IO) { quickUnlock?.fullPassphraseAccepted(session.identity.userId) }
                     acceptSession(session)

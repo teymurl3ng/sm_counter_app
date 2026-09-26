@@ -42,6 +42,7 @@ fun OwnerOverviewScreen(
     onLeaveConfirmed: () -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     onAttentionReview: () -> Unit = {},
+    onOpenCashCount: () -> Unit = {},
     onOpenMonthReports: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
@@ -98,6 +99,7 @@ fun OwnerOverviewScreen(
                             roleLabel = "Owner",
                             businessDate = state.snapshot.businessDate,
                             postingOpen = state.snapshot.postingOpen,
+                            onDayStatusClick = onOpenCashCount,
                         )
                         OverviewBody(
                             snapshot = state.snapshot,

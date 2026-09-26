@@ -152,7 +152,7 @@ object NativePreviewSampleData {
             }
 
         val seededStaff = step("preview staff", 0) {
-            ensurePreviewStaffAccounts(database, security, sessionHandle)
+            ensurePreviewStaffAccountsLocked(database, security, sessionHandle)
         }
         val seededCustomers = step("customers", false) {
             ensureSampleCustomers(database)
@@ -287,7 +287,16 @@ object NativePreviewSampleData {
      * Existing active accounts are left untouched (no passphrase reset).
      * @return count of accounts newly enrolled this call
      */
+    /** Locked entry point — the login path runs alongside host seeding. */
     suspend fun ensurePreviewStaffAccounts(
+        database: MilkShopDatabase,
+        security: UserSecurityService,
+        sessionHandle: String,
+    ): Int = seedMutex.withLock {
+        ensurePreviewStaffAccountsLocked(database, security, sessionHandle)
+    }
+
+    private suspend fun ensurePreviewStaffAccountsLocked(
         database: MilkShopDatabase,
         security: UserSecurityService,
         sessionHandle: String,

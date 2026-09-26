@@ -129,6 +129,7 @@ class NativeDeliveriesScreenContractTest {
             draftActions = draftActionsRecording(onCreate = { created = true }),
         )
         composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesNewSection).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsDeliveryExpand).performClick()
         composeRule.onNodeWithTag(NativeUiTags.OpsDeliveryCreate).assertIsEnabled()
         composeRule.onNodeWithTag(NativeUiTags.OpsDeliveryCreate).performClick()
         assertTrue(created)
@@ -146,6 +147,7 @@ class NativeDeliveriesScreenContractTest {
             ),
             draftActions = draftActionsRecording(onCreate = { created = true }),
         )
+        composeRule.onNodeWithTag(NativeUiTags.OpsDeliveryExpand).performClick()
         composeRule.onNodeWithTag(NativeUiTags.OpsDeliveryCreate).assertIsNotEnabled()
         composeRule.onNodeWithTag(NativeUiTags.OpsDeliveryQuantity).performTextInput("3")
         composeRule.onNodeWithTag(NativeUiTags.OpsDeliveryCreate).assertIsNotEnabled()

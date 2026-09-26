@@ -31,10 +31,13 @@ internal fun OwnerScaffold(
     section: OwnerSection,
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier = Modifier,
+    contentWindowInsets: androidx.compose.foundation.layout.WindowInsets =
+        androidx.compose.material3.ScaffoldDefaults.contentWindowInsets,
     content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit,
 ) {
     AdaptiveNavigationScaffold(
         snackbarHostState = snackbarHostState,
+        contentWindowInsets = contentWindowInsets,
         modifier = modifier.testTag(NativeUiTags.OwnerShellRoot),
         compactNavigation = {
             OwnerNavigation(selected = section, onNavigate = onNavigate)

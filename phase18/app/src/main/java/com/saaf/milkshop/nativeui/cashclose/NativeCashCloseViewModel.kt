@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.delay
 
 sealed interface NativeCashCloseState {
     data object Idle : NativeCashCloseState
@@ -114,6 +115,7 @@ class NativeCashCloseViewModel(
                     context = submission.refreshedContext,
                     receipt = submission.receipt,
                 )
+                autoClearReceipt(submission.receipt)
                 DayStateBus.notifyDayStateChanged()
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
@@ -155,6 +157,18 @@ class NativeCashCloseViewModel(
                 }
             } finally {
                 passphrase.fill('\u0000')
+            }
+        }
+    }
+
+
+    /** Auto-clears the success receipt after 4s unless a newer one replaced it. */
+    private fun autoClearReceipt(receipt: Any?) {
+        scope.launch {
+            delay(4_000)
+            val current = _state.value as? NativeCashCloseState.Ready ?: return@launch
+            if (current.receipt === receipt) {
+                _state.value = current.copy(receipt = null)
             }
         }
     }

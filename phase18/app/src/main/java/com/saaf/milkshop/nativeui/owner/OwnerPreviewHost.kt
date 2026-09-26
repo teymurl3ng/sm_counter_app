@@ -896,6 +896,10 @@ fun OwnerPreviewHost(
                             onOwnerSectionChange(OwnerSection.Work)
                             ownerWorkViewModel.openDestination(NativeOwnerWorkDestination.CashCountAndClose)
                         },
+                        onOpenCashCount = {
+                            onOwnerSectionChange(OwnerSection.Work)
+                            ownerWorkViewModel.openDestination(NativeOwnerWorkDestination.CashCountAndClose)
+                        },
                         onOpenMonthReports = { ownerReportsViewModel.open(sessionHandle) },
                     )
                 }

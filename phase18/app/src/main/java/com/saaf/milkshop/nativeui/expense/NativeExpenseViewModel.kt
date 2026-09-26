@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.delay
 
 sealed interface NativeExpenseState {
     data object Idle : NativeExpenseState
@@ -90,6 +91,7 @@ class NativeExpenseViewModel(
                     context = submission.refreshedContext,
                     receipt = submission.receipt,
                 )
+                autoClearReceipt(submission.receipt)
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
@@ -105,6 +107,18 @@ class NativeExpenseViewModel(
     fun recordAnother() {
         val current = _state.value as? NativeExpenseState.Ready ?: return
         _state.value = current.copy(receipt = null, error = null)
+    }
+
+
+    /** Auto-clears the success receipt after 4s unless a newer one replaced it. */
+    private fun autoClearReceipt(receipt: Any?) {
+        scope.launch {
+            delay(4_000)
+            val current = _state.value as? NativeExpenseState.Ready ?: return@launch
+            if (current.receipt === receipt) {
+                _state.value = current.copy(receipt = null)
+            }
+        }
     }
 
     fun clearFeedback() {

@@ -3,6 +3,9 @@ package com.saaf.milkshop
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -62,9 +65,45 @@ class NativeDeliveriesScreenContractTest {
         assertTrue(true)
     }
 
+    @Test
+    fun linkSaleRecordsPhysicalFulfilmentAgainstRecordedSale() {
+        var linked: Pair<Long, String>? = null
+        setScreen(
+            NativeDeliveriesState.Ready(context = contextWith(item(77L), linkable = listOf(item(77L)))),
+            onLinkSale = { id, sale -> linked = id to sale },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.opsDeliveryLinkSection(77L)).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.opsDeliveryLinkInput(77L))
+            .performTextInput("42")
+        composeRule.onNodeWithTag(NativeUiTags.opsDeliveryLink(77L)).performClick()
+        assertEquals(77L to "42", linked)
+    }
+
+    @Test
+    fun linkSaleRejectsInvalidSaleNumber() {
+        var linked: Pair<Long, String>? = null
+        setScreen(
+            NativeDeliveriesState.Ready(context = contextWith(item(77L), linkable = listOf(item(77L)))),
+            onLinkSale = { id, sale -> linked = id to sale },
+        )
+        // Non-digits are filtered out, leading zeros dropped: "a0c7" -> "7".
+        composeRule.onNodeWithTag(NativeUiTags.opsDeliveryLinkInput(77L))
+            .performTextInput("a0c7")
+        composeRule.onNodeWithTag(NativeUiTags.opsDeliveryLink(77L)).performClick()
+        assertEquals(77L to "7", linked)
+        // Leading zero alone leaves nothing to submit; the button stays disabled.
+        composeRule.onNodeWithTag(NativeUiTags.opsDeliveryLinkInput(77L))
+            .performTextClearance()
+        composeRule.onNodeWithTag(NativeUiTags.opsDeliveryLinkInput(77L))
+            .performTextInput("0")
+        composeRule.onNodeWithTag(NativeUiTags.opsDeliveryLink(77L)).assertIsNotEnabled()
+        assertEquals(77L to "7", linked)
+    }
+
     private fun setScreen(
         state: NativeDeliveriesState,
         onMarkDelivered: (Long) -> Unit = {},
+        onLinkSale: (Long, String) -> Unit = { _, _ -> },
     ) {
         composeRule.setContent {
             SaafTheme {
@@ -80,6 +119,7 @@ class NativeDeliveriesScreenContractTest {
                     state = state,
                     onRetry = {},
                     onMarkDelivered = onMarkDelivered,
+                    onLinkSale = onLinkSale,
                     onNavigate = {},
                     onLeaveConfirmed = {},
                 )
@@ -97,11 +137,15 @@ class NativeDeliveriesScreenContractTest {
         isToday = true,
     )
 
-    private fun contextWith(vararg items: NativeDeliveryItem) = NativeDeliveriesContext(
+    private fun contextWith(
+        vararg items: NativeDeliveryItem,
+        linkable: List<NativeDeliveryItem> = emptyList(),
+    ) = NativeDeliveriesContext(
         businessDate = "2026-09-20",
         postingOpen = true,
         today = items.toList(),
         earlier = emptyList(),
+        linkable = linkable,
     )
 
     private fun emptyContext() = NativeDeliveriesContext(

@@ -98,6 +98,7 @@ fun OwnerUsersRolesScreen(
     onConfirmSetEnabled: () -> Unit,
     onCancelSetEnabled: () -> Unit,
     onBeginCredentialReset: () -> Unit = {},
+    onResumeCredentialSetup: () -> Unit = {},
     onSubmitReauth: (CharArray) -> Unit,
     onCancelReauth: () -> Unit,
     hostedScaffold: HostedScaffold,
@@ -177,6 +178,7 @@ fun OwnerUsersRolesScreen(
                 onConfirmSetEnabled = onConfirmSetEnabled,
                 onCancelSetEnabled = onCancelSetEnabled,
                 onBeginCredentialReset = onBeginCredentialReset,
+                onResumeCredentialSetup = onResumeCredentialSetup,
                 hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
@@ -312,6 +314,7 @@ private fun OwnerUsersRolesDetailScreen(
     onConfirmSetEnabled: () -> Unit,
     onCancelSetEnabled: () -> Unit,
     onBeginCredentialReset: () -> Unit = {},
+    onResumeCredentialSetup: () -> Unit = {},
     hostedScaffold: HostedScaffold,
     modifier: Modifier,
 ) {
@@ -397,6 +400,15 @@ private fun OwnerUsersRolesDetailScreen(
                         .fillMaxWidth()
                         .testTag(NativeUiTags.OwnerUsersRolesCredentialReset),
                 ) { Text("Reset credentials") }
+                if (row.setupRequired) {
+                    Button(
+                        onClick = onResumeCredentialSetup,
+                        enabled = !enableBusy,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.OwnerUsersRolesResumeSetup),
+                    ) { Text("Resume setup") }
+                }
                 Text(
                     "Creates a one-time setup token so this staff login can choose a new passphrase. " +
                         "This is staff login access, not Employees salary accounts.",

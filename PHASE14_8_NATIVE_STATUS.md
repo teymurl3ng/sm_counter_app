@@ -37,6 +37,7 @@ Branch: `codex/native-menu-coverage`
 
 ## Recommended next
 
+0. DONE 2026-09-26 — interaction polish (14.8.54a/b/c) and endpoint-ownership closure (14.8.55/55b): 91/91 actions have native ownership; WebView/bridge retirement (14.8.6) is now unblocked
 1. Reconcile the existing Vercel account service with the native identity/session model: inventory contracts, choose source-of-truth boundaries, and add a typed client behind the current local interfaces
 2. Run a whole-app interaction polish pass on real data/device traces: remaining inline progress, micro-feedback, accessibility motion checks, and long-list performance
 3. Approval queue only after an authoritative domain API exists

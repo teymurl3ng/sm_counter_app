@@ -26,6 +26,7 @@ fun ManagerDeliveriesEntryScreen(
     state: NativeDeliveriesState,
     onRetry: () -> Unit,
     onMarkDelivered: (Long) -> Unit,
+    onLinkSale: (Long, String) -> Unit,
     onBackToWork: () -> Unit,
     onNavigate: (ManagerSection) -> Unit,
     modifier: Modifier = Modifier,
@@ -58,6 +59,7 @@ fun ManagerDeliveriesEntryScreen(
                     identity = identity,
                     state = state,
                     onMarkDelivered = onMarkDelivered,
+                    onLinkSale = onLinkSale,
                     contentPadding = padding,
                 )
             }

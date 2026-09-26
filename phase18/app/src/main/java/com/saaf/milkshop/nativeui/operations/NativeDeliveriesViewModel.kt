@@ -23,6 +23,8 @@ sealed interface NativeDeliveriesState {
         val context: NativeDeliveriesContext,
         val markingDeliveryId: Long? = null,
         val lastDeliveredId: Long? = null,
+        val linkingDeliveryId: Long? = null,
+        val lastLinkedId: Long? = null,
         val error: String? = null,
         val refreshing: Boolean = false,
     ) : NativeDeliveriesState
@@ -91,6 +93,35 @@ class NativeDeliveriesViewModel(
                     onSessionExpired()
                 } else {
                     _state.value = current.copy(error = publicMessage(error))
+                }
+            }
+        }
+    }
+
+    fun linkSale(deliveryId: Long, saleNumber: String) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeDeliveriesState.Ready ?: return
+        if (current.linkingDeliveryId != null || current.markingDeliveryId != null) return
+        _state.value = current.copy(linkingDeliveryId = deliveryId, error = null)
+        scope.launch {
+            try {
+                val refreshed = withContext(Dispatchers.IO) {
+                    facade.linkSale(session, deliveryId, saleNumber)
+                }
+                _state.value = NativeDeliveriesState.Ready(
+                    context = refreshed,
+                    lastLinkedId = deliveryId,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.SessionExpired) {
+                    sessionHandle = null
+                    _state.value = NativeDeliveriesState.Idle
+                    onSessionExpired()
+                } else {
+                    _state.value = current.copy(
+                        linkingDeliveryId = null,
+                        error = publicMessage(error),
+                    )
                 }
             }
         }

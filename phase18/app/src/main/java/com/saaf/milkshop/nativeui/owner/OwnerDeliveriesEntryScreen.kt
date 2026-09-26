@@ -25,6 +25,7 @@ fun OwnerDeliveriesEntryScreen(
     state: NativeDeliveriesState,
     onRetry: () -> Unit,
     onMarkDelivered: (Long) -> Unit,
+    onLinkSale: (Long, String) -> Unit,
     onBackToWork: () -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier = Modifier,
@@ -57,6 +58,7 @@ fun OwnerDeliveriesEntryScreen(
                     identity = identity,
                     state = state,
                     onMarkDelivered = onMarkDelivered,
+                    onLinkSale = onLinkSale,
                     contentPadding = padding,
                 )
             }

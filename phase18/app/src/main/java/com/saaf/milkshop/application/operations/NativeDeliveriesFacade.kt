@@ -33,6 +33,60 @@ class NativeDeliveriesFacade(
             postingOpen = !database.dailyCloseDao().isPostingClosed(businessDate),
             today = pending.filter { it.businessDate == businessDate },
             earlier = pending.filter { it.businessDate != businessDate },
+            linkable = linkableDeliveries(businessDate),
+        )
+    }
+
+    /**
+     * Links a delivery to an already-recorded sale (physical logistics only —
+     * the sale itself is not created here). Mirrors the hybrid validation:
+     * a positive whole sale record number.
+     */
+    suspend fun linkSale(
+        sessionHandle: String,
+        deliveryId: Long,
+        saleNumber: String,
+        date: LocalDate = LocalDate.now(),
+    ): NativeDeliveriesContext {
+        val clean = saleNumber.trim()
+        if (!Regex("^[1-9][0-9]*$").matches(clean)) {
+            throw IllegalArgumentException("Sale record number must be a positive whole number.")
+        }
+        commands.linkSale(
+            sessionHandle = sessionHandle,
+            deliveryId = deliveryId,
+            saleEventId = clean.toLong(),
+        )
+        return load(sessionHandle, date)
+    }
+
+    private suspend fun linkableDeliveries(today: String): List<NativeDeliveryItem> {
+        val items = mutableListOf<NativeDeliveryItem>()
+        for (delivery in database.deliveryDao().activeDeliveries()) {
+            if (delivery.saleEventId != null) continue
+            val customer = database.accountDao().findById(delivery.customerAccountId)
+            val product = database.productDao().findById(delivery.productId)
+            val customerName = customer?.name
+                ?.removePrefix("Customer: ")
+                ?.trim()
+                .orEmpty()
+                .ifBlank { "Customer #${delivery.customerAccountId}" }
+            val productName = product?.name ?: "Product #${delivery.productId}"
+            val unit = product?.unit?.trim().orEmpty().ifBlank { "units" }
+            items += NativeDeliveryItem(
+                deliveryId = delivery.deliveryId,
+                customerName = customerName,
+                productName = productName,
+                quantityLabel = "${formatQty(delivery.quantity)} $unit",
+                route = delivery.route?.trim()?.takeIf { it.isNotEmpty() },
+                businessDate = delivery.businessDate,
+                isToday = delivery.businessDate == today,
+            )
+        }
+        return items.sortedWith(
+            compareByDescending<NativeDeliveryItem> { it.isToday }
+                .thenByDescending { it.businessDate }
+                .thenBy { it.customerName.lowercase(Locale.US) },
         )
     }
 
@@ -118,6 +172,7 @@ data class NativeDeliveriesContext(
     val postingOpen: Boolean,
     val today: List<NativeDeliveryItem>,
     val earlier: List<NativeDeliveryItem>,
+    val linkable: List<NativeDeliveryItem> = emptyList(),
 ) {
     val isEmpty: Boolean get() = today.isEmpty() && earlier.isEmpty()
 }

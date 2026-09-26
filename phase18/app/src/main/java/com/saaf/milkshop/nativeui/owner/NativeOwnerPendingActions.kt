@@ -8,6 +8,7 @@ internal sealed interface PendingUsersRolesAction {
     data class SetEnabled(val userId: Long, val enabled: Boolean) : PendingUsersRolesAction
     data class ChangeRole(val userId: Long, val roleWire: String) : PendingUsersRolesAction
     data class BeginCredentialReset(val userId: Long) : PendingUsersRolesAction
+    data class ResumeCredentialSetup(val userId: Long) : PendingUsersRolesAction
 }
 
 internal sealed interface PendingBackupAction {

@@ -2,7 +2,9 @@ package com.saaf.milkshop
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -97,6 +99,42 @@ class NativeOwnerUsersRolesScreenContractTest {
             .performScrollTo()
             .performClick()
         assertTrue(back)
+    }
+
+    @Test
+    fun resumeSetupReopensPendingCredentialEnrollment() {
+        var resumed = false
+        setScreen(
+            users = listOf(sampleUser()),
+            userDetail = NativeOwnerUserDetail(
+                row = sampleUser().copy(setupRequired = true),
+                createdAt = "2026-01-01T00:00:00Z",
+                updatedAt = "2026-01-02T00:00:00Z",
+                disabledAt = null,
+                employeeAccountIdLabel = "Not linked",
+            ),
+            onResumeCredentialSetup = { resumed = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerUsersRolesResumeSetup)
+            .performScrollTo()
+            .performClick()
+        assertTrue(resumed)
+    }
+
+    @Test
+    fun resumeSetupHiddenWhenSetupComplete() {
+        setScreen(
+            users = listOf(sampleUser()),
+            userDetail = NativeOwnerUserDetail(
+                row = sampleUser(),
+                createdAt = "2026-01-01T00:00:00Z",
+                updatedAt = "2026-01-02T00:00:00Z",
+                disabledAt = null,
+                employeeAccountIdLabel = "Not linked",
+            ),
+        )
+        composeRule.onAllNodesWithTag(NativeUiTags.OwnerUsersRolesResumeSetup)
+            .assertCountEquals(0)
     }
 
     @Test
@@ -271,6 +309,7 @@ class NativeOwnerUsersRolesScreenContractTest {
         onCancelSetEnabled: () -> Unit = {},
         onSubmitReauth: (CharArray) -> Unit = { it.fill('\u0000') },
         onCancelReauth: () -> Unit = {},
+        onResumeCredentialSetup: () -> Unit = {},
     ) {
         composeRule.setContent {
             SaafTheme(darkTheme = false) {
@@ -314,6 +353,7 @@ class NativeOwnerUsersRolesScreenContractTest {
                     onBackFromRoleChange = onBackFromRoleChange,
                     onChangeRole = onChangeRole,
                     onRequestSetEnabled = onRequestSetEnabled,
+                    onResumeCredentialSetup = onResumeCredentialSetup,
                     onConfirmSetEnabled = onConfirmSetEnabled,
                     onCancelSetEnabled = onCancelSetEnabled,
                     onSubmitReauth = onSubmitReauth,

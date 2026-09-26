@@ -171,6 +171,7 @@ fun CashierDeliveriesEntryScreen(
     state: NativeDeliveriesState,
     onRetry: () -> Unit,
     onMarkDelivered: (Long) -> Unit,
+    onLinkSale: (Long, String) -> Unit,
     onBackToMore: () -> Unit,
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
@@ -190,6 +191,7 @@ fun CashierDeliveriesEntryScreen(
                 identity = identity,
                 state = state,
                 onMarkDelivered = onMarkDelivered,
+                onLinkSale = onLinkSale,
                 contentPadding = padding,
             )
         }

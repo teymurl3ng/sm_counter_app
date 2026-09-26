@@ -550,6 +550,49 @@ internal class OwnerUsersRolesController(
         }
     }
 
+    fun resumeCredentialSetup() {
+        val token = runtime.captureSession() ?: return
+        val session = token.handle
+        val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
+        val detail = current.userDetail ?: return
+        if (current.destination != NativeOwnerMoreDestination.UsersRoles || current.userEnrollBusy) return
+        runtime.state.value = current.copy(userEnrollBusy = true, usersError = null)
+        runtime.scope.launch {
+            try {
+                val pending = withContext(Dispatchers.IO) {
+                    facade.resumeCredentialSetup(session, detail.row.userId)
+                }
+                val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (!runtime.isCurrent(token)) return@launch
+                if (latest.destination != NativeOwnerMoreDestination.UsersRoles) return@launch
+                pendingUsersAction = null
+                runtime.state.value = latest.copy(
+                    userEnrollOpen = true,
+                    userEnrollPending = pending,
+                    userEnrollBusy = false,
+                    userReauthOpen = false,
+                    usersError = null,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.RecentAuthenticationRequired) {
+                    pendingUsersAction = PendingUsersRolesAction.ResumeCredentialSetup(
+                        userId = detail.row.userId,
+                    )
+                    val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                    if (!runtime.isCurrent(token)) return@launch
+                    runtime.state.value = latest.copy(
+                        userEnrollBusy = false,
+                        userReauthOpen = true,
+                        userReauthBusy = false,
+                        usersError = null,
+                    )
+                } else {
+                    handleFailure(token, error)
+                }
+            }
+        }
+    }
+
     fun submitUsersRolesReauth(passphrase: CharArray) {
         val token = runtime.captureSession()
         val current = runtime.state.value as? NativeOwnerMoreState.Ready
@@ -626,6 +669,22 @@ internal class OwnerUsersRolesController(
                         runtime.state.value = latest.copy(
                             userEnrollOpen = true,
                             userEnrollPending = resetPending,
+                            userEnrollBusy = false,
+                            userReauthOpen = false,
+                            userReauthBusy = false,
+                            usersError = null,
+                        )
+                    }
+                    is PendingUsersRolesAction.ResumeCredentialSetup -> {
+                        val resumedPending = withContext(Dispatchers.IO) {
+                            facade.resumeCredentialSetup(session, pending.userId)
+                        }
+                        val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                        if (!runtime.isCurrent(token)) return@launch
+                        pendingUsersAction = null
+                        runtime.state.value = latest.copy(
+                            userEnrollOpen = true,
+                            userEnrollPending = resumedPending,
                             userEnrollBusy = false,
                             userReauthOpen = false,
                             userReauthBusy = false,

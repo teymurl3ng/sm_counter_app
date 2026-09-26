@@ -168,6 +168,7 @@ fun OwnerMoreScreen(
     onConfirmSetUserEnabled: () -> Unit,
     onCancelSetUserEnabled: () -> Unit,
     onBeginCredentialReset: () -> Unit = {},
+    onResumeCredentialSetup: () -> Unit = {},
     onSubmitUsersRolesReauth: (CharArray) -> Unit,
     onCancelUsersRolesReauth: () -> Unit,
     onRetrySecurityHistory: () -> Unit,
@@ -588,6 +589,7 @@ fun OwnerMoreScreen(
                 onConfirmSetEnabled = onConfirmSetUserEnabled,
                 onCancelSetEnabled = onCancelSetUserEnabled,
                 onBeginCredentialReset = onBeginCredentialReset,
+                onResumeCredentialSetup = onResumeCredentialSetup,
                 onSubmitReauth = onSubmitUsersRolesReauth,
                 onCancelReauth = onCancelUsersRolesReauth,
                 hostedScaffold = { snackbar, mod, wrapNav, content ->

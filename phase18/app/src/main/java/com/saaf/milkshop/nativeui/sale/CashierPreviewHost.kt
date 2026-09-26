@@ -298,6 +298,7 @@ fun CashierPreviewHost(
                         state = deliveriesState,
                         onRetry = deliveriesViewModel::refresh,
                         onMarkDelivered = deliveriesViewModel::markDelivered,
+                        onLinkSale = deliveriesViewModel::linkSale,
                         onBackToMore = {
                             deliveriesViewModel.close()
                             moreViewModel.backToMenu()

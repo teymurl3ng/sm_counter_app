@@ -61,6 +61,7 @@ class NativeOwnerDeliveriesEntryScreenContractTest {
                         state = NativeDeliveriesState.Loading
                     },
                     onMarkDelivered = {},
+            onLinkSale = { _, _ -> },
                     onBackToWork = {},
                     onNavigate = {},
                 )
@@ -84,6 +85,7 @@ class NativeOwnerDeliveriesEntryScreenContractTest {
                     state = state,
                     onRetry = {},
                     onMarkDelivered = {},
+            onLinkSale = { _, _ -> },
                     onBackToWork = {},
                     onNavigate = {},
                 )

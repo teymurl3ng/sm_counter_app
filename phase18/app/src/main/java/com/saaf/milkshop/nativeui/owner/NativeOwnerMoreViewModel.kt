@@ -348,6 +348,7 @@ class NativeOwnerMoreViewModel internal constructor(
     fun confirmSetUserEnabled() = usersRolesController.confirmSetUserEnabled()
 
     fun beginCredentialReset() = usersRolesController.beginCredentialReset()
+    fun resumeCredentialSetup() = usersRolesController.resumeCredentialSetup()
 
     fun submitUsersRolesReauth(passphrase: CharArray) =
         usersRolesController.submitUsersRolesReauth(passphrase)

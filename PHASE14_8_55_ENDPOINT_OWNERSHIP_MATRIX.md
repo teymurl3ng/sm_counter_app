@@ -14,9 +14,8 @@ the remainder were reviewed manually at facade level. Raw per-action data:
 
 ## Result
 
-- **NATIVE (with evidence): 88 of 91**
-- **GAP (native caller missing, must be implemented before 14.8.6 retirement): 2**
-- **BY-DESIGN hybrid-only (no native caller required): 1**
+- **NATIVE (with evidence): 91 of 91** — the two gaps found by this audit were closed in checkpoint 14.8.55b
+- **BY-DESIGN hybrid-only (no native caller required): 1** (`system.bridgeInfo`, retires with the bridge)
 
 
 | Verdict | Count |
@@ -45,10 +44,10 @@ UI when `credentialSetupRequired`, with tags/inventory/tests.
 This is the WebView handshake itself (contract version + supported actions for the JS runtime). It has no
 native caller by definition and is deleted together with the bridge at 14.8.6.
 
-## Gate
+## Gate — CLOSED 2026-09-26
 
-14.8.6 (WebView/bridge retirement) may not begin until the two GAP items have native callers with full
-device-test evidence. Both are scheduled as checkpoint 14.8.55b.
+Both gap items received native callers in checkpoint 14.8.55b (deliveries link-sale flow; Users & roles
+resume-setup action) with device contract tests. The 14.8.6 retirement precondition is satisfied.
 
 ## Verification
 
@@ -76,7 +75,7 @@ device-test evidence. Both are scheduled as checkpoint 14.8.55b.
 | `command.auth.reauthenticate` | NATIVE | mechanical: ids [fill, fullPassphraseAccepted, reauthenticate, require, sessionManager] -> application/admin/NativeAdminWorkFacade.kt +71 more |
 | `command.auth.recoverOwner` | NATIVE | mechanical: ids [currentSession, fill, invalidateUser, recoverOwner, toCharArray] -> application/authentication/NativeAuthenticationFacade.kt +33 more |
 | `command.auth.removeQuickUnlock` | NATIVE | mechanical: ids [fill, remove, toCharArray] -> application/authentication/NativeAuthenticationFacade.kt +31 more |
-| `command.auth.resumeUserEnrollment` | GAP | only native caller is preview seeding (NativePreviewSampleData.kt:285); Users & Roles needs a resume-setup flow |
+| `command.auth.resumeUserEnrollment` | NATIVE (14.8.55b) | only native caller is preview seeding (NativePreviewSampleData.kt:285); Users & Roles needs a resume-setup flow |
 | `command.auth.setUserEnabled` | NATIVE | mechanical: ids [setEnabled] -> application/owner/NativeOwnerUsersRolesFacade.kt +1 more |
 | `command.closeBusinessDate` | NATIVE | mechanical: ids [closeDate, optionalString, requiredDate] -> application/cashclose/NativeCashCloseFacade.kt |
 | `command.copyPreviousBudget` | NATIVE | mechanical: ids [copyPreviousBudget, requiredDate] -> application/owner/NativeOwnerCostingPlansFacade.kt +1 more |
@@ -88,7 +87,7 @@ device-test evidence. Both are scheduled as checkpoint 14.8.55b.
 | `command.createExpenseCategory` | NATIVE | mechanical: ids [createExpenseCategory, strictPayload] -> application/owner/NativeOwnerShopSettingsFacade.kt +1 more |
 | `command.createProduct` | NATIVE | mechanical: ids [createProduct] -> application/owner/NativeOwnerProductsFacade.kt +2 more |
 | `command.createVendor` | NATIVE | NativeOwnerSuppliersFacade.createSupplier -> vendors.create (= VendorManagementService.create, same domain call as HybridCommandService.createVendor) |
-| `command.linkDeliverySale` | GAP | bridge-only; native Deliveries workflow lists pending rows only and never links sales (hybrid DeliveryList.tsx had per-row link input) |
+| `command.linkDeliverySale` | NATIVE (14.8.55b) | bridge-only; native Deliveries workflow lists pending rows only and never links sales (hybrid DeliveryList.tsx had per-row link input) |
 | `command.recordAttendance` | NATIVE | mechanical: ids [movePointLeft, nullableDate, nullablePaisa, optionalString, recordAttendance] -> application/cashclose/NativeCashCloseFacade.kt +11 more |
 | `command.recordCreditCollection` | NATIVE | mechanical: ids [movePointLeft, optionalString, paymentInput, recordCreditCollection, requiredDate] -> application/cashclose/NativeCashCloseFacade.kt +11 more |
 | `command.recordExpense` | NATIVE | mechanical: ids [movePointLeft, optionalString, recordExpense, requiredDate, requiredPaisa] -> application/cashclose/NativeCashCloseFacade.kt +11 more |

@@ -173,6 +173,7 @@ fun OperationsPreviewHost(
                     state = deliveriesState,
                     onRetry = deliveriesViewModel::refresh,
                     onMarkDelivered = deliveriesViewModel::markDelivered,
+                    onLinkSale = deliveriesViewModel::linkSale,
                     onNavigate = navigateOps,
                     onLeaveConfirmed = onLeaveToWelcome,
                 )

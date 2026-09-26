@@ -813,6 +813,7 @@ object NativeUiTags {
     const val OwnerUsersRolesRoleChangeDiscard = "owner_users_roles_role_change_discard"
     const val OwnerUsersRolesRoleChangeKeep = "owner_users_roles_role_change_keep"
     const val OwnerUsersRolesCredentialResetDeferred = "owner_users_roles_credential_reset_deferred"
+    const val OwnerUsersRolesResumeSetup = "owner_users_roles_resume_setup"
     const val OwnerUsersRolesCredentialReset = "owner_users_roles_credential_reset"
     const val OwnerUsersRolesReauth = "owner_users_roles_reauth"
     const val OwnerUsersRolesReauthPassphrase = "owner_users_roles_reauth_passphrase"
@@ -1058,6 +1059,12 @@ object NativeUiTags {
     fun opsDelivery(deliveryId: Long): String = "ops_delivery_$deliveryId"
 
     fun opsDeliveryMark(deliveryId: Long): String = "ops_delivery_mark_$deliveryId"
+
+    fun opsDeliveryLinkSection(deliveryId: Long): String = "ops_delivery_link_section_$deliveryId"
+
+    fun opsDeliveryLinkInput(deliveryId: Long): String = "ops_delivery_link_input_$deliveryId"
+
+    fun opsDeliveryLink(deliveryId: Long): String = "ops_delivery_link_$deliveryId"
 
     fun opsMoreWorkRecord(eventId: Long): String = "ops_more_work_$eventId"
 }

@@ -40,6 +40,13 @@ import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
 
 @Composable
 fun DeliveriesScreen(
@@ -48,6 +55,7 @@ fun DeliveriesScreen(
     state: NativeDeliveriesState,
     onRetry: () -> Unit,
     onMarkDelivered: (Long) -> Unit,
+    onLinkSale: (Long, String) -> Unit,
     onNavigate: (OperationsSection) -> Unit,
     onLeaveConfirmed: () -> Unit,
     modifier: Modifier = Modifier,
@@ -76,6 +84,7 @@ fun DeliveriesScreen(
                 identity = identity,
                 state = state,
                 onMarkDelivered = onMarkDelivered,
+                onLinkSale = onLinkSale,
                 contentPadding = padding,
             )
         }
@@ -106,6 +115,7 @@ internal fun DeliveriesReadyContent(
     identity: NativeSignedInIdentity,
     state: NativeDeliveriesState.Ready,
     onMarkDelivered: (Long) -> Unit,
+    onLinkSale: (Long, String) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
@@ -154,6 +164,26 @@ internal fun DeliveriesReadyContent(
                         Spacer(Modifier.width(8.dp))
                         Text(
                             "Marked delivered (#${state.lastDeliveredId})",
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    }
+                }
+            }
+            if (state.lastLinkedId != null) {
+                Surface(
+                    tonalElevation = 2.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(NativeUiTags.OpsDeliveriesSuccess),
+                ) {
+                    Row(
+                        Modifier.padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(Icons.Outlined.CheckCircle, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            "Sale linked (#${state.lastLinkedId})",
                             style = MaterialTheme.typography.titleMedium,
                         )
                     }
@@ -214,6 +244,74 @@ internal fun DeliveriesReadyContent(
                         )
                     }
                 }
+                if (state.context.linkable.isNotEmpty()) {
+                    SectionLabel("Link a recorded sale")
+                    state.context.linkable.forEach { item ->
+                        LinkSaleCard(
+                            item = item,
+                            linking = state.linkingDeliveryId == item.deliveryId,
+                            busy = state.linkingDeliveryId != null || state.markingDeliveryId != null,
+                            onLinkSale = onLinkSale,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LinkSaleCard(
+    item: NativeDeliveryItem,
+    linking: Boolean,
+    busy: Boolean,
+    onLinkSale: (Long, String) -> Unit,
+) {
+    var saleNumber by rememberSaveable(item.deliveryId) { mutableStateOf("") }
+    Surface(
+        tonalElevation = 1.dp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(NativeUiTags.opsDeliveryLinkSection(item.deliveryId)),
+    ) {
+        Column(
+            Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(item.customerName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text("${item.productName} · ${item.quantityLabel}")
+            Text(
+                "Delivery #${item.deliveryId} · ${item.businessDate}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            OutlinedTextField(
+                value = saleNumber,
+                onValueChange = { saleNumber = it.filter(Char::isDigit).dropWhile { it == '0' }.take(15) },
+                label = { Text("Sale record number") },
+                singleLine = true,
+                enabled = !busy,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(NativeUiTags.opsDeliveryLinkInput(item.deliveryId)),
+            )
+            Button(
+                onClick = { onLinkSale(item.deliveryId, saleNumber) },
+                enabled = !busy && saleNumber.isNotBlank(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = SaafYellow,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp)
+                    .testTag(NativeUiTags.opsDeliveryLink(item.deliveryId)),
+            ) {
+                Text(
+                    if (linking) "Linking…" else "Link",
+                    fontWeight = FontWeight.SemiBold,
+                )
             }
         }
     }

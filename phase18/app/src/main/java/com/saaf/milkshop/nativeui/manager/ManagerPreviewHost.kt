@@ -415,6 +415,7 @@ fun ManagerPreviewHost(
                     state = deliveriesState,
                     onRetry = deliveriesViewModel::refresh,
                     onMarkDelivered = deliveriesViewModel::markDelivered,
+                        onLinkSale = deliveriesViewModel::linkSale,
                     onBackToWork = { returnManagerWorkHome() },
                     onNavigate = navigate,
                 )

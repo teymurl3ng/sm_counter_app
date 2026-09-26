@@ -635,6 +635,7 @@ fun OwnerPreviewHost(
                     onConfirmSetUserEnabled = ownerMoreViewModel::confirmSetUserEnabled,
                     onCancelSetUserEnabled = ownerMoreViewModel::cancelSetUserEnabled,
                     onBeginCredentialReset = ownerMoreViewModel::beginCredentialReset,
+                    onResumeCredentialSetup = ownerMoreViewModel::resumeCredentialSetup,
                     onSubmitUsersRolesReauth = ownerMoreViewModel::submitUsersRolesReauth,
                     onCancelUsersRolesReauth = ownerMoreViewModel::cancelUsersRolesReauth,
                     onRetrySecurityHistory = ownerMoreViewModel::refreshSecurityHistory,
@@ -844,6 +845,7 @@ fun OwnerPreviewHost(
                     state = deliveriesState,
                     onRetry = deliveriesViewModel::refresh,
                     onMarkDelivered = deliveriesViewModel::markDelivered,
+                        onLinkSale = deliveriesViewModel::linkSale,
                     onBackToWork = { returnOwnerWorkHome() },
                     onNavigate = navigateOwner,
                 )

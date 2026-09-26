@@ -151,6 +151,24 @@ class NativeOwnerUsersRolesFacade(
     }
 
     /**
+     * Re-open credential setup for a user still waiting for it. Requires
+     * recent auth (domain). Complete via [completeEnroll] with the returned
+     * enrollment token.
+     */
+    suspend fun resumeCredentialSetup(
+        sessionHandle: String,
+        targetUserId: Long,
+    ): NativeOwnerPendingEnrollment {
+        requireStaffUsersAccess(sessionHandle)
+        val detail = loadDetail(sessionHandle, targetUserId)
+        val allowed = enrollableRoles(sessionHandle).map { it.wireValue }.toSet()
+        require(detail.row.roleWire.trim().lowercase() in allowed) {
+            "Administrator cannot manage Owner or Administrator credentials."
+        }
+        return security.resumeUserEnrollment(sessionHandle, targetUserId).toNative()
+    }
+
+    /**
      * Full passphrase re-authentication for sensitive Users & roles writes.
      * Wipes [passphrase] before returning.
      */

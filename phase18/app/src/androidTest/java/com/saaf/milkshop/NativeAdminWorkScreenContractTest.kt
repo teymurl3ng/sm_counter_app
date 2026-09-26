@@ -83,6 +83,9 @@ class NativeAdminWorkScreenContractTest {
         onRetry: () -> Unit = {},
         onOpenDestination: (NativeAdminWorkDestination) -> Unit = {},
         onOpenPeople: () -> Unit = {},
+        onOpenEnrollment: () -> Unit = {},
+        onOpenProductRates: () -> Unit = {},
+        onOpenEmployeeLinks: () -> Unit = {},
     ) {
         composeRule.setContent {
             SaafTheme(darkTheme = false) {
@@ -92,6 +95,9 @@ class NativeAdminWorkScreenContractTest {
                     onRetry = onRetry,
                     onOpenDestination = onOpenDestination,
                     onOpenPeople = onOpenPeople,
+            onOpenEnrollment = onOpenEnrollment,
+            onOpenProductRates = onOpenProductRates,
+            onOpenEmployeeLinks = onOpenEmployeeLinks,
                     onBackToHome = {},
                     onLeaveConfirmed = {},
                     onNavigate = {},
@@ -105,6 +111,7 @@ class NativeAdminWorkScreenContractTest {
         postingOpen = true,
         shopName = "Saaf Milk",
         setupRequiredCount = 0,
+                firstSetupRequiredUserId = null,
         productsMissingRateCount = 0,
         catalogEmpty = false,
         unlinkedStaffCount = 0,

@@ -220,6 +220,20 @@ fun AdminPreviewHost(
                     onRetry = adminWorkViewModel::refresh,
                     onOpenDestination = adminWorkViewModel::openDestination,
                     onOpenPeople = { navigate(AdminSection.People) },
+                    onOpenEnrollment = {
+                        navigate(AdminSection.People)
+                        ownerMoreViewModel.openUsersRoles()
+                        (adminWorkState as? NativeAdminWorkState.Ready)?.context?.firstSetupRequiredUserId
+                            ?.let { ownerMoreViewModel.openUserDetail(it) }
+                    },
+                    onOpenProductRates = {
+                        navigate(AdminSection.More)
+                        ownerMoreViewModel.openProducts()
+                    },
+                    onOpenEmployeeLinks = {
+                        navigate(AdminSection.People)
+                        ownerMoreViewModel.openUsersRoles()
+                    },
                     onBackToHome = { returnAdminWorkHome() },
                     onLeaveConfirmed = {
                         // Stay on Work home; session remains authenticated.

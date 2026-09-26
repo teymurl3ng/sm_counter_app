@@ -7,6 +7,7 @@ import com.saaf.milkshop.application.operations.NativeDeliveriesFacade
 import com.saaf.milkshop.application.operations.NativeDeliveryDraft
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
+import com.saaf.milkshop.nativeui.DataChangeBus
 import com.saaf.milkshop.nativeui.DayStateBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -106,6 +107,7 @@ class NativeDeliveriesViewModel(
                     lastDeliveredId = deliveryId,
                 )
                 autoDismissSuccess("delivered", deliveryId)
+                DataChangeBus.notifyDataChanged()
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
@@ -133,6 +135,7 @@ class NativeDeliveriesViewModel(
                     lastLinkedId = deliveryId,
                 )
                 autoDismissSuccess("linked", deliveryId)
+                DataChangeBus.notifyDataChanged()
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
@@ -199,6 +202,7 @@ class NativeDeliveriesViewModel(
                     lastCreatedId = createdId,
                 )
                 createdId?.let { autoDismissSuccess("created", it) }
+                DataChangeBus.notifyDataChanged()
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
@@ -222,6 +226,7 @@ class NativeDeliveriesViewModel(
                     facade.archiveDelivery(session, deliveryId)
                 }
                 _state.value = NativeDeliveriesState.Ready(context = refreshed)
+                DataChangeBus.notifyDataChanged()
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null

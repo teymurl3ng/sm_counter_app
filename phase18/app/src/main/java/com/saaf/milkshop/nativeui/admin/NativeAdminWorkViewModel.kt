@@ -6,6 +6,7 @@ import com.saaf.milkshop.application.admin.NativeAdminWorkContext
 import com.saaf.milkshop.application.admin.NativeAdminWorkFacade
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
+import com.saaf.milkshop.nativeui.DataChangeBus
 import com.saaf.milkshop.nativeui.DayStateBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,6 +48,11 @@ class NativeAdminWorkViewModel(
     init {
         scope.launch {
             DayStateBus.changes.collect {
+                if (sessionHandle != null) refresh()
+            }
+        }
+        scope.launch {
+            DataChangeBus.changes.collect {
                 if (sessionHandle != null) refresh()
             }
         }

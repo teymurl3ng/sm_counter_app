@@ -50,6 +50,9 @@ fun AdminWorkScreen(
     onRetry: () -> Unit,
     onOpenDestination: (NativeAdminWorkDestination) -> Unit,
     onOpenPeople: () -> Unit,
+    onOpenEnrollment: () -> Unit,
+    onOpenProductRates: () -> Unit,
+    onOpenEmployeeLinks: () -> Unit,
     onBackToHome: () -> Unit,
     onLeaveConfirmed: () -> Unit,
     onNavigate: (AdminSection) -> Unit,
@@ -95,6 +98,9 @@ fun AdminWorkScreen(
             state = state,
             onOpenDestination = onOpenDestination,
             onOpenPeople = onOpenPeople,
+            onOpenEnrollment = onOpenEnrollment,
+            onOpenProductRates = onOpenProductRates,
+            onOpenEmployeeLinks = onOpenEmployeeLinks,
             onBackToHome = onBackToHome,
             onLeaveConfirmed = onLeaveConfirmed,
             onNavigate = onNavigate,
@@ -109,6 +115,9 @@ private fun ReadyWork(
     state: NativeAdminWorkState.Ready,
     onOpenDestination: (NativeAdminWorkDestination) -> Unit,
     onOpenPeople: () -> Unit,
+    onOpenEnrollment: () -> Unit,
+    onOpenProductRates: () -> Unit,
+    onOpenEmployeeLinks: () -> Unit,
     onBackToHome: () -> Unit,
     onLeaveConfirmed: () -> Unit,
     onNavigate: (AdminSection) -> Unit,
@@ -138,6 +147,9 @@ private fun ReadyWork(
                         context = state.context,
                         onOpenDestination = onOpenDestination,
                         onOpenPeople = onOpenPeople,
+                        onOpenEnrollment = onOpenEnrollment,
+                        onOpenProductRates = onOpenProductRates,
+                        onOpenEmployeeLinks = onOpenEmployeeLinks,
                         modifier = Modifier
                             .weight(1f)
                             .testTag(NativeUiTags.AdminWorkHome),
@@ -170,6 +182,9 @@ private fun WorkHomeBody(
     context: NativeAdminWorkContext,
     onOpenDestination: (NativeAdminWorkDestination) -> Unit,
     onOpenPeople: () -> Unit,
+    onOpenEnrollment: () -> Unit,
+    onOpenProductRates: () -> Unit,
+    onOpenEmployeeLinks: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -204,7 +219,7 @@ private fun WorkHomeBody(
                 icon = Icons.Outlined.PersonOff,
                 tag = NativeUiTags.AdminWorkSetupRequired,
                 badge = context.setupRequiredCount.takeIf { it > 0 }?.toString(),
-                onClick = onOpenPeople,
+                onClick = onOpenEnrollment,
             )
             HealthRow(
                 label = "Products and rates",
@@ -221,8 +236,8 @@ private fun WorkHomeBody(
                     context.productsMissingRateCount > 0 -> context.productsMissingRateCount.toString()
                     else -> null
                 },
-                onClick = null,
-                enabled = false,
+                onClick = onOpenProductRates,
+                enabled = true,
             )
             HealthRow(
                 label = "Staff employee links",
@@ -234,7 +249,7 @@ private fun WorkHomeBody(
                 icon = Icons.Outlined.LinkOff,
                 tag = NativeUiTags.AdminWorkEmployeeLinks,
                 badge = context.unlinkedStaffCount.takeIf { it > 0 }?.toString(),
-                onClick = onOpenPeople,
+                onClick = onOpenEmployeeLinks,
             )
         }
 

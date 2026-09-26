@@ -4,6 +4,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerUsersRolesFacade
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.CreateUserInput
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.DataChangeBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -323,6 +324,7 @@ internal class OwnerUsersRolesController(
             try {
                 withContext(Dispatchers.IO) {
                     facade.completeEnroll(pending.enrollmentToken, passphrase)
+                    DataChangeBus.notifyDataChanged()
                 }
                 val snapshot = withContext(Dispatchers.IO) { facade.loadUsers(session) }
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
@@ -390,6 +392,7 @@ internal class OwnerUsersRolesController(
             try {
                 withContext(Dispatchers.IO) {
                     facade.changeRole(session, detail.row.userId, roleWire)
+                    DataChangeBus.notifyDataChanged()
                 }
                 val refreshed = withContext(Dispatchers.IO) {
                     facade.loadDetail(session, detail.row.userId)
@@ -467,6 +470,7 @@ internal class OwnerUsersRolesController(
             try {
                 withContext(Dispatchers.IO) {
                     facade.setEnabled(session, detail.row.userId, enabled)
+                    DataChangeBus.notifyDataChanged()
                 }
                 val refreshed = withContext(Dispatchers.IO) {
                     facade.loadDetail(session, detail.row.userId)

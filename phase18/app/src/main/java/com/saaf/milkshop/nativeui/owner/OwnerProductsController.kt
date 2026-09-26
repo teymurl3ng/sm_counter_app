@@ -2,6 +2,7 @@ package com.saaf.milkshop.nativeui.owner
 
 import com.saaf.milkshop.application.owner.NativeOwnerProductsFacade
 import com.saaf.milkshop.domain.ProductCatalogInput
+import com.saaf.milkshop.nativeui.DataChangeBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -199,6 +200,7 @@ internal class OwnerProductsController(
         runtime.scope.launch {
             try {
                 withContext(Dispatchers.IO) { facade.createProduct(token.handle, input) }
+                    DataChangeBus.notifyDataChanged()
                 val snapshot = withContext(Dispatchers.IO) {
                     facade.loadProducts(token.handle, includeArchived = false)
                 }
@@ -265,6 +267,7 @@ internal class OwnerProductsController(
             try {
                 withContext(Dispatchers.IO) {
                     facade.updateProduct(token.handle, productId, input)
+                    DataChangeBus.notifyDataChanged()
                 }
                 val detail = withContext(Dispatchers.IO) {
                     facade.loadDetail(token.handle, productId)
@@ -335,8 +338,10 @@ internal class OwnerProductsController(
                 withContext(Dispatchers.IO) {
                     if (archived) {
                         facade.archiveProduct(token.handle, productId)
+                    DataChangeBus.notifyDataChanged()
                     } else {
                         facade.unarchiveProduct(token.handle, productId)
+                    DataChangeBus.notifyDataChanged()
                     }
                 }
                 val snapshot = withContext(Dispatchers.IO) {

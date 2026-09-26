@@ -13,6 +13,8 @@ data class NativeAdminWorkContext(
     val shopName: String,
     /** Accounts waiting for private credential enrollment. */
     val setupRequiredCount: Int,
+    /** First setup-required user id, for direct deep links (null when none). */
+    val firstSetupRequiredUserId: Long?,
     /** Active products missing a default sale rate (blocks priced sales). */
     val productsMissingRateCount: Int,
     /** True when the catalog has no active products. */
@@ -44,6 +46,7 @@ class NativeAdminWorkFacade(
         security.requirePermission(sessionHandle, AppPermission.MANAGE_STAFF_USERS)
         val users = security.listUsers(sessionHandle)
         val setupRequiredCount = users.count { it.credentialSetupRequired }
+        val firstSetupRequiredUserId = users.firstOrNull { it.credentialSetupRequired }?.userId
         val unlinkedStaffCount = users.count { user ->
             val userRole = runCatching { AppRole.parse(user.role) }.getOrNull() ?: return@count false
             userRole != AppRole.OWNER &&
@@ -62,6 +65,7 @@ class NativeAdminWorkFacade(
             shopName = database.storeProfileDao().get()?.storeName?.takeIf { it.isNotBlank() }
                 ?: "Saaf Milk",
             setupRequiredCount = setupRequiredCount,
+            firstSetupRequiredUserId = firstSetupRequiredUserId,
             productsMissingRateCount = productsMissingRateCount,
             catalogEmpty = activeProducts.isEmpty(),
             unlinkedStaffCount = unlinkedStaffCount,

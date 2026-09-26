@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Saaf Milk launcher foreground: dark-green squircle tile carrying the
+     line-art milk vessel (ivory strokes), golden purity drop (#F2C85B) and
+     the verification check badge — scaled into the adaptive-icon safe zone
+     (group offset 28.6875,25.3125 = translate(136,120) at 0.2109375). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Squircle tile 240x240 rx64 -->
+    <path
+        android:fillColor="#173F32"
+        android:pathData="M28.6875,38.8125 a13.5,13.5 0 0 1 13.5,-13.5 h23.625 a13.5,13.5 0 0 1 13.5,13.5 v23.625 a13.5,13.5 0 0 1 -13.5,13.5 h-23.625 a13.5,13.5 0 0 1 -13.5,-13.5 z" />
+    <!-- Pot neck & rim -->
+    <path
+        android:fillColor="#F4F1E8"
+        android:pathData="M48.09375,35.859375 a1.265625,1.265625 0 0 1 1.265625,-1.265625 h9.28125 a1.265625,1.265625 0 0 1 1.265625,1.265625 v0 a1.265625,1.265625 0 0 1 -1.265625,1.265625 h-9.28125 a1.265625,1.265625 0 0 1 -1.265625,-1.265625 z" />
+    <!-- Pot body -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#F4F1E8"
+        android:strokeWidth="2.53125"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M44.71875,39.65625 C41.765625,42.609375 40.078125,47.25 40.078125,52.734375 C40.078125,61.59375 45.5625,66.65625 54,66.65625 C62.4375,66.65625 67.921875,61.59375 67.921875,52.734375 C67.921875,47.25 66.234375,42.609375 63.28125,39.65625 Z" />
+    <!-- Freshness lines -->
+    <path
+        android:strokeColor="#F4F1E8"
+        android:strokeWidth="1.6875"
+        android:strokeLineCap="round"
+        android:pathData="M46.40625,46.828125 L52.734375,46.828125" />
+    <path
+        android:strokeColor="#F4F1E8"
+        android:strokeWidth="1.6875"
+        android:strokeLineCap="round"
+        android:pathData="M46.40625,51.046875 L50.625,51.046875" />
+    <path
+        android:strokeColor="#F4F1E8"
+        android:strokeWidth="1.6875"
+        android:strokeLineCap="round"
+        android:pathData="M46.40625,55.265625 L51.890625,55.265625" />
+    <!-- Golden purity drop -->
+    <path
+        android:fillColor="#F2C85B"
+        android:pathData="M59.0625,49.78125 C59.0625,49.78125 61.59375,53.15625 61.59375,55.265625 C61.59375,56.953125 60.22265625,58.21875 58.5390625,58.21875 C56.84765625,58.21875 55.4765625,56.953125 55.4765625,55.265625 C55.4765625,53.15625 59.0625,49.78125 59.0625,49.78125 Z" />
+    <!-- Verification badge -->
+    <path
+        android:fillColor="#F2C85B"
+        android:strokeColor="#173F32"
+        android:strokeWidth="1.265625"
+        android:pathData="M71.71875,62.4375 a5.90625,5.90625 0 1 0 0.01,0 z" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#173F32"
+        android:strokeWidth="1.0546875"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M69.609375,68.34375 L71.0859375,69.8203125 L73.828125,66.65625" />
+</vector>

@@ -1,23 +1,38 @@
 package com.saaf.milkshop.nativeui.welcome
 
-import androidx.compose.foundation.Canvas
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Verified
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -25,17 +40,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.R
@@ -43,6 +61,8 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.theme.SaafGreen
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafIvory
+import com.saaf.milkshop.nativeui.theme.SaafLine
+import com.saaf.milkshop.nativeui.theme.SaafMuted
 import com.saaf.milkshop.nativeui.theme.SaafSurface
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 
@@ -52,8 +72,8 @@ fun WelcomeScreen(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        color = SaafGreen,
-        contentColor = SaafSurface,
+        color = SaafIvory,
+        contentColor = SaafInk,
         modifier = modifier.fillMaxSize(),
     ) {
         Column(
@@ -69,16 +89,20 @@ fun WelcomeScreen(
             Text(
                 text = stringResource(R.string.native_app_name),
                 style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.ExtraBold,
+                color = SaafGreen,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.native_welcome_tagline),
                 style = MaterialTheme.typography.bodyLarge,
-                color = SaafSurface.copy(alpha = 0.86f),
+                color = SaafMuted,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(28.dp))
+            WelcomeLedgerProgress()
+            Spacer(Modifier.weight(1f))
             Surface(
                 color = SaafSurface,
                 contentColor = SaafInk,
@@ -119,63 +143,120 @@ fun WelcomeScreen(
             Text(
                 text = stringResource(R.string.native_continue_hint),
                 style = MaterialTheme.typography.bodyMedium,
-                color = SaafSurface.copy(alpha = 0.72f),
+                color = SaafMuted,
                 textAlign = TextAlign.Center,
             )
         }
     }
 }
 
+/**
+ * Brand mark from the Counter Ledger design: light line-art milk vessel with
+ * freshness lines and the golden purity drop on a green tile, overlaid with
+ * the yellow verification-check badge.
+ */
 @Composable
 private fun SaafBrandMark() {
     val description = stringResource(R.string.native_brand_mark)
-    Surface(
-        color = SaafIvory,
-        contentColor = SaafGreen,
-        shape = RoundedCornerShape(24.dp),
-        modifier = Modifier.size(92.dp),
+    Box(
+        modifier = Modifier
+            .size(92.dp)
+            .semantics { contentDescription = description },
     ) {
-        Canvas(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(22.dp)
-                .semantics { contentDescription = description },
+        Surface(
+            color = SaafGreen,
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier.fillMaxSize(),
         ) {
-            val stroke = Stroke(width = 3.5.dp.toPx(), cap = StrokeCap.Round)
-            drawRoundRect(
-                color = SaafGreen,
-                topLeft = Offset(size.width * 0.23f, size.height * 0.28f),
-                size = Size(size.width * 0.54f, size.height * 0.61f),
-                cornerRadius = CornerRadius(7.dp.toPx()),
-                style = stroke,
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                Image(
+                    painter = painterResource(R.drawable.saaf_brand_mark),
+                    contentDescription = null,
+                    modifier = Modifier.size(56.dp),
+                )
+            }
+        }
+        Surface(
+            color = SaafYellow,
+            contentColor = SaafInk,
+            shape = CircleShape,
+            border = androidx.compose.foundation.BorderStroke(2.dp, SaafIvory),
+            modifier = Modifier
+                .size(26.dp)
+                .align(Alignment.BottomEnd)
+                .offset(x = (-2).dp, y = (-2).dp),
+        ) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                Icon(
+                    Icons.Outlined.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                )
+            }
+        }
+    }
+}
+
+/** Animated ledger-ready sequence from the Counter Ledger welcome design. */
+@Composable
+private fun WelcomeLedgerProgress() {
+    val stages = listOf(
+        0.45f to R.string.native_splash_stage_1,
+        0.78f to R.string.native_splash_stage_2,
+        1f to R.string.native_splash_stage_3,
+    )
+    var stage by remember { mutableIntStateOf(0) }
+    LaunchedEffect(Unit) {
+        for (index in stages.indices) {
+            stage = index
+            if (index < stages.lastIndex) kotlinx.coroutines.delay(450)
+        }
+    }
+    val target = stages[stage].first
+    val progress by animateFloatAsState(
+        targetValue = target,
+        animationSpec = tween(durationMillis = 450, easing = LinearEasing),
+        label = "ledger_progress",
+    )
+    val label = stringResource(stages[stage].second)
+    val spin = rememberInfiniteTransition(label = "ledger_sync")
+    val rotation by spin.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(tween(2500, easing = LinearEasing), RepeatMode.Restart),
+        label = "ledger_sync_rotation",
+    )
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            Modifier
+                .width(240.dp)
+                .height(6.dp)
+                .background(SaafLine, RoundedCornerShape(3.dp)),
+        ) {
+            Box(
+                Modifier
+                    .fillMaxWidth(progress)
+                    .fillMaxHeight()
+                    .background(SaafYellow, RoundedCornerShape(3.dp)),
             )
-            drawLine(
-                color = SaafGreen,
-                start = Offset(size.width * 0.35f, size.height * 0.12f),
-                end = Offset(size.width * 0.65f, size.height * 0.12f),
-                strokeWidth = stroke.width,
-                cap = StrokeCap.Round,
+        }
+        Spacer(Modifier.height(10.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                Icons.Outlined.Sync,
+                contentDescription = null,
+                tint = SaafGreen,
+                modifier = Modifier
+                    .size(16.dp)
+                    .rotate(rotation),
             )
-            drawLine(
-                color = SaafGreen,
-                start = Offset(size.width * 0.35f, size.height * 0.12f),
-                end = Offset(size.width * 0.35f, size.height * 0.28f),
-                strokeWidth = stroke.width,
-                cap = StrokeCap.Round,
-            )
-            drawLine(
-                color = SaafGreen,
-                start = Offset(size.width * 0.65f, size.height * 0.12f),
-                end = Offset(size.width * 0.65f, size.height * 0.28f),
-                strokeWidth = stroke.width,
-                cap = StrokeCap.Round,
-            )
-            drawLine(
-                color = SaafYellow,
-                start = Offset(size.width * 0.34f, size.height * 0.58f),
-                end = Offset(size.width * 0.66f, size.height * 0.58f),
-                strokeWidth = 5.dp.toPx(),
-                cap = StrokeCap.Round,
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = SaafInk,
             )
         }
     }

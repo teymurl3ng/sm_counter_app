@@ -7,6 +7,7 @@ import com.saaf.milkshop.application.operations.NativeDeliveriesFacade
 import com.saaf.milkshop.application.operations.NativeDeliveryDraft
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
+import com.saaf.milkshop.nativeui.DayStateBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -49,6 +50,14 @@ class NativeDeliveriesViewModel(
     private var sessionHandle: String? = null
     private val loadGate = SessionRequestGate()
     val state: StateFlow<NativeDeliveriesState> = _state.asStateFlow()
+
+    init {
+        scope.launch {
+            DayStateBus.changes.collect {
+                if (sessionHandle != null) refresh()
+            }
+        }
+    }
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle && _state.value !is NativeDeliveriesState.Idle) return

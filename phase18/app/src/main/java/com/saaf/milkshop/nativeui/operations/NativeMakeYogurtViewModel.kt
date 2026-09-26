@@ -7,6 +7,7 @@ import com.saaf.milkshop.application.operations.NativeMakeYogurtFacade
 import com.saaf.milkshop.application.operations.NativeMakeYogurtReceipt
 import com.saaf.milkshop.application.operations.NativeMakeYogurtRequest
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.DayStateBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -38,6 +39,14 @@ class NativeMakeYogurtViewModel(
     private val _state = MutableStateFlow<NativeMakeYogurtState>(NativeMakeYogurtState.Idle)
     private var sessionHandle: String? = null
     val state: StateFlow<NativeMakeYogurtState> = _state.asStateFlow()
+
+    init {
+        scope.launch {
+            DayStateBus.changes.collect {
+                if (sessionHandle != null) refresh()
+            }
+        }
+    }
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle && _state.value !is NativeMakeYogurtState.Idle) return

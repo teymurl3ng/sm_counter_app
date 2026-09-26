@@ -6,6 +6,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerWorkContext
 import com.saaf.milkshop.application.owner.NativeOwnerWorkFacade
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
+import com.saaf.milkshop.nativeui.DayStateBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -51,6 +52,14 @@ class NativeOwnerWorkViewModel(
     private var sessionHandle: String? = null
     private val loadGate = SessionRequestGate()
     val state: StateFlow<NativeOwnerWorkState> = _state.asStateFlow()
+
+    init {
+        scope.launch {
+            DayStateBus.changes.collect {
+                if (sessionHandle != null) refresh()
+            }
+        }
+    }
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle &&

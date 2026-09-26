@@ -7,6 +7,7 @@ import com.saaf.milkshop.application.vendorpayment.NativeVendorPaymentFacade
 import com.saaf.milkshop.application.vendorpayment.NativeVendorPaymentReceipt
 import com.saaf.milkshop.application.vendorpayment.NativeVendorPaymentRequest
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.DayStateBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -38,6 +39,14 @@ class NativeVendorPaymentViewModel(
     private val _state = MutableStateFlow<NativeVendorPaymentState>(NativeVendorPaymentState.Idle)
     private var sessionHandle: String? = null
     val state: StateFlow<NativeVendorPaymentState> = _state.asStateFlow()
+
+    init {
+        scope.launch {
+            DayStateBus.changes.collect {
+                if (sessionHandle != null) refresh()
+            }
+        }
+    }
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle && _state.value !is NativeVendorPaymentState.Idle) return

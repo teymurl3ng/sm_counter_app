@@ -9,6 +9,7 @@ import com.saaf.milkshop.application.operations.NativeRecordSpoilageRequest
 import com.saaf.milkshop.application.operations.NativeSpoilageProduct
 import com.saaf.milkshop.application.operations.NativeSpoilageReason
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.DayStateBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -44,6 +45,14 @@ class NativeRecordSpoilageViewModel(
     private val _state = MutableStateFlow<NativeRecordSpoilageState>(NativeRecordSpoilageState.Idle)
     private var sessionHandle: String? = null
     val state: StateFlow<NativeRecordSpoilageState> = _state.asStateFlow()
+
+    init {
+        scope.launch {
+            DayStateBus.changes.collect {
+                if (sessionHandle != null) refresh()
+            }
+        }
+    }
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle && _state.value !is NativeRecordSpoilageState.Idle) return

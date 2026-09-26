@@ -7,6 +7,7 @@ import com.saaf.milkshop.application.expense.NativeExpenseFacade
 import com.saaf.milkshop.application.expense.NativeExpenseReceipt
 import com.saaf.milkshop.application.expense.NativeExpenseRequest
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.DayStateBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -38,6 +39,14 @@ class NativeExpenseViewModel(
     private val _state = MutableStateFlow<NativeExpenseState>(NativeExpenseState.Idle)
     private var sessionHandle: String? = null
     val state: StateFlow<NativeExpenseState> = _state.asStateFlow()
+
+    init {
+        scope.launch {
+            DayStateBus.changes.collect {
+                if (sessionHandle != null) refresh()
+            }
+        }
+    }
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle && _state.value !is NativeExpenseState.Idle) return

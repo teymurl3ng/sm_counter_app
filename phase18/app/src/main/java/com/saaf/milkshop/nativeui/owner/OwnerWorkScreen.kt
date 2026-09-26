@@ -130,6 +130,7 @@ private fun ReadyWork(
                         roleLabel = "Owner",
                         businessDate = state.context.businessDate,
                         postingOpen = state.context.postingOpen,
+                        onDayStatusClick = { onOpenDestination(NativeOwnerWorkDestination.CashCountAndClose) },
                     )
                     WorkHomeBody(
                         context = state.context,
@@ -190,12 +191,22 @@ private fun WorkHomeBody(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         if (!context.postingOpen) {
-            Text(
-                text = "This business date is closed. Reopen is not available in this Owner Work slice yet.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.error,
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.testTag(NativeUiTags.OwnerWorkClosed),
-            )
+            ) {
+                Text(
+                    text = "This business date is closed. Reopen it from Cash count & close.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                )
+                Button(
+                    onClick = { onOpenDestination(NativeOwnerWorkDestination.CashCountAndClose) },
+                    modifier = Modifier.testTag(NativeUiTags.OwnerWorkClosedReopen),
+                ) {
+                    Text("Go to Cash count & close")
+                }
+            }
         }
         Row(
             Modifier

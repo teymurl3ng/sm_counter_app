@@ -12,6 +12,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
@@ -1944,6 +1945,8 @@ class NativeFoundationUiTest {
                     .isNotEmpty()
             }.getOrDefault(false)
         }
+        composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesScroll)
+            .performScrollToNode(hasText("Delivered"))
         composeRule.onAllNodesWithText("Delivered", substring = false)[0].performClick()
         composeRule.waitUntil(15_000) {
             runCatching {

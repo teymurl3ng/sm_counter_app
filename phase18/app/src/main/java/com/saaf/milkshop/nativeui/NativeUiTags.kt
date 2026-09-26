@@ -326,6 +326,7 @@ object NativeUiTags {
     const val OwnerWorkLoading = "owner_work_loading"
     const val OwnerWorkRetryLoad = "owner_work_retry_load"
     const val OwnerWorkClosed = "owner_work_closed"
+    const val OwnerWorkClosedReopen = "owner_work_closed_reopen"
     const val OwnerWorkPrimaryActions = "owner_work_primary_actions"
     const val OwnerWorkStockSection = "owner_work_stock_section"
     const val OwnerWorkMoneySection = "owner_work_money_section"
@@ -1067,6 +1068,7 @@ object NativeUiTags {
     fun opsDeliveryLink(deliveryId: Long): String = "ops_delivery_link_$deliveryId"
 
     const val OpsDeliveriesNewSection = "ops_deliveries_new_section"
+    const val OpsDeliveryExpand = "ops_delivery_expand"
     const val OpsDeliveriesScroll = "ops_deliveries_scroll"
     const val OpsDeliveryCustomerPick = "ops_delivery_customer_pick"
     const val OpsDeliveryProductPick = "ops_delivery_product_pick"

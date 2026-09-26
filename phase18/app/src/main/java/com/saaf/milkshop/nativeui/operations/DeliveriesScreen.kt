@@ -314,6 +314,7 @@ private fun NewDeliveryCard(
     state: NativeDeliveriesState.Ready,
     draftActions: NativeDeliveriesDraftActions,
 ) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
     var pickingCustomer by rememberSaveable { mutableStateOf(false) }
     var pickingProduct by rememberSaveable { mutableStateOf(false) }
     val selectedCustomer = state.context.customers.firstOrNull { it.id == state.draftCustomerId }
@@ -331,6 +332,17 @@ private fun NewDeliveryCard(
             Modifier.padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
+            if (!expanded) {
+                Button(
+                    onClick = { expanded = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
+                        .testTag(NativeUiTags.OpsDeliveryExpand),
+                ) {
+                    Text("＋ New delivery", fontWeight = FontWeight.SemiBold)
+                }
+            } else {
             Text("New delivery", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             OutlinedTextField(
                 value = selectedCustomer?.label ?: "",
@@ -413,6 +425,7 @@ private fun NewDeliveryCard(
                     if (state.creating) "Recording…" else "Record delivery",
                     fontWeight = FontWeight.SemiBold,
                 )
+            }
             }
         }
     }

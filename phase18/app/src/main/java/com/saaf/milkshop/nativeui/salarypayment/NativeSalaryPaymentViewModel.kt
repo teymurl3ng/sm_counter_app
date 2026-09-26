@@ -7,6 +7,7 @@ import com.saaf.milkshop.application.salarypayment.NativeSalaryPaymentFacade
 import com.saaf.milkshop.application.salarypayment.NativeSalaryPaymentReceipt
 import com.saaf.milkshop.application.salarypayment.NativeSalaryPaymentRequest
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.DayStateBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -38,6 +39,14 @@ class NativeSalaryPaymentViewModel(
     private val _state = MutableStateFlow<NativeSalaryPaymentState>(NativeSalaryPaymentState.Idle)
     private var sessionHandle: String? = null
     val state: StateFlow<NativeSalaryPaymentState> = _state.asStateFlow()
+
+    init {
+        scope.launch {
+            DayStateBus.changes.collect {
+                if (sessionHandle != null) refresh()
+            }
+        }
+    }
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle && _state.value !is NativeSalaryPaymentState.Idle) return

@@ -10,6 +10,7 @@ import com.saaf.milkshop.application.cashclose.NativeCashCloseFacade
 import com.saaf.milkshop.application.cashclose.NativeCashCloseReceipt
 import com.saaf.milkshop.application.cashclose.NativeCashCloseReopenSubmission
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.DayStateBus
 import com.saaf.milkshop.nativeui.SessionRequestGate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -113,6 +114,7 @@ class NativeCashCloseViewModel(
                     context = submission.refreshedContext,
                     receipt = submission.receipt,
                 )
+                DayStateBus.notifyDayStateChanged()
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
@@ -142,6 +144,7 @@ class NativeCashCloseViewModel(
                     context = submission.refreshedContext,
                     reopenSuccess = submission,
                 )
+                DayStateBus.notifyDayStateChanged()
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null

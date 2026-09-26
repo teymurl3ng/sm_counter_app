@@ -9,6 +9,7 @@ import com.saaf.milkshop.application.operations.NativeReceiveMilkReceipt
 import com.saaf.milkshop.application.operations.NativeReceiveMilkRequest
 import com.saaf.milkshop.application.operations.NativeReceiveMilkVendor
 import com.saaf.milkshop.domain.SecurityFailure
+import com.saaf.milkshop.nativeui.DayStateBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -42,6 +43,14 @@ class NativeReceiveMilkViewModel(
     private val _state = MutableStateFlow<NativeReceiveMilkState>(NativeReceiveMilkState.Idle)
     private var sessionHandle: String? = null
     val state: StateFlow<NativeReceiveMilkState> = _state.asStateFlow()
+
+    init {
+        scope.launch {
+            DayStateBus.changes.collect {
+                if (sessionHandle != null) refresh()
+            }
+        }
+    }
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle && _state.value !is NativeReceiveMilkState.Idle) return

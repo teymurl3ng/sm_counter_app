@@ -34,6 +34,7 @@ fun CashierScreenHeader(
     businessDate: String,
     postingOpen: Boolean,
     modifier: Modifier = Modifier,
+    onDayStatusClick: (() -> Unit)? = null,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -68,6 +69,8 @@ fun CashierScreenHeader(
                     )
                 }
                 Surface(
+                    onClick = { onDayStatusClick?.invoke() },
+                    enabled = onDayStatusClick != null,
                     color = if (postingOpen) SaafYellow else MaterialTheme.colorScheme.error,
                     contentColor = if (postingOpen) SaafInk else MaterialTheme.colorScheme.onError,
                     shape = RoundedCornerShape(999.dp),

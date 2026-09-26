@@ -35,6 +35,7 @@ import com.saaf.milkshop.nativeui.more.NativeMoreViewModel
 import com.saaf.milkshop.nativeui.operations.NativeDeliveriesState
 import com.saaf.milkshop.nativeui.operations.NativeDeliveriesViewModel
 import com.saaf.milkshop.nativeui.theme.SaafTheme
+import com.saaf.milkshop.nativeui.operations.NativeDeliveriesDraftActions
 
 /**
  * Cashier-authenticated preview host: Sell / Collect / Activity / More.
@@ -298,6 +299,15 @@ fun CashierPreviewHost(
                         state = deliveriesState,
                         onRetry = deliveriesViewModel::refresh,
                         onMarkDelivered = deliveriesViewModel::markDelivered,
+                        draftActions = NativeDeliveriesDraftActions(
+                            selectCustomer = deliveriesViewModel::selectDraftCustomer,
+                            selectProduct = deliveriesViewModel::selectDraftProduct,
+                            setQuantity = deliveriesViewModel::updateDraftQuantity,
+                            setRoute = deliveriesViewModel::updateDraftRoute,
+                            setNotes = deliveriesViewModel::updateDraftNotes,
+                            create = deliveriesViewModel::createDelivery,
+                        ),
+                        onArchive = deliveriesViewModel::archiveDelivery,
                         onLinkSale = deliveriesViewModel::linkSale,
                         onBackToMore = {
                             deliveriesViewModel.close()

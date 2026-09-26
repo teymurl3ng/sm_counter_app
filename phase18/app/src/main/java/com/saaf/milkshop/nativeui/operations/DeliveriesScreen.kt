@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.operations.NativeDeliveryItem
+import com.saaf.milkshop.application.operations.NativeDeliveryReference
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
@@ -46,7 +47,22 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.getValue
+
+/** Draft editing callbacks for the create-delivery form, bundled for host wiring. */
+data class NativeDeliveriesDraftActions(
+    val selectCustomer: (Long?) -> Unit,
+    val selectProduct: (Long?) -> Unit,
+    val setQuantity: (String) -> Unit,
+    val setRoute: (String) -> Unit,
+    val setNotes: (String) -> Unit,
+    val create: () -> Unit,
+)
 
 @Composable
 fun DeliveriesScreen(
@@ -56,6 +72,8 @@ fun DeliveriesScreen(
     onRetry: () -> Unit,
     onMarkDelivered: (Long) -> Unit,
     onLinkSale: (Long, String) -> Unit,
+    draftActions: NativeDeliveriesDraftActions,
+    onArchive: (Long) -> Unit,
     onNavigate: (OperationsSection) -> Unit,
     onLeaveConfirmed: () -> Unit,
     modifier: Modifier = Modifier,
@@ -85,6 +103,8 @@ fun DeliveriesScreen(
                 state = state,
                 onMarkDelivered = onMarkDelivered,
                 onLinkSale = onLinkSale,
+                draftActions = draftActions,
+                onArchive = onArchive,
                 contentPadding = padding,
             )
         }
@@ -116,6 +136,8 @@ internal fun DeliveriesReadyContent(
     state: NativeDeliveriesState.Ready,
     onMarkDelivered: (Long) -> Unit,
     onLinkSale: (Long, String) -> Unit,
+    draftActions: NativeDeliveriesDraftActions,
+    onArchive: (Long) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
@@ -139,7 +161,8 @@ internal fun DeliveriesReadyContent(
             Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .testTag(NativeUiTags.OpsDeliveriesScroll),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             if (!state.context.postingOpen) {
@@ -189,6 +212,26 @@ internal fun DeliveriesReadyContent(
                     }
                 }
             }
+            if (state.lastCreatedId != null) {
+                Surface(
+                    tonalElevation = 2.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(NativeUiTags.OpsDeliveriesSuccess),
+                ) {
+                    Row(
+                        Modifier.padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(Icons.Outlined.CheckCircle, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            "Delivery recorded (#${state.lastCreatedId})",
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    }
+                }
+            }
             if (state.error != null) {
                 Text(
                     state.error,
@@ -196,6 +239,10 @@ internal fun DeliveriesReadyContent(
                     modifier = Modifier.testTag(NativeUiTags.OpsDeliveriesError),
                 )
             }
+            NewDeliveryCard(
+                state = state,
+                draftActions = draftActions,
+            )
             if (state.context.isEmpty) {
                 Surface(
                     tonalElevation = 1.dp,
@@ -244,20 +291,197 @@ internal fun DeliveriesReadyContent(
                         )
                     }
                 }
-                if (state.context.linkable.isNotEmpty()) {
-                    SectionLabel("Link a recorded sale")
-                    state.context.linkable.forEach { item ->
-                        LinkSaleCard(
-                            item = item,
-                            linking = state.linkingDeliveryId == item.deliveryId,
-                            busy = state.linkingDeliveryId != null || state.markingDeliveryId != null,
-                            onLinkSale = onLinkSale,
+            if (state.context.linkable.isNotEmpty()) {
+                SectionLabel("Link a recorded sale")
+                state.context.linkable.forEach { item ->
+                    LinkSaleCard(
+                        item = item,
+                        linking = state.linkingDeliveryId == item.deliveryId,
+                        busy = state.linkingDeliveryId != null || state.markingDeliveryId != null,
+                        onLinkSale = onLinkSale,
+                        onArchive = onArchive,
+                        archiving = state.archivingDeliveryId == item.deliveryId,
+                    )
+                }
+            }
+            }
+        }
+    }
+}
+
+@Composable
+private fun NewDeliveryCard(
+    state: NativeDeliveriesState.Ready,
+    draftActions: NativeDeliveriesDraftActions,
+) {
+    var pickingCustomer by rememberSaveable { mutableStateOf(false) }
+    var pickingProduct by rememberSaveable { mutableStateOf(false) }
+    val selectedCustomer = state.context.customers.firstOrNull { it.id == state.draftCustomerId }
+    val selectedProduct = state.context.products.firstOrNull { it.id == state.draftProductId }
+    val quantityValid = state.draftQuantity.toDoubleOrNull()?.let { it > 0 } == true
+    val canCreate = selectedCustomer != null && selectedProduct != null && quantityValid && !state.creating
+
+    Surface(
+        tonalElevation = 1.dp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(NativeUiTags.OpsDeliveriesNewSection),
+    ) {
+        Column(
+            Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text("New delivery", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            OutlinedTextField(
+                value = selectedCustomer?.label ?: "",
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Customer") },
+                placeholder = { Text("Choose a customer") },
+                singleLine = true,
+                enabled = !state.creating,
+                trailingIcon = {
+                    TextButton(
+                        onClick = { pickingCustomer = true },
+                        enabled = !state.creating,
+                        modifier = Modifier.testTag(NativeUiTags.OpsDeliveryCustomerPick),
+                    ) { Text("Pick") }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OutlinedTextField(
+                value = selectedProduct?.label ?: "",
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Product") },
+                placeholder = { Text("Choose a product") },
+                singleLine = true,
+                enabled = !state.creating,
+                trailingIcon = {
+                    TextButton(
+                        onClick = { pickingProduct = true },
+                        enabled = !state.creating,
+                        modifier = Modifier.testTag(NativeUiTags.OpsDeliveryProductPick),
+                    ) { Text("Pick") }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OutlinedTextField(
+                value = state.draftQuantity,
+                onValueChange = draftActions.setQuantity,
+                label = { Text("Quantity") },
+                placeholder = { Text("e.g. 5") },
+                singleLine = true,
+                enabled = !state.creating,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(NativeUiTags.OpsDeliveryQuantity),
+            )
+            OutlinedTextField(
+                value = state.draftRoute,
+                onValueChange = draftActions.setRoute,
+                label = { Text("Route (optional)") },
+                singleLine = true,
+                enabled = !state.creating,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(NativeUiTags.OpsDeliveryRoute),
+            )
+            OutlinedTextField(
+                value = state.draftNotes,
+                onValueChange = draftActions.setNotes,
+                label = { Text("Notes (optional)") },
+                enabled = !state.creating,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(NativeUiTags.OpsDeliveryNotes),
+            )
+            Button(
+                onClick = draftActions.create,
+                enabled = canCreate,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = SaafYellow,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp)
+                    .testTag(NativeUiTags.OpsDeliveryCreate),
+            ) {
+                Text(
+                    if (state.creating) "Recording…" else "Record delivery",
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+        }
+    }
+
+    if (pickingCustomer) {
+        NativeDeliveryPickerDialog(
+            title = "Choose customer",
+            options = state.context.customers,
+            selectedId = state.draftCustomerId,
+            onSelect = {
+                draftActions.selectCustomer(it)
+                pickingCustomer = false
+            },
+            onDismiss = { pickingCustomer = false },
+        )
+    }
+    if (pickingProduct) {
+        NativeDeliveryPickerDialog(
+            title = "Choose product",
+            options = state.context.products,
+            selectedId = state.draftProductId,
+            onSelect = {
+                draftActions.selectProduct(it)
+                pickingProduct = false
+            },
+            onDismiss = { pickingProduct = false },
+        )
+    }
+}
+
+@Composable
+private fun NativeDeliveryPickerDialog(
+    title: String,
+    options: List<NativeDeliveryReference>,
+    selectedId: Long?,
+    onSelect: (Long) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            LazyColumn(
+                Modifier
+                    .heightIn(max = 360.dp)
+                    .testTag(NativeUiTags.OpsDeliveryPickerList),
+            ) {
+                if (options.isEmpty()) {
+                    item { Text("Nothing available yet.", style = MaterialTheme.typography.bodyMedium) }
+                }
+                items(options, key = { it.id }) { option ->
+                    TextButton(
+                        onClick = { onSelect(option.id) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.opsDeliveryPickerOption(option.id)),
+                    ) {
+                        Text(
+                            option.label + if (option.id == selectedId) " ✓" else "",
+                            fontWeight = if (option.id == selectedId) FontWeight.SemiBold else null,
                         )
                     }
                 }
             }
-        }
-    }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text("Cancel") }
+        },
+    )
 }
 
 @Composable
@@ -266,6 +490,8 @@ private fun LinkSaleCard(
     linking: Boolean,
     busy: Boolean,
     onLinkSale: (Long, String) -> Unit,
+    onArchive: (Long) -> Unit,
+    archiving: Boolean,
 ) {
     var saleNumber by rememberSaveable(item.deliveryId) { mutableStateOf("") }
     Surface(
@@ -287,7 +513,7 @@ private fun LinkSaleCard(
             )
             OutlinedTextField(
                 value = saleNumber,
-                onValueChange = { saleNumber = it.filter(Char::isDigit).dropWhile { it == '0' }.take(15) },
+                onValueChange = { saleNumber = it.filter(Char::isDigit).dropWhile { zero -> zero == '0' }.take(15) },
                 label = { Text("Sale record number") },
                 singleLine = true,
                 enabled = !busy,
@@ -312,6 +538,18 @@ private fun LinkSaleCard(
                     if (linking) "Linking…" else "Link",
                     fontWeight = FontWeight.SemiBold,
                 )
+            }
+            if (!item.pending) {
+                OutlinedButton(
+                    onClick = { onArchive(item.deliveryId) },
+                    enabled = !busy,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
+                        .testTag(NativeUiTags.opsDeliveryArchive(item.deliveryId)),
+                ) {
+                    Text(if (archiving) "Removing…" else "Remove from active list")
+                }
             }
         }
     }

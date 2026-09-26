@@ -73,6 +73,7 @@ import com.saaf.milkshop.nativeui.operations.DeliveriesLoadingBody
 import com.saaf.milkshop.nativeui.operations.DeliveriesLoadFailureBody
 import com.saaf.milkshop.nativeui.operations.DeliveriesReadyContent
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
+import com.saaf.milkshop.nativeui.operations.NativeDeliveriesDraftActions
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.Locale
@@ -172,6 +173,8 @@ fun CashierDeliveriesEntryScreen(
     onRetry: () -> Unit,
     onMarkDelivered: (Long) -> Unit,
     onLinkSale: (Long, String) -> Unit,
+    draftActions: NativeDeliveriesDraftActions,
+    onArchive: (Long) -> Unit,
     onBackToMore: () -> Unit,
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
@@ -192,6 +195,8 @@ fun CashierDeliveriesEntryScreen(
                 state = state,
                 onMarkDelivered = onMarkDelivered,
                 onLinkSale = onLinkSale,
+                draftActions = draftActions,
+                onArchive = onArchive,
                 contentPadding = padding,
             )
         }

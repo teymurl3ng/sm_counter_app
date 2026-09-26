@@ -17,6 +17,7 @@ import com.saaf.milkshop.application.operations.NativeDeliveriesContext
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.operations.NativeDeliveriesDraftActions
 import com.saaf.milkshop.nativeui.operations.NativeDeliveriesState
 import com.saaf.milkshop.nativeui.owner.OwnerDeliveriesEntryScreen
 import com.saaf.milkshop.nativeui.theme.SaafTheme
@@ -62,6 +63,8 @@ class NativeOwnerDeliveriesEntryScreenContractTest {
                     },
                     onMarkDelivered = {},
             onLinkSale = { _, _ -> },
+            draftActions = NativeDeliveriesDraftActions({}, {}, {}, {}, {}, {}),
+            onArchive = {},
                     onBackToWork = {},
                     onNavigate = {},
                 )
@@ -86,6 +89,8 @@ class NativeOwnerDeliveriesEntryScreenContractTest {
                     onRetry = {},
                     onMarkDelivered = {},
             onLinkSale = { _, _ -> },
+            draftActions = NativeDeliveriesDraftActions({}, {}, {}, {}, {}, {}),
+            onArchive = {},
                     onBackToWork = {},
                     onNavigate = {},
                 )

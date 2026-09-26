@@ -11,6 +11,7 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.nativeui.theme.SaafTheme
+import com.saaf.milkshop.nativeui.operations.NativeDeliveriesDraftActions
 
 /**
  * Operations-authenticated preview host: Work/Deliveries/Attendance/More plus
@@ -173,6 +174,15 @@ fun OperationsPreviewHost(
                     state = deliveriesState,
                     onRetry = deliveriesViewModel::refresh,
                     onMarkDelivered = deliveriesViewModel::markDelivered,
+                    draftActions = NativeDeliveriesDraftActions(
+                        selectCustomer = deliveriesViewModel::selectDraftCustomer,
+                        selectProduct = deliveriesViewModel::selectDraftProduct,
+                        setQuantity = deliveriesViewModel::updateDraftQuantity,
+                        setRoute = deliveriesViewModel::updateDraftRoute,
+                        setNotes = deliveriesViewModel::updateDraftNotes,
+                        create = deliveriesViewModel::createDelivery,
+                    ),
+                    onArchive = deliveriesViewModel::archiveDelivery,
                     onLinkSale = deliveriesViewModel::linkSale,
                     onNavigate = navigateOps,
                     onLeaveConfirmed = onLeaveToWelcome,

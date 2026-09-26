@@ -46,6 +46,7 @@ import com.saaf.milkshop.nativeui.sale.NativeSaleViewModel
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import com.saaf.milkshop.nativeui.vendorpayment.NativeVendorPaymentState
 import com.saaf.milkshop.nativeui.vendorpayment.NativeVendorPaymentViewModel
+import com.saaf.milkshop.nativeui.operations.NativeDeliveriesDraftActions
 import java.time.LocalDate
 
 /**
@@ -415,6 +416,15 @@ fun ManagerPreviewHost(
                     state = deliveriesState,
                     onRetry = deliveriesViewModel::refresh,
                     onMarkDelivered = deliveriesViewModel::markDelivered,
+                    draftActions = NativeDeliveriesDraftActions(
+                        selectCustomer = deliveriesViewModel::selectDraftCustomer,
+                        selectProduct = deliveriesViewModel::selectDraftProduct,
+                        setQuantity = deliveriesViewModel::updateDraftQuantity,
+                        setRoute = deliveriesViewModel::updateDraftRoute,
+                        setNotes = deliveriesViewModel::updateDraftNotes,
+                        create = deliveriesViewModel::createDelivery,
+                    ),
+                    onArchive = deliveriesViewModel::archiveDelivery,
                         onLinkSale = deliveriesViewModel::linkSale,
                     onBackToWork = { returnManagerWorkHome() },
                     onNavigate = navigate,

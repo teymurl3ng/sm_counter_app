@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.saaf.milkshop.application.operations.NativeDeliveriesContext
 import com.saaf.milkshop.application.operations.NativeDeliveriesFacade
+import com.saaf.milkshop.application.operations.NativeDeliveryDraft
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
 import kotlinx.coroutines.CoroutineScope
@@ -25,6 +26,14 @@ sealed interface NativeDeliveriesState {
         val lastDeliveredId: Long? = null,
         val linkingDeliveryId: Long? = null,
         val lastLinkedId: Long? = null,
+        val archivingDeliveryId: Long? = null,
+        val draftCustomerId: Long? = null,
+        val draftProductId: Long? = null,
+        val draftQuantity: String = "",
+        val draftRoute: String = "",
+        val draftNotes: String = "",
+        val creating: Boolean = false,
+        val lastCreatedId: Long? = null,
         val error: String? = null,
         val refreshing: Boolean = false,
     ) : NativeDeliveriesState
@@ -122,6 +131,90 @@ class NativeDeliveriesViewModel(
                         linkingDeliveryId = null,
                         error = publicMessage(error),
                     )
+                }
+            }
+        }
+    }
+
+    fun selectDraftCustomer(id: Long?) {
+        val current = _state.value as? NativeDeliveriesState.Ready ?: return
+        _state.value = current.copy(draftCustomerId = id)
+    }
+
+    fun selectDraftProduct(id: Long?) {
+        val current = _state.value as? NativeDeliveriesState.Ready ?: return
+        _state.value = current.copy(draftProductId = id)
+    }
+
+    fun updateDraftQuantity(value: String) {
+        val current = _state.value as? NativeDeliveriesState.Ready ?: return
+        _state.value = current.copy(draftQuantity = value.filter { it.isDigit() || it == '.' })
+    }
+
+    fun updateDraftRoute(value: String) {
+        val current = _state.value as? NativeDeliveriesState.Ready ?: return
+        _state.value = current.copy(draftRoute = value)
+    }
+
+    fun updateDraftNotes(value: String) {
+        val current = _state.value as? NativeDeliveriesState.Ready ?: return
+        _state.value = current.copy(draftNotes = value)
+    }
+
+    fun createDelivery() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeDeliveriesState.Ready ?: return
+        if (current.creating || current.markingDeliveryId != null || current.linkingDeliveryId != null) return
+        _state.value = current.copy(creating = true, error = null, lastCreatedId = null)
+        scope.launch {
+            try {
+                val refreshed = withContext(Dispatchers.IO) {
+                    facade.createDelivery(
+                        session,
+                        NativeDeliveryDraft(
+                            customerAccountId = current.draftCustomerId,
+                            productId = current.draftProductId,
+                            quantity = current.draftQuantity,
+                            route = current.draftRoute,
+                            notes = current.draftNotes,
+                        ),
+                    )
+                }
+                _state.value = NativeDeliveriesState.Ready(
+                    context = refreshed,
+                    lastCreatedId = refreshed.today.firstOrNull()?.deliveryId
+                        ?: refreshed.earlier.firstOrNull()?.deliveryId,
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.SessionExpired) {
+                    sessionHandle = null
+                    _state.value = NativeDeliveriesState.Idle
+                    onSessionExpired()
+                } else {
+                    _state.value = current.copy(creating = false, error = publicMessage(error))
+                }
+            }
+        }
+    }
+
+    fun archiveDelivery(deliveryId: Long) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeDeliveriesState.Ready ?: return
+        if (current.archivingDeliveryId != null) return
+        _state.value = current.copy(archivingDeliveryId = deliveryId, error = null)
+        scope.launch {
+            try {
+                val refreshed = withContext(Dispatchers.IO) {
+                    facade.archiveDelivery(session, deliveryId)
+                }
+                _state.value = NativeDeliveriesState.Ready(context = refreshed)
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.SessionExpired) {
+                    sessionHandle = null
+                    _state.value = NativeDeliveriesState.Idle
+                    onSessionExpired()
+                } else {
+                    _state.value = current.copy(archivingDeliveryId = null, error = publicMessage(error))
                 }
             }
         }

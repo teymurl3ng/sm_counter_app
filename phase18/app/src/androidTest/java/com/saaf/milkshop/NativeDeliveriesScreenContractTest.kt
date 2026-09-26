@@ -2,7 +2,10 @@ package com.saaf.milkshop
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
@@ -18,7 +21,9 @@ import com.saaf.milkshop.application.operations.NativeDeliveryItem
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.application.operations.NativeDeliveryReference
 import com.saaf.milkshop.nativeui.operations.DeliveriesScreen
+import com.saaf.milkshop.nativeui.operations.NativeDeliveriesDraftActions
 import com.saaf.milkshop.nativeui.operations.NativeDeliveriesState
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertEquals
@@ -48,6 +53,8 @@ class NativeDeliveriesScreenContractTest {
             onMarkDelivered = { marked = it },
         )
         composeRule.onNodeWithTag(NativeUiTags.opsDelivery(77L)).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesScroll)
+            .performScrollToNode(hasTestTag(NativeUiTags.opsDeliveryMark(77L)))
         composeRule.onNodeWithTag(NativeUiTags.opsDeliveryMark(77L)).performClick()
         assertEquals(77L, marked)
     }
@@ -72,6 +79,8 @@ class NativeDeliveriesScreenContractTest {
             NativeDeliveriesState.Ready(context = contextWith(item(77L), linkable = listOf(item(77L)))),
             onLinkSale = { id, sale -> linked = id to sale },
         )
+        composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesScroll)
+            .performScrollToNode(hasTestTag(NativeUiTags.opsDeliveryLinkSection(77L)))
         composeRule.onNodeWithTag(NativeUiTags.opsDeliveryLinkSection(77L)).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.opsDeliveryLinkInput(77L))
             .performTextInput("42")
@@ -87,6 +96,8 @@ class NativeDeliveriesScreenContractTest {
             onLinkSale = { id, sale -> linked = id to sale },
         )
         // Non-digits are filtered out, leading zeros dropped: "a0c7" -> "7".
+        composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesScroll)
+            .performScrollToNode(hasTestTag(NativeUiTags.opsDeliveryLink(77L)))
         composeRule.onNodeWithTag(NativeUiTags.opsDeliveryLinkInput(77L))
             .performTextInput("a0c7")
         composeRule.onNodeWithTag(NativeUiTags.opsDeliveryLink(77L)).performClick()
@@ -100,10 +111,80 @@ class NativeDeliveriesScreenContractTest {
         assertEquals(77L to "7", linked)
     }
 
+    @Test
+    fun createDeliveryRecordsPhysicalLogisticsPlan() {
+        var created = false
+        setScreen(
+            state = NativeDeliveriesState.Ready(
+                context = contextWith(
+                    item(77L),
+                    linkable = listOf(item(77L)),
+                    customers = listOf(NativeDeliveryReference(5L, "Noor Store")),
+                    products = listOf(NativeDeliveryReference(9L, "Milk")),
+                ),
+                draftCustomerId = 5L,
+                draftProductId = 9L,
+                draftQuantity = "4",
+            ),
+            draftActions = draftActionsRecording(onCreate = { created = true }),
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesNewSection).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsDeliveryCreate).assertIsEnabled()
+        composeRule.onNodeWithTag(NativeUiTags.OpsDeliveryCreate).performClick()
+        assertTrue(created)
+    }
+
+    @Test
+    fun createDeliveryRequiresCustomerProductQuantity() {
+        var created = false
+        setScreen(
+            state = NativeDeliveriesState.Ready(
+                context = contextWith(
+                    customers = listOf(NativeDeliveryReference(5L, "Noor Store")),
+                    products = listOf(NativeDeliveryReference(9L, "Milk")),
+                ),
+            ),
+            draftActions = draftActionsRecording(onCreate = { created = true }),
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OpsDeliveryCreate).assertIsNotEnabled()
+        composeRule.onNodeWithTag(NativeUiTags.OpsDeliveryQuantity).performTextInput("3")
+        composeRule.onNodeWithTag(NativeUiTags.OpsDeliveryCreate).assertIsNotEnabled()
+        assertTrue(!created)
+    }
+
+    @Test
+    fun archiveDeliveryRemovesFromActiveList() {
+        var archived: Long? = null
+        val finished = item(31L).copy(pending = false)
+        setScreen(
+            state = NativeDeliveriesState.Ready(
+                context = contextWith(linkable = listOf(finished)),
+            ),
+            onArchive = { archived = it },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OpsDeliveriesScroll)
+            .performScrollToNode(hasTestTag(NativeUiTags.opsDeliveryArchive(31L)))
+        composeRule.onNodeWithTag(NativeUiTags.opsDeliveryArchive(31L)).performClick()
+        assertEquals(31L, archived)
+    }
+
+    private fun draftActionsRecording(
+        onCreate: () -> Unit,
+    ) = NativeDeliveriesDraftActions(
+        selectCustomer = {},
+        selectProduct = {},
+        setQuantity = {},
+        setRoute = {},
+        setNotes = {},
+        create = onCreate,
+    )
+
     private fun setScreen(
         state: NativeDeliveriesState,
         onMarkDelivered: (Long) -> Unit = {},
         onLinkSale: (Long, String) -> Unit = { _, _ -> },
+        draftActions: NativeDeliveriesDraftActions = NativeDeliveriesDraftActions({}, {}, {}, {}, {}, {}),
+        onArchive: (Long) -> Unit = {},
     ) {
         composeRule.setContent {
             SaafTheme {
@@ -120,6 +201,8 @@ class NativeDeliveriesScreenContractTest {
                     onRetry = {},
                     onMarkDelivered = onMarkDelivered,
                     onLinkSale = onLinkSale,
+                    draftActions = draftActions,
+                    onArchive = onArchive,
                     onNavigate = {},
                     onLeaveConfirmed = {},
                 )
@@ -140,12 +223,16 @@ class NativeDeliveriesScreenContractTest {
     private fun contextWith(
         vararg items: NativeDeliveryItem,
         linkable: List<NativeDeliveryItem> = emptyList(),
+        customers: List<NativeDeliveryReference> = emptyList(),
+        products: List<NativeDeliveryReference> = emptyList(),
     ) = NativeDeliveriesContext(
         businessDate = "2026-09-20",
         postingOpen = true,
         today = items.toList(),
         earlier = emptyList(),
         linkable = linkable,
+        customers = customers,
+        products = products,
     )
 
     private fun emptyContext() = NativeDeliveriesContext(

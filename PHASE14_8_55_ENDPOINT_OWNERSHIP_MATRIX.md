@@ -82,7 +82,7 @@ resume-setup action) with device contract tests. The 14.8.6 retirement precondit
 | `command.correctEvent` | NATIVE | mechanical: ids [correct, correctEvent, eventDetail, eventHistory, movePointLeft] -> application/cashclose/NativeCashCloseFacade.kt +14 more |
 | `command.correctOpeningState` | NATIVE | mechanical: ids [correctOpeningState, isFinite, mapObjects, movePointLeft, openingState] -> application/cashclose/NativeCashCloseFacade.kt +19 more |
 | `command.createCustomer` | NATIVE | mechanical: ids [createCustomer, strictPayload] -> application/owner/NativeOwnerCustomersFacade.kt +2 more |
-| `command.createDelivery` | NATIVE | mechanical: ids [create, optionalString, requiredDate, requiredDecimal, requiredNullableId] -> application/owner/NativeOwnerCustomersFacade.kt +30 more |
+| `command.createDelivery` | NATIVE (14.8.55c) | NATIVE | mechanical: ids [create, optionalString, requiredDate, requiredDecimal, requiredNullableId] -> application/owner/NativeOwnerCustomersFacade.kt +30 more |
 | `command.createEmployee` | NATIVE | mechanical: ids [createEmployee, strictPayload] -> application/owner/NativeOwnerEmployeesFacade.kt +2 more |
 | `command.createExpenseCategory` | NATIVE | mechanical: ids [createExpenseCategory, strictPayload] -> application/owner/NativeOwnerShopSettingsFacade.kt +1 more |
 | `command.createProduct` | NATIVE | mechanical: ids [createProduct] -> application/owner/NativeOwnerProductsFacade.kt +2 more |

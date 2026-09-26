@@ -1066,5 +1066,19 @@ object NativeUiTags {
 
     fun opsDeliveryLink(deliveryId: Long): String = "ops_delivery_link_$deliveryId"
 
+    const val OpsDeliveriesNewSection = "ops_deliveries_new_section"
+    const val OpsDeliveriesScroll = "ops_deliveries_scroll"
+    const val OpsDeliveryCustomerPick = "ops_delivery_customer_pick"
+    const val OpsDeliveryProductPick = "ops_delivery_product_pick"
+    const val OpsDeliveryPickerList = "ops_delivery_picker_list"
+    const val OpsDeliveryQuantity = "ops_delivery_quantity"
+    const val OpsDeliveryRoute = "ops_delivery_route"
+    const val OpsDeliveryNotes = "ops_delivery_notes"
+    const val OpsDeliveryCreate = "ops_delivery_create"
+
+    fun opsDeliveryPickerOption(optionId: Long): String = "ops_delivery_picker_option_$optionId"
+
+    fun opsDeliveryArchive(deliveryId: Long): String = "ops_delivery_archive_$deliveryId"
+
     fun opsMoreWorkRecord(eventId: Long): String = "ops_more_work_$eventId"
 }

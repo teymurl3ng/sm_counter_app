@@ -3,6 +3,7 @@ package com.saaf.milkshop.application.operations
 import com.saaf.milkshop.application.bridge.DeliveryBridgeCommandService
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
+import com.saaf.milkshop.domain.DeliveryInput
 import com.saaf.milkshop.domain.DeliveryService
 import com.saaf.milkshop.domain.UserSecurityService
 import java.math.BigDecimal
@@ -28,13 +29,57 @@ class NativeDeliveriesFacade(
         security.requirePermission(sessionHandle, AppPermission.DELIVERY)
         val businessDate = date.toString()
         val pending = pendingDeliveries(businessDate)
+        val customers = deliveryReferences().first
+        val products = deliveryReferences().second
         return NativeDeliveriesContext(
             businessDate = businessDate,
             postingOpen = !database.dailyCloseDao().isPostingClosed(businessDate),
             today = pending.filter { it.businessDate == businessDate },
             earlier = pending.filter { it.businessDate != businessDate },
             linkable = linkableDeliveries(businessDate),
+            customers = customers,
+            products = products,
         )
+    }
+
+    /**
+     * Creates a delivery (physical logistics plan) — the sale side is never
+     * touched here. Mirrors the hybrid validation: active customer, active
+     * product, positive quantity, open business day.
+     */
+    suspend fun createDelivery(
+        sessionHandle: String,
+        draft: NativeDeliveryDraft,
+        date: LocalDate = LocalDate.now(),
+    ): NativeDeliveriesContext {
+        val quantity = draft.quantity.trim().toDoubleOrNull()
+        require(quantity != null && quantity > 0) { "Quantity must be a positive number." }
+        val customerAccountId = draft.customerAccountId
+            ?: throw IllegalArgumentException("Choose a customer first.")
+        val productId = draft.productId
+            ?: throw IllegalArgumentException("Choose a product first.")
+        commands.create(
+            sessionHandle = sessionHandle,
+            input = DeliveryInput(
+                customerAccountId = customerAccountId,
+                productId = productId,
+                quantity = quantity,
+                route = draft.route.trim().takeIf { it.isNotEmpty() },
+                businessDate = date.toString(),
+                notes = draft.notes.trim().takeIf { it.isNotEmpty() },
+            ),
+        )
+        return load(sessionHandle, date)
+    }
+
+    /** Removes a finished (delivered/cancelled) delivery from the active list. */
+    suspend fun archiveDelivery(
+        sessionHandle: String,
+        deliveryId: Long,
+        date: LocalDate = LocalDate.now(),
+    ): NativeDeliveriesContext {
+        commands.archive(sessionHandle, deliveryId)
+        return load(sessionHandle, date)
     }
 
     /**
@@ -64,6 +109,7 @@ class NativeDeliveriesFacade(
         val items = mutableListOf<NativeDeliveryItem>()
         for (delivery in database.deliveryDao().activeDeliveries()) {
             if (delivery.saleEventId != null) continue
+            val status = database.deliveryDao().latestStatus(delivery.deliveryId)?.status
             val customer = database.accountDao().findById(delivery.customerAccountId)
             val product = database.productDao().findById(delivery.productId)
             val customerName = customer?.name
@@ -81,6 +127,7 @@ class NativeDeliveriesFacade(
                 route = delivery.route?.trim()?.takeIf { it.isNotEmpty() },
                 businessDate = delivery.businessDate,
                 isToday = delivery.businessDate == today,
+                pending = status == DeliveryService.STATUS_PENDING,
             )
         }
         return items.sortedWith(
@@ -88,6 +135,34 @@ class NativeDeliveriesFacade(
                 .thenByDescending { it.businessDate }
                 .thenBy { it.customerName.lowercase(Locale.US) },
         )
+    }
+
+    /** Active customers + non-archived products for the create-delivery pickers. */
+    private suspend fun deliveryReferences(): Pair<List<NativeDeliveryReference>, List<NativeDeliveryReference>> {
+        val customers = database.accountDao().findByCategory("Customer").mapNotNull { account ->
+            val profile = database.customerProfileDao().findByAccountId(account.accountId)
+            if (profile?.active == true) {
+                NativeDeliveryReference(
+                    id = account.accountId,
+                    label = account.name.removePrefix("Customer: ").trim()
+                        .ifBlank { "Customer #${account.accountId}" },
+                )
+            } else {
+                null
+            }
+        }
+        val products = database.productDao().all().mapNotNull { product ->
+            val profile = database.productProfileDao().findByProductId(product.productId)
+            if (profile?.archived == true) {
+                null
+            } else {
+                NativeDeliveryReference(
+                    id = product.productId,
+                    label = product.name.trim().ifBlank { "Product #${product.productId}" },
+                )
+            }
+        }
+        return customers to products
     }
 
     suspend fun markDelivered(
@@ -165,6 +240,20 @@ data class NativeDeliveryItem(
     val route: String?,
     val businessDate: String,
     val isToday: Boolean,
+    val pending: Boolean = true,
+)
+
+data class NativeDeliveryReference(
+    val id: Long,
+    val label: String,
+)
+
+data class NativeDeliveryDraft(
+    val customerAccountId: Long?,
+    val productId: Long?,
+    val quantity: String,
+    val route: String,
+    val notes: String,
 )
 
 data class NativeDeliveriesContext(
@@ -173,6 +262,8 @@ data class NativeDeliveriesContext(
     val today: List<NativeDeliveryItem>,
     val earlier: List<NativeDeliveryItem>,
     val linkable: List<NativeDeliveryItem> = emptyList(),
+    val customers: List<NativeDeliveryReference> = emptyList(),
+    val products: List<NativeDeliveryReference> = emptyList(),
 ) {
-    val isEmpty: Boolean get() = today.isEmpty() && earlier.isEmpty()
+    val isEmpty: Boolean get() = today.isEmpty() && earlier.isEmpty() && linkable.isEmpty()
 }

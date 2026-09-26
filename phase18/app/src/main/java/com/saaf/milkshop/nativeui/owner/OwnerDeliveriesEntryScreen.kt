@@ -13,6 +13,7 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.operations.DeliveriesLoadFailureBody
 import com.saaf.milkshop.nativeui.operations.DeliveriesLoadingBody
 import com.saaf.milkshop.nativeui.operations.DeliveriesReadyContent
+import com.saaf.milkshop.nativeui.operations.NativeDeliveriesDraftActions
 import com.saaf.milkshop.nativeui.operations.NativeDeliveriesState
 
 /**
@@ -26,6 +27,8 @@ fun OwnerDeliveriesEntryScreen(
     onRetry: () -> Unit,
     onMarkDelivered: (Long) -> Unit,
     onLinkSale: (Long, String) -> Unit,
+    draftActions: NativeDeliveriesDraftActions,
+    onArchive: (Long) -> Unit,
     onBackToWork: () -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier = Modifier,
@@ -59,6 +62,8 @@ fun OwnerDeliveriesEntryScreen(
                     state = state,
                     onMarkDelivered = onMarkDelivered,
                     onLinkSale = onLinkSale,
+                    draftActions = draftActions,
+                    onArchive = onArchive,
                     contentPadding = padding,
                 )
             }

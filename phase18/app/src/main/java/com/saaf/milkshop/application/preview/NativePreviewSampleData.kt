@@ -18,6 +18,8 @@ import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.domain.VendorManagementService
 import com.saaf.milkshop.domain.VendorPurchaseInput
 import com.saaf.milkshop.domain.VendorPurchaseService
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.time.LocalDate
 
 /**
@@ -29,6 +31,13 @@ import java.time.LocalDate
  * re-created or passphrase-reset on later launches.
  */
 object NativePreviewSampleData {
+    /**
+     * Serializes all seeding. Two role hosts can start near-simultaneously;
+     * without this lock their check-then-create fixture steps race and one
+     * dies on a UNIQUE constraint (accounts.name).
+     */
+    private val seedMutex = kotlinx.coroutines.sync.Mutex()
+
     /** Debug-only shared passphrase for the isolated preview package. Empty in release. */
     val PREVIEW_SHARED_PASSPHRASE: String
         get() = BuildConfig.NATIVE_PREVIEW_SHARED_PASSPHRASE
@@ -111,6 +120,26 @@ object NativePreviewSampleData {
         collectionFacade: NativeCollectionFacade,
         activityFacade: NativeActivityFacade,
         date: LocalDate = LocalDate.now(),
+    ): Result = seedMutex.withLock {
+        seedForSession(
+            database = database,
+            security = security,
+            sessionHandle = sessionHandle,
+            saleFacade = saleFacade,
+            collectionFacade = collectionFacade,
+            activityFacade = activityFacade,
+            date = date,
+        )
+    }
+
+    private suspend fun seedForSession(
+        database: MilkShopDatabase,
+        security: UserSecurityService,
+        sessionHandle: String,
+        saleFacade: NativeSaleFacade,
+        collectionFacade: NativeCollectionFacade,
+        activityFacade: NativeActivityFacade,
+        date: LocalDate,
     ): Result {
         if (!fixturesEnabled) return Result(false, false, 0, false)
         val errors = mutableListOf<String>()

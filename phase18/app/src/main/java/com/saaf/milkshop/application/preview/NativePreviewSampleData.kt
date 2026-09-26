@@ -158,7 +158,7 @@ object NativePreviewSampleData {
             ensureSampleCustomers(database)
         }
         val seededVendor = step("vendor", false) {
-            ensureSampleVendor(database)
+            ensureSampleVendorLocked(database)
         }
         val seededStock = step("milk stock", false) {
             ensureMilkStock(database, date)
@@ -208,7 +208,12 @@ object NativePreviewSampleData {
         date = date,
     )
 
-    suspend fun ensureSampleVendor(database: MilkShopDatabase): Boolean {
+    /** Locked entry point — the login path runs alongside host seeding. */
+    suspend fun ensureSampleVendor(database: MilkShopDatabase): Boolean = seedMutex.withLock {
+        ensureSampleVendorLocked(database)
+    }
+
+    private suspend fun ensureSampleVendorLocked(database: MilkShopDatabase): Boolean {
         if (!fixturesEnabled) return false
         val exists = database.accountDao().findByCategory("Vendor").any {
             it.name.removePrefix("Vendor: ").trim().equals(PREVIEW_VENDOR_NAME, ignoreCase = true)
@@ -221,12 +226,17 @@ object NativePreviewSampleData {
         return !exists
     }
 
-    /**
-     * Links an Operator account to a Salary employee so My attendance can Mark present.
-     */
+    /** Locked entry point — the login path runs alongside host seeding. */
     suspend fun ensurePreviewOperatorEmployeeLink(
         database: MilkShopDatabase,
         loginName: String = PREVIEW_OPERATOR_LOGIN,
+    ): Boolean = seedMutex.withLock {
+        ensurePreviewOperatorEmployeeLinkLocked(database, loginName)
+    }
+
+    private suspend fun ensurePreviewOperatorEmployeeLinkLocked(
+        database: MilkShopDatabase,
+        loginName: String,
     ): Boolean {
         if (!fixturesEnabled) return false
         val user = database.appUserDao().findByLoginName(loginName) ?: return false

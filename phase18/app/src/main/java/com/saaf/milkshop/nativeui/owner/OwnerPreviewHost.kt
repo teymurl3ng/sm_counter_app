@@ -713,6 +713,7 @@ fun OwnerPreviewHost(
                     onRetry = saleViewModel::refresh,
                     onClearFeedback = saleViewModel::clearFeedback,
                     onRecordSale = saleViewModel::record,
+                    onSendAsDelivery = saleViewModel::sendAsDelivery,
                     onBackToWork = { returnOwnerWorkHome() },
                     onNavigate = navigateOwner,
                 )

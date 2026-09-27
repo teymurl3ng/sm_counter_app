@@ -197,10 +197,6 @@ class NativeActivityFacade(
         return if (normalized.scale() <= 0) normalized.toPlainString() else "%.2f".format(Locale.US, value)
     }
 
-    private fun formatClock(createdAt: String): String = try {
-        val instant = OffsetDateTime.parse(createdAt)
-        instant.toLocalTime().format(DateTimeFormatter.ofPattern("h:mm a", Locale.US))
-    } catch (_: Exception) {
-        createdAt.takeLast(8)
-    }
+    private fun formatClock(createdAt: String): String =
+        com.saaf.milkshop.application.AppTimeFormats.clock(createdAt)
 }

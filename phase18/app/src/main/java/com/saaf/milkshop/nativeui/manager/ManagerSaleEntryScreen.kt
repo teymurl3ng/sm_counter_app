@@ -31,6 +31,7 @@ fun ManagerSaleEntryScreen(
     onRetry: () -> Unit,
     onClearFeedback: () -> Unit,
     onRecordSale: (NativeSaleRequest) -> Unit,
+    onSendAsDelivery: (String) -> Unit,
     onBackToWork: () -> Unit,
     onNavigate: (ManagerSection) -> Unit,
     modifier: Modifier = Modifier,
@@ -76,6 +77,7 @@ fun ManagerSaleEntryScreen(
                     state = state,
                     onClearFeedback = onClearFeedback,
                     onRecordSale = onRecordSale,
+                    onSendAsDelivery = onSendAsDelivery,
                     leaveGuard = leaveGuard,
                     contentPadding = padding,
                 )

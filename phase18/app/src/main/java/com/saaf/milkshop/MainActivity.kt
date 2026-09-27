@@ -68,6 +68,7 @@ import com.saaf.milkshop.presentation.transactions.SaleTransactionAction
 import com.saaf.milkshop.presentation.transactions.SaleViewModel
 import com.saaf.milkshop.presentation.transactions.SimpleTransactionsViewModel
 import com.saaf.milkshop.presentation.transactions.SimpleTransactionActions
+import com.saaf.milkshop.nativeui.common.lockPortraitOnPhones
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -217,6 +218,7 @@ class MainActivity : ComponentActivity() {
     private var authenticationStarted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        lockPortraitOnPhones()
         appShellUi = AppShellUi(this, appPreferences)
         appShellUi.applySavedTheme()
         super.onCreate(savedInstanceState)

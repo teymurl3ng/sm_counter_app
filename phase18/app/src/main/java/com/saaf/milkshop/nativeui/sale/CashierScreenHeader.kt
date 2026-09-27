@@ -36,6 +36,7 @@ fun CashierScreenHeader(
     postingOpen: Boolean,
     modifier: Modifier = Modifier,
     onDayStatusClick: (() -> Unit)? = null,
+    showDayChip: Boolean = true,
 ) {
     val dayStatusAction = onDayStatusClick ?: LocalDayStatusAction.current
     Surface(
@@ -70,18 +71,20 @@ fun CashierScreenHeader(
                         color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.82f),
                     )
                 }
-                Surface(
-                    onClick = { dayStatusAction?.invoke() },
-                    enabled = dayStatusAction != null,
-                    color = if (postingOpen) SaafYellow else MaterialTheme.colorScheme.error,
-                    contentColor = if (postingOpen) SaafInk else MaterialTheme.colorScheme.onError,
-                    shape = RoundedCornerShape(999.dp),
-                ) {
-                    Text(
-                        text = if (postingOpen) "Open" else "Closed",
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                        style = MaterialTheme.typography.labelLarge,
-                    )
+                if (showDayChip) {
+                    Surface(
+                        onClick = { dayStatusAction?.invoke() },
+                        enabled = dayStatusAction != null,
+                        color = if (postingOpen) SaafYellow else MaterialTheme.colorScheme.error,
+                        contentColor = if (postingOpen) SaafInk else MaterialTheme.colorScheme.onError,
+                        shape = RoundedCornerShape(999.dp),
+                    ) {
+                        Text(
+                            text = if (postingOpen) "Open" else "Closed",
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            style = MaterialTheme.typography.labelLarge,
+                        )
+                    }
                 }
             }
         }

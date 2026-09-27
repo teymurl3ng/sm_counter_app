@@ -97,6 +97,7 @@ fun AdminRecordsScreen(
         AdminRecordsDestination.Hub -> AdminRecordsHubScreen(
             snackbarHostState = snackbarHostState,
             identity = identity,
+            postingOpen = (ownerMoreState as? NativeOwnerMoreState.Ready)?.context?.postingOpen ?: true,
             onOpenBusiness = onOpenBusiness,
             onOpenSecurityHistory = onOpenSecurityHistory,
             onNavigate = onNavigate,
@@ -177,6 +178,7 @@ fun AdminRecordsScreen(
 private fun AdminRecordsHubScreen(
     snackbarHostState: SnackbarHostState,
     identity: NativeSignedInIdentity,
+    postingOpen: Boolean,
     onOpenBusiness: () -> Unit,
     onOpenSecurityHistory: () -> Unit,
     onNavigate: (AdminSection) -> Unit,
@@ -194,7 +196,7 @@ private fun AdminRecordsHubScreen(
                 displayName = identity.displayName,
                 roleLabel = "Admin",
                 businessDate = LocalDate.now().toString(),
-                postingOpen = true,
+                postingOpen = postingOpen,
             )
             Column(
                 Modifier

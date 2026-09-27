@@ -229,6 +229,7 @@ fun CashierPreviewHost(
                 onRetry = saleViewModel::refresh,
                 onClearFeedback = saleViewModel::clearFeedback,
                 onRecordSale = saleViewModel::record,
+                    onSendAsDelivery = saleViewModel::sendAsDelivery,
                 onLeaveConfirmed = onLeaveToWelcome,
                 onNavigate = navigateCashier,
             )

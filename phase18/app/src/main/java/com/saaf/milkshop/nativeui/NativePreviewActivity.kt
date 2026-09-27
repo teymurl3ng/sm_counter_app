@@ -125,6 +125,7 @@ import com.saaf.milkshop.quickunlock.AndroidQuickUnlockRecordStore
 import com.saaf.milkshop.quickunlock.QuickUnlockService
 import com.saaf.milkshop.nativeui.common.LocalDayStatusAction
 import com.saaf.milkshop.nativeui.owner.NativeOwnerWorkDestination
+import com.saaf.milkshop.nativeui.common.lockPortraitOnPhones
 import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.launch
 
@@ -177,6 +178,7 @@ class NativePreviewActivity : FragmentActivity() {
     private val saleViewModel by viewModels<NativeSaleViewModel> {
         NativeSaleViewModel.Factory(
             facade = saleFacade,
+            deliveriesFacade = deliveriesFacade,
             onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
         )
     }
@@ -338,6 +340,7 @@ class NativePreviewActivity : FragmentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        lockPortraitOnPhones()
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         val app = application as MilkShopApplication
@@ -911,16 +914,19 @@ private fun NativeFoundationPreview(
             onContinue = { destination = PreviewDestination.Access },
         )
         PreviewDestination.Access -> {
-        val dayStatusAction: (() -> Unit)? = {
-            when {
-                showingOwner -> {
-                    ownerSection = OwnerSection.Work
-                    ownerWorkViewModel.openDestination(NativeOwnerWorkDestination.CashCountAndClose)
-                }
-                showingManager -> managerSection = ManagerSection.Close
-                else -> Unit
-            }
+        val dayStatusAction: (() -> Unit)? = when {
+            showingOwner -> ({
+                ownerSection = OwnerSection.Work
+                ownerWorkViewModel.openDestination(NativeOwnerWorkDestination.CashCountAndClose)
+            })
+            showingManager -> ({
+                managerSection = ManagerSection.Close
+            })
+            else -> null
         }
+        // Owner/Manager: tapping the day chip anywhere opens the close flow.
+        // Cashier/Operator/Admin: null — their chip is a passive indicator
+        // (they cannot close or reopen the day).
         CompositionLocalProvider(LocalDayStatusAction provides dayStatusAction) {
             if (showingOwner) {
                 val authenticated = authenticationState as NativeAuthenticationState.Authenticated

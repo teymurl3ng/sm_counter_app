@@ -107,6 +107,8 @@ import com.saaf.milkshop.nativeui.theme.SaafYellow
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import java.util.Locale
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.foundation.layout.FlowRow
 
 private enum class EntryMode { Quantity, Amount }
 private enum class PaymentChoice { PaidNow, CustomerAccount }
@@ -120,6 +122,7 @@ fun CashierSaleScreen(
     onRetry: () -> Unit,
     onClearFeedback: () -> Unit,
     onRecordSale: (NativeSaleRequest) -> Unit,
+    onSendAsDelivery: (String) -> Unit,
     onLeaveConfirmed: () -> Unit,
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
@@ -163,6 +166,7 @@ fun CashierSaleScreen(
                 state = state,
                 onClearFeedback = onClearFeedback,
                 onRecordSale = onRecordSale,
+                onSendAsDelivery = onSendAsDelivery,
                 leaveGuard = leaveGuard,
                 contentPadding = padding,
             )
@@ -210,6 +214,7 @@ internal fun SaleEntryContent(
     state: NativeSaleState.Ready,
     onClearFeedback: () -> Unit,
     onRecordSale: (NativeSaleRequest) -> Unit,
+    onSendAsDelivery: (String) -> Unit,
     leaveGuard: EntryLeaveGuard,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
@@ -284,6 +289,7 @@ internal fun SaleEntryContent(
                 modifier = Modifier
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
+                    .testTag(NativeUiTags.CashierSaleScroll)
                     .padding(horizontal = 16.dp, vertical = 12.dp),
             ) {
                 if (!context.postingOpen) {
@@ -446,6 +452,25 @@ internal fun SaleEntryContent(
                         error = false,
                         tag = NativeUiTags.CashierSaleSuccess,
                     )
+                    Spacer(Modifier.height(8.dp))
+                }
+                state.deliveryFollowUp?.let { followUp ->
+                    if (!followUp.sent) {
+                        SaleDeliveryFollowUpCard(
+                            customerName = followUp.customerName,
+                            productName = followUp.productName,
+                            quantity = followUp.quantity,
+                            sending = followUp.sending,
+                            error = followUp.error,
+                            onSend = onSendAsDelivery,
+                        )
+                    } else {
+                        StatusMessage(
+                            message = "Delivery recorded for sale #${followUp.saleEventId}",
+                            error = false,
+                            tag = NativeUiTags.CashierSaleDeliveryLinked,
+                        )
+                    }
                     Spacer(Modifier.height(8.dp))
                 }
                 state.error?.let { error ->
@@ -1415,4 +1440,57 @@ private fun androidx.compose.foundation.layout.RowScope.CashierNavigationItem(
             unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
     )
+}
+
+@Composable
+private fun SaleDeliveryFollowUpCard(
+    customerName: String,
+    productName: String,
+    quantity: String,
+    sending: Boolean,
+    error: String?,
+    onSend: (String) -> Unit,
+) {
+    var route by rememberSaveable { mutableStateOf("") }
+    Surface(
+        tonalElevation = 1.dp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(NativeUiTags.CashierSaleDeliveryCard),
+    ) {
+        Column(
+            Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text("Deliver to $customerName", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text("$productName · $quantity", style = MaterialTheme.typography.bodyMedium)
+            OutlinedTextField(
+                value = route,
+                onValueChange = { route = it },
+                label = { Text("Route (optional)") },
+                singleLine = true,
+                enabled = !sending,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(NativeUiTags.CashierSaleDeliveryRoute),
+            )
+            Button(
+                onClick = { onSend(route) },
+                enabled = !sending,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = SaafYellow,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp)
+                    .testTag(NativeUiTags.CashierSaleDeliverySend),
+            ) {
+                Text(if (sending) "Recording…" else "Send as delivery", fontWeight = FontWeight.SemiBold)
+            }
+            error?.let {
+                Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+            }
+        }
+    }
 }

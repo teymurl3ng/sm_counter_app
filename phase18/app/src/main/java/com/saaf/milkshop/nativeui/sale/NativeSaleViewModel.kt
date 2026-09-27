@@ -6,6 +6,9 @@ import com.saaf.milkshop.application.sale.NativeSaleContext
 import com.saaf.milkshop.application.sale.NativeSaleFacade
 import com.saaf.milkshop.application.sale.NativeSaleReceipt
 import com.saaf.milkshop.application.sale.NativeSaleRequest
+import com.saaf.milkshop.application.sale.NativeSaleEntryMode
+import com.saaf.milkshop.application.sale.NativeSalePaymentKind
+import com.saaf.milkshop.application.operations.NativeDeliveriesFacade
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
 import com.saaf.milkshop.nativeui.DayStateBus
@@ -19,6 +22,22 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/**
+ * Follow-up offer shown after a credit sale: one delivery, born-linked to
+ * the sale, pre-filled with the sale's customer/product/quantity.
+ */
+data class NativeSaleDeliveryFollowUp(
+    val customerId: Long,
+    val productId: Long,
+    val customerName: String,
+    val productName: String,
+    val quantity: String,
+    val saleEventId: Long,
+    val sending: Boolean = false,
+    val sent: Boolean = false,
+    val error: String? = null,
+)
+
 sealed interface NativeSaleState {
     data object Idle : NativeSaleState
     data object Loading : NativeSaleState
@@ -26,6 +45,7 @@ sealed interface NativeSaleState {
         val context: NativeSaleContext,
         val saving: Boolean = false,
         val receipt: NativeSaleReceipt? = null,
+        val deliveryFollowUp: NativeSaleDeliveryFollowUp? = null,
         val error: String? = null,
         val refreshing: Boolean = false,
     ) : NativeSaleState
@@ -34,6 +54,7 @@ sealed interface NativeSaleState {
 
 class NativeSaleViewModel(
     private val facade: NativeSaleFacade,
+    private val deliveriesFacade: NativeDeliveriesFacade,
     private val onSessionExpired: () -> Unit,
 ) : ViewModel() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -55,6 +76,54 @@ class NativeSaleViewModel(
         sessionHandle = nextSessionHandle
         refresh()
     }
+
+    /**
+     * Creates a delivery born-linked to the just-recorded credit sale, so the
+     * customer pick on a credit sale can dispatch the driver without manual
+     * matching later. Customer/product/quantity flow from the sale request.
+     */
+    /** Sends the follow-up delivery born-linked to the recorded credit sale. */
+    fun sendAsDelivery(route: String) {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeSaleState.Ready ?: return
+        val followUp = current.deliveryFollowUp ?: return
+        if (followUp.sending || followUp.sent) return
+        _state.value = current.copy(
+            deliveryFollowUp = followUp.copy(sending = true, error = null),
+        )
+        scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    deliveriesFacade.createDeliveryForSale(
+                        sessionHandle = session,
+                        customerAccountId = followUp.customerId,
+                        productId = followUp.productId,
+                        quantity = followUp.quantity,
+                        saleEventId = followUp.saleEventId,
+                        route = route.ifBlank { null },
+                    )
+                }
+                val latest = _state.value as? NativeSaleState.Ready ?: return@launch
+                _state.value = latest.copy(
+                    deliveryFollowUp = followUp.copy(sending = false, sent = true),
+                )
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.SessionExpired) {
+                    sessionHandle = null
+                    _state.value = NativeSaleState.Idle
+                    onSessionExpired()
+                } else {
+                    val latest = _state.value as? NativeSaleState.Ready
+                    if (latest != null) {
+                        _state.value = latest.copy(
+                            deliveryFollowUp = followUp.copy(sending = false, error = publicMessage(error)),
+                        )
+                    }
+                }
+            }
+        }
+    }
+
 
     fun refresh() {
         val session = sessionHandle ?: return
@@ -86,12 +155,16 @@ class NativeSaleViewModel(
         val current = _state.value as? NativeSaleState.Ready ?: return
         if (current.saving) return
         _state.value = current.copy(saving = true, receipt = null, error = null)
+        val followUp = deliveryFollowUpFor(current.context, request)
         scope.launch {
             try {
                 val submission = withContext(Dispatchers.IO) { facade.record(session, request) }
                 _state.value = NativeSaleState.Ready(
                     context = submission.refreshedContext,
                     receipt = submission.receipt,
+                    deliveryFollowUp = followUp?.copy(
+                        saleEventId = submission.receipt.eventId,
+                    ),
                 )
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
@@ -103,6 +176,27 @@ class NativeSaleViewModel(
                 }
             }
         }
+    }
+
+
+    private fun deliveryFollowUpFor(
+        context: NativeSaleContext,
+        request: NativeSaleRequest,
+    ): NativeSaleDeliveryFollowUp? {
+        if (request.paymentKind != NativeSalePaymentKind.CUSTOMER_ACCOUNT) return null
+        if (request.entryMode != NativeSaleEntryMode.QUANTITY) return null
+        val customerId = request.customerAccountId ?: return null
+        val productName = context.products.firstOrNull { it.productId == request.productId }?.name
+            ?: return null
+        val customerName = context.customers.firstOrNull { it.accountId == customerId }?.name ?: ""
+        return NativeSaleDeliveryFollowUp(
+            customerId = customerId,
+            productId = request.productId,
+            customerName = customerName,
+            productName = productName,
+            quantity = request.enteredValue.toString(),
+            saleEventId = 0L,
+        )
     }
 
     fun clearFeedback() {
@@ -140,12 +234,13 @@ class NativeSaleViewModel(
 
     class Factory(
         private val facade: NativeSaleFacade,
+        private val deliveriesFacade: NativeDeliveriesFacade,
         private val onSessionExpired: () -> Unit,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             require(modelClass.isAssignableFrom(NativeSaleViewModel::class.java))
-            return NativeSaleViewModel(facade, onSessionExpired) as T
+            return NativeSaleViewModel(facade, deliveriesFacade, onSessionExpired) as T
         }
     }
 }

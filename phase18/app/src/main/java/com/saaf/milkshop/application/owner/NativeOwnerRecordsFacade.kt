@@ -645,21 +645,17 @@ class NativeOwnerRecordsFacade(
 
     private fun formatPaisa(paisa: Long): String = "PKR ${formatMoney(paisa)}"
 
-    private fun formatDateTime(value: String): String = runCatching {
-        OffsetDateTime.parse(value).format(DateTimeFormatter.ofPattern("yyyy-MM-dd · h:mm a", Locale.US))
-    }.getOrDefault(value)
+    private fun formatDateTime(value: String): String =
+        com.saaf.milkshop.application.AppTimeFormats.dateTime(value)
 
     private fun formatQuantity(value: Double): String =
         BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
 
     private fun formatClock(createdAt: String, occurredAt: String): String {
-        val clock = runCatching {
-            OffsetDateTime.parse(createdAt).toLocalTime()
-                .format(DateTimeFormatter.ofPattern("h:mm a", Locale.US))
-        }.getOrNull()
+        val clock = com.saaf.milkshop.application.AppTimeFormats.clock(createdAt)
         return when {
-            clock != null && occurredAt.isNotBlank() -> "$occurredAt · $clock"
-            clock != null -> clock
+            clock != createdAt && occurredAt.isNotBlank() -> "$occurredAt · $clock"
+            clock != createdAt -> clock
             else -> occurredAt.ifBlank { createdAt }
         }
     }

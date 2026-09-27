@@ -53,6 +53,7 @@ import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
+import com.saaf.milkshop.application.AppTimeFormats
 
 /**
  * Backup surface — Drive vault + local export/restore under HostedScaffold for Owner,
@@ -731,7 +732,7 @@ private fun OwnerBackupRestoreScreen(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             OwnerBackupFact("File", inspection.fileName)
-                            OwnerBackupFact("Created", inspection.createdAt)
+                            OwnerBackupFact("Created", AppTimeFormats.dateTime(inspection.createdAt))
                             OwnerBackupFact("Format", inspection.formatVersion.toString())
                             OwnerBackupFact(
                                 "Contains users",
@@ -1127,7 +1128,7 @@ private fun OwnerBackupCloudScreen(
                             ) {
                                 Text(remote.name, fontWeight = FontWeight.SemiBold)
                                 Text(
-                                    remote.createdAt,
+                                    AppTimeFormats.dateTime(remote.createdAt),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -1183,7 +1184,7 @@ private fun OwnerBackupCloudScreen(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             OwnerBackupFact("File", inspected.fileName)
-                            OwnerBackupFact("Created", inspected.createdAt)
+                            OwnerBackupFact("Created", AppTimeFormats.dateTime(inspected.createdAt))
                             OwnerBackupFact("Format", inspected.formatVersion.toString())
                             OwnerBackupFact(
                                 "Security state",

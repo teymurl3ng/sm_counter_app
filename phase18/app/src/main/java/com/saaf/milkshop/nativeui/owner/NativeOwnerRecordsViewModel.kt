@@ -11,6 +11,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerRecordsSnapshot
 import com.saaf.milkshop.application.owner.NativeRecordsGroup
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
+import com.saaf.milkshop.nativeui.DayStateBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -73,6 +74,14 @@ class NativeOwnerRecordsViewModel(
     private var detailGeneration = 0L
     private val loadGate = SessionRequestGate()
     val state: StateFlow<NativeOwnerRecordsState> = _state.asStateFlow()
+
+    init {
+        scope.launch {
+            DayStateBus.changes.collect {
+                if (sessionHandle != null) refresh()
+            }
+        }
+    }
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle &&

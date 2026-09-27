@@ -58,6 +58,7 @@ import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
+import com.saaf.milkshop.application.AppTimeFormats
 import java.util.Locale
 
 /**
@@ -356,7 +357,7 @@ private fun OwnerUsersRolesDetailScreen(
                 OwnerUserFact("Role", row.roleLabel)
                 OwnerUserFact("Status", row.statusLabel)
                 OwnerUserFact("Setup required", if (row.setupRequired) "Yes" else "No")
-                OwnerUserFact("Created at", detail.createdAt)
+                OwnerUserFact("Created at", AppTimeFormats.dateTime(detail.createdAt))
                 OwnerUserFact("Updated at", detail.updatedAt)
                 detail.disabledAt?.takeIf { it.isNotBlank() }?.let {
                     OwnerUserFact("Disabled at", it)

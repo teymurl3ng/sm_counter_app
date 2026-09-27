@@ -39,6 +39,7 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
 import com.saaf.milkshop.application.owner.NativeOwnerSecurityAuditDetail
 import com.saaf.milkshop.application.owner.NativeOwnerSecurityAuditRow
+import com.saaf.milkshop.application.AppTimeFormats
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -224,7 +225,7 @@ private fun OwnerSecurityHistoryDetailScreen(
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.testTag(NativeUiTags.OwnerSecurityHistoryDetailAction),
                 )
-                OwnerSecurityAuditFact("Occurred at", row.occurredAt)
+                OwnerSecurityAuditFact("Occurred at", AppTimeFormats.dateTime(row.occurredAt))
                 OwnerSecurityAuditFact("Result", row.resultCode)
                 OwnerSecurityAuditFact("Actor", row.actorLabel)
                 detail.reasonCode?.takeIf { it.isNotBlank() }?.let {

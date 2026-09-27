@@ -412,6 +412,7 @@ private fun PreviewDestination(
                 roleLabel = formatCashierRoleLabel(identity.role.wireValue),
                 businessDate = java.time.LocalDate.now().toString(),
                 postingOpen = true,
+                showDayChip = false,
             )
             Column(
                 Modifier

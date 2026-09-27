@@ -7,6 +7,7 @@ import com.saaf.milkshop.application.activity.NativeActivityFacade
 import com.saaf.milkshop.application.activity.NativeActivityRecordDetail
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
+import com.saaf.milkshop.nativeui.DayStateBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -40,6 +41,14 @@ class NativeActivityViewModel(
     private var detailGeneration = 0L
     private val loadGate = SessionRequestGate()
     val state: StateFlow<NativeActivityState> = _state.asStateFlow()
+
+    init {
+        scope.launch {
+            DayStateBus.changes.collect {
+                if (sessionHandle != null) refresh()
+            }
+        }
+    }
 
     fun open(nextSessionHandle: String) {
         if (

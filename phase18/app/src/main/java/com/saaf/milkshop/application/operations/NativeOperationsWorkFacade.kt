@@ -92,10 +92,8 @@ class NativeOperationsWorkFacade(
     private fun formatQuantity(value: Double): String =
         BigDecimal.valueOf(value).setScale(1, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
 
-    private fun formatClock(iso: String): String = runCatching {
-        OffsetDateTime.parse(iso).toLocalTime()
-            .format(DateTimeFormatter.ofPattern("h:mm a", Locale.getDefault()))
-    }.getOrElse { iso }
+    private fun formatClock(iso: String): String =
+        com.saaf.milkshop.application.AppTimeFormats.clock(iso)
 
     private fun formatAttendanceStatus(raw: String): String =
         raw.replace('_', ' ').replaceFirstChar { it.titlecase(Locale.US) }

@@ -83,6 +83,7 @@ fun OwnerReportsScreen(
                         roleLabel = formatCashierRoleLabel(identity.role.wireValue),
                         businessDate = "",
                         postingOpen = true,
+                        showDayChip = false,
                     )
                     Box(
                         Modifier
@@ -100,6 +101,7 @@ fun OwnerReportsScreen(
                         roleLabel = formatCashierRoleLabel(identity.role.wireValue),
                         businessDate = "",
                         postingOpen = true,
+                        showDayChip = false,
                     )
                     Column(
                         Modifier

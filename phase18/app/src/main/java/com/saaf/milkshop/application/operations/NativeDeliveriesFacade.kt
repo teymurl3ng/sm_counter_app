@@ -72,6 +72,37 @@ class NativeDeliveriesFacade(
         return load(sessionHandle, date)
     }
 
+    /**
+     * Creates a delivery born-linked to an already-recorded credit sale.
+     * Customer/product/quantity come from the sale, so no matching is
+     * needed later. Validates via the shared bridge command service.
+     */
+    suspend fun createDeliveryForSale(
+        sessionHandle: String,
+        customerAccountId: Long,
+        productId: Long,
+        quantity: String,
+        saleEventId: Long,
+        route: String? = null,
+        date: LocalDate = LocalDate.now(),
+    ): NativeDeliveriesContext {
+        val parsed = quantity.trim().toDoubleOrNull()
+        require(parsed != null && parsed > 0) { "Quantity must be a positive number." }
+        commands.create(
+            sessionHandle = sessionHandle,
+            input = DeliveryInput(
+                customerAccountId = customerAccountId,
+                productId = productId,
+                quantity = parsed,
+                route = route?.trim()?.takeIf { it.isNotEmpty() },
+                businessDate = date.toString(),
+                saleEventId = saleEventId,
+                notes = null,
+            ),
+        )
+        return load(sessionHandle, date)
+    }
+
     /** Removes a finished (delivered/cancelled) delivery from the active list. */
     suspend fun archiveDelivery(
         sessionHandle: String,

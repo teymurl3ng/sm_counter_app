@@ -26,6 +26,7 @@ import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.domain.StoreIdentityInput
 import com.saaf.milkshop.domain.VendorProfileInput
 import com.saaf.milkshop.domain.YieldPolicyInput
+import com.saaf.milkshop.nativeui.DayStateBus
 import android.net.Uri
 import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
@@ -68,6 +69,14 @@ class NativeOwnerMoreViewModel internal constructor(
         OwnerSecurityHistoryController(dependencies.securityHistory, runtime)
     private val backupController = OwnerBackupController(dependencies.backup, runtime)
     val state: StateFlow<NativeOwnerMoreState> = _state.asStateFlow()
+
+    init {
+        scope.launch {
+            DayStateBus.changes.collect {
+                if (sessionHandle != null) refresh()
+            }
+        }
+    }
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle &&

@@ -644,7 +644,10 @@ private fun AccessFrame(
                 .safeDrawingPadding()
                 .imePadding(),
         ) {
-            Surface(color = SaafGreen, contentColor = MaterialTheme.colorScheme.onPrimary) {
+            Surface(
+                color = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ) {
                 Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 16.dp)) {
                     if (onBack != null) {
                         TextButton(

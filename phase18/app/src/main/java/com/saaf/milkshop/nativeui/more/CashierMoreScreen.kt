@@ -471,10 +471,10 @@ private fun MorePersonalSecurityScreen(
                         onRemove(secret)
                     },
                     modifier = Modifier.testTag(NativeUiTags.MoreSecurityRemoveConfirm),
-                ) { Text("Remove") }
+                ) { Text("Discard and leave") }
             },
             dismissButton = {
-                TextButton(onClick = onCancelRemove) { Text("Keep") }
+                TextButton(onClick = onCancelRemove) { Text("Keep editing") }
             },
         )
     }

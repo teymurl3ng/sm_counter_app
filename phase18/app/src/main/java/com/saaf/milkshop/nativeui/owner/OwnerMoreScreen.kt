@@ -883,10 +883,10 @@ private fun OwnerMorePersonalSecurityScreen(
                         onRemove(secret)
                     },
                     modifier = Modifier.testTag(NativeUiTags.OwnerMoreSecurityRemoveConfirm),
-                ) { Text("Remove") }
+                ) { Text("Discard and leave") }
             },
             dismissButton = {
-                TextButton(onClick = onCancelRemove) { Text("Keep") }
+                TextButton(onClick = onCancelRemove) { Text("Keep editing") }
             },
         )
     }

@@ -483,7 +483,10 @@ internal fun OperationsNavigation(
     selected: OperationsSection,
     onNavigate: (OperationsSection) -> Unit,
 ) {
-    NavigationBar {
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.background,
+        tonalElevation = 0.dp,
+    ) {
         OpsNavItem(
             selected = selected == OperationsSection.Work,
             label = "Work",
@@ -526,13 +529,15 @@ private fun androidx.compose.foundation.layout.RowScope.OpsNavItem(
     NavigationBarItem(
         selected = selected,
         onClick = onClick,
-        modifier = Modifier.testTag(tag),
+        modifier = Modifier.testTag(tag).heightIn(min = 56.dp),
         icon = { Icon(icon, contentDescription = label) },
         label = { Text(label) },
         colors = NavigationBarItemDefaults.colors(
             selectedIconColor = MaterialTheme.colorScheme.onPrimary,
             selectedTextColor = MaterialTheme.colorScheme.primary,
             indicatorColor = MaterialTheme.colorScheme.primary,
+            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
     )
 }

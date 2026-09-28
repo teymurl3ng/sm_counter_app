@@ -495,10 +495,10 @@ private fun ManagerMorePersonalSecurityScreen(
                     passphrase = ""
                     pin = ""
                     onRemove(secret)
-                }) { Text("Remove") }
+                }) { Text("Discard and leave") }
             },
             dismissButton = {
-                TextButton(onClick = onCancelRemove) { Text("Keep") }
+                TextButton(onClick = onCancelRemove) { Text("Keep editing") }
             },
         )
     }

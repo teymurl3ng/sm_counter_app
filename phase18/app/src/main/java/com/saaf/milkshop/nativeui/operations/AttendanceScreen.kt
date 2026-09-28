@@ -37,6 +37,7 @@ import com.saaf.milkshop.application.operations.NativeAttendanceLink
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
+import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
@@ -252,11 +253,11 @@ private fun LinkedBody(
                     enabled = postingOpen && !saving,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = SaafYellow,
-                        contentColor = MaterialTheme.colorScheme.onSurface,
+                        contentColor = SaafInk,
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 52.dp)
+                        .heightIn(min = 56.dp)
                         .testTag(NativeUiTags.OpsAttendanceMarkPresent),
                 ) {
                     Icon(Icons.Outlined.EventAvailable, contentDescription = null)

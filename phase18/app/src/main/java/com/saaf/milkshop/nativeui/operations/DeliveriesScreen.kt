@@ -41,6 +41,7 @@ import com.saaf.milkshop.application.operations.NativeDeliveryReference
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
+import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
@@ -426,11 +427,11 @@ private fun NewDeliveryCard(
                 enabled = canCreate,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SaafYellow,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
+                    contentColor = SaafInk,
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp)
+                    .heightIn(min = 56.dp)
                     .testTag(NativeUiTags.OpsDeliveryCreate),
             ) {
                 Text(
@@ -503,7 +504,8 @@ private fun NativeDeliveryPickerDialog(
                 }
             }
         },
-        confirmButton = {
+        confirmButton = {},
+        dismissButton = {
             TextButton(onClick = onDismiss) { Text("Cancel") }
         },
     )
@@ -552,11 +554,11 @@ private fun LinkSaleCard(
                 enabled = !busy && saleNumber.isNotBlank(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SaafYellow,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
+                    contentColor = SaafInk,
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp)
+                    .heightIn(min = 56.dp)
                     .testTag(NativeUiTags.opsDeliveryLink(item.deliveryId)),
             ) {
                 Text(
@@ -640,11 +642,11 @@ private fun DeliveryCard(
                 enabled = canMark,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SaafYellow,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
+                    contentColor = SaafInk,
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp)
+                    .heightIn(min = 56.dp)
                     .testTag(NativeUiTags.opsDeliveryMark(item.deliveryId)),
             ) {
                 Text(

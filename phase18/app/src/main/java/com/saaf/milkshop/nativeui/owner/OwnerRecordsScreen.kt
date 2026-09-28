@@ -914,7 +914,7 @@ private fun RecordsCorrectionDiscardDialog(leaveGuard: EntryLeaveGuard) {
             TextButton(
                 onClick = leaveGuard::confirmDiscard,
                 modifier = Modifier.testTag(NativeUiTags.OwnerRecordsCorrectionDiscardConfirm),
-            ) { Text("Discard") }
+            ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(

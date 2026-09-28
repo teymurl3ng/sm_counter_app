@@ -60,6 +60,7 @@ import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
+import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
@@ -338,11 +339,11 @@ internal fun RecordSpoilageReadyContent(
                         enabled = canRecord,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = SaafYellow,
-                            contentColor = MaterialTheme.colorScheme.onSurface,
+                            contentColor = SaafInk,
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 52.dp)
+                            .heightIn(min = 56.dp)
                             .testTag(NativeUiTags.OpsRecordSpoilageRecord),
                     ) {
                         Text(
@@ -382,7 +383,7 @@ internal fun RecordSpoilageDiscardDialog(leaveGuard: EntryLeaveGuard) {
             TextButton(
                 onClick = leaveGuard::confirmDiscard,
                 modifier = Modifier.testTag(NativeUiTags.OpsRecordSpoilageDiscardConfirm),
-            ) { Text("Discard") }
+            ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(
@@ -487,7 +488,7 @@ private fun SuccessCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Outlined.CheckCircle, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Spoilage recorded", style = MaterialTheme.typography.titleMedium)
+                Text("Spoilage recorded", style = MaterialTheme.typography.headlineMedium)
             }
             Text("Record #${receipt.eventId}")
             Text(

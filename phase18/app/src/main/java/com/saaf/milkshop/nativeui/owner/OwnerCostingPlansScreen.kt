@@ -1085,7 +1085,7 @@ internal fun OwnerCostingPlansDiscardDialog(
             TextButton(
                 onClick = leaveGuard::confirmDiscard,
                 modifier = Modifier.testTag(discardTag),
-            ) { Text("Discard") }
+            ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(

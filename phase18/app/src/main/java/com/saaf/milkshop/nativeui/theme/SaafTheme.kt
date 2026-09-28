@@ -130,6 +130,39 @@ private val SaafTypography = Typography(
         fontSize = 12.sp,
         lineHeight = 16.sp,
     ),
+    // Remaining slots keep Material sizes but must render in Manrope —
+    // leaving them default leaks Roboto next to the brand font on the same
+    // screen (headlineSmall/titleSmall/bodySmall are used ~50× across UI).
+    headlineLarge = TextStyle(
+        fontFamily = SaafFontFamily,
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 32.sp,
+        lineHeight = 40.sp,
+    ),
+    headlineSmall = TextStyle(
+        fontFamily = SaafFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 24.sp,
+        lineHeight = 32.sp,
+    ),
+    titleSmall = TextStyle(
+        fontFamily = SaafFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+    ),
+    bodySmall = TextStyle(
+        fontFamily = SaafFontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+    ),
+    labelSmall = TextStyle(
+        fontFamily = SaafFontFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 11.sp,
+        lineHeight = 16.sp,
+    ),
 )
 
 @Composable

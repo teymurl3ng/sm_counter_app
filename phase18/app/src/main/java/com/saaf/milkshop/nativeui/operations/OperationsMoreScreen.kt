@@ -383,10 +383,10 @@ private fun OpsMorePersonalSecurityScreen(
                         onRemove(secret)
                     },
                     modifier = Modifier.testTag(NativeUiTags.OpsMoreSecurityRemoveConfirm),
-                ) { Text("Remove") }
+                ) { Text("Discard and leave") }
             },
             dismissButton = {
-                TextButton(onClick = onCancelRemove) { Text("Keep") }
+                TextButton(onClick = onCancelRemove) { Text("Keep editing") }
             },
         )
     }

@@ -31,6 +31,7 @@ import androidx.compose.material.icons.outlined.Notes
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -68,6 +69,8 @@ import com.saaf.milkshop.application.expense.NativeExpensePaymentAccount
 import com.saaf.milkshop.application.expense.NativeExpenseReceipt
 import com.saaf.milkshop.application.expense.NativeExpenseRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.theme.SaafInk
+import com.saaf.milkshop.nativeui.theme.SaafYellow
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
@@ -408,6 +411,10 @@ private fun ExpenseForm(
                 .fillMaxWidth()
                 .heightIn(min = 56.dp)
                 .testTag(NativeUiTags.ExpenseRecord),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = SaafYellow,
+            contentColor = SaafInk,
+        ),
         ) {
             Text(
                 if (state.saving) "Recording…" else "Save expense",

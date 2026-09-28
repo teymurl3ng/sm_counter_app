@@ -1585,7 +1585,7 @@ private fun ReviewDock(
                 enabled = enabled,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 54.dp)
+                    .heightIn(min = 56.dp)
                     .testTag(buttonTag),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -1610,7 +1610,6 @@ internal fun CashierNavigation(
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.background,
         tonalElevation = 0.dp,
-        modifier = Modifier.navigationBarsPadding(),
     ) {
         CashierNavigationItem(
             icon = Icons.Outlined.PointOfSale,
@@ -1704,11 +1703,11 @@ private fun SaleDeliveryFollowUpCard(
                 enabled = !sending,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SaafYellow,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
+                    contentColor = SaafInk,
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp)
+                    .heightIn(min = 56.dp)
                     .testTag(NativeUiTags.CashierSaleDeliverySend),
             ) {
                 Text(if (sending) "Recording…" else "Send as delivery", fontWeight = FontWeight.SemiBold)

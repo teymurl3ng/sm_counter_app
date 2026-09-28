@@ -81,8 +81,10 @@ object LegacyUid {
         "Expense: Other" to "Operating Expense",
     )
 
-    private fun seedUid(table: String, name: String): String =
-        "u1_seed_" + table + "_" + name.map { if (it.isLetterOrDigit()) it else '_' }
+    private fun seedUid(table: String, name: String): String = buildString {
+        append("u1_seed_").append(table).append('_')
+        name.forEach { char -> append(if (char.isLetterOrDigit()) char else '_') }
+    }
 
     private fun deterministic(table: String, vararg fields: Any?): String {
         val canonical = buildString {

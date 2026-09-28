@@ -151,50 +151,18 @@ fun WelcomeScreen(
 }
 
 /**
- * Brand mark from the Counter Ledger design: light line-art milk vessel with
- * freshness lines and the golden purity drop on a green tile, overlaid with
- * the yellow verification-check badge.
+ * Canonical brand mark: the exact launcher-icon foreground (milk vessel,
+ * golden purity drop, verification badge on the green tile). One drawing for
+ * the app icon and the sign-in screen — no wrapper frames, no drift.
  */
 @Composable
 private fun SaafBrandMark() {
     val description = stringResource(R.string.native_brand_mark)
-    Box(
-        modifier = Modifier
-            .size(92.dp)
-            .semantics { contentDescription = description },
-    ) {
-        Surface(
-            color = SaafGreen,
-            shape = RoundedCornerShape(20.dp),
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                Image(
-                    painter = painterResource(R.drawable.saaf_brand_mark),
-                    contentDescription = null,
-                    modifier = Modifier.size(56.dp),
-                )
-            }
-        }
-        Surface(
-            color = SaafYellow,
-            contentColor = SaafInk,
-            shape = CircleShape,
-            border = androidx.compose.foundation.BorderStroke(2.dp, SaafIvory),
-            modifier = Modifier
-                .size(26.dp)
-                .align(Alignment.BottomEnd)
-                .offset(x = (-2).dp, y = (-2).dp),
-        ) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                Icon(
-                    Icons.Outlined.Check,
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp),
-                )
-            }
-        }
-    }
+    Image(
+        painter = painterResource(R.drawable.ic_launcher_foreground),
+        contentDescription = description,
+        modifier = Modifier.size(120.dp),
+    )
 }
 
 /** Animated ledger-ready sequence from the Counter Ledger welcome design. */

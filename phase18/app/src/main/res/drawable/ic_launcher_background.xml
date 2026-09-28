@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Saaf Milk launcher background: warm ivory canvas with the cream inner ring
-     (adapted from the Counter Ledger adaptive-icon design, 512-unit SVG scaled
-     to the 108dp adaptive canvas at 0.2109375). -->
+<!-- Saaf Milk launcher background: full-bleed brand green so the masked icon
+     edge matches the foreground tile — no ivory frame around the logo. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
     <path
-        android:fillColor="#F4F1E8"
+        android:fillColor="#173F32"
         android:pathData="M0,0 h108 v108 h-108 z" />
-    <path
-        android:fillColor="#FFFDF7"
-        android:strokeColor="#E3DEC8"
-        android:strokeWidth="0.84"
-        android:pathData="M13.5,54 a40.5,40.5 0 1 0 81,0 a40.5,40.5 0 1 0 -81,0 z" />
 </vector>

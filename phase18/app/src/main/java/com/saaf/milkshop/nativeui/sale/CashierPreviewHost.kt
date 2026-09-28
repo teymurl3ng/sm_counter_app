@@ -93,9 +93,6 @@ fun CashierPreviewHost(
                     database = database,
                     security = security,
                     sessionHandle = sessionHandle,
-                    saleFacade = saleFacade,
-                    collectionFacade = collectionFacade,
-                    activityFacade = activityFacade,
                 )
             }.getOrNull()
             sampleReady = true
@@ -106,7 +103,7 @@ fun CashierPreviewHost(
                 )
             } else if (sample?.changed == true) {
                 snackbarHostState.showSnackbar(
-                    message = "Sample shop data ready for Sell, Collect, and Activity.",
+                    message = "Sample shop setup ready — products, customers, and accounts.",
                     duration = SnackbarDuration.Short,
                 )
             }
@@ -230,6 +227,7 @@ fun CashierPreviewHost(
                 onClearFeedback = saleViewModel::clearFeedback,
                 onRecordSale = saleViewModel::record,
                     onSendAsDelivery = saleViewModel::sendAsDelivery,
+                    onStartNextSale = saleViewModel::startNextSale,
                 onLeaveConfirmed = onLeaveToWelcome,
                 onNavigate = navigateCashier,
             )

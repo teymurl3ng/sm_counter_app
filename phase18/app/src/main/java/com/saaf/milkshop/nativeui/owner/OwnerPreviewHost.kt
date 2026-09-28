@@ -133,9 +133,6 @@ fun OwnerPreviewHost(
                         database = database,
                         security = security,
                         sessionHandle = sessionHandle,
-                        saleFacade = saleFacade,
-                        collectionFacade = collectionFacade,
-                        activityFacade = activityFacade,
                     )
                 }
             }.getOrElse { error ->
@@ -158,7 +155,7 @@ fun OwnerPreviewHost(
                     val message = if (sample.seededStaffAccounts > 0) {
                         NativePreviewSampleData.previewAccountsHint()
                     } else {
-                        "Sample shop data ready for Owner Overview."
+                        "Sample shop setup ready — products, customers, and accounts."
                     }
                     snackbarHostState.showSnackbar(
                         message = message,
@@ -714,6 +711,7 @@ fun OwnerPreviewHost(
                     onClearFeedback = saleViewModel::clearFeedback,
                     onRecordSale = saleViewModel::record,
                     onSendAsDelivery = saleViewModel::sendAsDelivery,
+                    onStartNextSale = saleViewModel::startNextSale,
                     onBackToWork = { returnOwnerWorkHome() },
                     onNavigate = navigateOwner,
                 )

@@ -311,6 +311,7 @@ fun ManagerPreviewHost(
                     onClearFeedback = saleViewModel::clearFeedback,
                     onRecordSale = saleViewModel::record,
                     onSendAsDelivery = saleViewModel::sendAsDelivery,
+                    onStartNextSale = saleViewModel::startNextSale,
                     onBackToWork = { returnManagerWorkHome() },
                     onNavigate = navigate,
                 )

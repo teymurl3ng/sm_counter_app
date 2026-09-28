@@ -123,6 +123,7 @@ fun CashierSaleScreen(
     onClearFeedback: () -> Unit,
     onRecordSale: (NativeSaleRequest) -> Unit,
     onSendAsDelivery: (String) -> Unit,
+    onStartNextSale: () -> Unit,
     onLeaveConfirmed: () -> Unit,
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
@@ -167,6 +168,7 @@ fun CashierSaleScreen(
                 onClearFeedback = onClearFeedback,
                 onRecordSale = onRecordSale,
                 onSendAsDelivery = onSendAsDelivery,
+                onStartNextSale = onStartNextSale,
                 leaveGuard = leaveGuard,
                 contentPadding = padding,
             )
@@ -215,6 +217,7 @@ internal fun SaleEntryContent(
     onClearFeedback: () -> Unit,
     onRecordSale: (NativeSaleRequest) -> Unit,
     onSendAsDelivery: (String) -> Unit,
+    onStartNextSale: () -> Unit,
     leaveGuard: EntryLeaveGuard,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
@@ -257,14 +260,14 @@ internal fun SaleEntryContent(
             PaymentChoice.CustomerAccount -> selectedCustomer != null
         }
 
+    // The receipt posts on top of the untouched form (Square-style "new sale"
+    // flow): product, quantity, mode, payment, and customer carry into the
+    // next sale until the cashier changes them — a repeat credit sale needs
+    // no re-taps, and nothing flips while the follow-up card is on screen.
+    // Only the leave guard clears so leaving after a sale doesn't warn about
+    // changes that are already saved.
     LaunchedEffect(state.receipt?.eventId) {
         if (state.receipt != null) {
-            selectedProductId = context.products.firstOrNull()?.productId
-            entryMode = EntryMode.Quantity
-            payment = PaymentChoice.PaidNow
-            entryValue = "2.0"
-            selectedCustomerId = null
-            secondaryDetailsExpanded = false
             leaveGuard.clear()
         }
     }
@@ -470,6 +473,18 @@ internal fun SaleEntryContent(
                             error = false,
                             tag = NativeUiTags.CashierSaleDeliveryLinked,
                         )
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
+                if (state.receipt != null) {
+                    TextButton(
+                        onClick = onStartNextSale,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 44.dp)
+                            .testTag(NativeUiTags.CashierSaleNext),
+                    ) {
+                        Text("Record next sale", fontWeight = FontWeight.SemiBold)
                     }
                     Spacer(Modifier.height(8.dp))
                 }

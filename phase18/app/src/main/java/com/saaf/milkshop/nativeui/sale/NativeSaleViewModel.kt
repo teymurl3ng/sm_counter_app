@@ -12,6 +12,7 @@ import com.saaf.milkshop.application.operations.NativeDeliveriesFacade
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
 import com.saaf.milkshop.nativeui.DayStateBus
+import com.saaf.milkshop.nativeui.DataChangeBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 /**
  * Follow-up offer shown after a credit sale: one delivery, born-linked to
@@ -107,6 +109,7 @@ class NativeSaleViewModel(
                 _state.value = latest.copy(
                     deliveryFollowUp = followUp.copy(sending = false, sent = true),
                 )
+                DataChangeBus.notifyDataChanged()
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
@@ -166,6 +169,10 @@ class NativeSaleViewModel(
                         saleEventId = submission.receipt.eventId,
                     ),
                 )
+                // Records/Activity hold the receipt context, not this VM — a
+                // self-refresh here would wipe the posted receipt and the
+                // delivery follow-up card.
+                DataChangeBus.notifyDataChanged()
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
@@ -184,24 +191,50 @@ class NativeSaleViewModel(
         request: NativeSaleRequest,
     ): NativeSaleDeliveryFollowUp? {
         if (request.paymentKind != NativeSalePaymentKind.CUSTOMER_ACCOUNT) return null
-        if (request.entryMode != NativeSaleEntryMode.QUANTITY) return null
         val customerId = request.customerAccountId ?: return null
-        val productName = context.products.firstOrNull { it.productId == request.productId }?.name
+        val product = context.products.firstOrNull { it.productId == request.productId }
             ?: return null
+        val quantityText = when (request.entryMode) {
+            NativeSaleEntryMode.QUANTITY -> request.enteredValue.toString()
+            NativeSaleEntryMode.AMOUNT -> {
+                val rate = product.ratePaisaPerUnit / 100.0
+                if (rate <= 0.0) return null
+                followUpQuantityText(request.enteredValue / rate)
+            }
+        }
         val customerName = context.customers.firstOrNull { it.accountId == customerId }?.name ?: ""
         return NativeSaleDeliveryFollowUp(
             customerId = customerId,
             productId = request.productId,
             customerName = customerName,
-            productName = productName,
-            quantity = request.enteredValue.toString(),
+            productName = product.name,
+            quantity = quantityText,
             saleEventId = 0L,
         )
     }
 
+    /** Amount-entry credit sales derive the delivery quantity from amount ÷ rate. */
+    private fun followUpQuantityText(quantity: Double): String =
+        if (quantity == kotlin.math.floor(quantity)) {
+            "${quantity.toInt()}.0"
+        } else {
+            String.format(Locale.US, "%.2f", quantity)
+        }
+
     fun clearFeedback() {
         val current = _state.value as? NativeSaleState.Ready ?: return
         _state.value = current.copy(receipt = null, error = null)
+    }
+
+    /**
+     * "Record next sale": clears the posted receipt and its follow-up offer so
+     * the next sale starts from a clean slate — while the form itself (product,
+     * quantity, mode, payment, customer) carries over untouched, so a repeat
+     * credit sale needs no re-selection.
+     */
+    fun startNextSale() {
+        val current = _state.value as? NativeSaleState.Ready ?: return
+        _state.value = current.copy(receipt = null, error = null, deliveryFollowUp = null)
     }
 
     fun close() {

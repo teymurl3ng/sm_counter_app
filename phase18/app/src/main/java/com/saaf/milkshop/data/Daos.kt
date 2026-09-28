@@ -51,6 +51,9 @@ interface EventDao {
 
     @Query("SELECT COUNT(*) FROM events")
     suspend fun count(): Int
+
+    @Query("SELECT COUNT(*) FROM events WHERE notes = :notes")
+    suspend fun countByNotes(notes: String): Int
 }
 
 @Dao

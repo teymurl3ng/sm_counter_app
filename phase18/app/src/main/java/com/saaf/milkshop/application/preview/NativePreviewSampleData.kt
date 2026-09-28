@@ -1,13 +1,6 @@
 package com.saaf.milkshop.application.preview
 
 import com.saaf.milkshop.BuildConfig
-import com.saaf.milkshop.application.activity.NativeActivityFacade
-import com.saaf.milkshop.application.collection.NativeCollectionFacade
-import com.saaf.milkshop.application.collection.NativeCollectionRequest
-import com.saaf.milkshop.application.sale.NativeSaleEntryMode
-import com.saaf.milkshop.application.sale.NativeSaleFacade
-import com.saaf.milkshop.application.sale.NativeSalePaymentKind
-import com.saaf.milkshop.application.sale.NativeSaleRequest
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.data.DatabaseSql
 import com.saaf.milkshop.domain.AppPermission
@@ -28,10 +21,11 @@ import java.time.LocalDate
 /**
  * Debug/preview shop filler for [com.saaf.milkshop.nativeui.NativePreviewActivity].
  *
- * Uses existing domain and native facades only — no SQL/business-rule changes.
- * Idempotent: sample customers / stock / Activity rows are topped up when thin;
- * preview role accounts are enrolled **once** when missing and are never
- * re-created or passphrase-reset on later launches.
+ * Uses existing domain services only — no SQL/business-rule changes.
+ * Idempotent scaffolding: sample customers / vendor / stock / staff accounts
+ * are created once when missing and never re-created on later launches.
+ * Deliberately does NOT record sales, collections, or any other business
+ * activity: Records must show only what was actually recorded.
  */
 object NativePreviewSampleData {
     /**
@@ -46,6 +40,8 @@ object NativePreviewSampleData {
         get() = BuildConfig.NATIVE_PREVIEW_SHARED_PASSPHRASE
 
     const val SAMPLE_DELIVERY_NOTES = "Preview sample delivery"
+    const val SAMPLE_MILK_STOCK_NOTES = "Native preview sample stock"
+    const val SAMPLE_YOGURT_STOCK_NOTES = "Native preview sample yogurt batch"
 
     const val PREVIEW_OWNER_LOGIN = "preview.owner"
     const val PREVIEW_OWNER_DISPLAY_NAME = "Preview Owner"
@@ -121,18 +117,12 @@ object NativePreviewSampleData {
         database: MilkShopDatabase,
         security: UserSecurityService,
         sessionHandle: String,
-        saleFacade: NativeSaleFacade,
-        collectionFacade: NativeCollectionFacade,
-        activityFacade: NativeActivityFacade,
         date: LocalDate = LocalDate.now(),
     ): Result = seedMutex.withLock {
         seedForSession(
             database = database,
             security = security,
             sessionHandle = sessionHandle,
-            saleFacade = saleFacade,
-            collectionFacade = collectionFacade,
-            activityFacade = activityFacade,
             date = date,
         )
     }
@@ -141,9 +131,6 @@ object NativePreviewSampleData {
         database: MilkShopDatabase,
         security: UserSecurityService,
         sessionHandle: String,
-        saleFacade: NativeSaleFacade,
-        collectionFacade: NativeCollectionFacade,
-        activityFacade: NativeActivityFacade,
         date: LocalDate,
     ): Result {
         if (!fixturesEnabled) return Result(false, false, 0, false)
@@ -171,19 +158,10 @@ object NativePreviewSampleData {
         val seededYogurt = step("yogurt stock", false) {
             ensureYogurtStock(database, date)
         }
-        val seededActivityRows = step("today activity", 0) {
-            ensureTodayActivity(
-                sessionHandle = sessionHandle,
-                saleFacade = saleFacade,
-                collectionFacade = collectionFacade,
-                activityFacade = activityFacade,
-                date = date,
-            )
-        }
         return Result(
             seededCustomers = seededCustomers,
             seededStock = seededStock || seededYogurt,
-            seededActivityRows = seededActivityRows,
+            seededActivityRows = 0,
             seededOperator = seededStaff > 0,
             seededStaffAccounts = seededStaff,
             seededVendor = seededVendor,
@@ -192,24 +170,18 @@ object NativePreviewSampleData {
     }
 
     /**
-     * Owner Overview preview filler: same shop sample plus yogurt stock so the
-     * decision summary is readable on an empty install.
+     * Owner Overview preview filler: same shop sample so the decision summary
+     * is readable on an empty install.
      */
     suspend fun ensureForOwnerOverview(
         database: MilkShopDatabase,
         security: UserSecurityService,
         sessionHandle: String,
-        saleFacade: NativeSaleFacade,
-        collectionFacade: NativeCollectionFacade,
-        activityFacade: NativeActivityFacade,
         date: LocalDate = LocalDate.now(),
     ): Result = ensureForSession(
         database = database,
         security = security,
         sessionHandle = sessionHandle,
-        saleFacade = saleFacade,
-        collectionFacade = collectionFacade,
-        activityFacade = activityFacade,
         date = date,
     )
 
@@ -454,11 +426,10 @@ object NativePreviewSampleData {
 
     private suspend fun ensureMilkStock(database: MilkShopDatabase, date: LocalDate): Boolean {
         val milk = database.productDao().findByName("Milk") ?: return false
-        val onHand = database.readModelDao().currentStock()
-            .firstOrNull { it.productId == milk.productId }
-            ?.quantityOnHand
-            ?: 0.0
-        if (onHand >= 40.0) return false
+        // One-time scaffolding keyed on the sample marker, not on on-hand
+        // stock: a threshold guard would re-fire after real selling drops
+        // stock and inject surprise purchase events into Records.
+        if (database.eventDao().countByNotes(SAMPLE_MILK_STOCK_NOTES) > 0) return false
         val vendorName = "Sample · Rehman Dairy"
         val vendors = database.accountDao().findByCategory("Vendor")
         val vendorId = vendors.firstOrNull { it.name == vendorName }?.accountId
@@ -470,7 +441,7 @@ object NativePreviewSampleData {
                 rawLiters = 80.0,
                 fatPercentage = 4.2,
                 lrReading = 28.5,
-                notes = "Native preview sample stock",
+                notes = SAMPLE_MILK_STOCK_NOTES,
             ),
         )
         return true
@@ -478,11 +449,7 @@ object NativePreviewSampleData {
 
     private suspend fun ensureYogurtStock(database: MilkShopDatabase, date: LocalDate): Boolean {
         val yogurt = database.productDao().findByName("Yogurt") ?: return false
-        val onHand = database.readModelDao().currentStock()
-            .firstOrNull { it.productId == yogurt.productId }
-            ?.quantityOnHand
-            ?: 0.0
-        if (onHand >= 10.0) return false
+        if (database.eventDao().countByNotes(SAMPLE_YOGURT_STOCK_NOTES) > 0) return false
         ensureMilkStock(database, date)
         val milk = database.productDao().findByName("Milk") ?: return false
         val milkOnHand = database.readModelDao().currentStock()
@@ -495,76 +462,9 @@ object NativePreviewSampleData {
                 occurredAt = date.toString(),
                 milkLitersUsed = 20.0,
                 yogurtKgProduced = 18.0,
-                notes = "Native preview sample yogurt batch",
+                notes = SAMPLE_YOGURT_STOCK_NOTES,
             ),
         )
         return true
-    }
-
-    private suspend fun ensureTodayActivity(
-        sessionHandle: String,
-        saleFacade: NativeSaleFacade,
-        collectionFacade: NativeCollectionFacade,
-        activityFacade: NativeActivityFacade,
-        date: LocalDate,
-    ): Int {
-        val today = activityFacade.loadToday(sessionHandle, date)
-        if (today.records.size >= 3) return 0
-
-        val saleContext = saleFacade.load(sessionHandle, date)
-        val milk = saleContext.products.firstOrNull { it.name.equals("Milk", ignoreCase = true) }
-            ?: return 0
-        val cashId = saleContext.defaultPaymentAccountId
-            ?: saleContext.paymentAccounts.firstOrNull()?.accountId
-            ?: return 0
-        val customers = saleContext.customers.filter { it.name.startsWith("Sample ·") }
-            .ifEmpty { saleContext.customers }
-        if (customers.isEmpty()) return 0
-
-        val creditCustomer = customers.first()
-        var created = 0
-
-        saleFacade.record(
-            sessionHandle,
-            NativeSaleRequest(
-                productId = milk.productId,
-                entryMode = NativeSaleEntryMode.QUANTITY,
-                enteredValue = 2.0,
-                paymentKind = NativeSalePaymentKind.PAID_NOW,
-                paymentAccountId = cashId,
-                customerAccountId = null,
-            ),
-            date,
-        )
-        created += 1
-
-        saleFacade.record(
-            sessionHandle,
-            NativeSaleRequest(
-                productId = milk.productId,
-                entryMode = NativeSaleEntryMode.QUANTITY,
-                enteredValue = 5.0,
-                paymentKind = NativeSalePaymentKind.CUSTOMER_ACCOUNT,
-                paymentAccountId = null,
-                customerAccountId = creditCustomer.accountId,
-            ),
-            date,
-        )
-        created += 1
-
-        val collectionContext = collectionFacade.load(sessionHandle, date)
-        val paymentId = collectionContext.defaultPaymentAccountId ?: cashId
-        collectionFacade.record(
-            sessionHandle,
-            NativeCollectionRequest(
-                customerAccountId = creditCustomer.accountId,
-                paymentAccountId = paymentId,
-                amountPaisa = 50_000L,
-                notes = "Sample Friday route collection",
-            ),
-            date,
-        )
-        created += 1
-        return created
     }
 }

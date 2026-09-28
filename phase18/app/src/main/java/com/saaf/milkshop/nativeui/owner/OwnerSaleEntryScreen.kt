@@ -31,6 +31,7 @@ fun OwnerSaleEntryScreen(
     onClearFeedback: () -> Unit,
     onRecordSale: (NativeSaleRequest) -> Unit,
     onSendAsDelivery: (String) -> Unit,
+    onStartNextSale: () -> Unit,
     onBackToWork: () -> Unit,
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier = Modifier,
@@ -77,6 +78,7 @@ fun OwnerSaleEntryScreen(
                     onClearFeedback = onClearFeedback,
                     onRecordSale = onRecordSale,
                     onSendAsDelivery = onSendAsDelivery,
+                    onStartNextSale = onStartNextSale,
                     leaveGuard = leaveGuard,
                     contentPadding = padding,
                 )

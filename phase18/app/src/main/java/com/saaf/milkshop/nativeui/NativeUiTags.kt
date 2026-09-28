@@ -50,6 +50,7 @@ object NativeUiTags {
     const val CashierSaleDeliveryRoute = "cashier_sale_delivery_route"
     const val CashierSaleDeliverySend = "cashier_sale_delivery_send"
     const val CashierSaleDeliveryLinked = "cashier_sale_delivery_linked"
+    const val CashierSaleNext = "cashier_sale_next"
     const val CashierSaleError = "cashier_sale_error"
     const val CashierPostingClosed = "cashier_posting_closed"
     const val CashierProductUnavailable = "cashier_product_unavailable"

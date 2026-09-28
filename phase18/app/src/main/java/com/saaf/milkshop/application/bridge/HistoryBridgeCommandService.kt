@@ -10,6 +10,7 @@ import com.saaf.milkshop.domain.CorrectionResult
 import com.saaf.milkshop.domain.CorrectionService
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.sync.BusinessDateGuard
+import com.saaf.milkshop.sync.SyncScheduler
 import java.time.Instant
 
 internal class HistoryBridgeCommandService(
@@ -42,7 +43,7 @@ internal class HistoryBridgeCommandService(
             details = "event_id=${result.eventId};original_event_id=${input.originalEventId};event_type=${result.eventType}",
         ))
         result
-    }
+    }.also { SyncScheduler.requestPush() }
 
     companion object {
         const val ACTION_CORRECT_EVENT = "bridge_correct_event"

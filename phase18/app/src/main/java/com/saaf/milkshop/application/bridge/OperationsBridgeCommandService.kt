@@ -32,6 +32,7 @@ import com.saaf.milkshop.domain.YogurtProductionInput
 import com.saaf.milkshop.domain.YogurtProductionResult
 import com.saaf.milkshop.domain.YogurtProductionService
 import com.saaf.milkshop.sync.BusinessDateGuard
+import com.saaf.milkshop.sync.SyncScheduler
 import java.time.Instant
 
 internal class OperationsBridgeCommandService(
@@ -72,7 +73,7 @@ internal class OperationsBridgeCommandService(
                 )
             )
             result
-        }
+        }.also { SyncScheduler.requestPush() }
 
     suspend fun recordSale(sessionHandle: String, input: SaleInput): SaleResult =
         database.withWriteTransaction {
@@ -118,7 +119,7 @@ internal class OperationsBridgeCommandService(
                 actor.role,
             )
             result
-        }
+        }.also { SyncScheduler.requestPush() }
 
     suspend fun recordProduction(
         sessionHandle: String,
@@ -146,7 +147,7 @@ internal class OperationsBridgeCommandService(
             actor.role,
         )
         result
-    }
+    }.also { SyncScheduler.requestPush() }
 
     suspend fun recordExpense(
         sessionHandle: String,
@@ -182,7 +183,7 @@ internal class OperationsBridgeCommandService(
             actor.role,
         )
         result
-    }
+    }.also { SyncScheduler.requestPush() }
 
     suspend fun recordVendorPayment(
         sessionHandle: String,
@@ -206,7 +207,7 @@ internal class OperationsBridgeCommandService(
             actor.role,
         )
         result
-    }
+    }.also { SyncScheduler.requestPush() }
 
     suspend fun recordCreditCollection(
         sessionHandle: String,
@@ -230,7 +231,7 @@ internal class OperationsBridgeCommandService(
             actor.role,
         )
         result
-    }
+    }.also { SyncScheduler.requestPush() }
 
     suspend fun recordSalaryPayment(
         sessionHandle: String,
@@ -254,7 +255,7 @@ internal class OperationsBridgeCommandService(
             actor.role,
         )
         result
-    }
+    }.also { SyncScheduler.requestPush() }
 
     suspend fun recordSpoilage(
         sessionHandle: String,
@@ -284,7 +285,7 @@ internal class OperationsBridgeCommandService(
             actor.role,
         )
         result
-    }
+    }.also { SyncScheduler.requestPush() }
 
     private suspend fun requirePaymentAccount(accountId: Long) {
         if (database.accountDao().findById(accountId)?.category != "Cash/Bank") {

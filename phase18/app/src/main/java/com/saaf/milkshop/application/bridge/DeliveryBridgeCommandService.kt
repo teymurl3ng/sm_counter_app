@@ -8,6 +8,7 @@ import com.saaf.milkshop.domain.DeliveryInput
 import com.saaf.milkshop.domain.DeliveryService
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.sync.BusinessDateGuard
+import com.saaf.milkshop.sync.SyncScheduler
 import java.time.Instant
 
 internal class DeliveryBridgeCommandService(
@@ -23,7 +24,7 @@ internal class DeliveryBridgeCommandService(
         val id = DeliveryService(database).create(input)
         audit(ACTION_CREATE_DELIVERY, "delivery_id=$id", actor.userId, actor.displayName, actor.role)
         id
-    }
+    }.also { SyncScheduler.requestPush() }
 
     suspend fun transition(sessionHandle: String, deliveryId: Long, status: String, notes: String?) =
         database.withWriteTransaction {
@@ -44,7 +45,7 @@ internal class DeliveryBridgeCommandService(
                 actor.displayName,
                 actor.role,
             )
-        }
+        }.also { SyncScheduler.requestPush() }
 
     suspend fun linkSale(sessionHandle: String, deliveryId: Long, saleEventId: Long) = database.withWriteTransaction {
         val actor = security.requirePermission(sessionHandle, AppPermission.DELIVERY)
@@ -59,7 +60,7 @@ internal class DeliveryBridgeCommandService(
             actor.displayName,
             actor.role,
         )
-    }
+    }.also { SyncScheduler.requestPush() }
 
     suspend fun archive(sessionHandle: String, deliveryId: Long) = database.withWriteTransaction {
         val actor = security.requirePermission(sessionHandle, AppPermission.DELIVERY)
@@ -68,7 +69,7 @@ internal class DeliveryBridgeCommandService(
         if (delivery.archived) throw BridgeCommandConflict("This delivery is already archived")
         DeliveryService(database).archive(deliveryId)
         audit(ACTION_ARCHIVE_DELIVERY, "delivery_id=$deliveryId", actor.userId, actor.displayName, actor.role)
-    }
+    }.also { SyncScheduler.requestPush() }
 
     private suspend fun requireDelivery(deliveryId: Long) = database.deliveryDao().findById(deliveryId)
         ?: throw BridgeCommandNotFound("This delivery no longer exists")

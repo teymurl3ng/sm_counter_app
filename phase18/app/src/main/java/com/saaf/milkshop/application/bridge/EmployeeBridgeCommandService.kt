@@ -11,6 +11,7 @@ import com.saaf.milkshop.domain.EmployeeProfileInput
 import com.saaf.milkshop.domain.EmployeeProfileService
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.sync.BusinessDateGuard
+import com.saaf.milkshop.sync.SyncScheduler
 import java.time.Instant
 
 internal class EmployeeBridgeCommandService(
@@ -58,7 +59,7 @@ internal class EmployeeBridgeCommandService(
             )
         )
         attendanceId
-    }
+    }.also { SyncScheduler.requestPush() }
 
     private suspend fun requireEmployee(accountId: Long) {
         val account = database.accountDao().findById(accountId)

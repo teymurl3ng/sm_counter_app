@@ -13,6 +13,7 @@ import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.domain.VerifiedDailyCloseInput
 import com.saaf.milkshop.domain.VerifiedDailyReopenInput
 import com.saaf.milkshop.sync.BusinessDateGuard
+import com.saaf.milkshop.sync.SyncScheduler
 import java.time.Instant
 
 internal class ReconciliationBridgeCommandService(
@@ -39,7 +40,7 @@ internal class ReconciliationBridgeCommandService(
                 actor.role,
             )
             result
-        }
+        }.also { SyncScheduler.requestPush() }
 
     suspend fun closeDate(sessionHandle: String, input: VerifiedDailyCloseInput): DailyCloseRecord =
         database.withWriteTransaction {
@@ -70,7 +71,7 @@ internal class ReconciliationBridgeCommandService(
                 actor.role,
             )
             result
-        }
+        }.also { SyncScheduler.requestPush() }
 
     suspend fun reopenDate(sessionHandle: String, input: VerifiedDailyReopenInput): DailyCloseRecord =
         database.withWriteTransaction {
@@ -90,7 +91,7 @@ internal class ReconciliationBridgeCommandService(
                 actor.role,
             )
             result
-        }
+        }.also { SyncScheduler.requestPush() }
 
     private suspend fun audit(action: String, details: String, actorUserId: Long, actorName: String, actorRole: String) {
         database.securityAuditDao().insert(

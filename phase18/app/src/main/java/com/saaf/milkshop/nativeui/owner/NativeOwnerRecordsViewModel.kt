@@ -12,6 +12,7 @@ import com.saaf.milkshop.application.owner.NativeRecordsGroup
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
 import com.saaf.milkshop.nativeui.DayStateBus
+import com.saaf.milkshop.nativeui.DataChangeBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -79,6 +80,19 @@ class NativeOwnerRecordsViewModel(
         scope.launch {
             DayStateBus.changes.collect {
                 if (sessionHandle != null) refresh()
+            }
+        }
+        // Sales/collections/deliveries recorded elsewhere in the session land
+        // in Records immediately. A refresh rebuilds Ready, so skip while a
+        // detail pane, ledger, or correction editor is open — it must not be
+        // yanked out from under the user.
+        scope.launch {
+            DataChangeBus.changes.collect {
+                val current = _state.value as? NativeOwnerRecordsState.Ready ?: return@collect
+                if (current.detail != null || current.ledger != null || current.correction != null) {
+                    return@collect
+                }
+                refresh()
             }
         }
     }

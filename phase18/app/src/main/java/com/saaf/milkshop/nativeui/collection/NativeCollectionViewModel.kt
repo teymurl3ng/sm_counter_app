@@ -10,6 +10,7 @@ import com.saaf.milkshop.application.collection.NativeCollectionRequest
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
 import com.saaf.milkshop.nativeui.DayStateBus
+import com.saaf.milkshop.nativeui.DataChangeBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -130,6 +131,7 @@ class NativeCollectionViewModel(
                     receipt = submission.receipt,
                 )
                 autoClearReceipt(submission.receipt)
+                DataChangeBus.notifyDataChanged()
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null

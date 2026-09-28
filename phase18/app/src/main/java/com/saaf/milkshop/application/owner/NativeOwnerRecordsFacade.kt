@@ -14,6 +14,7 @@ import com.saaf.milkshop.domain.CorrectionInput
 import com.saaf.milkshop.domain.CorrectionResult
 import com.saaf.milkshop.domain.CreditCollectionService
 import com.saaf.milkshop.domain.ExpenseService
+import com.saaf.milkshop.domain.OpeningStateService
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.domain.SalaryPaymentService
 import com.saaf.milkshop.domain.SaleService
@@ -173,11 +174,18 @@ class NativeOwnerRecordsFacade(
         val businessDate = date.toString()
         val history = reads.eventHistory(sessionHandle)
         val eventsById = database.eventDao().findAllDescending().associateBy { it.eventId }
+        val spoilageByEvent = database.spoilageDao().all().associateBy { it.eventId }
+        val productUnits = database.productDao().all().associate { it.productId to it.unit }
+        fun spoilageLabel(eventId: Long): String? = spoilageByEvent[eventId]?.let { detail ->
+            listOf(formatQuantity(detail.quantity), productUnits[detail.productId].orEmpty())
+                .filter { it.isNotBlank() }
+                .joinToString(" ")
+        }
         // Recent-ordering follows the recording time (created_at), not the
         // business date: a just-recorded entry must be the first thing the
         // owner sees, even when seeded/history rows share the business date.
         val records = history.map { dto ->
-            toRow(dto, eventsById[dto.eventId])
+            toRow(dto, eventsById[dto.eventId], spoilageLabel(dto.eventId))
         }.sortedWith(
             compareByDescending<NativeOwnerRecordsRow> { it.createdAt }
                 .thenByDescending { it.eventId },
@@ -263,7 +271,13 @@ class NativeOwnerRecordsFacade(
         val actor = security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
         val detail = reads.eventDetail(sessionHandle, eventId)
         val entity = database.eventDao().findById(eventId)
-        val row = toRow(detail.event, entity)
+        val spoilageLabel = database.spoilageDao().findByEventId(eventId)?.let { detail ->
+            val unit = database.productDao().findById(detail.productId)?.unit.orEmpty()
+            listOf(formatQuantity(detail.quantity), unit)
+                .filter { it.isNotBlank() }
+                .joinToString(" ")
+        }
+        val row = toRow(detail.event, entity, spoilageLabel)
         val canCorrectPermission = RolePermissions.allows(
             AppRole.parse(actor.role),
             AppPermission.CORRECTION,
@@ -537,7 +551,11 @@ class NativeOwnerRecordsFacade(
         return BigDecimal.valueOf(value).stripTrailingZeros().toPlainString()
     }
 
-    private fun toRow(dto: EventHistoryDto, entity: EventEntity?): NativeOwnerRecordsRow {
+    private fun toRow(
+        dto: EventHistoryDto,
+        entity: EventEntity?,
+        spoilageQuantityLabel: String? = null,
+    ): NativeOwnerRecordsRow {
         val taskLabel = taskLabel(dto.eventTypeCode)
         val identityLabel = identityLabel(dto.eventTypeCode, dto.eventId)
         val stateLabel = when {
@@ -554,7 +572,7 @@ class NativeOwnerRecordsFacade(
             identityLabel = identityLabel,
             actorLabel = dto.actor?.displayName?.takeIf { it.isNotBlank() },
             timeLabel = formatClock(dto.createdAt, dto.occurredAt),
-            trailingLabel = trailingLabel(dto.eventTypeCode, entity),
+            trailingLabel = trailingLabel(dto.eventTypeCode, entity, spoilageQuantityLabel),
             stateLabel = stateLabel,
             notes = dto.notes?.trim()?.takeIf { it.isNotEmpty() },
             isCorrection = dto.isCorrection,
@@ -572,6 +590,7 @@ class NativeOwnerRecordsFacade(
         ExpenseService.EVENT_TYPE_EXPENSE -> "Expense"
         VendorPaymentService.EVENT_TYPE_VENDOR_PAYMENT -> "Supplier payment"
         SalaryPaymentService.EVENT_TYPE_SALARY_PAYMENT -> "Salary payment"
+        OpeningStateService.EVENT_TYPE_OPENING_STATE -> "Opening balance"
         else -> eventType.replace('_', ' ').lowercase(Locale.US)
             .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.US) else it.toString() }
     }
@@ -588,7 +607,11 @@ class NativeOwnerRecordsFacade(
         return if (prefix != null) "#$prefix-$eventId" else "#$eventId"
     }
 
-    private fun trailingLabel(eventType: String, entity: EventEntity?): String? {
+    private fun trailingLabel(
+        eventType: String,
+        entity: EventEntity?,
+        spoilageQuantityLabel: String?,
+    ): String? {
         entity ?: return null
         return when (eventType) {
             SaleService.EVENT_TYPE_SALE -> {
@@ -604,8 +627,9 @@ class NativeOwnerRecordsFacade(
                 entity.rawLiters?.let { "${formatQuantity(it)} L" }
             YogurtProductionService.EVENT_TYPE_PRODUCTION ->
                 entity.yogurtKgProduced?.let { "${formatQuantity(it)} kg" }
-            SpoilageService.EVENT_TYPE_SPOILAGE ->
-                entity.saleQuantity?.let { formatQuantity(it) }
+            // The spoiled quantity lives in the spoilage detail row, not on
+            // the event itself — pass the prebuilt label through.
+            SpoilageService.EVENT_TYPE_SPOILAGE -> spoilageQuantityLabel
             else -> null
         }
     }
@@ -651,12 +675,28 @@ class NativeOwnerRecordsFacade(
     private fun formatQuantity(value: Double): String =
         BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
 
+    /**
+     * Row timestamp: business date ("Today" / "26 Sep") plus the recording
+     * clock time — never the raw ISO storage string.
+     */
     private fun formatClock(createdAt: String, occurredAt: String): String {
         val clock = com.saaf.milkshop.application.AppTimeFormats.clock(createdAt)
-        return when {
-            clock != createdAt && occurredAt.isNotBlank() -> "$occurredAt · $clock"
-            clock != createdAt -> clock
-            else -> occurredAt.ifBlank { createdAt }
+        if (clock == createdAt) {
+            // createdAt isn't a parseable instant; fall back to the raw date.
+            return occurredAt.ifBlank { createdAt }
+        }
+        val day = formatBusinessDate(occurredAt) ?: return clock
+        return "$day · $clock"
+    }
+
+    /** "Today" / "Yesterday" / "26 Sep" from a date-only string; null if unparseable. */
+    private fun formatBusinessDate(value: String): String? {
+        val local = runCatching { LocalDate.parse(value) }.getOrNull() ?: return null
+        val today = LocalDate.now()
+        return when (local) {
+            today -> "Today"
+            today.minusDays(1) -> "Yesterday"
+            else -> local.format(DateTimeFormatter.ofPattern("d MMM", Locale.US))
         }
     }
 }

@@ -8,6 +8,7 @@ import com.saaf.milkshop.application.activity.NativeActivityRecordDetail
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
 import com.saaf.milkshop.nativeui.DayStateBus
+import com.saaf.milkshop.nativeui.DataChangeBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -46,6 +47,16 @@ class NativeActivityViewModel(
         scope.launch {
             DayStateBus.changes.collect {
                 if (sessionHandle != null) refresh()
+            }
+        }
+        // A just-recorded sale or collection appears on the same session's
+        // Activity immediately; skip while a record detail is open so the
+        // refresh can't close it.
+        scope.launch {
+            DataChangeBus.changes.collect {
+                val current = _state.value as? NativeActivityState.Ready ?: return@collect
+                if (current.detail != null || current.loadingDetail) return@collect
+                refresh()
             }
         }
     }

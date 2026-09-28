@@ -13,6 +13,8 @@ import com.saaf.milkshop.domain.NativeSessionManager
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.sync.BusinessClock
 import com.saaf.milkshop.sync.SyncIdentity
+import com.saaf.milkshop.sync.SyncRuntime
+import com.saaf.milkshop.sync.SyncScheduler
 import com.saaf.milkshop.sync.TimeTrustMonitor
 import com.saaf.milkshop.sync.TrustedTime
 import kotlinx.coroutines.CoroutineScope
@@ -35,9 +37,15 @@ class MilkShopApplication : Application() {
             TrustedTime.warmUp(this)
             BusinessClock.warmUp(this)
         }
+        runCatching {
+            SyncScheduler.warmUp(this)
+        }
         timeTrustScope.launch {
             runCatching { TimeTrustMonitor.check(applicationContext, database) }
         }
+        // An enrolled device drains anything queued while it was offline at
+        // every start; an unenrolled device schedules nothing (inert).
+        SyncScheduler.requestPush()
     }
 
     val database: MilkShopDatabase by lazy {
@@ -48,6 +56,7 @@ class MilkShopApplication : Application() {
         UserSecurityService(database, nativeSessions)
     }
     val backupManager: BackupManager by lazy { BackupManager(applicationContext) }
+    val syncRuntime: SyncRuntime by lazy { SyncRuntime(applicationContext, database) }
     val cloudBackupSettings: CloudBackupSettingsStore by lazy { CloudBackupSettingsStore(applicationContext) }
     val cloudBackupOutbox: CloudBackupOutbox by lazy { CloudBackupOutbox(applicationContext) }
     val cloudBackupCryptography: CloudBackupCryptography by lazy { CloudBackupCryptography() }

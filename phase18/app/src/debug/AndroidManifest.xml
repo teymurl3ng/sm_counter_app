@@ -23,5 +23,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".sync.SyncDebugReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.saaf.milkshop.sync.ENROLL" />
+                <action android:name="com.saaf.milkshop.sync.STATUS" />
+                <action android:name="com.saaf.milkshop.sync.UNENROLL" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

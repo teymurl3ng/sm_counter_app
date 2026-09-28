@@ -72,3 +72,74 @@ interface SyncPullStateDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(state: SyncPullStateEntity)
 }
+
+/**
+ * Read-side queries for the sync push envelopes: rows by uid, their event
+ * children, and their profile satellites. Read-only by design — the outbox
+ * and the capture triggers own all writes.
+ */
+@Dao
+interface SyncEnvelopeDao {
+    @Query("SELECT * FROM events WHERE event_uid IN (:uids)")
+    suspend fun eventsByUid(uids: List<String>): List<EventEntity>
+
+    @Query("SELECT * FROM products WHERE uid IN (:uids)")
+    suspend fun productsByUid(uids: List<String>): List<ProductEntity>
+
+    @Query("SELECT * FROM accounts WHERE uid IN (:uids)")
+    suspend fun accountsByUid(uids: List<String>): List<AccountEntity>
+
+    @Query("SELECT * FROM budget_plans WHERE uid IN (:uids)")
+    suspend fun budgetsByUid(uids: List<String>): List<BudgetPlanEntity>
+
+    @Query("SELECT * FROM collections_targets WHERE uid IN (:uids)")
+    suspend fun targetsByUid(uids: List<String>): List<CollectionsTargetEntity>
+
+    @Query("SELECT * FROM deliveries WHERE uid IN (:uids)")
+    suspend fun deliveriesByUid(uids: List<String>): List<DeliveryEntity>
+
+    @Query("SELECT * FROM attendance_records WHERE uid IN (:uids)")
+    suspend fun attendanceByUid(uids: List<String>): List<AttendanceRecordEntity>
+
+    @Query("SELECT * FROM delivery_status_history WHERE uid IN (:uids)")
+    suspend fun deliveryStatusesByUid(uids: List<String>): List<DeliveryStatusEntity>
+
+    @Query("SELECT * FROM daily_close_actions WHERE uid IN (:uids)")
+    suspend fun dailyCloseActionsByUid(uids: List<String>): List<DailyCloseActionEntity>
+
+    @Query("SELECT * FROM physical_cash_counts WHERE uid IN (:uids)")
+    suspend fun physicalCashCountsByUid(uids: List<String>): List<PhysicalCashCountEntity>
+
+    @Query("SELECT * FROM settings WHERE setting_key IN (:keys)")
+    suspend fun settingsByKeys(keys: List<String>): List<SettingEntity>
+
+    @Query("SELECT * FROM store_profile LIMIT 1")
+    suspend fun storeProfile(): StoreProfileEntity?
+
+    @Query("SELECT * FROM inventory_log WHERE event_id IN (:eventIds)")
+    suspend fun inventoryLogsForEvents(eventIds: List<Long>): List<InventoryLogEntity>
+
+    @Query("SELECT * FROM financial_log WHERE event_id IN (:eventIds)")
+    suspend fun financialLogsForEvents(eventIds: List<Long>): List<FinancialLogEntity>
+
+    @Query("SELECT * FROM spoilage_details WHERE event_id IN (:eventIds)")
+    suspend fun spoilageDetailsForEvents(eventIds: List<Long>): List<SpoilageDetailEntity>
+
+    @Query("SELECT * FROM event_actor_links WHERE event_id IN (:eventIds)")
+    suspend fun actorLinksForEvents(eventIds: List<Long>): List<EventActorLinkEntity>
+
+    @Query("SELECT * FROM product_profiles WHERE product_id IN (:productIds)")
+    suspend fun productProfilesFor(productIds: List<Long>): List<ProductProfileEntity>
+
+    @Query("SELECT * FROM customer_profiles WHERE account_id IN (:accountIds)")
+    suspend fun customerProfilesFor(accountIds: List<Long>): List<CustomerProfileEntity>
+
+    @Query("SELECT * FROM vendor_profiles WHERE account_id IN (:accountIds)")
+    suspend fun vendorProfilesFor(accountIds: List<Long>): List<VendorProfileEntity>
+
+    @Query("SELECT * FROM employee_profiles WHERE account_id IN (:accountIds)")
+    suspend fun employeeProfilesFor(accountIds: List<Long>): List<EmployeeProfileEntity>
+
+    @Query("SELECT * FROM expense_category_profiles WHERE account_id IN (:accountIds)")
+    suspend fun expenseCategoryProfilesFor(accountIds: List<Long>): List<ExpenseCategoryProfileEntity>
+}

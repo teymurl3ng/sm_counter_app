@@ -41,11 +41,13 @@ object TrustedTime {
 
     @Volatile private var anchor: Anchor? = null
     @Volatile private var appContext: Context? = null
+    @Volatile private var cachedBootCount: Int = -1
 
     fun warmUp(context: Context) {
         appContext = context.applicationContext
-        val stored = runCatching { anchorFile(context).readText().trim() }.getOrDefault("")
         val bootCount = currentBootCount(context)
+        cachedBootCount = bootCount
+        val stored = runCatching { anchorFile(context).readText().trim() }.getOrDefault("")
         val parts = stored.split('\n')
         val candidate = if (parts.size == 3) {
             runCatching {
@@ -64,16 +66,17 @@ object TrustedTime {
     }
 
     /**
-     * Records server time from any server response. Server clocks are
-     * authoritative; the device clock is only used to sanity-check the value.
+     * Records server time from any server response. The in-memory anchor is
+     * always refreshed (trusted time must never depend on disk state);
+     * persistence is best-effort when a context is available. Server clocks
+     * are authoritative; the device clock only sanity-checks the value.
      */
     fun anchor(serverEpochMs: Long) {
-        val context = appContext ?: return
-        val bootCount = currentBootCount(context)
         val now = System.currentTimeMillis()
         if (abs(serverEpochMs - now) > MAX_SANE_SERVER_SKEW_MS) return
-        val fresh = Anchor(bootCount, serverEpochMs, SystemClock.elapsedRealtime())
+        val fresh = Anchor(cachedBootCount, serverEpochMs, SystemClock.elapsedRealtime())
         anchor = fresh
+        val context = appContext ?: return
         runCatching {
             val file = anchorFile(context)
             file.parentFile?.let { dir -> check(dir.isDirectory || dir.mkdirs()) }

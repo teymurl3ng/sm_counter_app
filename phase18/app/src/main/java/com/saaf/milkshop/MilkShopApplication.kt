@@ -11,12 +11,16 @@ import com.saaf.milkshop.cloud.CloudBackupSettingsStore
 import com.saaf.milkshop.cloud.GoogleDriveCloudBackupProvider
 import com.saaf.milkshop.domain.NativeSessionManager
 import com.saaf.milkshop.domain.UserSecurityService
+import com.saaf.milkshop.sync.SyncIdentity
 
 class MilkShopApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         runCatching {
             cloudBackupSettings.read()?.let { cloudBackupScheduler.apply(it.enabled, it.allowMetered) }
+        }
+        runCatching {
+            SyncIdentity.warmUp(this)
         }
     }
 

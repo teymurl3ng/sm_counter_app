@@ -6,10 +6,15 @@ import androidx.room3.Entity
 import androidx.room3.ForeignKey
 import androidx.room3.Index
 import androidx.room3.PrimaryKey
+import com.saaf.milkshop.sync.LegacyUid
+import com.saaf.milkshop.sync.SyncIdentity
 
 @Entity(
     tableName = "products",
-    indices = [Index(value = ["name"], unique = true)]
+    indices = [
+        Index(value = ["name"], unique = true),
+        Index(value = ["uid"], unique = true),
+    ]
 )
 data class ProductEntity(
     @PrimaryKey(autoGenerate = true)
@@ -19,11 +24,17 @@ data class ProductEntity(
     val name: String,
 
     val unit: String,
+
+    @ColumnInfo(name = "uid", defaultValue = "''")
+    val uid: String = LegacyUid.randomUid(),
 )
 
 @Entity(
     tableName = "accounts",
-    indices = [Index(value = ["name"], unique = true)]
+    indices = [
+        Index(value = ["name"], unique = true),
+        Index(value = ["uid"], unique = true),
+    ]
 )
 data class AccountEntity(
     @PrimaryKey(autoGenerate = true)
@@ -35,6 +46,9 @@ data class AccountEntity(
     val type: String,
 
     val category: String,
+
+    @ColumnInfo(name = "uid", defaultValue = "''")
+    val uid: String = LegacyUid.randomUid(),
 )
 
 @Entity(
@@ -52,6 +66,7 @@ data class AccountEntity(
         Index(value = ["event_type"]),
         Index(value = ["occurred_at"]),
         Index(value = ["corrects_event_id"]),
+        Index(value = ["event_uid"], unique = true),
     ]
 )
 data class EventEntity(
@@ -125,6 +140,12 @@ data class EventEntity(
     val surchargeApplied: Double = 0.0,
 
     val notes: String? = null,
+
+    @ColumnInfo(name = "event_uid", defaultValue = "''")
+    val eventUid: String = LegacyUid.randomUid(),
+
+    @ColumnInfo(name = "origin_device_id", defaultValue = "''")
+    val originDeviceId: String = SyncIdentity.currentOrNull(),
 )
 
 @Entity(
@@ -220,6 +241,7 @@ data class SettingEntity(
     indices = [
         Index(value = ["category", "period_start", "archived"]),
         Index(value = ["supersedes_id"]),
+        Index(value = ["uid"], unique = true),
     ]
 )
 data class BudgetPlanEntity(
@@ -254,6 +276,9 @@ data class BudgetPlanEntity(
     val supersedesId: Long? = null,
 
     val archived: Boolean = false,
+
+    @ColumnInfo(name = "uid", defaultValue = "''")
+    val uid: String = LegacyUid.randomUid(),
 )
 
 @Entity(
@@ -261,6 +286,7 @@ data class BudgetPlanEntity(
     indices = [
         Index(value = ["week_start", "archived"]),
         Index(value = ["supersedes_id"]),
+        Index(value = ["uid"], unique = true),
     ]
 )
 data class CollectionsTargetEntity(
@@ -284,6 +310,9 @@ data class CollectionsTargetEntity(
     val supersedesId: Long? = null,
 
     val archived: Boolean = false,
+
+    @ColumnInfo(name = "uid", defaultValue = "''")
+    val uid: String = LegacyUid.randomUid(),
 )
 
 @DatabaseView(

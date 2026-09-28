@@ -167,6 +167,8 @@ class CloudBackupCryptography(
                 snapshotId = snapshotId,
                 vaultId = configuration.vaultId,
                 createdAt = createdAt,
+                innerFormatVersion = BackupManager.FORMAT_VERSION,
+                schemaVersion = BackupManager.CURRENT_SCHEMA_VERSION,
                 ciphertextLength = ciphertextLength,
                 portableWrap = configuration.portableWrap,
             )
@@ -215,6 +217,8 @@ class CloudBackupCryptography(
                     parsed.snapshotId,
                     parsed.vaultId,
                     parsed.createdAt,
+                    parsed.innerFormatVersion,
+                    parsed.schemaVersion,
                     parsed.ciphertextLength,
                     parsed.portableWrap,
                 ),
@@ -252,6 +256,8 @@ class CloudBackupCryptography(
                     parsed.snapshotId,
                     parsed.vaultId,
                     parsed.createdAt,
+                    parsed.innerFormatVersion,
+                    parsed.schemaVersion,
                     parsed.ciphertextLength,
                     parsed.portableWrap,
                 ),
@@ -287,6 +293,8 @@ class CloudBackupCryptography(
                     parsed.snapshotId,
                     parsed.vaultId,
                     parsed.createdAt,
+                    parsed.innerFormatVersion,
+                    parsed.schemaVersion,
                     parsed.ciphertextLength,
                     parsed.portableWrap,
                 ),
@@ -308,7 +316,7 @@ class CloudBackupCryptography(
         val snapshotId = envelope.getString("snapshot_id").also(UUID::fromString)
         val vaultId = envelope.getString("vault_id").also(UUID::fromString)
         val createdAt = envelope.getString("created_at").also(Instant::parse)
-        require(envelope.getInt("inner_format_version") == BackupManager.FORMAT_VERSION) {
+        require(envelope.getInt("inner_format_version") in BackupManager.MIN_RESTORE_FORMAT_VERSION..BackupManager.FORMAT_VERSION) {
             "Unsupported inner backup format"
         }
         require(envelope.getInt("schema_version") <= BackupManager.CURRENT_SCHEMA_VERSION) {
@@ -330,6 +338,8 @@ class CloudBackupCryptography(
             snapshotId = snapshotId,
             vaultId = vaultId,
             createdAt = createdAt,
+            innerFormatVersion = envelope.getInt("inner_format_version"),
+            schemaVersion = envelope.getInt("schema_version"),
             portableWrap = portableWrap,
             ciphertextLength = ciphertextLength,
             snapshotCipher = snapshotCipher,
@@ -421,6 +431,8 @@ class CloudBackupCryptography(
         snapshotId: String,
         vaultId: String,
         createdAt: String,
+        innerFormatVersion: Int,
+        schemaVersion: Int,
         ciphertextLength: Int,
         portableWrap: PortableVaultWrap,
     ): ByteArray = listOf(
@@ -429,8 +441,8 @@ class CloudBackupCryptography(
         snapshotId,
         vaultId,
         createdAt,
-        BackupManager.FORMAT_VERSION.toString(),
-        BackupManager.CURRENT_SCHEMA_VERSION.toString(),
+        innerFormatVersion.toString(),
+        schemaVersion.toString(),
         ciphertextLength.toString(),
         portableWrap.saltBase64,
         portableWrap.memoryKib.toString(),
@@ -450,6 +462,8 @@ class CloudBackupCryptography(
         val snapshotId: String,
         val vaultId: String,
         val createdAt: String,
+        val innerFormatVersion: Int,
+        val schemaVersion: Int,
         val portableWrap: PortableVaultWrap,
         val ciphertextLength: Int,
         val snapshotCipher: WrappedCiphertext,

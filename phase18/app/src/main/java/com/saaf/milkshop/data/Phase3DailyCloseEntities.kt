@@ -5,6 +5,7 @@ import androidx.room3.Entity
 import androidx.room3.ForeignKey
 import androidx.room3.Index
 import androidx.room3.PrimaryKey
+import com.saaf.milkshop.sync.LegacyUid
 
 @Entity(
     tableName = "daily_close_actions",
@@ -36,6 +37,7 @@ import androidx.room3.PrimaryKey
         Index(value = ["physical_cash_count_id"], unique = true),
         Index(value = ["supersedes_action_id"], unique = true),
         Index(value = ["actor_user_id"]),
+        Index(value = ["uid"], unique = true),
     ],
 )
 data class DailyCloseActionEntity(
@@ -58,4 +60,7 @@ data class DailyCloseActionEntity(
     val createdAt: String,
     @ColumnInfo(name = "supersedes_action_id")
     val supersedesActionId: Long? = null,
+
+    @ColumnInfo(name = "uid", defaultValue = "''")
+    val uid: String = LegacyUid.randomUid(),
 )

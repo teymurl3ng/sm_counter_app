@@ -1,5 +1,7 @@
 package com.saaf.milkshop.data
 
+import com.saaf.milkshop.sync.LegacyUid
+
 /**
  * SQLite-only integrity objects that Room's entity annotations do not express:
  * CHECK-equivalent validation triggers, business-direction triggers, and the
@@ -741,19 +743,19 @@ internal object DatabaseSql {
             sql.contains("CREATE TRIGGER IF NOT EXISTS prevent_closed_")
 
     val seedStatements: List<String> = listOf(
-        "INSERT INTO products (name, unit) VALUES ('Milk', 'Liters')",
-        "INSERT INTO products (name, unit) VALUES ('Yogurt', 'Kg')",
-        "INSERT INTO accounts (name, type, category) VALUES ('Cash', 'Asset', 'Cash/Bank')",
-        "INSERT INTO accounts (name, type, category) VALUES ('JazzCash', 'Asset', 'Cash/Bank')",
-        "INSERT INTO accounts (name, type, category) VALUES ('Bank', 'Asset', 'Cash/Bank')",
-        "INSERT INTO accounts (name, type, category) VALUES ('Expense: Rent', 'Expense', 'Operating Expense')",
-        "INSERT INTO accounts (name, type, category) VALUES ('Expense: Electricity', 'Expense', 'Operating Expense')",
-        "INSERT INTO accounts (name, type, category) VALUES ('Expense: Internet', 'Expense', 'Operating Expense')",
-        "INSERT INTO accounts (name, type, category) VALUES ('Expense: Water', 'Expense', 'Operating Expense')",
-        "INSERT INTO accounts (name, type, category) VALUES ('Expense: Fuel', 'Expense', 'Operating Expense')",
-        "INSERT INTO accounts (name, type, category) VALUES ('Expense: Poly bags', 'Expense', 'Operating Expense')",
-        "INSERT INTO accounts (name, type, category) VALUES ('Expense: LPG', 'Expense', 'Operating Expense')",
-        "INSERT INTO accounts (name, type, category) VALUES ('Expense: Other', 'Expense', 'Operating Expense')",
+        seedProduct("Milk", "Liters"),
+        seedProduct("Yogurt", "Kg"),
+        seedAccount("Cash", "Asset", "Cash/Bank"),
+        seedAccount("JazzCash", "Asset", "Cash/Bank"),
+        seedAccount("Bank", "Asset", "Cash/Bank"),
+        seedAccount("Expense: Rent", "Expense", "Operating Expense"),
+        seedAccount("Expense: Electricity", "Expense", "Operating Expense"),
+        seedAccount("Expense: Internet", "Expense", "Operating Expense"),
+        seedAccount("Expense: Water", "Expense", "Operating Expense"),
+        seedAccount("Expense: Fuel", "Expense", "Operating Expense"),
+        seedAccount("Expense: Poly bags", "Expense", "Operating Expense"),
+        seedAccount("Expense: LPG", "Expense", "Operating Expense"),
+        seedAccount("Expense: Other", "Expense", "Operating Expense"),
         "INSERT INTO settings (setting_key, setting_value, updated_at) VALUES ('milk_rate_vdr', 170.0, CURRENT_TIMESTAMP)",
         "INSERT INTO settings (setting_key, setting_value, updated_at) VALUES ('delivery_fee_vdr', 11.0, CURRENT_TIMESTAMP)",
         "INSERT INTO settings (setting_key, setting_value, updated_at) VALUES ('ts_standard', 13.00, CURRENT_TIMESTAMP)",
@@ -761,4 +763,20 @@ internal object DatabaseSql {
         "INSERT INTO settings (setting_key, setting_value, updated_at) VALUES ('retail_rate_yogurt', 280.0, CURRENT_TIMESTAMP)",
         "INSERT INTO settings (setting_key, setting_value, updated_at) VALUES ('default_delivery_surcharge', 50.0, CURRENT_TIMESTAMP)",
     )
+
+    /**
+     * Seed rows carry fixed well-known uids so every fresh installation in
+     * every lineage agrees on their identity before the first sync runs.
+     */
+    private fun seedProduct(name: String, unit: String): String {
+        val uid = LegacyUid.seedProductUid(name, unit)
+            ?: error("Unknown seed product identity: $name")
+        return "INSERT INTO products (name, unit, uid) VALUES ('$name', '$unit', '$uid')"
+    }
+
+    private fun seedAccount(name: String, type: String, category: String): String {
+        val uid = LegacyUid.seedAccountUid(name, category)
+            ?: error("Unknown seed account identity: $name")
+        return "INSERT INTO accounts (name, type, category, uid) VALUES ('$name', '$type', '$category', '$uid')"
+    }
 }

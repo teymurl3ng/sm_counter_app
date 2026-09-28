@@ -5,6 +5,7 @@ import androidx.room3.Entity
 import androidx.room3.ForeignKey
 import androidx.room3.Index
 import androidx.room3.PrimaryKey
+import com.saaf.milkshop.sync.LegacyUid
 
 @Entity(
     tableName = "product_profiles",
@@ -140,6 +141,7 @@ data class EmployeeProfileEntity(
     indices = [
         Index(value = ["employee_account_id", "business_date", "archived"]),
         Index(value = ["supersedes_id"]),
+        Index(value = ["uid"], unique = true),
     ],
 )
 data class AttendanceRecordEntity(
@@ -158,6 +160,8 @@ data class AttendanceRecordEntity(
     val supersedesId: Long? = null,
     @ColumnInfo(defaultValue = "0")
     val archived: Boolean = false,
+    @ColumnInfo(name = "uid", defaultValue = "''")
+    val uid: String = LegacyUid.randomUid(),
 )
 
 @Entity(
@@ -190,6 +194,7 @@ data class AttendanceRecordEntity(
         Index(value = ["product_id"]),
         Index(value = ["sale_event_id"], unique = true),
         Index(value = ["archived"]),
+        Index(value = ["uid"], unique = true),
     ],
 )
 data class DeliveryEntity(
@@ -211,6 +216,8 @@ data class DeliveryEntity(
     val createdAt: String,
     @ColumnInfo(defaultValue = "0")
     val archived: Boolean = false,
+    @ColumnInfo(name = "uid", defaultValue = "''")
+    val uid: String = LegacyUid.randomUid(),
 )
 
 @Entity(
@@ -224,7 +231,10 @@ data class DeliveryEntity(
             onUpdate = ForeignKey.NO_ACTION,
         )
     ],
-    indices = [Index(value = ["delivery_id", "status_id"])],
+    indices = [
+        Index(value = ["delivery_id", "status_id"]),
+        Index(value = ["uid"], unique = true),
+    ],
 )
 data class DeliveryStatusEntity(
     @PrimaryKey(autoGenerate = true)
@@ -236,6 +246,8 @@ data class DeliveryStatusEntity(
     @ColumnInfo(name = "occurred_at")
     val occurredAt: String,
     val notes: String? = null,
+    @ColumnInfo(name = "uid", defaultValue = "''")
+    val uid: String = LegacyUid.randomUid(),
 )
 
 @Entity(
@@ -293,7 +305,10 @@ data class SpoilageHistoryRow(
             onUpdate = ForeignKey.NO_ACTION,
         )
     ],
-    indices = [Index(value = ["account_id", "business_date", "counted_at"])],
+    indices = [
+        Index(value = ["account_id", "business_date", "counted_at"]),
+        Index(value = ["uid"], unique = true),
+    ],
 )
 data class PhysicalCashCountEntity(
     @PrimaryKey(autoGenerate = true)
@@ -308,6 +323,8 @@ data class PhysicalCashCountEntity(
     @ColumnInfo(name = "counted_at")
     val countedAt: String,
     val notes: String? = null,
+    @ColumnInfo(name = "uid", defaultValue = "''")
+    val uid: String = LegacyUid.randomUid(),
 )
 
 @Entity(

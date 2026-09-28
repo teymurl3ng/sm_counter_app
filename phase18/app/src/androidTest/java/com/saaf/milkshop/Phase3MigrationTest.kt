@@ -7,8 +7,11 @@ import androidx.sqlite.execSQL
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.saaf.milkshop.data.MilkShopDatabase
+import com.saaf.milkshop.sync.LegacyUid
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,7 +31,7 @@ class Phase3MigrationTest {
         databaseFactory = {
             Room.databaseBuilder<MilkShopDatabase>(context, databaseName)
                 .setDriver(BundledSQLiteDriver())
-                .addMigrations(MilkShopDatabase.MIGRATION_3_4, MilkShopDatabase.MIGRATION_4_5, MilkShopDatabase.MIGRATION_5_6, MilkShopDatabase.MIGRATION_6_7, MilkShopDatabase.MIGRATION_7_8, MilkShopDatabase.MIGRATION_8_9)
+                .addMigrations(MilkShopDatabase.MIGRATION_3_4, MilkShopDatabase.MIGRATION_4_5, MilkShopDatabase.MIGRATION_5_6, MilkShopDatabase.MIGRATION_6_7, MilkShopDatabase.MIGRATION_7_8, MilkShopDatabase.MIGRATION_8_9, MilkShopDatabase.MIGRATION_9_10)
                 .build()
         },
         autoMigrationSpecs = emptyList(),
@@ -196,6 +199,86 @@ class Phase3MigrationTest {
             )
         }
     }
+
+    @Test
+    fun legacyUid_knownAnswerVectorsAreFrozen() {
+        // Any change to these values forks row identity for every legacy row;
+        // if one legitimately changes, regenerate the vector and say so loudly.
+        assertEquals("u1_7f6844c02d08f7b4749c8b99cfdd1cb5", LegacyUid.event(1, "SALE", "2026-01-01T00:00:00Z"))
+        assertEquals("u1_8c2d1bb8208e448bca8b7293ba1e97bc", LegacyUid.event(2, "SALE", "2026-01-02T00:00:00Z"))
+        assertEquals("u1_798c656933df2ff0f0af7163c181dd69", LegacyUid.product(7, "Butter", "Kg"))
+        assertEquals("u1_eb7360e6f91498b315250dcbad1d61d8", LegacyUid.account(5, "Customer: Noor Store", "Customer"))
+        assertEquals("u1_42d05bdd864d13f54df59bb7107a4ccd", LegacyUid.dailyCloseAction(3, "2026-01-01", "close", "2026-01-01T20:00:00Z"))
+        // Seed identities are fixed well-known values shared by every install.
+        assertEquals("u1_seed_products_Milk", LegacyUid.seedProductUid("Milk", "Liters"))
+        assertEquals("u1_seed_accounts_Cash", LegacyUid.seedAccountUid("Cash", "Cash/Bank"))
+        assertNull(LegacyUid.seedProductUid("Milk", "Kg"))
+        assertNull(LegacyUid.seedAccountUid("Cash", "Vendor"))
+    }
+
+    @Test
+    fun migration9To10_backfillsDeterministicUniqueUids_andPreservesRows() = runBlocking {
+        val first = migrateSchema9SampleTo10()
+
+        // Seed rows adopt the shared well-known identities; custom rows adopt
+        // the frozen deterministic identities for their immutable fields.
+        assertEquals(listOf("u1_seed_products_Milk", "u1_798c656933df2ff0f0af7163c181dd69"), first.getValue("products"))
+        assertEquals(listOf("u1_seed_accounts_Cash", "u1_eb7360e6f91498b315250dcbad1d61d8"), first.getValue("accounts"))
+        assertEquals(
+            listOf("u1_7f6844c02d08f7b4749c8b99cfdd1cb5", "u1_8c2d1bb8208e448bca8b7293ba1e97bc"),
+            first.getValue("events"),
+        )
+        assertEquals(listOf("u1_42d05bdd864d13f54df59bb7107a4ccd"), first.getValue("closes"))
+        first.values.forEach { uids ->
+            assertEquals(uids.size, uids.distinct().size)
+            uids.forEach { uid -> assertTrue(uid.isNotBlank()) }
+        }
+
+        // Determinism: migrating the identical schema-9 data again yields the
+        // identical identities, which is what makes legacy-backup imports
+        // idempotent across devices.
+        val second = migrateSchema9SampleTo10()
+        assertEquals(first, second)
+    }
+
+    private suspend fun migrateSchema9SampleTo10(): Map<String, List<String>> {
+        context.deleteDatabase(databaseName)
+        helper.createDatabase(9).apply {
+            execSQL("INSERT INTO products(product_id, name, unit) VALUES (1, 'Milk', 'Liters')")
+            execSQL("INSERT INTO products(product_id, name, unit) VALUES (7, 'Butter', 'Kg')")
+            execSQL("INSERT INTO accounts(account_id, name, type, category) VALUES (1, 'Cash', 'Asset', 'Cash/Bank')")
+            execSQL("INSERT INTO accounts(account_id, name, type, category) VALUES (5, 'Customer: Noor Store', 'Asset', 'Customer')")
+            execSQL("INSERT INTO events(event_id, created_at, occurred_at, event_type, surcharge_applied) VALUES (1, '2026-01-01T00:00:00Z', '2026-01-01', 'SALE', 0)")
+            execSQL("INSERT INTO events(event_id, created_at, occurred_at, event_type, corrects_event_id, surcharge_applied) VALUES (2, '2026-01-02T00:00:00Z', '2026-01-01', 'SALE', 1, 0)")
+            execSQL("INSERT INTO physical_cash_counts(count_id, account_id, business_date, counted_amount, counted_at) VALUES (2, 1, '2026-01-01', 500, '2026-01-01T20:00:00Z')")
+            execSQL("INSERT INTO daily_close_actions(action_id, business_date, action, physical_cash_count_id, actor_name, actor_role, created_at) VALUES (3, '2026-01-01', 'close', 2, 'Owner', 'owner', '2026-01-01T20:00:00Z')")
+            close()
+        }
+        helper.runMigrationsAndValidate(10, listOf(MilkShopDatabase.MIGRATION_9_10)).use { connection ->
+            // Every schema-9 row survives the migration.
+            assertEquals(2L, connection.scalarLong("SELECT COUNT(*) FROM products"))
+            assertEquals(2L, connection.scalarLong("SELECT COUNT(*) FROM accounts"))
+            assertEquals(2L, connection.scalarLong("SELECT COUNT(*) FROM events"))
+            assertEquals(1L, connection.scalarLong("SELECT COUNT(*) FROM physical_cash_counts"))
+            assertEquals(1L, connection.scalarLong("SELECT COUNT(*) FROM daily_close_actions"))
+            // Legacy events carry no origin: it is unknown, never invented.
+            assertEquals("", connection.scalarText("SELECT origin_device_id FROM events WHERE event_id = 1"))
+            return mapOf(
+                "products" to connection.uidColumn("SELECT uid FROM products ORDER BY product_id"),
+                "accounts" to connection.uidColumn("SELECT uid FROM accounts ORDER BY account_id"),
+                "events" to connection.uidColumn("SELECT event_uid FROM events ORDER BY event_id"),
+                "counts" to connection.uidColumn("SELECT uid FROM physical_cash_counts ORDER BY count_id"),
+                "closes" to connection.uidColumn("SELECT uid FROM daily_close_actions ORDER BY action_id"),
+            )
+        }
+    }
+
+    private fun androidx.sqlite.SQLiteConnection.uidColumn(sql: String): List<String> =
+        prepare(sql).use { statement ->
+            buildList {
+                while (statement.step()) add(statement.getText(0))
+            }
+        }
 
     private fun androidx.sqlite.SQLiteConnection.scalarLong(sql: String): Long =
         prepare(sql).use { statement ->

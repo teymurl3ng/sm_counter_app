@@ -50,8 +50,16 @@ class BackupManager(
 
     companion object {
         const val LEGACY_FORMAT_VERSION = 1
-        const val FORMAT_VERSION = 3
-        const val CURRENT_SCHEMA_VERSION = 9
+        const val FORMAT_VERSION = 4
+        const val CURRENT_SCHEMA_VERSION = 10
+
+        /**
+         * Oldest portable/local/cloud backup format this build can still
+         * restore. Bumping FORMAT_VERSION must never orphan existing backups:
+         * format 3 (schema 9) snapshots remain restorable; their rows simply
+         * receive deterministic uids at import (BackupSnapshotCodec).
+         */
+        const val MIN_RESTORE_FORMAT_VERSION = 3
         const val FULL_GROUP = "business"
         const val PLANNING_GROUP = "planning"
         const val PREFERENCES_GROUP = "preferences"
@@ -308,7 +316,7 @@ class BackupManager(
             val json = cryptography.readEncryptedAndVerify(cryptography.readUri(uri), passphrase)
             val metadata = json.getJSONObject("metadata")
             validateCompatibility(metadata)
-            require(metadata.getInt("format_version") == FORMAT_VERSION) { "Encrypted backup format is invalid" }
+            requireRestorableFormat(metadata)
             restoreEngine.restore(database, json, selection, includeSecurity = true)
             sessions.invalidateAll()
             backupMeta(json, uri.lastPathSegment ?: "backup")
@@ -357,7 +365,7 @@ class BackupManager(
         val json = readAndVerify(bytes)
         val metadata = json.getJSONObject("metadata")
         validateCompatibility(metadata)
-        require(metadata.getInt("format_version") == FORMAT_VERSION) { "Encrypted backup format is invalid" }
+        requireRestorableFormat(metadata)
         return EncryptedBackupInspection(
             meta = backupMeta(json, fileName),
             containsSecurityState = json.getJSONObject("data").optJSONArray("app_users")?.length()?.let { it > 0 } == true,
@@ -376,7 +384,7 @@ class BackupManager(
             val json = readAndVerify(bytes)
             val metadata = json.getJSONObject("metadata")
             validateCompatibility(metadata)
-            require(metadata.getInt("format_version") == FORMAT_VERSION) { "Encrypted backup format is invalid" }
+            requireRestorableFormat(metadata)
             require(json.getJSONObject("data").getJSONArray("app_users").length() > 0) {
                 "This encrypted backup contains no application users"
             }
@@ -491,6 +499,13 @@ class BackupManager(
         }
         require(schema <= CURRENT_SCHEMA_VERSION) {
             "This backup was created with a newer database schema ($schema). Update the app before restoring it."
+        }
+    }
+
+    private fun requireRestorableFormat(metadata: JSONObject) {
+        val format = metadata.getInt("format_version")
+        require(format in MIN_RESTORE_FORMAT_VERSION..FORMAT_VERSION) {
+            "This backup uses an unsupported backup format ($format)."
         }
     }
 

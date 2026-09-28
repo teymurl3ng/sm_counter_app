@@ -1,6 +1,7 @@
 package com.saaf.milkshop
 
 import com.saaf.milkshop.data.*
+import com.saaf.milkshop.sync.LegacyUid
 import org.json.JSONArray
 import org.json.JSONObject
 import java.security.MessageDigest
@@ -17,10 +18,10 @@ internal fun readAndVerify(bytes: ByteArray): JSONObject {
 }
 
 internal fun productJson(v: ProductEntity) = JSONObject().apply {
-    put("product_id", v.productId); put("name", v.name); put("unit", v.unit)
+    put("product_id", v.productId); put("name", v.name); put("unit", v.unit); put("uid", v.uid)
 }
 internal fun accountJson(v: AccountEntity) = JSONObject().apply {
-    put("account_id", v.accountId); put("name", v.name); put("type", v.type); put("category", v.category)
+    put("account_id", v.accountId); put("name", v.name); put("type", v.type); put("category", v.category); put("uid", v.uid)
 }
 internal fun eventJson(v: EventEntity) = JSONObject().apply {
     put("event_id", v.eventId); put("created_at", v.createdAt); put("occurred_at", v.occurredAt); put("event_type", v.eventType)
@@ -31,6 +32,7 @@ internal fun eventJson(v: EventEntity) = JSONObject().apply {
     putNullable("milk_rate_used", v.milkRateUsed); putNullable("delivery_fee_used", v.deliveryFeeUsed); putNullable("ts_standard_used", v.tsStandardUsed)
     putNullable("sale_quantity", v.saleQuantity); putNullable("sale_value", v.saleValue); putNullable("unit_rate", v.unitRate)
     put("surcharge_applied", v.surchargeApplied); putNullable("notes", v.notes)
+    put("event_uid", v.eventUid); put("origin_device_id", v.originDeviceId)
 }
 internal fun inventoryJson(v: InventoryLogEntity) = JSONObject().apply {
     put("log_id", v.logId); put("event_id", v.eventId); put("product_id", v.productId); put("quantity", v.quantity)
@@ -45,10 +47,12 @@ internal fun budgetJson(v: BudgetPlanEntity) = JSONObject().apply {
     put("budget_id", v.budgetId); put("category", v.category); put("period_start", v.periodStart); put("period_end_exclusive", v.periodEndExclusive)
     putNullable("planned_liters", v.plannedLiters); putNullable("planned_amount", v.plannedAmount); putNullable("vendor_rate_snapshot", v.vendorRateSnapshot)
     putNullable("retail_rate_snapshot", v.retailRateSnapshot); put("created_at", v.createdAt); putNullable("supersedes_id", v.supersedesId); put("archived", v.archived)
+    put("uid", v.uid)
 }
 internal fun collectionJson(v: CollectionsTargetEntity) = JSONObject().apply {
     put("target_id", v.targetId); put("week_start", v.weekStart); put("week_end_exclusive", v.weekEndExclusive); put("target_amount", v.targetAmount)
     put("created_at", v.createdAt); putNullable("supersedes_id", v.supersedesId); put("archived", v.archived)
+    put("uid", v.uid)
 }
 internal fun productProfileJson(v: ProductProfileEntity) = JSONObject().apply {
     put("product_id", v.productId); putNullable("default_sale_rate", v.defaultSaleRate); put("inventory_tracking", v.inventoryTracking)
@@ -68,14 +72,17 @@ internal fun employeeProfileJson(v: EmployeeProfileEntity) = JSONObject().apply 
 internal fun attendanceJson(v: AttendanceRecordEntity) = JSONObject().apply {
     put("attendance_id", v.attendanceId); put("employee_account_id", v.employeeAccountId); put("business_date", v.businessDate); put("status", v.status)
     putNullable("notes", v.notes); put("created_at", v.createdAt); putNullable("supersedes_id", v.supersedesId); put("archived", v.archived)
+    put("uid", v.uid)
 }
 internal fun deliveryJson(v: DeliveryEntity) = JSONObject().apply {
     put("delivery_id", v.deliveryId); put("customer_account_id", v.customerAccountId); put("product_id", v.productId); put("quantity", v.quantity)
     putNullable("route", v.route); put("business_date", v.businessDate); putNullable("sale_event_id", v.saleEventId); putNullable("notes", v.notes)
     put("created_at", v.createdAt); put("archived", v.archived)
+    put("uid", v.uid)
 }
 internal fun deliveryStatusJson(v: DeliveryStatusEntity) = JSONObject().apply {
     put("status_id", v.statusId); put("delivery_id", v.deliveryId); put("status", v.status); put("occurred_at", v.occurredAt); putNullable("notes", v.notes)
+    put("uid", v.uid)
 }
 internal fun spoilageDetailJson(v: SpoilageDetailEntity) = JSONObject().apply {
     put("event_id", v.eventId); put("product_id", v.productId); put("quantity", v.quantity); put("reason", v.reason)
@@ -83,6 +90,7 @@ internal fun spoilageDetailJson(v: SpoilageDetailEntity) = JSONObject().apply {
 internal fun physicalCashCountJson(v: PhysicalCashCountEntity) = JSONObject().apply {
     put("count_id", v.countId); put("account_id", v.accountId); put("business_date", v.businessDate); put("counted_amount", v.countedAmount)
     put("counted_at", v.countedAt); putNullable("notes", v.notes)
+    put("uid", v.uid)
 }
 internal fun expenseCategoryProfileJson(v: ExpenseCategoryProfileEntity) = JSONObject().apply {
     put("account_id", v.accountId); put("display_name", v.displayName); put("active", v.active); put("created_at", v.createdAt)
@@ -105,6 +113,7 @@ internal fun dailyCloseActionJson(v: DailyCloseActionEntity, includeSecurity: Bo
     putNullable("physical_cash_count_id", v.physicalCashCountId); put("actor_name", v.actorName); put("actor_role", v.actorRole)
     if (includeSecurity) putNullable("actor_user_id", v.actorUserId)
     putNullable("reason", v.reason); put("created_at", v.createdAt); putNullable("supersedes_action_id", v.supersedesActionId)
+    put("uid", v.uid)
 }
 internal fun appUserJson(v: AppUserEntity) = JSONObject().apply {
     put("user_id", v.userId); put("login_name", v.loginName); put("display_name", v.displayName); put("role", v.role)
@@ -177,8 +186,21 @@ internal fun serverShopSnapshotJson(v: ServerShopSnapshotEntity) = JSONObject().
 
 internal fun JSONObject.putNullable(key: String, value: Any?) { put(key, value ?: JSONObject.NULL) }
 
-internal fun readProducts(a: JSONArray?): List<ProductEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let { ProductEntity(it.getLong("product_id"), it.getString("name"), it.getString("unit")) } }
-internal fun readAccounts(a: JSONArray?): List<AccountEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let { AccountEntity(it.getLong("account_id"), it.getString("name"), it.getString("type"), it.getString("category")) } }
+/**
+ * Pre-schema-10 backups carry no uid fields. Their rows must still import
+ * with the same deterministic identities the schema-10 migration assigns, so
+ * restoring an old backup never forks row identity across devices.
+ */
+private fun JSONObject.restoredUid(key: String): String? = optStringOrNull(key)?.takeIf { it.isNotBlank() }
+
+internal fun readProducts(a: JSONArray?): List<ProductEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
+    val productId = it.getLong("product_id"); val name = it.getString("name"); val unit = it.getString("unit")
+    ProductEntity(productId, name, unit, uid = it.restoredUid("uid") ?: LegacyUid.product(productId, name, unit))
+} }
+internal fun readAccounts(a: JSONArray?): List<AccountEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
+    val accountId = it.getLong("account_id"); val name = it.getString("name"); val category = it.getString("category")
+    AccountEntity(accountId, name, it.getString("type"), category, uid = it.restoredUid("uid") ?: LegacyUid.account(accountId, name, category))
+} }
 internal fun readEvents(a: JSONArray?): List<EventEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let { EventEntity(
     eventId = it.getLong("event_id"), createdAt = it.getString("created_at"), occurredAt = it.getString("occurred_at"), eventType = it.getString("event_type"),
     channel = it.optStringOrNull("channel"), correctsEventId = it.optLongOrNull("corrects_event_id"), rawLiters = it.optDoubleOrNull("raw_liters"),
@@ -187,7 +209,10 @@ internal fun readEvents(a: JSONArray?): List<EventEntity> = (0 until (a?.length(
     milkLitersUsed = it.optDoubleOrNull("milk_liters_used"), yogurtKgProduced = it.optDoubleOrNull("yogurt_kg_produced"), amount = it.optDoubleOrNull("amount"),
     milkRateUsed = it.optDoubleOrNull("milk_rate_used"), deliveryFeeUsed = it.optDoubleOrNull("delivery_fee_used"), tsStandardUsed = it.optDoubleOrNull("ts_standard_used"),
     saleQuantity = it.optDoubleOrNull("sale_quantity"), saleValue = it.optDoubleOrNull("sale_value"), unitRate = it.optDoubleOrNull("unit_rate"),
-    surchargeApplied = it.optDouble("surcharge_applied", 0.0), notes = it.optStringOrNull("notes")
+    surchargeApplied = it.optDouble("surcharge_applied", 0.0), notes = it.optStringOrNull("notes"),
+    eventUid = it.restoredUid("event_uid")
+        ?: LegacyUid.event(it.getLong("event_id"), it.getString("event_type"), it.getString("created_at")),
+    originDeviceId = it.optStringOrNull("origin_device_id") ?: ""
 ) } }
 internal fun readInventoryLogs(a: JSONArray?): List<InventoryLogEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let { InventoryLogEntity(it.getLong("log_id"), it.getLong("event_id"), it.getLong("product_id"), it.getDouble("quantity")) } }
 internal fun readFinancialLogs(a: JSONArray?): List<FinancialLogEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let { FinancialLogEntity(it.getLong("log_id"), it.getLong("event_id"), it.getLong("account_id"), it.getDouble("amount")) } }
@@ -195,11 +220,15 @@ internal fun readSettings(a: JSONArray?): List<SettingEntity> = (0 until (a?.len
 internal fun readBudgets(a: JSONArray?): List<BudgetPlanEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let { BudgetPlanEntity(
     budgetId = it.getLong("budget_id"), category = it.getString("category"), periodStart = it.getString("period_start"), periodEndExclusive = it.getString("period_end_exclusive"),
     plannedLiters = it.optDoubleOrNull("planned_liters"), plannedAmount = it.optDoubleOrNull("planned_amount"), vendorRateSnapshot = it.optDoubleOrNull("vendor_rate_snapshot"),
-    retailRateSnapshot = it.optDoubleOrNull("retail_rate_snapshot"), createdAt = it.getString("created_at"), supersedesId = it.optLongOrNull("supersedes_id"), archived = it.optBoolean("archived", false)
+    retailRateSnapshot = it.optDoubleOrNull("retail_rate_snapshot"), createdAt = it.getString("created_at"), supersedesId = it.optLongOrNull("supersedes_id"), archived = it.optBoolean("archived", false),
+    uid = it.restoredUid("uid")
+        ?: LegacyUid.budget(it.getLong("budget_id"), it.getString("category"), it.getString("period_start"), it.getString("created_at"))
 ) } }
 internal fun readCollectionsTargets(a: JSONArray?): List<CollectionsTargetEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let { CollectionsTargetEntity(
     targetId = it.getLong("target_id"), weekStart = it.getString("week_start"), weekEndExclusive = it.getString("week_end_exclusive"), targetAmount = it.getDouble("target_amount"),
-    createdAt = it.getString("created_at"), supersedesId = it.optLongOrNull("supersedes_id"), archived = it.optBoolean("archived", false)
+    createdAt = it.getString("created_at"), supersedesId = it.optLongOrNull("supersedes_id"), archived = it.optBoolean("archived", false),
+    uid = it.restoredUid("uid")
+        ?: LegacyUid.collectionsTarget(it.getLong("target_id"), it.getString("week_start"), it.getString("created_at"))
 ) } }
 internal fun readProductProfiles(a: JSONArray?): List<ProductProfileEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
     ProductProfileEntity(it.getLong("product_id"), it.optDoubleOrNull("default_sale_rate"), it.optBoolean("inventory_tracking", true), it.optBoolean("archived", false), it.optStringOrNull("notes"), it.getString("created_at"))
@@ -214,19 +243,27 @@ internal fun readEmployeeProfiles(a: JSONArray?): List<EmployeeProfileEntity> = 
     EmployeeProfileEntity(it.getLong("account_id"), it.optStringOrNull("role"), it.optStringOrNull("phone"), it.optDoubleOrNull("reference_salary"), it.optStringOrNull("salary_period"), it.optStringOrNull("join_date"), it.optBoolean("active", true), it.getString("created_at"))
 } }
 internal fun readAttendanceRecords(a: JSONArray?): List<AttendanceRecordEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
-    AttendanceRecordEntity(it.getLong("attendance_id"), it.getLong("employee_account_id"), it.getString("business_date"), it.getString("status"), it.optStringOrNull("notes"), it.getString("created_at"), it.optLongOrNull("supersedes_id"), it.optBoolean("archived", false))
+    AttendanceRecordEntity(it.getLong("attendance_id"), it.getLong("employee_account_id"), it.getString("business_date"), it.getString("status"), it.optStringOrNull("notes"), it.getString("created_at"), it.optLongOrNull("supersedes_id"), it.optBoolean("archived", false),
+        uid = it.restoredUid("uid")
+            ?: LegacyUid.attendance(it.getLong("attendance_id"), it.getString("business_date"), it.getString("created_at")))
 } }
 internal fun readDeliveries(a: JSONArray?): List<DeliveryEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
-    DeliveryEntity(it.getLong("delivery_id"), it.getLong("customer_account_id"), it.getLong("product_id"), it.getDouble("quantity"), it.optStringOrNull("route"), it.getString("business_date"), it.optLongOrNull("sale_event_id"), it.optStringOrNull("notes"), it.getString("created_at"), it.optBoolean("archived", false))
+    DeliveryEntity(it.getLong("delivery_id"), it.getLong("customer_account_id"), it.getLong("product_id"), it.getDouble("quantity"), it.optStringOrNull("route"), it.getString("business_date"), it.optLongOrNull("sale_event_id"), it.optStringOrNull("notes"), it.getString("created_at"), it.optBoolean("archived", false),
+        uid = it.restoredUid("uid")
+            ?: LegacyUid.delivery(it.getLong("delivery_id"), it.getString("business_date"), it.getString("created_at")))
 } }
 internal fun readDeliveryStatuses(a: JSONArray?): List<DeliveryStatusEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
-    DeliveryStatusEntity(it.getLong("status_id"), it.getLong("delivery_id"), it.getString("status"), it.getString("occurred_at"), it.optStringOrNull("notes"))
+    DeliveryStatusEntity(it.getLong("status_id"), it.getLong("delivery_id"), it.getString("status"), it.getString("occurred_at"), it.optStringOrNull("notes"),
+        uid = it.restoredUid("uid")
+            ?: LegacyUid.deliveryStatus(it.getLong("status_id"), it.getLong("delivery_id"), it.getString("occurred_at")))
 } }
 internal fun readSpoilageDetails(a: JSONArray?): List<SpoilageDetailEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
     SpoilageDetailEntity(it.getLong("event_id"), it.getLong("product_id"), it.getDouble("quantity"), it.getString("reason"))
 } }
 internal fun readPhysicalCashCounts(a: JSONArray?): List<PhysicalCashCountEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
-    PhysicalCashCountEntity(it.getLong("count_id"), it.getLong("account_id"), it.getString("business_date"), it.getDouble("counted_amount"), it.getString("counted_at"), it.optStringOrNull("notes"))
+    PhysicalCashCountEntity(it.getLong("count_id"), it.getLong("account_id"), it.getString("business_date"), it.getDouble("counted_amount"), it.getString("counted_at"), it.optStringOrNull("notes"),
+        uid = it.restoredUid("uid")
+            ?: LegacyUid.physicalCashCount(it.getLong("count_id"), it.getString("business_date"), it.getString("counted_at")))
 } }
 internal fun readExpenseCategoryProfiles(a: JSONArray?): List<ExpenseCategoryProfileEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
     ExpenseCategoryProfileEntity(it.getLong("account_id"), it.getString("display_name"), it.optBoolean("active", true), it.getString("created_at"))
@@ -247,7 +284,9 @@ internal fun readDailyCloseActions(a: JSONArray?): List<DailyCloseActionEntity> 
     DailyCloseActionEntity(
         actionId = it.getLong("action_id"), businessDate = it.getString("business_date"), action = it.getString("action"),
         physicalCashCountId = it.optLongOrNull("physical_cash_count_id"), actorName = it.getString("actor_name"), actorRole = it.getString("actor_role"),
-        actorUserId = it.optLongOrNull("actor_user_id"), reason = it.optStringOrNull("reason"), createdAt = it.getString("created_at"), supersedesActionId = it.optLongOrNull("supersedes_action_id")
+        actorUserId = it.optLongOrNull("actor_user_id"), reason = it.optStringOrNull("reason"), createdAt = it.getString("created_at"), supersedesActionId = it.optLongOrNull("supersedes_action_id"),
+        uid = it.restoredUid("uid")
+            ?: LegacyUid.dailyCloseAction(it.getLong("action_id"), it.getString("business_date"), it.getString("action"), it.getString("created_at"))
     )
 } }
 internal fun readAppUsers(a: JSONArray?): List<AppUserEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {

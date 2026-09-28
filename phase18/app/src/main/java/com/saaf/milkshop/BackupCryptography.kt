@@ -96,7 +96,7 @@ internal class BackupCryptography(private val context: Context) {
 
     internal fun readLocalAndVerify(bytes: ByteArray): JSONObject {
         val envelope = JSONObject(bytes.toString(Charsets.UTF_8))
-        require(envelope.getInt("format_version") == BackupManager.FORMAT_VERSION) { "Local backup format is invalid" }
+        require(envelope.getInt("format_version") in BackupManager.MIN_RESTORE_FORMAT_VERSION..BackupManager.FORMAT_VERSION) { "Local backup format is invalid" }
         require(envelope.getString("protection") == LOCAL_BACKUP_PROTECTION) { "Backup is not a device-local snapshot" }
         val cipherJson = envelope.getJSONObject("cipher")
         require(cipherJson.getString("algorithm") == BACKUP_CIPHER_ALGORITHM) { "Unsupported local backup encryption" }
@@ -139,7 +139,7 @@ internal class BackupCryptography(private val context: Context) {
 
     internal fun readEncryptedAndVerify(bytes: ByteArray, passphrase: CharArray): JSONObject {
         val envelope = JSONObject(bytes.toString(Charsets.UTF_8))
-        require(envelope.getInt("format_version") == BackupManager.FORMAT_VERSION) { "Encrypted backup format is invalid" }
+        require(envelope.getInt("format_version") in BackupManager.MIN_RESTORE_FORMAT_VERSION..BackupManager.FORMAT_VERSION) { "Encrypted backup format is invalid" }
         val kdf = envelope.getJSONObject("kdf")
         val cipherJson = envelope.getJSONObject("cipher")
         require(kdf.getString("algorithm") == BACKUP_KDF_ALGORITHM) { "Unsupported backup key derivation" }

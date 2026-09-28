@@ -69,7 +69,7 @@ import com.saaf.milkshop.application.salarypayment.NativeSalaryPaymentEmployee
 import com.saaf.milkshop.application.salarypayment.NativeSalaryPaymentReceipt
 import com.saaf.milkshop.application.salarypayment.NativeSalaryPaymentRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalContext
 import com.saaf.milkshop.nativeui.common.hapticTap
 import com.saaf.milkshop.nativeui.common.hapticCommit
 import com.saaf.milkshop.nativeui.theme.SaafInk
@@ -405,9 +405,9 @@ private fun SalaryPaymentForm(
             )
         }
 
-        val hapticView = LocalView.current
+        val hapticContext = LocalContext.current
         Button(
-            onClick = { hapticView.hapticCommit(); onSubmit() },
+            onClick = { hapticContext.hapticCommit(); onSubmit() },
             enabled = validRequest,
             modifier = Modifier
                 .fillMaxWidth()

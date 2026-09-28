@@ -1,7 +1,7 @@
 package com.saaf.milkshop.nativeui.operations
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -213,7 +213,7 @@ private fun LinkedBody(
     saving: Boolean,
     onMarkPresent: () -> Unit,
 ) {
-val hapticView = LocalView.current
+val hapticContext = LocalContext.current
     Surface(
         tonalElevation = 1.dp,
         modifier = Modifier
@@ -250,7 +250,7 @@ val hapticView = LocalView.current
                     modifier = Modifier.testTag(NativeUiTags.OpsAttendanceNotMarked),
                 )
                 Button(
-                    onClick = { hapticView.hapticCommit(); onMarkPresent() },
+                    onClick = { hapticContext.hapticCommit(); onMarkPresent() },
                     enabled = postingOpen && !saving,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = SaafYellow,

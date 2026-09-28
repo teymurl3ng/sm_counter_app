@@ -77,7 +77,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -213,10 +213,10 @@ private fun CashierRailItem(
     tag: String,
     onClick: () -> Unit,
 ) {
-    val view = LocalView.current
+    val context = LocalContext.current
     NavigationRailItem(
         selected = selected,
-        onClick = { view.hapticTap(); onClick() },
+        onClick = { context.hapticTap(); onClick() },
         modifier = Modifier.testTag(tag).heightIn(min = 56.dp),
         icon = { Icon(icon, contentDescription = null) },
         label = { Text(label, maxLines = 2) },
@@ -640,7 +640,7 @@ private fun PaymentAccountSelectionRow(
     accountName: String,
     onClick: () -> Unit,
 ) {
-    val view = LocalView.current
+    val context = LocalContext.current
     Surface(
         color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(12.dp),
@@ -649,7 +649,7 @@ private fun PaymentAccountSelectionRow(
             .fillMaxWidth()
             .heightIn(min = 52.dp)
             .testTag(NativeUiTags.CashierPaymentAccountSelector)
-            .clickable(role = Role.Button) { view.hapticSelect(); onClick() },
+            .clickable(role = Role.Button) { context.hapticSelect(); onClick() },
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
@@ -1044,13 +1044,13 @@ private fun SaleEntryEditor(
 
 @Composable
 private fun Segment(text: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val view = LocalView.current
+    val context = LocalContext.current
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .clip(RoundedCornerShape(9.dp))
             .background(if (selected) MaterialTheme.colorScheme.primary else Color.Transparent)
-            .selectable(selected = selected, role = Role.RadioButton) { view.hapticSelect(); onClick() }
+            .selectable(selected = selected, role = Role.RadioButton) { context.hapticSelect(); onClick() }
             .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
         Text(
@@ -1223,9 +1223,9 @@ private fun StepButton(
     tag: String,
     onClick: () -> Unit,
 ) {
-    val view = LocalView.current
+    val context = LocalContext.current
     Surface(
-        onClick = { view.hapticTap(); onClick() },
+        onClick = { context.hapticTap(); onClick() },
         shape = RoundedCornerShape(12.dp),
         color = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.primary,
@@ -1248,7 +1248,7 @@ private fun PaymentCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val view = LocalView.current
+    val context = LocalContext.current
     Surface(
         color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
         contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
@@ -1256,7 +1256,7 @@ private fun PaymentCard(
         border = if (selected) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
         modifier = modifier
             .heightIn(min = 56.dp)
-            .selectable(selected = selected, role = Role.RadioButton) { view.hapticSelect(); onClick() },
+            .selectable(selected = selected, role = Role.RadioButton) { context.hapticSelect(); onClick() },
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
@@ -1293,7 +1293,7 @@ private fun CustomerSelectionRow(
     selectedCustomer: String?,
     onClick: () -> Unit,
 ) {
-    val view = LocalView.current
+    val context = LocalContext.current
     Surface(
         color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(12.dp),
@@ -1302,7 +1302,7 @@ private fun CustomerSelectionRow(
             .fillMaxWidth()
             .heightIn(min = 52.dp)
             .testTag(NativeUiTags.CashierCustomerSelector)
-            .clickable(role = Role.Button) { view.hapticSelect(); onClick() },
+            .clickable(role = Role.Button) { context.hapticSelect(); onClick() },
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
@@ -1534,7 +1534,7 @@ private fun ReviewDock(
     buttonTag: String,
     onRecordSale: () -> Unit,
 ) {
-    val view = LocalView.current
+    val context = LocalContext.current
     Surface(
         color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(14.dp),
@@ -1591,7 +1591,7 @@ private fun ReviewDock(
             }
             Spacer(Modifier.height(9.dp))
             Button(
-                onClick = { view.hapticCommit(); onRecordSale() },
+                onClick = { context.hapticCommit(); onRecordSale() },
                 enabled = enabled,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -1660,10 +1660,10 @@ private fun androidx.compose.foundation.layout.RowScope.CashierNavigationItem(
     tag: String,
     onClick: () -> Unit,
 ) {
-    val view = LocalView.current
+    val context = LocalContext.current
     NavigationBarItem(
         selected = selected,
-        onClick = { view.hapticTap(); onClick() },
+        onClick = { context.hapticTap(); onClick() },
         modifier = Modifier.testTag(tag),
         icon = { Icon(icon, contentDescription = null) },
         label = { Text(label, maxLines = 2) },
@@ -1687,7 +1687,7 @@ private fun SaleDeliveryFollowUpCard(
     onSend: (String) -> Unit,
 ) {
     var route by rememberSaveable { mutableStateOf("") }
-    val view = LocalView.current
+    val context = LocalContext.current
     Surface(
         tonalElevation = 1.dp,
         modifier = Modifier
@@ -1711,7 +1711,7 @@ private fun SaleDeliveryFollowUpCard(
                     .testTag(NativeUiTags.CashierSaleDeliveryRoute),
             )
             Button(
-                onClick = { view.hapticCommit(); onSend(route) },
+                onClick = { context.hapticCommit(); onSend(route) },
                 enabled = !sending,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SaafYellow,
@@ -1751,8 +1751,8 @@ private fun SaleChequePane(
     onSendAsDelivery: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val view = LocalView.current
-    LaunchedEffect(receipt.eventId) { view.hapticConfirm() }
+    val context = LocalContext.current
+    LaunchedEffect(receipt.eventId) { context.hapticConfirm() }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -1816,7 +1816,7 @@ private fun SaleChequePane(
             }
         }
         Button(
-            onClick = { view.hapticTap(); onStartNextSale() },
+            onClick = { context.hapticTap(); onStartNextSale() },
             colors = ButtonDefaults.buttonColors(
                 containerColor = SaafYellow,
                 contentColor = SaafInk,

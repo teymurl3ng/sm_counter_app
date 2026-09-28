@@ -1,6 +1,6 @@
 package com.saaf.milkshop.nativeui.cashclose
 
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -273,7 +273,7 @@ private fun CashCloseForm(
     allowReopen: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
-    val hapticView = LocalView.current
+    val hapticContext = LocalContext.current
     val focusManager = LocalFocusManager.current
     val canCount = state.context.postingOpen &&
         countedPaisa != null &&
@@ -396,7 +396,7 @@ private fun CashCloseForm(
         )
 
         Button(
-            onClick = { hapticView.hapticCommit(); onRecordCount() },
+            onClick = { hapticContext.hapticCommit(); onRecordCount() },
             enabled = canCount,
             modifier = Modifier
                 .fillMaxWidth()
@@ -429,7 +429,7 @@ private fun CashCloseForm(
             }
             if (state.context.postingOpen) {
                 Button(
-                    onClick = { hapticView.hapticCommit(); onCloseDay() },
+                    onClick = { hapticContext.hapticCommit(); onCloseDay() },
                     enabled = canClose,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = SaafYellow,
@@ -477,7 +477,7 @@ private fun ReopenPanel(
     onPassphraseChange: (String) -> Unit,
     onReopen: () -> Unit,
 ) {
-val hapticView = LocalView.current
+val hapticContext = LocalContext.current
     Surface(
         color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(16.dp),
@@ -521,7 +521,7 @@ val hapticView = LocalView.current
                     .testTag(NativeUiTags.CashCloseReopenPassphrase),
             )
             Button(
-                onClick = { hapticView.hapticCommit(); onReopen() },
+                onClick = { hapticContext.hapticCommit(); onReopen() },
                 enabled = canReopen,
                 modifier = Modifier
                     .fillMaxWidth()

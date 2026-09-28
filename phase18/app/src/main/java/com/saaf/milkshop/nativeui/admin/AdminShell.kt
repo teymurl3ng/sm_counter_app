@@ -18,7 +18,7 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
@@ -72,8 +72,8 @@ private fun AdminRailItem(
     icon: ImageVector,
     label: String,
 ) {
-    val view = LocalView.current
-    val onClickHaptic = { view.hapticTap(); onClick() }
+    val context = LocalContext.current
+    val onClickHaptic = { context.hapticTap(); onClick() }
     NavigationRailItem(
         selected = selected,
         onClick = onClickHaptic,
@@ -131,8 +131,8 @@ private fun RowScope.AdminNavItem(
     icon: ImageVector,
     label: String,
 ) {
-    val view = LocalView.current
-    val onClickHaptic = { view.hapticTap(); onClick() }
+    val context = LocalContext.current
+    val onClickHaptic = { context.hapticTap(); onClick() }
     NavigationBarItem(
         selected = selected,
         onClick = onClickHaptic,

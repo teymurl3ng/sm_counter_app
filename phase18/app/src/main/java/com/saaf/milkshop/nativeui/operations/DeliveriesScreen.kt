@@ -31,7 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -158,10 +158,10 @@ internal fun DeliveriesReadyContent(
             .imePaddingExcludingNavBar()
             .testTag(NativeUiTags.OpsDeliveriesRoot),
     ) {
-        val hapticView = LocalView.current
+        val hapticContext = LocalContext.current
         LaunchedEffect(state.lastDeliveredId, state.lastLinkedId, state.lastCreatedId) {
             if (state.lastDeliveredId != null || state.lastLinkedId != null || state.lastCreatedId != null) {
-                hapticView.hapticConfirm()
+                hapticContext.hapticConfirm()
             }
         }
         CashierScreenHeader(
@@ -328,7 +328,7 @@ private fun NewDeliveryCard(
     state: NativeDeliveriesState.Ready,
     draftActions: NativeDeliveriesDraftActions,
 ) {
-    val hapticView = LocalView.current
+    val hapticContext = LocalContext.current
     var expanded by rememberSaveable { mutableStateOf(false) }
     var pickingCustomer by rememberSaveable { mutableStateOf(false) }
     var pickingProduct by rememberSaveable { mutableStateOf(false) }
@@ -425,7 +425,7 @@ private fun NewDeliveryCard(
                     .testTag(NativeUiTags.OpsDeliveryNotes),
             )
             Button(
-                onClick = { hapticView.hapticCommit(); draftActions.create() },
+                onClick = { hapticContext.hapticCommit(); draftActions.create() },
                 enabled = canCreate,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SaafYellow,
@@ -522,7 +522,7 @@ private fun LinkSaleCard(
     onArchive: (Long) -> Unit,
     archiving: Boolean,
 ) {
-    val hapticView = LocalView.current
+    val hapticContext = LocalContext.current
     var saleNumber by rememberSaveable(item.deliveryId) { mutableStateOf("") }
     Surface(
         tonalElevation = 1.dp,
@@ -553,7 +553,7 @@ private fun LinkSaleCard(
                     .testTag(NativeUiTags.opsDeliveryLinkInput(item.deliveryId)),
             )
             Button(
-                onClick = { hapticView.hapticCommit(); onLinkSale(item.deliveryId, saleNumber) },
+                onClick = { hapticContext.hapticCommit(); onLinkSale(item.deliveryId, saleNumber) },
                 enabled = !busy && saleNumber.isNotBlank(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SaafYellow,
@@ -602,7 +602,7 @@ private fun DeliveryCard(
     canMark: Boolean,
     onMarkDelivered: (Long) -> Unit,
 ) {
-    val hapticView = LocalView.current
+    val hapticContext = LocalContext.current
     Surface(
         tonalElevation = 1.dp,
         modifier = Modifier
@@ -642,7 +642,7 @@ private fun DeliveryCard(
                 color = MaterialTheme.colorScheme.primary,
             )
             Button(
-                onClick = { hapticView.hapticCommit(); onMarkDelivered(item.deliveryId) },
+                onClick = { hapticContext.hapticCommit(); onMarkDelivered(item.deliveryId) },
                 enabled = canMark,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SaafYellow,

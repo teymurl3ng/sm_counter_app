@@ -1,13 +1,13 @@
 package com.saaf.milkshop.nativeui.common
 
-import android.view.View
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalContext
 
 /**
  * Presentation-only leave guard for draft entry forms.
@@ -16,7 +16,7 @@ import androidx.compose.ui.platform.LocalView
  * routine action.
  */
 @Stable
-class EntryLeaveGuard(private val view: View? = null) {
+class EntryLeaveGuard(private val context: Context? = null) {
     var dirty by mutableStateOf(false)
         private set
 
@@ -43,7 +43,7 @@ class EntryLeaveGuard(private val view: View? = null) {
     }
 
     fun confirmDiscard() {
-        view?.hapticHeavy()
+        context?.hapticHeavy()
         val action = pendingLeave
         clear()
         action?.invoke()
@@ -56,6 +56,6 @@ class EntryLeaveGuard(private val view: View? = null) {
 
 @Composable
 fun rememberEntryLeaveGuard(): EntryLeaveGuard {
-    val view = LocalView.current
-    return remember { EntryLeaveGuard(view) }
+    val context = LocalContext.current
+    return remember { EntryLeaveGuard(context) }
 }

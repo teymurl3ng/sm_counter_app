@@ -2315,10 +2315,12 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithTag(NativeUiTags.CashierProductMilk).assertIsSelected()
         composeRule.onNodeWithTag(NativeUiTags.CashierProductYogurt).performClick().assertIsSelected()
         composeRule.onNodeWithText("At PKR ${formatAmount(yogurtRate)} / kg").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).performScrollTo().performTextReplacement("2")
         composeRule.onNodeWithText("Cash +PKR ${formatAmount(yogurtRate * 2)}").performScrollTo().assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.CashierProductMilk).performScrollTo().performClick().assertIsSelected()
         composeRule.onNodeWithText("At PKR ${formatAmount(milkRate)} / L").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).performScrollTo().performTextReplacement("2")
         composeRule.onNodeWithText("Cash +PKR ${formatAmount(milkRate * 2)}").performScrollTo().assertIsDisplayed()
     }
 
@@ -2329,7 +2331,8 @@ class NativeFoundationUiTest {
         val threeUnits = formatInput(milkRate * 3)
 
         composeRule.onNodeWithTag(NativeUiTags.CashierModeAmount).performClick().assertIsSelected()
-        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).assertTextEquals(formatInput(milkRate * 2))
+        // Empty entry stays empty across the mode switch; typing drives the rest.
+        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).assertTextEquals("")
         composeRule.onNodeWithText("PKR").assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).performTextReplacement(threeUnits)
@@ -2432,6 +2435,7 @@ class NativeFoundationUiTest {
         val ahmedId = customerId("Ahmed Store")
         val total = formatAmount(retailRate(SettingKeys.RETAIL_RATE_MILK) * 2)
 
+        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).performScrollTo().performTextReplacement("2")
         composeRule.onNodeWithTag(NativeUiTags.CashierPaymentCustomer).performScrollTo().performClick()
         selectCustomer(ahmedId)
 
@@ -2572,14 +2576,15 @@ class NativeFoundationUiTest {
         val priorEventId = app.database.eventDao().findAllDescending().maxOfOrNull { it.eventId } ?: 0L
         openCashier()
 
+        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).performScrollTo().performTextReplacement("2")
         composeRule.onNodeWithTag(NativeUiTags.CashierRecordSale).performScrollTo().performClick()
         composeRule.waitUntil(15_000) {
             composeRule.onAllNodesWithText("Record sale").fetchSemanticsNodes().isNotEmpty() &&
                 runCatching {
-                    composeRule.onNodeWithTag(NativeUiTags.CashierSaleSuccess).fetchSemanticsNode()
+                    composeRule.onNodeWithTag(NativeUiTags.CashierSaleCheque).fetchSemanticsNode()
                 }.isSuccess
         }
-        composeRule.onNodeWithTag(NativeUiTags.CashierSaleSuccess).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashierSaleCheque).assertIsDisplayed()
 
         val sale = app.database.eventDao().findAllDescending().single {
             it.eventId > priorEventId && it.eventType == "SALE"
@@ -2593,7 +2598,6 @@ class NativeFoundationUiTest {
         val actor = app.database.eventActorLinkDao().find(sale.eventId)
         assertNotNull(actor)
         assertEquals("Instrumentation Cashier", actor!!.actorNameSnapshot)
-        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).assertTextEquals("2.0")
         Unit
     }
 
@@ -2608,11 +2612,12 @@ class NativeFoundationUiTest {
         val priorEventId = app.database.eventDao().findAllDescending().maxOfOrNull { it.eventId } ?: 0L
         openCashier()
 
+        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).performScrollTo().performTextReplacement("2")
         composeRule.onNodeWithTag(NativeUiTags.CashierPaymentCustomer).performScrollTo().performClick()
         selectCustomer(customerId)
         composeRule.onNodeWithTag(NativeUiTags.CashierRecordSale).performScrollTo().performClick()
         composeRule.waitUntil(15_000) {
-            runCatching { composeRule.onNodeWithTag(NativeUiTags.CashierSaleSuccess).fetchSemanticsNode() }.isSuccess
+            runCatching { composeRule.onNodeWithTag(NativeUiTags.CashierSaleCheque).fetchSemanticsNode() }.isSuccess
         }
 
         val sale = app.database.eventDao().findAllDescending().single {

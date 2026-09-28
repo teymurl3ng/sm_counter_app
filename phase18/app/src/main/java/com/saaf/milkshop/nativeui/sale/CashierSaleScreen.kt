@@ -230,7 +230,7 @@ internal fun SaleEntryContent(
     var selectedProductId by rememberSaveable { mutableStateOf<Long?>(null) }
     var entryMode by rememberSaveable { mutableStateOf(EntryMode.Quantity) }
     var payment by rememberSaveable { mutableStateOf(PaymentChoice.PaidNow) }
-    var entryValue by rememberSaveable { mutableStateOf("2.0") }
+    var entryValue by rememberSaveable { mutableStateOf("") }
     var selectedCustomerId by rememberSaveable { mutableStateOf<Long?>(null) }
     var showCustomerPicker by rememberSaveable { mutableStateOf(false) }
     var secondaryDetailsExpanded by rememberSaveable { mutableStateOf(false) }
@@ -306,7 +306,7 @@ internal fun SaleEntryContent(
                         selectedProductId = null
                         entryMode = EntryMode.Quantity
                         payment = PaymentChoice.PaidNow
-                        entryValue = "2.0"
+                        entryValue = ""
                         selectedCustomerId = null
                         secondaryDetailsExpanded = false
                         leaveGuard.clear()
@@ -928,6 +928,21 @@ private fun QuantityEditor(
                         fontWeight = FontWeight.ExtraBold,
                         lineHeight = 36.sp,
                     ),
+                    decorationBox = { inner ->
+                        Box {
+                            if (value.isEmpty()) {
+                                Text(
+                                    text = "0",
+                                    style = TextStyle(
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f),
+                                        fontSize = 34.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                    ),
+                                )
+                            }
+                            inner()
+                        }
+                    },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Decimal,
                         imeAction = ImeAction.Done,
@@ -1073,7 +1088,7 @@ private fun PaymentCard(
             .selectable(selected = selected, onClick = onClick, role = Role.RadioButton),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             RadioButton(
@@ -1084,19 +1099,19 @@ private fun PaymentCard(
                     unselectedColor = MaterialTheme.colorScheme.outline,
                 ),
             )
-            Text(
-                text = title,
-                style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier.weight(1f),
-            )
-            if (detail != null) {
-                Spacer(Modifier.width(5.dp))
+            Spacer(Modifier.width(8.dp))
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = detail,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = if (selected) MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.78f) else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.weight(1f),
+                    text = title,
+                    style = MaterialTheme.typography.labelLarge,
                 )
+                if (detail != null) {
+                    Text(
+                        text = detail,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = if (selected) MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.78f) else MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     }

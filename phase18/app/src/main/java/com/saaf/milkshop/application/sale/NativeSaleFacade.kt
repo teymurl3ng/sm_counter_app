@@ -7,6 +7,7 @@ import com.saaf.milkshop.domain.SaleInput
 import com.saaf.milkshop.domain.SalePayment
 import com.saaf.milkshop.domain.UserSecurityService
 import java.time.LocalDate
+import com.saaf.milkshop.sync.BusinessClock
 
 data class NativeSaleProduct(
     val productId: Long,
@@ -71,7 +72,7 @@ class NativeSaleFacade(
     private val reads = HybridReadModelService(database, security)
     private val commands = OperationsBridgeCommandService(database, security)
 
-    suspend fun load(sessionHandle: String, date: LocalDate = LocalDate.now()): NativeSaleContext {
+    suspend fun load(sessionHandle: String, date: LocalDate = BusinessClock.today()): NativeSaleContext {
         val businessDate = date.toString()
         val endDate = date.plusDays(1).toString()
         val references = reads.transactionReferences(sessionHandle)
@@ -117,7 +118,7 @@ class NativeSaleFacade(
     suspend fun record(
         sessionHandle: String,
         request: NativeSaleRequest,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeSaleSubmission {
         require(request.enteredValue.isFinite() && request.enteredValue > 0.0) {
             "Enter a sale quantity or amount greater than zero."

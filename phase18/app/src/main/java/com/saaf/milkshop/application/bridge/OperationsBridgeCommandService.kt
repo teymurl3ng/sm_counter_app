@@ -31,6 +31,7 @@ import com.saaf.milkshop.domain.VendorPaymentService
 import com.saaf.milkshop.domain.YogurtProductionInput
 import com.saaf.milkshop.domain.YogurtProductionResult
 import com.saaf.milkshop.domain.YogurtProductionService
+import com.saaf.milkshop.sync.BusinessDateGuard
 import java.time.Instant
 
 internal class OperationsBridgeCommandService(
@@ -48,6 +49,7 @@ internal class OperationsBridgeCommandService(
             if (database.dailyCloseDao().isPostingClosed(input.occurredAt)) {
                 throw BridgeCommandDayClosed("This business day is closed. Reopen it before recording the purchase.")
             }
+            BusinessDateGuard.requireHappenedWithinHorizon(input.occurredAt)
             val result = VendorPurchaseService(database).record(input)
             database.eventActorLinkDao().insert(
                 EventActorLinkEntity(
@@ -98,6 +100,7 @@ internal class OperationsBridgeCommandService(
             if (database.dailyCloseDao().isPostingClosed(input.occurredAt)) {
                 throw BridgeCommandDayClosed("This business day is closed. Reopen it before recording the sale.")
             }
+            BusinessDateGuard.requireHappenedWithinHorizon(input.occurredAt)
             val result = try {
                 SaleService(database).record(input)
             } catch (error: Throwable) {
@@ -125,6 +128,7 @@ internal class OperationsBridgeCommandService(
         if (database.dailyCloseDao().isPostingClosed(input.occurredAt)) {
             throw BridgeCommandDayClosed("This business day is closed. Reopen it before recording production.")
         }
+        BusinessDateGuard.requireHappenedWithinHorizon(input.occurredAt)
         val result = try {
             YogurtProductionService(database).record(input)
         } catch (error: Throwable) {
@@ -165,6 +169,7 @@ internal class OperationsBridgeCommandService(
         if (database.dailyCloseDao().isPostingClosed(occurredAt)) {
             throw BridgeCommandDayClosed("This business day is closed. Reopen it before recording the expense.")
         }
+        BusinessDateGuard.requireHappenedWithinHorizon(occurredAt)
         val result = ExpenseService(database).record(
             ExpenseInput(category.displayName, paymentAccountId, amount, occurredAt, notes)
         )
@@ -288,6 +293,7 @@ internal class OperationsBridgeCommandService(
     }
 
     private suspend fun requireOpenDate(occurredAt: String, operation: String) {
+        BusinessDateGuard.requireHappenedWithinHorizon(occurredAt)
         if (database.dailyCloseDao().isPostingClosed(occurredAt)) {
             throw BridgeCommandDayClosed("This business day is closed. Reopen it before recording the $operation.")
         }

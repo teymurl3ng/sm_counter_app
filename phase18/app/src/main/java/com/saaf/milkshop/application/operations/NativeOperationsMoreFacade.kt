@@ -13,6 +13,7 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import com.saaf.milkshop.sync.BusinessClock
 
 /**
  * Typed native boundary for Operations More.
@@ -27,7 +28,7 @@ class NativeOperationsMoreFacade(
 ) {
     suspend fun load(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeOperationsMoreContext {
         security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
         val businessDate = date.toString()
@@ -39,7 +40,7 @@ class NativeOperationsMoreFacade(
 
     suspend fun loadTodayWork(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeOperationsMoreToday {
         val actor = security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
         val context = load(sessionHandle, date)

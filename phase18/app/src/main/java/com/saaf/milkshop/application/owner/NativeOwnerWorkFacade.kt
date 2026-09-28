@@ -7,6 +7,7 @@ import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.DeliveryService
 import com.saaf.milkshop.domain.UserSecurityService
 import java.time.LocalDate
+import com.saaf.milkshop.sync.BusinessClock
 
 data class NativeOwnerWorkContext(
     val businessDate: String,
@@ -25,7 +26,7 @@ class NativeOwnerWorkFacade(
 ) {
     suspend fun load(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeOwnerWorkContext {
         val actor = security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
         require(AppRole.parse(actor.role) == AppRole.OWNER) {

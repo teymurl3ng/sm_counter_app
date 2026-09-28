@@ -10,6 +10,7 @@ import java.math.RoundingMode
 import java.time.LocalDate
 import java.util.Locale
 import kotlin.math.round
+import com.saaf.milkshop.sync.BusinessClock
 
 /**
  * Typed native boundary for Operations Record spoilage.
@@ -24,7 +25,7 @@ class NativeRecordSpoilageFacade(
 
     suspend fun load(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeRecordSpoilageContext {
         security.requirePermission(sessionHandle, AppPermission.PRODUCTION_AND_SPOILAGE)
         val businessDate = date.toString()
@@ -39,7 +40,7 @@ class NativeRecordSpoilageFacade(
     suspend fun record(
         sessionHandle: String,
         request: NativeRecordSpoilageRequest,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeRecordSpoilageSubmission {
         require(request.quantity.isFinite() && request.quantity > 0.0) {
             "Enter a quantity greater than zero."

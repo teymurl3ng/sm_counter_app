@@ -9,6 +9,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
 import kotlin.math.round
+import com.saaf.milkshop.sync.BusinessClock
 
 /**
  * Typed native boundary for Operations Make yogurt.
@@ -24,7 +25,7 @@ class NativeMakeYogurtFacade(
 
     suspend fun load(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeMakeYogurtContext {
         security.requirePermission(sessionHandle, AppPermission.PRODUCTION_AND_SPOILAGE)
         val businessDate = date.toString()
@@ -58,7 +59,7 @@ class NativeMakeYogurtFacade(
     suspend fun record(
         sessionHandle: String,
         request: NativeMakeYogurtRequest,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeMakeYogurtSubmission {
         require(request.milkLitersUsed.isFinite() && request.milkLitersUsed > 0.0) {
             "Enter milk liters greater than zero."

@@ -12,6 +12,7 @@ import com.saaf.milkshop.domain.VerifiedDailyReopenInput
 import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.math.abs
+import com.saaf.milkshop.sync.BusinessClock
 
 data class NativeCashCloseCountSnapshot(
     val countId: Long,
@@ -86,7 +87,7 @@ class NativeCashCloseFacade(
 
     suspend fun load(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeCashCloseContext {
         security.requirePermission(sessionHandle, AppPermission.CASH_COUNT_AND_CLOSE)
         val cash = database.accountDao().findByCategory("Cash/Bank")
@@ -120,7 +121,7 @@ class NativeCashCloseFacade(
     suspend fun recordCount(
         sessionHandle: String,
         request: NativeCashCloseCountRequest,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeCashCloseCountSubmission {
         require(request.countedCashPaisa >= 0L) { "Counted drawer cash cannot be negative." }
         val context = load(sessionHandle, date)
@@ -152,7 +153,7 @@ class NativeCashCloseFacade(
     suspend fun closeDay(
         sessionHandle: String,
         request: NativeCashCloseDayRequest,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeCashCloseDaySubmission {
         val context = load(sessionHandle, date)
         if (!context.postingOpen) {
@@ -200,7 +201,7 @@ class NativeCashCloseFacade(
         sessionHandle: String,
         reason: String,
         passphrase: CharArray,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeCashCloseReopenSubmission {
         try {
             val cleanedReason = reason.trim()

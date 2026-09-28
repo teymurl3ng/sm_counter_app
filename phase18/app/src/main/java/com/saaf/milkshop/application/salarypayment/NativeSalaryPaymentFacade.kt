@@ -8,6 +8,7 @@ import com.saaf.milkshop.domain.SalaryPaymentInput
 import com.saaf.milkshop.domain.UserSecurityService
 import java.math.BigDecimal
 import java.time.LocalDate
+import com.saaf.milkshop.sync.BusinessClock
 
 data class NativeSalaryPaymentEmployee(
     val accountId: Long,
@@ -61,7 +62,7 @@ class NativeSalaryPaymentFacade(
 
     suspend fun load(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeSalaryPaymentContext {
         security.requirePermission(sessionHandle, AppPermission.SALARY_PAYMENT)
         val references = reads.transactionReferences(sessionHandle)
@@ -86,7 +87,7 @@ class NativeSalaryPaymentFacade(
     suspend fun record(
         sessionHandle: String,
         request: NativeSalaryPaymentRequest,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeSalaryPaymentSubmission {
         require(request.amountPaisa > 0L) { "Enter an amount greater than zero." }
         val context = load(sessionHandle, date)

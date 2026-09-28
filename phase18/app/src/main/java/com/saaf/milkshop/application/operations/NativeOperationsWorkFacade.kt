@@ -12,6 +12,7 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import com.saaf.milkshop.sync.BusinessClock
 
 data class NativeOperationsWorkContext(
     val businessDate: String,
@@ -40,7 +41,7 @@ class NativeOperationsWorkFacade(
 ) {
     suspend fun load(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeOperationsWorkContext {
         val actor = security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
         val businessDate = date.toString()

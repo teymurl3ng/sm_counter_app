@@ -29,6 +29,7 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import com.saaf.milkshop.sync.BusinessClock
 
 data class NativeOwnerRecordsContext(
     val businessDate: String,
@@ -167,7 +168,7 @@ class NativeOwnerRecordsFacade(
 
     suspend fun loadHistory(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeOwnerRecordsSnapshot {
         requireRecordsHost(sessionHandle)
         security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
@@ -692,7 +693,7 @@ class NativeOwnerRecordsFacade(
     /** "Today" / "Yesterday" / "26 Sep" from a date-only string; null if unparseable. */
     private fun formatBusinessDate(value: String): String? {
         val local = runCatching { LocalDate.parse(value) }.getOrNull() ?: return null
-        val today = LocalDate.now()
+        val today = BusinessClock.today()
         return when (local) {
             today -> "Today"
             today.minusDays(1) -> "Yesterday"

@@ -7,6 +7,7 @@ import com.saaf.milkshop.domain.AttendanceInput
 import com.saaf.milkshop.domain.UserSecurityService
 import java.time.LocalDate
 import java.util.Locale
+import com.saaf.milkshop.sync.BusinessClock
 
 /**
  * Typed native boundary for Operations My attendance.
@@ -21,7 +22,7 @@ class NativeAttendanceFacade(
 
     suspend fun load(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeAttendanceContext {
         val actor = security.requirePermission(sessionHandle, AppPermission.ATTENDANCE)
         val businessDate = date.toString()
@@ -54,7 +55,7 @@ class NativeAttendanceFacade(
 
     suspend fun markPresent(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeAttendanceContext {
         val before = load(sessionHandle, date)
         if (!before.postingOpen) {

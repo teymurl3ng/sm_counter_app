@@ -11,9 +11,18 @@ import com.saaf.milkshop.cloud.CloudBackupSettingsStore
 import com.saaf.milkshop.cloud.GoogleDriveCloudBackupProvider
 import com.saaf.milkshop.domain.NativeSessionManager
 import com.saaf.milkshop.domain.UserSecurityService
+import com.saaf.milkshop.sync.BusinessClock
 import com.saaf.milkshop.sync.SyncIdentity
+import com.saaf.milkshop.sync.TimeTrustMonitor
+import com.saaf.milkshop.sync.TrustedTime
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 class MilkShopApplication : Application() {
+    private val timeTrustScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     override fun onCreate() {
         super.onCreate()
         runCatching {
@@ -21,6 +30,13 @@ class MilkShopApplication : Application() {
         }
         runCatching {
             SyncIdentity.warmUp(this)
+        }
+        runCatching {
+            TrustedTime.warmUp(this)
+            BusinessClock.warmUp(this)
+        }
+        timeTrustScope.launch {
+            runCatching { TimeTrustMonitor.check(applicationContext, database) }
         }
     }
 

@@ -20,6 +20,7 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import com.saaf.milkshop.sync.BusinessClock
 
 enum class NativeOwnerOverviewAttentionKind {
     CashCountWaiting,
@@ -73,7 +74,7 @@ class NativeOwnerOverviewFacade(
 ) {
     suspend fun load(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
         now: Instant = Instant.now(),
     ): NativeOwnerOverviewSnapshot {
         val actor = security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)

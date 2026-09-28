@@ -9,6 +9,7 @@ import com.saaf.milkshop.domain.CorrectionInput
 import com.saaf.milkshop.domain.CorrectionResult
 import com.saaf.milkshop.domain.CorrectionService
 import com.saaf.milkshop.domain.UserSecurityService
+import com.saaf.milkshop.sync.BusinessDateGuard
 import java.time.Instant
 
 internal class HistoryBridgeCommandService(
@@ -25,6 +26,7 @@ internal class HistoryBridgeCommandService(
         if (database.dailyCloseDao().isPostingClosed(input.occurredAt)) {
             throw BridgeCommandDayClosed("This business day is closed. Reopen it before recording a correction.")
         }
+        BusinessDateGuard.requireHappenedWithinHorizon(input.occurredAt)
         val result = try {
             CorrectionService(database).correct(input)
         } catch (failure: Throwable) {

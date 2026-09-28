@@ -6,6 +6,7 @@ import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.ProductCatalogService
 import com.saaf.milkshop.domain.UserSecurityService
 import java.time.LocalDate
+import com.saaf.milkshop.sync.BusinessClock
 
 data class NativeAdminWorkContext(
     val businessDate: String,
@@ -35,7 +36,7 @@ class NativeAdminWorkFacade(
 ) {
     suspend fun load(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeAdminWorkContext {
         val actor = security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
         val role = AppRole.parse(actor.role)

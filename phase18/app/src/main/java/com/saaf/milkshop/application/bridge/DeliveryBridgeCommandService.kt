@@ -7,6 +7,7 @@ import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.DeliveryInput
 import com.saaf.milkshop.domain.DeliveryService
 import com.saaf.milkshop.domain.UserSecurityService
+import com.saaf.milkshop.sync.BusinessDateGuard
 import java.time.Instant
 
 internal class DeliveryBridgeCommandService(
@@ -92,6 +93,7 @@ internal class DeliveryBridgeCommandService(
     }
 
     private suspend fun requireOpenDate(businessDate: String, operation: String) {
+        BusinessDateGuard.requirePlannedWithinHorizon(businessDate)
         if (database.dailyCloseDao().isPostingClosed(businessDate)) {
             throw BridgeCommandDayClosed("This business day is closed. Reopen it before $operation.")
         }

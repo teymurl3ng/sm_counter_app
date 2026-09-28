@@ -11,6 +11,7 @@ import java.math.RoundingMode
 import java.time.LocalDate
 import java.util.Locale
 import kotlin.math.round
+import com.saaf.milkshop.sync.BusinessClock
 
 /**
  * Typed native boundary for Operations Receive milk.
@@ -26,7 +27,7 @@ class NativeReceiveMilkFacade(
 
     suspend fun load(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeReceiveMilkContext {
         security.requirePermission(sessionHandle, AppPermission.PURCHASE)
         val businessDate = date.toString()
@@ -70,7 +71,7 @@ class NativeReceiveMilkFacade(
     suspend fun record(
         sessionHandle: String,
         request: NativeReceiveMilkRequest,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeReceiveMilkSubmission {
         require(request.rawLiters.isFinite() && request.rawLiters > 0.0) {
             "Enter liters greater than zero."

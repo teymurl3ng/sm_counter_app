@@ -9,6 +9,7 @@ import com.saaf.milkshop.domain.UserSecurityService
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
+import com.saaf.milkshop.sync.BusinessClock
 
 data class NativeCollectionCustomer(
     val accountId: Long,
@@ -70,7 +71,7 @@ class NativeCollectionFacade(
 
     suspend fun load(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeCollectionContext {
         security.requirePermission(sessionHandle, AppPermission.SALE_AND_COLLECTION)
         val references = reads.transactionReferences(sessionHandle)
@@ -100,7 +101,7 @@ class NativeCollectionFacade(
     suspend fun loadCustomer(
         sessionHandle: String,
         customerAccountId: Long,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeCollectionCustomerBalance {
         val context = load(sessionHandle, date)
         val customer = context.customers.singleOrNull { it.accountId == customerAccountId }
@@ -113,7 +114,7 @@ class NativeCollectionFacade(
     suspend fun record(
         sessionHandle: String,
         request: NativeCollectionRequest,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeCollectionSubmission {
         require(request.amountPaisa > 0L) { "Enter an amount greater than zero." }
         val context = load(sessionHandle, date)

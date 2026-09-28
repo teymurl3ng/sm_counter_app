@@ -9,6 +9,7 @@ import com.saaf.milkshop.quickunlock.QuickUnlockService
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
+import com.saaf.milkshop.sync.BusinessClock
 
 data class NativeMoreContext(
     val businessDate: String,
@@ -43,7 +44,7 @@ class NativeMoreFacade(
 
     suspend fun load(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeMoreContext {
         security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
         val cash = database.accountDao().findByCategory("Cash/Bank")
@@ -83,7 +84,7 @@ class NativeMoreFacade(
         sessionHandle: String,
         countedCashPaisa: Long,
         notes: String?,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeBlindCashCountReceipt {
         require(countedCashPaisa >= 0L) { "Counted drawer cash cannot be negative." }
         val context = load(sessionHandle, date)

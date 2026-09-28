@@ -8,6 +8,7 @@ import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.quickunlock.QuickUnlockService
 import java.time.LocalDate
+import com.saaf.milkshop.sync.BusinessClock
 
 data class NativeOwnerMoreContext(
     val businessDate: String,
@@ -27,7 +28,7 @@ class NativeOwnerMoreFacade(
 ) {
     suspend fun load(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeOwnerMoreContext {
         requireOwner(sessionHandle)
         security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)

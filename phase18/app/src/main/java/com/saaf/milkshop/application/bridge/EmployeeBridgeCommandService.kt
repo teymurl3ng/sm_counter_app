@@ -10,6 +10,7 @@ import com.saaf.milkshop.domain.EmployeeManagementService
 import com.saaf.milkshop.domain.EmployeeProfileInput
 import com.saaf.milkshop.domain.EmployeeProfileService
 import com.saaf.milkshop.domain.UserSecurityService
+import com.saaf.milkshop.sync.BusinessDateGuard
 import java.time.Instant
 
 internal class EmployeeBridgeCommandService(
@@ -42,6 +43,7 @@ internal class EmployeeBridgeCommandService(
 
     suspend fun recordAttendance(sessionHandle: String, input: AttendanceInput): Long = database.withWriteTransaction {
         val actor = security.requirePermission(sessionHandle, AppPermission.ATTENDANCE)
+        BusinessDateGuard.requireHappenedWithinHorizon(input.businessDate)
         requireEmployee(input.employeeAccountId)
         val attendanceId = AttendanceService(database).record(input)
         database.securityAuditDao().insert(

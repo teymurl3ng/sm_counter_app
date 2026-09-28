@@ -8,6 +8,7 @@ import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.domain.VendorPaymentInput
 import java.math.BigDecimal
 import java.time.LocalDate
+import com.saaf.milkshop.sync.BusinessClock
 
 data class NativeVendorPaymentVendor(
     val accountId: Long,
@@ -61,7 +62,7 @@ class NativeVendorPaymentFacade(
 
     suspend fun load(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeVendorPaymentContext {
         security.requirePermission(sessionHandle, AppPermission.SUPPLIER_PAYMENT)
         val references = reads.transactionReferences(sessionHandle)
@@ -86,7 +87,7 @@ class NativeVendorPaymentFacade(
     suspend fun record(
         sessionHandle: String,
         request: NativeVendorPaymentRequest,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeVendorPaymentSubmission {
         require(request.amountPaisa > 0L) { "Enter an amount greater than zero." }
         val context = load(sessionHandle, date)

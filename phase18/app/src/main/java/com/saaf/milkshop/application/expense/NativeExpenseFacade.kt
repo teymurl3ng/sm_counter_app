@@ -7,6 +7,7 @@ import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.UserSecurityService
 import java.math.BigDecimal
 import java.time.LocalDate
+import com.saaf.milkshop.sync.BusinessClock
 
 data class NativeExpenseCategory(
     val accountId: Long,
@@ -60,7 +61,7 @@ class NativeExpenseFacade(
 
     suspend fun load(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeExpenseContext {
         security.requirePermission(sessionHandle, AppPermission.EXPENSE)
         val references = reads.transactionReferences(sessionHandle)
@@ -85,7 +86,7 @@ class NativeExpenseFacade(
     suspend fun record(
         sessionHandle: String,
         request: NativeExpenseRequest,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeExpenseSubmission {
         require(request.amountPaisa > 0L) { "Enter an amount greater than zero." }
         val context = load(sessionHandle, date)

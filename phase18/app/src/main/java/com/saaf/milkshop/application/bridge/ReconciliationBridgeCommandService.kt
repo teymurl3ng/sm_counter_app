@@ -12,6 +12,7 @@ import com.saaf.milkshop.domain.PhysicalCashCountService
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.domain.VerifiedDailyCloseInput
 import com.saaf.milkshop.domain.VerifiedDailyReopenInput
+import com.saaf.milkshop.sync.BusinessDateGuard
 import java.time.Instant
 
 internal class ReconciliationBridgeCommandService(
@@ -28,6 +29,7 @@ internal class ReconciliationBridgeCommandService(
             if (database.dailyCloseDao().isPostingClosed(input.businessDate)) {
                 throw BridgeCommandDayClosed("This business day is closed. Reopen it before counting cash.")
             }
+            BusinessDateGuard.requireHappenedWithinHorizon(input.businessDate)
             val result = PhysicalCashCountService(database).record(input)
             audit(
                 ACTION_RECORD_CASH_COUNT,
@@ -42,6 +44,7 @@ internal class ReconciliationBridgeCommandService(
     suspend fun closeDate(sessionHandle: String, input: VerifiedDailyCloseInput): DailyCloseRecord =
         database.withWriteTransaction {
             val actor = security.requirePermission(sessionHandle, AppPermission.CASH_COUNT_AND_CLOSE)
+            BusinessDateGuard.requireHappenedWithinHorizon(input.businessDate)
             val current = database.dailyCloseDao().currentAction(input.businessDate)
             if (current?.action == DailyCloseService.ACTION_CLOSE) {
                 throw BridgeCommandConflict("This business date is already closed")
@@ -72,6 +75,7 @@ internal class ReconciliationBridgeCommandService(
     suspend fun reopenDate(sessionHandle: String, input: VerifiedDailyReopenInput): DailyCloseRecord =
         database.withWriteTransaction {
             val actor = security.requirePermission(sessionHandle, AppPermission.REOPEN_DAY)
+            BusinessDateGuard.requireHappenedWithinHorizon(input.businessDate)
             val current = database.dailyCloseDao().currentAction(input.businessDate)
                 ?: throw BridgeCommandNotFound("This business date has not been closed")
             if (current.action == DailyCloseService.ACTION_REOPEN) {

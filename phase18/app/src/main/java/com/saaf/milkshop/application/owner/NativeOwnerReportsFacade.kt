@@ -12,6 +12,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
 import java.util.Locale
+import com.saaf.milkshop.sync.BusinessClock
 
 enum class NativeOwnerReportsCoverageKind {
     Complete,
@@ -67,7 +68,7 @@ class NativeOwnerReportsFacade(
         startInclusive: String,
         endExclusive: String,
         preset: NativeOwnerReportsPreset,
-        today: LocalDate = LocalDate.now(),
+        today: LocalDate = BusinessClock.today(),
     ): NativeOwnerReportsSnapshot {
         val actor = security.requirePermission(sessionHandle, AppPermission.VIEW_FULL_FINANCIAL)
         require(AppRole.parse(actor.role) == AppRole.OWNER) {
@@ -84,7 +85,7 @@ class NativeOwnerReportsFacade(
         )
     }
 
-    fun rangeForPreset(preset: NativeOwnerReportsPreset, today: LocalDate = LocalDate.now()): Pair<String, String> {
+    fun rangeForPreset(preset: NativeOwnerReportsPreset, today: LocalDate = BusinessClock.today()): Pair<String, String> {
         val month = java.time.YearMonth.from(today)
         return when (preset) {
             NativeOwnerReportsPreset.ThisMonth ->

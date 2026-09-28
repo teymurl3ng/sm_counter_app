@@ -11,6 +11,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
 import java.util.Locale
+import com.saaf.milkshop.sync.BusinessClock
 
 /**
  * Typed native boundary for Operations Active deliveries.
@@ -25,7 +26,7 @@ class NativeDeliveriesFacade(
 
     suspend fun load(
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeDeliveriesContext {
         security.requirePermission(sessionHandle, AppPermission.DELIVERY)
         val businessDate = date.toString()
@@ -51,7 +52,7 @@ class NativeDeliveriesFacade(
     suspend fun createDelivery(
         sessionHandle: String,
         draft: NativeDeliveryDraft,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeDeliveriesContext {
         val quantity = draft.quantity.trim().toDoubleOrNull()
         require(quantity != null && quantity > 0) { "Quantity must be a positive number." }
@@ -85,7 +86,7 @@ class NativeDeliveriesFacade(
         quantity: String,
         saleEventId: Long,
         route: String? = null,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeDeliveriesContext {
         val parsed = quantity.trim().toDoubleOrNull()
         require(parsed != null && parsed > 0) { "Quantity must be a positive number." }
@@ -108,7 +109,7 @@ class NativeDeliveriesFacade(
     suspend fun archiveDelivery(
         sessionHandle: String,
         deliveryId: Long,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeDeliveriesContext {
         commands.archive(sessionHandle, deliveryId)
         return load(sessionHandle, date)
@@ -123,7 +124,7 @@ class NativeDeliveriesFacade(
         sessionHandle: String,
         deliveryId: Long,
         saleNumber: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeDeliveriesContext {
         val clean = saleNumber.trim()
         if (!Regex("^[1-9][0-9]*$").matches(clean)) {
@@ -207,7 +208,7 @@ class NativeDeliveriesFacade(
     suspend fun markDelivered(
         sessionHandle: String,
         deliveryId: Long,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): NativeDeliveriesContext {
         val before = load(sessionHandle, date)
         if (!before.postingOpen) {

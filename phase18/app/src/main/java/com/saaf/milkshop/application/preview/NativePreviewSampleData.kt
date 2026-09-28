@@ -17,6 +17,7 @@ import androidx.room3.executeSQL
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.time.LocalDate
+import com.saaf.milkshop.sync.BusinessClock
 
 /**
  * Debug/preview shop filler for [com.saaf.milkshop.nativeui.NativePreviewActivity].
@@ -117,7 +118,7 @@ object NativePreviewSampleData {
         database: MilkShopDatabase,
         security: UserSecurityService,
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): Result = seedMutex.withLock {
         seedForSession(
             database = database,
@@ -177,7 +178,7 @@ object NativePreviewSampleData {
         database: MilkShopDatabase,
         security: UserSecurityService,
         sessionHandle: String,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): Result = ensureForSession(
         database = database,
         security = security,
@@ -239,7 +240,7 @@ object NativePreviewSampleData {
      */
     suspend fun ensureSamplePendingDeliveries(
         database: MilkShopDatabase,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ): Boolean {
         retireStaleSampleDeliveries(database, date)
         val hasPending = database.deliveryDao().activeDeliveries().any { delivery ->
@@ -275,7 +276,7 @@ object NativePreviewSampleData {
      */
     private suspend fun retireStaleSampleDeliveries(
         database: MilkShopDatabase,
-        date: LocalDate = LocalDate.now(),
+        date: LocalDate = BusinessClock.today(),
     ) {
         val guardTriggers = listOf(
             "prevent_closed_delivery_update",

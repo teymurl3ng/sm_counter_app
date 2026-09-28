@@ -83,6 +83,21 @@ interface SyncEnvelopeDao {
     @Query("SELECT * FROM events WHERE event_uid IN (:uids)")
     suspend fun eventsByUid(uids: List<String>): List<EventEntity>
 
+    @Query("SELECT * FROM events WHERE event_id IN (:ids)")
+    suspend fun eventsByIds(ids: List<Long>): List<EventEntity>
+
+    @Query("SELECT * FROM daily_close_actions WHERE action_id IN (:ids)")
+    suspend fun dailyCloseActionsByIds(ids: List<Long>): List<DailyCloseActionEntity>
+
+    @Query("SELECT * FROM attendance_records WHERE attendance_id IN (:ids)")
+    suspend fun attendanceByIds(ids: List<Long>): List<AttendanceRecordEntity>
+
+    @Query("SELECT * FROM budget_plans WHERE budget_id IN (:ids)")
+    suspend fun budgetsByIds(ids: List<Long>): List<BudgetPlanEntity>
+
+    @Query("SELECT * FROM collections_targets WHERE target_id IN (:ids)")
+    suspend fun targetsByIds(ids: List<Long>): List<CollectionsTargetEntity>
+
     @Query("SELECT * FROM products WHERE uid IN (:uids)")
     suspend fun productsByUid(uids: List<String>): List<ProductEntity>
 

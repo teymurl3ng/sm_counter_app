@@ -55,6 +55,12 @@ class SyncEnvelopeFactory(private val database: MilkShopDatabase) {
                     val financial = dao.financialLogsForEvents(eventIds).groupBy { it.eventId }
                     val spoilage = dao.spoilageDetailsForEvents(eventIds).groupBy { it.eventId }
                     val actors = dao.actorLinksForEvents(eventIds).associateBy { it.eventId }
+                    // Corrections reference their original by uid, never by the
+                    // local integer id (D3): resolve every corrects_event_id in
+                    // the batch before serializing.
+                    val correctedUids = dao.eventsByIds(
+                        byUid.values.mapNotNull { it.correctsEventId }.distinct(),
+                    ).associate { it.eventId to it.eventUid }
                     tableRows.forEach { row ->
                         val event = byUid[row.rowUid]
                         if (event == null) {
@@ -62,6 +68,9 @@ class SyncEnvelopeFactory(private val database: MilkShopDatabase) {
                             return@forEach
                         }
                         val payload = eventJson(event).apply {
+                            event.correctsEventId?.let { original ->
+                                correctedUids[original]?.let { uid -> put("corrects_event_uid", uid) }
+                            }
                             put("inventory_logs", JSONArray(inventory[event.eventId].orEmpty().map(::inventoryJson)))
                             put("financial_logs", JSONArray(financial[event.eventId].orEmpty().map(::financialJson)))
                             put("spoilage_details", JSONArray(spoilage[event.eventId].orEmpty().map(::spoilageDetailJson)))
@@ -118,20 +127,42 @@ class SyncEnvelopeFactory(private val database: MilkShopDatabase) {
                     }
                 }
 
-                "budget_plans" -> emit(tableRows, skipped, envelopes) { row ->
-                    dao.budgetsByUid(listOf(row.rowUid)).firstOrNull()?.let { envelope(row, budgetJson(it)) }
+                "deliveries" -> {
+                    val byUid = dao.deliveriesByUid(tableRows.map { it.rowUid }).associateBy { it.uid }
+                    val linkedSaleUids = dao.eventsByIds(
+                        byUid.values.mapNotNull { it.saleEventId }.distinct(),
+                    ).associate { it.eventId to it.eventUid }
+                    tableRows.forEach { row ->
+                        val delivery = byUid[row.rowUid]
+                        if (delivery == null) {
+                            skipped += row
+                            return@forEach
+                        }
+                        val payload = deliveryJson(delivery)
+                        delivery.saleEventId?.let { saleId ->
+                            linkedSaleUids[saleId]?.let { uid -> payload.put("sale_event_uid", uid) }
+                        }
+                        envelopes += envelope(row, payload)
+                    }
                 }
 
-                "collections_targets" -> emit(tableRows, skipped, envelopes) { row ->
-                    dao.targetsByUid(listOf(row.rowUid)).firstOrNull()?.let { envelope(row, collectionJson(it)) }
-                }
-
-                "deliveries" -> emit(tableRows, skipped, envelopes) { row ->
-                    dao.deliveriesByUid(listOf(row.rowUid)).firstOrNull()?.let { envelope(row, deliveryJson(it)) }
-                }
-
-                "attendance_records" -> emit(tableRows, skipped, envelopes) { row ->
-                    dao.attendanceByUid(listOf(row.rowUid)).firstOrNull()?.let { envelope(row, attendanceJson(it)) }
+                "attendance_records" -> {
+                    val byUid = dao.attendanceByUid(tableRows.map { it.rowUid }).associateBy { it.uid }
+                    val supersedesUids = dao.attendanceByIds(
+                        byUid.values.mapNotNull { it.supersedesId }.distinct(),
+                    ).associate { it.attendanceId to it.uid }
+                    tableRows.forEach { row ->
+                        val record = byUid[row.rowUid]
+                        if (record == null) {
+                            skipped += row
+                            return@forEach
+                        }
+                        val payload = attendanceJson(record)
+                        record.supersedesId?.let { id ->
+                            supersedesUids[id]?.let { uid -> payload.put("supersedes_uid", uid) }
+                        }
+                        envelopes += envelope(row, payload)
+                    }
                 }
 
                 "delivery_status_history" -> emit(tableRows, skipped, envelopes) { row ->
@@ -139,9 +170,45 @@ class SyncEnvelopeFactory(private val database: MilkShopDatabase) {
                         ?.let { envelope(row, deliveryStatusJson(it)) }
                 }
 
-                "daily_close_actions" -> emit(tableRows, skipped, envelopes) { row ->
-                    dao.dailyCloseActionsByUid(listOf(row.rowUid)).firstOrNull()
-                        ?.let { envelope(row, dailyCloseActionJson(it, includeSecurity = true)) }
+                "budget_plans" -> emit(tableRows, skipped, envelopes) { row ->
+                    dao.budgetsByUid(listOf(row.rowUid)).firstOrNull()?.let { budget ->
+                        val payload = budgetJson(budget)
+                        budget.supersedesId?.let { id ->
+                            dao.budgetsByIds(listOf(id)).firstOrNull()
+                                ?.let { previous -> payload.put("supersedes_uid", previous.uid) }
+                        }
+                        envelope(row, payload)
+                    }
+                }
+
+                "collections_targets" -> emit(tableRows, skipped, envelopes) { row ->
+                    dao.targetsByUid(listOf(row.rowUid)).firstOrNull()?.let { target ->
+                        val payload = collectionJson(target)
+                        target.supersedesId?.let { id ->
+                            dao.targetsByIds(listOf(id)).firstOrNull()
+                                ?.let { previous -> payload.put("supersedes_uid", previous.uid) }
+                        }
+                        envelope(row, payload)
+                    }
+                }
+
+                "daily_close_actions" -> {
+                    val byUid = dao.dailyCloseActionsByUid(tableRows.map { it.rowUid }).associateBy { it.uid }
+                    val supersedesUids = dao.dailyCloseActionsByIds(
+                        byUid.values.mapNotNull { it.supersedesActionId }.distinct(),
+                    ).associate { it.actionId to it.uid }
+                    tableRows.forEach { row ->
+                        val action = byUid[row.rowUid]
+                        if (action == null) {
+                            skipped += row
+                            return@forEach
+                        }
+                        val payload = dailyCloseActionJson(action, includeSecurity = true)
+                        action.supersedesActionId?.let { id ->
+                            supersedesUids[id]?.let { uid -> payload.put("supersedes_action_uid", uid) }
+                        }
+                        envelopes += envelope(row, payload)
+                    }
                 }
 
                 "physical_cash_counts" -> emit(tableRows, skipped, envelopes) { row ->

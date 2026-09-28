@@ -9,6 +9,7 @@ import com.saaf.milkshop.data.InventoryLogEntity
 import com.saaf.milkshop.data.AccountEntity
 import com.saaf.milkshop.data.AppUserEntity
 import com.saaf.milkshop.data.CustomerProfileEntity
+import com.saaf.milkshop.data.DeliveryEntity
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.data.SyncOutboxEntity
 import com.saaf.milkshop.sync.AccountAuthClient
@@ -242,6 +243,27 @@ class SyncTransportTest {
             database.customerProfileDao().save(
                 CustomerProfileEntity(accountId = accountId, phone = "0300", createdAt = "2026-09-28T09:00:00Z"),
             )
+            val deliveryId = database.deliveryDao().insert(
+                DeliveryEntity(
+                    customerAccountId = accountId,
+                    productId = 1L,
+                    quantity = 2.0,
+                    businessDate = "2026-09-28",
+                    saleEventId = eventId,
+                    createdAt = "2026-09-28T10:00:02Z",
+                ),
+            )
+            val correction = database.eventDao().insert(
+                EventEntity(
+                    createdAt = "2026-09-28T12:00:00Z",
+                    occurredAt = "2026-09-28",
+                    eventType = "SALE",
+                    saleQuantity = 3.0,
+                    saleValue = 570.0,
+                    unitRate = 190.0,
+                    correctsEventId = eventId,
+                ),
+            )
 
             val outbox = database.syncOutboxDao().nextBatch(1000)
             val build = SyncEnvelopeFactory(database).build(outbox)
@@ -253,6 +275,15 @@ class SyncTransportTest {
             assertEquals(1, payload.getJSONArray("inventory_logs").length())
             assertEquals(1, payload.getJSONArray("financial_logs").length())
             assertEquals("Owner", payload.getJSONObject("actor_link").getString("actor_name_snapshot"))
+
+            // Cross-device references travel by uid, never local ids (D3).
+            val correctionEnvelope = build.envelopes.first {
+                it.getJSONObject("payload").optLong("event_id") == correction
+            }
+            assertEquals(event.eventUid, correctionEnvelope.getJSONObject("payload").getString("corrects_event_uid"))
+            val deliveryUid = database.backupDataDao().deliveries().single { it.deliveryId == deliveryId }.uid
+            val deliveryEnvelope = build.envelopes.first { it.getString("uid") == deliveryUid }
+            assertEquals(event.eventUid, deliveryEnvelope.getJSONObject("payload").getString("sale_event_uid"))
 
             val accountUid = database.backupDataDao().accounts().single { it.accountId == accountId }.uid
             val accountEnvelope = build.envelopes.first { it.getString("uid") == accountUid }
@@ -276,7 +307,9 @@ class SyncTransportTest {
         val database = MilkShopDatabase.createInMemory()
         val store = SyncTokenStore(context)
         val http = FakeSyncHttp()
-        val client = SyncServerClient(http, config, database, store)
+        val client = SyncServerClient(http, config, database, store) {
+            "249b9c78-475d-483d-b252-314dc5784ff9"
+        }
         try {
             val event = EventEntity(
                 createdAt = "2026-09-28T11:00:00Z",
@@ -304,7 +337,20 @@ class SyncTransportTest {
             assertEquals("Bearer jwt-token-1", pushRequest.headers["Authorization"])
             val body = JSONObject(String(pushRequest.body!!))
             assertTrue(body.has("device_id"))
+            assertEquals("249b9c78-475d-483d-b252-314dc5784ff9", body.getString("shop_id"))
             assertTrue(body.getJSONArray("envelopes").length() >= 1)
+
+            // The RPC's real refusal shape: HTTP 200 with ok:false and a
+            // stable reason code (e.g. a cashier pushing a correction).
+            http.handler = {
+                SyncHttpResponse(
+                    200,
+                    """{"ok":false,"error":{"code":"correction_privilege_required","message":"Correcting recorded history requires an owner or admin account"}}""".toByteArray(),
+                )
+            }
+            val refused = client.push(rows)
+            assertTrue(refused.toString(), refused is SyncPushResult.Permanent)
+            assertEquals("correction_privilege_required", (refused as SyncPushResult.Permanent).reasonCode)
 
             http.handler = { SyncHttpResponse(403, """{"error":{"code":"policy_rejected"}}""".toByteArray()) }
             val permanent = client.push(rows)

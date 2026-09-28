@@ -24,6 +24,8 @@ class SyncServerClient(
     private val config: SyncServerConfig,
     private val database: MilkShopDatabase,
     private val tokenStore: SyncTokenStore,
+    /** The enrolled shop's server id, sent with every push (wired at activation). */
+    private val shopIdProvider: (() -> String?)? = null,
 ) : SyncPushTransport {
 
     override suspend fun push(rows: List<SyncOutboxEntity>): SyncPushResult {
@@ -38,6 +40,9 @@ class SyncServerClient(
         val body = JSONObject()
             .put("device_id", SyncIdentity.currentOrNull())
             .put("envelopes", JSONArray(build.envelopes))
+            .apply {
+                shopIdProvider?.invoke()?.takeIf { it.isNotEmpty() }?.let { shopId -> put("shop_id", shopId) }
+            }
             .toString()
             .toByteArray(Charsets.UTF_8)
 
@@ -58,23 +63,36 @@ class SyncServerClient(
             return SyncPushResult.Transient("network")
         }
 
-        return when (response.status) {
-            in 200..299 -> {
-                anchorFrom(response)
-                SyncPushResult.Success(build.envelopes.size)
+        if (response.status !in 200..299) {
+            return when (response.status) {
+                401 -> SyncPushResult.Transient("unauthorized")
+                403, 422 -> {
+                    anchorFrom(response)
+                    val code = stableErrorCodeOf(response)
+                    SyncPushResult.Permanent(
+                        reasonCode = code ?: "rejected_${response.status}",
+                        message = "Server refused a queued record",
+                    )
+                }
+                429 -> SyncPushResult.Transient("rate_limited")
+                in 500..599 -> SyncPushResult.Transient("server_${response.status}")
+                else -> SyncPushResult.Transient("http_${response.status}")
             }
-            401 -> SyncPushResult.Transient("unauthorized")
-            403, 422 -> {
-                anchorFrom(response)
-                val code = stableErrorCodeOf(response)
-                SyncPushResult.Permanent(
-                    reasonCode = code ?: "rejected_${response.status}",
-                    message = "Server refused a queued record",
-                )
-            }
-            429 -> SyncPushResult.Transient("rate_limited")
-            in 500..599 -> SyncPushResult.Transient("server_${response.status}")
-            else -> SyncPushResult.Transient("http_${response.status}")
         }
+
+        // The RPC answers 200 with an ok flag; a refused batch carries a
+        // stable error code the engine halts on (e.g. a cashier pushing a
+        // correction — correction_privilege_required).
+        anchorFrom(response)
+        val text = response.bodyText()?.trim().orEmpty()
+        val json = if (text.isNotEmpty()) runCatching { JSONObject(text) }.getOrNull() else null
+        if (json != null && json.optBoolean("ok", true) == false) {
+            val error = json.optJSONObject("error")
+            return SyncPushResult.Permanent(
+                reasonCode = error?.optString("code")?.takeIf { it.isNotEmpty() } ?: "server_rejected",
+                message = error?.optString("message")?.takeIf { it.isNotEmpty() } ?: "Server refused the batch",
+            )
+        }
+        return SyncPushResult.Success(build.envelopes.size)
     }
 }

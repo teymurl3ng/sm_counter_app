@@ -1,22 +1,38 @@
 package com.saaf.milkshop.nativeui.common
 
 import android.provider.Settings
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -81,6 +97,70 @@ fun <T> NativeSecondaryTransition(
         label = "secondary_destination",
         content = content,
     )
+}
+
+/**
+ * Warm-refresh indicator drawn as a faded overlay at the top of a screen —
+ * never composed in flow, so its appearance/disappearance cannot shift the
+ * layout by even its 4dp height (the old in-column bar made whole screens
+ * jitter on every re-validation). Place inside a Box, aligned TopCenter.
+ */
+@Composable
+fun NativeRefreshOverlay(
+    refreshing: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    AnimatedVisibility(
+        visible = refreshing,
+        enter = fadeIn(tween(150)),
+        exit = fadeOut(tween(150)),
+        modifier = modifier,
+    ) {
+        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+    }
+}
+
+/**
+ * Warm-refresh indicator drawn ON TOP of the modified layout: an indeterminate
+ * 4dp sweep at the top edge with a fast fade. Never composed in flow, so it
+ * cannot shift content by even 4dp (the old in-column bar made whole screens
+ * jitter on every re-validation). Attach to a screen's root column, before
+ * verticalScroll so the sweep stays pinned while content scrolls.
+ */
+@Composable
+fun Modifier.nativeRefreshOverlay(refreshing: Boolean): Modifier {
+    val alpha by animateFloatAsState(
+        targetValue = if (refreshing) 1f else 0f,
+        animationSpec = tween(150),
+        label = "refresh_alpha",
+    )
+    val sweep by rememberInfiniteTransition(label = "refresh_sweep").animateFloat(
+        initialValue = -0.4f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(1100, easing = FastOutSlowInEasing)),
+        label = "refresh_shift",
+    )
+    val bar = MaterialTheme.colorScheme.primary
+    return drawWithContent {
+        drawContent()
+        if (alpha > 0.01f) {
+            val h = 4.dp.toPx()
+            val w = size.width
+            drawRect(color = bar.copy(alpha = 0.14f * alpha), size = Size(w, h))
+            val seg = w * 0.32f
+            val x = sweep * w
+            drawRect(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(bar.copy(alpha = 0f), bar, bar.copy(alpha = 0f)),
+                    startX = x,
+                    endX = x + seg,
+                ),
+                alpha = alpha,
+                topLeft = Offset(x, 0f),
+                size = Size(seg, h),
+            )
+        }
+    }
 }
 
 @Composable

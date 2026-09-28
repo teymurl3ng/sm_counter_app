@@ -43,7 +43,9 @@ import com.saaf.milkshop.application.activity.NativeActivityRecordDetail
 import com.saaf.milkshop.application.activity.NativeActivityRecordSummary
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierNavigation
 import com.saaf.milkshop.nativeui.sale.CashierNavigationRail
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -64,7 +66,7 @@ fun CashierActivityScreen(
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
+    NativeSecondaryTransition(targetState = state::class) { when (state) {
         NativeActivityState.Idle,
         NativeActivityState.Loading,
         -> ActivityLoadingScreen(snackbarHostState, onNavigate, modifier)
@@ -102,6 +104,7 @@ fun CashierActivityScreen(
                 )
             }
         }
+    }
     }
 }
 
@@ -175,12 +178,9 @@ private fun ActivityListScreen(
     ActivityScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.ActivityRoot) { padding ->
         Column(
             Modifier
-                .fillMaxSize()
+                .fillMaxSize().nativeRefreshOverlay(state.refreshing)
                 .padding(padding),
         ) {
-            if (state.refreshing) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
             CashierScreenHeader(
                 title = "Today’s activity",
                 displayName = identity.displayName,

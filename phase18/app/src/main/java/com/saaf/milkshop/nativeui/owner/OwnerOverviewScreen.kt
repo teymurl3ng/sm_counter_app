@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saaf.milkshop.application.owner.NativeOwnerOverviewSnapshot
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
@@ -87,12 +88,9 @@ fun OwnerOverviewScreen(
                 OwnerScaffold(snackbarHostState, section, onNavigate, modifier) { padding ->
                     Column(
                         Modifier
-                            .fillMaxSize()
+                            .fillMaxSize().nativeRefreshOverlay(state.refreshing)
                             .padding(padding),
                     ) {
-                        if (state.refreshing) {
-                            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-                        }
                         CashierScreenHeader(
                             title = "Overview",
                             displayName = state.snapshot.shopName,

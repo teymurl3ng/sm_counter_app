@@ -39,11 +39,13 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.operations.NativeDeliveryItem
 import com.saaf.milkshop.application.operations.NativeDeliveryReference
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 import com.saaf.milkshop.nativeui.common.hapticConfirm
 import com.saaf.milkshop.nativeui.common.imePaddingExcludingNavBar
@@ -91,7 +93,7 @@ fun DeliveriesScreen(
         onNavigate = onNavigate,
         modifier = modifier,
     ) { padding ->
-        when (state) {
+        NativeSecondaryTransition(targetState = state::class) { when (state) {
             NativeDeliveriesState.Idle,
             NativeDeliveriesState.Loading,
             -> DeliveriesLoadingBody(
@@ -113,6 +115,7 @@ fun DeliveriesScreen(
                 onArchive = onArchive,
                 contentPadding = padding,
             )
+        }
         }
     }
 }
@@ -149,7 +152,7 @@ internal fun DeliveriesReadyContent(
 ) {
     Column(
         modifier
-            .fillMaxSize()
+            .fillMaxSize().nativeRefreshOverlay(state.refreshing)
             .padding(contentPadding)
             .imePaddingExcludingNavBar()
             .testTag(NativeUiTags.OpsDeliveriesRoot),
@@ -159,9 +162,6 @@ internal fun DeliveriesReadyContent(
             if (state.lastDeliveredId != null || state.lastLinkedId != null || state.lastCreatedId != null) {
                 hapticView.hapticConfirm()
             }
-        }
-        if (state.refreshing) {
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         }
         CashierScreenHeader(
             title = "Active deliveries",

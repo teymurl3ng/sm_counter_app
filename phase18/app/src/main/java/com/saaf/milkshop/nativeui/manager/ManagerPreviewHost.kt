@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
 import com.saaf.milkshop.nativeui.cashclose.NativeCashCloseState
 import com.saaf.milkshop.nativeui.cashclose.NativeCashCloseViewModel
 import com.saaf.milkshop.nativeui.collection.NativeCollectionState
@@ -207,9 +208,10 @@ fun ManagerPreviewHost(
         }
 
         val sectionStateHolder = rememberSaveableStateHolder()
-        sectionStateHolder.SaveableStateProvider("$sessionHandle:${managerSection.name}") {
+        NativeSecondaryTransition(targetState = managerSection) { section ->
+        sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}") {
         when {
-            managerSection == ManagerSection.Work &&
+            section == ManagerSection.Work &&
                 workDestination == NativeManagerWorkDestination.RecordSale -> {
                 ManagerSaleEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -224,7 +226,7 @@ fun ManagerPreviewHost(
                     onNavigate = navigate,
                 )
             }
-            managerSection == ManagerSection.Work &&
+            section == ManagerSection.Work &&
                 workDestination == NativeManagerWorkDestination.RecordPayment -> {
                 ManagerCollectionEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -243,7 +245,7 @@ fun ManagerPreviewHost(
                     onNavigate = navigate,
                 )
             }
-            managerSection == ManagerSection.Work &&
+            section == ManagerSection.Work &&
                 workDestination == NativeManagerWorkDestination.RecordExpense -> {
                 ManagerExpenseEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -256,7 +258,7 @@ fun ManagerPreviewHost(
                     onNavigate = navigate,
                 )
             }
-            managerSection == ManagerSection.Work &&
+            section == ManagerSection.Work &&
                 workDestination == NativeManagerWorkDestination.PaySupplier -> {
                 ManagerPaySupplierEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -269,7 +271,7 @@ fun ManagerPreviewHost(
                     onNavigate = navigate,
                 )
             }
-            managerSection == ManagerSection.Work &&
+            section == ManagerSection.Work &&
                 workDestination == NativeManagerWorkDestination.ReceiveMilk -> {
                 ManagerReceiveMilkEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -286,7 +288,7 @@ fun ManagerPreviewHost(
                     onNavigate = navigate,
                 )
             }
-            managerSection == ManagerSection.Work &&
+            section == ManagerSection.Work &&
                 workDestination == NativeManagerWorkDestination.MakeYogurt -> {
                 ManagerMakeYogurtEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -299,7 +301,7 @@ fun ManagerPreviewHost(
                     onNavigate = navigate,
                 )
             }
-            managerSection == ManagerSection.Work &&
+            section == ManagerSection.Work &&
                 workDestination == NativeManagerWorkDestination.RecordSpoilage -> {
                 ManagerRecordSpoilageEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -318,7 +320,7 @@ fun ManagerPreviewHost(
                     onNavigate = navigate,
                 )
             }
-            managerSection == ManagerSection.Work &&
+            section == ManagerSection.Work &&
                 workDestination == NativeManagerWorkDestination.Deliveries -> {
                 ManagerDeliveriesEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -340,7 +342,7 @@ fun ManagerPreviewHost(
                     onNavigate = navigate,
                 )
             }
-            managerSection == ManagerSection.Close -> {
+            section == ManagerSection.Close -> {
                 ManagerCashCloseEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -354,7 +356,7 @@ fun ManagerPreviewHost(
                     onNavigate = navigate,
                 )
             }
-            managerSection == ManagerSection.Work -> {
+            section == ManagerSection.Work -> {
                 ManagerWorkScreen(
                     snackbarHostState = snackbarHostState,
                     state = managerWorkState,
@@ -368,7 +370,7 @@ fun ManagerPreviewHost(
                     onNavigate = navigate,
                 )
             }
-            managerSection == ManagerSection.Records -> {
+            section == ManagerSection.Records -> {
                 OwnerRecordsScreen(
                     snackbarHostState = snackbarHostState,
                     state = ownerRecordsState,
@@ -463,6 +465,7 @@ fun ManagerPreviewHost(
         }
     }
 }
+        }
 
 @Composable
 private fun ManagerStubSection(
@@ -566,5 +569,5 @@ fun ManagerShellChromePreview(
                 }
             }
         }
+        }
     }
-}

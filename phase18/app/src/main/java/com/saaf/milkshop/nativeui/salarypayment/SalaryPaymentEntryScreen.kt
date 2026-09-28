@@ -72,6 +72,7 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
@@ -205,13 +206,10 @@ internal fun SalaryPaymentEntryContent(
 
     Column(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxSize().nativeRefreshOverlay(state.refreshing)
             .padding(contentPadding)
             .imePadding(),
     ) {
-        if (state.refreshing) {
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-        }
         CashierScreenHeader(
             title = "Pay salary",
             displayName = identity.displayName,

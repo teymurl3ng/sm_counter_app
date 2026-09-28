@@ -49,6 +49,7 @@ import com.saaf.milkshop.application.operations.NativeOperationsAttendanceStatus
 import com.saaf.milkshop.application.operations.NativeOperationsWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 
@@ -189,12 +190,9 @@ private fun ReadyWork(
             WorkScaffold(snackbarHostState, OperationsSection.Work, onNavigate, modifier) { padding ->
                 Column(
                     Modifier
-                        .fillMaxSize()
+                        .fillMaxSize().nativeRefreshOverlay(state.refreshing)
                         .padding(padding),
                 ) {
-                    if (state.refreshing) {
-                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-                    }
                     state.error?.let {
                         Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                     }

@@ -12,6 +12,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import com.saaf.milkshop.application.activity.NativeActivityFacade
+import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.collection.NativeCollectionFacade
 import com.saaf.milkshop.application.preview.NativePreviewSampleData
@@ -438,9 +439,10 @@ fun OwnerPreviewHost(
             }
         }
         val sectionStateHolder = rememberSaveableStateHolder()
-        sectionStateHolder.SaveableStateProvider("$sessionHandle:${ownerSection.name}") {
+        NativeSecondaryTransition(targetState = ownerSection) { section ->
+        sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}") {
         when {
-            ownerSection == OwnerSection.More -> {
+            section == OwnerSection.More -> {
                 OwnerMoreScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -569,7 +571,7 @@ fun OwnerPreviewHost(
                     onLeaveConfirmed = onLeaveToWelcome,
                 )
             }
-            ownerSection == OwnerSection.Records -> {
+            section == OwnerSection.Records -> {
                 OwnerRecordsScreen(
                     snackbarHostState = snackbarHostState,
                     state = ownerRecordsState,
@@ -597,7 +599,7 @@ fun OwnerPreviewHost(
                     onSaveCorrection = ownerRecordsViewModel::saveCorrection,
                 )
             }
-            ownerSection == OwnerSection.Work &&
+            section == OwnerSection.Work &&
                 ownerWorkDestination == NativeOwnerWorkDestination.RecordSale -> {
                 OwnerSaleEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -612,7 +614,7 @@ fun OwnerPreviewHost(
                     onNavigate = navigateOwner,
                 )
             }
-            ownerSection == OwnerSection.Work &&
+            section == OwnerSection.Work &&
                 ownerWorkDestination == NativeOwnerWorkDestination.RecordPayment -> {
                 OwnerCollectionEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -631,7 +633,7 @@ fun OwnerPreviewHost(
                     onNavigate = navigateOwner,
                 )
             }
-            ownerSection == OwnerSection.Work &&
+            section == OwnerSection.Work &&
                 ownerWorkDestination == NativeOwnerWorkDestination.RecordExpense -> {
                 OwnerExpenseEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -644,7 +646,7 @@ fun OwnerPreviewHost(
                     onNavigate = navigateOwner,
                 )
             }
-            ownerSection == OwnerSection.Work &&
+            section == OwnerSection.Work &&
                 ownerWorkDestination == NativeOwnerWorkDestination.PaySupplier -> {
                 OwnerPaySupplierEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -657,7 +659,7 @@ fun OwnerPreviewHost(
                     onNavigate = navigateOwner,
                 )
             }
-            ownerSection == OwnerSection.Work &&
+            section == OwnerSection.Work &&
                 ownerWorkDestination == NativeOwnerWorkDestination.PaySalary -> {
                 OwnerPaySalaryEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -670,7 +672,7 @@ fun OwnerPreviewHost(
                     onNavigate = navigateOwner,
                 )
             }
-            ownerSection == OwnerSection.Work &&
+            section == OwnerSection.Work &&
                 ownerWorkDestination == NativeOwnerWorkDestination.CashCountAndClose -> {
                 OwnerCashCloseEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -684,7 +686,7 @@ fun OwnerPreviewHost(
                     onNavigate = navigateOwner,
                 )
             }
-            ownerSection == OwnerSection.Work &&
+            section == OwnerSection.Work &&
                 ownerWorkDestination == NativeOwnerWorkDestination.ReceiveMilk -> {
                 OwnerReceiveMilkEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -701,7 +703,7 @@ fun OwnerPreviewHost(
                     onNavigate = navigateOwner,
                 )
             }
-            ownerSection == OwnerSection.Work &&
+            section == OwnerSection.Work &&
                 ownerWorkDestination == NativeOwnerWorkDestination.MakeYogurt -> {
                 OwnerMakeYogurtEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -714,7 +716,7 @@ fun OwnerPreviewHost(
                     onNavigate = navigateOwner,
                 )
             }
-            ownerSection == OwnerSection.Work &&
+            section == OwnerSection.Work &&
                 ownerWorkDestination == NativeOwnerWorkDestination.RecordSpoilage -> {
                 OwnerRecordSpoilageEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -733,7 +735,7 @@ fun OwnerPreviewHost(
                     onNavigate = navigateOwner,
                 )
             }
-            ownerSection == OwnerSection.Work &&
+            section == OwnerSection.Work &&
                 ownerWorkDestination == NativeOwnerWorkDestination.Deliveries -> {
                 OwnerDeliveriesEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -755,7 +757,7 @@ fun OwnerPreviewHost(
                     onNavigate = navigateOwner,
                 )
             }
-            ownerSection == OwnerSection.Work -> {
+            section == OwnerSection.Work -> {
                 OwnerWorkScreen(
                     snackbarHostState = snackbarHostState,
                     state = ownerWorkState,
@@ -799,6 +801,7 @@ fun OwnerPreviewHost(
                     )
                 }
             }
+        }
         }
         }
     }

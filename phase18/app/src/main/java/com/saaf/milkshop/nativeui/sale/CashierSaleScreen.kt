@@ -103,7 +103,9 @@ import com.saaf.milkshop.application.sale.NativeSaleProduct
 import com.saaf.milkshop.application.sale.NativeSaleReceipt
 import com.saaf.milkshop.application.sale.NativeSaleRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.hapticConfirm
 import com.saaf.milkshop.nativeui.common.imePaddingExcludingNavBar
@@ -153,7 +155,7 @@ fun CashierSaleScreen(
         compactNavigation = { CashierNavigation(CashierSection.Sell, guardedNavigate) },
         expandedNavigation = { CashierNavigationRail(CashierSection.Sell, guardedNavigate) },
     ) { padding ->
-        when (state) {
+        NativeSecondaryTransition(targetState = state::class) { when (state) {
             NativeSaleState.Idle,
             NativeSaleState.Loading,
             -> SaleLoadingBody(
@@ -178,6 +180,7 @@ fun CashierSaleScreen(
                 leaveGuard = leaveGuard,
                 contentPadding = padding,
             )
+        }
         }
     }
     SaleDiscardDialog(leaveGuard)
@@ -293,13 +296,10 @@ internal fun SaleEntryContent(
 
     Column(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxSize().nativeRefreshOverlay(state.refreshing)
             .padding(contentPadding)
             .imePaddingExcludingNavBar(),
     ) {
-            if (state.refreshing) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
             CashierScreenHeader(
                 title = stringResource(R.string.native_new_sale),
                 displayName = identity.displayName,

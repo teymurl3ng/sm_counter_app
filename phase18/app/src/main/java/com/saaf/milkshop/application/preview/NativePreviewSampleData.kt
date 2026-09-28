@@ -198,8 +198,10 @@ object NativePreviewSampleData {
         if (!exists) {
             VendorManagementService(database).create(PREVIEW_VENDOR_NAME)
         }
-        // Deliveries are optional preview chrome; never block stock/sales seeding.
-        runCatching { ensureSamplePendingDeliveries(database) }
+        // No sample delivery seeding: a re-created "ghost" pending delivery on
+        // every launch reads as fake data on the Work badge and Deliveries
+        // list. Real deliveries are created from the New delivery form.
+        runCatching { retireStaleSampleDeliveries(database) }
         return !exists
     }
 
@@ -232,44 +234,14 @@ object NativePreviewSampleData {
     }
 
     /**
-     * Seeds one pending Active delivery when none exist, so Operators can try Mark delivered.
+     * Seeds one pending Active delivery when none exist. Only used by the
+     * instrumentation test now — production seeding no longer creates ghosts.
      */
     suspend fun ensureSamplePendingDeliveries(
         database: MilkShopDatabase,
         date: LocalDate = LocalDate.now(),
     ): Boolean {
-        // Retire stale sample pendings first: a sample delivery dated on a
-        // since-closed business day can never be delivered or cancelled from
-        // the UI (date guard), so it would stick as a permanent badge. The
-        // domain service is used directly — the preview seeder is fixture
-        // management, not a user action, and owns its own cleanup.
-        // Stale sample pendings are frozen by the closed-business-date SQL
-        // triggers, so the guards are lifted for this fixture-only write and
-        // restored immediately after (same pattern as BackupRestoreEngine).
-        val guardTriggers = listOf(
-            "prevent_closed_delivery_update",
-            "prevent_closed_delivery_insert",
-            "prevent_closed_delivery_status",
-        )
-        val staleSamples = database.deliveryDao().activeDeliveries().filter { delivery ->
-            delivery.notes == SAMPLE_DELIVERY_NOTES &&
-                delivery.businessDate < date.toString() &&
-                database.deliveryDao().latestStatus(delivery.deliveryId)?.status ==
-                    com.saaf.milkshop.domain.DeliveryService.STATUS_PENDING
-        }
-        if (staleSamples.isNotEmpty()) {
-            database.withWriteTransaction<Unit> {
-                guardTriggers.forEach { executeSQL("DROP TRIGGER IF EXISTS $it") }
-                staleSamples.forEach { delivery ->
-                    runCatching {
-                        com.saaf.milkshop.domain.DeliveryService(database).archive(delivery.deliveryId)
-                    }.onFailure {
-                        android.util.Log.d("SaafSeed", "stale archive #${delivery.deliveryId} failed: ${it.message}")
-                    }
-                }
-                DatabaseSql.createTriggers.forEach { executeSQL(it) }
-            }
-        }
+        retireStaleSampleDeliveries(database, date)
         val hasPending = database.deliveryDao().activeDeliveries().any { delivery ->
             database.deliveryDao().latestStatus(delivery.deliveryId)?.status ==
                 com.saaf.milkshop.domain.DeliveryService.STATUS_PENDING
@@ -289,6 +261,45 @@ object NativePreviewSampleData {
             ),
         )
         return true
+    }
+
+    /**
+     * Retires any pending sample delivery left by older preview installs: a
+     * fixture nobody wants, and one dated on a since-closed business day could
+     * never be delivered or cancelled from the UI (date guard), sticking as a
+     * permanent badge. The domain service is used directly — the preview
+     * seeder is fixture management, not a user action, and owns its cleanup.
+     * Closed-day samples are frozen by the closed-business-date SQL triggers,
+     * so the guards are lifted for this fixture-only write and restored
+     * immediately after (same pattern as BackupRestoreEngine).
+     */
+    private suspend fun retireStaleSampleDeliveries(
+        database: MilkShopDatabase,
+        date: LocalDate = LocalDate.now(),
+    ) {
+        val guardTriggers = listOf(
+            "prevent_closed_delivery_update",
+            "prevent_closed_delivery_insert",
+            "prevent_closed_delivery_status",
+        )
+        val staleSamples = database.deliveryDao().activeDeliveries().filter { delivery ->
+            delivery.notes == SAMPLE_DELIVERY_NOTES &&
+                delivery.businessDate <= date.toString() &&
+                database.deliveryDao().latestStatus(delivery.deliveryId)?.status ==
+                    com.saaf.milkshop.domain.DeliveryService.STATUS_PENDING
+        }
+        if (staleSamples.isEmpty()) return
+        database.withWriteTransaction<Unit> {
+            guardTriggers.forEach { executeSQL("DROP TRIGGER IF EXISTS $it") }
+            staleSamples.forEach { delivery ->
+                runCatching {
+                    com.saaf.milkshop.domain.DeliveryService(database).archive(delivery.deliveryId)
+                }.onFailure {
+                    android.util.Log.d("SaafSeed", "stale archive #${delivery.deliveryId} failed: ${it.message}")
+                }
+            }
+            DatabaseSql.createTriggers.forEach { executeSQL(it) }
+        }
     }
 
     /**

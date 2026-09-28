@@ -50,6 +50,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerAccountLedgerDetail
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsRow
 import com.saaf.milkshop.application.owner.NativeRecordsGroup
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.formatRecordTimestamp
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.HostedScaffold
@@ -191,6 +192,7 @@ private fun RecordsListBody(
         Column(
             Modifier
                 .fillMaxSize()
+                .nativeRefreshOverlay(state.refreshing)
                 .padding(padding)
                 .testTag(rootTag),
         ) {
@@ -253,9 +255,6 @@ private fun RecordsListBody(
                         modifier = Modifier.testTag(NativeUiTags.OwnerRecordsGroupCorrections),
                     )
                 }
-            }
-            if (state.refreshing) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
             }
             Box(Modifier.fillMaxSize()) {
                 when {

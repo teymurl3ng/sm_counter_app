@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.manager.NativeManagerWorkContext
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 
@@ -126,13 +127,10 @@ private fun ReadyWork(
             ManagerScaffold(snackbarHostState, ManagerSection.Work, onNavigate, modifier) { padding ->
                 Column(
                     Modifier
-                        .fillMaxSize()
+                        .fillMaxSize().nativeRefreshOverlay(state.refreshing)
                         .padding(padding)
                         .testTag(NativeUiTags.ManagerWorkRoot),
                 ) {
-                    if (state.refreshing) {
-                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-                    }
                     CashierScreenHeader(
                         title = "Today's work",
                         displayName = state.context.shopName,

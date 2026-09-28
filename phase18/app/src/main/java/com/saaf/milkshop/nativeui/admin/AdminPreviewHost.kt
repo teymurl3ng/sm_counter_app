@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
 import com.saaf.milkshop.nativeui.expense.NativeExpenseState
 import com.saaf.milkshop.nativeui.expense.NativeExpenseViewModel
 import com.saaf.milkshop.nativeui.owner.NativeOwnerMoreDestination
@@ -197,9 +198,10 @@ fun AdminPreviewHost(
 
         val businessDate = LocalDate.now().toString()
         val sectionStateHolder = rememberSaveableStateHolder()
-        sectionStateHolder.SaveableStateProvider("$sessionHandle:${adminSection.name}") {
+        NativeSecondaryTransition(targetState = adminSection) { section ->
+        sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}") {
         when {
-            adminSection == AdminSection.Work &&
+            section == AdminSection.Work &&
                 workDestination == NativeAdminWorkDestination.RecordExpense -> {
                 AdminExpenseEntryScreen(
                     snackbarHostState = snackbarHostState,
@@ -212,7 +214,7 @@ fun AdminPreviewHost(
                     onNavigate = navigate,
                 )
             }
-            adminSection == AdminSection.Work -> {
+            section == AdminSection.Work -> {
                 AdminWorkScreen(
                     snackbarHostState = snackbarHostState,
                     state = adminWorkState,
@@ -240,7 +242,7 @@ fun AdminPreviewHost(
                     onNavigate = navigate,
                 )
             }
-            adminSection == AdminSection.People -> {
+            section == AdminSection.People -> {
                 AdminPeopleScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -296,7 +298,7 @@ fun AdminPreviewHost(
                     onNavigate = navigate,
                 )
             }
-            adminSection == AdminSection.Records -> {
+            section == AdminSection.Records -> {
                 AdminRecordsScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -387,6 +389,7 @@ fun AdminPreviewHost(
         }
     }
 }
+        }
 
 @Composable
 private fun AdminStubSection(
@@ -490,5 +493,5 @@ fun AdminShellChromePreview(
                 }
             }
         }
+        }
     }
-}

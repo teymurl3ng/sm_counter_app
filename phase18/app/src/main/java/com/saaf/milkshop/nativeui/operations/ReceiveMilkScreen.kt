@@ -57,6 +57,7 @@ import com.saaf.milkshop.application.operations.NativeReceiveMilkRequest
 import com.saaf.milkshop.application.operations.NativeReceiveMilkVendor
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
@@ -205,14 +206,11 @@ internal fun ReceiveMilkReadyContent(
     Box(modifier.fillMaxSize()) {
         Column(
             Modifier
-                .fillMaxSize()
+                .fillMaxSize().nativeRefreshOverlay(state.refreshing)
                 .padding(contentPadding)
                 .imePadding()
                 .testTag(NativeUiTags.OpsReceiveMilkForm),
         ) {
-            if (state.refreshing) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
             CashierScreenHeader(
                 title = "Receive milk",
                 displayName = identity.displayName,

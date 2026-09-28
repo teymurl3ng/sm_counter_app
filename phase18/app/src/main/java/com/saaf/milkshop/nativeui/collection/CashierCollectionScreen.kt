@@ -83,7 +83,9 @@ import com.saaf.milkshop.application.collection.NativeCollectionPaymentAccount
 import com.saaf.milkshop.application.collection.NativeCollectionReceipt
 import com.saaf.milkshop.application.collection.NativeCollectionRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.hapticConfirm
 import com.saaf.milkshop.nativeui.common.imePaddingExcludingNavBar
@@ -132,7 +134,7 @@ fun CashierCollectionScreen(
         },
         modifier = modifier,
     ) { padding ->
-        when (state) {
+        NativeSecondaryTransition(targetState = state::class) { when (state) {
             NativeCollectionState.Idle,
             NativeCollectionState.Loading,
             -> CollectionLoadingBody(
@@ -159,6 +161,7 @@ fun CashierCollectionScreen(
                 leaveGuard = leaveGuard,
                 contentPadding = padding,
             )
+        }
         }
     }
     CollectionDiscardDialog(leaveGuard)
@@ -329,13 +332,10 @@ internal fun CollectionEntryContent(
 
     Column(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxSize().nativeRefreshOverlay(state.refreshing)
             .padding(contentPadding)
             .imePaddingExcludingNavBar(),
     ) {
-        if (state.refreshing) {
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-        }
         CashierScreenHeader(
             title = "Collect payment",
             displayName = identity.displayName,

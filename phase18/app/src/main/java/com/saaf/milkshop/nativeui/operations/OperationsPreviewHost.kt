@@ -10,6 +10,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
+import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import com.saaf.milkshop.nativeui.operations.NativeDeliveriesDraftActions
 
@@ -143,9 +144,10 @@ fun OperationsPreviewHost(
         }
         val workReady = operationsWorkState as? NativeOperationsWorkState.Ready
         val sectionStateHolder = rememberSaveableStateHolder()
-        sectionStateHolder.SaveableStateProvider("$sessionHandle:${operationsSection.name}") {
+        NativeSecondaryTransition(targetState = operationsSection) { section ->
+        sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}") {
         when {
-            operationsSection == OperationsSection.Deliveries -> {
+            section == OperationsSection.Deliveries -> {
                 DeliveriesScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -166,7 +168,7 @@ fun OperationsPreviewHost(
                     onLeaveConfirmed = onLeaveToWelcome,
                 )
             }
-            operationsSection == OperationsSection.Attendance -> {
+            section == OperationsSection.Attendance -> {
                 AttendanceScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -177,7 +179,7 @@ fun OperationsPreviewHost(
                     onLeaveConfirmed = onLeaveToWelcome,
                 )
             }
-            operationsSection == OperationsSection.More -> {
+            section == OperationsSection.More -> {
                 OperationsMoreScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -197,7 +199,7 @@ fun OperationsPreviewHost(
                     onLeaveConfirmed = onLeaveToWelcome,
                 )
             }
-            operationsSection == OperationsSection.Work &&
+            section == OperationsSection.Work &&
                 workReady?.destination == NativeOperationsWorkDestination.ReceiveMilk -> {
                 ReceiveMilkScreen(
                     snackbarHostState = snackbarHostState,
@@ -216,7 +218,7 @@ fun OperationsPreviewHost(
                     onNavigate = navigateOps,
                 )
             }
-            operationsSection == OperationsSection.Work &&
+            section == OperationsSection.Work &&
                 workReady?.destination == NativeOperationsWorkDestination.MakeYogurt -> {
                 MakeYogurtScreen(
                     snackbarHostState = snackbarHostState,
@@ -231,7 +233,7 @@ fun OperationsPreviewHost(
                     onNavigate = navigateOps,
                 )
             }
-            operationsSection == OperationsSection.Work &&
+            section == OperationsSection.Work &&
                 workReady?.destination == NativeOperationsWorkDestination.RecordSpoilage -> {
                 RecordSpoilageScreen(
                     snackbarHostState = snackbarHostState,
@@ -276,6 +278,7 @@ fun OperationsPreviewHost(
                     onNavigate = navigateOps,
                 )
             }
+        }
         }
         }
     }

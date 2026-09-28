@@ -59,6 +59,7 @@ import com.saaf.milkshop.application.more.NativeMoreSecurityStatus
 import com.saaf.milkshop.application.operations.NativeOperationsMoreContext
 import com.saaf.milkshop.application.operations.NativeOperationsWorkRecord
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -106,10 +107,7 @@ fun OperationsMoreScreen(
             targetState = state.destination,
             modifier = modifier,
         ) { destination ->
-            Column {
-                if (state.refreshing) {
-                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-                }
+            Column(Modifier.nativeRefreshOverlay(state.refreshing)) {
                 when (destination) {
                     NativeOperationsMoreDestination.Menu -> OpsMoreMenuScreen(
                         snackbarHostState = snackbarHostState,

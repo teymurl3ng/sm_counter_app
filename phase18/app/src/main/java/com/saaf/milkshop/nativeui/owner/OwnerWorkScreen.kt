@@ -42,6 +42,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.owner.NativeOwnerWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 
 @Composable
@@ -55,7 +57,7 @@ fun OwnerWorkScreen(
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
+    NativeSecondaryTransition(targetState = state::class) { when (state) {
         NativeOwnerWorkState.Idle,
         NativeOwnerWorkState.Loading,
         -> OwnerScaffold(snackbarHostState, OwnerSection.Work, onNavigate, modifier) {
@@ -100,6 +102,7 @@ fun OwnerWorkScreen(
             modifier = modifier,
         )
     }
+    }
 }
 
 @Composable
@@ -118,12 +121,9 @@ private fun ReadyWork(
             OwnerScaffold(snackbarHostState, OwnerSection.Work, onNavigate, modifier) { padding ->
                 Column(
                     Modifier
-                        .fillMaxSize()
+                        .fillMaxSize().nativeRefreshOverlay(state.refreshing)
                         .padding(padding),
                 ) {
-                    if (state.refreshing) {
-                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-                    }
                     CashierScreenHeader(
                         title = "Work",
                         displayName = state.context.shopName,

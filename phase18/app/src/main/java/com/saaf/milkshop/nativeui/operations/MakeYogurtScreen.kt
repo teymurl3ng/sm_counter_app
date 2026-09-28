@@ -49,6 +49,7 @@ import com.saaf.milkshop.application.operations.NativeMakeYogurtReceipt
 import com.saaf.milkshop.application.operations.NativeMakeYogurtRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
@@ -177,14 +178,11 @@ internal fun MakeYogurtReadyContent(
 
     Column(
         modifier
-            .fillMaxSize()
+            .fillMaxSize().nativeRefreshOverlay(state.refreshing)
             .padding(contentPadding)
             .imePadding()
             .testTag(NativeUiTags.OpsMakeYogurtForm),
     ) {
-        if (state.refreshing) {
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-        }
         CashierScreenHeader(
             title = "Make yogurt",
             displayName = identity.displayName,

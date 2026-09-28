@@ -40,6 +40,7 @@ import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 
 @Composable
@@ -129,13 +130,10 @@ private fun AttendanceReady(
     WorkScaffold(snackbarHostState, OperationsSection.Attendance, onNavigate, modifier) { padding ->
         Column(
             Modifier
-                .fillMaxSize()
+                .fillMaxSize().nativeRefreshOverlay(state.refreshing)
                 .padding(padding)
                 .testTag(NativeUiTags.OpsAttendanceRoot),
         ) {
-            if (state.refreshing) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
             CashierScreenHeader(
                 title = "My attendance",
                 displayName = identity.displayName,

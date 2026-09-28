@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.admin.NativeAdminWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 
 /**
@@ -129,13 +130,10 @@ private fun ReadyWork(
             AdminScaffold(snackbarHostState, AdminSection.Work, onNavigate, modifier) { padding ->
                 Column(
                     Modifier
-                        .fillMaxSize()
+                        .fillMaxSize().nativeRefreshOverlay(state.refreshing)
                         .padding(padding)
                         .testTag(NativeUiTags.AdminWorkRoot),
                 ) {
-                    if (state.refreshing) {
-                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-                    }
                     CashierScreenHeader(
                         title = "Work desk",
                         displayName = state.context.shopName,

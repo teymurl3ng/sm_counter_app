@@ -57,6 +57,7 @@ import com.saaf.milkshop.application.operations.NativeSpoilageProduct
 import com.saaf.milkshop.application.operations.NativeSpoilageReason
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
@@ -207,14 +208,11 @@ internal fun RecordSpoilageReadyContent(
     Box(modifier.fillMaxSize()) {
         Column(
             Modifier
-                .fillMaxSize()
+                .fillMaxSize().nativeRefreshOverlay(state.refreshing)
                 .padding(contentPadding)
                 .imePadding()
                 .testTag(NativeUiTags.OpsRecordSpoilageForm),
         ) {
-            if (state.refreshing) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
             CashierScreenHeader(
                 title = "Record spoilage",
                 displayName = identity.displayName,

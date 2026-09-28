@@ -72,6 +72,7 @@ import com.saaf.milkshop.domain.StoreIdentityInput
 import com.saaf.milkshop.domain.VendorProfileInput
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 
@@ -722,13 +723,10 @@ private fun OwnerMoreMenuScreen(
             OwnerMoreHeader(identity, state.context)
             Column(
                 Modifier
-                    .fillMaxSize()
+                    .fillMaxSize().nativeRefreshOverlay(state.refreshing)
                     .verticalScroll(rememberScrollState())
                     .testTag(NativeUiTags.OwnerMoreMenu),
             ) {
-                if (state.refreshing) {
-                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-                }
                 state.error?.let {
                     Text(
                         it,

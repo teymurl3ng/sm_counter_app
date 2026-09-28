@@ -40,6 +40,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerReportsPreset
 import com.saaf.milkshop.application.owner.NativeOwnerReportsProductRow
 import com.saaf.milkshop.application.owner.NativeOwnerReportsSnapshot
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.theme.SaafInk
@@ -158,13 +159,6 @@ fun OwnerReportsScreen(
                             modifier = Modifier.testTag(NativeUiTags.OwnerReportsCustomPreview),
                         ) { Text("Custom range") }
                     }
-                    if (state.refreshing) {
-                        LinearProgressIndicator(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .testTag(NativeUiTags.OwnerReportsRefreshing),
-                        )
-                    }
                     state.error?.let {
                         Text(
                             it,
@@ -178,6 +172,7 @@ fun OwnerReportsScreen(
                         Modifier
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
+                            .nativeRefreshOverlay(state.refreshing)
                             .padding(horizontal = 16.dp, vertical = 12.dp)
                             .testTag(NativeUiTags.OwnerReportsContent),
                         verticalArrangement = Arrangement.spacedBy(14.dp),

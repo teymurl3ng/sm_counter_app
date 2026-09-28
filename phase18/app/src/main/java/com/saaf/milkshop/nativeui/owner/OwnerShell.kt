@@ -31,8 +31,10 @@ internal fun OwnerScaffold(
     section: OwnerSection,
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier = Modifier,
+    // Zeroed by default so the green header bleeds under the status bar like
+    // every other shell; individual screens may still pass their own insets.
     contentWindowInsets: androidx.compose.foundation.layout.WindowInsets =
-        androidx.compose.material3.ScaffoldDefaults.contentWindowInsets,
+        androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
     content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit,
 ) {
     AdaptiveNavigationScaffold(

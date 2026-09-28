@@ -62,6 +62,7 @@ import com.saaf.milkshop.application.more.NativeMoreContext
 import com.saaf.milkshop.application.more.NativeMoreSecurityStatus
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
 import com.saaf.milkshop.nativeui.sale.CashierNavigation
 import com.saaf.milkshop.nativeui.sale.CashierNavigationRail
@@ -100,7 +101,7 @@ fun CashierMoreScreen(
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
+    NativeSecondaryTransition(targetState = state::class) { when (state) {
         NativeMoreState.Idle,
         NativeMoreState.Loading,
         -> MoreLoadingScreen(snackbarHostState, onNavigate, modifier)
@@ -162,6 +163,7 @@ fun CashierMoreScreen(
             }
             }
         }
+    }
     }
 }
 
@@ -271,10 +273,7 @@ private fun MoreMenuScreen(
     modifier: Modifier,
 ) {
     MoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.MoreRoot) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding)) {
-            if (state.refreshing) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
+        Column(Modifier.fillMaxSize().nativeRefreshOverlay(state.refreshing).padding(padding)) {
             state.error?.let {
                 Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
             }
@@ -370,13 +369,10 @@ private fun MoreCountCashScreen(
     MoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.MoreCountCashScreen) { padding ->
         Column(
             Modifier
-                .fillMaxSize()
+                .fillMaxSize().nativeRefreshOverlay(state.refreshing)
                 .padding(padding)
                 .imePadding(),
         ) {
-            if (state.refreshing) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
             MoreHeader(identity, state.context)
             Column(
                 Modifier
@@ -482,13 +478,10 @@ private fun MorePersonalSecurityScreen(
     MoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.MoreSecurityScreen) { padding ->
         Column(
             Modifier
-                .fillMaxSize()
+                .fillMaxSize().nativeRefreshOverlay(state.refreshing)
                 .padding(padding)
                 .imePadding(),
         ) {
-            if (state.refreshing) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
             MoreHeader(identity, state.context)
             Column(
                 Modifier

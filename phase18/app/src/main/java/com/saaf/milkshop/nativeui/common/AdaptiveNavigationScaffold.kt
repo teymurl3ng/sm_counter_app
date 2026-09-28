@@ -26,7 +26,10 @@ internal fun AdaptiveNavigationScaffold(
     expandedNavigation: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     containerColor: Color = MaterialTheme.colorScheme.background,
-    contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
+    // Zeroed by default: every screen leads with the green CashierScreenHeader,
+    // which pads its own title band under the status bar — the full-bleed look.
+    // (ScaffoldDefaults would insert an ivory status-bar strip above it.)
+    contentWindowInsets: WindowInsets = WindowInsets(0, 0, 0, 0),
     content: @Composable (PaddingValues) -> Unit,
 ) {
     BoxWithConstraints(modifier = modifier) {

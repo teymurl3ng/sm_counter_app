@@ -86,6 +86,7 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.hapticConfirm
+import com.saaf.milkshop.nativeui.common.imePaddingExcludingNavBar
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierNavigation
 import com.saaf.milkshop.nativeui.sale.CashierNavigationRail
@@ -330,7 +331,7 @@ internal fun CollectionEntryContent(
         modifier = modifier
             .fillMaxSize()
             .padding(contentPadding)
-            .imePadding(),
+            .imePaddingExcludingNavBar(),
     ) {
         if (state.refreshing) {
             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())

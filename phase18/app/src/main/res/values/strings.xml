@@ -484,6 +484,7 @@ Schema version: %3$d</string>
     <string name="native_sale_total_format">PKR %1$s</string>
     <string name="native_stock_effect_format">Stock −%1$s %2$s</string>
     <string name="native_cash_effect_format">Cash +PKR %1$s</string>
+    <string name="native_paid_account_effect_format">%1$s +PKR %2$s</string>
     <string name="native_customer_effect_format">Customer due +PKR %1$s</string>
     <string name="native_record_sale">Record sale</string>
     <string name="native_sell">Sell</string>

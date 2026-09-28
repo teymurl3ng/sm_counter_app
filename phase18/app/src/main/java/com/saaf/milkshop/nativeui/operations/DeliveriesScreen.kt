@@ -45,6 +45,7 @@ import com.saaf.milkshop.nativeui.theme.SaafYellow
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 import com.saaf.milkshop.nativeui.common.hapticConfirm
+import com.saaf.milkshop.nativeui.common.imePaddingExcludingNavBar
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -149,7 +150,7 @@ internal fun DeliveriesReadyContent(
         modifier
             .fillMaxSize()
             .padding(contentPadding)
-            .imePadding()
+            .imePaddingExcludingNavBar()
             .testTag(NativeUiTags.OpsDeliveriesRoot),
     ) {
         val hapticView = LocalView.current

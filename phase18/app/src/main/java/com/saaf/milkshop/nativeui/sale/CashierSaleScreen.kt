@@ -106,6 +106,7 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.hapticConfirm
+import com.saaf.milkshop.nativeui.common.imePaddingExcludingNavBar
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
@@ -294,7 +295,7 @@ internal fun SaleEntryContent(
         modifier = modifier
             .fillMaxSize()
             .padding(contentPadding)
-            .imePadding(),
+            .imePaddingExcludingNavBar(),
     ) {
             if (state.refreshing) {
                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
@@ -488,8 +489,6 @@ internal fun SaleEntryContent(
                     Spacer(Modifier.height(8.dp))
                     PaymentAccountSelectionRow(
                         accountName = paidNowAccount.name,
-                        balanceLabel = paidNowAccount.balancePaisa
-                            ?.let { "PKR ${formatAmount(it / 100.0)} available" },
                         onClick = { showPaymentPicker = true },
                     )
                 }
@@ -557,7 +556,11 @@ internal fun SaleEntryContent(
                         quantityUnit,
                     ),
                     moneyEffect = if (payment == PaymentChoice.PaidNow) {
-                        stringResource(R.string.native_cash_effect_format, totalText)
+                        stringResource(
+                            R.string.native_paid_account_effect_format,
+                            paidNowAccount?.name ?: stringResource(R.string.native_cash),
+                            totalText,
+                        )
                     } else {
                         stringResource(R.string.native_customer_effect_format, totalText)
                     },
@@ -631,7 +634,6 @@ internal fun SaleEntryContent(
 @Composable
 private fun PaymentAccountSelectionRow(
     accountName: String,
-    balanceLabel: String?,
     onClick: () -> Unit,
 ) {
     Surface(
@@ -645,23 +647,15 @@ private fun PaymentAccountSelectionRow(
             .clickable(role = Role.Button, onClick = onClick),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = accountName,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                if (balanceLabel != null) {
-                    Text(
-                        text = balanceLabel,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
+            Text(
+                text = accountName,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.weight(1f),
+            )
             Text(
                 text = stringResource(R.string.native_change),
                 style = MaterialTheme.typography.labelLarge,
@@ -699,16 +693,12 @@ private fun SalePaymentPickerDialog(
                             .padding(vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(account.name, fontWeight = FontWeight.SemiBold)
-                            account.balancePaisa?.let {
-                                Text(
-                                    text = "PKR ${formatAmount(it / 100.0)}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        }
+                        Text(
+                            text = account.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.weight(1f),
+                        )
                         if (account.accountId == selectedId) {
                             Icon(Icons.Outlined.CheckCircle, contentDescription = null)
                         }

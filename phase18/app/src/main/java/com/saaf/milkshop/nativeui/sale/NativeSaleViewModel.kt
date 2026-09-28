@@ -227,10 +227,10 @@ class NativeSaleViewModel(
     }
 
     /**
-     * "Record next sale": clears the posted receipt and its follow-up offer so
-     * the next sale starts from a clean slate — while the form itself (product,
-     * quantity, mode, payment, customer) carries over untouched, so a repeat
-     * credit sale needs no re-selection.
+     * "Start new sale": clears the posted receipt and its follow-up offer so
+     * the cheque pane hands back to the entry form. The screen resets the
+     * form fields to fresh defaults (quantity included) as part of the same
+     * tap — nothing carries over.
      */
     fun startNextSale() {
         val current = _state.value as? NativeSaleState.Ready ?: return

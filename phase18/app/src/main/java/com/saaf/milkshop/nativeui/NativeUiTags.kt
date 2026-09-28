@@ -46,6 +46,7 @@ object NativeUiTags {
     const val CashierRecordSale = "cashier_record_sale"
     const val CashierSaleScroll = "cashier_sale_scroll"
     const val CashierSaleSuccess = "cashier_sale_success"
+    const val CashierSaleCheque = "cashier_sale_cheque"
     const val CashierSaleDeliveryCard = "cashier_sale_delivery_card"
     const val CashierSaleDeliveryRoute = "cashier_sale_delivery_route"
     const val CashierSaleDeliverySend = "cashier_sale_delivery_send"

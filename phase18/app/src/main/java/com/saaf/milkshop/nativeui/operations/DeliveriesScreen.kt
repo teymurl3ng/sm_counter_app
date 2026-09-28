@@ -27,8 +27,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -41,6 +43,7 @@ import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
+import com.saaf.milkshop.nativeui.common.hapticConfirm
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -147,6 +150,12 @@ internal fun DeliveriesReadyContent(
             .padding(contentPadding)
             .testTag(NativeUiTags.OpsDeliveriesRoot),
     ) {
+        val hapticView = LocalView.current
+        LaunchedEffect(state.lastDeliveredId, state.lastLinkedId, state.lastCreatedId) {
+            if (state.lastDeliveredId != null || state.lastLinkedId != null || state.lastCreatedId != null) {
+                hapticView.hapticConfirm()
+            }
+        }
         if (state.refreshing) {
             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         }
@@ -552,17 +561,17 @@ private fun LinkSaleCard(
                     fontWeight = FontWeight.SemiBold,
                 )
             }
-            if (!item.pending) {
-                OutlinedButton(
-                    onClick = { onArchive(item.deliveryId) },
-                    enabled = !busy,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 48.dp)
-                        .testTag(NativeUiTags.opsDeliveryArchive(item.deliveryId)),
-                ) {
-                    Text(if (archiving) "Removing…" else "Remove from active list")
-                }
+            // An escape hatch for any unlinked delivery — pending or already
+            // delivered — so nothing is stuck with only "Link" as an option.
+            OutlinedButton(
+                onClick = { onArchive(item.deliveryId) },
+                enabled = !busy,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp)
+                    .testTag(NativeUiTags.opsDeliveryArchive(item.deliveryId)),
+            ) {
+                Text(if (archiving) "Removing…" else "Remove from active list")
             }
         }
     }
@@ -597,6 +606,13 @@ private fun DeliveryCard(
         ) {
             Text(item.customerName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             Text("${item.productName} · ${item.quantityLabel}")
+            if (item.saleEventId != null) {
+                Text(
+                    "From sale #S-${item.saleEventId} — no linking needed",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             if (item.route != null) {
                 Text(
                     "Route: ${item.route}",

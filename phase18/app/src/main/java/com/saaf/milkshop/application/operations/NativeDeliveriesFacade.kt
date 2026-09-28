@@ -1,6 +1,7 @@
 package com.saaf.milkshop.application.operations
 
 import com.saaf.milkshop.application.bridge.DeliveryBridgeCommandService
+import com.saaf.milkshop.application.preview.NativePreviewSampleData
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.DeliveryInput
@@ -140,7 +141,14 @@ class NativeDeliveriesFacade(
         val items = mutableListOf<NativeDeliveryItem>()
         for (delivery in database.deliveryDao().activeDeliveries()) {
             if (delivery.saleEventId != null) continue
+            // Fixture chrome: the preview seeder's sample delivery is born
+            // standalone and must never pose as an unlinked sale needing a
+            // manual link — it permanently shows otherwise.
+            if (delivery.notes == NativePreviewSampleData.SAMPLE_DELIVERY_NOTES) continue
             val status = database.deliveryDao().latestStatus(delivery.deliveryId)?.status
+            // Only a pending delivery can still be linked; finished ones must
+            // never resurface as link prompts.
+            if (status != DeliveryService.STATUS_PENDING) continue
             val customer = database.accountDao().findById(delivery.customerAccountId)
             val product = database.productDao().findById(delivery.productId)
             val customerName = customer?.name
@@ -222,6 +230,12 @@ class NativeDeliveriesFacade(
             status = DeliveryService.STATUS_DELIVERED,
             notes = null,
         )
+        // Delivered = finished: archive it out of the active list in the same
+        // breath. Otherwise the row lingers active-but-invisible and resurfaces
+        // as a "link a sale" prompt the operator can never satisfy. The
+        // pending-only linkable filter is the safety net if this archive loses
+        // a race with a same-moment cash close.
+        runCatching { commands.archive(sessionHandle = sessionHandle, deliveryId = deliveryId) }
         return load(sessionHandle, date)
     }
 
@@ -247,6 +261,7 @@ class NativeDeliveriesFacade(
                 route = delivery.route?.trim()?.takeIf { it.isNotEmpty() },
                 businessDate = delivery.businessDate,
                 isToday = delivery.businessDate == today,
+                saleEventId = delivery.saleEventId,
             )
         }
         return items.sortedWith(
@@ -272,6 +287,8 @@ data class NativeDeliveryItem(
     val businessDate: String,
     val isToday: Boolean,
     val pending: Boolean = true,
+    /** Non-null when the delivery was born from (or later linked to) a sale. */
+    val saleEventId: Long? = null,
 )
 
 data class NativeDeliveryReference(

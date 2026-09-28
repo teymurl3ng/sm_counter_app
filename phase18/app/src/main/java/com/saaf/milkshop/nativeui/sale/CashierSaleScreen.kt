@@ -34,6 +34,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.History
@@ -76,6 +77,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -97,10 +99,12 @@ import com.saaf.milkshop.application.sale.NativeSaleAccount
 import com.saaf.milkshop.application.sale.NativeSaleEntryMode
 import com.saaf.milkshop.application.sale.NativeSalePaymentKind
 import com.saaf.milkshop.application.sale.NativeSaleProduct
+import com.saaf.milkshop.application.sale.NativeSaleReceipt
 import com.saaf.milkshop.application.sale.NativeSaleRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.hapticConfirm
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
@@ -288,6 +292,30 @@ internal fun SaleEntryContent(
                 businessDate = context.businessDate,
                 postingOpen = context.postingOpen,
             )
+            if (state.receipt != null) {
+                // Confirmation cheque: the receipt is its own screen. The form
+                // state stays frozen at the recorded values while the pane is
+                // up, so the cheque can show exactly what was booked.
+                SaleChequePane(
+                    receipt = state.receipt,
+                    followUp = state.deliveryFollowUp,
+                    productName = productName,
+                    quantityUnit = quantityUnit,
+                    paymentSummary = paymentSummary,
+                    onStartNextSale = {
+                        selectedProductId = null
+                        entryMode = EntryMode.Quantity
+                        payment = PaymentChoice.PaidNow
+                        entryValue = "2.0"
+                        selectedCustomerId = null
+                        secondaryDetailsExpanded = false
+                        leaveGuard.clear()
+                        onStartNextSale()
+                    },
+                    onSendAsDelivery = onSendAsDelivery,
+                    modifier = Modifier.weight(1f),
+                )
+            } else {
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -449,45 +477,6 @@ internal fun SaleEntryContent(
                     onToggle = { secondaryDetailsExpanded = !secondaryDetailsExpanded },
                 )
                 Spacer(Modifier.height(10.dp))
-                state.receipt?.let { receipt ->
-                    StatusMessage(
-                        message = "Sale #${receipt.eventId} recorded · ${formatQuantity(receipt.quantity)} $quantityUnit · PKR ${formatAmount(receipt.totalPaisa / 100.0)}",
-                        error = false,
-                        tag = NativeUiTags.CashierSaleSuccess,
-                    )
-                    Spacer(Modifier.height(8.dp))
-                }
-                state.deliveryFollowUp?.let { followUp ->
-                    if (!followUp.sent) {
-                        SaleDeliveryFollowUpCard(
-                            customerName = followUp.customerName,
-                            productName = followUp.productName,
-                            quantity = followUp.quantity,
-                            sending = followUp.sending,
-                            error = followUp.error,
-                            onSend = onSendAsDelivery,
-                        )
-                    } else {
-                        StatusMessage(
-                            message = "Delivery recorded for sale #${followUp.saleEventId}",
-                            error = false,
-                            tag = NativeUiTags.CashierSaleDeliveryLinked,
-                        )
-                    }
-                    Spacer(Modifier.height(8.dp))
-                }
-                if (state.receipt != null) {
-                    TextButton(
-                        onClick = onStartNextSale,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 44.dp)
-                            .testTag(NativeUiTags.CashierSaleNext),
-                    ) {
-                        Text("Record next sale", fontWeight = FontWeight.SemiBold)
-                    }
-                    Spacer(Modifier.height(8.dp))
-                }
                 state.error?.let { error ->
                     StatusMessage(
                         message = error,
@@ -543,6 +532,7 @@ internal fun SaleEntryContent(
                     },
                 )
                 Spacer(Modifier.height(12.dp))
+            }
             }
         }
 
@@ -1507,5 +1497,108 @@ private fun SaleDeliveryFollowUpCard(
                 Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
             }
         }
+    }
+}
+
+/**
+ * Confirmation cheque shown in place of the entry form while a recorded sale
+ * is on screen. Mirrors CollectionSuccess: big check, total, receipt rows,
+ * then the delivery offer and the next action. "Start new sale" clears the
+ * cheque and resets the form to fresh defaults — quantity included — so the
+ * next sale always starts clean.
+ */
+@Composable
+private fun SaleChequePane(
+    receipt: NativeSaleReceipt,
+    followUp: NativeSaleDeliveryFollowUp?,
+    productName: String,
+    quantityUnit: String,
+    paymentSummary: String,
+    onStartNextSale: () -> Unit,
+    onSendAsDelivery: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val view = LocalView.current
+    LaunchedEffect(receipt.eventId) { view.hapticConfirm() }
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp, vertical = 20.dp)
+            .semantics { liveRegion = LiveRegionMode.Polite }
+            .testTag(NativeUiTags.CashierSaleCheque),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Icon(
+            Icons.Outlined.CheckCircle,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(56.dp),
+        )
+        Text("Sale recorded", style = MaterialTheme.typography.headlineMedium)
+        Text(
+            "PKR ${formatAmount(receipt.totalPaisa / 100.0)}",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.ExtraBold,
+        )
+        Surface(
+            color = MaterialTheme.colorScheme.surface,
+            shape = RoundedCornerShape(16.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                SaleChequeRow("Sale", "#S-${receipt.eventId}")
+                HorizontalDivider()
+                SaleChequeRow("Product", "$productName · ${formatQuantity(receipt.quantity)} $quantityUnit")
+                HorizontalDivider()
+                SaleChequeRow("Payment", paymentSummary)
+            }
+        }
+        followUp?.let { followUp ->
+            if (!followUp.sent) {
+                SaleDeliveryFollowUpCard(
+                    customerName = followUp.customerName,
+                    productName = followUp.productName,
+                    quantity = followUp.quantity,
+                    sending = followUp.sending,
+                    error = followUp.error,
+                    onSend = onSendAsDelivery,
+                )
+            } else {
+                StatusMessage(
+                    message = "Delivery recorded for sale #${followUp.saleEventId}",
+                    error = false,
+                    tag = NativeUiTags.CashierSaleDeliveryLinked,
+                )
+            }
+        }
+        Button(
+            onClick = onStartNextSale,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = SaafYellow,
+                contentColor = SaafInk,
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 56.dp)
+                .testTag(NativeUiTags.CashierSaleNext),
+        ) {
+            Text(
+                "Start new sale",
+                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.titleMedium,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SaleChequeRow(label: String, value: String) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.width(16.dp))
+        Text(value, fontWeight = FontWeight.SemiBold)
     }
 }

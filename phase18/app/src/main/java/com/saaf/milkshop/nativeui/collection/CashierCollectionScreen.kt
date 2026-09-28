@@ -63,6 +63,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
@@ -84,6 +85,7 @@ import com.saaf.milkshop.application.collection.NativeCollectionRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.hapticConfirm
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierNavigation
 import com.saaf.milkshop.nativeui.sale.CashierNavigationRail
@@ -640,6 +642,8 @@ private fun CollectionSuccess(
     onViewRecord: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val view = LocalView.current
+    LaunchedEffect(receipt.eventId) { view.hapticConfirm() }
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())

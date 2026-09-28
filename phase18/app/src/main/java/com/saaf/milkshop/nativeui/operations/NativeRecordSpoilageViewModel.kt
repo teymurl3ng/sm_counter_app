@@ -56,7 +56,12 @@ class NativeRecordSpoilageViewModel(
     }
 
     fun open(nextSessionHandle: String) {
-        if (sessionHandle == nextSessionHandle && _state.value !is NativeRecordSpoilageState.Idle) return
+        if (sessionHandle == nextSessionHandle && _state.value !is NativeRecordSpoilageState.Idle) {
+            // Warm re-entry: keep the content on screen and re-validate in
+            // place (thin refresh bar) instead of showing stale data.
+            refresh()
+            return
+        }
         sessionHandle = nextSessionHandle
         refresh()
     }

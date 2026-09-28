@@ -114,16 +114,12 @@ fun CashierPreviewHost(
             sampleReady,
         ) {
             if (!sampleReady) return@LaunchedEffect
+            // Sections stay warm: open() re-validates cheaply and close() is
+            // reserved for session changes, so re-entry shows content at once.
             when (cashierSection) {
-                CashierSection.Sell -> {
-                    expenseViewModel.close()
-                    saleViewModel.open(sessionHandle)
-                }
-                CashierSection.Collect -> {
-                    expenseViewModel.close()
-                    collectionViewModel.open(sessionHandle)
-                }
-                CashierSection.Activity -> expenseViewModel.close()
+                CashierSection.Sell -> saleViewModel.open(sessionHandle)
+                CashierSection.Collect -> collectionViewModel.open(sessionHandle)
+                CashierSection.Activity -> Unit
                 CashierSection.More -> moreViewModel.open(sessionHandle)
             }
         }
@@ -137,13 +133,9 @@ fun CashierPreviewHost(
             val destination = (moreState as? NativeMoreState.Ready)?.destination
             if (destination == NativeMoreDestination.Expense) {
                 expenseViewModel.open(sessionHandle)
-            } else {
-                expenseViewModel.close()
             }
             if (destination == NativeMoreDestination.Deliveries) {
                 deliveriesViewModel.open(sessionHandle)
-            } else {
-                deliveriesViewModel.close()
             }
         }
         BackHandler {
@@ -171,13 +163,9 @@ fun CashierPreviewHost(
                     val ready = moreState as? NativeMoreState.Ready
                     if (ready != null && ready.destination == NativeMoreDestination.Expense) {
                         // CashierExpenseEntryScreen owns Back + leave-guard.
-                    } else if (ready != null && ready.destination == NativeMoreDestination.Deliveries) {
-                        deliveriesViewModel.close()
-                        moreViewModel.backToMenu()
                     } else if (ready != null && ready.destination != NativeMoreDestination.Menu) {
                         moreViewModel.backToMenu()
                     } else {
-                        expenseViewModel.close()
                         onCashierSectionChange(CashierSection.Sell)
                     }
                 }
@@ -282,11 +270,9 @@ fun CashierPreviewHost(
                         onRecordExpense = expenseViewModel::record,
                         onRecordAnother = expenseViewModel::recordAnother,
                         onBackToMore = {
-                            expenseViewModel.close()
                             moreViewModel.backToMenu()
                         },
                         onNavigate = { section ->
-                            expenseViewModel.close()
                             moreViewModel.backToMenu()
                             navigateCashier(section)
                         },
@@ -309,11 +295,9 @@ fun CashierPreviewHost(
                         onArchive = deliveriesViewModel::archiveDelivery,
                         onLinkSale = deliveriesViewModel::linkSale,
                         onBackToMore = {
-                            deliveriesViewModel.close()
                             moreViewModel.backToMenu()
                         },
                         onNavigate = { section ->
-                            deliveriesViewModel.close()
                             moreViewModel.backToMenu()
                             navigateCashier(section)
                         },
@@ -335,7 +319,6 @@ fun CashierPreviewHost(
                         },
                         onOpenPersonalSecurity = moreViewModel::openPersonalSecurity,
                         onBackToMenu = {
-                            expenseViewModel.close()
                             moreViewModel.backToMenu()
                         },
                         onRecordCashCount = moreViewModel::recordCashCount,

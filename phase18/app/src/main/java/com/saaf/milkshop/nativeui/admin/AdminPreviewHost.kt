@@ -64,7 +64,8 @@ fun AdminPreviewHost(
         }
 
         fun returnAdminWorkHome() {
-            closeExpense()
+            // The expense VM stays warm for instant re-entry; close() is
+            // reserved for session changes.
             adminWorkViewModel.backToHome()
         }
 
@@ -101,12 +102,10 @@ fun AdminPreviewHost(
         ) {
             val workDestination =
                 (adminWorkState as? NativeAdminWorkState.Ready)?.destination
-            when {
-                adminSection != AdminSection.Work -> closeExpense()
-                workDestination == NativeAdminWorkDestination.RecordExpense -> {
-                    expenseViewModel.open(sessionHandle)
-                }
-                else -> closeExpense()
+            if (adminSection == AdminSection.Work &&
+                workDestination == NativeAdminWorkDestination.RecordExpense
+            ) {
+                expenseViewModel.open(sessionHandle)
             }
         }
 

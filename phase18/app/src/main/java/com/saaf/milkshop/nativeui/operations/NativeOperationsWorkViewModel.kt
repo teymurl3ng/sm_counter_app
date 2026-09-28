@@ -67,8 +67,11 @@ class NativeOperationsWorkViewModel(
             (_state.value is NativeOperationsWorkState.Ready ||
                 _state.value is NativeOperationsWorkState.Loading)
         ) {
+            // Warm re-entry: keep the content on screen and re-validate in
+            // place (thin refresh bar) instead of showing stale data.
+            refresh()
             return
-        }
+    }
         sessionHandle = nextSessionHandle
         refresh()
     }

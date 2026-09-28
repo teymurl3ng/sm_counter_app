@@ -68,6 +68,9 @@ fun OperationsPreviewHost(
                 OperationsSection.More -> operationsMoreViewModel.open(sessionHandle)
             }
         }
+        // Work entries stay warm across switches: closing siblings here forced
+        // a full cold reload on every destination round-trip. open()
+        // re-validates cheaply and close() is reserved for session changes.
         LaunchedEffect(
             sessionHandle,
             operationsSection,
@@ -75,31 +78,12 @@ fun OperationsPreviewHost(
         ) {
             val destination =
                 (operationsWorkState as? NativeOperationsWorkState.Ready)?.destination
-            when {
-                operationsSection != OperationsSection.Work -> {
-                    receiveMilkViewModel.close()
-                    makeYogurtViewModel.close()
-                    recordSpoilageViewModel.close()
-                }
-                destination == NativeOperationsWorkDestination.ReceiveMilk -> {
-                    makeYogurtViewModel.close()
-                    recordSpoilageViewModel.close()
-                    receiveMilkViewModel.open(sessionHandle)
-                }
-                destination == NativeOperationsWorkDestination.MakeYogurt -> {
-                    receiveMilkViewModel.close()
-                    recordSpoilageViewModel.close()
-                    makeYogurtViewModel.open(sessionHandle)
-                }
-                destination == NativeOperationsWorkDestination.RecordSpoilage -> {
-                    receiveMilkViewModel.close()
-                    makeYogurtViewModel.close()
-                    recordSpoilageViewModel.open(sessionHandle)
-                }
-                destination != null -> {
-                    receiveMilkViewModel.close()
-                    makeYogurtViewModel.close()
-                    recordSpoilageViewModel.close()
+            if (operationsSection == OperationsSection.Work) {
+                when (destination) {
+                    NativeOperationsWorkDestination.ReceiveMilk -> receiveMilkViewModel.open(sessionHandle)
+                    NativeOperationsWorkDestination.MakeYogurt -> makeYogurtViewModel.open(sessionHandle)
+                    NativeOperationsWorkDestination.RecordSpoilage -> recordSpoilageViewModel.open(sessionHandle)
+                    else -> Unit
                 }
             }
         }
@@ -119,9 +103,6 @@ fun OperationsPreviewHost(
                     if (ready != null &&
                         ready.destination != NativeOperationsWorkDestination.Home
                     ) {
-                        receiveMilkViewModel.close()
-                        makeYogurtViewModel.close()
-                        recordSpoilageViewModel.close()
                         operationsWorkViewModel.backToHome()
                     } else {
                         onLeaveToWelcome()
@@ -154,9 +135,6 @@ fun OperationsPreviewHost(
                 OperationsSection.More,
                 -> {
                     if (operationsSection == OperationsSection.Work) {
-                        receiveMilkViewModel.close()
-                        makeYogurtViewModel.close()
-                        recordSpoilageViewModel.close()
                         operationsWorkViewModel.backToHome()
                     }
                     onOperationsSectionChange(section)
@@ -233,7 +211,6 @@ fun OperationsPreviewHost(
                     onRecord = receiveMilkViewModel::record,
                     onReceiveAnother = receiveMilkViewModel::receiveAnother,
                     onBackToHome = {
-                        receiveMilkViewModel.close()
                         operationsWorkViewModel.backToHome()
                     },
                     onNavigate = navigateOps,
@@ -249,7 +226,6 @@ fun OperationsPreviewHost(
                     onRecord = makeYogurtViewModel::record,
                     onMakeAnother = makeYogurtViewModel::makeAnother,
                     onBackToHome = {
-                        makeYogurtViewModel.close()
                         operationsWorkViewModel.backToHome()
                     },
                     onNavigate = navigateOps,
@@ -271,7 +247,6 @@ fun OperationsPreviewHost(
                     onRecord = recordSpoilageViewModel::record,
                     onRecordAnother = recordSpoilageViewModel::recordAnother,
                     onBackToHome = {
-                        recordSpoilageViewModel.close()
                         operationsWorkViewModel.backToHome()
                     },
                     onNavigate = navigateOps,

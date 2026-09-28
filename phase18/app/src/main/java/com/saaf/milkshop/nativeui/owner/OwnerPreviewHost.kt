@@ -112,7 +112,8 @@ fun OwnerPreviewHost(
         }
 
         fun returnOwnerWorkHome() {
-            closeOwnerWorkEntries()
+            // Entry VMs stay warm for instant re-entry; only the Work menu
+            // itself returns to its home tile list.
             ownerWorkViewModel.backToHome()
         }
 
@@ -185,6 +186,10 @@ fun OwnerPreviewHost(
                 OwnerSection.More -> ownerMoreViewModel.open(sessionHandle)
             }
         }
+        // Work entries stay warm across switches: closing siblings here forced
+        // a full cold reload on every Work → back → Work round-trip. open()
+        // re-validates cheaply (thin refresh bar) and close() is reserved for
+        // session changes.
         LaunchedEffect(
             sessionHandle,
             ownerSection,
@@ -192,129 +197,20 @@ fun OwnerPreviewHost(
         ) {
             val workDestination =
                 (ownerWorkState as? NativeOwnerWorkState.Ready)?.destination
-            when {
-                ownerSection != OwnerSection.Work -> closeOwnerWorkEntries()
-                workDestination == NativeOwnerWorkDestination.RecordSale -> {
-                    collectionViewModel.close()
-                    expenseViewModel.close()
-                    vendorPaymentViewModel.close()
-                    salaryPaymentViewModel.close()
-                    cashCloseViewModel.close()
-                    receiveMilkViewModel.close()
-                    makeYogurtViewModel.close()
-                    recordSpoilageViewModel.close()
-                    deliveriesViewModel.close()
-                    saleViewModel.open(sessionHandle)
+            if (ownerSection == OwnerSection.Work) {
+                when (workDestination) {
+                    NativeOwnerWorkDestination.RecordSale -> saleViewModel.open(sessionHandle)
+                    NativeOwnerWorkDestination.RecordPayment -> collectionViewModel.open(sessionHandle)
+                    NativeOwnerWorkDestination.RecordExpense -> expenseViewModel.open(sessionHandle)
+                    NativeOwnerWorkDestination.PaySupplier -> vendorPaymentViewModel.open(sessionHandle)
+                    NativeOwnerWorkDestination.PaySalary -> salaryPaymentViewModel.open(sessionHandle)
+                    NativeOwnerWorkDestination.CashCountAndClose -> cashCloseViewModel.open(sessionHandle)
+                    NativeOwnerWorkDestination.ReceiveMilk -> receiveMilkViewModel.open(sessionHandle)
+                    NativeOwnerWorkDestination.MakeYogurt -> makeYogurtViewModel.open(sessionHandle)
+                    NativeOwnerWorkDestination.RecordSpoilage -> recordSpoilageViewModel.open(sessionHandle)
+                    NativeOwnerWorkDestination.Deliveries -> deliveriesViewModel.open(sessionHandle)
+                    else -> Unit
                 }
-                workDestination == NativeOwnerWorkDestination.RecordPayment -> {
-                    saleViewModel.close()
-                    expenseViewModel.close()
-                    vendorPaymentViewModel.close()
-                    salaryPaymentViewModel.close()
-                    cashCloseViewModel.close()
-                    receiveMilkViewModel.close()
-                    makeYogurtViewModel.close()
-                    recordSpoilageViewModel.close()
-                    deliveriesViewModel.close()
-                    collectionViewModel.open(sessionHandle)
-                }
-                workDestination == NativeOwnerWorkDestination.RecordExpense -> {
-                    saleViewModel.close()
-                    collectionViewModel.close()
-                    vendorPaymentViewModel.close()
-                    salaryPaymentViewModel.close()
-                    cashCloseViewModel.close()
-                    receiveMilkViewModel.close()
-                    makeYogurtViewModel.close()
-                    recordSpoilageViewModel.close()
-                    deliveriesViewModel.close()
-                    expenseViewModel.open(sessionHandle)
-                }
-                workDestination == NativeOwnerWorkDestination.PaySupplier -> {
-                    saleViewModel.close()
-                    collectionViewModel.close()
-                    expenseViewModel.close()
-                    salaryPaymentViewModel.close()
-                    cashCloseViewModel.close()
-                    receiveMilkViewModel.close()
-                    makeYogurtViewModel.close()
-                    recordSpoilageViewModel.close()
-                    deliveriesViewModel.close()
-                    vendorPaymentViewModel.open(sessionHandle)
-                }
-                workDestination == NativeOwnerWorkDestination.PaySalary -> {
-                    saleViewModel.close()
-                    collectionViewModel.close()
-                    expenseViewModel.close()
-                    vendorPaymentViewModel.close()
-                    cashCloseViewModel.close()
-                    receiveMilkViewModel.close()
-                    makeYogurtViewModel.close()
-                    recordSpoilageViewModel.close()
-                    deliveriesViewModel.close()
-                    salaryPaymentViewModel.open(sessionHandle)
-                }
-                workDestination == NativeOwnerWorkDestination.CashCountAndClose -> {
-                    saleViewModel.close()
-                    collectionViewModel.close()
-                    expenseViewModel.close()
-                    vendorPaymentViewModel.close()
-                    salaryPaymentViewModel.close()
-                    receiveMilkViewModel.close()
-                    makeYogurtViewModel.close()
-                    recordSpoilageViewModel.close()
-                    deliveriesViewModel.close()
-                    cashCloseViewModel.open(sessionHandle)
-                }
-                workDestination == NativeOwnerWorkDestination.ReceiveMilk -> {
-                    saleViewModel.close()
-                    collectionViewModel.close()
-                    expenseViewModel.close()
-                    vendorPaymentViewModel.close()
-                    salaryPaymentViewModel.close()
-                    cashCloseViewModel.close()
-                    makeYogurtViewModel.close()
-                    recordSpoilageViewModel.close()
-                    deliveriesViewModel.close()
-                    receiveMilkViewModel.open(sessionHandle)
-                }
-                workDestination == NativeOwnerWorkDestination.MakeYogurt -> {
-                    saleViewModel.close()
-                    collectionViewModel.close()
-                    expenseViewModel.close()
-                    vendorPaymentViewModel.close()
-                    salaryPaymentViewModel.close()
-                    cashCloseViewModel.close()
-                    receiveMilkViewModel.close()
-                    recordSpoilageViewModel.close()
-                    deliveriesViewModel.close()
-                    makeYogurtViewModel.open(sessionHandle)
-                }
-                workDestination == NativeOwnerWorkDestination.RecordSpoilage -> {
-                    saleViewModel.close()
-                    collectionViewModel.close()
-                    expenseViewModel.close()
-                    vendorPaymentViewModel.close()
-                    salaryPaymentViewModel.close()
-                    cashCloseViewModel.close()
-                    receiveMilkViewModel.close()
-                    makeYogurtViewModel.close()
-                    deliveriesViewModel.close()
-                    recordSpoilageViewModel.open(sessionHandle)
-                }
-                workDestination == NativeOwnerWorkDestination.Deliveries -> {
-                    saleViewModel.close()
-                    collectionViewModel.close()
-                    expenseViewModel.close()
-                    vendorPaymentViewModel.close()
-                    salaryPaymentViewModel.close()
-                    cashCloseViewModel.close()
-                    receiveMilkViewModel.close()
-                    makeYogurtViewModel.close()
-                    recordSpoilageViewModel.close()
-                    deliveriesViewModel.open(sessionHandle)
-                }
-                else -> closeOwnerWorkEntries()
             }
         }
         val ownerReportsOwnsBack =

@@ -37,6 +37,8 @@ object NativeUiTags {
     const val CashierIncrease = "cashier_increase"
     const val CashierPaymentPaidNow = "cashier_payment_paid_now"
     const val CashierPaymentCustomer = "cashier_payment_customer"
+    const val CashierPaymentAccountSelector = "cashier_payment_account_selector"
+    const val CashierPaymentCancel = "cashier_payment_cancel"
     const val CashierCustomerSelector = "cashier_customer_selector"
     const val CashierCustomerList = "cashier_customer_list"
     const val CashierCustomerAhmed = "cashier_customer_ahmed"
@@ -1047,6 +1049,8 @@ object NativeUiTags {
     fun collectCustomer(accountId: Long): String = "collect_customer_$accountId"
 
     fun collectPaymentAccount(accountId: Long): String = "collect_payment_account_$accountId"
+
+    fun cashierPaymentAccount(accountId: Long): String = "cashier_payment_account_$accountId"
 
     fun expenseCategory(accountId: Long): String = "expense_category_$accountId"
 

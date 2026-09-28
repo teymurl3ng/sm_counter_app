@@ -84,6 +84,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
@@ -233,6 +234,8 @@ internal fun SaleEntryContent(
     var entryValue by rememberSaveable { mutableStateOf("") }
     var selectedCustomerId by rememberSaveable { mutableStateOf<Long?>(null) }
     var showCustomerPicker by rememberSaveable { mutableStateOf(false) }
+    var paidNowAccountId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var showPaymentPicker by rememberSaveable { mutableStateOf(false) }
     var secondaryDetailsExpanded by rememberSaveable { mutableStateOf(false) }
     var saleNote by rememberSaveable { mutableStateOf("") }
     var wholesale by rememberSaveable { mutableStateOf(false) }
@@ -243,9 +246,12 @@ internal fun SaleEntryContent(
     val product = context.products.firstOrNull { it.productId == selectedProductId }
         ?: context.products.firstOrNull()
     val selectedCustomer = context.customers.firstOrNull { it.accountId == selectedCustomerId }
-    val paymentAccount = context.paymentAccounts.firstOrNull {
-        it.accountId == context.defaultPaymentAccountId
-    }
+    // Paid-now destination: the cashier's explicit choice (Cash, Bank,
+    // JazzCash…) falling back to the shop default. Sales are no longer
+    // locked to whichever account happens to be named "Cash".
+    val paidNowAccount = context.paymentAccounts.firstOrNull {
+        it.accountId == (paidNowAccountId ?: context.defaultPaymentAccountId)
+    } ?: context.paymentAccounts.firstOrNull()
     val wholesaleRate = wholesaleRateText.toDoubleOrNull()?.takeIf { it > 0.0 }
     val wholesaleRatePaisa = wholesaleRate?.let { (it * 100.0).let { v -> kotlin.math.round(v).toLong() } }
     val activeRatePaisa = if (wholesale) wholesaleRatePaisa ?: product?.ratePaisaPerUnit ?: 0L
@@ -261,14 +267,14 @@ internal fun SaleEntryContent(
     val quantityText = formatQuantity(quantity)
     val totalText = formatAmount(total)
     val paymentSummary = when (payment) {
-        PaymentChoice.PaidNow -> paymentAccount?.name ?: "Payment unavailable"
+        PaymentChoice.PaidNow -> paidNowAccount?.name ?: "Payment unavailable"
         PaymentChoice.CustomerAccount -> selectedCustomer?.name
             ?: stringResource(R.string.native_customer_account)
     }
     val canRecord = context.postingOpen && product != null && quantity > 0.0 && !state.saving &&
         (!wholesale || wholesaleRatePaisa != null) &&
         when (payment) {
-            PaymentChoice.PaidNow -> paymentAccount != null
+            PaymentChoice.PaidNow -> paidNowAccount != null
             PaymentChoice.CustomerAccount -> selectedCustomer != null
         }
 
@@ -318,6 +324,7 @@ internal fun SaleEntryContent(
                         payment = PaymentChoice.PaidNow
                         entryValue = ""
                         selectedCustomerId = null
+                        paidNowAccountId = null
                         secondaryDetailsExpanded = false
                         saleNote = ""
                         wholesale = false
@@ -454,7 +461,7 @@ internal fun SaleEntryContent(
                 SectionHeading(title = stringResource(R.string.native_payment_destination))
                 PaymentSelector(
                     paidNowTitle = stringResource(R.string.native_paid_now),
-                    paidNowDetail = paymentAccount?.name ?: "Unavailable",
+                    paidNowDetail = paidNowAccount?.name ?: "Unavailable",
                     customerTitle = stringResource(R.string.native_customer_account),
                     selected = payment,
                     stacked = useStackedLayout,
@@ -475,6 +482,15 @@ internal fun SaleEntryContent(
                         message = "No active Cash/Bank account is available. Ask an owner or manager to configure one.",
                         error = true,
                         tag = NativeUiTags.CashierPaymentUnavailable,
+                    )
+                }
+                if (payment == PaymentChoice.PaidNow && paidNowAccount != null) {
+                    Spacer(Modifier.height(8.dp))
+                    PaymentAccountSelectionRow(
+                        accountName = paidNowAccount.name,
+                        balanceLabel = paidNowAccount.balancePaisa
+                            ?.let { "PKR ${formatAmount(it / 100.0)} available" },
+                        onClick = { showPaymentPicker = true },
                     )
                 }
                 if (payment == PaymentChoice.CustomerAccount) {
@@ -566,7 +582,7 @@ internal fun SaleEntryContent(
                                 } else {
                                     NativeSalePaymentKind.CUSTOMER_ACCOUNT
                                 },
-                                paymentAccountId = paymentAccount?.accountId,
+                                paymentAccountId = paidNowAccount?.accountId,
                                 customerAccountId = selectedCustomer?.accountId,
                                 notes = saleNote.trim().takeIf { it.isNotEmpty() },
                                 wholesale = wholesale,
@@ -595,6 +611,119 @@ internal fun SaleEntryContent(
         )
     }
 
+    if (showPaymentPicker) {
+        SalePaymentPickerDialog(
+            accounts = context.paymentAccounts,
+            selectedId = paidNowAccount?.accountId,
+            onSelect = { account ->
+                paidNowAccountId = account.accountId
+                payment = PaymentChoice.PaidNow
+                showPaymentPicker = false
+                leaveGuard.markDirty()
+                onClearFeedback()
+            },
+            onDismiss = { showPaymentPicker = false },
+        )
+    }
+
+}
+
+@Composable
+private fun PaymentAccountSelectionRow(
+    accountName: String,
+    balanceLabel: String?,
+    onClick: () -> Unit,
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 52.dp)
+            .testTag(NativeUiTags.CashierPaymentAccountSelector)
+            .clickable(role = Role.Button, onClick = onClick),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = accountName,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                if (balanceLabel != null) {
+                    Text(
+                        text = balanceLabel,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            Text(
+                text = stringResource(R.string.native_change),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SalePaymentPickerDialog(
+    accounts: List<NativeSaleAccount>,
+    selectedId: Long?,
+    onSelect: (NativeSaleAccount) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.native_paid_now)) },
+        text = {
+            Column {
+                accounts.forEach { account ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 56.dp)
+                            .clickable { onSelect(account) }
+                            .semantics {
+                                role = Role.RadioButton
+                                contentDescription = if (account.accountId == selectedId) {
+                                    "${account.name}, selected"
+                                } else account.name
+                            }
+                            .testTag(NativeUiTags.cashierPaymentAccount(account.accountId))
+                            .padding(vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text(account.name, fontWeight = FontWeight.SemiBold)
+                            account.balancePaisa?.let {
+                                Text(
+                                    text = "PKR ${formatAmount(it / 100.0)}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                        if (account.accountId == selectedId) {
+                            Icon(Icons.Outlined.CheckCircle, contentDescription = null)
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss,
+                modifier = Modifier.testTag(NativeUiTags.CashierPaymentCancel),
+            ) { Text(stringResource(R.string.native_cancel)) }
+        },
+    )
 }
 
 @Composable

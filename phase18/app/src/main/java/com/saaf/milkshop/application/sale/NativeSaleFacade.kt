@@ -16,7 +16,12 @@ data class NativeSaleProduct(
     val quantityOnHand: String,
 )
 
-data class NativeSaleAccount(val accountId: Long, val name: String)
+data class NativeSaleAccount(
+    val accountId: Long,
+    val name: String,
+    /** Current balance for Cash/Bank payment accounts; null for customers. */
+    val balancePaisa: Long? = null,
+)
 
 data class NativeSaleContext(
     val businessDate: String,
@@ -87,7 +92,11 @@ class NativeSaleFacade(
                 quantityOnHand = stockByProduct[product.productId]?.quantityOnHand ?: "0",
             )
         }
-        val accounts = references.paymentAccounts.map { NativeSaleAccount(it.accountId, it.name) }
+        val accounts = references.paymentAccounts.map { reference ->
+            val balance = cashier.paymentAccounts.firstOrNull { it.accountId == reference.accountId }
+                ?.canonicalBalancePaisa
+            NativeSaleAccount(reference.accountId, reference.name, balance)
+        }
         val defaultAccount = accounts.firstOrNull { it.name.equals("Cash", ignoreCase = true) }
             ?: accounts.firstOrNull()
         val defaultBalance = cashier.paymentAccounts.firstOrNull {

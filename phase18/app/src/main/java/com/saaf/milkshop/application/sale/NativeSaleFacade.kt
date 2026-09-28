@@ -39,6 +39,12 @@ data class NativeSaleRequest(
     val paymentKind: NativeSalePaymentKind,
     val paymentAccountId: Long?,
     val customerAccountId: Long?,
+    /** Optional cashier note, persisted on the sale event. */
+    val notes: String? = null,
+    /** Wholesale pricing: uses the four-value channel convention and an
+     *  operator-entered rate instead of the stored retail rate. */
+    val wholesale: Boolean = false,
+    val wholesaleRatePaisa: Long? = null,
 )
 
 data class NativeSaleReceipt(
@@ -128,17 +134,36 @@ class NativeSaleFacade(
                 SalePayment.OnCredit(customerId)
             }
         }
+        if (request.wholesale) {
+            val rate = request.wholesaleRatePaisa
+            require(rate != null && rate > 0L) {
+                "Enter a wholesale rate greater than zero."
+            }
+        }
+        // Four-value channel convention shared with the hybrid client:
+        // retail / credit-retail / wholesale / credit-wholesale.
+        val channel = when {
+            request.wholesale && request.paymentKind == NativeSalePaymentKind.CUSTOMER_ACCOUNT -> "credit-wholesale"
+            request.wholesale -> "wholesale"
+            request.paymentKind == NativeSalePaymentKind.CUSTOMER_ACCOUNT -> "credit-retail"
+            else -> "retail"
+        }
+        val unitRatePaisa = if (request.wholesale) {
+            request.wholesaleRatePaisa ?: product.ratePaisaPerUnit
+        } else {
+            product.ratePaisaPerUnit
+        }
         val result = commands.recordSale(
             sessionHandle,
             SaleInput(
                 productId = product.productId,
                 occurredAt = context.businessDate,
-                channel = "retail",
-                unitRate = product.ratePaisaPerUnit / 100.0,
+                channel = channel,
+                unitRate = unitRatePaisa / 100.0,
                 quantity = request.enteredValue.takeIf { request.entryMode == NativeSaleEntryMode.QUANTITY },
                 value = request.enteredValue.takeIf { request.entryMode == NativeSaleEntryMode.AMOUNT },
                 payment = payment,
-                notes = "Recorded from native Sale",
+                notes = request.notes?.trim()?.takeIf { it.isNotEmpty() },
             ),
         )
         return NativeSaleSubmission(

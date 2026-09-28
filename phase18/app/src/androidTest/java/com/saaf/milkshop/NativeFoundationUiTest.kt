@@ -2473,12 +2473,15 @@ class NativeFoundationUiTest {
         openCashier()
 
         composeRule.onNodeWithTag(NativeUiTags.CashierSecondaryDetails).performScrollTo().performClick()
-        composeRule.onNodeWithText("Counter pickup").assertIsDisplayed()
-        composeRule.onNodeWithText("None").assertIsDisplayed()
+        composeRule.onNodeWithText("Standard").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("Wholesale").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashierSaleNote).performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("Delivery can be sent right after recording on a credit sale.")
+            .performScrollTo().assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.CashierSecondaryDetails).performClick()
-        composeRule.onNodeWithText("Counter pickup").assertDoesNotExist()
-        composeRule.onNodeWithText("None").assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierSaleNote).assertDoesNotExist()
+        composeRule.onNodeWithText("Wholesale").assertDoesNotExist()
     }
 
     @Test

@@ -43,6 +43,8 @@ object NativeUiTags {
     const val CashierCustomerBilal = "cashier_customer_bilal"
     const val CashierCustomerCancel = "cashier_customer_cancel"
     const val CashierSecondaryDetails = "cashier_secondary_details"
+    const val CashierWholesaleRate = "cashier_wholesale_rate"
+    const val CashierSaleNote = "cashier_sale_note"
     const val CashierRecordSale = "cashier_record_sale"
     const val CashierSaleScroll = "cashier_sale_scroll"
     const val CashierSaleSuccess = "cashier_sale_success"

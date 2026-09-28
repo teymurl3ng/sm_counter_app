@@ -234,6 +234,9 @@ internal fun SaleEntryContent(
     var selectedCustomerId by rememberSaveable { mutableStateOf<Long?>(null) }
     var showCustomerPicker by rememberSaveable { mutableStateOf(false) }
     var secondaryDetailsExpanded by rememberSaveable { mutableStateOf(false) }
+    var saleNote by rememberSaveable { mutableStateOf("") }
+    var wholesale by rememberSaveable { mutableStateOf(false) }
+    var wholesaleRateText by rememberSaveable { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
     val useStackedLayout = LocalDensity.current.fontScale >= 1.3f
 
@@ -243,7 +246,11 @@ internal fun SaleEntryContent(
     val paymentAccount = context.paymentAccounts.firstOrNull {
         it.accountId == context.defaultPaymentAccountId
     }
-    val rate = (product?.ratePaisaPerUnit ?: 0L) / 100.0
+    val wholesaleRate = wholesaleRateText.toDoubleOrNull()?.takeIf { it > 0.0 }
+    val wholesaleRatePaisa = wholesaleRate?.let { (it * 100.0).let { v -> kotlin.math.round(v).toLong() } }
+    val activeRatePaisa = if (wholesale) wholesaleRatePaisa ?: product?.ratePaisaPerUnit ?: 0L
+    else product?.ratePaisaPerUnit ?: 0L
+    val rate = activeRatePaisa / 100.0
     val productName = product?.name.orEmpty()
     val quantityUnit = product?.unit?.toDisplayUnit().orEmpty()
     val enteredNumber = entryValue.toDoubleOrNull()?.coerceAtLeast(0.0) ?: 0.0
@@ -259,6 +266,7 @@ internal fun SaleEntryContent(
             ?: stringResource(R.string.native_customer_account)
     }
     val canRecord = context.postingOpen && product != null && quantity > 0.0 && !state.saving &&
+        (!wholesale || wholesaleRatePaisa != null) &&
         when (payment) {
             PaymentChoice.PaidNow -> paymentAccount != null
             PaymentChoice.CustomerAccount -> selectedCustomer != null
@@ -302,6 +310,8 @@ internal fun SaleEntryContent(
                     productName = productName,
                     quantityUnit = quantityUnit,
                     paymentSummary = paymentSummary,
+                    priceLabel = if (wholesale && rate > 0.0) "Wholesale · ${formatAmount(rate)} / $quantityUnit" else null,
+                    note = saleNote.trim().takeIf { it.isNotEmpty() },
                     onStartNextSale = {
                         selectedProductId = null
                         entryMode = EntryMode.Quantity
@@ -309,6 +319,9 @@ internal fun SaleEntryContent(
                         entryValue = ""
                         selectedCustomerId = null
                         secondaryDetailsExpanded = false
+                        saleNote = ""
+                        wholesale = false
+                        wholesaleRateText = ""
                         leaveGuard.clear()
                         onStartNextSale()
                     },
@@ -475,6 +488,34 @@ internal fun SaleEntryContent(
                 SecondaryDetails(
                     expanded = secondaryDetailsExpanded,
                     onToggle = { secondaryDetailsExpanded = !secondaryDetailsExpanded },
+                    unit = quantityUnit,
+                    retailRateText = product?.ratePaisaPerUnit?.let { formatAmount(it / 100.0) } ?: "",
+                    wholesale = wholesale,
+                    onWholesaleSelected = { next ->
+                        if (next != wholesale) {
+                            if (next && wholesaleRateText.isBlank()) {
+                                wholesaleRateText = product?.ratePaisaPerUnit
+                                    ?.let { formatAmount(it / 100.0) } ?: ""
+                            }
+                            wholesale = next
+                            leaveGuard.markDirty()
+                            onClearFeedback()
+                        }
+                    },
+                    wholesaleRateText = wholesaleRateText,
+                    onWholesaleRateChange = { next ->
+                        if (isValidDecimalInput(next)) {
+                            wholesaleRateText = next
+                            leaveGuard.markDirty()
+                            onClearFeedback()
+                        }
+                    },
+                    note = saleNote,
+                    onNoteChange = { next ->
+                        saleNote = next.take(240)
+                        leaveGuard.markDirty()
+                        onClearFeedback()
+                    },
                 )
                 Spacer(Modifier.height(10.dp))
                 state.error?.let { error ->
@@ -527,6 +568,9 @@ internal fun SaleEntryContent(
                                 },
                                 paymentAccountId = paymentAccount?.accountId,
                                 customerAccountId = selectedCustomer?.accountId,
+                                notes = saleNote.trim().takeIf { it.isNotEmpty() },
+                                wholesale = wholesale,
+                                wholesaleRatePaisa = wholesaleRatePaisa,
                             ),
                         )
                     },
@@ -1235,6 +1279,14 @@ private fun CustomerAccountDialog(
 private fun SecondaryDetails(
     expanded: Boolean,
     onToggle: () -> Unit,
+    unit: String,
+    retailRateText: String,
+    wholesale: Boolean,
+    onWholesaleSelected: (Boolean) -> Unit,
+    wholesaleRateText: String,
+    onWholesaleRateChange: (String) -> Unit,
+    note: String,
+    onNoteChange: (String) -> Unit,
 ) {
     Column {
         Surface(
@@ -1275,36 +1327,70 @@ private fun SecondaryDetails(
             ) {
                 Column(
                     modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    SecondaryDetail(
-                        label = stringResource(R.string.native_price_type),
-                        value = stringResource(R.string.native_standard_price),
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(
+                            text = stringResource(R.string.native_price_type),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .selectableGroup()
+                                .clip(RoundedCornerShape(9.dp))
+                                .background(MaterialTheme.colorScheme.surface)
+                                .padding(3.dp),
+                            horizontalArrangement = Arrangement.spacedBy(3.dp),
+                        ) {
+                            Segment(
+                                text = stringResource(R.string.native_standard_price),
+                                selected = !wholesale,
+                                onClick = { onWholesaleSelected(false) },
+                                modifier = Modifier.weight(1f),
+                            )
+                            Segment(
+                                text = "Wholesale",
+                                selected = wholesale,
+                                onClick = { onWholesaleSelected(true) },
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                    }
+                    if (wholesale) {
+                        OutlinedTextField(
+                            value = wholesaleRateText,
+                            onValueChange = onWholesaleRateChange,
+                            label = { Text("Wholesale rate (PKR / $unit)") },
+                            placeholder = { Text(retailRateText) },
+                            supportingText = { Text("Prefilled with the retail rate — adjust per sale.") },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag(NativeUiTags.CashierWholesaleRate),
+                        )
+                    }
+                    OutlinedTextField(
+                        value = note,
+                        onValueChange = onNoteChange,
+                        label = { Text(stringResource(R.string.native_note)) },
+                        supportingText = { Text("Optional · ${note.length}/240") },
+                        minLines = 2,
+                        maxLines = 4,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(NativeUiTags.CashierSaleNote),
                     )
-                    SecondaryDetail(
-                        label = stringResource(R.string.native_delivery),
-                        value = stringResource(R.string.native_counter_pickup),
-                    )
-                    SecondaryDetail(
-                        label = stringResource(R.string.native_note),
-                        value = stringResource(R.string.native_no_note),
+                    Text(
+                        text = stringResource(R.string.native_delivery_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun SecondaryDetail(label: String, value: String) {
-    Row(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Spacer(Modifier.weight(1f))
-        Text(text = value, style = MaterialTheme.typography.labelLarge)
     }
 }
 
@@ -1529,6 +1615,8 @@ private fun SaleChequePane(
     productName: String,
     quantityUnit: String,
     paymentSummary: String,
+    priceLabel: String?,
+    note: String?,
     onStartNextSale: () -> Unit,
     onSendAsDelivery: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -1569,6 +1657,14 @@ private fun SaleChequePane(
                 SaleChequeRow("Product", "$productName · ${formatQuantity(receipt.quantity)} $quantityUnit")
                 HorizontalDivider()
                 SaleChequeRow("Payment", paymentSummary)
+                if (priceLabel != null) {
+                    HorizontalDivider()
+                    SaleChequeRow("Price", priceLabel)
+                }
+                if (note != null) {
+                    HorizontalDivider()
+                    SaleChequeRow("Note", note)
+                }
             }
         }
         followUp?.let { followUp ->

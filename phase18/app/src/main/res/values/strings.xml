@@ -475,6 +475,7 @@ Schema version: %3$d</string>
     <string name="native_counter_pickup">Counter pickup</string>
     <string name="native_note">Note</string>
     <string name="native_no_note">None</string>
+    <string name="native_delivery_hint">Delivery can be sent right after recording on a credit sale.</string>
     <string name="native_sale_summary">2.0 L Milk · Cash</string>
     <string name="native_sale_total">PKR 600</string>
     <string name="native_stock_effect">Stock −2.0 L</string>

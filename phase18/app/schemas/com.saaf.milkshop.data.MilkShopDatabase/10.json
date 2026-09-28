@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 10,
-    "identityHash": "6398e279e74a8b8de21ccb6e617b1848",
+    "identityHash": "9d757d4fdf2018fa308db5dde128b59f",
     "entities": [
       {
         "tableName": "products",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`product_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `unit` TEXT NOT NULL, `uid` TEXT NOT NULL DEFAULT '')",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`product_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `unit` TEXT NOT NULL, `uid` TEXT NOT NULL DEFAULT '', `sync_updated_at` TEXT NOT NULL DEFAULT '')",
         "fields": [
           {
             "fieldPath": "productId",
@@ -29,6 +29,13 @@
           {
             "fieldPath": "uid",
             "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "syncUpdatedAt",
+            "columnName": "sync_updated_at",
             "affinity": "TEXT",
             "notNull": true,
             "defaultValue": "''"
@@ -63,7 +70,7 @@
       },
       {
         "tableName": "accounts",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`account_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `type` TEXT NOT NULL, `category` TEXT NOT NULL, `uid` TEXT NOT NULL DEFAULT '')",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`account_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `type` TEXT NOT NULL, `category` TEXT NOT NULL, `uid` TEXT NOT NULL DEFAULT '', `sync_updated_at` TEXT NOT NULL DEFAULT '')",
         "fields": [
           {
             "fieldPath": "accountId",
@@ -92,6 +99,13 @@
           {
             "fieldPath": "uid",
             "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "syncUpdatedAt",
+            "columnName": "sync_updated_at",
             "affinity": "TEXT",
             "notNull": true,
             "defaultValue": "''"
@@ -126,7 +140,7 @@
       },
       {
         "tableName": "events",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `created_at` TEXT NOT NULL, `occurred_at` TEXT NOT NULL, `event_type` TEXT NOT NULL, `channel` TEXT, `corrects_event_id` INTEGER, `raw_liters` REAL, `fat_percentage` REAL, `lr_reading` REAL, `snf_percentage` REAL, `ts_percentage` REAL, `adjusted_liters` REAL, `amount_owed` REAL, `milk_liters_used` REAL, `yogurt_kg_produced` REAL, `amount` REAL, `milk_rate_used` REAL, `delivery_fee_used` REAL, `ts_standard_used` REAL, `sale_quantity` REAL, `sale_value` REAL, `unit_rate` REAL, `surcharge_applied` REAL NOT NULL, `notes` TEXT, `event_uid` TEXT NOT NULL DEFAULT '', `origin_device_id` TEXT NOT NULL DEFAULT '', FOREIGN KEY(`corrects_event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `created_at` TEXT NOT NULL, `occurred_at` TEXT NOT NULL, `event_type` TEXT NOT NULL, `channel` TEXT, `corrects_event_id` INTEGER, `raw_liters` REAL, `fat_percentage` REAL, `lr_reading` REAL, `snf_percentage` REAL, `ts_percentage` REAL, `adjusted_liters` REAL, `amount_owed` REAL, `milk_liters_used` REAL, `yogurt_kg_produced` REAL, `amount` REAL, `milk_rate_used` REAL, `delivery_fee_used` REAL, `ts_standard_used` REAL, `sale_quantity` REAL, `sale_value` REAL, `unit_rate` REAL, `surcharge_applied` REAL NOT NULL, `notes` TEXT, `event_uid` TEXT NOT NULL DEFAULT '', `origin_device_id` TEXT NOT NULL DEFAULT '', `raw_device_ts` TEXT NOT NULL DEFAULT '', `trusted_estimated_at` TEXT NOT NULL DEFAULT '', `time_trust` TEXT NOT NULL DEFAULT 'device_only', FOREIGN KEY(`corrects_event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "eventId",
@@ -266,6 +280,27 @@
             "affinity": "TEXT",
             "notNull": true,
             "defaultValue": "''"
+          },
+          {
+            "fieldPath": "rawDeviceTs",
+            "columnName": "raw_device_ts",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "trustedEstimatedAt",
+            "columnName": "trusted_estimated_at",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "timeTrust",
+            "columnName": "time_trust",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'device_only'"
           }
         ],
         "primaryKey": {
@@ -518,7 +553,7 @@
       },
       {
         "tableName": "budget_plans",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`budget_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `category` TEXT NOT NULL, `period_start` TEXT NOT NULL, `period_end_exclusive` TEXT NOT NULL, `planned_liters` REAL, `planned_amount` REAL, `vendor_rate_snapshot` REAL, `retail_rate_snapshot` REAL, `created_at` TEXT NOT NULL, `supersedes_id` INTEGER, `archived` INTEGER NOT NULL, `uid` TEXT NOT NULL DEFAULT '')",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`budget_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `category` TEXT NOT NULL, `period_start` TEXT NOT NULL, `period_end_exclusive` TEXT NOT NULL, `planned_liters` REAL, `planned_amount` REAL, `vendor_rate_snapshot` REAL, `retail_rate_snapshot` REAL, `created_at` TEXT NOT NULL, `supersedes_id` INTEGER, `archived` INTEGER NOT NULL, `uid` TEXT NOT NULL DEFAULT '', `sync_updated_at` TEXT NOT NULL DEFAULT '')",
         "fields": [
           {
             "fieldPath": "budgetId",
@@ -587,6 +622,13 @@
             "affinity": "TEXT",
             "notNull": true,
             "defaultValue": "''"
+          },
+          {
+            "fieldPath": "syncUpdatedAt",
+            "columnName": "sync_updated_at",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
           }
         ],
         "primaryKey": {
@@ -629,7 +671,7 @@
       },
       {
         "tableName": "collections_targets",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`target_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `week_start` TEXT NOT NULL, `week_end_exclusive` TEXT NOT NULL, `target_amount` REAL NOT NULL, `created_at` TEXT NOT NULL, `supersedes_id` INTEGER, `archived` INTEGER NOT NULL, `uid` TEXT NOT NULL DEFAULT '')",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`target_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `week_start` TEXT NOT NULL, `week_end_exclusive` TEXT NOT NULL, `target_amount` REAL NOT NULL, `created_at` TEXT NOT NULL, `supersedes_id` INTEGER, `archived` INTEGER NOT NULL, `uid` TEXT NOT NULL DEFAULT '', `sync_updated_at` TEXT NOT NULL DEFAULT '')",
         "fields": [
           {
             "fieldPath": "targetId",
@@ -675,6 +717,13 @@
           {
             "fieldPath": "uid",
             "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "syncUpdatedAt",
+            "columnName": "sync_updated_at",
             "affinity": "TEXT",
             "notNull": true,
             "defaultValue": "''"
@@ -982,7 +1031,7 @@
       },
       {
         "tableName": "attendance_records",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`attendance_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `employee_account_id` INTEGER NOT NULL, `business_date` TEXT NOT NULL, `status` TEXT NOT NULL, `notes` TEXT, `created_at` TEXT NOT NULL, `supersedes_id` INTEGER, `archived` INTEGER NOT NULL DEFAULT 0, `uid` TEXT NOT NULL DEFAULT '', FOREIGN KEY(`employee_account_id`) REFERENCES `accounts`(`account_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`supersedes_id`) REFERENCES `attendance_records`(`attendance_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`attendance_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `employee_account_id` INTEGER NOT NULL, `business_date` TEXT NOT NULL, `status` TEXT NOT NULL, `notes` TEXT, `created_at` TEXT NOT NULL, `supersedes_id` INTEGER, `archived` INTEGER NOT NULL DEFAULT 0, `uid` TEXT NOT NULL DEFAULT '', `sync_updated_at` TEXT NOT NULL DEFAULT '', FOREIGN KEY(`employee_account_id`) REFERENCES `accounts`(`account_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`supersedes_id`) REFERENCES `attendance_records`(`attendance_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "attendanceId",
@@ -1034,6 +1083,13 @@
           {
             "fieldPath": "uid",
             "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "syncUpdatedAt",
+            "columnName": "sync_updated_at",
             "affinity": "TEXT",
             "notNull": true,
             "defaultValue": "''"
@@ -1103,7 +1159,7 @@
       },
       {
         "tableName": "deliveries",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`delivery_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `customer_account_id` INTEGER NOT NULL, `product_id` INTEGER NOT NULL, `quantity` REAL NOT NULL, `route` TEXT, `business_date` TEXT NOT NULL, `sale_event_id` INTEGER, `notes` TEXT, `created_at` TEXT NOT NULL, `archived` INTEGER NOT NULL DEFAULT 0, `uid` TEXT NOT NULL DEFAULT '', FOREIGN KEY(`customer_account_id`) REFERENCES `accounts`(`account_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`product_id`) REFERENCES `products`(`product_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`sale_event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`delivery_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `customer_account_id` INTEGER NOT NULL, `product_id` INTEGER NOT NULL, `quantity` REAL NOT NULL, `route` TEXT, `business_date` TEXT NOT NULL, `sale_event_id` INTEGER, `notes` TEXT, `created_at` TEXT NOT NULL, `archived` INTEGER NOT NULL DEFAULT 0, `uid` TEXT NOT NULL DEFAULT '', `sync_updated_at` TEXT NOT NULL DEFAULT '', FOREIGN KEY(`customer_account_id`) REFERENCES `accounts`(`account_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`product_id`) REFERENCES `products`(`product_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`sale_event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "deliveryId",
@@ -1166,6 +1222,13 @@
           {
             "fieldPath": "uid",
             "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "syncUpdatedAt",
+            "columnName": "sync_updated_at",
             "affinity": "TEXT",
             "notNull": true,
             "defaultValue": "''"
@@ -3524,6 +3587,84 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "sync_outbox",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`outbox_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `table_name` TEXT NOT NULL, `row_uid` TEXT NOT NULL, `enqueued_at` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "outboxId",
+            "columnName": "outbox_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tableName",
+            "columnName": "table_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rowUid",
+            "columnName": "row_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "enqueuedAt",
+            "columnName": "enqueued_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "outbox_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_sync_outbox_table_name_row_uid",
+            "unique": true,
+            "columnNames": [
+              "table_name",
+              "row_uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_sync_outbox_table_name_row_uid` ON `${TABLE_NAME}` (`table_name`, `row_uid`)"
+          }
+        ]
+      },
+      {
+        "tableName": "sync_pull_state",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`state_id` INTEGER NOT NULL, `last_server_seq` INTEGER NOT NULL, `updated_at` TEXT NOT NULL, PRIMARY KEY(`state_id`))",
+        "fields": [
+          {
+            "fieldPath": "stateId",
+            "columnName": "state_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastServerSeq",
+            "columnName": "last_server_seq",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "state_id"
+          ]
+        }
       }
     ],
     "views": [
@@ -3546,7 +3687,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6398e279e74a8b8de21ccb6e617b1848')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9d757d4fdf2018fa308db5dde128b59f')"
     ]
   }
 }

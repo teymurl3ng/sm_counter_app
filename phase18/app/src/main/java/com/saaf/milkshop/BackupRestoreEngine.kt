@@ -27,6 +27,10 @@ internal class BackupRestoreEngine(
                 val backupDao = database.backupDataDao()
                 if (selection.business) {
                     Phase3CostingMigrationSql.immutableTriggerNames.forEach { executeSQL("DROP TRIGGER IF EXISTS $it") }
+                    // Sync capture triggers must not fire while the snapshot's
+                    // rows stream in: a restored database starts with an empty
+                    // outbox, not a re-push of its own contents.
+                    SyncMigrationSql.triggerNames.forEach { executeSQL("DROP TRIGGER IF EXISTS $it") }
                     if (includeSecurity) {
                         executeSQL("DROP TRIGGER IF EXISTS prevent_app_user_delete")
                         executeSQL("DROP TRIGGER IF EXISTS prevent_security_audit_delete")
@@ -71,6 +75,8 @@ internal class BackupRestoreEngine(
                     backupDao.deleteAccounts()
                     backupDao.deleteProducts()
                     backupDao.deleteSettings()
+                    backupDao.deleteSyncOutbox()
+                    backupDao.deleteSyncPullState()
                     backupDao.insertProducts(readProducts(data.optJSONArray("products")))
                     backupDao.insertAccounts(readAccounts(data.optJSONArray("accounts")))
                     backupDao.insertEvents(readEvents(data.optJSONArray("events")))
@@ -141,7 +147,11 @@ internal class BackupRestoreEngine(
                     backupDao.backfillVendorProfiles()
                     backupDao.backfillEmployeeProfiles()
                     backupDao.backfillExpenseCategoryProfiles()
+                    // The pull cursor rides in the snapshot so a replaced
+                    // device resumes exactly where its backup left off.
+                    backupDao.insertSyncPullState(readSyncPullState(data.optJSONArray("sync_pull_state")))
                     Phase3CostingMigrationSql.immutableTriggers.forEach { executeSQL(it) }
+                    SyncMigrationSql.captureTriggers.forEach { executeSQL(it) }
                     if (includeSecurity) {
                         Phase3SecurityMigrationSql.triggerNames.zip(Phase3SecurityMigrationSql.createTriggers)
                             .filter { (name, _) ->

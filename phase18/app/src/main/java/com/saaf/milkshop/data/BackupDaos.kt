@@ -110,6 +110,8 @@ interface BackupDataDao {
     @Query("DELETE FROM settings") suspend fun deleteSettings()
     @Query("DELETE FROM budget_plans") suspend fun deleteBudgets()
     @Query("DELETE FROM collections_targets") suspend fun deleteCollectionsTargets()
+    @Query("DELETE FROM sync_outbox") suspend fun deleteSyncOutbox()
+    @Query("DELETE FROM sync_pull_state") suspend fun deleteSyncPullState()
 
     @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertProducts(rows: List<ProductEntity>)
     @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertAccounts(rows: List<AccountEntity>)
@@ -119,6 +121,7 @@ interface BackupDataDao {
     @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertSettings(rows: List<SettingEntity>)
     @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertBudgets(rows: List<BudgetPlanEntity>)
     @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertCollectionsTargets(rows: List<CollectionsTargetEntity>)
+    @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertSyncPullState(rows: List<SyncPullStateEntity>)
     @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertProductProfiles(rows: List<ProductProfileEntity>)
     @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertCustomerProfiles(rows: List<CustomerProfileEntity>)
     @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertVendorProfiles(rows: List<VendorProfileEntity>)

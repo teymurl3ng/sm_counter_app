@@ -458,6 +458,7 @@ class BackupManager(
             put("opening_inventory_entries", JSONArray(dao.openingInventoryEntries().map(::openingInventoryEntryJson)))
             put("opening_account_entries", JSONArray(dao.openingAccountEntries().map(::openingAccountEntryJson)))
             put("daily_close_actions", JSONArray(dao.dailyCloseActions().map { dailyCloseActionJson(it, includeSecurity) }))
+            put("sync_pull_state", JSONArray(listOfNotNull(database.syncPullStateDao().find()).map(::syncPullStateJson)))
             put("preferences", preferencesJson())
             if (includeSecurity) {
                 put("app_users", JSONArray(dao.appUsers().map(::appUserJson)))

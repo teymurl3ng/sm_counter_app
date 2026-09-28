@@ -162,6 +162,8 @@ data class AttendanceRecordEntity(
     val archived: Boolean = false,
     @ColumnInfo(name = "uid", defaultValue = "''")
     val uid: String = LegacyUid.randomUid(),
+    @ColumnInfo(name = "sync_updated_at", defaultValue = "''")
+    val syncUpdatedAt: String = "",
 )
 
 @Entity(
@@ -218,6 +220,8 @@ data class DeliveryEntity(
     val archived: Boolean = false,
     @ColumnInfo(name = "uid", defaultValue = "''")
     val uid: String = LegacyUid.randomUid(),
+    @ColumnInfo(name = "sync_updated_at", defaultValue = "''")
+    val syncUpdatedAt: String = "",
 )
 
 @Entity(

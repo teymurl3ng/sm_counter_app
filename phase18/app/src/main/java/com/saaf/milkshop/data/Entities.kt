@@ -6,6 +6,7 @@ import androidx.room3.Entity
 import androidx.room3.ForeignKey
 import androidx.room3.Index
 import androidx.room3.PrimaryKey
+import com.saaf.milkshop.sync.EventTimeTrust
 import com.saaf.milkshop.sync.LegacyUid
 import com.saaf.milkshop.sync.SyncIdentity
 
@@ -27,6 +28,9 @@ data class ProductEntity(
 
     @ColumnInfo(name = "uid", defaultValue = "''")
     val uid: String = LegacyUid.randomUid(),
+
+    @ColumnInfo(name = "sync_updated_at", defaultValue = "''")
+    val syncUpdatedAt: String = "",
 )
 
 @Entity(
@@ -49,6 +53,9 @@ data class AccountEntity(
 
     @ColumnInfo(name = "uid", defaultValue = "''")
     val uid: String = LegacyUid.randomUid(),
+
+    @ColumnInfo(name = "sync_updated_at", defaultValue = "''")
+    val syncUpdatedAt: String = "",
 )
 
 @Entity(
@@ -146,6 +153,15 @@ data class EventEntity(
 
     @ColumnInfo(name = "origin_device_id", defaultValue = "''")
     val originDeviceId: String = SyncIdentity.currentOrNull(),
+
+    @ColumnInfo(name = "raw_device_ts", defaultValue = "''")
+    val rawDeviceTs: String = EventTimeTrust.rawDeviceNow(),
+
+    @ColumnInfo(name = "trusted_estimated_at", defaultValue = "''")
+    val trustedEstimatedAt: String = EventTimeTrust.trustedEstimateNow(),
+
+    @ColumnInfo(name = "time_trust", defaultValue = "'device_only'")
+    val timeTrust: String = EventTimeTrust.flagNow(),
 )
 
 @Entity(
@@ -279,6 +295,9 @@ data class BudgetPlanEntity(
 
     @ColumnInfo(name = "uid", defaultValue = "''")
     val uid: String = LegacyUid.randomUid(),
+
+    @ColumnInfo(name = "sync_updated_at", defaultValue = "''")
+    val syncUpdatedAt: String = "",
 )
 
 @Entity(
@@ -313,6 +332,9 @@ data class CollectionsTargetEntity(
 
     @ColumnInfo(name = "uid", defaultValue = "''")
     val uid: String = LegacyUid.randomUid(),
+
+    @ColumnInfo(name = "sync_updated_at", defaultValue = "''")
+    val syncUpdatedAt: String = "",
 )
 
 @DatabaseView(

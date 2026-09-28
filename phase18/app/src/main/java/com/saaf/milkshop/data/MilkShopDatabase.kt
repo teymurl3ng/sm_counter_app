@@ -49,6 +49,8 @@ import androidx.sqlite.execSQL
         AccountInstallationBindingEntity::class,
         ServerIdentityLinkEntity::class,
         ServerShopSnapshotEntity::class,
+        SyncOutboxEntity::class,
+        SyncPullStateEntity::class,
     ],
     views = [
         CurrentStockView::class,
@@ -92,6 +94,8 @@ abstract class MilkShopDatabase : RoomDatabase() {
     abstract fun productionLossAssessmentDao(): ProductionLossAssessmentDao
     abstract fun inventoryCostProjectionDao(): InventoryCostProjectionDao
     abstract fun serverAccountDao(): ServerAccountDao
+    abstract fun syncOutboxDao(): SyncOutboxDao
+    abstract fun syncPullStateDao(): SyncPullStateDao
 
     companion object {
         private const val DATABASE_NAME = "milk_shop.db"
@@ -204,7 +208,12 @@ abstract class MilkShopDatabase : RoomDatabase() {
         val MIGRATION_9_10 = object : androidx.room3.migration.Migration(9, 10) {
             override suspend fun migrate(connection: androidx.sqlite.SQLiteConnection) {
                 SyncMigrationSql.alterStatements.forEach(connection::execSQL)
+                SyncMigrationSql.createStatements.forEach(connection::execSQL)
+                // Triggers exist before the backfills so every legacy row is
+                // captured as the baseline the first push must upload.
+                SyncMigrationSql.captureTriggers.forEach(connection::execSQL)
                 SyncMigrationSql.backfillUids(connection)
+                SyncMigrationSql.backfillSupportColumns(connection)
                 SyncMigrationSql.indexStatements.forEach(connection::execSQL)
             }
         }
@@ -231,6 +240,9 @@ abstract class MilkShopDatabase : RoomDatabase() {
     private class DatabaseCallback : Callback() {
         override suspend fun onCreate(connection: androidx.sqlite.SQLiteConnection) {
             DatabaseSql.createTriggers.forEach(connection::execSQL)
+            // Capture triggers precede the seeds so fresh installs enqueue
+            // their seed rows (including the shared well-known identities).
+            SyncMigrationSql.captureTriggers.forEach(connection::execSQL)
             DatabaseSql.seedStatements.forEach(connection::execSQL)
             Phase3MigrationSql.backfillStatements.forEach(connection::execSQL)
             Phase3SecurityMigrationSql.createTriggers.forEach(connection::execSQL)

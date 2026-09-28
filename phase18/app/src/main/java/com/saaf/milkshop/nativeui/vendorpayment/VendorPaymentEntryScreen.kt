@@ -69,6 +69,9 @@ import com.saaf.milkshop.application.vendorpayment.NativeVendorPaymentReceipt
 import com.saaf.milkshop.application.vendorpayment.NativeVendorPaymentRequest
 import com.saaf.milkshop.application.vendorpayment.NativeVendorPaymentVendor
 import com.saaf.milkshop.nativeui.NativeUiTags
+import androidx.compose.ui.platform.LocalView
+import com.saaf.milkshop.nativeui.common.hapticTap
+import com.saaf.milkshop.nativeui.common.hapticCommit
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
@@ -402,8 +405,9 @@ private fun VendorPaymentForm(
             )
         }
 
+        val hapticView = LocalView.current
         Button(
-            onClick = onSubmit,
+            onClick = { hapticView.hapticCommit(); onSubmit() },
             enabled = validRequest,
             modifier = Modifier
                 .fillMaxWidth()

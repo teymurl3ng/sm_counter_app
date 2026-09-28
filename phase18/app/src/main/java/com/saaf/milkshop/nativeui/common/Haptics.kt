@@ -5,12 +5,47 @@ import android.view.HapticFeedbackConstants
 import android.view.View
 
 /**
- * Confirmation haptic for success moments (a receipt posts, a delivery is
- * marked, a payment lands). Fires the platform CONFIRM gesture on API 30+,
- * falling back to a virtual-key tap on older devices. Every "recorded"
- * confirmation pane/banner in the app calls this the moment it appears, so
- * the cashier feels the save even before reading the screen.
+ * App-wide haptic vocabulary. Every interactive element should give physical
+ * feedback through one of these so touching the app never feels like "air":
+ *
+ *  - [hapticTap]     light tick — buttons, nav items, tiles, steppers
+ *  - [hapticSelect]  select tick — segments, radio cards, picker rows
+ *  - [hapticCommit]  firm click — yellow commit actions (record/save/close)
+ *  - [hapticHeavy]   heavy press — destructive confirms (discard, remove)
+ *  - [hapticConfirm] success pulse — a receipt posts, a delivery is marked
+ *
+ * All use View.performHapticFeedback (no VIBRATE permission) and respect the
+ * system haptics setting. On Samsung hardware CONFIRM can be faint; if
+ * commits feel weak on a device, swap [hapticCommit] to HEAVY_CLICK.
  */
+fun View.hapticTap() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+    } else {
+        performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+    }
+}
+
+fun View.hapticSelect() {
+    performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+}
+
+fun View.hapticCommit() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+    } else {
+        performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+    }
+}
+
+fun View.hapticHeavy() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+    } else {
+        performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+    }
+}
+
 fun View.hapticConfirm() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         performHapticFeedback(HapticFeedbackConstants.CONFIRM)

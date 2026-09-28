@@ -107,7 +107,10 @@ import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.hapticCommit
 import com.saaf.milkshop.nativeui.common.hapticConfirm
+import com.saaf.milkshop.nativeui.common.hapticSelect
+import com.saaf.milkshop.nativeui.common.hapticTap
 import com.saaf.milkshop.nativeui.common.imePaddingExcludingNavBar
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.theme.SaafInk
@@ -210,9 +213,10 @@ private fun CashierRailItem(
     tag: String,
     onClick: () -> Unit,
 ) {
+    val view = LocalView.current
     NavigationRailItem(
         selected = selected,
-        onClick = onClick,
+        onClick = { view.hapticTap(); onClick() },
         modifier = Modifier.testTag(tag).heightIn(min = 56.dp),
         icon = { Icon(icon, contentDescription = null) },
         label = { Text(label, maxLines = 2) },
@@ -636,6 +640,7 @@ private fun PaymentAccountSelectionRow(
     accountName: String,
     onClick: () -> Unit,
 ) {
+    val view = LocalView.current
     Surface(
         color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(12.dp),
@@ -644,7 +649,7 @@ private fun PaymentAccountSelectionRow(
             .fillMaxWidth()
             .heightIn(min = 52.dp)
             .testTag(NativeUiTags.CashierPaymentAccountSelector)
-            .clickable(role = Role.Button, onClick = onClick),
+            .clickable(role = Role.Button) { view.hapticSelect(); onClick() },
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
@@ -1039,12 +1044,13 @@ private fun SaleEntryEditor(
 
 @Composable
 private fun Segment(text: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val view = LocalView.current
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .clip(RoundedCornerShape(9.dp))
             .background(if (selected) MaterialTheme.colorScheme.primary else Color.Transparent)
-            .selectable(selected = selected, onClick = onClick, role = Role.RadioButton)
+            .selectable(selected = selected, role = Role.RadioButton) { view.hapticSelect(); onClick() }
             .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
         Text(
@@ -1217,8 +1223,9 @@ private fun StepButton(
     tag: String,
     onClick: () -> Unit,
 ) {
+    val view = LocalView.current
     Surface(
-        onClick = onClick,
+        onClick = { view.hapticTap(); onClick() },
         shape = RoundedCornerShape(12.dp),
         color = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.primary,
@@ -1241,6 +1248,7 @@ private fun PaymentCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val view = LocalView.current
     Surface(
         color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
         contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
@@ -1248,7 +1256,7 @@ private fun PaymentCard(
         border = if (selected) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
         modifier = modifier
             .heightIn(min = 56.dp)
-            .selectable(selected = selected, onClick = onClick, role = Role.RadioButton),
+            .selectable(selected = selected, role = Role.RadioButton) { view.hapticSelect(); onClick() },
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
@@ -1285,6 +1293,7 @@ private fun CustomerSelectionRow(
     selectedCustomer: String?,
     onClick: () -> Unit,
 ) {
+    val view = LocalView.current
     Surface(
         color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(12.dp),
@@ -1293,7 +1302,7 @@ private fun CustomerSelectionRow(
             .fillMaxWidth()
             .heightIn(min = 52.dp)
             .testTag(NativeUiTags.CashierCustomerSelector)
-            .clickable(role = Role.Button, onClick = onClick),
+            .clickable(role = Role.Button) { view.hapticSelect(); onClick() },
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
@@ -1525,6 +1534,7 @@ private fun ReviewDock(
     buttonTag: String,
     onRecordSale: () -> Unit,
 ) {
+    val view = LocalView.current
     Surface(
         color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(14.dp),
@@ -1581,7 +1591,7 @@ private fun ReviewDock(
             }
             Spacer(Modifier.height(9.dp))
             Button(
-                onClick = onRecordSale,
+                onClick = { view.hapticCommit(); onRecordSale() },
                 enabled = enabled,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -1650,9 +1660,10 @@ private fun androidx.compose.foundation.layout.RowScope.CashierNavigationItem(
     tag: String,
     onClick: () -> Unit,
 ) {
+    val view = LocalView.current
     NavigationBarItem(
         selected = selected,
-        onClick = onClick,
+        onClick = { view.hapticTap(); onClick() },
         modifier = Modifier.testTag(tag),
         icon = { Icon(icon, contentDescription = null) },
         label = { Text(label, maxLines = 2) },
@@ -1676,6 +1687,7 @@ private fun SaleDeliveryFollowUpCard(
     onSend: (String) -> Unit,
 ) {
     var route by rememberSaveable { mutableStateOf("") }
+    val view = LocalView.current
     Surface(
         tonalElevation = 1.dp,
         modifier = Modifier
@@ -1699,7 +1711,7 @@ private fun SaleDeliveryFollowUpCard(
                     .testTag(NativeUiTags.CashierSaleDeliveryRoute),
             )
             Button(
-                onClick = { onSend(route) },
+                onClick = { view.hapticCommit(); onSend(route) },
                 enabled = !sending,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SaafYellow,
@@ -1804,7 +1816,7 @@ private fun SaleChequePane(
             }
         }
         Button(
-            onClick = onStartNextSale,
+            onClick = { view.hapticTap(); onStartNextSale() },
             colors = ButtonDefaults.buttonColors(
                 containerColor = SaafYellow,
                 contentColor = SaafInk,

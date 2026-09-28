@@ -1,5 +1,6 @@
 package com.saaf.milkshop.nativeui.cashclose
 
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -65,6 +66,7 @@ import com.saaf.milkshop.application.cashclose.NativeCashCloseFacade
 import com.saaf.milkshop.application.cashclose.NativeCashCloseReceipt
 import com.saaf.milkshop.application.cashclose.NativeCashCloseReopenSubmission
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.hapticCommit
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
@@ -271,6 +273,7 @@ private fun CashCloseForm(
     allowReopen: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
+    val hapticView = LocalView.current
     val focusManager = LocalFocusManager.current
     val canCount = state.context.postingOpen &&
         countedPaisa != null &&
@@ -393,7 +396,7 @@ private fun CashCloseForm(
         )
 
         Button(
-            onClick = onRecordCount,
+            onClick = { hapticView.hapticCommit(); onRecordCount() },
             enabled = canCount,
             modifier = Modifier
                 .fillMaxWidth()
@@ -426,7 +429,7 @@ private fun CashCloseForm(
             }
             if (state.context.postingOpen) {
                 Button(
-                    onClick = onCloseDay,
+                    onClick = { hapticView.hapticCommit(); onCloseDay() },
                     enabled = canClose,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = SaafYellow,
@@ -474,6 +477,7 @@ private fun ReopenPanel(
     onPassphraseChange: (String) -> Unit,
     onReopen: () -> Unit,
 ) {
+val hapticView = LocalView.current
     Surface(
         color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(16.dp),
@@ -517,7 +521,7 @@ private fun ReopenPanel(
                     .testTag(NativeUiTags.CashCloseReopenPassphrase),
             )
             Button(
-                onClick = onReopen,
+                onClick = { hapticView.hapticCommit(); onReopen() },
                 enabled = canReopen,
                 modifier = Modifier
                     .fillMaxWidth()

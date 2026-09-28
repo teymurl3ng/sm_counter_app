@@ -18,11 +18,13 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.hapticTap
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 
 @Composable
@@ -70,9 +72,11 @@ private fun AdminRailItem(
     icon: ImageVector,
     label: String,
 ) {
+    val view = LocalView.current
+    val onClickHaptic = { view.hapticTap(); onClick() }
     NavigationRailItem(
         selected = selected,
-        onClick = onClick,
+        onClick = onClickHaptic,
         modifier = Modifier.testTag(tag).heightIn(min = 56.dp),
         icon = { Icon(icon, contentDescription = null) },
         label = { Text(label) },
@@ -127,9 +131,11 @@ private fun RowScope.AdminNavItem(
     icon: ImageVector,
     label: String,
 ) {
+    val view = LocalView.current
+    val onClickHaptic = { view.hapticTap(); onClick() }
     NavigationBarItem(
         selected = selected,
-        onClick = onClick,
+        onClick = onClickHaptic,
         modifier = Modifier
             .testTag(tag)
             .heightIn(min = 56.dp),

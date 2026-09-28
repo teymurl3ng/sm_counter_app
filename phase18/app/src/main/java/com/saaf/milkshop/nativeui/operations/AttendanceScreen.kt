@@ -1,6 +1,7 @@
 package com.saaf.milkshop.nativeui.operations
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.operations.NativeAttendanceLink
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.hapticCommit
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.theme.SaafInk
@@ -211,6 +213,7 @@ private fun LinkedBody(
     saving: Boolean,
     onMarkPresent: () -> Unit,
 ) {
+val hapticView = LocalView.current
     Surface(
         tonalElevation = 1.dp,
         modifier = Modifier
@@ -247,7 +250,7 @@ private fun LinkedBody(
                     modifier = Modifier.testTag(NativeUiTags.OpsAttendanceNotMarked),
                 )
                 Button(
-                    onClick = onMarkPresent,
+                    onClick = { hapticView.hapticCommit(); onMarkPresent() },
                     enabled = postingOpen && !saving,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = SaafYellow,

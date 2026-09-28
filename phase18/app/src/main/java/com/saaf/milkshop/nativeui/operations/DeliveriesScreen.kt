@@ -48,6 +48,7 @@ import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 import com.saaf.milkshop.nativeui.common.hapticConfirm
+import com.saaf.milkshop.nativeui.common.hapticCommit
 import com.saaf.milkshop.nativeui.common.imePaddingExcludingNavBar
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.text.input.KeyboardType
@@ -327,6 +328,7 @@ private fun NewDeliveryCard(
     state: NativeDeliveriesState.Ready,
     draftActions: NativeDeliveriesDraftActions,
 ) {
+    val hapticView = LocalView.current
     var expanded by rememberSaveable { mutableStateOf(false) }
     var pickingCustomer by rememberSaveable { mutableStateOf(false) }
     var pickingProduct by rememberSaveable { mutableStateOf(false) }
@@ -423,7 +425,7 @@ private fun NewDeliveryCard(
                     .testTag(NativeUiTags.OpsDeliveryNotes),
             )
             Button(
-                onClick = draftActions.create,
+                onClick = { hapticView.hapticCommit(); draftActions.create() },
                 enabled = canCreate,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SaafYellow,
@@ -520,6 +522,7 @@ private fun LinkSaleCard(
     onArchive: (Long) -> Unit,
     archiving: Boolean,
 ) {
+    val hapticView = LocalView.current
     var saleNumber by rememberSaveable(item.deliveryId) { mutableStateOf("") }
     Surface(
         tonalElevation = 1.dp,
@@ -550,7 +553,7 @@ private fun LinkSaleCard(
                     .testTag(NativeUiTags.opsDeliveryLinkInput(item.deliveryId)),
             )
             Button(
-                onClick = { onLinkSale(item.deliveryId, saleNumber) },
+                onClick = { hapticView.hapticCommit(); onLinkSale(item.deliveryId, saleNumber) },
                 enabled = !busy && saleNumber.isNotBlank(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SaafYellow,
@@ -599,6 +602,7 @@ private fun DeliveryCard(
     canMark: Boolean,
     onMarkDelivered: (Long) -> Unit,
 ) {
+    val hapticView = LocalView.current
     Surface(
         tonalElevation = 1.dp,
         modifier = Modifier
@@ -638,7 +642,7 @@ private fun DeliveryCard(
                 color = MaterialTheme.colorScheme.primary,
             )
             Button(
-                onClick = { onMarkDelivered(item.deliveryId) },
+                onClick = { hapticView.hapticCommit(); onMarkDelivered(item.deliveryId) },
                 enabled = canMark,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SaafYellow,

@@ -48,6 +48,9 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.operations.NativeOperationsAttendanceStatus
 import com.saaf.milkshop.application.operations.NativeOperationsWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
+import androidx.compose.ui.platform.LocalView
+import com.saaf.milkshop.nativeui.common.hapticTap
+import com.saaf.milkshop.nativeui.common.hapticCommit
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -334,8 +337,9 @@ private fun TaskButton(
     tag: String,
     onClick: () -> Unit,
 ) {
+    val view = LocalView.current
     OutlinedButton(
-        onClick = onClick,
+        onClick = { view.hapticTap(); onClick() },
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 56.dp)
@@ -524,9 +528,10 @@ private fun androidx.compose.foundation.layout.RowScope.OpsNavItem(
     tag: String,
     onClick: () -> Unit,
 ) {
+    val view = LocalView.current
     NavigationBarItem(
         selected = selected,
-        onClick = onClick,
+        onClick = { view.hapticTap(); onClick() },
         modifier = Modifier.testTag(tag).heightIn(min = 56.dp),
         icon = { Icon(icon, contentDescription = label) },
         label = { Text(label) },

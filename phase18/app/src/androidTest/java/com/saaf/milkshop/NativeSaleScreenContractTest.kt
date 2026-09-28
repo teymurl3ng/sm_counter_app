@@ -57,6 +57,7 @@ class NativeSaleScreenContractTest {
                     onClearFeedback = {},
                     onRecordSale = {},
                     onSendAsDelivery = {},
+                    onStartNextSale = {},
                     onLeaveConfirmed = {},
                     onNavigate = {},
                 )
@@ -86,6 +87,7 @@ class NativeSaleScreenContractTest {
                     onClearFeedback = {},
                     onRecordSale = {},
                     onSendAsDelivery = { sent = true },
+                    onStartNextSale = {},
                     onLeaveConfirmed = {},
                     onNavigate = {},
                 )
@@ -122,6 +124,7 @@ class NativeSaleScreenContractTest {
                     onClearFeedback = {},
                     onRecordSale = {},
                     onSendAsDelivery = { sentRoute = it },
+                    onStartNextSale = {},
                     onLeaveConfirmed = {},
                     onNavigate = {},
                 )
@@ -152,6 +155,7 @@ class NativeSaleScreenContractTest {
                     onClearFeedback = {},
                     onRecordSale = {},
                     onSendAsDelivery = {},
+                    onStartNextSale = {},
                     onLeaveConfirmed = {},
                     onNavigate = {},
                 )

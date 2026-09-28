@@ -90,6 +90,7 @@ class NativeOwnerSaleEntryScreenContractTest {
                     onClearFeedback = {},
                     onRecordSale = {},
             onSendAsDelivery = {},
+            onStartNextSale = {},
                     onBackToWork = {},
                     onNavigate = {},
                 )
@@ -118,6 +119,7 @@ class NativeOwnerSaleEntryScreenContractTest {
                     onClearFeedback = {},
                     onRecordSale = {},
             onSendAsDelivery = {},
+            onStartNextSale = {},
                     onBackToWork = {},
                     onNavigate = onNavigate,
                 )

@@ -97,6 +97,7 @@ class NativeSaleHardeningContractTest {
                         onClearFeedback = {},
                         onRecordSale = {},
             onSendAsDelivery = {},
+            onStartNextSale = {},
                         onLeaveConfirmed = {},
                         onNavigate = {},
                     )
@@ -151,6 +152,7 @@ class NativeSaleHardeningContractTest {
                     onClearFeedback = {},
                     onRecordSale = {},
             onSendAsDelivery = {},
+            onStartNextSale = {},
                     onLeaveConfirmed = {},
                     onNavigate = {},
                 )

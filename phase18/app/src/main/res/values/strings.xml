@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Milk Shop</string>
+    <string name="app_name">Saaf Milk</string>
     <string name="dashboard_title">Milk Shop</string>
     <string name="dashboard_subtitle">Current stock and money balances</string>
     <string name="stock_title">Stock</string>

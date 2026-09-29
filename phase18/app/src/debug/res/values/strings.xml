@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Debug/preview installs are labeled distinctly so they are never
+         confused with the production app on the same device. -->
+    <string name="app_name">Saaf Milk (preview)</string>
+</resources>

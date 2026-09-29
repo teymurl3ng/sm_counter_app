@@ -345,6 +345,7 @@ fun CashierPreviewHost(
                         snackbarHostState = snackbarHostState,
                         identity = identity,
                         state = expenseState,
+                        onRegisterGuard = { activeGuard = it },
                         onRetry = expenseViewModel::refresh,
                         onRecordExpense = expenseViewModel::record,
                         onRecordAnother = expenseViewModel::recordAnother,
@@ -361,6 +362,7 @@ fun CashierPreviewHost(
                         snackbarHostState = snackbarHostState,
                         identity = identity,
                         state = deliveriesState,
+                        onRegisterGuard = { activeGuard = it },
                         onRetry = deliveriesViewModel::refresh,
                         onMarkDelivered = deliveriesViewModel::markDelivered,
                         draftActions = NativeDeliveriesDraftActions(

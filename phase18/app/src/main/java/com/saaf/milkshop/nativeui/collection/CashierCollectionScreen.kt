@@ -336,7 +336,7 @@ internal fun CollectionEntryContent(
             .padding(contentPadding)
             .imePaddingExcludingNavBar(),
     ) {
-        CashierScreenHeader(
+        if (showHeader) CashierScreenHeader(
             title = "Collect payment",
             displayName = identity.displayName,
             roleLabel = formatCashierRoleLabel(identity.role.wireValue),

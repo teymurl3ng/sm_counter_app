@@ -1,5 +1,6 @@
 package com.saaf.milkshop.nativeui.more
 
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -186,6 +187,7 @@ fun CashierDeliveriesEntryScreen(
     onBackToMore: () -> Unit,
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
+    onRegisterGuard: (com.saaf.milkshop.nativeui.common.EntryLeaveGuard?) -> Unit = {},
 ) {
     BackHandler(onBack = onBackToMore)
     MoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.MoreRoot) { padding ->

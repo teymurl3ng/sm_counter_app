@@ -2,6 +2,8 @@ package com.saaf.milkshop.nativeui.more
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -11,6 +13,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
@@ -40,6 +43,7 @@ fun CashierExpenseEntryScreen(
     onBackToMore: () -> Unit,
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
+    onRegisterGuard: (com.saaf.milkshop.nativeui.common.EntryLeaveGuard?) -> Unit = {},
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
     val canLeave = (state as? NativeExpenseState.Ready)?.saving != true
@@ -51,41 +55,27 @@ fun CashierExpenseEntryScreen(
         if (canLeave) leaveGuard.requestLeave(onBackToMore)
     }
 
+    DisposableEffect(leaveGuard) {
+        onRegisterGuard(leaveGuard)
+        onDispose { onRegisterGuard(null) }
+    }
+
     Box(
         modifier
             .fillMaxSize()
             .testTag(NativeUiTags.CashierExpenseEntryRoot),
     ) {
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            containerColor = androidx.compose.material3.MaterialTheme.colorScheme.background,
-            contentWindowInsets = WindowInsets(0, 0, 0, 0),
-            snackbarHost = { SnackbarHost(snackbarHostState) },
-            bottomBar = {
-                CashierNavigation(
-                    selected = CashierSection.More,
-                    onNavigate = { section ->
-                        if (canLeave) {
-                            leaveGuard.requestLeave { onNavigate(section) }
-                        }
-                    },
-                )
-            },
-        ) { padding ->
+        Box(modifier = Modifier.fillMaxSize()) {
             when (state) {
                 NativeExpenseState.Idle,
                 NativeExpenseState.Loading,
                 -> ExpenseLoadingBody(
-                    modifier = Modifier
-                        .padding(padding)
-                        .statusBarsPadding(),
+                    modifier = Modifier,
                 )
                 is NativeExpenseState.LoadFailure -> ExpenseLoadFailureBody(
                     message = state.message,
                     onRetry = onRetry,
-                    modifier = Modifier
-                        .padding(padding)
-                        .statusBarsPadding(),
+                    modifier = Modifier,
                 )
                 is NativeExpenseState.Ready -> ExpenseEntryContent(
                     identity = identity,
@@ -94,7 +84,7 @@ fun CashierExpenseEntryScreen(
                     onRecordAnother = onRecordAnother,
                     onBack = onBackToMore,
                     leaveGuard = leaveGuard,
-                    contentPadding = padding,
+                    contentPadding = PaddingValues(0.dp),
                     showHeader = false,
                 )
             }

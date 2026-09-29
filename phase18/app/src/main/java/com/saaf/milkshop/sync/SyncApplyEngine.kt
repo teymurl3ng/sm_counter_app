@@ -1,0 +1,505 @@
+package com.saaf.milkshop.sync
+
+import androidx.room3.executeSQL
+import androidx.room3.withWriteTransaction
+import com.saaf.milkshop.data.SyncMigrationSql
+import com.saaf.milkshop.data.AccountEntity
+import com.saaf.milkshop.data.AttendanceRecordEntity
+import com.saaf.milkshop.data.DailyCloseActionEntity
+import com.saaf.milkshop.data.DeliveryEntity
+import com.saaf.milkshop.data.EventActorLinkEntity
+import com.saaf.milkshop.data.EventEntity
+import com.saaf.milkshop.data.FinancialLogEntity
+import com.saaf.milkshop.data.InventoryLogEntity
+import com.saaf.milkshop.data.MilkShopDatabase
+import com.saaf.milkshop.data.PhysicalCashCountEntity
+import com.saaf.milkshop.data.ProductEntity
+import com.saaf.milkshop.data.SettingEntity
+import com.saaf.milkshop.data.SpoilageDetailEntity
+import com.saaf.milkshop.domain.InventoryCostProjectionService
+import org.json.JSONObject
+import java.time.Instant
+
+/**
+ * Phase 7 apply engine: turns pulled server records into local Room rows.
+ *
+ * Invariants:
+ *  - Idempotent — applying the same batch twice changes nothing (uid keying).
+ *  - Origin-local integer ids in payloads are NEVER trusted; every cross-row
+ *    reference is remapped through its `*_uid` companion field.
+ *  - Records apply in server_seq order inside one write transaction with the
+ *    sync capture triggers dropped (pulled rows are not device-originated and
+ *    must not echo back into the outbox).
+ *  - A correction whose target already has a different child correction is a
+ *    sibling conflict (P1): it is skipped and audited, never inserted twice —
+ *    the read models would double-count.
+ *  - A record that cannot resolve (missing target, closed-day refusal) is
+ *    skipped and audited; the cursor still advances so one bad row can never
+ *    wedge the queue.
+ *  - The costing projection is refreshed after the batch; derived views
+ *    recompute on read.
+ */
+class SyncApplyEngine(private val database: MilkShopDatabase) {
+
+    data class ApplyReport(
+        val applied: Int,
+        val updated: Int,
+        val skipped: Int,
+        val conflicts: Int,
+        val latestServerSeq: Long,
+    )
+
+    suspend fun apply(records: List<SyncPulledRecord>): ApplyReport = database.withWriteTransaction {
+        var applied = 0
+        var updated = 0
+        var skipped = 0
+        var conflicts = 0
+
+        // Capture triggers stay down for the whole batch: pulled rows are
+        // server-originated history, not new device writes.
+        SyncMigrationSql.triggerNames.forEach { name -> executeSQL("DROP TRIGGER IF EXISTS $name") }
+        try {
+            for (record in records) {
+                val outcome = applyOne(record)
+                when (outcome) {
+                    PerRecord.APPLIED -> applied += 1
+                    PerRecord.UPDATED -> updated += 1
+                    PerRecord.SKIPPED -> skipped += 1
+                    PerRecord.CONFLICT -> conflicts += 1
+                }
+            }
+        } finally {
+            SyncMigrationSql.captureTriggers.forEach { create -> executeSQL(create) }
+        }
+
+        runCatching { InventoryCostProjectionService(database).rebuild() }
+
+        ApplyReport(
+            applied = applied,
+            updated = updated,
+            skipped = skipped,
+            conflicts = conflicts,
+            latestServerSeq = records.maxOfOrNull { it.serverSeq } ?: 0L,
+        )
+    }
+
+    private enum class PerRecord { APPLIED, UPDATED, SKIPPED, CONFLICT }
+
+    private suspend fun applyOne(record: SyncPulledRecord): PerRecord {
+        val payload = record.payload
+        return try {
+            when (record.tableName) {
+                "products" -> applyProduct(record.rowUid, payload)
+                "accounts" -> applyAccount(record.rowUid, payload)
+                "settings" -> applySetting(payload)
+                "events" -> applyEvent(record.rowUid, payload)
+                "deliveries" -> applyDelivery(record.rowUid, payload)
+                "attendance_records" -> applyAttendance(record.rowUid, payload)
+                "budget_plans", "collections_targets" -> PerRecord.SKIPPED // planning rows: pulled but not applied until planning sync lands
+                "delivery_status_history" -> applyDeliveryStatus(record.rowUid, payload)
+                "physical_cash_counts" -> applyCashCount(record.rowUid, payload)
+                "daily_close_actions" -> applyCloseAction(record.rowUid, payload)
+                "store_profile" -> applyStoreProfile(payload)
+                else -> PerRecord.SKIPPED
+            }
+        } catch (failure: Throwable) {
+            auditSkip(record, failure.message ?: failure.javaClass.simpleName)
+            PerRecord.SKIPPED
+        }
+    }
+
+    private suspend fun applyProduct(uid: String, payload: JSONObject): PerRecord {
+        val existing = database.syncEnvelopeDao().productsByUid(listOf(uid)).firstOrNull()
+        val name = payload.getString("name")
+        val unit = payload.getString("unit")
+        return if (existing == null) {
+            database.productDao().insert(ProductEntity(name = name, unit = unit, uid = uid))
+            PerRecord.APPLIED
+        } else {
+            val stamp = payload.optString("sync_updated_at").ifEmpty { Instant.now().toString() }
+            database.syncApplyDao().updateProductByUid(uid, name, unit, stamp)
+            applyProfileChild(payload)
+            PerRecord.UPDATED
+        }
+    }
+
+    private suspend fun applyAccount(uid: String, payload: JSONObject): PerRecord {
+        val existing = database.syncEnvelopeDao().accountsByUid(listOf(uid)).firstOrNull()
+        val name = payload.getString("name")
+        val type = payload.getString("type")
+        val category = payload.getString("category")
+        return if (existing == null) {
+            val id = database.accountDao().insert(
+                AccountEntity(name = name, type = type, category = category, uid = uid),
+            )
+            applyProfileChild(payload, id)
+            PerRecord.APPLIED
+        } else {
+            val stamp = payload.optString("sync_updated_at").ifEmpty { Instant.now().toString() }
+            database.syncApplyDao().updateAccountByUid(uid, name, type, category, stamp)
+            applyProfileChild(payload, existing.accountId)
+            PerRecord.UPDATED
+        }
+    }
+
+    private suspend fun applySetting(payload: JSONObject): PerRecord {
+        val key = payload.getString("setting_key")
+        val value = payload.getDouble("setting_value")
+        val stamp = payload.optString("updated_at").ifEmpty { Instant.now().toString() }
+        val changed = database.syncApplyDao().updateSettingByKey(key, value, stamp)
+        return if (changed == 0) {
+            database.backupDataDao().insertSettings(listOf(SettingEntity(key, value, stamp)))
+            PerRecord.APPLIED
+        } else {
+            PerRecord.UPDATED
+        }
+    }
+
+    private suspend fun applyEvent(uid: String, payload: JSONObject): PerRecord {
+        val existing = database.syncEnvelopeDao().eventsByUid(listOf(uid)).firstOrNull()
+        if (existing != null) return PerRecord.SKIPPED // events are immutable history
+
+        val correctsUid = payload.optNullableString("corrects_event_uid")
+        var correctsLocalId: Long? = null
+        if (correctsUid != null) {
+            val target = database.syncEnvelopeDao().eventsByUid(listOf(correctsUid)).firstOrNull()
+                ?: return skipUnresolved("correction target $correctsUid not local yet")
+            // P1 sibling guard: the target already carries a different
+            // correction — never double-count; leave the owner to resolve.
+            val existingChild = database.syncEnvelopeDao().correctionsOf(target.eventId)
+                .firstOrNull { it.eventUid != uid }
+            if (existingChild != null) {
+                auditConflict(uid, target.eventUid, existingChild.eventUid)
+                return PerRecord.CONFLICT
+            }
+            correctsLocalId = target.eventId
+        }
+
+        val event = EventEntity(
+            createdAt = payload.getString("created_at"),
+            occurredAt = payload.getString("occurred_at"),
+            eventType = payload.getString("event_type"),
+            channel = payload.optNullableString("channel"),
+            correctsEventId = correctsLocalId,
+            rawLiters = payload.optDoubleOrNullCompat("raw_liters"),
+            fatPercentage = payload.optDoubleOrNullCompat("fat_percentage"),
+            lrReading = payload.optDoubleOrNullCompat("lr_reading"),
+            snfPercentage = payload.optDoubleOrNullCompat("snf_percentage"),
+            tsPercentage = payload.optDoubleOrNullCompat("ts_percentage"),
+            adjustedLiters = payload.optDoubleOrNullCompat("adjusted_liters"),
+            amountOwed = payload.optDoubleOrNullCompat("amount_owed"),
+            milkLitersUsed = payload.optDoubleOrNullCompat("milk_liters_used"),
+            yogurtKgProduced = payload.optDoubleOrNullCompat("yogurt_kg_produced"),
+            amount = payload.optDoubleOrNullCompat("amount"),
+            milkRateUsed = payload.optDoubleOrNullCompat("milk_rate_used"),
+            deliveryFeeUsed = payload.optDoubleOrNullCompat("delivery_fee_used"),
+            tsStandardUsed = payload.optDoubleOrNullCompat("ts_standard_used"),
+            saleQuantity = payload.optDoubleOrNullCompat("sale_quantity"),
+            saleValue = payload.optDoubleOrNullCompat("sale_value"),
+            unitRate = payload.optDoubleOrNullCompat("unit_rate"),
+            surchargeApplied = payload.optDouble("surcharge_applied", 0.0),
+            notes = payload.optNullableString("notes"),
+            eventUid = uid,
+            originDeviceId = payload.optNullableString("origin_device_id") ?: "",
+            rawDeviceTs = payload.optNullableString("raw_device_ts") ?: payload.getString("created_at"),
+            trustedEstimatedAt = payload.optNullableString("trusted_estimated_at") ?: "",
+            timeTrust = payload.optNullableString("time_trust") ?: EventTimeTrust.DEVICE_ONLY,
+        )
+        val eventId = database.eventDao().insert(event)
+
+        payload.optJSONArray("inventory_logs")?.let { rows ->
+            for (index in 0 until rows.length()) {
+                val row = rows.optJSONObject(index) ?: continue
+                val productId = resolveProduct(row.optString("product_uid")) ?: continue
+                database.inventoryLogDao().insert(
+                    InventoryLogEntity(eventId = eventId, productId = productId, quantity = row.getDouble("quantity")),
+                )
+            }
+        }
+        payload.optJSONArray("financial_logs")?.let { rows ->
+            for (index in 0 until rows.length()) {
+                val row = rows.optJSONObject(index) ?: continue
+                val accountId = resolveAccount(row.optString("account_uid")) ?: continue
+                database.financialLogDao().insert(
+                    FinancialLogEntity(eventId = eventId, accountId = accountId, amount = row.getDouble("amount")),
+                )
+            }
+        }
+        payload.optJSONArray("spoilage_details")?.let { rows ->
+            for (index in 0 until rows.length()) {
+                val row = rows.optJSONObject(index) ?: continue
+                val productId = resolveProduct(row.optString("product_uid")) ?: continue
+                database.spoilageDao().insert(
+                    SpoilageDetailEntity(
+                        eventId = eventId,
+                        productId = productId,
+                        quantity = row.getDouble("quantity"),
+                        reason = row.getString("reason"),
+                    ),
+                )
+            }
+        }
+
+        // Actor attribution is best-effort cross-device: app users are
+        // device-local, so a receiving device may have no matching user row.
+        // The event and its ledger apply regardless; attribution appears
+        // once the staff account exists locally (all-staff linking).
+        payload.optJSONObject("actor_link")?.let { link ->
+            runCatching {
+                database.eventActorLinkDao().insert(
+                    EventActorLinkEntity(
+                        eventId = eventId,
+                        actorUserId = 0L,
+                        actorNameSnapshot = link.optNullableString("actor_name_snapshot") ?: "synced",
+                        actorRoleSnapshot = link.optNullableString("actor_role_snapshot") ?: "synced",
+                        attributedAt = link.optNullableString("attributed_at") ?: Instant.now().toString(),
+                    ),
+                )
+            }
+        }
+        return PerRecord.APPLIED
+    }
+
+    private suspend fun resolveProduct(uid: String): Long? =
+        if (uid.isEmpty()) null
+        else database.syncEnvelopeDao().productsByUid(listOf(uid)).firstOrNull()?.productId
+
+    private suspend fun resolveAccount(uid: String): Long? =
+        if (uid.isEmpty()) null
+        else database.syncEnvelopeDao().accountsByUid(listOf(uid)).firstOrNull()?.accountId
+
+    private suspend fun resolveEvent(uid: String): Long? =
+        if (uid.isEmpty()) null
+        else database.syncEnvelopeDao().eventsByUid(listOf(uid)).firstOrNull()?.eventId
+
+    private suspend fun resolveDelivery(uid: String): Long? =
+        if (uid.isEmpty()) null
+        else database.syncEnvelopeDao().deliveriesByUid(listOf(uid)).firstOrNull()?.deliveryId
+
+    private suspend fun resolveCashCount(uid: String): Long? =
+        if (uid.isEmpty()) null
+        else database.syncEnvelopeDao().physicalCashCountsByUid(listOf(uid)).firstOrNull()?.countId
+
+    private suspend fun applyDelivery(uid: String, payload: JSONObject): PerRecord {
+        val customerUid = payload.optString("customer_uid")
+        val productUid = payload.optString("product_uid")
+        val customerId = resolveAccount(customerUid) ?: return skipUnresolved("delivery customer $customerUid not local")
+        val productId = resolveProduct(productUid) ?: return skipUnresolved("delivery product $productUid not local")
+        val saleId = payload.optNullableString("sale_event_uid")?.let { resolveEvent(it) }
+        val existing = database.syncEnvelopeDao().deliveriesByUid(listOf(uid)).firstOrNull()
+        return if (existing == null) {
+            database.deliveryDao().insert(
+                DeliveryEntity(
+                    customerAccountId = customerId,
+                    productId = productId,
+                    quantity = payload.getDouble("quantity"),
+                    route = payload.optNullableString("route"),
+                    businessDate = payload.getString("business_date"),
+                    saleEventId = saleId,
+                    notes = payload.optNullableString("notes"),
+                    createdAt = payload.getString("created_at"),
+                    archived = payload.optBoolean("archived", false),
+                    uid = uid,
+                ),
+            )
+            PerRecord.APPLIED
+        } else {
+            database.syncApplyDao().updateDeliveryByUid(
+                uid = uid,
+                customerAccountId = customerId,
+                productId = productId,
+                quantity = payload.getDouble("quantity"),
+                route = payload.optNullableString("route"),
+                businessDate = payload.getString("business_date"),
+                saleEventId = saleId,
+                notes = payload.optNullableString("notes"),
+                archived = payload.optBoolean("archived", false),
+                stamp = payload.optString("sync_updated_at").ifEmpty { Instant.now().toString() },
+            )
+            PerRecord.UPDATED
+        }
+    }
+
+    private suspend fun applyAttendance(uid: String, payload: JSONObject): PerRecord {
+        val employeeUid = payload.optString("employee_uid")
+        val employeeId = resolveAccount(employeeUid) ?: return skipUnresolved("attendance employee $employeeUid not local")
+        val supersedes = payload.optNullableString("supersedes_uid")
+            ?.let { database.syncEnvelopeDao().attendanceByUid(listOf(it)).firstOrNull()?.attendanceId }
+        val existing = database.syncEnvelopeDao().attendanceByUid(listOf(uid)).firstOrNull()
+        return if (existing == null) {
+            database.attendanceDao().insert(
+                AttendanceRecordEntity(
+                    employeeAccountId = employeeId,
+                    businessDate = payload.getString("business_date"),
+                    status = payload.getString("status"),
+                    notes = payload.optNullableString("notes"),
+                    createdAt = payload.getString("created_at"),
+                    supersedesId = supersedes,
+                    uid = uid,
+                ),
+            )
+            PerRecord.APPLIED
+        } else {
+            database.syncApplyDao().updateAttendanceByUid(
+                uid = uid,
+                employeeAccountId = employeeId,
+                businessDate = payload.getString("business_date"),
+                status = payload.getString("status"),
+                notes = payload.optNullableString("notes"),
+                supersedesId = supersedes,
+                archived = payload.optBoolean("archived", false),
+                stamp = payload.optString("sync_updated_at").ifEmpty { Instant.now().toString() },
+            )
+            PerRecord.UPDATED
+        }
+    }
+
+    private suspend fun applyDeliveryStatus(uid: String, payload: JSONObject): PerRecord {
+        val deliveryUid = payload.optString("delivery_uid")
+        val deliveryId = resolveDelivery(deliveryUid) ?: return skipUnresolved("status delivery $deliveryUid not local")
+        val existing = database.syncEnvelopeDao().deliveryStatusesByUid(listOf(uid)).firstOrNull()
+        if (existing != null) return PerRecord.SKIPPED
+        database.deliveryDao().insertStatus(
+            com.saaf.milkshop.data.DeliveryStatusEntity(
+                deliveryId = deliveryId,
+                status = payload.getString("status"),
+                occurredAt = payload.getString("occurred_at"),
+                notes = payload.optNullableString("notes"),
+                uid = uid,
+            ),
+        )
+        return PerRecord.APPLIED
+    }
+
+    private suspend fun applyCashCount(uid: String, payload: JSONObject): PerRecord {
+        if (database.syncEnvelopeDao().physicalCashCountsByUid(listOf(uid)).isNotEmpty()) return PerRecord.SKIPPED
+        val accountUid = payload.optString("account_uid")
+        val accountId = resolveAccount(accountUid) ?: return skipUnresolved("cash count account $accountUid not local")
+        database.backupDataDao().insertPhysicalCashCount(
+            PhysicalCashCountEntity(
+                accountId = accountId,
+                businessDate = payload.getString("business_date"),
+                countedAmount = payload.getDouble("counted_amount"),
+                countedAt = payload.getString("counted_at"),
+                notes = payload.optNullableString("notes"),
+                uid = uid,
+            ),
+        )
+        return PerRecord.APPLIED
+    }
+
+    private suspend fun applyCloseAction(uid: String, payload: JSONObject): PerRecord {
+        if (database.syncEnvelopeDao().dailyCloseActionsByUid(listOf(uid)).isNotEmpty()) return PerRecord.SKIPPED
+        val countId = payload.optNullableString("count_uid")?.let { resolveCashCount(it) }
+        val supersedesId = payload.optNullableString("supersedes_action_uid")
+            ?.let { database.syncEnvelopeDao().dailyCloseActionsByUid(listOf(it)).firstOrNull()?.actionId }
+        database.backupDataDao().insertDailyCloseAction(
+            DailyCloseActionEntity(
+                businessDate = payload.getString("business_date"),
+                action = payload.getString("action"),
+                physicalCashCountId = countId,
+                actorName = payload.optString("actor_name").ifEmpty { "synced" },
+                actorRole = payload.optString("actor_role").ifEmpty { "synced" },
+                reason = payload.optNullableString("reason"),
+                createdAt = payload.getString("created_at"),
+                supersedesActionId = supersedesId,
+                uid = uid,
+            ),
+        )
+        return PerRecord.APPLIED
+    }
+
+    private suspend fun applyStoreProfile(payload: JSONObject): PerRecord {
+        val existing = database.syncEnvelopeDao().storeProfile()
+        val entity = com.saaf.milkshop.data.StoreProfileEntity(
+            storeProfileId = existing?.storeProfileId ?: 1,
+            storeName = payload.getString("store_name"),
+            currencyCode = payload.getString("currency_code"),
+            phone = payload.optNullableString("phone"),
+            address = payload.optNullableString("address"),
+            updatedAt = payload.getString("updated_at"),
+        )
+        database.storeProfileDao().save(entity)
+        return if (existing == null) PerRecord.APPLIED else PerRecord.UPDATED
+    }
+
+    private suspend fun applyProfileChild(payload: JSONObject, accountId: Long? = null) {
+        val profile = payload.optJSONObject("profile") ?: return
+        when (payload.optString("category")) {
+            "Customer" -> {
+                val existing = database.customerProfileDao().findByAccountId(accountId ?: return)
+                if (existing == null) {
+                    database.customerProfileDao().save(
+                        com.saaf.milkshop.data.CustomerProfileEntity(
+                            accountId = accountId,
+                            phone = profile.optNullableString("phone"),
+                            notes = profile.optNullableString("notes"),
+                            createdAt = profile.getString("created_at"),
+                        ),
+                    )
+                }
+            }
+            "Vendor", "Salary", "Operating Expense" -> {
+                // Profile satellites for these categories ride along later;
+                // applying the account row is what the ledger needs.
+            }
+        }
+    }
+
+    private suspend fun skipUnresolved(reason: String): PerRecord {
+        auditSkipReason(reason)
+        return PerRecord.SKIPPED
+    }
+
+    private suspend fun auditSkip(record: SyncPulledRecord, reason: String) {
+        runCatching {
+            database.securityAuditDao().insert(
+                com.saaf.milkshop.data.SecurityAuditEntryEntity(
+                    auditId = 0,
+                    occurredAt = Instant.now().toString(),
+                    action = "sync_apply_skipped",
+                    result = "warning",
+                    reasonCode = "skipped",
+                    details = "table=${record.tableName};uid=${record.rowUid};seq=${record.serverSeq};reason=$reason",
+                ),
+            )
+        }
+    }
+
+    private suspend fun auditSkipReason(reason: String) {
+        runCatching {
+            database.securityAuditDao().insert(
+                com.saaf.milkshop.data.SecurityAuditEntryEntity(
+                    auditId = 0,
+                    occurredAt = Instant.now().toString(),
+                    action = "sync_apply_skipped",
+                    result = "warning",
+                    reasonCode = "unresolved_reference",
+                    details = "reason=$reason",
+                ),
+            )
+        }
+    }
+
+    private suspend fun auditConflict(incomingUid: String, targetUid: String, existingUid: String) {
+        runCatching {
+            database.securityAuditDao().insert(
+                com.saaf.milkshop.data.SecurityAuditEntryEntity(
+                    auditId = 0,
+                    occurredAt = Instant.now().toString(),
+                    action = "sync_apply_conflict",
+                    result = "warning",
+                    reasonCode = "sibling_correction",
+                    details = "incoming=$incomingUid;target=$targetUid;existing_child=$existingUid",
+                ),
+            )
+        }
+    }
+}
+
+private fun JSONObject.optDoubleOrNullCompat(name: String): Double? =
+    if (!has(name) || isNull(name)) null else getDouble(name)
+
+/** org.json's optString returns the literal "null" for JSON null; read honestly. */
+private fun JSONObject.optNullableString(name: String): String? =
+    if (!has(name) || isNull(name)) null else optString(name).takeIf { it.isNotEmpty() }

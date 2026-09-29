@@ -30,6 +30,7 @@
             <intent-filter>
                 <action android:name="com.saaf.milkshop.sync.ENROLL" />
                 <action android:name="com.saaf.milkshop.sync.STATUS" />
+                <action android:name="com.saaf.milkshop.sync.DRAIN" />
                 <action android:name="com.saaf.milkshop.sync.UNENROLL" />
             </intent-filter>
         </receiver>

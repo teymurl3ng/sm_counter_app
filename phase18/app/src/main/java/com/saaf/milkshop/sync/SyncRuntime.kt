@@ -3,7 +3,6 @@ package com.saaf.milkshop.sync
 import android.content.Context
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.data.SyncOutboxEntity
-
 /**
  * Phase 6 runtime glue: builds the production transport from the stored
  * config/session/binding and drains the outbox. An expired access token is
@@ -40,6 +39,60 @@ class SyncRuntime(
             },
         )
         return engine.drainOnce()
+    }
+
+    /**
+     * Pulls and applies everything the server has beyond the local cursor,
+     * batch by batch in server_seq order. Enrolled devices pull before
+     * pushing (shop convergence first), matching the locked decisions.
+     */
+    suspend fun pullOnce(): SyncPullSummary {
+        val config = SyncServerConfigStore.load(context) ?: return SyncPullSummary.NotEnrolled
+        val binding = SyncShopBindingStore.load(context) ?: return SyncPullSummary.NotEnrolled
+        if (tokenStore.load() == null) return SyncPullSummary.NotEnrolled
+
+        val client = SyncPullClient(http, config, tokenStore)
+        val applyEngine = SyncApplyEngine(database)
+        var applied = 0
+        var updated = 0
+        var skipped = 0
+        var conflicts = 0
+
+        while (true) {
+            val cursor = database.syncPullStateDao().find()?.lastServerSeq ?: 0L
+            val outcome = client.pull(cursor, maxRows = 100, shopId = binding.shopId)
+            when (outcome) {
+                is SyncPullOutcome.Fetched -> {
+                    if (outcome.batch.records.isEmpty()) return SyncPullSummary.Done(applied, updated, skipped, conflicts)
+                    val report = applyEngine.apply(outcome.batch.records)
+                    applied += report.applied
+                    updated += report.updated
+                    skipped += report.skipped
+                    conflicts += report.conflicts
+                    database.syncPullStateDao().upsert(
+                        com.saaf.milkshop.data.SyncPullStateEntity(
+                            lastServerSeq = outcome.batch.latestServerSeq,
+                            updatedAt = java.time.Instant.now().toString(),
+                        ),
+                    )
+                    if (!outcome.hasMore) return SyncPullSummary.Done(applied, updated, skipped, conflicts)
+                }
+                SyncPullOutcome.NotConfigured -> return SyncPullSummary.NotEnrolled
+                is SyncPullOutcome.RetryLater -> {
+                    return if (applied + updated > 0) {
+                        SyncPullSummary.Done(applied, updated, skipped, conflicts)
+                    } else {
+                        SyncPullSummary.RetryLater(outcome.reason)
+                    }
+                }
+            }
+        }
+    }
+
+    sealed interface SyncPullSummary {
+        data class Done(val applied: Int, val updated: Int, val skipped: Int, val conflicts: Int) : SyncPullSummary
+        data class RetryLater(val reason: String) : SyncPullSummary
+        data object NotEnrolled : SyncPullSummary
     }
 
     /** One refresh attempt per push when the access token is rejected. */

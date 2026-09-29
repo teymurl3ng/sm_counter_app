@@ -59,9 +59,13 @@ class AccountAuthClient(
 ) {
 
     suspend fun signIn(username: String, credential: CharArray): AccountAuthResult {
+        // The server credential is the 15 digits — separators like the
+        // 98828-87931-48384 display form are stripped, matching the DEV
+        // probe script's wire behavior.
+        val normalizedCredential = String(credential).filter(Char::isDigit)
         val body = JSONObject()
             .put("email", "${username.trim().lowercase()}@saafmilk.local")
-            .put("password", String(credential))
+            .put("password", normalizedCredential)
             .toString()
             .toByteArray(Charsets.UTF_8)
 
@@ -79,7 +83,7 @@ class AccountAuthClient(
                 ),
             )
         } catch (failure: IOException) {
-            return AccountAuthResult.Unknown("network")
+            return AccountAuthResult.Unknown(describeNetworkFailure(failure))
         }
 
         return when (response.status) {
@@ -96,6 +100,14 @@ class AccountAuthClient(
             else -> AccountAuthResult.Unknown("sign_in_${response.status}")
         }
     }
+
+    /**
+     * Stable detail for field diagnostics: exception type plus message, with
+     * anything that could resemble a credential or token redacted by only
+     * ever carrying the exception's own text (never request bodies).
+     */
+    private fun describeNetworkFailure(failure: IOException): String =
+        "network:${failure.javaClass.simpleName}:${failure.message?.take(120) ?: "no detail"}"
 
     suspend fun refresh(refreshToken: String): AccountAuthResult {
         val body = JSONObject()

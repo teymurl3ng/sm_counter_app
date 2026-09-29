@@ -12,6 +12,7 @@ import com.saaf.milkshop.cloud.GoogleDriveCloudBackupProvider
 import com.saaf.milkshop.domain.NativeSessionManager
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.sync.BusinessClock
+import com.saaf.milkshop.sync.SyncServerConfigStore
 import com.saaf.milkshop.sync.SyncIdentity
 import com.saaf.milkshop.sync.SyncRuntime
 import com.saaf.milkshop.sync.SyncScheduler
@@ -42,6 +43,11 @@ class MilkShopApplication : Application() {
         }
         timeTrustScope.launch {
             runCatching { TimeTrustMonitor.check(applicationContext, database) }
+            // Enrolled devices pull before pushing: converge with the shop
+            // first, then drain the outbox (kicked below).
+            if (SyncServerConfigStore.load(applicationContext) != null) {
+                runCatching { syncRuntime.pullOnce() }
+            }
         }
         // An enrolled device drains anything queued while it was offline at
         // every start; an unenrolled device schedules nothing (inert).

@@ -97,6 +97,7 @@ abstract class MilkShopDatabase : RoomDatabase() {
     abstract fun syncOutboxDao(): SyncOutboxDao
     abstract fun syncPullStateDao(): SyncPullStateDao
     abstract fun syncEnvelopeDao(): SyncEnvelopeDao
+    abstract fun syncApplyDao(): SyncApplyDao
 
     companion object {
         private const val DATABASE_NAME = "milk_shop.db"

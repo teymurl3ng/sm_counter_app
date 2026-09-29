@@ -31,6 +31,7 @@ class SyncDebugReceiver : BroadcastReceiver() {
                 when (intent.action) {
                     ACTION_ENROLL -> enroll(context, intent)
                     ACTION_STATUS -> status(context)
+                    ACTION_DRAIN -> drain(context)
                     ACTION_UNENROLL -> unenroll(context)
                     else -> Log.i(TAG, "Unknown action: ${intent.action}")
                 }
@@ -55,7 +56,14 @@ class SyncDebugReceiver : BroadcastReceiver() {
             publishableKey = intent.getStringExtra(EXTRA_PUBLISHABLE_KEY) ?: DEFAULT_DEV_PUBLISHABLE_KEY,
         )
         Log.i(TAG, "Enrolling $username against ${config.baseUrl} (${config.environment})…")
-        when (val outcome = SyncEnrollment(context).enroll(config, username, credential.toCharArray())) {
+        when (
+            val outcome = SyncEnrollment(context).enroll(
+                config,
+                username,
+                credential.toCharArray(),
+                intent.getStringExtra(EXTRA_SHOP_ID)?.takeIf { it.isNotBlank() },
+            )
+        ) {
             is SyncEnrollment.Outcome.Enrolled -> Log.i(
                 TAG,
                 "ENROLLED as ${outcome.binding.role} for shop '${outcome.binding.shopName}' " +
@@ -92,6 +100,33 @@ class SyncDebugReceiver : BroadcastReceiver() {
         }
     }
 
+    private suspend fun drain(context: Context) {
+        val app = context.applicationContext as? com.saaf.milkshop.MilkShopApplication
+        if (app == null) {
+            Log.i(TAG, "DRAIN needs the app process")
+            return
+        }
+        // Pull first (shop convergence), then push the outbox.
+        when (val pull = app.syncRuntime.pullOnce()) {
+            is com.saaf.milkshop.sync.SyncRuntime.SyncPullSummary.Done ->
+                Log.i(TAG, "PULL: applied=${pull.applied} updated=${pull.updated} skipped=${pull.skipped} conflicts=${pull.conflicts}")
+            is com.saaf.milkshop.sync.SyncRuntime.SyncPullSummary.RetryLater ->
+                Log.i(TAG, "PULL: retry later (${pull.reason})")
+            com.saaf.milkshop.sync.SyncRuntime.SyncPullSummary.NotEnrolled ->
+                Log.i(TAG, "PULL: not enrolled")
+        }
+        Log.i(TAG, "Draining outbox…")
+        when (val outcome = app.syncRuntime.drainOnce()) {
+            SyncPushEngine.DrainOutcome.NotConfigured -> Log.i(TAG, "DRAIN: not enrolled")
+            is SyncPushEngine.DrainOutcome.Drained ->
+                Log.i(TAG, "DRAIN: pushed ${outcome.pushed} rows; outbox now ${app.database.syncOutboxDao().count()}")
+            is SyncPushEngine.DrainOutcome.RetryLater ->
+                Log.i(TAG, "DRAIN: retry later (transient; pushed ${outcome.pushed})")
+            is SyncPushEngine.DrainOutcome.Halted ->
+                Log.i(TAG, "DRAIN: HALTED (${outcome.reasonCode}; pushed ${outcome.pushed}) — see security history")
+        }
+    }
+
     private fun unenroll(context: Context) {
         SyncEnrollment(context).unenroll()
         Log.i(TAG, "UNENROLLED — push scheduling off, config/session/binding cleared.")
@@ -101,6 +136,7 @@ class SyncDebugReceiver : BroadcastReceiver() {
         const val TAG = "SaafSync"
         const val ACTION_ENROLL = "com.saaf.milkshop.sync.ENROLL"
         const val ACTION_STATUS = "com.saaf.milkshop.sync.STATUS"
+        const val ACTION_DRAIN = "com.saaf.milkshop.sync.DRAIN"
         const val ACTION_UNENROLL = "com.saaf.milkshop.sync.UNENROLL"
         const val EXTRA_USERNAME = "username"
         const val EXTRA_CREDENTIAL = "credential"

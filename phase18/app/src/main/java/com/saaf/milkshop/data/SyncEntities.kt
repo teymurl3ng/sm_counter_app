@@ -73,6 +73,54 @@ interface SyncPullStateDao {
     suspend fun upsert(state: SyncPullStateEntity)
 }
 
+@Dao
+interface SyncApplyDao {
+    @Query("UPDATE products SET name = :name, unit = :unit, sync_updated_at = :stamp WHERE uid = :uid")
+    suspend fun updateProductByUid(uid: String, name: String, unit: String, stamp: String): Int
+
+    @Query("UPDATE accounts SET name = :name, type = :type, category = :category, sync_updated_at = :stamp WHERE uid = :uid")
+    suspend fun updateAccountByUid(uid: String, name: String, type: String, category: String, stamp: String): Int
+
+    @Query("UPDATE settings SET setting_value = :value, updated_at = :stamp WHERE setting_key = :key")
+    suspend fun updateSettingByKey(key: String, value: Double, stamp: String): Int
+
+    @Query(
+        """UPDATE deliveries SET customer_account_id = :customerAccountId, product_id = :productId,
+           quantity = :quantity, route = :route, business_date = :businessDate,
+           sale_event_id = :saleEventId, notes = :notes, archived = :archived,
+           sync_updated_at = :stamp WHERE uid = :uid""",
+    )
+    suspend fun updateDeliveryByUid(
+        uid: String,
+        customerAccountId: Long,
+        productId: Long,
+        quantity: Double,
+        route: String?,
+        businessDate: String,
+        saleEventId: Long?,
+        notes: String?,
+        archived: Boolean,
+        stamp: String,
+    ): Int
+
+    @Query(
+        """UPDATE attendance_records SET employee_account_id = :employeeAccountId,
+           business_date = :businessDate, status = :status, notes = :notes,
+           supersedes_id = :supersedesId, archived = :archived,
+           sync_updated_at = :stamp WHERE uid = :uid""",
+    )
+    suspend fun updateAttendanceByUid(
+        uid: String,
+        employeeAccountId: Long,
+        businessDate: String,
+        status: String,
+        notes: String?,
+        supersedesId: Long?,
+        archived: Boolean,
+        stamp: String,
+    ): Int
+}
+
 /**
  * Read-side queries for the sync push envelopes: rows by uid, their event
  * children, and their profile satellites. Read-only by design — the outbox
@@ -100,6 +148,21 @@ interface SyncEnvelopeDao {
 
     @Query("SELECT * FROM products WHERE uid IN (:uids)")
     suspend fun productsByUid(uids: List<String>): List<ProductEntity>
+
+    @Query("SELECT * FROM products WHERE product_id IN (:ids)")
+    suspend fun productsByIds(ids: List<Long>): List<ProductEntity>
+
+    @Query("SELECT * FROM accounts WHERE account_id IN (:ids)")
+    suspend fun accountsByIds(ids: List<Long>): List<AccountEntity>
+
+    @Query("SELECT * FROM deliveries WHERE delivery_id IN (:ids)")
+    suspend fun deliveriesByIds(ids: List<Long>): List<DeliveryEntity>
+
+    @Query("SELECT * FROM physical_cash_counts WHERE count_id IN (:ids)")
+    suspend fun physicalCashCountsByIds(ids: List<Long>): List<PhysicalCashCountEntity>
+
+    @Query("SELECT * FROM events WHERE corrects_event_id = :eventId")
+    suspend fun correctionsOf(eventId: Long): List<EventEntity>
 
     @Query("SELECT * FROM accounts WHERE uid IN (:uids)")
     suspend fun accountsByUid(uids: List<String>): List<AccountEntity>

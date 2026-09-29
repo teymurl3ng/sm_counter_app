@@ -12,7 +12,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import com.saaf.milkshop.application.activity.NativeActivityFacade
-import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.collection.NativeCollectionFacade
 import com.saaf.milkshop.application.preview.NativePreviewSampleData
@@ -439,7 +439,11 @@ fun OwnerPreviewHost(
             }
         }
         val sectionStateHolder = rememberSaveableStateHolder()
-        NativeSecondaryTransition(targetState = ownerSection) { section ->
+        NativeSectionTransition<Pair<OwnerSection, NativeOwnerWorkDestination?>>(
+            targetState = ownerSection to ownerWorkDestination,
+            contentKey = { it },
+        ) { pane ->
+            val (section, paneDestination) = pane
         sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}") {
         when {
             section == OwnerSection.More -> {

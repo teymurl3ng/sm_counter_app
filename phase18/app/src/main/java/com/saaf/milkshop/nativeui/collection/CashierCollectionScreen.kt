@@ -83,7 +83,7 @@ import com.saaf.milkshop.application.collection.NativeCollectionPaymentAccount
 import com.saaf.milkshop.application.collection.NativeCollectionReceipt
 import com.saaf.milkshop.application.collection.NativeCollectionRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
-import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
@@ -134,7 +134,10 @@ fun CashierCollectionScreen(
         },
         modifier = modifier,
     ) { padding ->
-        NativeSecondaryTransition(targetState = state::class) { when (state) {
+        NativeSectionTransition(
+        targetState = state,
+        contentKey = { it::class },
+    ) { state -> when (state) {
             NativeCollectionState.Idle,
             NativeCollectionState.Loading,
             -> CollectionLoadingBody(

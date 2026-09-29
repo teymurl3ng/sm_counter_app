@@ -86,7 +86,14 @@ class NativeOperationsMoreViewModel(
                     contextRequest.await() to securityRequest.await()
                 }
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                _state.value = NativeOperationsMoreState.Ready(
+                // Merge into the previous pane: a warm refresh must never
+                // reset the open destination or in-progress dialogs.
+                _state.value = previous?.copy(
+                    context = context,
+                    security = security,
+                    refreshing = false,
+                    error = null,
+                ) ?: NativeOperationsMoreState.Ready(
                     context = context,
                     security = security,
                     refreshing = false,

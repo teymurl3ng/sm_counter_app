@@ -42,7 +42,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.owner.NativeOwnerWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
-import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 
@@ -57,7 +57,10 @@ fun OwnerWorkScreen(
     onNavigate: (OwnerSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    NativeSecondaryTransition(targetState = state::class) { when (state) {
+    NativeSectionTransition(
+        targetState = state,
+        contentKey = { it::class },
+    ) { state -> when (state) {
         NativeOwnerWorkState.Idle,
         NativeOwnerWorkState.Loading,
         -> OwnerScaffold(snackbarHostState, OwnerSection.Work, onNavigate, modifier) {

@@ -39,7 +39,7 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.operations.NativeDeliveryItem
 import com.saaf.milkshop.application.operations.NativeDeliveryReference
 import com.saaf.milkshop.nativeui.NativeUiTags
-import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.theme.SaafInk
@@ -94,7 +94,10 @@ fun DeliveriesScreen(
         onNavigate = onNavigate,
         modifier = modifier,
     ) { padding ->
-        NativeSecondaryTransition(targetState = state::class) { when (state) {
+        NativeSectionTransition(
+        targetState = state,
+        contentKey = { it::class },
+    ) { state -> when (state) {
             NativeDeliveriesState.Idle,
             NativeDeliveriesState.Loading,
             -> DeliveriesLoadingBody(

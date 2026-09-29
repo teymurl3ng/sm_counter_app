@@ -103,7 +103,7 @@ import com.saaf.milkshop.application.sale.NativeSaleProduct
 import com.saaf.milkshop.application.sale.NativeSaleReceipt
 import com.saaf.milkshop.application.sale.NativeSaleRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
-import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
@@ -158,7 +158,10 @@ fun CashierSaleScreen(
         compactNavigation = { CashierNavigation(CashierSection.Sell, guardedNavigate) },
         expandedNavigation = { CashierNavigationRail(CashierSection.Sell, guardedNavigate) },
     ) { padding ->
-        NativeSecondaryTransition(targetState = state::class) { when (state) {
+        NativeSectionTransition(
+        targetState = state,
+        contentKey = { it::class },
+    ) { state -> when (state) {
             NativeSaleState.Idle,
             NativeSaleState.Loading,
             -> SaleLoadingBody(

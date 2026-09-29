@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.nativeui.NativeUiTags
-import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.cashclose.NativeCashCloseState
 import com.saaf.milkshop.nativeui.cashclose.NativeCashCloseViewModel
 import com.saaf.milkshop.nativeui.collection.NativeCollectionState
@@ -208,7 +208,11 @@ fun ManagerPreviewHost(
         }
 
         val sectionStateHolder = rememberSaveableStateHolder()
-        NativeSecondaryTransition(targetState = managerSection) { section ->
+        NativeSectionTransition<Pair<ManagerSection, NativeManagerWorkDestination?>>(
+            targetState = managerSection to workDestination,
+            contentKey = { it },
+        ) { pane ->
+            val (section, paneDestination) = pane
         sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}") {
         when {
             section == ManagerSection.Work &&

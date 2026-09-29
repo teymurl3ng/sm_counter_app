@@ -61,7 +61,7 @@ import com.saaf.milkshop.domain.ProductCatalogInput
 import com.saaf.milkshop.domain.VendorProfileInput
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.HostedScaffold
-import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.owner.NativeOwnerMoreDestination
 import com.saaf.milkshop.nativeui.owner.NativeOwnerMoreState
 import com.saaf.milkshop.nativeui.owner.OwnerCustomersScreen
@@ -187,7 +187,10 @@ fun ManagerMoreScreen(
             }
         }
 
-        is NativeOwnerMoreState.Ready -> NativeSecondaryTransition(state.destination) { destination ->
+        is NativeOwnerMoreState.Ready -> NativeSectionTransition(
+            targetState = state.destination,
+            contentKey = { it },
+        ) { destination ->
             when (destination) {
             NativeOwnerMoreDestination.Menu -> ManagerMoreMenuScreen(
                 snackbarHostState = snackbarHostState,

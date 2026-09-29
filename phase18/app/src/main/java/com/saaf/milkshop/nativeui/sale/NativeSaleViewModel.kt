@@ -143,7 +143,10 @@ class NativeSaleViewModel(
             try {
                 val context = withContext(Dispatchers.IO) { facade.load(session) }
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                _state.value = NativeSaleState.Ready(context, refreshing = false)
+                // Merge: a refresh must never wipe the posted receipt or the
+                // delivery follow-up card.
+                _state.value = previous?.copy(context = context, refreshing = false)
+                    ?: NativeSaleState.Ready(context, refreshing = false)
             } catch (error: Throwable) {
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 if (error is SecurityFailure.SessionExpired || previous == null) {

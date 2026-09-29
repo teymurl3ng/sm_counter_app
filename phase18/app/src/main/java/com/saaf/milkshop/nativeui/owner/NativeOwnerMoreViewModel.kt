@@ -119,7 +119,15 @@ class NativeOwnerMoreViewModel internal constructor(
                     contextRequest.await() to securityRequest.await()
                 }
                 if (!runtime.isCurrent(token)) return@launch
-                _state.value = NativeOwnerMoreState.Ready(
+                // Merge: preserves the open destination, loaded destination
+                // lists and every in-progress editor (products, customers,
+                // costing, backup) across a warm refresh.
+                _state.value = previous?.copy(
+                    context = context,
+                    security = security,
+                    refreshing = false,
+                    error = null,
+                ) ?: NativeOwnerMoreState.Ready(
                     context = context,
                     security = security,
                     refreshing = false,

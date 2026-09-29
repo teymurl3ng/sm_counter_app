@@ -131,11 +131,18 @@ class NativeOwnerRecordsViewModel(
             try {
                 val snapshot = withContext(Dispatchers.IO) { facade.loadHistory(session) }
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                _state.value = NativeOwnerRecordsState.Ready(
+                // Merge: keeps an open detail, ledger, or correction editor on
+                // screen through a warm refresh.
+                val filtered = facade.filterRecords(snapshot.records, previousQuery, previousGroup)
+                _state.value = previous?.copy(
+                    snapshot = snapshot,
+                    visibleRecords = filtered,
+                    refreshing = false,
+                ) ?: NativeOwnerRecordsState.Ready(
                     snapshot = snapshot,
                     searchQuery = previousQuery,
                     activeGroup = previousGroup,
-                    visibleRecords = facade.filterRecords(snapshot.records, previousQuery, previousGroup),
+                    visibleRecords = filtered,
                     refreshing = false,
                 )
             } catch (error: Throwable) {

@@ -63,7 +63,7 @@ import com.saaf.milkshop.application.more.NativeMoreSecurityStatus
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
-import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.sale.CashierNavigation
 import com.saaf.milkshop.nativeui.sale.CashierNavigationRail
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -101,7 +101,10 @@ fun CashierMoreScreen(
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    NativeSecondaryTransition(targetState = state::class) { when (state) {
+    NativeSectionTransition(
+        targetState = state,
+        contentKey = { it::class },
+    ) { state -> when (state) {
         NativeMoreState.Idle,
         NativeMoreState.Loading,
         -> MoreLoadingScreen(snackbarHostState, onNavigate, modifier)
@@ -115,7 +118,10 @@ fun CashierMoreScreen(
         )
 
         is NativeMoreState.Ready -> {
-            NativeSecondaryTransition(targetState = state.destination) { destination ->
+            NativeSectionTransition(
+            targetState = state.destination,
+            contentKey = { it },
+        ) { destination ->
             when (destination) {
                 NativeMoreDestination.Menu -> MoreMenuScreen(
                     snackbarHostState = snackbarHostState,

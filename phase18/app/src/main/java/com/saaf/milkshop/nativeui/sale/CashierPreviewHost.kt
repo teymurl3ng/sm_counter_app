@@ -19,7 +19,7 @@ import com.saaf.milkshop.application.sale.NativeSaleFacade
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.nativeui.activity.CashierActivityScreen
-import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.activity.NativeActivityState
 import com.saaf.milkshop.nativeui.activity.NativeActivityViewModel
 import com.saaf.milkshop.nativeui.collection.CashierCollectionScreen
@@ -207,7 +207,11 @@ fun CashierPreviewHost(
         }
         val sectionStateHolder = rememberSaveableStateHolder()
         // Section swaps crossfade; the state key still restores per-section UI.
-        NativeSecondaryTransition(targetState = cashierSection) { section ->
+        NativeSectionTransition<Pair<CashierSection, NativeMoreDestination?>>(
+            targetState = cashierSection to (moreState as? NativeMoreState.Ready)?.destination,
+            contentKey = { it },
+        ) { pane ->
+            val (section, paneDestination) = pane
         sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}") {
         when (section) {
             CashierSection.Sell -> CashierSaleScreen(

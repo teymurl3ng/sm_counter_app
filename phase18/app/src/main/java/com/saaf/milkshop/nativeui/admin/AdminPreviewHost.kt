@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.nativeui.NativeUiTags
-import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.expense.NativeExpenseState
 import com.saaf.milkshop.nativeui.expense.NativeExpenseViewModel
 import com.saaf.milkshop.nativeui.owner.NativeOwnerMoreDestination
@@ -198,7 +198,11 @@ fun AdminPreviewHost(
 
         val businessDate = LocalDate.now().toString()
         val sectionStateHolder = rememberSaveableStateHolder()
-        NativeSecondaryTransition(targetState = adminSection) { section ->
+        NativeSectionTransition<Pair<AdminSection, NativeAdminWorkDestination?>>(
+            targetState = adminSection to workDestination,
+            contentKey = { it },
+        ) { pane ->
+            val (section, paneDestination) = pane
         sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}") {
         when {
             section == AdminSection.Work &&

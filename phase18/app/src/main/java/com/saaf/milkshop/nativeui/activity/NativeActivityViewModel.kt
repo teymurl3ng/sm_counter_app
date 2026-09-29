@@ -86,7 +86,9 @@ class NativeActivityViewModel(
             try {
                 val day = withContext(Dispatchers.IO) { facade.loadToday(session) }
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                _state.value = NativeActivityState.Ready(day = day, refreshing = false)
+                // Merge: keeps an open record detail on screen through a refresh.
+                _state.value = previous?.copy(day = day, refreshing = false)
+                    ?: NativeActivityState.Ready(day = day, refreshing = false)
             } catch (error: Throwable) {
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 if (error is SecurityFailure.SessionExpired || previous == null) {

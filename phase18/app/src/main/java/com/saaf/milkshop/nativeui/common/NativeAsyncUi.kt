@@ -1,6 +1,7 @@
 package com.saaf.milkshop.nativeui.common
 
 import android.provider.Settings
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -11,6 +12,8 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -134,12 +137,16 @@ fun Modifier.nativeRefreshOverlay(refreshing: Boolean): Modifier {
         animationSpec = tween(150),
         label = "refresh_alpha",
     )
-    val sweep by rememberInfiniteTransition(label = "refresh_sweep").animateFloat(
-        initialValue = -0.4f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(1100, easing = FastOutSlowInEasing)),
-        label = "refresh_shift",
-    )
+    val sweep = if (refreshing) {
+        rememberInfiniteTransition(label = "refresh_sweep").animateFloat(
+            initialValue = -0.4f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(tween(1100, easing = FastOutSlowInEasing)),
+            label = "refresh_shift",
+        ).value
+    } else {
+        -0.4f
+    }
     val bar = MaterialTheme.colorScheme.primary
     return drawWithContent {
         drawContent()
@@ -160,6 +167,45 @@ fun Modifier.nativeRefreshOverlay(refreshing: Boolean): Modifier {
                 size = Size(seg, h),
             )
         }
+    }
+}
+
+/**
+ * The app's one transition language: a quiet fade-through. Outgoing content
+ * fades out fast with no movement; incoming content fades in with a small
+ * upward settle. Panes never overlap at partial alpha (no brightness dip /
+ * flash) and the container never morphs size (no jumping). [contentKey] groups
+ * states that should share a pane — e.g. Idle/Loading of the same screen — so
+ * only real content changes animate, and each pane keeps rendering the state
+ * it was composed with (no mid-fade re-branching). Respects the system
+ * animator-duration-scale like NativeSecondaryTransition.
+ */
+@Composable
+fun <T> NativeSectionTransition(
+    targetState: T,
+    contentKey: (T) -> Any,
+    modifier: Modifier = Modifier,
+    content: @Composable (T) -> Unit,
+) {
+    val scale = rememberSecondaryTransitionDurationMillis() / SECONDARY_TRANSITION_BASE_MILLIS.toFloat()
+    val outMillis = (90 * scale).toInt().coerceIn(1, 500)
+    val inMillis = (180 * scale).toInt().coerceIn(1, 1000)
+    AnimatedContent(
+        targetState = targetState,
+        transitionSpec = {
+            (
+                fadeIn(tween(inMillis, delayMillis = outMillis)) +
+                    slideInVertically(
+                        animationSpec = tween(inMillis, delayMillis = outMillis),
+                        initialOffsetY = { it / 16 },
+                    )
+                ) togetherWith fadeOut(tween(outMillis))
+        },
+        contentKey = contentKey,
+        modifier = modifier,
+        label = "section_transition",
+    ) { state ->
+        content(state)
     }
 }
 

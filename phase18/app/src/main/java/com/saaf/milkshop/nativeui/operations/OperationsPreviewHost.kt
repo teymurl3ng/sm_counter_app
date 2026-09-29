@@ -10,7 +10,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
-import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import com.saaf.milkshop.nativeui.operations.NativeDeliveriesDraftActions
 
@@ -144,7 +144,11 @@ fun OperationsPreviewHost(
         }
         val workReady = operationsWorkState as? NativeOperationsWorkState.Ready
         val sectionStateHolder = rememberSaveableStateHolder()
-        NativeSecondaryTransition(targetState = operationsSection) { section ->
+        NativeSectionTransition<Pair<OperationsSection, NativeOperationsWorkDestination?>>(
+            targetState = operationsSection to (operationsWorkState as? NativeOperationsWorkState.Ready)?.destination,
+            contentKey = { it },
+        ) { pane ->
+            val (section, paneDestination) = pane
         sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}") {
         when {
             section == OperationsSection.Deliveries -> {

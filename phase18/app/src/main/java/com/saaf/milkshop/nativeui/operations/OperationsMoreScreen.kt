@@ -61,7 +61,7 @@ import com.saaf.milkshop.application.operations.NativeOperationsWorkRecord
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
-import com.saaf.milkshop.nativeui.common.NativeSecondaryTransition
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
@@ -103,8 +103,9 @@ fun OperationsMoreScreen(
             modifier = modifier,
         )
 
-        is NativeOperationsMoreState.Ready -> NativeSecondaryTransition(
+        is NativeOperationsMoreState.Ready -> NativeSectionTransition(
             targetState = state.destination,
+            contentKey = { it },
             modifier = modifier,
         ) { destination ->
             Column(Modifier.nativeRefreshOverlay(state.refreshing)) {

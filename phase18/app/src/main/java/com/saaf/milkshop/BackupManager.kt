@@ -46,6 +46,14 @@ class BackupManager(
         },
         capturePreferences = ::preferencesJson,
         restorePreferences = ::restorePreferences,
+        // Account Bridge spec §8: every restore deletes persisted remote
+        // tokens; the installation re-verifies (re-enrolls) before its next
+        // pull or push. Device identity/config/binding live outside Room and
+        // survive, so the shop association is never lost.
+        afterRestore = {
+            com.saaf.milkshop.sync.SyncTokenStore(context).clear()
+            com.saaf.milkshop.sync.SyncScheduler.warmUp(context)
+        },
     )
 
     companion object {
@@ -317,6 +325,7 @@ class BackupManager(
             val metadata = json.getJSONObject("metadata")
             validateCompatibility(metadata)
             requireRestorableFormat(metadata)
+            requireSameShop(json)
             restoreEngine.restore(database, json, selection, includeSecurity = true)
             sessions.invalidateAll()
             backupMeta(json, uri.lastPathSegment ?: "backup")
@@ -336,6 +345,7 @@ class BackupManager(
             val json = cryptography.readLocalAndVerify(cryptography.readUri(uri))
             val metadata = json.getJSONObject("metadata")
             validateCompatibility(metadata)
+            requireSameShop(json)
             val hasUsers = json.getJSONObject("data").getJSONArray("app_users").length() > 0
             if (hasUsers) {
                 require(selection.business && selection.security) {
@@ -385,6 +395,7 @@ class BackupManager(
             val metadata = json.getJSONObject("metadata")
             validateCompatibility(metadata)
             requireRestorableFormat(metadata)
+            requireSameShop(json)
             require(json.getJSONObject("data").getJSONArray("app_users").length() > 0) {
                 "This encrypted backup contains no application users"
             }
@@ -507,6 +518,28 @@ class BackupManager(
         val format = metadata.getInt("format_version")
         require(format in MIN_RESTORE_FORMAT_VERSION..FORMAT_VERSION) {
             "This backup uses an unsupported backup format ($format)."
+        }
+    }
+
+    /**
+     * Sync Phase 8 (Account Bridge spec §8.6): a security-bearing backup
+     * carries the shop it was recorded under. If this device is enrolled for
+     * a different shop, restoring would silently merge two shops' ledgers —
+     * refuse and require explicit resolution instead.
+     */
+    private fun requireSameShop(json: JSONObject) {
+        val localShopId = com.saaf.milkshop.sync.SyncShopBindingStore.load(context)?.shopId ?: return
+        val backupShops = json.getJSONObject("data").optJSONArray("server_account_binding")
+            ?.let { array ->
+                (0 until array.length()).mapNotNull { index ->
+                    array.optJSONObject(index)?.optString("shop_id")?.takeIf { it.isNotEmpty() }
+                }
+            }?.toSet() ?: emptySet()
+        if (backupShops.isNotEmpty() && localShopId !in backupShops) {
+            throw BackupFailure(
+                reason = "This backup belongs to a different shop than this device is enrolled for",
+                recovery = "Unenroll this device, or restore a backup recorded under the enrolled shop",
+            )
         }
     }
 

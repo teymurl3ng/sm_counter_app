@@ -11,6 +11,7 @@ internal class BackupRestoreEngine(
     private val buildVerifiedBytes: suspend (MilkShopDatabase, Boolean, Int) -> ByteArray,
     private val capturePreferences: () -> JSONObject,
     private val restorePreferences: (JSONObject?) -> Unit,
+    private val afterRestore: suspend () -> Unit = {},
 ) {
     suspend fun restore(
         database: MilkShopDatabase,
@@ -176,6 +177,9 @@ internal class BackupRestoreEngine(
                 readAndVerify(buildVerifiedBytes(database, includeSecurity, if (includeSecurity) BackupManager.FORMAT_VERSION else BackupManager.LEGACY_FORMAT_VERSION))
                 Unit
             }
+            // Account Bridge spec §8: every restore deletes persisted remote
+            // tokens. Cleanup failure never masks a successful restore.
+            runCatching { afterRestore() }
         } catch (error: Throwable) {
             if (previousPreferences != null) {
                 runCatching { restorePreferences(previousPreferences) }

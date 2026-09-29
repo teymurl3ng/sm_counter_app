@@ -3,7 +3,6 @@ package com.saaf.milkshop.nativeui.common
 import android.provider.Settings
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -79,27 +78,6 @@ fun NativeLoadFailurePane(
             modifier = retryTestTag?.let { Modifier.testTag(it) } ?: Modifier,
         ) { Text("Try again") }
     }
-}
-
-/**
- * Short continuity cue for destinations inside a menu; never use for primary
- * navigation. Scales with the system animator duration scale and snaps when
- * the user removes animations.
- */
-@Composable
-fun <T> NativeSecondaryTransition(
-    targetState: T,
-    modifier: Modifier = Modifier,
-    content: @Composable (T) -> Unit,
-) {
-    val durationMillis = rememberSecondaryTransitionDurationMillis()
-    Crossfade(
-        targetState = targetState,
-        modifier = modifier,
-        animationSpec = tween(durationMillis = durationMillis),
-        label = "secondary_destination",
-        content = content,
-    )
 }
 
 /**

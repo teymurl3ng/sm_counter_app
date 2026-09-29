@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark-mode launch: the window background paints before the first Compose
+         frame, so match the dark theme's background instead of flashing ivory. -->
+    <style name="Theme.SaafMilk.Native">
+        <item name="android:windowBackground">#101713</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

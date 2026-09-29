@@ -48,6 +48,8 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.operations.NativeOperationsAttendanceStatus
 import com.saaf.milkshop.application.operations.NativeOperationsWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.pressScale
+import com.saaf.milkshop.nativeui.common.rememberPressSource
 import androidx.compose.ui.platform.LocalContext
 import com.saaf.milkshop.nativeui.common.hapticTap
 import com.saaf.milkshop.nativeui.common.hapticCommit
@@ -338,12 +340,15 @@ private fun TaskButton(
     onClick: () -> Unit,
 ) {
     val context = LocalContext.current
+    val press = rememberPressSource()
     OutlinedButton(
         onClick = { context.hapticTap(); onClick() },
         modifier = Modifier
+            .pressScale(press)
             .fillMaxWidth()
             .heightIn(min = 56.dp)
             .testTag(tag),
+        interactionSource = press,
     ) {
         Icon(icon, contentDescription = null)
         Spacer(Modifier.width(8.dp))

@@ -39,6 +39,8 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.operations.NativeDeliveryItem
 import com.saaf.milkshop.application.operations.NativeDeliveryReference
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.pressScale
+import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
@@ -351,12 +353,15 @@ private fun NewDeliveryCard(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             if (!expanded) {
+                val press2 = rememberPressSource()
                 Button(
                     onClick = { expanded = true },
                     modifier = Modifier
+                        .pressScale(press2)
                         .fillMaxWidth()
                         .heightIn(min = 48.dp)
                         .testTag(NativeUiTags.OpsDeliveryExpand),
+                    interactionSource = press2,
                 ) {
                     Text("＋ New delivery", fontWeight = FontWeight.SemiBold)
                 }
@@ -555,6 +560,7 @@ private fun LinkSaleCard(
                     .fillMaxWidth()
                     .testTag(NativeUiTags.opsDeliveryLinkInput(item.deliveryId)),
             )
+            val press1 = rememberPressSource()
             Button(
                 onClick = { hapticContext.hapticCommit(); onLinkSale(item.deliveryId, saleNumber) },
                 enabled = !busy && saleNumber.isNotBlank(),
@@ -563,9 +569,11 @@ private fun LinkSaleCard(
                     contentColor = SaafInk,
                 ),
                 modifier = Modifier
+                    .pressScale(press1)
                     .fillMaxWidth()
                     .heightIn(min = 56.dp)
                     .testTag(NativeUiTags.opsDeliveryLink(item.deliveryId)),
+                interactionSource = press1,
             ) {
                 Text(
                     if (linking) "Linking…" else "Link",
@@ -644,6 +652,7 @@ private fun DeliveryCard(
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
             )
+            val press = rememberPressSource()
             Button(
                 onClick = { hapticContext.hapticCommit(); onMarkDelivered(item.deliveryId) },
                 enabled = canMark,
@@ -652,9 +661,11 @@ private fun DeliveryCard(
                     contentColor = SaafInk,
                 ),
                 modifier = Modifier
+                    .pressScale(press)
                     .fillMaxWidth()
                     .heightIn(min = 56.dp)
                     .testTag(NativeUiTags.opsDeliveryMark(item.deliveryId)),
+                interactionSource = press,
             ) {
                 Text(
                     if (marking) "Marking…" else "Delivered",

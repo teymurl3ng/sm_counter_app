@@ -36,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.operations.NativeAttendanceLink
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.pressScale
+import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.common.hapticCommit
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
@@ -249,6 +251,7 @@ val hapticContext = LocalContext.current
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.testTag(NativeUiTags.OpsAttendanceNotMarked),
                 )
+                val press = rememberPressSource()
                 Button(
                     onClick = { hapticContext.hapticCommit(); onMarkPresent() },
                     enabled = postingOpen && !saving,
@@ -257,9 +260,11 @@ val hapticContext = LocalContext.current
                         contentColor = SaafInk,
                     ),
                     modifier = Modifier
+                        .pressScale(press)
                         .fillMaxWidth()
                         .heightIn(min = 56.dp)
                         .testTag(NativeUiTags.OpsAttendanceMarkPresent),
+                    interactionSource = press,
                 ) {
                     Icon(Icons.Outlined.EventAvailable, contentDescription = null)
                     Spacer(Modifier.width(8.dp))

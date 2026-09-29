@@ -69,6 +69,8 @@ import com.saaf.milkshop.application.vendorpayment.NativeVendorPaymentReceipt
 import com.saaf.milkshop.application.vendorpayment.NativeVendorPaymentRequest
 import com.saaf.milkshop.application.vendorpayment.NativeVendorPaymentVendor
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.pressScale
+import com.saaf.milkshop.nativeui.common.rememberPressSource
 import androidx.compose.ui.platform.LocalContext
 import com.saaf.milkshop.nativeui.common.hapticTap
 import com.saaf.milkshop.nativeui.common.hapticCommit
@@ -406,10 +408,12 @@ private fun VendorPaymentForm(
         }
 
         val hapticContext = LocalContext.current
+        val press = rememberPressSource()
         Button(
             onClick = { hapticContext.hapticCommit(); onSubmit() },
             enabled = validRequest,
             modifier = Modifier
+                .pressScale(press)
                 .fillMaxWidth()
                 .heightIn(min = 56.dp)
                 .testTag(NativeUiTags.VendorPaymentRecord),
@@ -417,6 +421,7 @@ private fun VendorPaymentForm(
             containerColor = SaafYellow,
             contentColor = SaafInk,
         ),
+            interactionSource = press,
         ) {
             Text(
                 if (state.saving) "Recording…" else "Save payment",

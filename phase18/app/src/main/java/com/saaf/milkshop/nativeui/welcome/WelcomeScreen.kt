@@ -59,6 +59,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.R
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.pressScale
+import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.theme.SaafGreen
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafIvory
@@ -124,9 +126,11 @@ fun WelcomeScreen(
                 }
             }
             Spacer(Modifier.weight(1f))
+            val press = rememberPressSource()
             Button(
                 onClick = onContinue,
                 modifier = Modifier
+                    .pressScale(press)
                     .fillMaxWidth()
                     .height(56.dp)
                     .testTag(NativeUiTags.WelcomeContinue),
@@ -135,6 +139,7 @@ fun WelcomeScreen(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MaterialTheme.colorScheme.onSecondary,
                 ),
+                interactionSource = press,
             ) {
                 Text(
                     text = stringResource(R.string.native_continue),

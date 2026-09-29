@@ -56,6 +56,8 @@ import com.saaf.milkshop.application.operations.NativeRecordSpoilageRequest
 import com.saaf.milkshop.application.operations.NativeSpoilageProduct
 import com.saaf.milkshop.application.operations.NativeSpoilageReason
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.pressScale
+import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
@@ -320,7 +322,9 @@ internal fun RecordSpoilageReadyContent(
                             modifier = Modifier.testTag(NativeUiTags.OpsRecordSpoilageError),
                         )
                     }
+                    val press = rememberPressSource()
                     Button(
+                        interactionSource = press,
                         onClick = {
                             val selected = product ?: return@Button
                             val qty = quantity ?: return@Button
@@ -340,6 +344,7 @@ internal fun RecordSpoilageReadyContent(
                             contentColor = SaafInk,
                         ),
                         modifier = Modifier
+                            .pressScale(press)
                             .fillMaxWidth()
                             .heightIn(min = 56.dp)
                             .testTag(NativeUiTags.OpsRecordSpoilageRecord),

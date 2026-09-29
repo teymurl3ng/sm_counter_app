@@ -37,6 +37,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.admin.NativeAdminWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.pressScale
+import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 
@@ -261,12 +263,15 @@ private fun WorkHomeBody(
                 .testTag(NativeUiTags.AdminWorkPrimaryActions),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            val press = rememberPressSource()
             OutlinedButton(
                 onClick = { onOpenDestination(NativeAdminWorkDestination.RecordExpense) },
                 modifier = Modifier
+                    .pressScale(press)
                     .weight(1f)
                     .heightIn(min = 72.dp)
                     .testTag(NativeUiTags.AdminWorkRecordExpense),
+                interactionSource = press,
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,

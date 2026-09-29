@@ -103,6 +103,8 @@ import com.saaf.milkshop.application.sale.NativeSaleProduct
 import com.saaf.milkshop.application.sale.NativeSaleReceipt
 import com.saaf.milkshop.application.sale.NativeSaleRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.pressScale
+import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
@@ -1593,10 +1595,12 @@ private fun ReviewDock(
                 )
             }
             Spacer(Modifier.height(9.dp))
+            val press2 = rememberPressSource()
             Button(
                 onClick = { context.hapticCommit(); onRecordSale() },
                 enabled = enabled,
                 modifier = Modifier
+                    .pressScale(press2)
                     .fillMaxWidth()
                     .heightIn(min = 56.dp)
                     .testTag(buttonTag),
@@ -1605,6 +1609,7 @@ private fun ReviewDock(
                     containerColor = SaafYellow,
                     contentColor = SaafInk,
                 ),
+                interactionSource = press2,
             ) {
                 Text(
                     text = if (saving) "Recording…" else stringResource(R.string.native_record_sale),
@@ -1713,6 +1718,7 @@ private fun SaleDeliveryFollowUpCard(
                     .fillMaxWidth()
                     .testTag(NativeUiTags.CashierSaleDeliveryRoute),
             )
+            val press1 = rememberPressSource()
             Button(
                 onClick = { context.hapticCommit(); onSend(route) },
                 enabled = !sending,
@@ -1721,9 +1727,11 @@ private fun SaleDeliveryFollowUpCard(
                     contentColor = SaafInk,
                 ),
                 modifier = Modifier
+                    .pressScale(press1)
                     .fillMaxWidth()
                     .heightIn(min = 56.dp)
                     .testTag(NativeUiTags.CashierSaleDeliverySend),
+                interactionSource = press1,
             ) {
                 Text(if (sending) "Recording…" else "Send as delivery", fontWeight = FontWeight.SemiBold)
             }
@@ -1818,6 +1826,7 @@ private fun SaleChequePane(
                 )
             }
         }
+        val press = rememberPressSource()
         Button(
             onClick = { context.hapticTap(); onStartNextSale() },
             colors = ButtonDefaults.buttonColors(
@@ -1825,9 +1834,11 @@ private fun SaleChequePane(
                 contentColor = SaafInk,
             ),
             modifier = Modifier
+                .pressScale(press)
                 .fillMaxWidth()
                 .heightIn(min = 56.dp)
                 .testTag(NativeUiTags.CashierSaleNext),
+            interactionSource = press,
         ) {
             Text(
                 "Start new sale",

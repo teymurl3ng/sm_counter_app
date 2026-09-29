@@ -69,6 +69,8 @@ import com.saaf.milkshop.application.expense.NativeExpensePaymentAccount
 import com.saaf.milkshop.application.expense.NativeExpenseReceipt
 import com.saaf.milkshop.application.expense.NativeExpenseRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.pressScale
+import com.saaf.milkshop.nativeui.common.rememberPressSource
 import androidx.compose.ui.platform.LocalContext
 import com.saaf.milkshop.nativeui.common.hapticTap
 import com.saaf.milkshop.nativeui.common.hapticCommit
@@ -406,10 +408,12 @@ private fun ExpenseForm(
         }
 
         val hapticContext = LocalContext.current
+        val press = rememberPressSource()
         Button(
             onClick = { hapticContext.hapticCommit(); onSubmit() },
             enabled = validRequest,
             modifier = Modifier
+                .pressScale(press)
                 .fillMaxWidth()
                 .heightIn(min = 56.dp)
                 .testTag(NativeUiTags.ExpenseRecord),
@@ -417,6 +421,7 @@ private fun ExpenseForm(
             containerColor = SaafYellow,
             contentColor = SaafInk,
         ),
+            interactionSource = press,
         ) {
             Text(
                 if (state.saving) "Recording…" else "Save expense",

@@ -58,6 +58,8 @@ import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.authentication.NativeAccountSummary
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.pressScale
+import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.theme.SaafGreen
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafIvory
@@ -728,7 +730,9 @@ private fun AccessPrimaryButton(
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
+    val press = rememberPressSource()
     Button(
+        interactionSource = press,
         onClick = onClick,
         enabled = enabled,
         shape = RoundedCornerShape(13.dp),
@@ -736,7 +740,7 @@ private fun AccessPrimaryButton(
             containerColor = MaterialTheme.colorScheme.secondary,
             contentColor = MaterialTheme.colorScheme.onSecondary,
         ),
-        modifier = Modifier.fillMaxWidth().height(54.dp).testTag(tag),
+        modifier = Modifier.pressScale(press).fillMaxWidth().height(54.dp).testTag(tag),
     ) {
         Text(label, style = MaterialTheme.typography.titleMedium)
     }

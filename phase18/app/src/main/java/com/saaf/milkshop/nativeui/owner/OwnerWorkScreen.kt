@@ -42,6 +42,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.owner.NativeOwnerWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.pressScale
+import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -323,12 +325,15 @@ private fun PrimaryAction(
     tag: String,
     onClick: () -> Unit,
 ) {
+    val press = rememberPressSource()
     OutlinedButton(
         onClick = onClick,
         modifier = Modifier
+            .pressScale(press)
             .fillMaxWidth()
             .heightIn(min = 72.dp)
             .testTag(tag),
+        interactionSource = press,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

@@ -83,6 +83,8 @@ import com.saaf.milkshop.application.collection.NativeCollectionPaymentAccount
 import com.saaf.milkshop.application.collection.NativeCollectionReceipt
 import com.saaf.milkshop.application.collection.NativeCollectionRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.pressScale
+import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
@@ -573,6 +575,7 @@ private fun CollectionForm(
             )
         }
 
+        val press = rememberPressSource()
         Button(
             onClick = onSubmit,
             enabled = validRequest,
@@ -581,9 +584,11 @@ private fun CollectionForm(
                 contentColor = if (advancePaisa > 0L) SaafInk else MaterialTheme.colorScheme.onPrimary,
             ),
             modifier = Modifier
+                .pressScale(press)
                 .fillMaxWidth()
                 .heightIn(min = 56.dp)
                 .testTag(NativeUiTags.CollectRecord),
+            interactionSource = press,
         ) {
             Text(
                 when {
@@ -845,10 +850,12 @@ private fun AdvanceConfirmationDialog(
             }
         },
         confirmButton = {
+            val press = rememberPressSource()
             Button(
+                interactionSource = press,
                 onClick = onConfirm,
                 enabled = !saving,
-                modifier = Modifier.testTag(NativeUiTags.CollectConfirmAdvance),
+                modifier = Modifier.pressScale(press).testTag(NativeUiTags.CollectConfirmAdvance),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SaafYellow,
                     contentColor = SaafInk,

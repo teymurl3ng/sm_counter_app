@@ -56,6 +56,8 @@ import com.saaf.milkshop.application.operations.NativeReceiveMilkReceipt
 import com.saaf.milkshop.application.operations.NativeReceiveMilkRequest
 import com.saaf.milkshop.application.operations.NativeReceiveMilkVendor
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.pressScale
+import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
@@ -301,7 +303,9 @@ internal fun ReceiveMilkReadyContent(
                             modifier = Modifier.testTag(NativeUiTags.OpsReceiveMilkError),
                         )
                     }
+                    val press = rememberPressSource()
                     Button(
+                        interactionSource = press,
                         onClick = {
                             val vendor = state.selectedVendor ?: return@Button
                             val raw = liters ?: return@Button
@@ -323,6 +327,7 @@ internal fun ReceiveMilkReadyContent(
                             contentColor = SaafInk,
                         ),
                         modifier = Modifier
+                            .pressScale(press)
                             .fillMaxWidth()
                             .heightIn(min = 56.dp)
                             .testTag(NativeUiTags.OpsReceiveMilkRecord),

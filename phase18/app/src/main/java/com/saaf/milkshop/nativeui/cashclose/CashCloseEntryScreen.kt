@@ -66,6 +66,8 @@ import com.saaf.milkshop.application.cashclose.NativeCashCloseFacade
 import com.saaf.milkshop.application.cashclose.NativeCashCloseReceipt
 import com.saaf.milkshop.application.cashclose.NativeCashCloseReopenSubmission
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.pressScale
+import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.common.hapticCommit
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
@@ -395,10 +397,12 @@ private fun CashCloseForm(
             modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseNotesInput),
         )
 
+        val press2 = rememberPressSource()
         Button(
             onClick = { hapticContext.hapticCommit(); onRecordCount() },
             enabled = canCount,
             modifier = Modifier
+                .pressScale(press2)
                 .fillMaxWidth()
                 .heightIn(min = 56.dp)
                 .testTag(NativeUiTags.CashCloseRecordCount),
@@ -406,6 +410,7 @@ private fun CashCloseForm(
             containerColor = SaafYellow,
             contentColor = SaafInk,
         ),
+            interactionSource = press2,
         ) {
             Text(
                 if (state.saving && state.context.postingOpen) "Saving count…" else "Record count",
@@ -428,6 +433,7 @@ private fun CashCloseForm(
                 )
             }
             if (state.context.postingOpen) {
+                val press1 = rememberPressSource()
                 Button(
                     onClick = { hapticContext.hapticCommit(); onCloseDay() },
                     enabled = canClose,
@@ -436,9 +442,11 @@ private fun CashCloseForm(
                         contentColor = SaafInk,
                     ),
                     modifier = Modifier
+                        .pressScale(press1)
                         .fillMaxWidth()
                         .heightIn(min = 56.dp)
                         .testTag(NativeUiTags.CashCloseCloseDay),
+                    interactionSource = press1,
                 ) {
                     Text(
                         if (state.saving) "Closing…" else "Close ${state.context.businessDate}",
@@ -520,10 +528,12 @@ val hapticContext = LocalContext.current
                     .semantics { contentDescription = "Current full passphrase for reopen" }
                     .testTag(NativeUiTags.CashCloseReopenPassphrase),
             )
+            val press = rememberPressSource()
             Button(
                 onClick = { hapticContext.hapticCommit(); onReopen() },
                 enabled = canReopen,
                 modifier = Modifier
+                    .pressScale(press)
                     .fillMaxWidth()
                     .heightIn(min = 56.dp)
                     .testTag(NativeUiTags.CashCloseReopenDay),
@@ -531,6 +541,7 @@ val hapticContext = LocalContext.current
                 containerColor = SaafYellow,
                 contentColor = SaafInk,
             ),
+                interactionSource = press,
             ) {
                 Text(
                     if (saving) "Reopening…" else "Confirm Reopen",

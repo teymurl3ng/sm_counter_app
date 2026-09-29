@@ -48,6 +48,8 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.operations.NativeMakeYogurtReceipt
 import com.saaf.milkshop.application.operations.NativeMakeYogurtRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.pressScale
+import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
@@ -288,7 +290,9 @@ internal fun MakeYogurtReadyContent(
                 } else {
                     "Record batch"
                 }
+                val press = rememberPressSource()
                 Button(
+                    interactionSource = press,
                     onClick = {
                         val milkValue = milk ?: return@Button
                         val yogurtValue = yogurt ?: return@Button
@@ -306,6 +310,7 @@ internal fun MakeYogurtReadyContent(
                         contentColor = SaafInk,
                     ),
                     modifier = Modifier
+                        .pressScale(press)
                         .fillMaxWidth()
                         .heightIn(min = 56.dp)
                         .testTag(NativeUiTags.OpsMakeYogurtRecord),

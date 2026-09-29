@@ -11,7 +11,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.scaleIn
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -149,14 +149,15 @@ fun Modifier.nativeRefreshOverlay(refreshing: Boolean): Modifier {
 }
 
 /**
- * The app's one transition language: a quiet fade-through. Outgoing content
- * fades out fast with no movement; incoming content fades in with a small
- * upward settle. Panes never overlap at partial alpha (no brightness dip /
- * flash) and the container never morphs size (no jumping). [contentKey] groups
- * states that should share a pane — e.g. Idle/Loading of the same screen — so
- * only real content changes animate, and each pane keeps rendering the state
- * it was composed with (no mid-fade re-branching). Respects the system
- * animator-duration-scale like NativeSecondaryTransition.
+ * The app's one transition language: Material 3 fade-through. Outgoing content
+ * fades out fast with no movement; incoming content fades in while settling
+ * from 92% to full scale — no directional slide (screen switches are between
+ * peers, and M3 reserves slides for hierarchy). Panes never overlap at partial
+ * alpha (no brightness dip / flash) and the container never morphs size.
+ * [contentKey] groups states that should share a pane — e.g. Idle/Loading of
+ * the same screen — so only real content changes animate, and each pane keeps
+ * rendering the state it was composed with (no mid-fade re-branching). Respects
+ * the system animator-duration-scale.
  */
 @Composable
 fun <T> NativeSectionTransition(
@@ -167,15 +168,15 @@ fun <T> NativeSectionTransition(
 ) {
     val scale = rememberSecondaryTransitionDurationMillis() / SECONDARY_TRANSITION_BASE_MILLIS.toFloat()
     val outMillis = (90 * scale).toInt().coerceIn(1, 500)
-    val inMillis = (180 * scale).toInt().coerceIn(1, 1000)
+    val inMillis = (220 * scale).toInt().coerceIn(1, 1100)
     AnimatedContent(
         targetState = targetState,
         transitionSpec = {
             (
                 fadeIn(tween(inMillis, delayMillis = outMillis)) +
-                    slideInVertically(
+                    scaleIn(
                         animationSpec = tween(inMillis, delayMillis = outMillis),
-                        initialOffsetY = { it / 16 },
+                        initialScale = 0.92f,
                     )
                 ) togetherWith fadeOut(tween(outMillis))
         },

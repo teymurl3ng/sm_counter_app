@@ -44,7 +44,8 @@ fun interface SyncHttp {
 class UrlConnectionSyncHttp(
     private val connectTimeoutMs: Int = 15_000,
     private val readTimeoutMs: Int = 30_000,
-    private val maxErrorBodyBytes: Int = 16 * 1024,
+    /** Safety valve for runaway responses; pull batches stay far below this. */
+    private val maxBodyBytes: Int = 5 * 1024 * 1024,
 ) : SyncHttp {
 
     override suspend fun execute(request: SyncHttpRequest): SyncHttpResponse =
@@ -69,14 +70,15 @@ class UrlConnectionSyncHttp(
                 val dateEpochMs = connection.getHeaderFieldDate("Date", -1L).takeIf { it > 0 }
                 val stream = if (status in 200..399) connection.inputStream else connection.errorStream
                 val body = stream?.use { input ->
-                    val buffer = ByteArray(maxErrorBodyBytes)
-                    var read = 0
-                    while (read < buffer.size) {
-                        val n = input.read(buffer, read, buffer.size - read)
+                    val buffer = java.io.ByteArrayOutputStream()
+                    val chunk = ByteArray(8 * 1024)
+                    while (true) {
+                        val n = input.read(chunk)
                         if (n < 0) break
-                        read += n
+                        buffer.write(chunk, 0, n)
+                        check(buffer.size() <= maxBodyBytes) { "Response body exceeds $maxBodyBytes bytes" }
                     }
-                    if (read == 0) null else buffer.copyOf(read)
+                    if (buffer.size() == 0) null else buffer.toByteArray()
                 }
                 SyncHttpResponse(status, body, dateEpochMs)
             } finally {

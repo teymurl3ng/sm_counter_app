@@ -60,7 +60,14 @@ class SyncRuntime(
 
         while (true) {
             val cursor = database.syncPullStateDao().find()?.lastServerSeq ?: 0L
-            val outcome = client.pull(cursor, maxRows = 100, shopId = binding.shopId)
+            var outcome = client.pull(cursor, maxRows = 100, shopId = binding.shopId)
+            // Pull shares the push path's one-refresh rule: an expired access
+            // token is replaced once, then the attempt retries.
+            if (outcome is SyncPullOutcome.RetryLater && outcome.reason == "unauthorized") {
+                if (refreshSession(config)) {
+                    outcome = client.pull(cursor, maxRows = 100, shopId = binding.shopId)
+                }
+            }
             when (outcome) {
                 is SyncPullOutcome.Fetched -> {
                     if (outcome.batch.records.isEmpty()) return SyncPullSummary.Done(applied, updated, skipped, conflicts)

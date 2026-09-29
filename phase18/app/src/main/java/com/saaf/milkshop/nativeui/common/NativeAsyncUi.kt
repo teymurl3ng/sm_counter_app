@@ -168,15 +168,18 @@ fun <T> NativeSectionTransition(
 ) {
     val scale = rememberSecondaryTransitionDurationMillis() / SECONDARY_TRANSITION_BASE_MILLIS.toFloat()
     val outMillis = (90 * scale).toInt().coerceIn(1, 500)
-    val inMillis = (220 * scale).toInt().coerceIn(1, 1100)
+    val inMillis = (200 * scale).toInt().coerceIn(1, 1000)
     AnimatedContent(
         targetState = targetState,
         transitionSpec = {
+            // Enter starts immediately: no blank gap between screens (the
+            // gap read as a reload), and since the exit is instant there is
+            // no second screen to ghost over.
             (
-                fadeIn(tween(inMillis, delayMillis = outMillis)) +
+                fadeIn(tween(inMillis)) +
                     scaleIn(
-                        animationSpec = tween(inMillis, delayMillis = outMillis),
-                        initialScale = 0.92f,
+                        animationSpec = tween(inMillis),
+                        initialScale = 0.96f,
                     )
                 ) togetherWith fadeOut(tween(1))
         },

@@ -183,6 +183,7 @@ fun CashierPreviewHost(
                 else -> onLeaveToWelcome()
             }
         }
+        val moreDestination = (moreState as? NativeMoreState.Ready)?.destination
         val navigateCashier: (CashierSection) -> Unit = { section ->
             when (section) {
                 CashierSection.Sell -> {
@@ -207,7 +208,13 @@ fun CashierPreviewHost(
                 }
                 CashierSection.More -> {
                     if (cashierSection == CashierSection.More) {
-                        onShowNotice("More is already open.")
+                        // Already in More: if inside a sub-destination, the tab
+                        // returns to the More menu (Android-style escape).
+                        if (moreDestination != null) {
+                            moreViewModel.backToMenu()
+                        } else {
+                            onShowNotice("More is already open.")
+                        }
                     } else {
                         moreViewModel.open(sessionHandle)
                         onCashierSectionChange(CashierSection.More)
@@ -221,7 +228,6 @@ fun CashierPreviewHost(
         // header, exactly like top-level navigation in polished apps.
         var activeGuard by remember { mutableStateOf<com.saaf.milkshop.nativeui.common.EntryLeaveGuard?>(null) }
         var pendingSectionNav by remember { mutableStateOf<CashierSection?>(null) }
-        val moreDestination = (moreState as? NativeMoreState.Ready)?.destination
         fun guardedSectionNavigate(section: CashierSection) {
             val guard = activeGuard
             if (guard?.dirty == true) pendingSectionNav = section else navigateCashier(section)

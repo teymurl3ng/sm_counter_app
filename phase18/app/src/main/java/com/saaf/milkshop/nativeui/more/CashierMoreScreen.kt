@@ -381,9 +381,6 @@ private fun MoreCountCashScreen(
                     .padding(horizontal = 16.dp, vertical = 18.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                TextButton(onClick = onBack, modifier = Modifier.testTag(NativeUiTags.MoreBack)) {
-                    Text("Back to More")
-                }
                 Text("Count cash", style = MaterialTheme.typography.headlineMedium)
                 Text(
                     "Enter what is in the ${state.context.cashAccountName} drawer. This count stays blind — no expected drawer total is shown.",
@@ -489,9 +486,6 @@ private fun MorePersonalSecurityScreen(
                     .padding(horizontal = 16.dp, vertical = 18.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                TextButton(onClick = onBack, modifier = Modifier.testTag(NativeUiTags.MoreBack)) {
-                    Text("Back to More")
-                }
                 Text("Personal security", style = MaterialTheme.typography.headlineMedium)
                 if (security == null) {
                     CircularProgressIndicator()

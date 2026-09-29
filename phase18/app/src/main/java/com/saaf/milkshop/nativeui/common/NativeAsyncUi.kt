@@ -178,7 +178,7 @@ fun <T> NativeSectionTransition(
                         animationSpec = tween(inMillis, delayMillis = outMillis),
                         initialScale = 0.92f,
                     )
-                ) togetherWith fadeOut(tween(outMillis))
+                ) togetherWith fadeOut(tween(1))
         },
         contentKey = contentKey,
         modifier = modifier,

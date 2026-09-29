@@ -90,6 +90,16 @@ fun OwnerSyncScreen(
             return credential.toCharArray()
         }
 
+        // Header sits flush at the screen top — outside the horizontally
+        // padded, scrolling content column (white bars otherwise).
+        CashierScreenHeader(
+            title = "Sync",
+            displayName = context.shopName,
+            roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+            businessDate = context.businessDate,
+            postingOpen = context.postingOpen,
+        )
+
         Column(
             Modifier
                 .fillMaxSize()
@@ -97,13 +107,6 @@ fun OwnerSyncScreen(
                 .testTag(NativeUiTags.OwnerSyncRoot)
                 .padding(horizontal = 16.dp),
         ) {
-            CashierScreenHeader(
-                title = "Sync",
-                displayName = context.shopName,
-                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                businessDate = context.businessDate,
-                postingOpen = context.postingOpen,
-            )
             Spacer(Modifier.height(12.dp))
             TextButton(
                 onClick = {

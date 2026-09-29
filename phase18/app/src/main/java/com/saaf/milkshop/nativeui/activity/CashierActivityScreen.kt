@@ -119,15 +119,8 @@ private fun ActivityScaffold(
     rootTag: String,
     content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit,
 ) {
-    AdaptiveNavigationScaffold(
-        snackbarHostState = snackbarHostState,
-        modifier = modifier.fillMaxSize().testTag(rootTag),
-        containerColor = MaterialTheme.colorScheme.background,
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        compactNavigation = { CashierNavigation(selected = CashierSection.Activity, onNavigate = onNavigate) },
-        expandedNavigation = { CashierNavigationRail(selected = CashierSection.Activity, onNavigate = onNavigate) },
-        content = content,
-    )
+    // Chrome (nav + green header) lives in CashierPreviewHost; this is a body.
+    Box(modifier.fillMaxSize().testTag(rootTag)) { content(androidx.compose.foundation.layout.PaddingValues(0.dp)) }
 }
 
 @Composable
@@ -140,8 +133,7 @@ private fun ActivityLoadingScreen(
         Box(
             Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .statusBarsPadding(),
+                .padding(padding),
             contentAlignment = Alignment.Center,
         ) {
             CircularProgressIndicator(Modifier.testTag(NativeUiTags.ActivityLoading))
@@ -161,7 +153,7 @@ private fun ActivityLoadFailureScreen(
         NativeLoadFailurePane(
             message = message,
             onRetry = onRetry,
-            modifier = Modifier.fillMaxSize().padding(padding).statusBarsPadding(),
+            modifier = Modifier.fillMaxSize().padding(padding),
             retryTestTag = NativeUiTags.ActivityRetryLoad,
         )
     }
@@ -184,13 +176,6 @@ private fun ActivityListScreen(
                 .fillMaxSize().nativeRefreshOverlay(state.refreshing)
                 .padding(padding),
         ) {
-            CashierScreenHeader(
-                title = "Today’s activity",
-                displayName = identity.displayName,
-                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                businessDate = state.day.context.businessDate,
-                postingOpen = state.day.context.postingOpen,
-            )
             Box(Modifier.fillMaxSize()) {
                 when {
                     state.loadingDetail -> {
@@ -269,13 +254,6 @@ private fun ActivityDetailScreen(
             if (refreshing) {
                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
             }
-            CashierScreenHeader(
-                title = "Today’s activity",
-                displayName = identity.displayName,
-                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                businessDate = context.businessDate,
-                postingOpen = context.postingOpen,
-            )
             Column(
                 Modifier
                     .fillMaxSize()

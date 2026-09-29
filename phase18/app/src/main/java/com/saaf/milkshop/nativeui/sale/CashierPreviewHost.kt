@@ -1,6 +1,14 @@
 package com.saaf.milkshop.nativeui.sale
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -12,6 +20,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import com.saaf.milkshop.application.activity.NativeActivityFacade
+import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
+import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.collection.NativeCollectionFacade
 import com.saaf.milkshop.application.preview.NativePreviewSampleData
@@ -206,10 +216,72 @@ fun CashierPreviewHost(
             }
         }
         val sectionStateHolder = rememberSaveableStateHolder()
+        // Chrome (nav bar + green header) lives here, OUTSIDE the pane
+        // transition: switching sections animates only the content below the
+        // header, exactly like top-level navigation in polished apps.
+        var activeGuard by remember { mutableStateOf<com.saaf.milkshop.nativeui.common.EntryLeaveGuard?>(null) }
+        var pendingSectionNav by remember { mutableStateOf<CashierSection?>(null) }
+        val moreDestination = (moreState as? NativeMoreState.Ready)?.destination
+        fun guardedSectionNavigate(section: CashierSection) {
+            val guard = activeGuard
+            if (guard?.dirty == true) pendingSectionNav = section else navigateCashier(section)
+        }
+        AdaptiveNavigationScaffold(
+            snackbarHostState = snackbarHostState,
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            compactNavigation = { CashierNavigation(cashierSection) { guardedSectionNavigate(it) } },
+            expandedNavigation = { CashierNavigationRail(cashierSection) { guardedSectionNavigate(it) } },
+        ) { hostPadding ->
+            Column(modifier = Modifier.fillMaxSize().padding(hostPadding)) {
+            CashierScreenHeader(
+                title = when {
+                    cashierSection == CashierSection.Sell -> "New sale"
+                    cashierSection == CashierSection.Collect -> "Collect payment"
+                    cashierSection == CashierSection.Activity -> "Today’s activity"
+                    moreDestination == NativeMoreDestination.Expense -> "Record expense"
+                    moreDestination == NativeMoreDestination.Deliveries -> "Active deliveries"
+                    else -> "More"
+                },
+                displayName = identity.displayName,
+                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                businessDate = when (cashierSection) {
+                    CashierSection.Sell ->
+                        (saleState as? NativeSaleState.Ready)?.context?.businessDate
+                    CashierSection.Collect ->
+                        (collectionState as? NativeCollectionState.Ready)?.context?.businessDate
+                    CashierSection.Activity ->
+                        (activityState as? NativeActivityState.Ready)?.day?.context?.businessDate
+                    CashierSection.More -> when (moreDestination) {
+                        NativeMoreDestination.Expense ->
+                            (expenseState as? NativeExpenseState.Ready)?.context?.businessDate
+                        NativeMoreDestination.Deliveries ->
+                            (deliveriesState as? NativeDeliveriesState.Ready)?.context?.businessDate
+                        else ->
+                            (moreState as? NativeMoreState.Ready)?.context?.businessDate
+                    }
+                } ?: java.time.LocalDate.now().toString(),
+                postingOpen = when (cashierSection) {
+                    CashierSection.Sell ->
+                        (saleState as? NativeSaleState.Ready)?.context?.postingOpen
+                    CashierSection.Collect ->
+                        (collectionState as? NativeCollectionState.Ready)?.context?.postingOpen
+                    CashierSection.Activity ->
+                        (activityState as? NativeActivityState.Ready)?.day?.context?.postingOpen
+                    CashierSection.More -> when (moreDestination) {
+                        NativeMoreDestination.Expense ->
+                            (expenseState as? NativeExpenseState.Ready)?.context?.postingOpen
+                        NativeMoreDestination.Deliveries ->
+                            (deliveriesState as? NativeDeliveriesState.Ready)?.context?.postingOpen
+                        else ->
+                            (moreState as? NativeMoreState.Ready)?.context?.postingOpen
+                    }
+                } ?: true,
+            )
         // Section swaps crossfade; the state key still restores per-section UI.
         NativeSectionTransition<Pair<CashierSection, NativeMoreDestination?>>(
-            targetState = cashierSection to (moreState as? NativeMoreState.Ready)?.destination,
+            targetState = cashierSection to moreDestination,
             contentKey = { it },
+            modifier = Modifier.weight(1f),
         ) { pane ->
             val (section, paneDestination) = pane
         sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}:$paneDestination") {
@@ -342,6 +414,29 @@ fun CashierPreviewHost(
             }
         }
         }
+        }
+            }
+        }
+        // Tab switch with a dirty draft: confirm at host level, exactly like
+        // the old per-screen nav guards.
+        val sectionGuard = activeGuard
+        if (pendingSectionNav != null && sectionGuard?.dirty == true) {
+            AlertDialog(
+                onDismissRequest = { pendingSectionNav = null },
+                title = { Text("Discard this entry?") },
+                text = { Text("What you entered on this screen will be cleared.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        val target = pendingSectionNav
+                        pendingSectionNav = null
+                        sectionGuard.clear()
+                        if (target != null) navigateCashier(target)
+                    }) { Text("Discard and leave") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { pendingSectionNav = null }) { Text("Keep editing") }
+                },
+            )
         }
     }
 }

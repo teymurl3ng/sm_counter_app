@@ -206,6 +206,7 @@ fun CashierDeliveriesEntryScreen(
                 draftActions = draftActions,
                 onArchive = onArchive,
                 contentPadding = padding,
+                showHeader = false,
             )
         }
     }
@@ -219,15 +220,8 @@ private fun MoreScaffold(
     rootTag: String,
     content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit,
 ) {
-    AdaptiveNavigationScaffold(
-        snackbarHostState = snackbarHostState,
-        modifier = modifier.fillMaxSize().testTag(rootTag),
-        containerColor = MaterialTheme.colorScheme.background,
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        compactNavigation = { CashierNavigation(selected = CashierSection.More, onNavigate = onNavigate) },
-        expandedNavigation = { CashierNavigationRail(selected = CashierSection.More, onNavigate = onNavigate) },
-        content = content,
-    )
+    // Chrome (nav + green header) lives in CashierPreviewHost; this is a body.
+    Box(modifier.fillMaxSize().testTag(rootTag)) { content(androidx.compose.foundation.layout.PaddingValues(0.dp)) }
 }
 
 @Composable
@@ -283,7 +277,6 @@ private fun MoreMenuScreen(
             state.error?.let {
                 Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
             }
-            MoreHeader(identity, state.context)
             Column(
                 Modifier
                     .fillMaxSize()
@@ -379,7 +372,6 @@ private fun MoreCountCashScreen(
                 .padding(padding)
                 .imePadding(),
         ) {
-            MoreHeader(identity, state.context)
             Column(
                 Modifier
                     .weight(1f)
@@ -488,7 +480,6 @@ private fun MorePersonalSecurityScreen(
                 .padding(padding)
                 .imePadding(),
         ) {
-            MoreHeader(identity, state.context)
             Column(
                 Modifier
                     .weight(1f)
@@ -565,16 +556,6 @@ private fun MorePersonalSecurityScreen(
     }
 }
 
-@Composable
-private fun MoreHeader(identity: NativeSignedInIdentity, context: NativeMoreContext) {
-    CashierScreenHeader(
-        title = "More",
-        displayName = identity.displayName,
-        roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-        businessDate = context.businessDate,
-        postingOpen = context.postingOpen,
-    )
-}
 
 @Composable
 private fun MoreMenuRow(

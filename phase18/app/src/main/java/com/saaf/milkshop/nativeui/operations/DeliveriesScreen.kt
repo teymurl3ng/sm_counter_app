@@ -155,6 +155,7 @@ internal fun DeliveriesReadyContent(
     onArchive: (Long) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
+    showHeader: Boolean = true,
 ) {
     Column(
         modifier
@@ -169,7 +170,7 @@ internal fun DeliveriesReadyContent(
                 hapticContext.hapticConfirm()
             }
         }
-        CashierScreenHeader(
+        if (showHeader) CashierScreenHeader(
             title = "Active deliveries",
             displayName = identity.displayName,
             roleLabel = formatCashierRoleLabel(identity.role.wireValue),

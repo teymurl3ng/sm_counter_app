@@ -95,6 +95,7 @@ fun CashierExpenseEntryScreen(
                     onBack = onBackToMore,
                     leaveGuard = leaveGuard,
                     contentPadding = padding,
+                    showHeader = false,
                 )
             }
         }

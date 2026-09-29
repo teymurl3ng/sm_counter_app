@@ -65,6 +65,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -140,43 +141,33 @@ fun CashierSaleScreen(
     onLeaveConfirmed: () -> Unit,
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    onRegisterGuard: (EntryLeaveGuard?) -> Unit = {},
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
     val canLeave = (state as? NativeSaleState.Ready)?.saving != true
     LaunchedEffect(state is NativeSaleState.Ready) {
         if (state !is NativeSaleState.Ready) leaveGuard.clear()
     }
+    DisposableEffect(leaveGuard) {
+        onRegisterGuard(leaveGuard)
+        onDispose { onRegisterGuard(null) }
+    }
     BackHandler {
         if (canLeave) leaveGuard.requestLeave(onLeaveConfirmed)
     }
-    val guardedNavigate: (CashierSection) -> Unit = { section ->
-        if (canLeave) leaveGuard.requestLeave { onNavigate(section) }
-    }
-    AdaptiveNavigationScaffold(
-        snackbarHostState = snackbarHostState,
-        modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        compactNavigation = { CashierNavigation(CashierSection.Sell, guardedNavigate) },
-        expandedNavigation = { CashierNavigationRail(CashierSection.Sell, guardedNavigate) },
-    ) { padding ->
+    Column(modifier = modifier.fillMaxSize().padding(contentPadding)) {
         NativeSectionTransition(
-        targetState = state,
-        contentKey = { it::class },
-    ) { state -> when (state) {
+            targetState = state,
+            contentKey = { it::class },
+            modifier = Modifier.fillMaxSize(),
+        ) { state -> when (state) {
             NativeSaleState.Idle,
             NativeSaleState.Loading,
-            -> SaleLoadingBody(
-                modifier = Modifier
-                    .padding(padding)
-                    .statusBarsPadding(),
-            )
+            -> SaleLoadingBody()
             is NativeSaleState.LoadFailure -> SaleLoadFailureBody(
                 message = state.message,
                 onRetry = onRetry,
-                modifier = Modifier
-                    .padding(padding)
-                    .statusBarsPadding(),
             )
             is NativeSaleState.Ready -> SaleEntryContent(
                 identity = identity,
@@ -186,7 +177,8 @@ fun CashierSaleScreen(
                 onSendAsDelivery = onSendAsDelivery,
                 onStartNextSale = onStartNextSale,
                 leaveGuard = leaveGuard,
-                contentPadding = padding,
+                contentPadding = PaddingValues(0.dp),
+                showHeader = false,
             )
         }
         }
@@ -239,6 +231,7 @@ internal fun SaleEntryContent(
     leaveGuard: EntryLeaveGuard,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
+    showHeader: Boolean = true,
 ) {
     val context = state.context
     var selectedProductId by rememberSaveable { mutableStateOf<Long?>(null) }
@@ -309,7 +302,7 @@ internal fun SaleEntryContent(
             .padding(contentPadding)
             .imePaddingExcludingNavBar(),
     ) {
-            CashierScreenHeader(
+            if (showHeader) CashierScreenHeader(
                 title = stringResource(R.string.native_new_sale),
                 displayName = identity.displayName,
                 roleLabel = formatCashierRoleLabel(identity.role.wireValue),

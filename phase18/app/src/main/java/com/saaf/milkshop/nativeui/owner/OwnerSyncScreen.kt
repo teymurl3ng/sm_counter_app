@@ -37,6 +37,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
+import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
@@ -95,6 +97,14 @@ fun OwnerSyncScreen(
                 .testTag(NativeUiTags.OwnerSyncRoot)
                 .padding(horizontal = 16.dp),
         ) {
+            CashierScreenHeader(
+                title = "Sync",
+                displayName = context.shopName,
+                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                businessDate = context.businessDate,
+                postingOpen = context.postingOpen,
+            )
+            Spacer(Modifier.height(12.dp))
             TextButton(
                 onClick = {
                     lastCredential?.fill(' ')

@@ -146,6 +146,7 @@ internal fun ExpenseEntryContent(
     leaveGuard: EntryLeaveGuard,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
+    showHeader: Boolean = true,
 ) {
     var categoryPickerOpen by rememberSaveable { mutableStateOf(false) }
     var paymentPickerOpen by rememberSaveable { mutableStateOf(false) }
@@ -215,7 +216,7 @@ internal fun ExpenseEntryContent(
             .padding(contentPadding)
             .imePadding(),
     ) {
-        CashierScreenHeader(
+        if (showHeader) CashierScreenHeader(
             title = "Record expense",
             displayName = identity.displayName,
             roleLabel = formatCashierRoleLabel(identity.role.wireValue),

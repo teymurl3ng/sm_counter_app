@@ -51,6 +51,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -118,42 +119,34 @@ fun CashierCollectionScreen(
     onLeaveConfirmed: () -> Unit,
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    onRegisterGuard: (EntryLeaveGuard?) -> Unit = {},
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
     val canLeave = (state as? NativeCollectionState.Ready)?.saving != true
     LaunchedEffect(state is NativeCollectionState.Ready) {
         if (state !is NativeCollectionState.Ready) leaveGuard.clear()
     }
+    DisposableEffect(leaveGuard) {
+        onRegisterGuard(leaveGuard)
+        onDispose { onRegisterGuard(null) }
+    }
     BackHandler {
         if (canLeave) leaveGuard.requestLeave(onLeaveConfirmed)
     }
-    CollectionScaffold(
-        snackbarHostState = snackbarHostState,
-        onNavigate = { section ->
-            if (canLeave) {
-                leaveGuard.requestLeave { onNavigate(section) }
-            }
-        },
-        modifier = modifier,
-    ) { padding ->
+    Column(modifier = modifier.fillMaxSize().padding(contentPadding)) {
         NativeSectionTransition(
-        targetState = state,
-        contentKey = { it::class },
-    ) { state -> when (state) {
+            targetState = state,
+            contentKey = { it::class },
+            modifier = Modifier.fillMaxSize(),
+        ) { state -> when (state) {
             NativeCollectionState.Idle,
             NativeCollectionState.Loading,
-            -> CollectionLoadingBody(
-                modifier = Modifier
-                    .padding(padding)
-                    .statusBarsPadding(),
-            )
+            -> CollectionLoadingBody()
 
             is NativeCollectionState.LoadFailure -> CollectionLoadFailureBody(
                 message = state.message,
                 onRetry = onRetry,
-                modifier = Modifier
-                    .padding(padding)
-                    .statusBarsPadding(),
             )
 
             is NativeCollectionState.Ready -> CollectionEntryContent(
@@ -164,7 +157,8 @@ fun CashierCollectionScreen(
                 onCollectAnother = onCollectAnother,
                 onViewRecord = onViewRecord,
                 leaveGuard = leaveGuard,
-                contentPadding = padding,
+                contentPadding = PaddingValues(0.dp),
+                showHeader = false,
             )
         }
         }
@@ -255,6 +249,7 @@ internal fun CollectionEntryContent(
     leaveGuard: EntryLeaveGuard,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
+    showHeader: Boolean = true,
 ) {
     var customerPickerOpen by rememberSaveable { mutableStateOf(false) }
     var paymentPickerOpen by rememberSaveable { mutableStateOf(false) }

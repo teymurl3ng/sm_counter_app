@@ -255,6 +255,9 @@ abstract class MilkShopDatabase : RoomDatabase() {
             // SQLite foreign-key enforcement is a connection setting. Reassert
             // it whenever a database connection is opened.
             connection.execSQL("PRAGMA foreign_keys = ON")
+            // Sync capture triggers never recurse by design; make that
+            // impossible, not just discouraged, on every SQLite build.
+            connection.execSQL("PRAGMA recursive_triggers = OFF")
         }
     }
 }

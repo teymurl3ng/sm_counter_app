@@ -171,10 +171,6 @@ internal object SyncMigrationSql {
         append("    DELETE FROM sync_outbox WHERE table_name = '${captured.table}' AND row_uid = NEW.${captured.uidColumn};\n")
         append("    INSERT INTO sync_outbox(table_name, row_uid, enqueued_at)\n")
         append("        VALUES ('${captured.table}', NEW.${captured.uidColumn}, $NOW);\n")
-        if (captured.stampsUpdated) {
-            append("    UPDATE ${captured.table} SET sync_updated_at = $NOW\n")
-            append("        WHERE ${captured.pkColumn} = NEW.${captured.pkColumn};\n")
-        }
         append("END")
     }
 

@@ -213,7 +213,7 @@ fun ManagerPreviewHost(
             contentKey = { it },
         ) { pane ->
             val (section, paneDestination) = pane
-        sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}") {
+        sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}:$paneDestination") {
         when {
             section == ManagerSection.Work &&
                 workDestination == NativeManagerWorkDestination.RecordSale -> {

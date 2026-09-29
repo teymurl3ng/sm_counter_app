@@ -1,0 +1,231 @@
+package com.saaf.milkshop.nativeui.owner
+
+import com.saaf.milkshop.application.owner.NativeOwnerSyncFacade
+import com.saaf.milkshop.sync.NativeSyncShopChoice
+import com.saaf.milkshop.sync.SyncRuntime
+import com.saaf.milkshop.sync.SyncEnrollment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+/**
+ * Owns the owner-facing sync screen: enrollment, status, shop choice, and
+ * unenrollment. All state lives in [OwnerSyncState] on the shared runtime;
+ * credentials are held only in locally-scoped CharArrays and never in state.
+ */
+internal class OwnerSyncController(
+    private val facade: NativeOwnerSyncFacade,
+    private val runtime: OwnerMoreRuntime,
+) {
+
+    fun openSync() {
+        val token = runtime.captureSession() ?: return
+        val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
+        runtime.state.value = current.copy(
+            destination = NativeOwnerMoreDestination.Sync,
+            syncState = OwnerSyncState(),
+        )
+        loadStatus(token)
+    }
+
+    fun refreshSync() {
+        val token = runtime.captureSession() ?: return
+        val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Sync) return
+        runtime.updateReady { it.copy(syncState = it.syncState.copy(busy = true, error = null, notice = null)) }
+        loadStatus(token)
+    }
+
+    fun enroll(username: String, credential: CharArray, environment: String) {
+        val token = runtime.captureSession() ?: return
+        val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Sync) return
+        runtime.updateReady { it.copy(syncState = it.syncState.copy(busy = true, error = null, notice = null)) }
+        runtime.scope.launch {
+            try {
+                val outcome = withContext(Dispatchers.IO) {
+                    facade.enroll(username, credential, shopId = null, environment = environment)
+                }
+                if (!runtime.isCurrent(token)) return@launch
+                when (outcome) {
+                    is SyncEnrollment.Outcome.Enrolled -> {
+                        runtime.updateReady {
+                            it.copy(
+                                syncState = it.syncState.copy(
+                                    busy = false,
+                                    notice = "Enrolled as ${outcome.binding.role} for " +
+                                        "'${outcome.binding.shopName ?: outcome.binding.shopId}'.",
+                                    shopChoices = emptyList(),
+                                ),
+                            )
+                        }
+                        loadStatus(token)
+                    }
+                    is SyncEnrollment.Outcome.ShopsAvailable ->
+                        runtime.updateReady {
+                            it.copy(
+                                syncState = it.syncState.copy(
+                                    busy = false,
+                                    shopChoices = outcome.shops.map { shop ->
+                                        NativeSyncShopChoice(shop.shopId, shop.shopName)
+                                    },
+                                ),
+                            )
+                        }
+                    is SyncEnrollment.Outcome.Failed ->
+                        runtime.updateReady {
+                            it.copy(syncState = it.syncState.copy(busy = false, error = describeFailure(outcome)))
+                        }
+                }
+            } catch (error: Throwable) {
+                if (runtime.isCurrent(token)) {
+                    runtime.updateReady {
+                        it.copy(syncState = it.syncState.copy(busy = false, error = error.message ?: "Enrollment failed"))
+                    }
+                }
+            }
+        }
+    }
+
+    fun enrollInShop(shopId: String, username: String, credential: CharArray, environment: String) {
+        val token = runtime.captureSession() ?: return
+        val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Sync) return
+        runtime.updateReady { it.copy(syncState = it.syncState.copy(busy = true, error = null, notice = null)) }
+        runtime.scope.launch {
+            try {
+                val outcome = withContext(Dispatchers.IO) {
+                    facade.enroll(username, credential, shopId = shopId, environment = environment)
+                }
+                if (!runtime.isCurrent(token)) return@launch
+                when (outcome) {
+                    is SyncEnrollment.Outcome.Enrolled -> {
+                        runtime.updateReady {
+                            it.copy(
+                                syncState = it.syncState.copy(
+                                    busy = false,
+                                    notice = "Enrolled as ${outcome.binding.role} for " +
+                                        "'${outcome.binding.shopName ?: outcome.binding.shopId}'.",
+                                    shopChoices = emptyList(),
+                                ),
+                            )
+                        }
+                        loadStatus(token)
+                    }
+                    // Single-shop path already handled elsewhere; a second
+                    // ambiguous answer here keeps the choices on screen.
+                    is SyncEnrollment.Outcome.ShopsAvailable ->
+                        runtime.updateReady { it.copy(syncState = it.syncState.copy(busy = false)) }
+                    is SyncEnrollment.Outcome.Failed ->
+                        runtime.updateReady {
+                            it.copy(syncState = it.syncState.copy(busy = false, error = describeFailure(outcome)))
+                        }
+                }
+            } catch (error: Throwable) {
+                if (runtime.isCurrent(token)) {
+                    runtime.updateReady {
+                        it.copy(syncState = it.syncState.copy(busy = false, error = error.message ?: "Enrollment failed"))
+                    }
+                }
+            }
+        }
+    }
+
+    fun syncNow() {
+        val token = runtime.captureSession() ?: return
+        val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Sync) return
+        runtime.updateReady { it.copy(syncState = it.syncState.copy(busy = true, error = null, notice = null)) }
+        runtime.scope.launch {
+            try {
+                val pull = withContext(Dispatchers.IO) { facade.pull() }
+                val push = withContext(Dispatchers.IO) { facade.push() }
+                val pullSummary = when (pull) {
+                    is SyncRuntime.SyncPullSummary.Done ->
+                        "applied=${pull.applied} updated=${pull.updated} skipped=${pull.skipped} conflicts=${pull.conflicts}"
+                    is SyncRuntime.SyncPullSummary.RetryLater -> "will retry (${pull.reason})"
+                    SyncRuntime.SyncPullSummary.NotEnrolled -> "not enrolled"
+                }
+                if (!runtime.isCurrent(token)) return@launch
+                runtime.updateReady {
+                    it.copy(
+                        syncState = it.syncState.copy(
+                            busy = false,
+                            notice = "Pull: $pullSummary · Push: ${push.javaClass.simpleName}",
+                        ),
+                    )
+                }
+                loadStatus(token)
+            } catch (error: Throwable) {
+                if (runtime.isCurrent(token)) {
+                    runtime.updateReady {
+                        it.copy(syncState = it.syncState.copy(busy = false, error = error.message ?: "Sync failed"))
+                    }
+                }
+            }
+        }
+    }
+
+    fun unenroll() {
+        val token = runtime.captureSession() ?: return
+        val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Sync) return
+        runtime.updateReady { it.copy(syncState = it.syncState.copy(busy = true, error = null, notice = null)) }
+        runtime.scope.launch {
+            try {
+                withContext(Dispatchers.IO) { facade.unenroll() }
+                if (!runtime.isCurrent(token)) return@launch
+                runtime.updateReady {
+                    it.copy(syncState = it.syncState.copy(busy = false, notice = "Stopped syncing this phone."))
+                }
+                loadStatus(token)
+            } catch (error: Throwable) {
+                if (runtime.isCurrent(token)) {
+                    runtime.updateReady {
+                        it.copy(syncState = it.syncState.copy(busy = false, error = error.message ?: "Failed"))
+                    }
+                }
+            }
+        }
+    }
+
+    fun leave() {
+        val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
+        runtime.state.value = current.copy(
+            destination = NativeOwnerMoreDestination.Menu,
+            syncState = OwnerSyncState(),
+        )
+    }
+
+    private fun loadStatus(token: OwnerSessionToken) {
+        runtime.scope.launch {
+            try {
+                val status = withContext(Dispatchers.IO) { facade.status() }
+                if (!runtime.isCurrent(token)) return@launch
+                val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
+                if (latest.destination != NativeOwnerMoreDestination.Sync) return@launch
+                runtime.state.value = latest.copy(
+                    syncState = latest.syncState.copy(
+                        status = status,
+                        busy = false,
+                        error = null,
+                    ),
+                    loadedDestinations = latest.loadedDestinations + NativeOwnerMoreDestination.Sync,
+                )
+            } catch (error: Throwable) {
+                if (!runtime.isCurrent(token)) return@launch
+                runtime.updateReady {
+                    it.copy(syncState = it.syncState.copy(busy = false, error = error.message ?: "Failed to load"))
+                }
+            }
+        }
+    }
+
+    private fun describeFailure(outcome: SyncEnrollment.Outcome.Failed): String = when (outcome.reason) {
+        "invalid_credentials" -> "The server login or credential is not correct."
+        "disabled" -> "This account is disabled on the server."
+        "not_authorized" -> "This account has no staff profile on the server."
+        "no_shops" -> "This account is not assigned to any shop."
+        else -> "Could not reach the server (${outcome.reason}). Try again."
+    }
+}

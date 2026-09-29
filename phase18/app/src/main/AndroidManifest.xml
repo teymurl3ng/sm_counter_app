@@ -14,6 +14,18 @@
         android:fullBackupContent="@xml/backup_rules"
         android:label="Saaf Milk"
         android:supportsRtl="true">
+        <!-- 14.8.6 cutover: the native app is the product. HybridActivity is
+             retained dormant until its removal phase. -->
+        <activity-alias
+            android:name=".Main"
+            android:exported="true"
+            android:targetActivity=".nativeui.NativePreviewActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
         <activity
             android:name=".nativeui.NativePreviewActivity"
             android:exported="false"
@@ -30,13 +42,8 @@
         <activity
             android:name=".hybrid.HybridActivity"
             android:configChanges="keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
-            android:exported="true"
+            android:exported="false"
             android:theme="@style/Theme.SaafMilk.Hybrid"
-            android:windowSoftInputMode="adjustResize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:windowSoftInputMode="adjustResize" />
     </application>
 </manifest>

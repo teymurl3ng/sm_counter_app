@@ -27,6 +27,8 @@ import com.saaf.milkshop.application.owner.NativeOwnerUserRow
 import com.saaf.milkshop.application.owner.NativeOwnerYieldBatchRow
 import com.saaf.milkshop.application.owner.NativeOwnerYieldPolicyRow
 import com.saaf.milkshop.domain.AppRole
+import com.saaf.milkshop.sync.NativeSyncShopChoice
+import com.saaf.milkshop.sync.NativeSyncStatus
 
 enum class NativeOwnerMoreDestination {
     Menu,
@@ -40,6 +42,7 @@ enum class NativeOwnerMoreDestination {
     UsersRoles,
     SecurityHistory,
     Backup,
+    Sync,
 }
 
 enum class NativeOwnerCostingSection {
@@ -200,6 +203,14 @@ data class OwnerBackupState(
     val backupCloudOpen: Boolean = false,
 )
 
+data class OwnerSyncState(
+    val status: NativeSyncStatus? = null,
+    val shopChoices: List<NativeSyncShopChoice> = emptyList(),
+    val busy: Boolean = false,
+    val error: String? = null,
+    val notice: String? = null,
+)
+
 sealed interface NativeOwnerMoreState {
     data object Idle : NativeOwnerMoreState
     data object Loading : NativeOwnerMoreState
@@ -218,6 +229,7 @@ sealed interface NativeOwnerMoreState {
         val usersRolesState: OwnerUsersRolesState = OwnerUsersRolesState(),
         val securityHistoryState: OwnerSecurityHistoryState = OwnerSecurityHistoryState(),
         val backupState: OwnerBackupState = OwnerBackupState(),
+        val syncState: OwnerSyncState = OwnerSyncState(),
         val refreshing: Boolean = false,
         val error: String? = null,
     ) : NativeOwnerMoreState {
@@ -712,6 +724,7 @@ internal fun NativeOwnerMoreState.Ready.copy(
     backupReauthBusy: Boolean = this.backupReauthBusy,
     backupDisconnectConfirmOpen: Boolean = this.backupDisconnectConfirmOpen,
     backupCloudOpen: Boolean = this.backupCloudOpen,
+    syncState: OwnerSyncState = this.syncState,
     saving: Boolean = this.saving,
     confirmRemoveUnlock: Boolean = this.confirmRemoveUnlock,
     error: String? = this.personalSecurity.error,
@@ -862,4 +875,5 @@ internal fun NativeOwnerMoreState.Ready.copy(
             backupDisconnectConfirmOpen = backupDisconnectConfirmOpen,
             backupCloudOpen = backupCloudOpen,
         ),
+        syncState = syncState,
     )

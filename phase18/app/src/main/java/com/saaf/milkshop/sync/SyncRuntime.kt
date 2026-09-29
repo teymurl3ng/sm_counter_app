@@ -24,6 +24,21 @@ class SyncRuntime(
             SyncShopBindingStore.load(context) != null &&
             tokenStore.load() != null
 
+    /** Snapshot for the owner-facing sync screen; null while unenrolled. */
+    suspend fun status(): NativeSyncStatus? {
+        val config = SyncServerConfigStore.load(context) ?: return null
+        val binding = SyncShopBindingStore.load(context) ?: return null
+        return NativeSyncStatus(
+            environment = config.environment,
+            shopName = binding.shopName,
+            role = binding.role,
+            sessionPresent = tokenStore.load() != null,
+            trustedTimeAnchored = TrustedTime.isAnchored(),
+            outboxCount = database.syncOutboxDao().count(),
+            pullCursor = database.syncPullStateDao().find()?.lastServerSeq ?: 0L,
+        )
+    }
+
     suspend fun drainOnce(): SyncPushEngine.DrainOutcome {
         val config = SyncServerConfigStore.load(context) ?: return SyncPushEngine.DrainOutcome.NotConfigured
         val binding = SyncShopBindingStore.load(context) ?: return SyncPushEngine.DrainOutcome.NotConfigured

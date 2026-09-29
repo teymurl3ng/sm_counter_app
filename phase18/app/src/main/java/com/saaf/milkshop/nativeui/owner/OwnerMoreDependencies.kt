@@ -7,6 +7,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerEmployeesFacade
 import com.saaf.milkshop.application.owner.NativeOwnerMoreFacade
 import com.saaf.milkshop.application.owner.NativeOwnerProductsFacade
 import com.saaf.milkshop.application.owner.NativeOwnerSecurityHistoryFacade
+import com.saaf.milkshop.application.owner.NativeOwnerSyncFacade
 import com.saaf.milkshop.application.owner.NativeOwnerShopSettingsFacade
 import com.saaf.milkshop.application.owner.NativeOwnerSuppliersFacade
 import com.saaf.milkshop.application.owner.NativeOwnerUsersRolesFacade
@@ -23,4 +24,5 @@ internal data class OwnerMoreDependencies(
     val usersRoles: NativeOwnerUsersRolesFacade,
     val securityHistory: NativeOwnerSecurityHistoryFacade,
     val backup: NativeOwnerBackupFacade,
+    val sync: NativeOwnerSyncFacade,
 )

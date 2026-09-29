@@ -2,6 +2,7 @@ package com.saaf.milkshop
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.sync.BusinessClock
 import com.saaf.milkshop.sync.SyncEnrollment
 import com.saaf.milkshop.sync.SyncHttp

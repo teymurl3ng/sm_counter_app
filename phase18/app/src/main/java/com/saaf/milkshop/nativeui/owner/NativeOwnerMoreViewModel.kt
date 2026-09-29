@@ -10,6 +10,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerEmployeesFacade
 import com.saaf.milkshop.application.owner.NativeOwnerMoreFacade
 import com.saaf.milkshop.application.owner.NativeOwnerProductsFacade
 import com.saaf.milkshop.application.owner.NativeOwnerSecurityHistoryFacade
+import com.saaf.milkshop.application.owner.NativeOwnerSyncFacade
 import com.saaf.milkshop.application.owner.NativeOwnerShopSettingsFacade
 import com.saaf.milkshop.application.owner.NativeOwnerSuppliersFacade
 import com.saaf.milkshop.application.owner.NativeOwnerUsersRolesFacade
@@ -68,6 +69,7 @@ class NativeOwnerMoreViewModel internal constructor(
     private val securityHistoryController =
         OwnerSecurityHistoryController(dependencies.securityHistory, runtime)
     private val backupController = OwnerBackupController(dependencies.backup, runtime)
+    private val syncController = OwnerSyncController(dependencies.sync, runtime)
     val state: StateFlow<NativeOwnerMoreState> = _state.asStateFlow()
 
     init {
@@ -100,6 +102,7 @@ class NativeOwnerMoreViewModel internal constructor(
         shopSettingsController.resetPending()
         usersRolesController.resetPending()
         backupController.leave()
+        syncController.leave()
         _state.value = NativeOwnerMoreState.Idle
     }
 
@@ -386,6 +389,20 @@ class NativeOwnerMoreViewModel internal constructor(
 
     fun openBackup() = backupController.openBackup()
 
+    fun openSync() = syncController.openSync()
+
+    fun refreshSync() = syncController.refreshSync()
+
+    fun enrollSync(username: String, credential: CharArray, environment: String) =
+        syncController.enroll(username, credential, environment)
+
+    fun enrollSyncInShop(shopId: String, username: String, credential: CharArray, environment: String) =
+        syncController.enrollInShop(shopId, username, credential, environment)
+
+    fun syncNow() = syncController.syncNow()
+
+    fun unenrollSync() = syncController.unenroll()
+
     fun refreshBackup() = backupController.refreshBackup()
 
     fun openBackupExport() = backupController.openBackupExport()
@@ -502,6 +519,7 @@ class NativeOwnerMoreViewModel internal constructor(
         private val usersRolesFacade: NativeOwnerUsersRolesFacade,
         private val securityHistoryFacade: NativeOwnerSecurityHistoryFacade,
         private val backupFacade: NativeOwnerBackupFacade,
+        private val syncFacade: NativeOwnerSyncFacade,
         private val onSessionExpired: () -> Unit,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
@@ -519,6 +537,7 @@ class NativeOwnerMoreViewModel internal constructor(
                     usersRoles = usersRolesFacade,
                     securityHistory = securityHistoryFacade,
                     backup = backupFacade,
+                    sync = syncFacade,
                 ),
                 onSessionExpired = onSessionExpired,
             ) as T

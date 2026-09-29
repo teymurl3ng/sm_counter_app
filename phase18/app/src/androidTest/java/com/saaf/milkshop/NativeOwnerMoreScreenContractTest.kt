@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.more.NativeMoreSecurityStatus
@@ -21,6 +22,9 @@ import com.saaf.milkshop.nativeui.owner.NativeOwnerMoreState
 import com.saaf.milkshop.nativeui.owner.OwnerMoreScreen
 import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.theme.SaafTheme
+import com.saaf.milkshop.nativeui.owner.OwnerSyncState
+import com.saaf.milkshop.sync.NativeSyncStatus
+import com.saaf.milkshop.sync.NativeSyncShopChoice
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -264,6 +268,12 @@ class NativeOwnerMoreScreenContractTest {
         onOpenUsersRoles: () -> Unit = {},
         onOpenSecurityHistory: () -> Unit = {},
         onOpenBackup: () -> Unit = {},
+        onOpenSync: () -> Unit = {},
+        onRefreshSync: () -> Unit = {},
+        onEnrollSync: (String, CharArray, String) -> Unit = { _, _, _ -> },
+        onEnrollSyncInShop: (String, String, CharArray, String) -> Unit = { _, _, _, _ -> },
+        onSyncNow: () -> Unit = {},
+        onUnenrollSync: () -> Unit = {},
         onBackToMenu: () -> Unit = {},
         onSwitchAccount: () -> Unit = {},
         onSignOut: () -> Unit = {},
@@ -292,6 +302,12 @@ class NativeOwnerMoreScreenContractTest {
                     onOpenUsersRoles = onOpenUsersRoles,
                     onOpenSecurityHistory = onOpenSecurityHistory,
                     onOpenBackup = onOpenBackup,
+                    onOpenSync = onOpenSync,
+                    onRefreshSync = onRefreshSync,
+                    onEnrollSync = onEnrollSync,
+                    onEnrollSyncInShop = onEnrollSyncInShop,
+                    onSyncNow = onSyncNow,
+                    onUnenrollSync = onUnenrollSync,
                     onBackToMenu = onBackToMenu,
                     onRetryProducts = {},
                     onOpenProduct = {},
@@ -403,4 +419,232 @@ class NativeOwnerMoreScreenContractTest {
         postingOpen = true,
         shopName = "Saaf Milk",
     )
+
+    // ---- Sync screen (14.8.6 cutover) ----
+
+    @Test
+    fun syncRowOpensFromMenu() {
+        var opened = false
+        setScreen(
+            NativeOwnerMoreState.Ready(context = openContext()),
+            onOpenSync = { opened = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreSync)
+            .performScrollTo()
+            .performClick()
+        assertTrue(opened)
+    }
+
+    @Test
+    fun syncScreenShowsStatusOrEnroll() {
+        setScreen(
+            NativeOwnerMoreState.Ready(
+                context = openContext(),
+                destination = NativeOwnerMoreDestination.Sync,
+            ),
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncRoot).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncEnroll)
+            .performScrollTo()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun enrolledShowsServerShopSession() {
+        setScreen(
+            NativeOwnerMoreState.Ready(
+                context = openContext(),
+                destination = NativeOwnerMoreDestination.Sync,
+                syncState = OwnerSyncState(status = syncStatus()),
+            ),
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncStatus)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithText("Shop 1").assertIsDisplayed()
+    }
+
+    @Test
+    fun loadingShowsWhileStatusLoads() {
+        setScreen(
+            NativeOwnerMoreState.Ready(
+                context = openContext(),
+                destination = NativeOwnerMoreDestination.Sync,
+                syncState = OwnerSyncState(busy = true),
+            ),
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncLoading).assertIsDisplayed()
+    }
+
+    @Test
+    fun syncNowPullsAndPushes() {
+        var pressed = false
+        setScreen(
+            NativeOwnerMoreState.Ready(
+                context = openContext(),
+                destination = NativeOwnerMoreDestination.Sync,
+                syncState = OwnerSyncState(status = syncStatus()),
+            ),
+            onSyncNow = { pressed = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncNow)
+            .performScrollTo()
+            .performClick()
+        assertTrue(pressed)
+    }
+
+    @Test
+    fun refreshReloadsStatus() {
+        var refreshed = false
+        setScreen(
+            NativeOwnerMoreState.Ready(
+                context = openContext(),
+                destination = NativeOwnerMoreDestination.Sync,
+                syncState = OwnerSyncState(status = syncStatus()),
+            ),
+            onRefreshSync = { refreshed = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncRefresh)
+            .performScrollTo()
+            .performClick()
+        assertTrue(refreshed)
+    }
+
+    @Test
+    fun unenrollOpensConfirm() {
+        setScreen(
+            NativeOwnerMoreState.Ready(
+                context = openContext(),
+                destination = NativeOwnerMoreDestination.Sync,
+                syncState = OwnerSyncState(status = syncStatus()),
+            ),
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncUnenroll)
+            .performScrollTo()
+            .performClick()
+        composeRule.onNodeWithText("Stop syncing this phone?").assertIsDisplayed()
+    }
+
+    @Test
+    fun confirmStopsSyncing() {
+        var stopped = false
+        setScreen(
+            NativeOwnerMoreState.Ready(
+                context = openContext(),
+                destination = NativeOwnerMoreDestination.Sync,
+                syncState = OwnerSyncState(status = syncStatus()),
+            ),
+            onUnenrollSync = { stopped = true },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncUnenroll)
+            .performScrollTo()
+            .performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncUnenrollConfirm).performClick()
+        assertTrue(stopped)
+    }
+
+    @Test
+    fun enrollConnectsPhone() {
+        var enrolled: String? = null
+        setScreen(
+            NativeOwnerMoreState.Ready(
+                context = openContext(),
+                destination = NativeOwnerMoreDestination.Sync,
+            ),
+            onEnrollSync = { username, _, _ -> enrolled = username },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncUsername)
+            .performScrollTo()
+            .performTextInput("teimur")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncCredential)
+            .performScrollTo()
+            .performTextInput("224511180177980")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncEnroll)
+            .performScrollTo()
+            .performClick()
+        assertEquals("teimur", enrolled)
+    }
+
+    @Test
+    fun shopChoicesListedWhenAmbiguous() {
+        setScreen(
+            NativeOwnerMoreState.Ready(
+                context = openContext(),
+                destination = NativeOwnerMoreDestination.Sync,
+                syncState = OwnerSyncState(
+                    shopChoices = listOf(
+                        NativeSyncShopChoice("shop-a", "Shop A"),
+                        NativeSyncShopChoice("shop-b", "Shop B"),
+                    ),
+                ),
+            ),
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncShopPicker)
+            .performScrollTo()
+            .assertIsDisplayed()
+        composeRule.onNodeWithText("Shop A").assertIsDisplayed()
+        composeRule.onNodeWithText("Shop B").assertIsDisplayed()
+    }
+
+    @Test
+    fun shopPickCompletesEnrollment() {
+        var picked: String? = null
+        setScreen(
+            NativeOwnerMoreState.Ready(
+                context = openContext(),
+                destination = NativeOwnerMoreDestination.Sync,
+                syncState = OwnerSyncState(
+                    shopChoices = listOf(NativeSyncShopChoice("shop-a", "Shop A")),
+                ),
+            ),
+            onEnrollSyncInShop = { shopId, _, _, _ -> picked = shopId },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncShopPick)
+            .performScrollTo()
+            .performClick()
+        assertEquals("shop-a", picked)
+    }
+
+    @Test
+    fun errorShowsFailureReason() {
+        setScreen(
+            NativeOwnerMoreState.Ready(
+                context = openContext(),
+                destination = NativeOwnerMoreDestination.Sync,
+                syncState = OwnerSyncState(
+                    error = "The server login or credential is not correct.",
+                ),
+            ),
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncError)
+            .performScrollTo()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun noticeShowsResultSummary() {
+        setScreen(
+            NativeOwnerMoreState.Ready(
+                context = openContext(),
+                destination = NativeOwnerMoreDestination.Sync,
+                syncState = OwnerSyncState(
+                    notice = "Enrolled as owner for 'Shop 1'.",
+                ),
+            ),
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncNotice)
+            .performScrollTo()
+            .assertIsDisplayed()
+    }
+
+    private fun syncStatus() = NativeSyncStatus(
+        environment = "prod",
+        shopName = "Shop 1",
+        role = "owner",
+        sessionPresent = true,
+        trustedTimeAnchored = true,
+        outboxCount = 0,
+        pullCursor = 12,
+    )
 }
+

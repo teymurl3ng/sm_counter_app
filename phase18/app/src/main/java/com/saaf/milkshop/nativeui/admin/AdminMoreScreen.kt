@@ -69,6 +69,7 @@ import com.saaf.milkshop.nativeui.owner.NativeOwnerCostingSection
 import com.saaf.milkshop.nativeui.owner.NativeOwnerMoreDestination
 import com.saaf.milkshop.nativeui.owner.NativeOwnerMoreState
 import com.saaf.milkshop.nativeui.owner.OwnerBackupScreen
+import com.saaf.milkshop.nativeui.owner.OwnerSyncScreen
 import com.saaf.milkshop.nativeui.owner.OwnerCostingPlansActions
 import com.saaf.milkshop.nativeui.owner.OwnerCostingPlansScreen
 import com.saaf.milkshop.nativeui.owner.OwnerProductsScreen
@@ -91,6 +92,12 @@ fun AdminMoreScreen(
     onOpenCostingPlans: () -> Unit,
     onOpenShopSettings: () -> Unit,
     onOpenBackup: () -> Unit,
+    onOpenSync: () -> Unit,
+    onRefreshSync: () -> Unit,
+    onEnrollSync: (String, CharArray, String) -> Unit,
+    onEnrollSyncInShop: (String, String, CharArray, String) -> Unit,
+    onSyncNow: () -> Unit,
+    onUnenrollSync: () -> Unit,
     onBackToMenu: () -> Unit,
     onRetryProducts: () -> Unit,
     onOpenProduct: (Long) -> Unit,
@@ -197,6 +204,12 @@ fun AdminMoreScreen(
                 onOpenCostingPlans = onOpenCostingPlans,
                 onOpenShopSettings = onOpenShopSettings,
                 onOpenBackup = onOpenBackup,
+                onOpenSync = onOpenSync,
+                onRefreshSync = onRefreshSync,
+                onEnrollSync = onEnrollSync,
+                onEnrollSyncInShop = onEnrollSyncInShop,
+                onSyncNow = onSyncNow,
+                onUnenrollSync = onUnenrollSync,
                 onSwitchAccount = onSwitchAccount,
                 onSignOut = onSignOut,
                 onNavigate = onNavigate,
@@ -361,6 +374,26 @@ fun AdminMoreScreen(
                     modifier = modifier,
                 )
             }
+            NativeOwnerMoreDestination.Sync -> OwnerSyncScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = state.context,
+                status = state.syncState.status,
+                shopChoices = state.syncState.shopChoices,
+                busy = state.syncState.busy,
+                error = state.syncState.error,
+                notice = state.syncState.notice,
+                onBackToMenu = onBackToMenu,
+                onRefresh = onRefreshSync,
+                onEnroll = onEnrollSync,
+                onEnrollInShop = onEnrollSyncInShop,
+                onSyncNow = onSyncNow,
+                onUnenroll = onUnenrollSync,
+                allowDevEnvironment = com.saaf.milkshop.BuildConfig.DEBUG,
+                hostedScaffold = adminMoreShell,
+                modifier = modifier,
+            )
+
             NativeOwnerMoreDestination.Backup -> Box(
                 Modifier
                     .fillMaxSize()
@@ -416,6 +449,12 @@ fun AdminMoreScreen(
                     onOpenCostingPlans = onOpenCostingPlans,
                     onOpenShopSettings = onOpenShopSettings,
                     onOpenBackup = onOpenBackup,
+                    onOpenSync = onOpenSync,
+                    onRefreshSync = onRefreshSync,
+                    onEnrollSync = onEnrollSync,
+                    onEnrollSyncInShop = onEnrollSyncInShop,
+                    onSyncNow = onSyncNow,
+                    onUnenrollSync = onUnenrollSync,
                     onSwitchAccount = onSwitchAccount,
                     onSignOut = onSignOut,
                     onNavigate = onNavigate,
@@ -437,6 +476,12 @@ private fun AdminMoreMenuScreen(
     onOpenCostingPlans: () -> Unit,
     onOpenShopSettings: () -> Unit,
     onOpenBackup: () -> Unit,
+    onOpenSync: () -> Unit,
+    onRefreshSync: () -> Unit,
+    onEnrollSync: (String, CharArray, String) -> Unit,
+    onEnrollSyncInShop: (String, String, CharArray, String) -> Unit,
+    onSyncNow: () -> Unit,
+    onUnenrollSync: () -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
     onNavigate: (AdminSection) -> Unit,

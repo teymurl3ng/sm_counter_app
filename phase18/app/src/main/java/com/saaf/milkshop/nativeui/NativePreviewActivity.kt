@@ -41,6 +41,7 @@ import com.saaf.milkshop.application.operations.NativeOperationsWorkFacade
 import com.saaf.milkshop.application.operations.NativeReceiveMilkFacade
 import com.saaf.milkshop.application.operations.NativeRecordSpoilageFacade
 import com.saaf.milkshop.application.owner.NativeOwnerBackupFacade
+import com.saaf.milkshop.application.owner.NativeOwnerSyncFacade
 import com.saaf.milkshop.application.owner.LiveNativeOwnerCloudBackupGateway
 import com.saaf.milkshop.application.owner.NativeOwnerCostingPlansFacade
 import com.saaf.milkshop.application.owner.NativeOwnerCustomersFacade
@@ -166,6 +167,7 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var ownerUsersRolesFacade: NativeOwnerUsersRolesFacade
     private lateinit var ownerSecurityHistoryFacade: NativeOwnerSecurityHistoryFacade
     private lateinit var ownerBackupFacade: NativeOwnerBackupFacade
+    private lateinit var ownerSyncFacade: NativeOwnerSyncFacade
     private var cloudAuthorization: HybridGoogleDriveAuthorization? = null
 
     private val authenticationViewModel by viewModels<NativeAuthenticationViewModel> {
@@ -336,6 +338,7 @@ class NativePreviewActivity : FragmentActivity() {
             usersRolesFacade = ownerUsersRolesFacade,
             securityHistoryFacade = ownerSecurityHistoryFacade,
             backupFacade = ownerBackupFacade,
+            syncFacade = ownerSyncFacade,
             onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
         )
     }
@@ -400,6 +403,7 @@ class NativePreviewActivity : FragmentActivity() {
                 },
             ),
         )
+        ownerSyncFacade = NativeOwnerSyncFacade(this, app.database)
         authenticationViewModel.attachQuickUnlock(quickUnlockFacade)
         val openOperator = intent.getBooleanExtra(EXTRA_OPEN_OPERATOR, false)
         val openOwner = intent.getBooleanExtra(EXTRA_OPEN_OWNER, false)

@@ -1,0 +1,382 @@
+package com.saaf.milkshop.nativeui.owner
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.HostedScaffold
+import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
+import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
+import com.saaf.milkshop.sync.NativeSyncShopChoice
+import com.saaf.milkshop.sync.NativeSyncStatus
+import com.saaf.milkshop.sync.SyncServerConfig
+
+/**
+ * Owner-facing sync enrollment and status (14.8.6 cutover). Shows the
+ * enrollment state of this phone, enrolls it against the Account Server
+ * (release builds are PROD-only; debug builds may pick DEV), and stops
+ * syncing on request. Daily shop entry never depends on any of this.
+ * Credentials live only in local Compose state and are wiped after use.
+ */
+@Composable
+fun OwnerSyncScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    context: NativeOwnerMoreContext,
+    status: NativeSyncStatus?,
+    shopChoices: List<NativeSyncShopChoice>,
+    busy: Boolean,
+    error: String?,
+    notice: String?,
+    onBackToMenu: () -> Unit,
+    onRefresh: () -> Unit,
+    onEnroll: (username: String, credential: CharArray, environment: String) -> Unit,
+    onEnrollInShop: (shopId: String, username: String, credential: CharArray, environment: String) -> Unit,
+    onSyncNow: () -> Unit,
+    onUnenroll: () -> Unit,
+    allowDevEnvironment: Boolean = false,
+    hostedScaffold: HostedScaffold,
+    modifier: Modifier = Modifier,
+) {
+    var unenrollConfirmOpen by remember { mutableStateOf(false) }
+    // Holds the credential between a first (possibly ambiguous) attempt
+    // and the shop pick, so the owner does not retype it. Wiped on use.
+    var lastCredential by remember { mutableStateOf<CharArray?>(null) }
+
+    hostedScaffold(snackbarHostState, modifier, { it() }) { _ ->
+        var username by rememberSaveable { mutableStateOf("") }
+        var credential by rememberSaveable { mutableStateOf("") }
+        var environment by rememberSaveable { mutableStateOf(SyncServerConfig.ENVIRONMENT_PROD) }
+        var environmentMenuOpen by remember { mutableStateOf(false) }
+
+        fun takeCredential(): CharArray {
+            lastCredential?.let { return it }
+            return credential.toCharArray()
+        }
+
+        Column(
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .testTag(NativeUiTags.OwnerSyncRoot)
+                .padding(horizontal = 16.dp),
+        ) {
+            TextButton(
+                onClick = {
+                    lastCredential?.fill(' ')
+                    lastCredential = null
+                    onBackToMenu()
+                },
+                modifier = Modifier.testTag(NativeUiTags.OwnerSyncBack),
+            ) { Text("Back to More") }
+
+            Text("Sync", style = MaterialTheme.typography.headlineSmall)
+            Text(
+                "Shop: ${context.shopName}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(8.dp))
+
+            when {
+                busy && status == null -> {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 48.dp)
+                            .testTag(NativeUiTags.OwnerSyncLoading),
+                        contentAlignment = Alignment.Center,
+                    ) { CircularProgressIndicator() }
+                }
+
+                status != null -> OwnerSyncEnrolledBody(
+                    status = status,
+                    busy = busy,
+                    onRefresh = onRefresh,
+                    onSyncNow = onSyncNow,
+                    onUnenroll = { unenrollConfirmOpen = true },
+                )
+
+                else -> OwnerSyncEnrollBody(
+                    username = username,
+                    onUsernameChange = { username = it },
+                    credential = credential,
+                    onCredentialChange = { credential = it },
+                    environment = environment,
+                    onEnvironmentChange = { environment = it },
+                    environmentMenuOpen = environmentMenuOpen,
+                    onEnvironmentMenuOpen = { environmentMenuOpen = true },
+                    onEnvironmentMenuDismiss = { environmentMenuOpen = false },
+                    allowDevEnvironment = allowDevEnvironment,
+                    busy = busy,
+                    onEnroll = {
+                        val chars = takeCredential()
+                        lastCredential = chars
+                        onEnroll(username, chars, environment)
+                    },
+                )
+            }
+
+            if (shopChoices.isNotEmpty()) {
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    "This account works at several shops. Pick the one this phone records for:",
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.testTag(NativeUiTags.OwnerSyncShopPicker),
+                )
+                shopChoices.forEach { choice ->
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text(choice.shopName ?: choice.shopId, style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                choice.shopId,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Button(
+                            onClick = {
+                                val chars = takeCredential()
+                                onEnrollInShop(choice.shopId, username, chars, environment)
+                                chars.fill(' ')
+                                lastCredential = null
+                            },
+                            enabled = !busy,
+                            modifier = Modifier.testTag(NativeUiTags.OwnerSyncShopPick),
+                        ) { Text("Choose") }
+                    }
+                }
+            }
+
+            notice?.let {
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.testTag(NativeUiTags.OwnerSyncNotice),
+                )
+            }
+            error?.let {
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    it,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.testTag(NativeUiTags.OwnerSyncError),
+                )
+            }
+            Spacer(Modifier.height(24.dp))
+        }
+    }
+
+    if (unenrollConfirmOpen) {
+        AlertDialog(
+            onDismissRequest = { unenrollConfirmOpen = false },
+            title = { Text("Stop syncing this phone?") },
+            text = {
+                Text(
+                    "New entries stay on this phone and stop uploading. " +
+                        "Existing data on this phone is not deleted.",
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        unenrollConfirmOpen = false
+                        onUnenroll()
+                    },
+                    modifier = Modifier.testTag(NativeUiTags.OwnerSyncUnenrollConfirm),
+                ) { Text("Stop syncing") }
+            },
+            dismissButton = {
+                TextButton(onClick = { unenrollConfirmOpen = false }) { Text("Cancel") }
+            },
+        )
+    }
+}
+
+@Composable
+private fun OwnerSyncEnrolledBody(
+    status: NativeSyncStatus,
+    busy: Boolean,
+    onRefresh: () -> Unit,
+    onSyncNow: () -> Unit,
+    onUnenroll: () -> Unit,
+) {
+    Column(Modifier.testTag(NativeUiTags.OwnerSyncStatus)) {
+        OwnerSyncStatusRow("Server", status.environment.uppercase())
+        OwnerSyncStatusRow("Shop", status.shopName ?: "—")
+        OwnerSyncStatusRow("Signed in as", status.role)
+        OwnerSyncStatusRow("Session", if (status.sessionPresent) "active" else "needs sign-in again")
+        OwnerSyncStatusRow("Trusted time", if (status.trustedTimeAnchored) "server-anchored" else "phone clock only")
+        OwnerSyncStatusRow("Waiting to upload", status.outboxCount.toString())
+        OwnerSyncStatusRow("Last pulled record", status.pullCursor.toString())
+    }
+    Spacer(Modifier.height(16.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Button(
+            onClick = onSyncNow,
+            enabled = !busy,
+            modifier = Modifier.testTag(NativeUiTags.OwnerSyncNow),
+        ) { Text(if (busy) "Syncing…" else "Sync now") }
+        OutlinedButton(
+            onClick = onRefresh,
+            enabled = !busy,
+            modifier = Modifier.testTag(NativeUiTags.OwnerSyncRefresh),
+        ) { Text("Refresh") }
+    }
+    Spacer(Modifier.height(8.dp))
+    TextButton(
+        onClick = onUnenroll,
+        enabled = !busy,
+        modifier = Modifier.testTag(NativeUiTags.OwnerSyncUnenroll),
+    ) { Text("Stop syncing this phone") }
+}
+
+@Composable
+private fun OwnerSyncStatusRow(label: String, value: String) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(label, style = MaterialTheme.typography.bodyMedium)
+        Text(
+            value,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+}
+
+@Composable
+private fun OwnerSyncEnrollBody(
+    username: String,
+    onUsernameChange: (String) -> Unit,
+    credential: String,
+    onCredentialChange: (String) -> Unit,
+    environment: String,
+    onEnvironmentChange: (String) -> Unit,
+    environmentMenuOpen: Boolean,
+    onEnvironmentMenuOpen: () -> Unit,
+    onEnvironmentMenuDismiss: () -> Unit,
+    allowDevEnvironment: Boolean,
+    busy: Boolean,
+    onEnroll: () -> Unit,
+) {
+    Column {
+        Text("Connect this phone to your shop", style = MaterialTheme.typography.titleMedium)
+        Text(
+            "Once connected, entries recorded on this phone upload to your shop's " +
+                "online record automatically whenever internet is available.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(16.dp))
+        OutlinedTextField(
+            value = username,
+            onValueChange = onUsernameChange,
+            label = { Text("Server username") },
+            singleLine = true,
+            enabled = !busy,
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(NativeUiTags.OwnerSyncUsername),
+        )
+        Spacer(Modifier.height(8.dp))
+        OutlinedTextField(
+            value = credential,
+            onValueChange = onCredentialChange,
+            label = { Text("Server credential (15 digits)") },
+            singleLine = true,
+            enabled = !busy,
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(NativeUiTags.OwnerSyncCredential),
+        )
+        if (allowDevEnvironment) {
+            Spacer(Modifier.height(8.dp))
+            Box {
+                OutlinedButton(
+                    onClick = onEnvironmentMenuOpen,
+                    enabled = !busy,
+                    modifier = Modifier.testTag(NativeUiTags.OwnerSyncEnvironment),
+                ) { Text("Server: ${environment.uppercase()}") }
+                DropdownMenu(
+                    expanded = environmentMenuOpen,
+                    onDismissRequest = onEnvironmentMenuDismiss,
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("PROD (live shop)") },
+                        onClick = {
+                            onEnvironmentChange(SyncServerConfig.ENVIRONMENT_PROD)
+                            onEnvironmentMenuDismiss()
+                        },
+                    )
+                    DropdownMenuItem(
+                        text = { Text("DEV (testing)") },
+                        onClick = {
+                            onEnvironmentChange(SyncServerConfig.ENVIRONMENT_DEV)
+                            onEnvironmentMenuDismiss()
+                        },
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.height(16.dp))
+        Button(
+            onClick = onEnroll,
+            enabled = !busy && username.isNotBlank() && credential.isNotBlank(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .testTag(NativeUiTags.OwnerSyncEnroll),
+        ) { Text(if (busy) "Connecting…" else "Connect this phone") }
+    }
+}

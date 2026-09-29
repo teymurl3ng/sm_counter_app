@@ -20,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.Backup
+import androidx.compose.material.icons.outlined.CloudSync
 import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.History
@@ -97,6 +98,7 @@ fun OwnerMoreScreen(
     onOpenUsersRoles: () -> Unit,
     onOpenSecurityHistory: () -> Unit,
     onOpenBackup: () -> Unit,
+    onOpenSync: () -> Unit,
     onBackToMenu: () -> Unit,
     onRetryProducts: () -> Unit,
     onOpenProduct: (Long) -> Unit,
@@ -185,6 +187,11 @@ fun OwnerMoreScreen(
     onInspectBackupRestore: (android.net.Uri, CharArray) -> Unit,
     onConfirmBackupRestore: (Boolean) -> Unit,
     onOpenBackupConnect: () -> Unit,
+    onRefreshSync: () -> Unit,
+    onEnrollSync: (String, CharArray, String) -> Unit,
+    onEnrollSyncInShop: (String, String, CharArray, String) -> Unit,
+    onSyncNow: () -> Unit,
+    onUnenrollSync: () -> Unit,
     onBackFromBackupConnect: () -> Unit,
     onConnectDriveBackup: (CharArray, Boolean) -> Unit,
     onSetDriveBackupEnabled: (Boolean) -> Unit,
@@ -270,6 +277,7 @@ fun OwnerMoreScreen(
                 onOpenUsersRoles = onOpenUsersRoles,
                 onOpenSecurityHistory = onOpenSecurityHistory,
                 onOpenBackup = onOpenBackup,
+                onOpenSync = onOpenSync,
                 onSwitchAccount = onSwitchAccount,
                 onSignOut = onSignOut,
                 onNavigate = onNavigate,
@@ -639,6 +647,35 @@ fun OwnerMoreScreen(
                 },
                 modifier = modifier,
             )
+            NativeOwnerMoreDestination.Sync -> OwnerSyncScreen(
+                snackbarHostState = snackbarHostState,
+                identity = identity,
+                context = state.context,
+                status = state.syncState.status,
+                shopChoices = state.syncState.shopChoices,
+                busy = state.syncState.busy,
+                error = state.syncState.error,
+                notice = state.syncState.notice,
+                onBackToMenu = onBackToMenu,
+                onRefresh = onRefreshSync,
+                onEnroll = onEnrollSync,
+                onEnrollInShop = onEnrollSyncInShop,
+                onSyncNow = onSyncNow,
+                onUnenroll = onUnenrollSync,
+                allowDevEnvironment = com.saaf.milkshop.BuildConfig.DEBUG,
+                hostedScaffold = { snackbar, mod, wrapNav, content ->
+                    OwnerScaffold(
+                        snackbarHostState = snackbar,
+                        section = OwnerSection.More,
+                        onNavigate = { section -> wrapNav { onNavigate(section) } },
+                        modifier = mod,
+                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                        content = content,
+                    )
+                },
+                modifier = modifier,
+            )
+
             NativeOwnerMoreDestination.Backup -> OwnerBackupScreen(
                 snackbarHostState = snackbarHostState,
                 identity = identity,
@@ -711,6 +748,7 @@ private fun OwnerMoreMenuScreen(
     onOpenUsersRoles: () -> Unit,
     onOpenSecurityHistory: () -> Unit,
     onOpenBackup: () -> Unit,
+    onOpenSync: () -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
     onNavigate: (OwnerSection) -> Unit,
@@ -824,6 +862,14 @@ private fun OwnerMoreMenuScreen(
                     subtitle = "Local export, Drive backup, restore",
                     tag = NativeUiTags.OwnerMoreBackup,
                     onClick = onOpenBackup,
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                OwnerMoreMenuRow(
+                    icon = Icons.Outlined.CloudSync,
+                    title = "Sync",
+                    subtitle = "Upload entries to your shop's online record",
+                    tag = NativeUiTags.OwnerMoreSync,
+                    onClick = onOpenSync,
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 

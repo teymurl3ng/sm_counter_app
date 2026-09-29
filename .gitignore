@@ -35,3 +35,7 @@ google-services.json
 # Python verification cache
 __pycache__/
 *.pyc
+
+# Sync release signing (never commit)
+keystore.properties
+phase18/keystore/

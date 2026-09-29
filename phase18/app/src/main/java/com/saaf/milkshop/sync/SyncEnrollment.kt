@@ -1,6 +1,7 @@
 package com.saaf.milkshop.sync
 
 import android.content.Context
+import com.saaf.milkshop.data.MilkShopDatabase
 
 /**
  * Enrollment (Account Bridge spec §6, minimal sync form): prove the server
@@ -13,6 +14,7 @@ import android.content.Context
 class SyncEnrollment(
     private val context: Context,
     private val http: SyncHttp = UrlConnectionSyncHttp(),
+    private val database: MilkShopDatabase? = null,
 ) {
 
     sealed interface Outcome {
@@ -63,6 +65,19 @@ class SyncEnrollment(
         )
         SyncShopBindingStore.save(context, binding)
         (target.timezone ?: auth.shopTimezone)?.let(BusinessClock::setZone)
+        // Re-baseline for the newly enrolled server: the complete local
+        // history is enqueued (idempotent — rows already queued or already
+        // on the server change nothing), and the pull cursor restarts at
+        // zero so the device converges with the server from the beginning.
+        database?.let { db ->
+            SyncBaseline.enqueueAll(db)
+            db.syncPullStateDao().upsert(
+                com.saaf.milkshop.data.SyncPullStateEntity(
+                    lastServerSeq = 0,
+                    updatedAt = java.time.Instant.now().toString(),
+                ),
+            )
+        }
         SyncScheduler.setSchedulingEnabled(true)
         SyncScheduler.requestPush()
         return Outcome.Enrolled(binding, target.timezone ?: auth.shopTimezone)

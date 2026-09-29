@@ -56,8 +56,12 @@ class SyncDebugReceiver : BroadcastReceiver() {
             publishableKey = intent.getStringExtra(EXTRA_PUBLISHABLE_KEY) ?: DEFAULT_DEV_PUBLISHABLE_KEY,
         )
         Log.i(TAG, "Enrolling $username against ${config.baseUrl} (${config.environment})…")
+        val app = context.applicationContext as? com.saaf.milkshop.MilkShopApplication
         when (
-            val outcome = SyncEnrollment(context).enroll(
+            val outcome = SyncEnrollment(
+                context,
+                database = app?.database,
+            ).enroll(
                 config,
                 username,
                 credential.toCharArray(),

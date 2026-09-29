@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("com.google.devtools.ksp")
@@ -20,6 +22,15 @@ val performanceTestBuild = providers.gradleProperty("saaf.performanceTestBuild")
 val googleWebClientId = providers.gradleProperty("saaf.googleWebClientId").orNull.orEmpty()
 val escapedGoogleWebClientId = googleWebClientId.replace("\\", "\\\\").replace("\"", "\\\"")
 
+// Release signing (sync go-live): keystore.properties lives next to the
+// root project and is gitignored — back both it and the keystore up; losing
+// them means the shop's installed app can never receive an update.
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.inputStream().use { stream -> keystoreProperties.load(stream) }
+}
+
 android {
     namespace = "com.saaf.milkshop"
     compileSdk = 36
@@ -28,8 +39,8 @@ android {
         applicationId = "com.saaf.milkshop"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$escapedGoogleWebClientId\"")
         buildConfigField("boolean", "ENABLE_NATIVE_PREVIEW_FIXTURES", "false")
         buildConfigField("String", "NATIVE_PREVIEW_SHARED_PASSPHRASE", "\"\"")
@@ -44,6 +55,17 @@ android {
     buildFeatures {
         buildConfig = true
         compose = true
+    }
+
+    signingConfigs {
+        create("release") {
+            if (keystorePropertiesFile.exists()) {
+                storeFile = rootProject.file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+            }
+        }
     }
 
     buildTypes {
@@ -70,6 +92,11 @@ android {
         }
         release {
             isMinifyEnabled = false
+            signingConfig = if (keystorePropertiesFile.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
         create("benchmark") {
             initWith(getByName("release"))

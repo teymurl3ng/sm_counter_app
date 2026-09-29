@@ -76,20 +76,29 @@ class SyncEnrollmentTest {
 
     @Test
     fun enrollment_persistsBindingSessionConfig_andSetsZone() = runBlocking {
-        val outcome = SyncEnrollment(context, allowedHttp())
-            .enroll(config, "Owner", "123456789012345".toCharArray())
+        val database = MilkShopDatabase.createInMemory()
+        try {
+            val outcome = SyncEnrollment(context, allowedHttp(), database)
+                .enroll(config, "Owner", "123456789012345".toCharArray())
 
-        assertTrue(outcome.toString(), outcome is SyncEnrollment.Outcome.Enrolled)
-        outcome as SyncEnrollment.Outcome.Enrolled
-        assertEquals("249b9c78-475d-483d-b252-314dc5784ff9", outcome.binding.shopId)
-        assertEquals("Asia/Karachi", outcome.shopTimezone)
+            assertTrue(outcome.toString(), outcome is SyncEnrollment.Outcome.Enrolled)
+            outcome as SyncEnrollment.Outcome.Enrolled
+            assertEquals("249b9c78-475d-483d-b252-314dc5784ff9", outcome.binding.shopId)
+            assertEquals("Asia/Karachi", outcome.shopTimezone)
 
-        assertNotNull(SyncServerConfigStore.load(context))
-        assertEquals("Asia/Karachi", BusinessClock.currentZone().id)
-        val binding = SyncShopBindingStore.load(context)!!
-        assertEquals("admin", binding.role)
-        assertEquals("11111111-1111-4111-8111-111111111111", binding.staffId)
-        assertEquals("jwt-1", SyncTokenStore(context).load()?.accessToken)
+            assertNotNull(SyncServerConfigStore.load(context))
+            assertEquals("Asia/Karachi", BusinessClock.currentZone().id)
+            val binding = SyncShopBindingStore.load(context)!!
+            assertEquals("admin", binding.role)
+            assertEquals("11111111-1111-4111-8111-111111111111", binding.staffId)
+            assertEquals("jwt-1", SyncTokenStore(context).load()?.accessToken)
+            // Re-baseline: the full local history is enqueued for the new server.
+            assertTrue(database.syncOutboxDao().count() > 0)
+            // The pull cursor restarts at zero for the new environment.
+            assertEquals(0L, database.syncPullStateDao().find()?.lastServerSeq)
+        } finally {
+            database.close()
+        }
     }
 
     @Test

@@ -60,34 +60,36 @@ class NativeAuthenticationScreenContractTest {
             }
         }
 
+        // The access screens now follow the system theme: in a dark host the
+        // body goes dark and its text goes light (it used to stay ivory-light).
         val titlePixels = composeRule.onNodeWithText("Who is using Saaf?")
             .captureToImage()
             .toPixelMap()
-        var brightestTitlePixel = 0f
+        var darkestTitlePixel = 3f
         for (y in 0 until titlePixels.height) {
             for (x in 0 until titlePixels.width) {
                 val color = titlePixels[x, y]
-                brightestTitlePixel = maxOf(brightestTitlePixel, color.red + color.green + color.blue)
+                darkestTitlePixel = minOf(darkestTitlePixel, color.red + color.green + color.blue)
             }
         }
         assertTrue(
-            "The green access header must retain its light title in a dark system host.",
-            brightestTitlePixel > 2.2f,
+            "The access header must follow the dark theme: dark title on the brand band.",
+            darkestTitlePixel < 1.8f,
         )
 
         val labelPixels = composeRule.onNodeWithText("ACCOUNTS ON THIS PHONE")
             .captureToImage()
             .toPixelMap()
-        var darkestLabelPixel = 3f
+        var brightestLabelPixel = 0f
         for (y in 0 until labelPixels.height) {
             for (x in 0 until labelPixels.width) {
                 val color = labelPixels[x, y]
-                darkestLabelPixel = minOf(darkestLabelPixel, color.red + color.green + color.blue)
+                brightestLabelPixel = maxOf(brightestLabelPixel, color.red + color.green + color.blue)
             }
         }
         assertTrue(
-            "The ivory access body must retain a dark readable label in a dark system host.",
-            darkestLabelPixel < 1.8f,
+            "The access body must follow the dark theme: light label on a dark background.",
+            brightestLabelPixel > 2.2f,
         )
     }
 

@@ -7,6 +7,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -72,8 +73,8 @@ fun WelcomeScreen(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        color = SaafIvory,
-        contentColor = SaafInk,
+        color = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
         modifier = modifier.fillMaxSize(),
     ) {
         Column(
@@ -90,23 +91,24 @@ fun WelcomeScreen(
                 text = stringResource(R.string.native_app_name),
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.ExtraBold,
-                color = SaafGreen,
+                color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.native_welcome_tagline),
                 style = MaterialTheme.typography.bodyLarge,
-                color = SaafMuted,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(28.dp))
             WelcomeLedgerProgress()
             Spacer(Modifier.weight(1f))
             Surface(
-                color = SaafSurface,
-                contentColor = SaafInk,
+                color = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
                 shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Column {
@@ -114,7 +116,7 @@ fun WelcomeScreen(
                         icon = { Icon(Icons.Outlined.CloudOff, contentDescription = null) },
                         text = stringResource(R.string.native_offline_assurance),
                     )
-                    Surface(color = SaafGreen.copy(alpha = 0.16f), modifier = Modifier.fillMaxWidth().height(1.dp)) {}
+                    Surface(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.16f), modifier = Modifier.fillMaxWidth().height(1.dp)) {}
                     WelcomeAssurance(
                         icon = { Icon(Icons.Outlined.Lock, contentDescription = null) },
                         text = stringResource(R.string.native_private_access_assurance),
@@ -130,8 +132,8 @@ fun WelcomeScreen(
                     .testTag(NativeUiTags.WelcomeContinue),
                 shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = SaafYellow,
-                    contentColor = SaafInk,
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
                 ),
             ) {
                 Text(
@@ -143,7 +145,7 @@ fun WelcomeScreen(
             Text(
                 text = stringResource(R.string.native_continue_hint),
                 style = MaterialTheme.typography.bodyMedium,
-                color = SaafMuted,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
         }
@@ -200,13 +202,13 @@ private fun WelcomeLedgerProgress() {
             Modifier
                 .width(240.dp)
                 .height(6.dp)
-                .background(SaafLine, RoundedCornerShape(3.dp)),
+                .background(MaterialTheme.colorScheme.outline, RoundedCornerShape(3.dp)),
         ) {
             Box(
                 Modifier
                     .fillMaxWidth(progress)
                     .fillMaxHeight()
-                    .background(SaafYellow, RoundedCornerShape(3.dp)),
+                    .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(3.dp)),
             )
         }
         Spacer(Modifier.height(10.dp))
@@ -214,7 +216,7 @@ private fun WelcomeLedgerProgress() {
             Icon(
                 Icons.Outlined.Sync,
                 contentDescription = null,
-                tint = SaafGreen,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .size(16.dp)
                     .rotate(rotation),
@@ -224,7 +226,7 @@ private fun WelcomeLedgerProgress() {
                 text = label,
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = SaafInk,
+                color = MaterialTheme.colorScheme.onSurface,
             )
         }
     }
@@ -241,8 +243,8 @@ private fun WelcomeAssurance(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Surface(
-            color = SaafGreen.copy(alpha = 0.09f),
-            contentColor = SaafGreen,
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.09f),
+            contentColor = MaterialTheme.colorScheme.primary,
             shape = RoundedCornerShape(11.dp),
             modifier = Modifier.size(42.dp),
         ) {

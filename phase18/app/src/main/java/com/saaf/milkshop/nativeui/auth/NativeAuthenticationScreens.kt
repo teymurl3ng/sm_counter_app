@@ -82,8 +82,8 @@ fun NativeAuthenticationHost(
     onAcknowledgeRecoveryCode: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    SaafTheme(darkTheme = false) {
-        when (state) {
+    // Inherits the ambient theme (the activity follows the system theme).
+    when (state) {
             NativeAuthenticationState.Loading -> AccessMessageScreen(
                 title = "Loading accounts",
                 message = "Checking this phone’s Saaf access…",
@@ -150,7 +150,6 @@ fun NativeAuthenticationHost(
             )
             is NativeAuthenticationState.Authenticated -> Unit
         }
-    }
 }
 
 @Composable
@@ -619,7 +618,7 @@ private fun AccessMessageScreen(
     AccessFrame(title = title, subtitle = message, onBack = null, modifier = modifier) {
         if (loading) {
             Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = SaafGreen)
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         }
         if (actionLabel != null && actionTag != null && onAction != null) {
@@ -637,7 +636,7 @@ private fun AccessFrame(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Surface(color = SaafIvory, modifier = modifier.fillMaxSize()) {
+    Surface(color = MaterialTheme.colorScheme.background, modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -692,7 +691,7 @@ private fun IdentityCard(account: NativeAccountSummary) {
             modifier = Modifier.padding(14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(Icons.Outlined.Person, contentDescription = null, tint = SaafGreen)
+            Icon(Icons.Outlined.Person, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.size(12.dp))
             Column {
                 Text(account.displayName, style = MaterialTheme.typography.titleMedium)
@@ -733,7 +732,10 @@ private fun AccessPrimaryButton(
         onClick = onClick,
         enabled = enabled,
         shape = RoundedCornerShape(13.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = SaafYellow, contentColor = SaafInk),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSecondary,
+        ),
         modifier = Modifier.fillMaxWidth().height(54.dp).testTag(tag),
     ) {
         Text(label, style = MaterialTheme.typography.titleMedium)

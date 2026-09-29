@@ -6,6 +6,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
@@ -902,12 +903,9 @@ private fun NativeFoundationPreview(
         }
     }
 
-    SystemBarAppearance(
-        useDarkIcons = when {
-            destination == PreviewDestination.Welcome -> false
-            else -> true
-        },
-    )
+    // Welcome and auth both follow the system theme now, so the bar icons
+    // simply invert with it (dark icons vanish on a dark background).
+    SystemBarAppearance(useDarkIcons = !isSystemInDarkTheme())
 
     when (destination) {
         PreviewDestination.Welcome -> WelcomeScreen(

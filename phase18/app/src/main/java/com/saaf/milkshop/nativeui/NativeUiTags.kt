@@ -905,7 +905,6 @@ object NativeUiTags {
     const val ManagerMoreLoading = "manager_more_loading"
     const val ManagerMoreRetryLoad = "manager_more_retry_load"
     const val ManagerMoreSecurityScreen = "manager_more_security_screen"
-    const val ManagerMoreBack = "manager_more_back"
     const val ManagerMoreSectionLabel = "manager_more_section_label"
     const val ManagerProductsRoot = "manager_products_root"
     const val ManagerCustomersRoot = "manager_customers_root"

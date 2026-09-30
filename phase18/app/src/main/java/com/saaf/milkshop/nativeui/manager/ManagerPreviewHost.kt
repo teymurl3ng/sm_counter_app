@@ -201,8 +201,35 @@ fun ManagerPreviewHost(
             if (managerSection == ManagerSection.Work && section != ManagerSection.Work) {
                 returnManagerWorkHome()
             }
-            if (managerSection == ManagerSection.More && section == ManagerSection.More) {
-                ownerMoreViewModel.backToMenu()
+            if (managerSection == section) {
+                when (section) {
+                    ManagerSection.Work -> {
+                        val ready = managerWorkState as? NativeManagerWorkState.Ready
+                        if (ready != null && ready.destination != NativeManagerWorkDestination.Home) {
+                            returnManagerWorkHome()
+                        } else {
+                            onShowNotice("Work is already open.")
+                        }
+                    }
+                    ManagerSection.Close -> onShowNotice("Close is already open.")
+                    ManagerSection.Records -> {
+                        val ready = ownerRecordsState as? NativeOwnerRecordsState.Ready
+                        if (ready?.detail != null || ready?.correction != null) {
+                            ownerRecordsViewModel.clearDetail()
+                        } else {
+                            onShowNotice("Records is already open.")
+                        }
+                    }
+                    ManagerSection.More -> {
+                        val ready = ownerMoreState as? NativeOwnerMoreState.Ready
+                        if (ready != null && ready.destination != NativeOwnerMoreDestination.Menu) {
+                            snackbarHostState.currentSnackbarData?.dismiss()
+                            ownerMoreViewModel.backToMenu()
+                        } else {
+                            onShowNotice("More is already open.")
+                        }
+                    }
+                }
             }
             onManagerSectionChange(section)
         }

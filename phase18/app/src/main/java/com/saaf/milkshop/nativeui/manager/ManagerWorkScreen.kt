@@ -41,6 +41,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.manager.NativeManagerWorkContext
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.pressScale
@@ -64,23 +66,19 @@ fun ManagerWorkScreen(
     onNavigate: (ManagerSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
+    NativeSectionTransition(
+        targetState = state,
+        contentKey = { if (it is NativeManagerWorkState.Idle || it is NativeManagerWorkState.Loading) NativeManagerWorkState.Loading::class else it::class },
+    ) { state -> when (state) {
         NativeManagerWorkState.Idle,
         NativeManagerWorkState.Loading,
         -> ManagerScaffold(snackbarHostState, ManagerSection.Work, onNavigate, modifier) {
-            Column(
-                Modifier
-                    .fillMaxSize()
+            NativeColdLoadingPane(
+                label = "Loading today's work…",
+                modifier = Modifier
                     .padding(it)
-                    .padding(24.dp)
                     .testTag(NativeUiTags.ManagerWorkLoading),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                CircularProgressIndicator()
-                Spacer(Modifier.height(12.dp))
-                Text("Loading today's work…")
-            }
+            )
         }
         is NativeManagerWorkState.LoadFailure -> ManagerScaffold(
             snackbarHostState, ManagerSection.Work, onNavigate, modifier,
@@ -109,6 +107,7 @@ fun ManagerWorkScreen(
             onNavigate = onNavigate,
             modifier = modifier,
         )
+    }
     }
 }
 

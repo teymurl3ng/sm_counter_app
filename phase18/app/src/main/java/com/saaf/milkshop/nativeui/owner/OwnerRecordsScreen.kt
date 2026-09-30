@@ -477,10 +477,9 @@ private fun RecordsLedgerBody(
             )
             Row(
                 Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                TextButton(onClick = onBack) { Text("Back to balances") }
                 Text(ledger.currentBalanceLabel, fontWeight = FontWeight.Bold)
             }
             Text(
@@ -551,10 +550,6 @@ private fun RecordsDetailBody(
                     .padding(horizontal = 16.dp, vertical = 18.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                TextButton(
-                    onClick = onBack,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerRecordsDetailBack),
-                ) { Text("Back to records") }
                 Text(
                     detail.row.taskLabel,
                     style = MaterialTheme.typography.headlineMedium,
@@ -674,11 +669,6 @@ private fun RecordsCorrectionBody(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        enabled = canLeave,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerRecordsCorrectionBack),
-                    ) { Text("Back to detail") }
                     Text(
                         "Correct ${editor.prefill.taskLabel}",
                         style = MaterialTheme.typography.headlineSmall,

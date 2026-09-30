@@ -780,8 +780,11 @@ fun OwnerPreviewHost(
                     onNavigate = navigateOwner,
                 )
             }
-            else -> {
-                if (ownerReportsState !is NativeOwnerReportsState.Idle) {
+            else -> NativeSectionTransition(
+                targetState = ownerReportsState is NativeOwnerReportsState.Idle,
+                contentKey = { it },
+            ) { overviewRoot ->
+                if (!overviewRoot) {
                     OwnerReportsScreen(
                         snackbarHostState = snackbarHostState,
                         identity = identity,

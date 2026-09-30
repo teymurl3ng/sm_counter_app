@@ -65,8 +65,6 @@ class NativeActivityScreenContractTest {
         assertEquals(41L, openedId)
         composeRule.onNodeWithTag(NativeUiTags.ActivityDetail).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.ActivityDetailEventId).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.ActivityDetailBack).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.ActivityList).assertIsDisplayed()
     }
 
     @Test

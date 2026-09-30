@@ -505,10 +505,6 @@ private fun SalaryPaymentSuccess(
             onClick = onRecordAnother,
             modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag(NativeUiTags.SalaryPaymentAnother),
         ) { Text("Pay another") }
-        OutlinedButton(
-            onClick = onBack,
-            modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag(NativeUiTags.SalaryPaymentBack),
-        ) { Text("Back") }
     }
 }
 

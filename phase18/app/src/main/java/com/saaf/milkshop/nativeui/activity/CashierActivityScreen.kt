@@ -261,10 +261,6 @@ private fun ActivityDetailScreen(
                     .padding(horizontal = 16.dp, vertical = 18.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                TextButton(
-                    onClick = onBack,
-                    modifier = Modifier.testTag(NativeUiTags.ActivityDetailBack),
-                ) { Text("Back to today") }
                 Text(
                     detail.summary.taskLabel,
                     style = MaterialTheme.typography.headlineMedium,

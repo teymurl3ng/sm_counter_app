@@ -48,17 +48,6 @@ class NativeOwnerReportsScreenContractTest {
     }
 
     @Test
-    fun backToOverviewFromContent() {
-        var back = false
-        setScreen(
-            NativeOwnerReportsState.Ready(snapshot = sampleSnapshot()),
-            onBackToOverview = { back = true },
-        )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerReportsBack).performClick()
-        assertTrue(back)
-    }
-
-    @Test
     fun presetChipRequestsLastMonth() {
         var preset: NativeOwnerReportsPreset? = null
         setScreen(

@@ -48,7 +48,7 @@ class NativeOwnerRecordsScreenContractTest {
     }
 
     @Test
-    fun readyListOpensDetailAndBackClearsIt() {
+    fun readyListOpensDetail() {
         var state by mutableStateOf<NativeOwnerRecordsState>(
             NativeOwnerRecordsState.Ready(snapshot = snapshotWith(row(41L))),
         )
@@ -77,12 +77,10 @@ class NativeOwnerRecordsScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetail).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetailEventId).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetailCorrect).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetailBack).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsList).assertIsDisplayed()
     }
 
     @Test
-    fun correctableDetailOpensEditorAndBackClearsIt() {
+    fun correctableDetailOpensEditor() {
         val record = row(55L)
         val prefill = monetaryPrefill(record)
         var state by mutableStateOf<NativeOwnerRecordsState>(
@@ -107,50 +105,6 @@ class NativeOwnerRecordsScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionRoot).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionMonetaryAmount).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionSave).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionBack).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetail).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionRoot).assertDoesNotExist()
-    }
-
-    @Test
-    fun dirtyCorrectionLeaveGuardRequiresConfirm() {
-        val record = row(77L)
-        val prefill = monetaryPrefill(record)
-        var state by mutableStateOf<NativeOwnerRecordsState>(
-            NativeOwnerRecordsState.Ready(
-                snapshot = snapshotWith(record),
-                detail = detail(record, canCorrect = true, prefill = prefill),
-                correction = NativeCorrectionEditorState(prefill = prefill),
-            ),
-        )
-        var cleared = false
-        setScreen(
-            stateProvider = { state },
-            onUpdateCorrection = { transform ->
-                val ready = state as NativeOwnerRecordsState.Ready
-                // Mirror NativeOwnerRecordsViewModel.updateCorrection so the
-                // contract test exercises the production dirty-draft path.
-                state = ready.copy(
-                    correction = transform(
-                        ready.correction!!.copy(draftTouched = true, error = null),
-                    ),
-                )
-            },
-            onBackFromCorrection = {
-                cleared = true
-                state = (state as NativeOwnerRecordsState.Ready).copy(correction = null)
-            },
-        )
-
-        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionMonetaryAmount)
-            .performTextReplacement("199.50")
-        composeRule.waitForIdle()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionBack).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionDiscardDialog).assertIsDisplayed()
-        assertTrue(!cleared)
-        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionDiscardConfirm).performClick()
-        assertTrue(cleared)
-        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetail).assertIsDisplayed()
     }
 
     @Test

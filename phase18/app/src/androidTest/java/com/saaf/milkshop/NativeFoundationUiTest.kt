@@ -2561,7 +2561,7 @@ class NativeFoundationUiTest {
         }
         composeRule.onNodeWithTag(NativeUiTags.ActivityDetail).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.ActivityDetailEventId).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.ActivityDetailBack).performClick()
+        pressHardwareBack()
         waitForText("Collect payment")
         composeRule.onNodeWithTag(NativeUiTags.CollectAnother).performClick()
         composeRule.onNodeWithTag(NativeUiTags.CollectCustomerSelector).assertIsDisplayed()

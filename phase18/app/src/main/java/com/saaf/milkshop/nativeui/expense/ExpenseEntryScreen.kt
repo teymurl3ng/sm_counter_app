@@ -506,10 +506,6 @@ private fun ExpenseSuccess(
             onClick = onRecordAnother,
             modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag(NativeUiTags.ExpenseAnother),
         ) { Text("Record another") }
-        OutlinedButton(
-            onClick = onBack,
-            modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag(NativeUiTags.ExpenseBack),
-        ) { Text("Back") }
     }
 }
 

@@ -505,10 +505,6 @@ private fun VendorPaymentSuccess(
             onClick = onRecordAnother,
             modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag(NativeUiTags.VendorPaymentAnother),
         ) { Text("Pay another") }
-        OutlinedButton(
-            onClick = onBack,
-            modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag(NativeUiTags.VendorPaymentBack),
-        ) { Text("Back") }
     }
 }
 

@@ -124,10 +124,6 @@ fun OwnerReportsScreen(
                             onClick = onRetry,
                             modifier = Modifier.testTag(NativeUiTags.OwnerReportsRetry),
                         ) { Text("Try again") }
-                        TextButton(
-                            onClick = onBackToOverview,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerReportsBack),
-                        ) { Text("Back to Overview") }
                     }
                 }
                 is NativeOwnerReportsState.Ready -> {
@@ -143,13 +139,9 @@ fun OwnerReportsScreen(
                         Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 8.dp, vertical = 4.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        TextButton(
-                            onClick = onBackToOverview,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerReportsBack),
-                        ) { Text("Back to Overview") }
                         TextButton(
                             onClick = {
                                 customStart = snapshot.startInclusive

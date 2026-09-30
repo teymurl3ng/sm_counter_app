@@ -209,8 +209,7 @@ class NativeOwnerMoreScreenContractTest {
     }
 
     @Test
-    fun personalSecurityScreenShowsStatusAndBack() {
-        var back = false
+    fun personalSecurityScreenShowsStatus() {
         setScreen(
             NativeOwnerMoreState.Ready(
                 context = openContext(),
@@ -222,15 +221,12 @@ class NativeOwnerMoreScreenContractTest {
                     phoneSecurityLabel = "Phone security",
                 ),
             ),
-            onBackToMenu = { back = true },
         )
         composeRule.waitForIdle()
         composeRule.onNodeWithTag(NativeUiTags.OwnerMoreSecurityScreen).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerMoreSecurityStatus)
             .assertExists()
             .assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreBack).performClick()
-        assertTrue(back)
     }
 
     @Test

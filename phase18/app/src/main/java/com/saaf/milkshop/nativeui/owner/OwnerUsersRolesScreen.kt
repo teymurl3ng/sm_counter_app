@@ -103,7 +103,6 @@ fun OwnerUsersRolesScreen(
     onSubmitReauth: (CharArray) -> Unit,
     onCancelReauth: () -> Unit,
     hostedScaffold: HostedScaffold,
-    backToHubLabel: String = "Back to More",
     modifier: Modifier = Modifier,
 ) {
     when {
@@ -231,10 +230,6 @@ fun OwnerUsersRolesScreen(
                             onClick = onRetry,
                             modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesRetry),
                         ) { Text("Try again") }
-                        TextButton(
-                            onClick = onBackToMenu,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesBack),
-                        ) { Text(backToHubLabel) }
                     }
                 }
                 else -> {
@@ -243,13 +238,9 @@ fun OwnerUsersRolesScreen(
                             Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 8.dp, vertical = 4.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            TextButton(
-                                onClick = onBackToMenu,
-                                modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesBack),
-                            ) { Text(backToHubLabel) }
                             TextButton(
                                 onClick = onOpenEnroll,
                                 modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesEnroll),
@@ -342,11 +333,6 @@ private fun OwnerUsersRolesDetailScreen(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                TextButton(
-                    onClick = onBack,
-                    enabled = !enableBusy,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesDetailBack),
-                ) { Text("Back to users") }
                 Text(
                     row.displayName,
                     style = MaterialTheme.typography.headlineMedium,
@@ -524,11 +510,6 @@ private fun OwnerUsersRolesEnrollIdentityScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        enabled = !saving,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesEnrollBack),
-                    ) { Text("Back to users") }
                     Text(
                         "Enroll user",
                         style = MaterialTheme.typography.headlineSmall,
@@ -667,11 +648,6 @@ private fun OwnerUsersRolesEnrollPassphraseScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        enabled = !saving,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesEnrollPassphraseBack),
-                    ) { Text("Back to users") }
                     Text(
                         "Passphrase for ${pending.displayName}",
                         style = MaterialTheme.typography.headlineSmall,
@@ -807,11 +783,6 @@ private fun OwnerUsersRolesRoleChangeScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        enabled = !saving,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesRoleChangeBack),
-                    ) { Text("Back to user") }
                     Text(
                         "Change role",
                         style = MaterialTheme.typography.headlineSmall,

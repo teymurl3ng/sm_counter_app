@@ -216,7 +216,6 @@ fun AdminPeopleScreen(
                     onSubmitReauth = onSubmitUsersRolesReauth,
                     onCancelReauth = onCancelUsersRolesReauth,
                     hostedScaffold = adminPeopleShell,
-                    backToHubLabel = "Back to People",
                     modifier = modifier,
                 )
             }

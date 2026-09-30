@@ -956,12 +956,6 @@ private fun OwnerMorePersonalSecurityScreen(
                     .padding(horizontal = 16.dp, vertical = 18.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                TextButton(
-                    onClick = onBack,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerMoreBack),
-                ) {
-                    Text("Back to More")
-                }
                 Text("Personal security", style = MaterialTheme.typography.headlineMedium)
                 if (security == null) {
                     CircularProgressIndicator()

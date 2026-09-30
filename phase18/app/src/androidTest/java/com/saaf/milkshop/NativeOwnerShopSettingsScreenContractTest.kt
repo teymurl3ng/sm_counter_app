@@ -51,14 +51,6 @@ class NativeOwnerShopSettingsScreenContractTest {
     }
 
     @Test
-    fun backToMenuFromContent() {
-        var back = false
-        setScreen(snapshot = sampleSnapshot(), onBackToMenu = { back = true })
-        composeRule.onNodeWithTag(NativeUiTags.OwnerShopSettingsBack).performClick()
-        assertTrue(back)
-    }
-
-    @Test
     fun editIdentityOpensForm() {
         var opened = false
         setScreen(

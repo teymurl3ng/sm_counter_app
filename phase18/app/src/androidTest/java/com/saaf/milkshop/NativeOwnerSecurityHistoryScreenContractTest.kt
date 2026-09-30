@@ -60,8 +60,7 @@ class NativeOwnerSecurityHistoryScreenContractTest {
     }
 
     @Test
-    fun detailShowsFactsAndBack() {
-        var back = false
+    fun detailShowsFacts() {
         setScreen(
             audits = listOf(sampleAudit()),
             auditDetail = NativeOwnerSecurityAuditDetail(
@@ -70,23 +69,12 @@ class NativeOwnerSecurityHistoryScreenContractTest {
                 targetUserId = 3L,
                 details = "Passphrase reset",
             ),
-            onBackFromDetail = { back = true },
         )
         composeRule.onNodeWithTag(NativeUiTags.OwnerSecurityHistoryDetail).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerSecurityHistoryDetailAction).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerSecurityHistoryDetailReadOnly)
             .performScrollTo()
             .assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerSecurityHistoryDetailBack).performClick()
-        assertTrue(back)
-    }
-
-    @Test
-    fun backToMenuFromList() {
-        var back = false
-        setScreen(audits = listOf(sampleAudit()), onBackToMenu = { back = true })
-        composeRule.onNodeWithTag(NativeUiTags.OwnerSecurityHistoryBack).performClick()
-        assertTrue(back)
     }
 
     @Test

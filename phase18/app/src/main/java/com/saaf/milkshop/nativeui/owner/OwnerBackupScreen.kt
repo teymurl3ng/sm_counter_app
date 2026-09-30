@@ -194,7 +194,6 @@ fun OwnerBackupScreen(
             onConfirmDisconnect = onConfirmDisconnect,
             onCancelDisconnect = onCancelDisconnect,
             hostedScaffold = hostedScaffold,
-            backToHubLabel = backToHubLabel,
             localExportOnly = localExportOnly,
             modifier = modifier,
         )
@@ -223,7 +222,6 @@ private fun OwnerBackupStatusScreen(
     onConfirmDisconnect: () -> Unit,
     onCancelDisconnect: () -> Unit,
     hostedScaffold: HostedScaffold,
-    backToHubLabel: String = "Back to More",
     localExportOnly: Boolean = false,
     modifier: Modifier,
 ) {
@@ -271,20 +269,10 @@ private fun OwnerBackupStatusScreen(
                             onClick = onRetry,
                             modifier = Modifier.testTag(NativeUiTags.OwnerBackupRetry),
                         ) { Text("Try again") }
-                        TextButton(
-                            onClick = onBackToMenu,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerBackupBack),
-                        ) { Text(backToHubLabel) }
                     }
                 }
                 snapshot != null -> {
                     Column(Modifier.fillMaxSize()) {
-                        TextButton(
-                            onClick = onBackToMenu,
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                                .testTag(NativeUiTags.OwnerBackupBack),
-                        ) { Text(backToHubLabel) }
                         error?.let {
                             Text(
                                 it,
@@ -534,10 +522,6 @@ private fun OwnerBackupExportScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        modifier = Modifier.testTag(NativeUiTags.OwnerBackupExportBack),
-                    ) { Text("Back") }
                     error?.let {
                         Text(
                             it,
@@ -675,10 +659,6 @@ private fun OwnerBackupRestoreScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        modifier = Modifier.testTag(NativeUiTags.OwnerBackupRestoreBack),
-                    ) { Text("Back") }
                     error?.let {
                         Text(
                             it,
@@ -837,10 +817,6 @@ private fun OwnerBackupConnectScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        modifier = Modifier.testTag(NativeUiTags.OwnerBackupConnectBack),
-                    ) { Text("Back") }
                     error?.let {
                         Text(
                             it,
@@ -1093,11 +1069,6 @@ private fun OwnerBackupCloudScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        enabled = !busy,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerBackupCloudBack),
-                    ) { Text("Back to Backup") }
                     error?.let {
                         Text(
                             it,

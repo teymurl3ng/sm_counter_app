@@ -338,11 +338,6 @@ internal fun OwnerCostingBudgetEditorScreen(
                 Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-            TextButton(
-                onClick = { requestLeave(onBack) },
-                enabled = !saving,
-                modifier = Modifier.testTag(NativeUiTags.OwnerCostingBudgetBack),
-            ) { Text("Back to plans") }
             Text(
                 "Set a spending or milk plan",
                 style = MaterialTheme.typography.titleLarge,
@@ -533,11 +528,6 @@ internal fun OwnerCostingCollectionsEditorScreen(
                 Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-            TextButton(
-                onClick = { requestLeave(onBack) },
-                enabled = !saving,
-                modifier = Modifier.testTag(NativeUiTags.OwnerCostingTargetBack),
-            ) { Text("Back to plans") }
             Text(
                 "Set a weekly collection target",
                 style = MaterialTheme.typography.titleLarge,
@@ -921,11 +911,6 @@ internal fun OwnerCostingYieldApproveScreen(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                TextButton(
-                    onClick = { requestLeave(onBack) },
-                    enabled = !saving,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerCostingYieldBack),
-                ) { Text("Back to yield") }
                 Text(
                     "Shop-specific yogurt yield baseline",
                     style = MaterialTheme.typography.titleLarge,

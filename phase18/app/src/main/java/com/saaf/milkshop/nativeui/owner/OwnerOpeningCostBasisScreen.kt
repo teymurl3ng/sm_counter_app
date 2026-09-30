@@ -242,13 +242,6 @@ internal fun OwnerOpeningCostBasisEditorScreen(
                 businessDate = context.businessDate,
                 postingOpen = context.postingOpen,
             )
-            TextButton(
-                onClick = requestBack,
-                enabled = !saving,
-                modifier = Modifier
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-                    .testTag(NativeUiTags.OwnerCostingOpeningBack),
-            ) { Text("Back to Opening") }
             Column(
                 Modifier
                     .fillMaxSize()

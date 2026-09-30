@@ -110,7 +110,6 @@ fun OwnerShopSettingsScreen(
     onSubmitOpeningReauth: (CharArray) -> Unit = {},
     onCancelOpeningReauth: () -> Unit = {},
     hostedScaffold: HostedScaffold,
-    backToHubLabel: String = "Back to More",
     modifier: Modifier = Modifier,
 ) {
     if (openingReauthOpen) {
@@ -252,20 +251,10 @@ fun OwnerShopSettingsScreen(
                             onClick = onRetry,
                             modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsRetry),
                         ) { Text("Try again") }
-                        TextButton(
-                            onClick = onBackToMenu,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsBack),
-                        ) { Text(backToHubLabel) }
                     }
                 }
                 snapshot != null -> {
                     Column(Modifier.fillMaxSize()) {
-                        TextButton(
-                            onClick = onBackToMenu,
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                                .testTag(NativeUiTags.OwnerShopSettingsBack),
-                        ) { Text(backToHubLabel) }
                         error?.let {
                             Text(
                                 it,
@@ -466,7 +455,6 @@ private fun OwnerShopSettingsIdentityEditScreen(
     onBack: () -> Unit,
     onSave: (StoreIdentityInput) -> Unit,
     hostedScaffold: HostedScaffold,
-    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -517,11 +505,6 @@ private fun OwnerShopSettingsIdentityEditScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        enabled = !saving,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsIdentityBack),
-                    ) { Text("Back to shop settings") }
                     Text(
                         "Edit identity",
                         style = MaterialTheme.typography.headlineSmall,
@@ -623,7 +606,6 @@ private fun OwnerShopSettingsRatesEditScreen(
     onBack: () -> Unit,
     onSave: (BusinessSettings) -> Unit,
     hostedScaffold: HostedScaffold,
-    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -701,11 +683,6 @@ private fun OwnerShopSettingsRatesEditScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        enabled = !saving,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsRatesBack),
-                    ) { Text("Back to shop settings") }
                     Text(
                         "Edit rates",
                         style = MaterialTheme.typography.headlineSmall,
@@ -813,7 +790,6 @@ private fun OwnerShopSettingsCategoryCreateScreen(
     onBack: () -> Unit,
     onSave: (String) -> Unit,
     hostedScaffold: HostedScaffold,
-    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -862,11 +838,6 @@ private fun OwnerShopSettingsCategoryCreateScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        enabled = !saving,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsCategoryCreateBack),
-                    ) { Text("Back to shop settings") }
                     Text(
                         "Add expense category",
                         style = MaterialTheme.typography.headlineSmall,
@@ -937,7 +908,6 @@ private fun OwnerShopSettingsCategoryDetailScreen(
     onBack: () -> Unit,
     onSetArchived: (Boolean) -> Unit,
     hostedScaffold: HostedScaffold,
-    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     var archiveConfirmOpen by rememberSaveable { mutableStateOf(false) }
@@ -973,11 +943,6 @@ private fun OwnerShopSettingsCategoryDetailScreen(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                TextButton(
-                    onClick = onBack,
-                    enabled = !busy,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsCategoryDetailBack),
-                ) { Text("Back to shop settings") }
                 Text(
                     category.name,
                     style = MaterialTheme.typography.headlineSmall,
@@ -1274,11 +1239,6 @@ private fun OpeningFormScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        enabled = !saving,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsOpeningBack),
-                    ) { Text("Back to shop settings") }
                     Text(
                         if (correction) "Correct opening balances" else "Enter opening balances",
                         style = MaterialTheme.typography.headlineSmall,

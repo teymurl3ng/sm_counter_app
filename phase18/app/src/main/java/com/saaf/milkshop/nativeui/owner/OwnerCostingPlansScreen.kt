@@ -154,7 +154,6 @@ fun OwnerCostingPlansScreen(
         if (category == BUDGET_CATEGORY_MILK_PURCHASES) start.plusDays(7) else start.plusMonths(1)
     },
     hostedScaffold: HostedScaffold,
-    backToHubLabel: String = "Back to More",
     modifier: Modifier = Modifier,
 ) {
     when {
@@ -334,7 +333,6 @@ fun OwnerCostingPlansScreen(
                 onOpenYieldApprove = onOpenYieldApprove,
                 onRecordProductionLoss = onRecordProductionLoss,
                 hostedScaffold = hostedScaffold,
-                backToHubLabel = backToHubLabel,
                 modifier = modifier,
             )
         }
@@ -373,7 +371,6 @@ private fun OwnerCostingPlansListBody(
     onOpenYieldApprove: () -> Unit,
     onRecordProductionLoss: (ProductionLossAssessmentInput) -> Unit,
     hostedScaffold: HostedScaffold,
-    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBackToMenu)
@@ -394,10 +391,6 @@ private fun OwnerCostingPlansListBody(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            TextButton(
-                onClick = onBackToMenu,
-                modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansBack),
-            ) { Text(backToHubLabel) }
             extraActions()
         }
         OwnerCostingPlansSectionTabs(
@@ -455,10 +448,6 @@ private fun OwnerCostingPlansListBody(
                             onClick = onRetry,
                             modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansRetry),
                         ) { Text("Try again") }
-                        TextButton(
-                            onClick = onBackToMenu,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansBack),
-                        ) { Text(backToHubLabel) }
                     }
                 }
             }
@@ -595,7 +584,6 @@ private fun OwnerCostingPlansDetailScreen(
     onBack: () -> Unit,
     onOpenApproveFromDetail: () -> Unit,
     hostedScaffold: HostedScaffold,
-    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBack)
@@ -621,10 +609,6 @@ private fun OwnerCostingPlansDetailScreen(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                TextButton(
-                    onClick = onBack,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansDetailBack),
-                ) { Text("Back to policies") }
                 Text(
                     row.calendarMonth,
                     style = MaterialTheme.typography.headlineMedium,
@@ -689,7 +673,6 @@ private fun OwnerCostingPlansApproveScreen(
     onBack: () -> Unit,
     onSave: (CostingPolicyInput) -> Unit,
     hostedScaffold: HostedScaffold,
-    backToHubLabel: String = "Back to More",
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -820,11 +803,6 @@ private fun OwnerCostingPlansApproveScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        enabled = !saving,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansApproveBack),
-                    ) { Text("Back to policies") }
                     Text(
                         if (supersedesPolicyId != null) {
                             "Approve corrected policy"

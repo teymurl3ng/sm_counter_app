@@ -136,17 +136,6 @@ class NativeOwnerCostingPlansScreenContractTest {
     }
 
     @Test
-    fun backToMenuFromList() {
-        var back = false
-        setScreen(
-            policies = listOf(samplePolicy()),
-            onBackToMenu = { back = true },
-        )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansBack).performClick()
-        assertTrue(back)
-    }
-
-    @Test
     fun approveOpensFormAndSavesTypedInput() {
         var saved: CostingPolicyInput? = null
         setScreen(
@@ -404,27 +393,6 @@ class NativeOwnerCostingPlansScreenContractTest {
         assertEquals(160_000L, saved!!.totalCostPaisa)
         assertEquals("owner_estimate", saved!!.basisKind)
         assertEquals(9L, saved!!.supersedesBasisId)
-    }
-
-    @Test
-    fun openingEditorGuardsDirtyDraftBeforeLeaving() {
-        var backed = false
-        setScreen(
-            policies = emptyList(),
-            section = NativeOwnerCostingSection.Opening,
-            openingEditor = sampleOpeningCost(),
-            openingBasisKinds = listOf("documented_historical", "owner_estimate"),
-            onBackFromOpeningEditor = { backed = true },
-        )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningTotal)
-            .performTextInput("1500")
-        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningBack).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningDiscard).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningKeep).performClick()
-        assertTrue(!backed)
-        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningBack).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningDiscard).performClick()
-        assertTrue(backed)
     }
 
     @Test

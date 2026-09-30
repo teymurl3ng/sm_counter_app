@@ -48,14 +48,6 @@ class NativeOwnerBackupScreenContractTest {
     }
 
     @Test
-    fun backToMenuFromContent() {
-        var back = false
-        setScreen(snapshot = sampleSnapshot(), onBackToMenu = { back = true })
-        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupBack).performClick()
-        assertTrue(back)
-    }
-
-    @Test
     fun exportOpensExportForm() {
         var opened = false
         setScreen(snapshot = sampleSnapshot(), onOpenExport = { opened = true })
@@ -124,45 +116,25 @@ class NativeOwnerBackupScreenContractTest {
 
     @Test
     fun exportFormShowsPassphraseControls() {
-        var back = false
         setScreen(
             snapshot = sampleSnapshot(),
             exportOpen = true,
-            onBackFromExport = { back = true },
         )
         composeRule.onNodeWithTag(NativeUiTags.OwnerBackupExportForm).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerBackupExportPassphrase).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerBackupExportConfirm).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerBackupExportSubmit).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupExportBack).performClick()
-        assertTrue(back)
     }
 
     @Test
     fun restoreFormShowsPickControls() {
-        var back = false
         setScreen(
             snapshot = sampleSnapshot(),
             restoreOpen = true,
-            onBackFromRestore = { back = true },
         )
         composeRule.onNodeWithTag(NativeUiTags.OwnerBackupRestoreForm).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerBackupRestorePassphrase).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerBackupRestorePick).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupRestoreBack).performClick()
-        assertTrue(back)
-    }
-
-    @Test
-    fun connectFormShowsBack() {
-        var back = false
-        setScreen(
-            snapshot = sampleSnapshot(cloudActionsAvailable = true),
-            connectOpen = true,
-            onBackFromConnect = { back = true },
-        )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupConnectBack).performClick()
-        assertTrue(back)
     }
 
     @Test

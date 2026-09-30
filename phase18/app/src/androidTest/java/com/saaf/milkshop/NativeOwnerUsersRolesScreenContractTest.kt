@@ -65,8 +65,7 @@ class NativeOwnerUsersRolesScreenContractTest {
     }
 
     @Test
-    fun detailShowsFactsActionsAndBack() {
-        var back = false
+    fun detailShowsFactsAndActions() {
         var roleChange = false
         var disableRequested: Boolean? = null
         setScreen(
@@ -78,7 +77,6 @@ class NativeOwnerUsersRolesScreenContractTest {
                 disabledAt = null,
                 employeeAccountIdLabel = "Not linked",
             ),
-            onBackFromDetail = { back = true },
             onOpenRoleChange = { roleChange = true },
             onRequestSetEnabled = { disableRequested = it },
         )
@@ -95,10 +93,6 @@ class NativeOwnerUsersRolesScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.OwnerUsersRolesCredentialReset)
             .performScrollTo()
             .assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerUsersRolesDetailBack)
-            .performScrollTo()
-            .performClick()
-        assertTrue(back)
     }
 
     @Test
@@ -137,13 +131,6 @@ class NativeOwnerUsersRolesScreenContractTest {
             .assertCountEquals(0)
     }
 
-    @Test
-    fun backToMenuFromList() {
-        var back = false
-        setScreen(users = listOf(sampleUser()), onBackToMenu = { back = true })
-        composeRule.onNodeWithTag(NativeUiTags.OwnerUsersRolesBack).performClick()
-        assertTrue(back)
-    }
 
     @Test
     fun enrollOpensIdentityForm() {

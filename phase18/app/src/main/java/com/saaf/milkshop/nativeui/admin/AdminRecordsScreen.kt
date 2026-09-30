@@ -165,7 +165,6 @@ fun AdminRecordsScreen(
                         onOpenAudit = onOpenSecurityAudit,
                         onBackFromDetail = onBackFromSecurityAuditDetail,
                         hostedScaffold = adminRecordsShell,
-                        backToHubLabel = "Back to Records",
                         modifier = modifier,
                     )
                 }

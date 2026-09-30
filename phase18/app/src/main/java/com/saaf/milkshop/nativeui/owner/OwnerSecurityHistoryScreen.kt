@@ -63,7 +63,6 @@ fun OwnerSecurityHistoryScreen(
     onOpenAudit: (Long) -> Unit,
     onBackFromDetail: () -> Unit,
     hostedScaffold: HostedScaffold,
-    backToHubLabel: String = "Back to More",
     modifier: Modifier = Modifier,
 ) {
     if (auditDetail != null) {
@@ -123,20 +122,10 @@ fun OwnerSecurityHistoryScreen(
                             onClick = onRetry,
                             modifier = Modifier.testTag(NativeUiTags.OwnerSecurityHistoryRetry),
                         ) { Text("Try again") }
-                        TextButton(
-                            onClick = onBackToMenu,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerSecurityHistoryBack),
-                        ) { Text(backToHubLabel) }
                     }
                 }
                 else -> {
                     Column(Modifier.fillMaxSize()) {
-                        TextButton(
-                            onClick = onBackToMenu,
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                                .testTag(NativeUiTags.OwnerSecurityHistoryBack),
-                        ) { Text(backToHubLabel) }
                         auditsError?.let {
                             Text(
                                 it,
@@ -215,10 +204,6 @@ private fun OwnerSecurityHistoryDetailScreen(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                TextButton(
-                    onClick = onBack,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerSecurityHistoryDetailBack),
-                ) { Text("Back to history") }
                 Text(
                     row.actionCode,
                     style = MaterialTheme.typography.headlineMedium,

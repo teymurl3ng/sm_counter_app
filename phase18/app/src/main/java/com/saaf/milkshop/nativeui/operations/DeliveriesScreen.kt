@@ -89,7 +89,6 @@ fun DeliveriesScreen(
     onLeaveConfirmed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    BackHandler(onBack = onLeaveConfirmed)
     WorkScaffold(
         snackbarHostState = snackbarHostState,
         section = OperationsSection.Deliveries,

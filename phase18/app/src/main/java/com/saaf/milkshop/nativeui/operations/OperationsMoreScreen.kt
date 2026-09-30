@@ -64,6 +64,7 @@ import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 
 /**
@@ -174,12 +175,13 @@ private fun OpsMoreLoadingScreen(
     modifier: Modifier,
 ) {
     OpsMoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.OpsMoreRoot) { padding ->
-        Box(
-            Modifier.fillMaxSize().padding(padding).statusBarsPadding(),
-            contentAlignment = Alignment.Center,
-        ) {
-            CircularProgressIndicator(modifier = Modifier.testTag(NativeUiTags.OpsMoreLoading))
-        }
+        NativeColdLoadingPane(
+            label = "Loading…",
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .testTag(NativeUiTags.OpsMoreLoading),
+        )
     }
 }
 
@@ -283,9 +285,6 @@ private fun OpsMoreTodayWorkScreen(
                     .padding(horizontal = 16.dp, vertical = 18.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                TextButton(onClick = onBack, modifier = Modifier.testTag(NativeUiTags.OpsMoreBack)) {
-                    Text("Back to More")
-                }
                 Text("Today's work", style = MaterialTheme.typography.headlineMedium)
                 Text(
                     "Physical records you posted today. Amounts and balances stay out of this list.",
@@ -405,9 +404,6 @@ private fun OpsMorePersonalSecurityScreen(
                     .padding(horizontal = 16.dp, vertical = 18.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                TextButton(onClick = onBack, modifier = Modifier.testTag(NativeUiTags.OpsMoreBack)) {
-                    Text("Back to More")
-                }
                 Text("Personal security", style = MaterialTheme.typography.headlineMedium)
                 if (security == null) {
                     CircularProgressIndicator()

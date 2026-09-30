@@ -53,6 +53,8 @@ import com.saaf.milkshop.nativeui.common.rememberPressSource
 import androidx.compose.ui.platform.LocalContext
 import com.saaf.milkshop.nativeui.common.hapticTap
 import com.saaf.milkshop.nativeui.common.hapticCommit
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -74,23 +76,19 @@ fun OperationsWorkScreen(
     modifier: Modifier = Modifier,
 ) {
     when (section) {
-        OperationsSection.Work -> when (state) {
+        OperationsSection.Work -> NativeSectionTransition(
+            targetState = state,
+            contentKey = { if (it is NativeOperationsWorkState.Idle || it is NativeOperationsWorkState.Loading) NativeOperationsWorkState.Loading::class else it::class },
+        ) { state -> when (state) {
             NativeOperationsWorkState.Idle,
             NativeOperationsWorkState.Loading,
             -> WorkScaffold(snackbarHostState, section, onNavigate, modifier) {
-                Column(
-                    Modifier
-                        .fillMaxSize()
+                NativeColdLoadingPane(
+                    label = "Loading work…",
+                    modifier = Modifier
                         .padding(it)
-                        .padding(24.dp)
                         .testTag(NativeUiTags.OpsWorkLoading),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CircularProgressIndicator()
-                    Spacer(Modifier.height(12.dp))
-                    Text("Loading work…")
-                }
+                )
             }
             is NativeOperationsWorkState.LoadFailure -> WorkScaffold(
                 snackbarHostState, section, onNavigate, modifier,
@@ -121,6 +119,7 @@ fun OperationsWorkScreen(
                 onNavigate = onNavigate,
                 modifier = modifier,
             )
+        }
         }
         OperationsSection.Deliveries -> {
             // Hosted by NativePreviewActivity via DeliveriesScreen.

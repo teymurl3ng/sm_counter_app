@@ -274,7 +274,6 @@ object NativeUiTags {
     const val OpsMorePersonalSecurity = "ops_more_personal_security"
     const val OpsMoreSwitchAccount = "ops_more_switch_account"
     const val OpsMoreSignOut = "ops_more_sign_out"
-    const val OpsMoreBack = "ops_more_back"
     const val OpsMoreError = "ops_more_error"
     const val OpsMoreSecurityScreen = "ops_more_security_screen"
     const val OpsMoreSecurityStatus = "ops_more_security_status"

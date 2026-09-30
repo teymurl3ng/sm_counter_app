@@ -43,6 +43,8 @@ import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
@@ -58,7 +60,10 @@ fun AttendanceScreen(
     onLeaveConfirmed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
+    NativeSectionTransition(
+        targetState = state,
+        contentKey = { if (it is NativeAttendanceState.Idle || it is NativeAttendanceState.Loading) NativeAttendanceState.Loading::class else it::class },
+    ) { state -> when (state) {
         NativeAttendanceState.Idle,
         NativeAttendanceState.Loading,
         -> AttendanceLoading(snackbarHostState, onNavigate, onLeaveConfirmed, modifier)
@@ -82,6 +87,7 @@ fun AttendanceScreen(
             modifier = modifier,
         )
     }
+    }
 }
 
 @Composable
@@ -91,7 +97,6 @@ private fun AttendanceLoading(
     onLeaveConfirmed: () -> Unit,
     modifier: Modifier,
 ) {
-    BackHandler(onBack = onLeaveConfirmed)
     WorkScaffold(snackbarHostState, OperationsSection.Attendance, onNavigate, modifier) {
         NativeColdLoadingPane(
             label = "Loading attendance…",
@@ -109,7 +114,6 @@ private fun AttendanceLoadFailure(
     onLeaveConfirmed: () -> Unit,
     modifier: Modifier,
 ) {
-    BackHandler(onBack = onLeaveConfirmed)
     WorkScaffold(snackbarHostState, OperationsSection.Attendance, onNavigate, modifier) { padding ->
         NativeLoadFailurePane(
             message = message,
@@ -130,7 +134,6 @@ private fun AttendanceReady(
     onLeaveConfirmed: () -> Unit,
     modifier: Modifier,
 ) {
-    BackHandler(onBack = onLeaveConfirmed)
     WorkScaffold(snackbarHostState, OperationsSection.Attendance, onNavigate, modifier) { padding ->
         Column(
             Modifier

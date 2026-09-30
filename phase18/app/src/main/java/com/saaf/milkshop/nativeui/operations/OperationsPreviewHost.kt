@@ -123,23 +123,32 @@ fun OperationsPreviewHost(
             }
         }
         val navigateOps: (OperationsSection) -> Unit = { section ->
-            when (section) {
-                OperationsSection.Work -> {
-                    if (operationsSection == OperationsSection.Work) {
-                        onShowNotice("Work is already open.")
-                    } else {
-                        onOperationsSectionChange(OperationsSection.Work)
+            if (operationsSection == section) {
+                when (section) {
+                    OperationsSection.Work -> {
+                        val ready = operationsWorkState as? NativeOperationsWorkState.Ready
+                        if (ready != null && ready.destination != NativeOperationsWorkDestination.Home) {
+                            operationsWorkViewModel.backToHome()
+                        } else {
+                            onShowNotice("Work is already open.")
+                        }
+                    }
+                    OperationsSection.Deliveries -> onShowNotice("Deliveries is already open.")
+                    OperationsSection.Attendance -> onShowNotice("Attendance is already open.")
+                    OperationsSection.More -> {
+                        val ready = operationsMoreState as? NativeOperationsMoreState.Ready
+                        if (ready != null && ready.destination != NativeOperationsMoreDestination.Menu) {
+                            operationsMoreViewModel.backToMenu()
+                        } else {
+                            onShowNotice("More is already open.")
+                        }
                     }
                 }
-                OperationsSection.Deliveries,
-                OperationsSection.Attendance,
-                OperationsSection.More,
-                -> {
-                    if (operationsSection == OperationsSection.Work) {
-                        operationsWorkViewModel.backToHome()
-                    }
-                    onOperationsSectionChange(section)
+            } else {
+                if (operationsSection == OperationsSection.Work) {
+                    operationsWorkViewModel.backToHome()
                 }
+                onOperationsSectionChange(section)
             }
         }
         val workReady = operationsWorkState as? NativeOperationsWorkState.Ready

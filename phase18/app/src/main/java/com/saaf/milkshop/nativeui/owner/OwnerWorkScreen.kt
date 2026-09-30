@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.owner.NativeOwnerWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.pressScale
 import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
@@ -61,24 +62,17 @@ fun OwnerWorkScreen(
 ) {
     NativeSectionTransition(
         targetState = state,
-        contentKey = { it::class },
+        contentKey = { if (it is NativeOwnerWorkState.Idle || it is NativeOwnerWorkState.Loading) NativeOwnerWorkState.Loading::class else it::class },
     ) { state -> when (state) {
         NativeOwnerWorkState.Idle,
         NativeOwnerWorkState.Loading,
         -> OwnerScaffold(snackbarHostState, OwnerSection.Work, onNavigate, modifier) {
-            Column(
-                Modifier
-                    .fillMaxSize()
+            NativeColdLoadingPane(
+                label = "Loading work…",
+                modifier = Modifier
                     .padding(it)
-                    .padding(24.dp)
                     .testTag(NativeUiTags.OwnerWorkLoading),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                CircularProgressIndicator()
-                Spacer(Modifier.height(12.dp))
-                Text("Loading work…")
-            }
+            )
         }
         is NativeOwnerWorkState.LoadFailure -> OwnerScaffold(
             snackbarHostState, OwnerSection.Work, onNavigate, modifier,

@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.operations.DeliveriesLoadFailureBody
 import com.saaf.milkshop.nativeui.operations.DeliveriesLoadingBody
 import com.saaf.milkshop.nativeui.operations.DeliveriesReadyContent
@@ -46,7 +47,10 @@ fun OwnerDeliveriesEntryScreen(
             onNavigate = onNavigate,
             modifier = Modifier.fillMaxSize(),
         ) { padding ->
-            when (state) {
+            NativeSectionTransition(
+                targetState = state,
+                contentKey = { if (it is NativeDeliveriesState.Idle || it is NativeDeliveriesState.Loading) NativeDeliveriesState.Loading::class else it::class },
+            ) { state -> when (state) {
                 NativeDeliveriesState.Idle,
                 NativeDeliveriesState.Loading,
                 -> DeliveriesLoadingBody(
@@ -66,6 +70,7 @@ fun OwnerDeliveriesEntryScreen(
                     onArchive = onArchive,
                     contentPadding = padding,
                 )
+            }
             }
         }
     }

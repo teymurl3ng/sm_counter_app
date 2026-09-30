@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.testTag
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.vendorpayment.NativeVendorPaymentRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.vendorpayment.NativeVendorPaymentState
 import com.saaf.milkshop.nativeui.vendorpayment.VendorPaymentDiscardDialog
@@ -59,7 +60,10 @@ fun OwnerPaySupplierEntryScreen(
             },
             modifier = Modifier.fillMaxSize(),
         ) { padding ->
-            when (state) {
+            NativeSectionTransition(
+                targetState = state,
+                contentKey = { if (it is NativeVendorPaymentState.Idle || it is NativeVendorPaymentState.Loading) NativeVendorPaymentState.Loading::class else it::class },
+            ) { state -> when (state) {
                 NativeVendorPaymentState.Idle,
                 NativeVendorPaymentState.Loading,
                 -> VendorPaymentLoadingBody(
@@ -79,6 +83,7 @@ fun OwnerPaySupplierEntryScreen(
                     leaveGuard = leaveGuard,
                     contentPadding = padding,
                 )
+            }
             }
         }
         VendorPaymentDiscardDialog(leaveGuard)

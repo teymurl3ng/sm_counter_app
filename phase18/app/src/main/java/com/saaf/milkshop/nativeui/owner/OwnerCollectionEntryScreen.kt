@@ -17,6 +17,7 @@ import com.saaf.milkshop.nativeui.collection.CollectionEntryContent
 import com.saaf.milkshop.nativeui.collection.CollectionLoadFailureBody
 import com.saaf.milkshop.nativeui.collection.CollectionLoadingBody
 import com.saaf.milkshop.nativeui.collection.NativeCollectionState
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 
 /**
@@ -61,7 +62,10 @@ fun OwnerCollectionEntryScreen(
             },
             modifier = Modifier.fillMaxSize(),
         ) { padding ->
-            when (state) {
+            NativeSectionTransition(
+                targetState = state,
+                contentKey = { if (it is NativeCollectionState.Idle || it is NativeCollectionState.Loading) NativeCollectionState.Loading::class else it::class },
+            ) { state -> when (state) {
                 NativeCollectionState.Idle,
                 NativeCollectionState.Loading,
                 -> CollectionLoadingBody(
@@ -82,6 +86,7 @@ fun OwnerCollectionEntryScreen(
                     leaveGuard = leaveGuard,
                     contentPadding = padding,
                 )
+            }
             }
         }
         CollectionDiscardDialog(leaveGuard)

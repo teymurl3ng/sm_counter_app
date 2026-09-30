@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.testTag
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.expense.NativeExpenseRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.expense.ExpenseDiscardDialog
 import com.saaf.milkshop.nativeui.expense.ExpenseEntryContent
@@ -59,7 +60,10 @@ fun OwnerExpenseEntryScreen(
             },
             modifier = Modifier.fillMaxSize(),
         ) { padding ->
-            when (state) {
+            NativeSectionTransition(
+                targetState = state,
+                contentKey = { if (it is NativeExpenseState.Idle || it is NativeExpenseState.Loading) NativeExpenseState.Loading::class else it::class },
+            ) { state -> when (state) {
                 NativeExpenseState.Idle,
                 NativeExpenseState.Loading,
                 -> ExpenseLoadingBody(
@@ -79,6 +83,7 @@ fun OwnerExpenseEntryScreen(
                     leaveGuard = leaveGuard,
                     contentPadding = padding,
                 )
+            }
             }
         }
         ExpenseDiscardDialog(leaveGuard)

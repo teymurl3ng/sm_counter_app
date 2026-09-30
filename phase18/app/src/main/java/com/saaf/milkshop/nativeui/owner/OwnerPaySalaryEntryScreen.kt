@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.testTag
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.salarypayment.NativeSalaryPaymentRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.salarypayment.NativeSalaryPaymentState
 import com.saaf.milkshop.nativeui.salarypayment.SalaryPaymentDiscardDialog
@@ -59,7 +60,10 @@ fun OwnerPaySalaryEntryScreen(
             },
             modifier = Modifier.fillMaxSize(),
         ) { padding ->
-            when (state) {
+            NativeSectionTransition(
+                targetState = state,
+                contentKey = { if (it is NativeSalaryPaymentState.Idle || it is NativeSalaryPaymentState.Loading) NativeSalaryPaymentState.Loading::class else it::class },
+            ) { state -> when (state) {
                 NativeSalaryPaymentState.Idle,
                 NativeSalaryPaymentState.Loading,
                 -> SalaryPaymentLoadingBody(
@@ -79,6 +83,7 @@ fun OwnerPaySalaryEntryScreen(
                     leaveGuard = leaveGuard,
                     contentPadding = padding,
                 )
+            }
             }
         }
         SalaryPaymentDiscardDialog(leaveGuard)

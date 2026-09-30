@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.testTag
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.operations.NativeMakeYogurtRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.operations.MakeYogurtDiscardDialog
 import com.saaf.milkshop.nativeui.operations.MakeYogurtLoadFailureBody
@@ -59,7 +60,10 @@ fun OwnerMakeYogurtEntryScreen(
             },
             modifier = Modifier.fillMaxSize(),
         ) { padding ->
-            when (state) {
+            NativeSectionTransition(
+                targetState = state,
+                contentKey = { if (it is NativeMakeYogurtState.Idle || it is NativeMakeYogurtState.Loading) NativeMakeYogurtState.Loading::class else it::class },
+            ) { state -> when (state) {
                 NativeMakeYogurtState.Idle,
                 NativeMakeYogurtState.Loading,
                 -> MakeYogurtLoadingBody(
@@ -80,6 +84,7 @@ fun OwnerMakeYogurtEntryScreen(
                     leaveGuard = leaveGuard,
                     contentPadding = padding,
                 )
+            }
             }
         }
         MakeYogurtDiscardDialog(leaveGuard)

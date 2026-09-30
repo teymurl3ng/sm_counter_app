@@ -102,10 +102,7 @@ fun CashierMoreScreen(
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    NativeSectionTransition(
-        targetState = state,
-        contentKey = { it::class },
-    ) { state -> when (state) {
+    when (state) {
         NativeMoreState.Idle,
         NativeMoreState.Loading,
         -> MoreLoadingScreen(snackbarHostState, onNavigate, modifier)
@@ -119,10 +116,7 @@ fun CashierMoreScreen(
         )
 
         is NativeMoreState.Ready -> {
-            NativeSectionTransition(
-            targetState = state.destination,
-            contentKey = { it },
-        ) { destination ->
+            val destination = state.destination
             when (destination) {
                 NativeMoreDestination.Menu -> MoreMenuScreen(
                     snackbarHostState = snackbarHostState,
@@ -168,9 +162,7 @@ fun CashierMoreScreen(
                     modifier = modifier,
                 )
             }
-            }
         }
-    }
     }
 }
 

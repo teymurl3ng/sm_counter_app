@@ -135,11 +135,7 @@ fun CashierCollectionScreen(
         if (canLeave) leaveGuard.requestLeave(onLeaveConfirmed)
     }
     Column(modifier = modifier.fillMaxSize().padding(contentPadding)) {
-        NativeSectionTransition(
-            targetState = state,
-            contentKey = { it::class },
-            modifier = Modifier.fillMaxSize(),
-        ) { state -> when (state) {
+        when (state) {
             NativeCollectionState.Idle,
             NativeCollectionState.Loading,
             -> CollectionLoadingBody()
@@ -160,7 +156,6 @@ fun CashierCollectionScreen(
                 contentPadding = PaddingValues(0.dp),
                 showHeader = false,
             )
-        }
         }
     }
     CollectionDiscardDialog(leaveGuard)

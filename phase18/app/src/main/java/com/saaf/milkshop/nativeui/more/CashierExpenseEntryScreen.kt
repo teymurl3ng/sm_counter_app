@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.expense.NativeExpenseRequest
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.expense.ExpenseDiscardDialog
@@ -66,7 +67,10 @@ fun CashierExpenseEntryScreen(
             .testTag(NativeUiTags.CashierExpenseEntryRoot),
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            when (state) {
+            NativeSectionTransition(
+            targetState = state,
+            contentKey = { it::class },
+        ) { state -> when (state) {
                 NativeExpenseState.Idle,
                 NativeExpenseState.Loading,
                 -> ExpenseLoadingBody(
@@ -88,6 +92,7 @@ fun CashierExpenseEntryScreen(
                     showHeader = false,
                 )
             }
+        }
         }
         ExpenseDiscardDialog(leaveGuard)
     }

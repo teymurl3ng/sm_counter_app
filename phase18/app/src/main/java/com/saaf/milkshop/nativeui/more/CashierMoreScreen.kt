@@ -102,7 +102,10 @@ fun CashierMoreScreen(
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
+    NativeSectionTransition(
+        targetState = state,
+        contentKey = { it::class },
+    ) { state -> when (state) {
         NativeMoreState.Idle,
         NativeMoreState.Loading,
         -> MoreLoadingScreen(snackbarHostState, onNavigate, modifier)
@@ -165,6 +168,7 @@ fun CashierMoreScreen(
         }
     }
 }
+    }
 
 @Composable
 fun CashierDeliveriesEntryScreen(

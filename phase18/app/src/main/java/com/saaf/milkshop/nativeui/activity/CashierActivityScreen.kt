@@ -66,7 +66,10 @@ fun CashierActivityScreen(
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
+    NativeSectionTransition(
+        targetState = state,
+        contentKey = { it::class },
+    ) { state -> when (state) {
         NativeActivityState.Idle,
         NativeActivityState.Loading,
         -> ActivityLoadingScreen(snackbarHostState, onNavigate, modifier)
@@ -104,6 +107,7 @@ fun CashierActivityScreen(
                 )
             }
         }
+    }
     }
 }
 

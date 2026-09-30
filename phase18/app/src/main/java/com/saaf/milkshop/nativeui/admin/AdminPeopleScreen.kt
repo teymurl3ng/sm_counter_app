@@ -44,6 +44,8 @@ import com.saaf.milkshop.domain.EmployeeProfileInput
 import com.saaf.milkshop.domain.VendorProfileInput
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.HostedScaffold
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.owner.NativeOwnerMoreDestination
 import com.saaf.milkshop.nativeui.owner.NativeOwnerMoreState
 import com.saaf.milkshop.nativeui.owner.OwnerCustomersScreen
@@ -123,19 +125,20 @@ fun AdminPeopleScreen(
         )
     }
 
-    when (state) {
+    NativeSectionTransition(
+        targetState = state,
+        contentKey = { it::class },
+    ) { state -> when (state) {
         NativeOwnerMoreState.Idle,
         NativeOwnerMoreState.Loading,
         -> AdminScaffold(snackbarHostState, AdminSection.People, onNavigate, modifier) {
-            Box(
-                Modifier
+            NativeColdLoadingPane(
+                label = "Loading…",
+                modifier = Modifier
                     .fillMaxSize()
                     .padding(it)
                     .testTag(NativeUiTags.AdminPeopleLoading),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator()
-            }
+            )
         }
 
         is NativeOwnerMoreState.LoadFailure -> AdminScaffold(
@@ -164,7 +167,10 @@ fun AdminPeopleScreen(
             }
         }
 
-        is NativeOwnerMoreState.Ready -> when (state.destination) {
+        is NativeOwnerMoreState.Ready -> NativeSectionTransition(
+            targetState = state.destination,
+            contentKey = { it },
+        ) { destination -> when (destination) {
             NativeOwnerMoreDestination.Menu -> AdminPeopleHubScreen(
                 snackbarHostState = snackbarHostState,
                 identity = identity,
@@ -327,7 +333,9 @@ fun AdminPeopleScreen(
                     modifier = modifier,
                 )
             }
+            }
         }
+    }
     }
 }
 

@@ -37,6 +37,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.admin.NativeAdminWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.pressScale
 import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
@@ -61,23 +63,19 @@ fun AdminWorkScreen(
     onNavigate: (AdminSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
+    NativeSectionTransition(
+        targetState = state,
+        contentKey = { if (it is NativeAdminWorkState.Idle || it is NativeAdminWorkState.Loading) NativeAdminWorkState.Loading::class else it::class },
+    ) { state -> when (state) {
         NativeAdminWorkState.Idle,
         NativeAdminWorkState.Loading,
         -> AdminScaffold(snackbarHostState, AdminSection.Work, onNavigate, modifier) {
-            Column(
-                Modifier
-                    .fillMaxSize()
+            NativeColdLoadingPane(
+                label = "Loading setup health…",
+                modifier = Modifier
                     .padding(it)
-                    .padding(24.dp)
                     .testTag(NativeUiTags.AdminWorkLoading),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                CircularProgressIndicator()
-                Spacer(Modifier.height(12.dp))
-                Text("Loading setup health…")
-            }
+            )
         }
         is NativeAdminWorkState.LoadFailure -> AdminScaffold(
             snackbarHostState, AdminSection.Work, onNavigate, modifier,
@@ -109,6 +107,7 @@ fun AdminWorkScreen(
             onNavigate = onNavigate,
             modifier = modifier,
         )
+    }
     }
 }
 

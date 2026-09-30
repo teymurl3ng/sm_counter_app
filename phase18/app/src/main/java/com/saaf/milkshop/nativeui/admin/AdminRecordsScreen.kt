@@ -36,6 +36,8 @@ import com.saaf.milkshop.application.owner.NativeCorrectionPrefill
 import com.saaf.milkshop.application.owner.NativeRecordsGroup
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.HostedScaffold
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.owner.NativeCorrectionEditorState
 import com.saaf.milkshop.nativeui.owner.NativeOwnerMoreState
 import com.saaf.milkshop.nativeui.owner.NativeOwnerRecordsState
@@ -93,7 +95,10 @@ fun AdminRecordsScreen(
         )
     }
 
-    when (destination) {
+    NativeSectionTransition(
+        targetState = destination,
+        contentKey = { it },
+    ) { destination -> when (destination) {
         AdminRecordsDestination.Hub -> AdminRecordsHubScreen(
             snackbarHostState = snackbarHostState,
             identity = identity,
@@ -136,15 +141,13 @@ fun AdminRecordsScreen(
             if (ready == null) {
                 BackHandler(onBack = onBackToHub)
                 AdminScaffold(snackbarHostState, AdminSection.Records, onNavigate, modifier) {
-                    Box(
-                        Modifier
+                    NativeColdLoadingPane(
+                        label = "Loading…",
+                        modifier = Modifier
                             .fillMaxSize()
                             .padding(it)
                             .testTag(NativeUiTags.AdminRecordsLoading),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        androidx.compose.material3.CircularProgressIndicator()
-                    }
+                    )
                 }
             } else {
                 Box(
@@ -169,6 +172,7 @@ fun AdminRecordsScreen(
                     )
                 }
             }
+        }
         }
     }
 }

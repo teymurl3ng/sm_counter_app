@@ -187,13 +187,40 @@ fun AdminPreviewHost(
             if (adminSection == AdminSection.Work && section != AdminSection.Work) {
                 returnAdminWorkHome()
             }
-            if (
-                section in setOf(AdminSection.People, AdminSection.More) &&
-                adminSection != section
-            ) {
+            if (adminSection == section) {
+                when (section) {
+                    AdminSection.Work -> {
+                        if (workDestination == NativeAdminWorkDestination.RecordExpense) {
+                            returnAdminWorkHome()
+                        } else {
+                            onShowNotice("Work is already open.")
+                        }
+                    }
+                    AdminSection.People -> {
+                        val ready = ownerMoreState as? NativeOwnerMoreState.Ready
+                        if (ready != null && ready.destination != NativeOwnerMoreDestination.Menu) {
+                            ownerMoreViewModel.backToMenu()
+                        } else {
+                            onShowNotice("People is already open.")
+                        }
+                    }
+                    AdminSection.Records -> onShowNotice("Records is already open.")
+                    AdminSection.More -> {
+                        val ready = ownerMoreState as? NativeOwnerMoreState.Ready
+                        if (ready != null && ready.destination != NativeOwnerMoreDestination.Menu) {
+                            snackbarHostState.currentSnackbarData?.dismiss()
+                            ownerMoreViewModel.backToMenu()
+                        } else {
+                            onShowNotice("More is already open.")
+                        }
+                    }
+                }
+            } else if (section in setOf(AdminSection.People, AdminSection.More)) {
                 ownerMoreViewModel.backToMenu()
+                onAdminSectionChange(section)
+            } else {
+                onAdminSectionChange(section)
             }
-            onAdminSectionChange(section)
         }
 
         val businessDate = LocalDate.now().toString()

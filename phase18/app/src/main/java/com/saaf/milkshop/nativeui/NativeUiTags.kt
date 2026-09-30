@@ -991,7 +991,6 @@ object NativeUiTags {
     const val AdminMoreSwitchAccount = "admin_more_switch_account"
     const val AdminMoreSignOut = "admin_more_sign_out"
     const val AdminMoreSecurityScreen = "admin_more_security_screen"
-    const val AdminMoreBack = "admin_more_back"
     const val AdminProductsRoot = "admin_products_root"
     const val AdminCostingPlansRoot = "admin_costing_plans_root"
     const val AdminShopSettingsRoot = "admin_shop_settings_root"

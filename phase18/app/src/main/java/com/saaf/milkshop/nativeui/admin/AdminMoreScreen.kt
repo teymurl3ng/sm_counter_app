@@ -64,6 +64,7 @@ import com.saaf.milkshop.domain.StoreIdentityInput
 import com.saaf.milkshop.domain.YieldPolicyInput
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.HostedScaffold
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.owner.NativeOwnerCostingSection
 import com.saaf.milkshop.nativeui.owner.NativeOwnerMoreDestination
@@ -149,19 +150,20 @@ fun AdminMoreScreen(
         )
     }
 
-    when (state) {
+    NativeSectionTransition(
+        targetState = state,
+        contentKey = { it::class },
+    ) { state -> when (state) {
         NativeOwnerMoreState.Idle,
         NativeOwnerMoreState.Loading,
         -> AdminScaffold(snackbarHostState, AdminSection.More, onNavigate, modifier) {
-            Box(
-                Modifier
+            NativeColdLoadingPane(
+                label = "Loading…",
+                modifier = Modifier
                     .fillMaxSize()
                     .padding(it)
                     .testTag(NativeUiTags.AdminMoreLoading),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator()
-            }
+            )
         }
 
         is NativeOwnerMoreState.LoadFailure -> AdminScaffold(
@@ -463,6 +465,7 @@ fun AdminMoreScreen(
             }
         }
     }
+    }
 }
 
 @Composable
@@ -619,12 +622,6 @@ private fun AdminMorePersonalSecurityScreen(
                     .padding(horizontal = 16.dp, vertical = 18.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                TextButton(
-                    onClick = onBack,
-                    modifier = Modifier.testTag(NativeUiTags.AdminMoreBack),
-                ) {
-                    Text("Back to More")
-                }
                 Text("Personal security", style = MaterialTheme.typography.headlineMedium)
                 if (security == null) {
                     CircularProgressIndicator()

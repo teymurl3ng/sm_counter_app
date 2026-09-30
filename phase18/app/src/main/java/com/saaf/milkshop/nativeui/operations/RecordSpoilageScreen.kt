@@ -42,6 +42,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -56,6 +57,7 @@ import com.saaf.milkshop.application.operations.NativeRecordSpoilageRequest
 import com.saaf.milkshop.application.operations.NativeSpoilageProduct
 import com.saaf.milkshop.application.operations.NativeSpoilageReason
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.hapticCommit
 import com.saaf.milkshop.nativeui.common.pressScale
 import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
@@ -317,10 +319,12 @@ internal fun RecordSpoilageReadyContent(
                             modifier = Modifier.testTag(NativeUiTags.OpsRecordSpoilageError),
                         )
                     }
+                    val hapticContext = LocalContext.current
                     val press = rememberPressSource()
                     Button(
                         interactionSource = press,
                         onClick = {
+                            hapticContext.hapticCommit()
                             val selected = product ?: return@Button
                             val qty = quantity ?: return@Button
                             val selectedReason = reason ?: return@Button

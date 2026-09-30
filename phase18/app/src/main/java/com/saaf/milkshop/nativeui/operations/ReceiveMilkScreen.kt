@@ -42,6 +42,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -56,6 +57,7 @@ import com.saaf.milkshop.application.operations.NativeReceiveMilkReceipt
 import com.saaf.milkshop.application.operations.NativeReceiveMilkRequest
 import com.saaf.milkshop.application.operations.NativeReceiveMilkVendor
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.hapticCommit
 import com.saaf.milkshop.nativeui.common.pressScale
 import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
@@ -298,10 +300,12 @@ internal fun ReceiveMilkReadyContent(
                             modifier = Modifier.testTag(NativeUiTags.OpsReceiveMilkError),
                         )
                     }
+                    val hapticContext = LocalContext.current
                     val press = rememberPressSource()
                     Button(
                         interactionSource = press,
                         onClick = {
+                            hapticContext.hapticCommit()
                             val vendor = state.selectedVendor ?: return@Button
                             val raw = liters ?: return@Button
                             val fatValue = fat ?: return@Button

@@ -38,6 +38,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -48,6 +49,7 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.operations.NativeMakeYogurtReceipt
 import com.saaf.milkshop.application.operations.NativeMakeYogurtRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.hapticCommit
 import com.saaf.milkshop.nativeui.common.pressScale
 import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
@@ -285,10 +287,12 @@ internal fun MakeYogurtReadyContent(
                 } else {
                     "Record batch"
                 }
+                val hapticContext = LocalContext.current
                 val press = rememberPressSource()
                 Button(
                     interactionSource = press,
                     onClick = {
+                        hapticContext.hapticCommit()
                         val milkValue = milk ?: return@Button
                         val yogurtValue = yogurt ?: return@Button
                         onRecord(

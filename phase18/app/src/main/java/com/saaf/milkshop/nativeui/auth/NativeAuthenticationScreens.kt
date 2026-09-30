@@ -763,12 +763,14 @@ private fun AccessMethodButton(
     icon: @Composable () -> Unit,
     onClick: () -> Unit,
 ) {
+    val press = rememberPressSource()
     OutlinedButton(
         onClick = onClick,
         enabled = enabled,
         shape = RoundedCornerShape(13.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-        modifier = Modifier.fillMaxWidth().height(68.dp).testTag(tag),
+        modifier = Modifier.pressScale(press).fillMaxWidth().height(68.dp).testTag(tag),
+        interactionSource = press,
     ) {
         icon()
         Spacer(Modifier.size(12.dp))

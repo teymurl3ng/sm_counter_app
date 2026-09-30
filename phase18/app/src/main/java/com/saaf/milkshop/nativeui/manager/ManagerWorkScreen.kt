@@ -38,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.manager.NativeManagerWorkContext
@@ -45,6 +46,7 @@ import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.hapticTap
 import com.saaf.milkshop.nativeui.common.pressScale
 import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -384,9 +386,10 @@ private fun PrimaryAction(
     tag: String,
     onClick: () -> Unit,
 ) {
+    val context = LocalContext.current
     val press = rememberPressSource()
     OutlinedButton(
-        onClick = onClick,
+        onClick = { context.hapticTap(); onClick() },
         modifier = Modifier
             .pressScale(press)
             .fillMaxWidth()

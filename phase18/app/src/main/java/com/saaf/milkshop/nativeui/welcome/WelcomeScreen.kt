@@ -9,6 +9,11 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.Spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,7 +49,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -161,14 +165,36 @@ fun WelcomeScreen(
  * Canonical brand mark: the exact launcher-icon foreground (milk vessel,
  * golden purity drop, verification badge on the green tile). One drawing for
  * the app icon and the sign-in screen — no wrapper frames, no drift.
+ * Entrance: settles from 92% scale + slight offset, springing into place.
  */
 @Composable
 private fun SaafBrandMark() {
     val description = stringResource(R.string.native_brand_mark)
+    var appeared by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { appeared = true }
+    val scale by animateFloatAsState(
+        targetValue = if (appeared) 1f else 0.92f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessMediumLow,
+        ),
+        label = "brand_scale",
+    )
+    val alpha by animateFloatAsState(
+        targetValue = if (appeared) 1f else 0f,
+        animationSpec = tween(220),
+        label = "brand_alpha",
+    )
     Image(
         painter = painterResource(R.drawable.ic_launcher_foreground),
         contentDescription = description,
-        modifier = Modifier.size(120.dp),
+        modifier = Modifier
+            .size(120.dp)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+                this.alpha = alpha
+            },
     )
 }
 

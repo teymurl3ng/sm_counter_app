@@ -166,11 +166,28 @@ fun <T> NativeSectionTransition(
     contentKey: (T) -> Any,
     content: @Composable (T) -> Unit,
 ) {
-    // Verified on device: hard cuts feel clean; every fade/slide variant we
-    // tried (crossfade, fade+settle, fade-through) read as a full reload on
-    // this screen size. Keep switching instant — if this ever changes, test
-    // on a real device with a screen recording before committing to it.
-    content(targetState)
+    AnimatedContent(
+        targetState = targetState,
+        transitionSpec = {
+            // Incoming screen is nearly opaque from frame one and settles
+            // 97%->100% over 130ms: visible motion, but never semi-transparent
+            // over the background (fading from 0% flashed background color on
+            // every switch, which read as a full reload) and never overlapping
+            // the outgoing pane (instant exit — two full screens read as a
+            // double). The old pane disappears in 1ms.
+            (
+                fadeIn(
+                    tween(130),
+                    initialAlpha = 0.85f,
+                ) + scaleIn(initialScale = 0.97f, animationSpec = tween(130))
+            ) togetherWith fadeOut(tween(1))
+        },
+        contentKey = contentKey,
+        modifier = modifier,
+        label = "section_transition",
+    ) { state ->
+        content(state)
+    }
 }
 @Composable
 private fun rememberSecondaryTransitionDurationMillis(): Int {

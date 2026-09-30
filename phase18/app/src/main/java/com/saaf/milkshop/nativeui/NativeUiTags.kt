@@ -440,7 +440,6 @@ object NativeUiTags {
     const val OwnerMoreBackup = "owner_more_backup"
     const val OwnerMoreSync = "owner_more_sync"
     const val OwnerSyncRoot = "owner_sync_root"
-    const val OwnerSyncBack = "owner_sync_back"
     const val OwnerSyncLoading = "owner_sync_loading"
     const val OwnerSyncStatus = "owner_sync_status"
     const val OwnerSyncNow = "owner_sync_now"

@@ -375,6 +375,8 @@ fun OwnerPreviewHost(
                                     ownerMoreViewModel.cancelBackupDisconnect()
                                 else -> ownerMoreViewModel.backToMenu()
                             }
+                        NativeOwnerMoreDestination.Sync ->
+                            ownerMoreViewModel.backToMenu()
                         else -> onLeaveToWelcome()
                     }
                 }

@@ -64,7 +64,6 @@ fun OwnerSyncScreen(
     busy: Boolean,
     error: String?,
     notice: String?,
-    onBackToMenu: () -> Unit,
     onRefresh: () -> Unit,
     onEnroll: (username: String, credential: CharArray, environment: String) -> Unit,
     onEnrollInShop: (shopId: String, username: String, credential: CharArray, environment: String) -> Unit,
@@ -79,7 +78,7 @@ fun OwnerSyncScreen(
     // and the shop pick, so the owner does not retype it. Wiped on use.
     var lastCredential by remember { mutableStateOf<CharArray?>(null) }
 
-    hostedScaffold(snackbarHostState, modifier, { it() }) { _ ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         var username by rememberSaveable { mutableStateOf("") }
         var credential by rememberSaveable { mutableStateOf("") }
         var environment by rememberSaveable { mutableStateOf(SyncServerConfig.ENVIRONMENT_PROD) }
@@ -90,6 +89,11 @@ fun OwnerSyncScreen(
             return credential.toCharArray()
         }
 
+        // Scaffold stacks content children in a Box — separate siblings draw
+        // on top of each other (the sync "ghosting"). One column holds the
+        // pinned header and the scrollable body below it, inset by the
+        // shell's padding.
+        Column(Modifier.fillMaxSize().padding(padding)) {
         // Header sits flush at the screen top — outside the horizontally
         // padded, scrolling content column (white bars otherwise).
         CashierScreenHeader(
@@ -102,28 +106,13 @@ fun OwnerSyncScreen(
 
         Column(
             Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .weight(1f)
                 .verticalScroll(rememberScrollState())
                 .testTag(NativeUiTags.OwnerSyncRoot)
                 .padding(horizontal = 16.dp),
         ) {
             Spacer(Modifier.height(12.dp))
-            TextButton(
-                onClick = {
-                    lastCredential?.fill(' ')
-                    lastCredential = null
-                    onBackToMenu()
-                },
-                modifier = Modifier.testTag(NativeUiTags.OwnerSyncBack),
-            ) { Text("Back to More") }
-
-            Text("Sync", style = MaterialTheme.typography.headlineSmall)
-            Text(
-                "Shop: ${context.shopName}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Spacer(Modifier.height(8.dp))
 
             when {
                 busy && status == null -> {
@@ -221,6 +210,7 @@ fun OwnerSyncScreen(
                 )
             }
             Spacer(Modifier.height(24.dp))
+        }
         }
     }
 

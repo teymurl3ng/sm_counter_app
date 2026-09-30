@@ -383,7 +383,6 @@ fun AdminMoreScreen(
                 busy = state.syncState.busy,
                 error = state.syncState.error,
                 notice = state.syncState.notice,
-                onBackToMenu = onBackToMenu,
                 onRefresh = onRefreshSync,
                 onEnroll = onEnrollSync,
                 onEnrollInShop = onEnrollSyncInShop,

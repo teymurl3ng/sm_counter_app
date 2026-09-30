@@ -21,9 +21,17 @@ internal class OwnerSyncController(
     fun openSync() {
         val token = runtime.captureSession() ?: return
         val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
+        // Keep any previously loaded status so the entering pane never flashes
+        // the enrollment form (or a wiped one) over real data while the section
+        // fade settles; only a genuine first load shows the busy pane.
+        val statusKnown = current.syncState.status != null
         runtime.state.value = current.copy(
             destination = NativeOwnerMoreDestination.Sync,
-            syncState = OwnerSyncState(),
+            syncState = current.syncState.copy(
+                busy = !statusKnown,
+                error = null,
+                notice = null,
+            ),
         )
         loadStatus(token)
     }

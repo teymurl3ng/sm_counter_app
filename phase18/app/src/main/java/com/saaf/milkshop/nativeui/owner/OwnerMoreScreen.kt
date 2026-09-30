@@ -72,6 +72,7 @@ import com.saaf.milkshop.domain.ProductCatalogInput
 import com.saaf.milkshop.domain.StoreIdentityInput
 import com.saaf.milkshop.domain.VendorProfileInput
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -217,19 +218,20 @@ fun OwnerMoreScreen(
     onLeaveConfirmed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
+    NativeSectionTransition(
+        targetState = state,
+        contentKey = { it::class },
+    ) { state -> when (state) {
         NativeOwnerMoreState.Idle,
         NativeOwnerMoreState.Loading,
         -> OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) {
-            Box(
-                Modifier
+            NativeColdLoadingPane(
+                label = "Loading…",
+                modifier = Modifier
                     .fillMaxSize()
                     .padding(it)
                     .testTag(NativeUiTags.OwnerMoreLoading),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator()
-            }
+            )
         }
 
         is NativeOwnerMoreState.LoadFailure -> OwnerScaffold(
@@ -729,6 +731,7 @@ fun OwnerMoreScreen(
             )
             }
         }
+    }
     }
 }
 

@@ -169,17 +169,15 @@ fun <T> NativeSectionTransition(
     AnimatedContent(
         targetState = targetState,
         transitionSpec = {
-            // Incoming screen is nearly opaque from frame one and settles
-            // 97%->100% over 130ms: visible motion, but never semi-transparent
-            // over the background (fading from 0% flashed background color on
-            // every switch, which read as a full reload) and never overlapping
-            // the outgoing pane (instant exit — two full screens read as a
-            // double). The old pane disappears in 1ms.
+            // Owner-preferred feel (the 17caeff fade+settle): full fade from
+            // transparent + 92%->100% scale over 200ms, instant exit. The old
+            // "doubling" came from nested inner transitions (removed), not
+            // from this spec — do not re-add them.
             (
-                fadeIn(
-                    tween(130),
-                    initialAlpha = 0.85f,
-                ) + scaleIn(initialScale = 0.97f, animationSpec = tween(130))
+                fadeIn(tween(200)) + scaleIn(
+                    initialScale = 0.92f,
+                    animationSpec = tween(200),
+                )
             ) togetherWith fadeOut(tween(1))
         },
         contentKey = contentKey,

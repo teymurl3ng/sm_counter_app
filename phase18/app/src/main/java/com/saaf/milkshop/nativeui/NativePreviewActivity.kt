@@ -127,6 +127,7 @@ import com.saaf.milkshop.quickunlock.AndroidQuickUnlockRecordStore
 import com.saaf.milkshop.quickunlock.QuickUnlockService
 import com.saaf.milkshop.nativeui.common.LocalDayStatusAction
 import com.saaf.milkshop.nativeui.owner.NativeOwnerWorkDestination
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.lockPortraitOnPhones
 import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.launch
@@ -527,6 +528,9 @@ class NativePreviewActivity : FragmentActivity() {
 
 private enum class PreviewDestination { Welcome, Access }
 
+/** What the Access screen is currently showing: sign-in flow or one role shell. */
+private enum class AuthShellPane { SignIn, Owner, Operator, Manager, Admin, Cashier }
+
 @Composable
 private fun NativeFoundationPreview(
     database: MilkShopDatabase,
@@ -911,7 +915,11 @@ private fun NativeFoundationPreview(
     // simply invert with it (dark icons vanish on a dark background).
     SystemBarAppearance(useDarkIcons = !isSystemInDarkTheme())
 
-    when (destination) {
+    NativeSectionTransition(
+        targetState = destination,
+        contentKey = { it },
+    ) { dest ->
+        when (dest) {
         PreviewDestination.Welcome -> WelcomeScreen(
             onContinue = { destination = PreviewDestination.Access },
         )
@@ -930,8 +938,21 @@ private fun NativeFoundationPreview(
         // Cashier/Operator/Admin: null — their chip is a passive indicator
         // (they cannot close or reopen the day).
         CompositionLocalProvider(LocalDayStatusAction provides dayStatusAction) {
-            if (showingOwner) {
-                val authenticated = authenticationState as NativeAuthenticationState.Authenticated
+            val authPane = when {
+                showingOwner -> AuthShellPane.Owner
+                showingOperator -> AuthShellPane.Operator
+                showingManager -> AuthShellPane.Manager
+                showingAdmin -> AuthShellPane.Admin
+                showingCashier -> AuthShellPane.Cashier
+                else -> AuthShellPane.SignIn
+            }
+            NativeSectionTransition(
+                targetState = authPane,
+                contentKey = { it },
+            ) { pane ->
+            if (pane == AuthShellPane.Owner) {
+                val authenticated = authenticationState as? NativeAuthenticationState.Authenticated
+                    ?: return@NativeSectionTransition
                 OwnerPreviewHost(
                     sessionHandle = authenticated.sessionHandle,
                     identity = authenticated.identity,
@@ -977,8 +998,9 @@ private fun NativeFoundationPreview(
                     onLeaveToAccountPicker = { leaveToAccountPicker() },
                     onShowNotice = { showPreviewNotice(it) },
                 )
-            } else if (showingOperator) {
-                val authenticated = authenticationState as NativeAuthenticationState.Authenticated
+            } else if (pane == AuthShellPane.Operator) {
+                val authenticated = authenticationState as? NativeAuthenticationState.Authenticated
+                    ?: return@NativeSectionTransition
                 OperationsPreviewHost(
                     sessionHandle = authenticated.sessionHandle,
                     identity = authenticated.identity,
@@ -1003,8 +1025,9 @@ private fun NativeFoundationPreview(
                     onLeaveToAccountPicker = { leaveToAccountPicker() },
                     onShowNotice = { showPreviewNotice(it) },
                 )
-            } else if (showingManager) {
-                val authenticated = authenticationState as NativeAuthenticationState.Authenticated
+            } else if (pane == AuthShellPane.Manager) {
+                val authenticated = authenticationState as? NativeAuthenticationState.Authenticated
+                    ?: return@NativeSectionTransition
                 ManagerPreviewHost(
                     sessionHandle = authenticated.sessionHandle,
                     identity = authenticated.identity,
@@ -1039,8 +1062,9 @@ private fun NativeFoundationPreview(
                     onLeaveToAccountPicker = { leaveToAccountPicker() },
                     onShowNotice = { showPreviewNotice(it) },
                 )
-            } else if (showingAdmin) {
-                val authenticated = authenticationState as NativeAuthenticationState.Authenticated
+            } else if (pane == AuthShellPane.Admin) {
+                val authenticated = authenticationState as? NativeAuthenticationState.Authenticated
+                    ?: return@NativeSectionTransition
                 AdminPreviewHost(
                     sessionHandle = authenticated.sessionHandle,
                     identity = authenticated.identity,
@@ -1059,8 +1083,9 @@ private fun NativeFoundationPreview(
                     onLeaveToAccountPicker = { leaveToAccountPicker() },
                     onShowNotice = { showPreviewNotice(it) },
                 )
-            } else if (showingCashier) {
-                val authenticated = authenticationState as NativeAuthenticationState.Authenticated
+            } else if (pane == AuthShellPane.Cashier) {
+                val authenticated = authenticationState as? NativeAuthenticationState.Authenticated
+                    ?: return@NativeSectionTransition
                 CashierPreviewHost(
                     sessionHandle = authenticated.sessionHandle,
                     identity = authenticated.identity,
@@ -1140,8 +1165,9 @@ private fun NativeFoundationPreview(
                     onAcknowledgeRecoveryCode = authenticationViewModel::acknowledgeRecoveryCode,
                 )
             }
-        
+            }
         }}
+    }
     }
 }
 

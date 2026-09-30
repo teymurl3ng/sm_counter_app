@@ -641,10 +641,6 @@ private fun CashCloseSuccess(
                 SummaryRow("Close record", "#${receipt.actionId}")
             }
         }
-        OutlinedButton(
-            onClick = onBack,
-            modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag(NativeUiTags.CashCloseBack),
-        ) { Text("Back to Work") }
     }
 }
 

@@ -229,11 +229,6 @@ internal fun RecordSpoilageReadyContent(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                TextButton(
-                    onClick = ::requestLeave,
-                    modifier = Modifier.testTag(NativeUiTags.OpsWorkBack),
-                ) { Text("Back to Work") }
-
                 if (!state.context.postingOpen) {
                     Text(
                         "This business day is closed. Ask Owner to reopen it before recording.",

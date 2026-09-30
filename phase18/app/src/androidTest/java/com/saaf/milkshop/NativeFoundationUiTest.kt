@@ -1967,7 +1967,7 @@ class NativeFoundationUiTest {
         }
         composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkReview).assertIsDisplayed()
         composeRule.onNodeWithText("No money", substring = true).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OpsWorkBack).performClick()
+        pressHardwareBack()
         composeRule.waitUntil(10_000) {
             runCatching {
                 composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).fetchSemanticsNode()
@@ -2025,7 +2025,7 @@ class NativeFoundationUiTest {
         }
         composeRule.onNodeWithTag(NativeUiTags.OpsMakeYogurtReview).assertIsDisplayed()
         composeRule.onNodeWithText("No money", substring = true).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OpsWorkBack).performClick()
+        pressHardwareBack()
         composeRule.waitUntil(10_000) {
             runCatching {
                 composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).fetchSemanticsNode()
@@ -2069,7 +2069,7 @@ class NativeFoundationUiTest {
                 composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkSuccess).fetchSemanticsNode()
             }.isSuccess
         }
-        composeRule.onNodeWithTag(NativeUiTags.OpsWorkBack).performClick()
+        pressHardwareBack()
         composeRule.waitUntil(10_000) {
             runCatching {
                 composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).fetchSemanticsNode()
@@ -2112,7 +2112,7 @@ class NativeFoundationUiTest {
         }
         composeRule.onNodeWithTag(NativeUiTags.OpsRecordSpoilageReview).assertIsDisplayed()
         composeRule.onNodeWithText("No money", substring = true).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OpsWorkBack).performClick()
+        pressHardwareBack()
         composeRule.waitUntil(10_000) {
             runCatching {
                 composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).fetchSemanticsNode()
@@ -2156,7 +2156,7 @@ class NativeFoundationUiTest {
                 composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkSuccess).fetchSemanticsNode()
             }.isSuccess
         }
-        composeRule.onNodeWithTag(NativeUiTags.OpsWorkBack).performClick()
+        pressHardwareBack()
         composeRule.waitUntil(10_000) {
             runCatching {
                 composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).fetchSemanticsNode()

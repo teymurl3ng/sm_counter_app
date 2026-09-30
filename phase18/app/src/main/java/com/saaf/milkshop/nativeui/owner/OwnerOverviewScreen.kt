@@ -52,7 +52,7 @@ fun OwnerOverviewScreen(
     when (section) {
         OwnerSection.Overview -> NativeSectionTransition(
             targetState = state,
-            contentKey = { it::class },
+            contentKey = { if (it is NativeOwnerOverviewState.Idle || it is NativeOwnerOverviewState.Loading) NativeOwnerOverviewState.Loading::class else it::class },
         ) { state -> when (state) {
             NativeOwnerOverviewState.Idle,
             NativeOwnerOverviewState.Loading,

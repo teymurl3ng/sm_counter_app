@@ -68,7 +68,7 @@ fun CashierActivityScreen(
 ) {
     NativeSectionTransition(
         targetState = state,
-        contentKey = { it::class },
+        contentKey = { if (it is NativeActivityState.Idle || it is NativeActivityState.Loading) NativeActivityState.Loading::class else it::class },
     ) { state -> when (state) {
         NativeActivityState.Idle,
         NativeActivityState.Loading,

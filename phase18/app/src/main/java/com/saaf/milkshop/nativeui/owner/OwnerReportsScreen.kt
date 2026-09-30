@@ -78,7 +78,7 @@ fun OwnerReportsScreen(
         ) {
             NativeSectionTransition(
                 targetState = state,
-                contentKey = { it::class },
+                contentKey = { if (it is NativeOwnerReportsState.Idle || it is NativeOwnerReportsState.Loading) NativeOwnerReportsState.Loading::class else it::class },
             ) { state -> when (state) {
                 NativeOwnerReportsState.Idle,
                 NativeOwnerReportsState.Loading,

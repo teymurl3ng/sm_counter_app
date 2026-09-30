@@ -127,7 +127,7 @@ fun AdminPeopleScreen(
 
     NativeSectionTransition(
         targetState = state,
-        contentKey = { it::class },
+        contentKey = { if (it is NativeOwnerMoreState.Idle || it is NativeOwnerMoreState.Loading) NativeOwnerMoreState.Loading::class else it::class },
     ) { state -> when (state) {
         NativeOwnerMoreState.Idle,
         NativeOwnerMoreState.Loading,

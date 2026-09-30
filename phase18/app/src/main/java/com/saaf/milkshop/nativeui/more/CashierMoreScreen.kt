@@ -104,7 +104,7 @@ fun CashierMoreScreen(
 ) {
     NativeSectionTransition(
         targetState = state,
-        contentKey = { it::class },
+        contentKey = { if (it is NativeMoreState.Idle || it is NativeMoreState.Loading) NativeMoreState.Loading::class else it::class },
     ) { state -> when (state) {
         NativeMoreState.Idle,
         NativeMoreState.Loading,
@@ -189,7 +189,7 @@ fun CashierDeliveriesEntryScreen(
     MoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.MoreRoot) { padding ->
         NativeSectionTransition(
             targetState = state,
-            contentKey = { it::class },
+            contentKey = { if (it is NativeDeliveriesState.Idle || it is NativeDeliveriesState.Loading) NativeDeliveriesState.Loading::class else it::class },
         ) { state -> when (state) {
             NativeDeliveriesState.Idle,
             NativeDeliveriesState.Loading,

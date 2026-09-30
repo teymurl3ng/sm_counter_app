@@ -137,7 +137,7 @@ fun CashierCollectionScreen(
     Column(modifier = modifier.fillMaxSize().padding(contentPadding)) {
         NativeSectionTransition(
             targetState = state,
-            contentKey = { it::class },
+            contentKey = { if (it is NativeCollectionState.Idle || it is NativeCollectionState.Loading) NativeCollectionState.Loading::class else it::class },
         ) { state -> when (state) {
             NativeCollectionState.Idle,
             NativeCollectionState.Loading,

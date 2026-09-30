@@ -69,7 +69,7 @@ fun CashierExpenseEntryScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             NativeSectionTransition(
             targetState = state,
-            contentKey = { it::class },
+            contentKey = { if (it is NativeExpenseState.Idle || it is NativeExpenseState.Loading) NativeExpenseState.Loading::class else it::class },
         ) { state -> when (state) {
                 NativeExpenseState.Idle,
                 NativeExpenseState.Loading,

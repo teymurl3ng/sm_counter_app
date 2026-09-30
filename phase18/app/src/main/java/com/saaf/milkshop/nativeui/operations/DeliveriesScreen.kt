@@ -96,8 +96,8 @@ fun DeliveriesScreen(
         modifier = modifier,
     ) { padding ->
         NativeSectionTransition(
-        targetState = state,
-        contentKey = { it::class },
+            targetState = state,
+            contentKey = { if (it is NativeDeliveriesState.Idle || it is NativeDeliveriesState.Loading) NativeDeliveriesState.Loading::class else it::class },
     ) { state -> when (state) {
             NativeDeliveriesState.Idle,
             NativeDeliveriesState.Loading,

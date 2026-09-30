@@ -90,7 +90,7 @@ fun OwnerRecordsScreen(
 ) {
     NativeSectionTransition(
         targetState = state,
-        contentKey = { it::class },
+        contentKey = { if (it is NativeOwnerRecordsState.Idle || it is NativeOwnerRecordsState.Loading) NativeOwnerRecordsState.Loading::class else it::class },
     ) { state -> when (state) {
         NativeOwnerRecordsState.Idle,
         NativeOwnerRecordsState.Loading,

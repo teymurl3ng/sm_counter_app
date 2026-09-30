@@ -187,7 +187,10 @@ fun CashierDeliveriesEntryScreen(
 ) {
     BackHandler(onBack = onBackToMore)
     MoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.MoreRoot) { padding ->
-        when (state) {
+        NativeSectionTransition(
+            targetState = state,
+            contentKey = { it::class },
+        ) { state -> when (state) {
             NativeDeliveriesState.Idle,
             NativeDeliveriesState.Loading,
             -> DeliveriesLoadingBody(Modifier.padding(padding))
@@ -206,6 +209,7 @@ fun CashierDeliveriesEntryScreen(
                 contentPadding = padding,
                 showHeader = false,
             )
+        }
         }
     }
 }

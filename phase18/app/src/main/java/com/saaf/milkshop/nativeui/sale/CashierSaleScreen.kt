@@ -157,7 +157,10 @@ fun CashierSaleScreen(
         if (canLeave) leaveGuard.requestLeave(onLeaveConfirmed)
     }
     Column(modifier = modifier.fillMaxSize().padding(contentPadding)) {
-        when (state) {
+        NativeSectionTransition(
+            targetState = state,
+            contentKey = { it::class },
+        ) { state -> when (state) {
             NativeSaleState.Idle,
             NativeSaleState.Loading,
             -> SaleLoadingBody()
@@ -176,6 +179,7 @@ fun CashierSaleScreen(
                 contentPadding = PaddingValues(0.dp),
                 showHeader = false,
             )
+        }
         }
     }
     SaleDiscardDialog(leaveGuard)

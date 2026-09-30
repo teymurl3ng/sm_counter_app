@@ -54,11 +54,16 @@ import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.formatRecordTimestamp
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.HostedScaffold
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import java.util.Locale
 
 private val SALE_CHANNELS = listOf("retail", "wholesale", "credit-retail", "credit-wholesale")
+
+/** Which pane the Ready records screen is showing; drives the section transition. */
+private enum class RecordsPane { List, Detail, Ledger, Correction }
 
 @Composable
 fun OwnerRecordsScreen(
@@ -83,23 +88,19 @@ fun OwnerRecordsScreen(
     onSaveCorrection: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
+    NativeSectionTransition(
+        targetState = state,
+        contentKey = { it::class },
+    ) { state -> when (state) {
         NativeOwnerRecordsState.Idle,
         NativeOwnerRecordsState.Loading,
         -> hostedScaffold(snackbarHostState, modifier, { it() }) {
-            Column(
-                Modifier
-                    .fillMaxSize()
+            NativeColdLoadingPane(
+                label = "Loading records…",
+                modifier = Modifier
                     .padding(it)
-                    .padding(24.dp)
                     .testTag(loadingTag),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                CircularProgressIndicator()
-                Spacer(Modifier.height(12.dp))
-                Text("Loading records…")
-            }
+            )
         }
 
         is NativeOwnerRecordsState.LoadFailure -> hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
@@ -121,39 +122,56 @@ fun OwnerRecordsScreen(
         }
 
         is NativeOwnerRecordsState.Ready -> {
-            val correction = state.correction
-            when {
-                correction != null -> RecordsCorrectionBody(
-                    snackbarHostState = snackbarHostState,
-                    context = state.snapshot.context,
-                    editor = correction,
-                    onBack = onBackFromCorrection,
-                    onUpdate = onUpdateCorrection,
-                    onSave = onSaveCorrection,
-                    hostedScaffold = hostedScaffold,
-                    roleLabel = roleLabel,
-                    modifier = modifier,
-                )
-                state.detail != null -> RecordsDetailBody(
-                    snackbarHostState = snackbarHostState,
-                    context = state.snapshot.context,
-                    detail = state.detail,
-                    onBack = onBackFromDetail,
-                    onOpenCorrection = onOpenCorrection,
-                    hostedScaffold = hostedScaffold,
-                    roleLabel = roleLabel,
-                    modifier = modifier,
-                )
-                state.ledger != null -> RecordsLedgerBody(
-                    snackbarHostState = snackbarHostState,
-                    context = state.snapshot.context,
-                    ledger = state.ledger,
-                    onBack = onBackFromLedger,
-                    hostedScaffold = hostedScaffold,
-                    roleLabel = roleLabel,
-                    modifier = modifier,
-                )
-                else -> RecordsListBody(
+            val recordsPane = when {
+                state.correction != null -> RecordsPane.Correction
+                state.detail != null -> RecordsPane.Detail
+                state.ledger != null -> RecordsPane.Ledger
+                else -> RecordsPane.List
+            }
+            NativeSectionTransition(
+                targetState = recordsPane,
+                contentKey = { it },
+            ) { pane -> when (pane) {
+                RecordsPane.Correction -> {
+                    val editor = state.correction ?: return@NativeSectionTransition
+                    RecordsCorrectionBody(
+                        snackbarHostState = snackbarHostState,
+                        context = state.snapshot.context,
+                        editor = editor,
+                        onBack = onBackFromCorrection,
+                        onUpdate = onUpdateCorrection,
+                        onSave = onSaveCorrection,
+                        hostedScaffold = hostedScaffold,
+                        roleLabel = roleLabel,
+                        modifier = modifier,
+                    )
+                }
+                RecordsPane.Detail -> {
+                    val detail = state.detail ?: return@NativeSectionTransition
+                    RecordsDetailBody(
+                        snackbarHostState = snackbarHostState,
+                        context = state.snapshot.context,
+                        detail = detail,
+                        onBack = onBackFromDetail,
+                        onOpenCorrection = onOpenCorrection,
+                        hostedScaffold = hostedScaffold,
+                        roleLabel = roleLabel,
+                        modifier = modifier,
+                    )
+                }
+                RecordsPane.Ledger -> {
+                    val ledger = state.ledger ?: return@NativeSectionTransition
+                    RecordsLedgerBody(
+                        snackbarHostState = snackbarHostState,
+                        context = state.snapshot.context,
+                        ledger = ledger,
+                        onBack = onBackFromLedger,
+                        hostedScaffold = hostedScaffold,
+                        roleLabel = roleLabel,
+                        modifier = modifier,
+                    )
+                }
+                RecordsPane.List -> RecordsListBody(
                     snackbarHostState = snackbarHostState,
                     state = state,
                     onSearchQueryChange = onSearchQueryChange,
@@ -168,7 +186,9 @@ fun OwnerRecordsScreen(
                     modifier = modifier,
                 )
             }
+            }
         }
+    }
     }
 }
 

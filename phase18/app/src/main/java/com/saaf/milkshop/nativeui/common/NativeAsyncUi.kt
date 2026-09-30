@@ -166,8 +166,10 @@ fun <T> NativeSectionTransition(
     contentKey: (T) -> Any,
     content: @Composable (T) -> Unit,
 ) {
-    // DIAGNOSTIC: switching is fully instant. If a "double" still appears
-    // with zero animation, it is a data repaint, not motion.
+    // Verified on device: hard cuts feel clean; every fade/slide variant we
+    // tried (crossfade, fade+settle, fade-through) read as a full reload on
+    // this screen size. Keep switching instant — if this ever changes, test
+    // on a real device with a screen recording before committing to it.
     content(targetState)
 }
 @Composable

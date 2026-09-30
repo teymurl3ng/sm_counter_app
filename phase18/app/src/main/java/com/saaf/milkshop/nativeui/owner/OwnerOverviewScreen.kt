@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saaf.milkshop.application.owner.NativeOwnerOverviewSnapshot
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.theme.SaafInk
@@ -48,23 +50,19 @@ fun OwnerOverviewScreen(
     modifier: Modifier = Modifier,
 ) {
     when (section) {
-        OwnerSection.Overview -> when (state) {
+        OwnerSection.Overview -> NativeSectionTransition(
+            targetState = state,
+            contentKey = { it::class },
+        ) { state -> when (state) {
             NativeOwnerOverviewState.Idle,
             NativeOwnerOverviewState.Loading,
             -> OwnerScaffold(snackbarHostState, section, onNavigate, modifier) {
-                Column(
-                    Modifier
-                        .fillMaxSize()
+                NativeColdLoadingPane(
+                    label = "Loading overview…",
+                    modifier = Modifier
                         .padding(it)
-                        .padding(24.dp)
                         .testTag(NativeUiTags.OwnerOverviewLoading),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CircularProgressIndicator()
-                    Spacer(Modifier.height(12.dp))
-                    Text("Loading overview…")
-                }
+                )
             }
             is NativeOwnerOverviewState.LoadFailure -> OwnerScaffold(
                 snackbarHostState, section, onNavigate, modifier,
@@ -110,6 +108,7 @@ fun OwnerOverviewScreen(
                     }
                 }
             }
+        }
         }
         OwnerSection.Work -> OwnerScaffold(snackbarHostState, section, onNavigate, modifier) {
             Column(

@@ -40,6 +40,8 @@ import com.saaf.milkshop.application.owner.NativeOwnerReportsPreset
 import com.saaf.milkshop.application.owner.NativeOwnerReportsProductRow
 import com.saaf.milkshop.application.owner.NativeOwnerReportsSnapshot
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
@@ -74,7 +76,10 @@ fun OwnerReportsScreen(
                 .padding(padding)
                 .testTag(NativeUiTags.OwnerReportsRoot),
         ) {
-            when (state) {
+            NativeSectionTransition(
+                targetState = state,
+                contentKey = { it::class },
+            ) { state -> when (state) {
                 NativeOwnerReportsState.Idle,
                 NativeOwnerReportsState.Loading,
                 -> {
@@ -86,14 +91,12 @@ fun OwnerReportsScreen(
                         postingOpen = true,
                         showDayChip = false,
                     )
-                    Box(
-                        Modifier
+                    NativeColdLoadingPane(
+                        label = "Loading reports…",
+                        modifier = Modifier
                             .fillMaxSize()
                             .testTag(NativeUiTags.OwnerReportsLoading),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                    )
                 }
                 is NativeOwnerReportsState.LoadFailure -> {
                     CashierScreenHeader(
@@ -259,6 +262,7 @@ fun OwnerReportsScreen(
                         }
                     }
                 }
+            }
             }
         }
     }

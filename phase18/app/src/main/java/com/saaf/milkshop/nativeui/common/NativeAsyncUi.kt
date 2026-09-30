@@ -162,35 +162,14 @@ fun Modifier.nativeRefreshOverlay(refreshing: Boolean): Modifier {
 @Composable
 fun <T> NativeSectionTransition(
     targetState: T,
-    contentKey: (T) -> Any,
     modifier: Modifier = Modifier,
+    contentKey: (T) -> Any,
     content: @Composable (T) -> Unit,
 ) {
-    val scale = rememberSecondaryTransitionDurationMillis() / SECONDARY_TRANSITION_BASE_MILLIS.toFloat()
-    val outMillis = (90 * scale).toInt().coerceIn(1, 500)
-    val inMillis = (200 * scale).toInt().coerceIn(1, 1000)
-    AnimatedContent(
-        targetState = targetState,
-        transitionSpec = {
-            // Enter starts immediately: no blank gap between screens (the
-            // gap read as a reload), and since the exit is instant there is
-            // no second screen to ghost over.
-            (
-                fadeIn(tween(inMillis)) +
-                    scaleIn(
-                        animationSpec = tween(inMillis),
-                        initialScale = 0.96f,
-                    )
-                ) togetherWith fadeOut(tween(1))
-        },
-        contentKey = contentKey,
-        modifier = modifier,
-        label = "section_transition",
-    ) { state ->
-        content(state)
-    }
+    // DIAGNOSTIC: switching is fully instant. If a "double" still appears
+    // with zero animation, it is a data repaint, not motion.
+    content(targetState)
 }
-
 @Composable
 private fun rememberSecondaryTransitionDurationMillis(): Int {
     val context = LocalContext.current

@@ -193,10 +193,6 @@ fun OwnerProductsScreen(
                             onClick = onRetry,
                             modifier = Modifier.testTag(NativeUiTags.OwnerProductsRetry),
                         ) { Text("Try again") }
-                        TextButton(
-                            onClick = onBackToMenu,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerProductsBack),
-                        ) { Text("Back to More") }
                     }
                 }
                 else -> {
@@ -205,13 +201,9 @@ fun OwnerProductsScreen(
                             Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 8.dp, vertical = 4.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            TextButton(
-                                onClick = onBackToMenu,
-                                modifier = Modifier.testTag(NativeUiTags.OwnerProductsBack),
-                            ) { Text("Back to More") }
                             if (!productsShowArchived) {
                                 TextButton(
                                     onClick = onOpenCreate,
@@ -301,7 +293,6 @@ private data class OwnerProductsFormTags(
     val notes: String,
     val save: String,
     val cancel: String,
-    val back: String,
     val discard: String,
     val keep: String,
 )
@@ -317,7 +308,6 @@ private fun OwnerProductsFormMode.tags(): OwnerProductsFormTags = when (this) {
         notes = NativeUiTags.OwnerProductsCreateNotes,
         save = NativeUiTags.OwnerProductsCreateSave,
         cancel = NativeUiTags.OwnerProductsCreateCancel,
-        back = NativeUiTags.OwnerProductsCreateBack,
         discard = NativeUiTags.OwnerProductsCreateDiscard,
         keep = NativeUiTags.OwnerProductsCreateKeep,
     )
@@ -331,7 +321,6 @@ private fun OwnerProductsFormMode.tags(): OwnerProductsFormTags = when (this) {
         notes = NativeUiTags.OwnerProductsEditNotes,
         save = NativeUiTags.OwnerProductsEditSave,
         cancel = NativeUiTags.OwnerProductsEditCancel,
-        back = NativeUiTags.OwnerProductsEditBack,
         discard = NativeUiTags.OwnerProductsEditDiscard,
         keep = NativeUiTags.OwnerProductsEditKeep,
     )
@@ -413,18 +402,6 @@ private fun OwnerProductsFormScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        enabled = !saving,
-                        modifier = Modifier.testTag(tags.back),
-                    ) {
-                        Text(
-                            when (mode) {
-                                OwnerProductsFormMode.Create -> "Back to products"
-                                OwnerProductsFormMode.Edit -> "Back to detail"
-                            },
-                        )
-                    }
                     Text(
                         when (mode) {
                             OwnerProductsFormMode.Create -> "Add product"
@@ -672,11 +649,6 @@ private fun OwnerProductsDetailScreen(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                TextButton(
-                    onClick = onBack,
-                    enabled = !busy,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerProductsDetailBack),
-                ) { Text("Back to products") }
                 Text(
                     row.name,
                     style = MaterialTheme.typography.headlineMedium,

@@ -67,12 +67,10 @@ class NativeOwnerEmployeesScreenContractTest {
 
     @Test
     fun detailShowsFactsAndEdit() {
-        var back = false
         var editOpened = false
         setScreen(
             employees = listOf(sampleEmployee()),
             employeeDetail = sampleDetail(),
-            onBackFromDetail = { back = true },
             onOpenEdit = { editOpened = true },
         )
         composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesDetail).assertIsDisplayed()
@@ -82,19 +80,6 @@ class NativeOwnerEmployeesScreenContractTest {
             .assertIsDisplayed()
             .performClick()
         assertTrue(editOpened)
-        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesDetailBack).performClick()
-        assertTrue(back)
-    }
-
-    @Test
-    fun backToMenuFromList() {
-        var back = false
-        setScreen(
-            employees = listOf(sampleEmployee()),
-            onBackToMenu = { back = true },
-        )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerEmployeesBack).performClick()
-        assertTrue(back)
     }
 
     @Test

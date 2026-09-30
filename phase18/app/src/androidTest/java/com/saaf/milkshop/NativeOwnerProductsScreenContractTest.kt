@@ -89,13 +89,11 @@ class NativeOwnerProductsScreenContractTest {
     }
 
     @Test
-    fun detailShowsFactsEditArchiveAndBack() {
-        var back = false
+    fun detailShowsFactsEditArchive() {
         var editOpened = false
         setScreen(
             products = listOf(sampleProduct()),
             productDetail = NativeOwnerProductDetail(sampleProduct()),
-            onBackFromDetail = { back = true },
             onOpenEdit = { editOpened = true },
         )
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetail).assertIsDisplayed()
@@ -108,8 +106,6 @@ class NativeOwnerProductsScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailArchive).performClick()
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsArchiveConfirm).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsArchiveCancel).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailBack).performClick()
-        assertTrue(back)
     }
 
     @Test
@@ -144,17 +140,6 @@ class NativeOwnerProductsScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailArchive).performClick()
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsArchiveConfirm).performClick()
         assertTrue(archived)
-    }
-
-    @Test
-    fun backToMenuFromList() {
-        var back = false
-        setScreen(
-            products = listOf(sampleProduct()),
-            onBackToMenu = { back = true },
-        )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsBack).performClick()
-        assertTrue(back)
     }
 
     @Test

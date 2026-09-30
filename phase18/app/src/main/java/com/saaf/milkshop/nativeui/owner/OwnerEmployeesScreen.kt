@@ -178,10 +178,6 @@ fun OwnerEmployeesScreen(
                             onClick = onRetry,
                             modifier = Modifier.testTag(NativeUiTags.OwnerEmployeesRetry),
                         ) { Text("Try again") }
-                        TextButton(
-                            onClick = onBackToMenu,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerEmployeesBack),
-                        ) { Text("Back to More") }
                     }
                 }
                 else -> {
@@ -190,13 +186,9 @@ fun OwnerEmployeesScreen(
                             Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 8.dp, vertical = 4.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            TextButton(
-                                onClick = onBackToMenu,
-                                modifier = Modifier.testTag(NativeUiTags.OwnerEmployeesBack),
-                            ) { Text("Back to More") }
                             TextButton(
                                 onClick = onOpenCreate,
                                 modifier = Modifier.testTag(NativeUiTags.OwnerEmployeesCreateOpen),
@@ -305,11 +297,6 @@ private fun OwnerEmployeesCreateScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        enabled = !saving,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerEmployeesCreateBack),
-                    ) { Text("Back to employees") }
                     Text(
                         "Add employee",
                         style = MaterialTheme.typography.headlineSmall,
@@ -445,11 +432,6 @@ private fun OwnerEmployeesEditScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        enabled = !saving,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerEmployeesEditBack),
-                    ) { Text("Back to detail") }
                     Text(
                         "Edit employee",
                         style = MaterialTheme.typography.headlineSmall,
@@ -678,10 +660,6 @@ private fun OwnerEmployeesDetailScreen(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                TextButton(
-                    onClick = onBack,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerEmployeesDetailBack),
-                ) { Text("Back to employees") }
                 Text(
                     row.name,
                     style = MaterialTheme.typography.headlineMedium,

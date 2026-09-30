@@ -177,10 +177,6 @@ fun OwnerCustomersScreen(
                             onClick = onRetry,
                             modifier = Modifier.testTag(NativeUiTags.OwnerCustomersRetry),
                         ) { Text("Try again") }
-                        TextButton(
-                            onClick = onBackToMenu,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerCustomersBack),
-                        ) { Text("Back to More") }
                     }
                 }
                 else -> {
@@ -189,13 +185,9 @@ fun OwnerCustomersScreen(
                             Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 8.dp, vertical = 4.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            TextButton(
-                                onClick = onBackToMenu,
-                                modifier = Modifier.testTag(NativeUiTags.OwnerCustomersBack),
-                            ) { Text("Back to More") }
                             TextButton(
                                 onClick = onOpenCreate,
                                 modifier = Modifier.testTag(NativeUiTags.OwnerCustomersCreateOpen),
@@ -304,11 +296,6 @@ private fun OwnerCustomersCreateScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        enabled = !saving,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerCustomersCreateBack),
-                    ) { Text("Back to customers") }
                     Text(
                         "Add customer",
                         style = MaterialTheme.typography.headlineSmall,
@@ -448,11 +435,6 @@ private fun OwnerCustomersEditScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        enabled = !saving,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerCustomersEditBack),
-                    ) { Text("Back to detail") }
                     Text(
                         "Edit customer",
                         style = MaterialTheme.typography.headlineSmall,
@@ -693,10 +675,6 @@ private fun OwnerCustomersDetailScreen(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                TextButton(
-                    onClick = onBack,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerCustomersDetailBack),
-                ) { Text("Back to customers") }
                 Text(
                     row.name,
                     style = MaterialTheme.typography.headlineMedium,

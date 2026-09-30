@@ -176,10 +176,6 @@ fun OwnerSuppliersScreen(
                             onClick = onRetry,
                             modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersRetry),
                         ) { Text("Try again") }
-                        TextButton(
-                            onClick = onBackToMenu,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersBack),
-                        ) { Text("Back to More") }
                     }
                 }
                 else -> {
@@ -188,13 +184,9 @@ fun OwnerSuppliersScreen(
                             Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 8.dp, vertical = 4.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            TextButton(
-                                onClick = onBackToMenu,
-                                modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersBack),
-                            ) { Text("Back to More") }
                             TextButton(
                                 onClick = onOpenCreate,
                                 modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersCreateOpen),
@@ -303,11 +295,6 @@ private fun OwnerSuppliersCreateScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        enabled = !saving,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersCreateBack),
-                    ) { Text("Back to suppliers") }
                     Text(
                         "Add supplier",
                         style = MaterialTheme.typography.headlineSmall,
@@ -434,11 +421,6 @@ private fun OwnerSuppliersEditScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    TextButton(
-                        onClick = { requestLeave(onBack) },
-                        enabled = !saving,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersEditBack),
-                    ) { Text("Back to detail") }
                     Text(
                         "Edit supplier",
                         style = MaterialTheme.typography.headlineSmall,
@@ -626,10 +608,6 @@ private fun OwnerSuppliersDetailScreen(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                TextButton(
-                    onClick = onBack,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersDetailBack),
-                ) { Text("Back to suppliers") }
                 Text(
                     row.name,
                     style = MaterialTheme.typography.headlineMedium,

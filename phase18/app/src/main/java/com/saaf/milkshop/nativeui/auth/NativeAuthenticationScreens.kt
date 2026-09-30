@@ -64,6 +64,7 @@ import com.saaf.milkshop.nativeui.theme.SaafGreen
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafIvory
 import com.saaf.milkshop.nativeui.theme.SaafYellow
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 
 @Composable
@@ -85,7 +86,13 @@ fun NativeAuthenticationHost(
     modifier: Modifier = Modifier,
 ) {
     // Inherits the ambient theme (the activity follows the system theme).
-    when (state) {
+    // Auth steps (picker -> passphrase -> loading -> authenticated) fade-and-
+    // settle with the same language as in-app screen switches.
+    NativeSectionTransition(
+        targetState = state,
+        contentKey = { it::class },
+        modifier = modifier,
+    ) { state -> when (state) {
             NativeAuthenticationState.Loading -> AccessMessageScreen(
                 title = "Loading accounts",
                 message = "Checking this phone’s Saaf access…",
@@ -152,6 +159,7 @@ fun NativeAuthenticationHost(
             )
             is NativeAuthenticationState.Authenticated -> Unit
         }
+    }
 }
 
 @Composable

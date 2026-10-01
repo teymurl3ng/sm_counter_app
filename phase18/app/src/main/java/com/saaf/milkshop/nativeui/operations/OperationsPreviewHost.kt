@@ -1,17 +1,32 @@
 package com.saaf.milkshop.nativeui.operations
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
+import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
+import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
+import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import com.saaf.milkshop.nativeui.operations.NativeDeliveriesDraftActions
 
@@ -154,9 +169,43 @@ fun OperationsPreviewHost(
         }
         val workReady = operationsWorkState as? NativeOperationsWorkState.Ready
         val sectionStateHolder = rememberSaveableStateHolder()
+        // Static chrome (Cashier pattern): one scaffold + one header at the
+        // host, outside the pane transition — nav and header never reload.
+        var activeEntryGuard by remember { mutableStateOf<EntryLeaveGuard?>(null) }
+        val guardedNavigateOps: (OperationsSection) -> Unit = { section ->
+            val guard = activeEntryGuard
+            if (guard != null) guard.requestLeave { navigateOps(section) } else navigateOps(section)
+        }
+        val moreReady = operationsMoreState as? NativeOperationsMoreState.Ready
+        val headerTitle = when {
+            operationsSection == OperationsSection.Deliveries -> "Active deliveries"
+            operationsSection == OperationsSection.Attendance -> "My attendance"
+            operationsSection == OperationsSection.More -> "More"
+            workDestination == NativeOperationsWorkDestination.ReceiveMilk -> "Receive milk"
+            workDestination == NativeOperationsWorkDestination.MakeYogurt -> "Make yogurt"
+            workDestination == NativeOperationsWorkDestination.RecordSpoilage -> "Record spoilage"
+            else -> "Work"
+        }
+        AdaptiveNavigationScaffold(
+            snackbarHostState = snackbarHostState,
+            modifier = Modifier.fillMaxSize(),
+            containerColor = MaterialTheme.colorScheme.background,
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            compactNavigation = { OperationsNavigation(selected = operationsSection, onNavigate = guardedNavigateOps) },
+            expandedNavigation = { OperationsNavigationRail(selected = operationsSection, onNavigate = guardedNavigateOps) },
+        ) { hostPadding ->
+            Column(Modifier.fillMaxSize().padding(hostPadding)) {
+        CashierScreenHeader(
+            title = headerTitle,
+            displayName = identity.displayName,
+            roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+            businessDate = workReady?.context?.businessDate ?: "",
+            postingOpen = workReady?.context?.postingOpen ?: true,
+        )
         NativeSectionTransition<Pair<OperationsSection, NativeOperationsWorkDestination?>>(
             targetState = operationsSection to (operationsWorkState as? NativeOperationsWorkState.Ready)?.destination,
             contentKey = { it },
+            modifier = Modifier.weight(1f),
         ) { pane ->
             val (section, paneDestination) = pane
         sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}:$paneDestination") {
@@ -179,13 +228,9 @@ fun OperationsPreviewHost(
                     onArchive = deliveriesViewModel::archiveDelivery,
                     onLinkSale = deliveriesViewModel::linkSale,
                     workScaffold = { s, m, content ->
-                        WorkScaffold(
-                            snackbarHostState = s,
-                            section = OperationsSection.Deliveries,
-                            onNavigate = navigateOps,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OpsWorkRoot)) {
+                            content(PaddingValues(0.dp))
+                        }
                     },
                     onLeaveConfirmed = onLeaveToWelcome,
                 )
@@ -198,13 +243,9 @@ fun OperationsPreviewHost(
                     onRetry = attendanceViewModel::refresh,
                     onMarkPresent = attendanceViewModel::markPresent,
                     attendanceScaffold = { s, m, content ->
-                        WorkScaffold(
-                            snackbarHostState = s,
-                            section = OperationsSection.Attendance,
-                            onNavigate = navigateOps,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OpsWorkRoot)) {
+                            content(PaddingValues(0.dp))
+                        }
                     },
                     onLeaveConfirmed = onLeaveToWelcome,
                 )
@@ -226,13 +267,9 @@ fun OperationsPreviewHost(
                     onSwitchAccount = onLeaveToAccountPicker,
                     onSignOut = onLeaveToWelcome,
                     moreScaffold = { s, m, content ->
-                        OpsMoreScaffold(
-                            snackbarHostState = s,
-                            onNavigate = navigateOps,
-                            modifier = m,
-                            rootTag = NativeUiTags.OpsMoreRoot,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OpsMoreRoot)) {
+                            content(PaddingValues(0.dp))
+                        }
                     },
                     onLeaveConfirmed = onLeaveToWelcome,
                 )
@@ -253,14 +290,11 @@ fun OperationsPreviewHost(
                     onBackToHome = {
                         operationsWorkViewModel.backToHome()
                     },
+                    onRegisterGuard = { activeEntryGuard = it },
                     workScaffold = { s, m, content ->
-                        WorkScaffold(
-                            snackbarHostState = s,
-                            section = OperationsSection.Work,
-                            onNavigate = navigateOps,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OpsWorkRoot)) {
+                            content(PaddingValues(0.dp))
+                        }
                     },
                 )
             }
@@ -276,14 +310,11 @@ fun OperationsPreviewHost(
                     onBackToHome = {
                         operationsWorkViewModel.backToHome()
                     },
+                    onRegisterGuard = { activeEntryGuard = it },
                     workScaffold = { s, m, content ->
-                        WorkScaffold(
-                            snackbarHostState = s,
-                            section = OperationsSection.Work,
-                            onNavigate = navigateOps,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OpsWorkRoot)) {
+                            content(PaddingValues(0.dp))
+                        }
                     },
                 )
             }
@@ -305,14 +336,11 @@ fun OperationsPreviewHost(
                     onBackToHome = {
                         operationsWorkViewModel.backToHome()
                     },
+                    onRegisterGuard = { activeEntryGuard = it },
                     workScaffold = { s, m, content ->
-                        WorkScaffold(
-                            snackbarHostState = s,
-                            section = OperationsSection.Work,
-                            onNavigate = navigateOps,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OpsWorkRoot)) {
+                            content(PaddingValues(0.dp))
+                        }
                     },
                 )
             }
@@ -338,18 +366,17 @@ fun OperationsPreviewHost(
                     onBackToHome = operationsWorkViewModel::backToHome,
                     onLeaveConfirmed = onLeaveToWelcome,
                     workScaffold = { s, m, content ->
-                        WorkScaffold(
-                            snackbarHostState = s,
-                            section = OperationsSection.Work,
-                            onNavigate = navigateOps,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OpsWorkRoot)) {
+                            content(PaddingValues(0.dp))
+                        }
                     },
                 )
             }
         }
         }
         }
+        }
     }
+}
+
 }

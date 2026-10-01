@@ -35,6 +35,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -86,10 +87,15 @@ fun RecordSpoilageScreen(
     onRecord: (NativeRecordSpoilageRequest) -> Unit,
     onRecordAnother: () -> Unit,
     onBackToHome: () -> Unit,
+    onRegisterGuard: (EntryLeaveGuard?) -> Unit = {},
     workScaffold: OpsScaffold,
     modifier: Modifier = Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
+    DisposableEffect(leaveGuard) {
+        onRegisterGuard(leaveGuard)
+        onDispose { onRegisterGuard(null) }
+    }
     val canLeave = (state as? NativeRecordSpoilageState.Ready)?.saving != true
     LaunchedEffect(state is NativeRecordSpoilageState.Ready) {
         if (state !is NativeRecordSpoilageState.Ready) leaveGuard.clear()

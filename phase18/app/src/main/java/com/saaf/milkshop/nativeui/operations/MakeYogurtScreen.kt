@@ -31,6 +31,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -72,10 +73,15 @@ fun MakeYogurtScreen(
     onRecord: (NativeMakeYogurtRequest) -> Unit,
     onMakeAnother: () -> Unit,
     onBackToHome: () -> Unit,
+    onRegisterGuard: (EntryLeaveGuard?) -> Unit = {},
     workScaffold: OpsScaffold,
     modifier: Modifier = Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
+    DisposableEffect(leaveGuard) {
+        onRegisterGuard(leaveGuard)
+        onDispose { onRegisterGuard(null) }
+    }
     val canLeave = (state as? NativeMakeYogurtState.Ready)?.saving != true
     LaunchedEffect(state is NativeMakeYogurtState.Ready) {
         if (state !is NativeMakeYogurtState.Ready) leaveGuard.clear()

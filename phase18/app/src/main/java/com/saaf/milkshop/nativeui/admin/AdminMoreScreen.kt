@@ -529,7 +529,7 @@ private fun AdminMoreMenuScreen(
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-                AdminMoreSectionLabel("Your account")
+                AdminMoreSectionLabel("Account")
                 AdminMoreMenuRow(
                     icon = Icons.Outlined.Lock,
                     title = "Personal security",
@@ -541,7 +541,7 @@ private fun AdminMoreMenuScreen(
                 AdminMoreMenuRow(
                     icon = Icons.Outlined.SwapHoriz,
                     title = "Switch account",
-                    subtitle = "Sign in as a different person on this phone",
+                    subtitle = "Choose another person on this phone",
                     tag = NativeUiTags.AdminMoreSwitchAccount,
                     onClick = onSwitchAccount,
                 )
@@ -549,7 +549,7 @@ private fun AdminMoreMenuScreen(
                 AdminMoreMenuRow(
                     icon = Icons.AutoMirrored.Outlined.Logout,
                     title = "Sign out",
-                    subtitle = "End this session on this phone",
+                    subtitle = "Return to Welcome",
                     tag = NativeUiTags.AdminMoreSignOut,
                     onClick = onSignOut,
                 )

@@ -214,13 +214,6 @@ internal fun ReceiveMilkReadyContent(
                 .imePadding()
                 .testTag(NativeUiTags.OpsReceiveMilkForm),
         ) {
-            CashierScreenHeader(
-                title = "Receive milk",
-                displayName = identity.displayName,
-                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                businessDate = state.context.businessDate,
-                postingOpen = state.context.postingOpen,
-            )
             Column(
                 Modifier
                     .weight(1f)

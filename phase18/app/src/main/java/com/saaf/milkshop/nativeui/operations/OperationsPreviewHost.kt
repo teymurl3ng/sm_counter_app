@@ -180,7 +180,11 @@ fun OperationsPreviewHost(
         val headerTitle = when {
             operationsSection == OperationsSection.Deliveries -> "Active deliveries"
             operationsSection == OperationsSection.Attendance -> "My attendance"
-            operationsSection == OperationsSection.More -> "More"
+            operationsSection == OperationsSection.More -> when (moreReady?.destination) {
+                NativeOperationsMoreDestination.TodayWork -> "Today's work"
+                NativeOperationsMoreDestination.PersonalSecurity -> "Personal security"
+                else -> "More"
+            }
             workDestination == NativeOperationsWorkDestination.ReceiveMilk -> "Receive milk"
             workDestination == NativeOperationsWorkDestination.MakeYogurt -> "Make yogurt"
             workDestination == NativeOperationsWorkDestination.RecordSpoilage -> "Record spoilage"

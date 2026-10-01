@@ -217,7 +217,6 @@ private fun OpsMoreMenuScreen(
 ) {
     moreScaffold(snackbarHostState, modifier) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
-            OpsMoreHeader(identity, state.context)
             Column(
                 Modifier
                     .fillMaxSize()
@@ -278,7 +277,6 @@ private fun OpsMoreTodayWorkScreen(
                 .imePadding()
                 .testTag(NativeUiTags.OpsMoreTodayWorkScreen),
         ) {
-            OpsMoreHeader(identity, state.context)
             Column(
                 Modifier
                     .weight(1f)
@@ -286,7 +284,6 @@ private fun OpsMoreTodayWorkScreen(
                     .padding(horizontal = 16.dp, vertical = 18.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                Text("Today's work", style = MaterialTheme.typography.headlineMedium)
                 Text(
                     "Physical records you posted today. Amounts and balances stay out of this list.",
                     style = MaterialTheme.typography.bodyMedium,
@@ -398,7 +395,6 @@ private fun OpsMorePersonalSecurityScreen(
                 .imePadding()
                 .testTag(NativeUiTags.OpsMoreSecurityScreen),
         ) {
-            OpsMoreHeader(identity, state.context)
             Column(
                 Modifier
                     .weight(1f)
@@ -406,7 +402,6 @@ private fun OpsMorePersonalSecurityScreen(
                     .padding(horizontal = 16.dp, vertical = 18.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                Text("Personal security", style = MaterialTheme.typography.headlineMedium)
                 if (security == null) {
                     CircularProgressIndicator()
                 } else {
@@ -470,17 +465,6 @@ private fun OpsMorePersonalSecurityScreen(
             }
         }
     }
-}
-
-@Composable
-private fun OpsMoreHeader(identity: NativeSignedInIdentity, context: NativeOperationsMoreContext) {
-    CashierScreenHeader(
-        title = "More",
-        displayName = identity.displayName,
-        roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-        businessDate = context.businessDate,
-        postingOpen = context.postingOpen,
-    )
 }
 
 @Composable

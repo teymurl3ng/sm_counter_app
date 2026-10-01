@@ -186,13 +186,6 @@ internal fun MakeYogurtReadyContent(
             .imePadding()
             .testTag(NativeUiTags.OpsMakeYogurtForm),
     ) {
-        CashierScreenHeader(
-            title = "Make yogurt",
-            displayName = identity.displayName,
-            roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-            businessDate = state.context.businessDate,
-            postingOpen = state.context.postingOpen,
-        )
         Column(
             Modifier
                 .weight(1f)

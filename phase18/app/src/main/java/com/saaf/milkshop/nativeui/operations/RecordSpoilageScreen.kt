@@ -216,13 +216,6 @@ internal fun RecordSpoilageReadyContent(
                 .imePadding()
                 .testTag(NativeUiTags.OpsRecordSpoilageForm),
         ) {
-            CashierScreenHeader(
-                title = "Record spoilage",
-                displayName = identity.displayName,
-                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                businessDate = state.context.businessDate,
-                postingOpen = state.context.postingOpen,
-            )
             Column(
                 Modifier
                     .weight(1f)

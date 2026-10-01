@@ -141,13 +141,6 @@ private fun AttendanceReady(
                 .padding(padding)
                 .testTag(NativeUiTags.OpsAttendanceRoot),
         ) {
-            CashierScreenHeader(
-                title = "My attendance",
-                displayName = identity.displayName,
-                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                businessDate = state.context.businessDate,
-                postingOpen = state.context.postingOpen,
-            )
             Column(
                 Modifier
                     .weight(1f)

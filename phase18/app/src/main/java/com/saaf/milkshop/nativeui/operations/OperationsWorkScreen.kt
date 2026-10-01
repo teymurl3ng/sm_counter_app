@@ -207,13 +207,6 @@ private fun ReadyWork(
                     state.error?.let {
                         Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                     }
-                    CashierScreenHeader(
-                        title = "Work",
-                        displayName = identity.displayName,
-                        roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                        businessDate = state.context.businessDate,
-                        postingOpen = state.context.postingOpen,
-                    )
                     WorkHomeBody(
                         context = state.context,
                         onOpenReceiveMilk = onOpenReceiveMilk,

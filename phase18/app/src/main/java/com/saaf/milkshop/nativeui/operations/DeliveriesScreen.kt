@@ -164,13 +164,6 @@ internal fun DeliveriesReadyContent(
                 hapticContext.hapticConfirm()
             }
         }
-        if (showHeader) CashierScreenHeader(
-            title = "Active deliveries",
-            displayName = identity.displayName,
-            roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-            businessDate = state.context.businessDate,
-            postingOpen = state.context.postingOpen,
-        )
         Column(
             Modifier
                 .weight(1f)

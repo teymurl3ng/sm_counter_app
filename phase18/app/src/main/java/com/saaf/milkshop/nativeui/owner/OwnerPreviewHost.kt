@@ -431,12 +431,14 @@ fun OwnerPreviewHost(
                     val recordsReady = ownerRecordsState as? NativeOwnerRecordsState.Ready
                     if (ownerSection == OwnerSection.Records &&
                         recordsReady?.detail == null &&
-                        recordsReady?.correction == null
+                        recordsReady?.correction == null &&
+                        recordsReady?.ledger == null
                     ) {
                         onShowNotice("Records is already open.")
                     } else {
                         if (ownerSection == OwnerSection.Records) {
                             ownerRecordsViewModel.clearDetail()
+                            ownerRecordsViewModel.clearLedger()
                         }
                         onOwnerSectionChange(OwnerSection.Records)
                     }

@@ -223,6 +223,9 @@ fun ManagerPreviewHost(
                         val ready = ownerRecordsState as? NativeOwnerRecordsState.Ready
                         if (ready?.detail != null || ready?.correction != null) {
                             ownerRecordsViewModel.clearDetail()
+                            ownerRecordsViewModel.clearLedger()
+                        } else if (ready?.ledger != null) {
+                            ownerRecordsViewModel.clearLedger()
                         } else {
                             onShowNotice("Records is already open.")
                         }

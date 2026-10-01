@@ -213,7 +213,17 @@ fun AdminPreviewHost(
                             onShowNotice("People is already open.")
                         }
                     }
-                    AdminSection.Records -> onShowNotice("Records is already open.")
+                    AdminSection.Records -> {
+                        val ready = ownerRecordsState as? NativeOwnerRecordsState.Ready
+                        if (ready?.detail != null || ready?.correction != null) {
+                            ownerRecordsViewModel.clearDetail()
+                            ownerRecordsViewModel.clearLedger()
+                        } else if (ready?.ledger != null) {
+                            ownerRecordsViewModel.clearLedger()
+                        } else {
+                            onShowNotice("Records is already open.")
+                        }
+                    }
                     AdminSection.More -> {
                         val ready = ownerMoreState as? NativeOwnerMoreState.Ready
                         if (ready != null && ready.destination != NativeOwnerMoreDestination.Menu) {

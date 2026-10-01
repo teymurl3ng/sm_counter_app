@@ -63,13 +63,41 @@ class NativeDeliveriesViewModel(
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle && _state.value !is NativeDeliveriesState.Idle) {
-            // Warm re-entry: keep the content on screen and re-validate in
-            // place (thin refresh bar) instead of showing stale data.
-            refresh()
+            // Warm re-entry: revalidate reference data silently — keep the
+            // visible list and any in-progress draft exactly as the user
+            // left them.
+            silentRefresh()
             return
         }
         sessionHandle = nextSessionHandle
         refresh()
+    }
+
+    /**
+     * Warm-open reload: revalidates the delivery list without announcing it —
+     * no refreshing flag, no state replacement unless the fresh data differs.
+     * Draft fields and link/archive progress survive; failures leave the
+     * list as-is.
+     */
+    private fun silentRefresh() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeDeliveriesState.Ready ?: return
+        scope.launch {
+            try {
+                val fresh = withContext(Dispatchers.IO) { facade.load(session) }
+                if (sessionHandle != session) return@launch
+                val latest = _state.value as? NativeDeliveriesState.Ready ?: return@launch
+                val merged = latest.copy(context = fresh, refreshing = false)
+                if (merged != _state.value) _state.value = merged
+            } catch (error: SecurityFailure.SessionExpired) {
+                sessionHandle = null
+                _state.value = NativeDeliveriesState.Idle
+                onSessionExpired()
+            } catch (error: Throwable) {
+                // Silent: the displayed data stays; it will revalidate on
+                // the next entry or day-state change.
+            }
+        }
     }
 
     fun refresh() {

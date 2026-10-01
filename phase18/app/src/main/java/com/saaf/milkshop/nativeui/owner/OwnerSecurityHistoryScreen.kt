@@ -19,7 +19,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -42,6 +41,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerSecurityAuditRow
 import com.saaf.milkshop.application.AppTimeFormats
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.HostedScaffold
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 
@@ -96,14 +96,12 @@ fun OwnerSecurityHistoryScreen(
             )
             when {
                 auditsLoading && audits.isEmpty() && auditsError == null -> {
-                    Box(
-                        Modifier
+                    NativeColdLoadingPane(
+                        label = "Loading security history…",
+                        modifier = Modifier
                             .fillMaxSize()
                             .testTag(NativeUiTags.OwnerSecurityHistoryLoading),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                    )
                 }
                 auditsError != null && audits.isEmpty() -> {
                     Column(

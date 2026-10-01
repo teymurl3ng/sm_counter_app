@@ -26,7 +26,6 @@ import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -407,7 +406,7 @@ private fun OpsMorePersonalSecurityScreen(
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
                 if (security == null) {
-                    CircularProgressIndicator()
+                    NativeColdLoadingPane(label = "Loading security…")
                 } else {
                     OpsMoreSecurityStatus(security)
                     OutlinedTextField(

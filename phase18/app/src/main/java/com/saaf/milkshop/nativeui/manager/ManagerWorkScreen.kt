@@ -5,10 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,7 +24,6 @@ import androidx.compose.material.icons.outlined.Science
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -163,18 +160,10 @@ private fun ReadyWork(
             // Hosted by ManagerPreviewHost via Manager*EntryScreen wrappers.
             BackHandler(onBack = onBackToHome)
             mgrScaffold(snackbarHostState, modifier) { padding ->
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(24.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CircularProgressIndicator()
-                    Spacer(Modifier.height(12.dp))
-                    Text(openingLabel(state.destination))
-                }
+                NativeColdLoadingPane(
+                    label = openingLabel(state.destination),
+                    modifier = Modifier.fillMaxSize().padding(padding),
+                )
             }
         }
     }

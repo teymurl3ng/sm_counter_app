@@ -22,7 +22,6 @@ import androidx.compose.material.icons.outlined.Science
 import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material.icons.outlined.WorkOutline
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -39,7 +38,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
@@ -131,52 +129,28 @@ fun OperationsWorkScreen(
         OperationsSection.Deliveries -> {
             // Hosted by NativePreviewActivity via DeliveriesScreen.
             workScaffold(snackbarHostState, modifier) { padding ->
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(24.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CircularProgressIndicator()
-                    Spacer(Modifier.height(12.dp))
-                    Text("Opening deliveries…")
-                }
+                NativeColdLoadingPane(
+                    label = "Opening deliveries…",
+                    modifier = Modifier.fillMaxSize().padding(padding),
+                )
             }
         }
         OperationsSection.Attendance -> {
             // Hosted by NativePreviewActivity via AttendanceScreen.
             workScaffold(snackbarHostState, modifier) { padding ->
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(24.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CircularProgressIndicator()
-                    Spacer(Modifier.height(12.dp))
-                    Text("Opening attendance…")
-                }
+                NativeColdLoadingPane(
+                    label = "Opening attendance…",
+                    modifier = Modifier.fillMaxSize().padding(padding),
+                )
             }
         }
         OperationsSection.More -> {
             // Hosted by NativePreviewActivity via OperationsMoreScreen.
             workScaffold(snackbarHostState, modifier) { padding ->
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(24.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CircularProgressIndicator()
-                    Spacer(Modifier.height(12.dp))
-                    Text("Opening More…")
-                }
+                NativeColdLoadingPane(
+                    label = "Opening More…",
+                    modifier = Modifier.fillMaxSize().padding(padding),
+                )
             }
         }
     }
@@ -226,24 +200,14 @@ private fun ReadyWork(
             // Hosted by NativePreviewActivity via dedicated entry screens.
             BackHandler(onBack = onBackToHome)
             workScaffold(snackbarHostState, modifier) { padding ->
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(24.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CircularProgressIndicator()
-                    Spacer(Modifier.height(12.dp))
-                    Text(
-                        when (state.destination) {
-                            NativeOperationsWorkDestination.MakeYogurt -> "Opening make yogurt…"
-                            NativeOperationsWorkDestination.RecordSpoilage -> "Opening record spoilage…"
-                            else -> "Opening receive milk…"
-                        },
-                    )
-                }
+                NativeColdLoadingPane(
+                    label = when (state.destination) {
+                        NativeOperationsWorkDestination.MakeYogurt -> "Opening make yogurt…"
+                        NativeOperationsWorkDestination.RecordSpoilage -> "Opening record spoilage…"
+                        else -> "Opening receive milk…"
+                    },
+                    modifier = Modifier.fillMaxSize().padding(padding),
+                )
             }
         }
     }

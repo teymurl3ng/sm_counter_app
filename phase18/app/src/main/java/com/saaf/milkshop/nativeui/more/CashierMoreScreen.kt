@@ -29,7 +29,6 @@ import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -63,6 +62,7 @@ import com.saaf.milkshop.application.more.NativeMoreContext
 import com.saaf.milkshop.application.more.NativeMoreSecurityStatus
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.sale.CashierNavigation
@@ -237,7 +237,7 @@ private fun MoreLoadingScreen(
             Modifier.fillMaxSize().padding(padding).statusBarsPadding(),
             contentAlignment = Alignment.Center,
         ) {
-            CircularProgressIndicator(Modifier.testTag(NativeUiTags.MoreLoading))
+            NativeColdLoadingPane(label = "Loading More…", modifier = Modifier.testTag(NativeUiTags.MoreLoading))
         }
     }
 }
@@ -488,7 +488,7 @@ private fun MorePersonalSecurityScreen(
             ) {
                 Text("Personal security", style = MaterialTheme.typography.headlineMedium)
                 if (security == null) {
-                    CircularProgressIndicator()
+                    NativeColdLoadingPane(label = "Loading security…")
                 } else {
                     SecurityStatus(security)
                     OutlinedTextField(

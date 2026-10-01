@@ -52,6 +52,7 @@ import com.saaf.milkshop.domain.VendorProfileInput
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.HostedScaffold
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
@@ -152,14 +153,12 @@ fun OwnerSuppliersScreen(
             }
             when {
                 suppliersLoading && suppliers.isEmpty() && suppliersError == null -> {
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .testTag(NativeUiTags.OwnerSuppliersLoading),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                        NativeColdLoadingPane(
+                            label = "Loading suppliers…",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .testTag(NativeUiTags.OwnerSuppliersLoading),
+                        )
                 }
                 suppliersError != null && suppliers.isEmpty() -> {
                     Column(

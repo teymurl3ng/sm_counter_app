@@ -19,7 +19,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -45,6 +44,7 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierNavigation
 import com.saaf.milkshop.nativeui.sale.CashierNavigationRail
@@ -136,7 +136,7 @@ private fun ActivityLoadingScreen(
                 .padding(padding),
             contentAlignment = Alignment.Center,
         ) {
-            CircularProgressIndicator(Modifier.testTag(NativeUiTags.ActivityLoading))
+            NativeColdLoadingPane(label = "Loading activity…", modifier = Modifier.testTag(NativeUiTags.ActivityLoading))
         }
     }
 }
@@ -179,9 +179,7 @@ private fun ActivityListScreen(
             Box(Modifier.fillMaxSize()) {
                 when {
                     state.loadingDetail -> {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
-                        }
+                        NativeColdLoadingPane(label = "Loading record…", modifier = Modifier.fillMaxSize())
                     }
                     state.day.records.isEmpty() -> {
                         Column(

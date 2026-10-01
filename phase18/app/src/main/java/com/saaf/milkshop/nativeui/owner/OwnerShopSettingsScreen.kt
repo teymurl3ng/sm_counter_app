@@ -58,6 +58,7 @@ import com.saaf.milkshop.domain.OpeningStateInput
 import com.saaf.milkshop.domain.StoreIdentityInput
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.HostedScaffold
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -225,14 +226,12 @@ fun OwnerShopSettingsScreen(
             )
             when {
                 loading && snapshot == null && error == null -> {
-                    Box(
-                        Modifier
+                    NativeColdLoadingPane(
+                        label = "Loading shop settings…",
+                        modifier = Modifier
                             .fillMaxSize()
                             .testTag(NativeUiTags.OwnerShopSettingsLoading),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                    )
                 }
                 error != null && snapshot == null -> {
                     Column(

@@ -21,7 +21,6 @@ import androidx.compose.material.icons.outlined.PersonOff
 import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -166,18 +165,10 @@ private fun ReadyWork(
         NativeAdminWorkDestination.RecordExpense -> {
             BackHandler(onBack = onBackToHome)
             admScaffold(snackbarHostState, modifier) { padding ->
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(24.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CircularProgressIndicator()
-                    Spacer(Modifier.height(12.dp))
-                    Text("Opening record expense…")
-                }
+                NativeColdLoadingPane(
+                    label = "Opening record expense…",
+                    modifier = Modifier.fillMaxSize().padding(padding),
+                )
             }
         }
     }

@@ -68,6 +68,7 @@ import com.saaf.milkshop.domain.ProductionLossAssessmentInput
 import com.saaf.milkshop.domain.YieldPolicyInput
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.HostedScaffold
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -417,7 +418,7 @@ private fun OwnerCostingPlansListBody(
                             .testTag(NativeUiTags.OwnerCostingPlansLoading),
                         contentAlignment = Alignment.Center,
                     ) {
-                        CircularProgressIndicator()
+                        NativeColdLoadingPane(label = "Loading costing plans…")
                     }
                 }
             }

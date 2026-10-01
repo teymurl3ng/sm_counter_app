@@ -21,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -55,6 +54,7 @@ import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.HostedScaffold
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
@@ -204,14 +204,12 @@ fun OwnerUsersRolesScreen(
             )
             when {
                 usersLoading && users.isEmpty() && usersError == null -> {
-                    Box(
-                        Modifier
+                    NativeColdLoadingPane(
+                        label = "Loading users & roles…",
+                        modifier = Modifier
                             .fillMaxSize()
                             .testTag(NativeUiTags.OwnerUsersRolesLoading),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                    )
                 }
                 usersError != null && users.isEmpty() -> {
                     Column(

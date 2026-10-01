@@ -22,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -287,9 +286,7 @@ private fun RecordsListBody(
             Box(Modifier.fillMaxSize()) {
                 when {
                     state.loadingDetail -> {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
-                        }
+                        NativeColdLoadingPane(label = "Loading record…", modifier = Modifier.fillMaxSize())
                     }
                     state.activeGroup == NativeRecordsGroup.Balances -> {
                         RecordsBalancesBody(state = state, onOpenLedger = onOpenLedger)

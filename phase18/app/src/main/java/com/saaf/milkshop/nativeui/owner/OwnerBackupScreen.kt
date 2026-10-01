@@ -49,6 +49,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerBackupSnapshot
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.HostedScaffold
+import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -243,14 +244,12 @@ private fun OwnerBackupStatusScreen(
             )
             when {
                 loading && snapshot == null && error == null -> {
-                    Box(
-                        Modifier
+                    NativeColdLoadingPane(
+                        label = "Loading backup…",
+                        modifier = Modifier
                             .fillMaxSize()
                             .testTag(NativeUiTags.OwnerBackupLoading),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                    )
                 }
                 error != null && snapshot == null -> {
                     Column(

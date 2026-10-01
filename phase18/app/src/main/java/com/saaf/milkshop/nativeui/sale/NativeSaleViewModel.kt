@@ -75,9 +75,9 @@ class NativeSaleViewModel(
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle && _state.value !is NativeSaleState.Idle) {
-            // Warm re-entry: keep the content on screen and re-validate in
-            // place (thin refresh bar) instead of showing stale data.
-            refresh()
+            // Warm re-entry: revalidate reference data silently — keep the
+            // visible form exactly as the user left it.
+            silentRefresh()
             return
         }
         sessionHandle = nextSessionHandle
@@ -157,6 +157,32 @@ class NativeSaleViewModel(
                         error = error.message ?: "The sale could not be refreshed. Check it and try again.",
                     )
                 }
+            }
+        }
+    }
+
+    /**
+     * Warm-open reload: revalidates reference data without announcing it —
+     * no refreshing flag, no state replacement unless the fresh data differs.
+     * Receipt and follow-up card survive; failures leave the form as-is.
+     */
+    private fun silentRefresh() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeSaleState.Ready ?: return
+        scope.launch {
+            try {
+                val fresh = withContext(Dispatchers.IO) { facade.load(session) }
+                if (sessionHandle != session) return@launch
+                val latest = _state.value as? NativeSaleState.Ready ?: return@launch
+                val merged = latest.copy(context = fresh, refreshing = false)
+                if (merged != _state.value) _state.value = merged
+            } catch (error: SecurityFailure.SessionExpired) {
+                sessionHandle = null
+                _state.value = NativeSaleState.Idle
+                onSessionExpired()
+            } catch (error: Throwable) {
+                // Silent: the displayed data stays; it will revalidate on
+                // the next entry or day-state change.
             }
         }
     }

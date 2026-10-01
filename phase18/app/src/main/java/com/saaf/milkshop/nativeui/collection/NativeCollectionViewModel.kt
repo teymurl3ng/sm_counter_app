@@ -58,9 +58,9 @@ class NativeCollectionViewModel(
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle && _state.value !is NativeCollectionState.Idle) {
-            // Warm re-entry: keep the content on screen and re-validate in
-            // place (thin refresh bar) instead of showing stale data.
-            refresh()
+            // Warm re-entry: revalidate reference data silently — keep the
+            // visible form exactly as the user left it.
+            silentRefresh()
             return
         }
         sessionHandle = nextSessionHandle
@@ -89,6 +89,33 @@ class NativeCollectionViewModel(
                         error = error.message ?: "Collection could not be refreshed. Try again.",
                     )
                 }
+            }
+        }
+    }
+
+    /**
+     * Warm-open reload: revalidates reference data without announcing it —
+     * no refreshing flag, no state replacement unless the fresh data differs.
+     * The selected customer's balance (loaded on demand) survives untouched;
+     * failures leave the form as-is.
+     */
+    private fun silentRefresh() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeCollectionState.Ready ?: return
+        scope.launch {
+            try {
+                val fresh = withContext(Dispatchers.IO) { facade.load(session) }
+                if (sessionHandle != session) return@launch
+                val latest = _state.value as? NativeCollectionState.Ready ?: return@launch
+                val merged = latest.copy(context = fresh, refreshing = false)
+                if (merged != _state.value) _state.value = merged
+            } catch (error: SecurityFailure.SessionExpired) {
+                sessionHandle = null
+                _state.value = NativeCollectionState.Idle
+                onSessionExpired()
+            } catch (error: Throwable) {
+                // Silent: the displayed data stays; it will revalidate on
+                // the next entry or day-state change.
             }
         }
     }

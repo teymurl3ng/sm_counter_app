@@ -91,7 +91,10 @@ fun OperationsMoreScreen(
     moreScaffold: OpsScaffold,
     modifier: Modifier = Modifier,
 ) {
-    when (state) {
+    NativeSectionTransition(
+        targetState = state,
+        contentKey = { if (it is NativeOperationsMoreState.Idle || it is NativeOperationsMoreState.Loading) NativeOperationsMoreState.Loading::class else it::class },
+    ) { state -> when (state) {
         NativeOperationsMoreState.Idle,
         NativeOperationsMoreState.Loading,
         -> OpsMoreLoadingScreen(snackbarHostState, moreScaffold, modifier)
@@ -146,6 +149,7 @@ fun OperationsMoreScreen(
                 }
             }
         }
+    }
     }
 }
 

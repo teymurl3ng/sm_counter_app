@@ -20,6 +20,7 @@ import com.saaf.milkshop.nativeui.cashclose.CashCloseLoadFailureBody
 import com.saaf.milkshop.nativeui.cashclose.CashCloseLoadingBody
 import com.saaf.milkshop.nativeui.cashclose.NativeCashCloseState
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 
 /**
@@ -67,7 +68,10 @@ fun ManagerCashCloseEntryScreen(
                 snackbarHostState,
                 Modifier.fillMaxSize(),
             ) { padding ->
-                when (state) {
+                NativeSectionTransition(
+                    targetState = state,
+                    contentKey = { if (it is NativeCashCloseState.Idle || it is NativeCashCloseState.Loading) NativeCashCloseState.Loading::class else it::class },
+                ) { state -> when (state) {
                     NativeCashCloseState.Idle,
                     NativeCashCloseState.Loading,
                     -> CashCloseLoadingBody(
@@ -89,6 +93,7 @@ fun ManagerCashCloseEntryScreen(
                         contentPadding = padding,
                         allowReopen = false,
                     )
+                }
                 }
             }
             CashCloseDiscardDialog(leaveGuard)

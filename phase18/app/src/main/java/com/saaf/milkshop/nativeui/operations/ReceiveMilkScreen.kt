@@ -70,6 +70,7 @@ import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import java.util.Locale
 
 @Composable
@@ -102,7 +103,10 @@ fun ReceiveMilkScreen(
         if (canLeave) leaveGuard.requestLeave(onBackToHome)
     }
     workScaffold(snackbarHostState, modifier) { padding ->
-        when (state) {
+        NativeSectionTransition(
+            targetState = state,
+            contentKey = { if (it is NativeReceiveMilkState.Idle || it is NativeReceiveMilkState.Loading) NativeReceiveMilkState.Loading::class else it::class },
+        ) { state -> when (state) {
             NativeReceiveMilkState.Idle,
             NativeReceiveMilkState.Loading,
             -> ReceiveMilkLoadingBody(
@@ -129,6 +133,7 @@ fun ReceiveMilkScreen(
                 leaveGuard = leaveGuard,
                 contentPadding = padding,
             )
+        }
         }
     }
     ReceiveMilkDiscardDialog(leaveGuard)

@@ -14,6 +14,7 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.sale.NativeSaleRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.sale.NativeSaleState
 import com.saaf.milkshop.nativeui.sale.SaleDiscardDialog
@@ -63,7 +64,10 @@ fun ManagerSaleEntryScreen(
             snackbarHostState,
             Modifier.fillMaxSize(),
         ) { padding ->
-            when (state) {
+            NativeSectionTransition(
+                targetState = state,
+                contentKey = { if (it is NativeSaleState.Idle || it is NativeSaleState.Loading) NativeSaleState.Loading::class else it::class },
+            ) { state -> when (state) {
                 NativeSaleState.Idle,
                 NativeSaleState.Loading,
                 -> SaleLoadingBody(
@@ -84,6 +88,7 @@ fun ManagerSaleEntryScreen(
                     leaveGuard = leaveGuard,
                     contentPadding = padding,
                 )
+            }
             }
         }
         SaleDiscardDialog(leaveGuard)

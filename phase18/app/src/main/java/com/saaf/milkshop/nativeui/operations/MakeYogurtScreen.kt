@@ -62,6 +62,7 @@ import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import java.util.Locale
 
 @Composable
@@ -90,7 +91,10 @@ fun MakeYogurtScreen(
         if (canLeave) leaveGuard.requestLeave(onBackToHome)
     }
     workScaffold(snackbarHostState, modifier) { padding ->
-        when (state) {
+        NativeSectionTransition(
+            targetState = state,
+            contentKey = { if (it is NativeMakeYogurtState.Idle || it is NativeMakeYogurtState.Loading) NativeMakeYogurtState.Loading::class else it::class },
+        ) { state -> when (state) {
             NativeMakeYogurtState.Idle,
             NativeMakeYogurtState.Loading,
             -> MakeYogurtLoadingBody(
@@ -113,6 +117,7 @@ fun MakeYogurtScreen(
                 leaveGuard = leaveGuard,
                 contentPadding = padding,
             )
+        }
         }
     }
     MakeYogurtDiscardDialog(leaveGuard)

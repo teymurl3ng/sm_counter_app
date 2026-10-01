@@ -14,6 +14,7 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.vendorpayment.NativeVendorPaymentRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.vendorpayment.NativeVendorPaymentState
 import com.saaf.milkshop.nativeui.vendorpayment.VendorPaymentDiscardDialog
@@ -61,7 +62,10 @@ fun ManagerPaySupplierEntryScreen(
             snackbarHostState,
             Modifier.fillMaxSize(),
         ) { padding ->
-            when (state) {
+            NativeSectionTransition(
+                targetState = state,
+                contentKey = { if (it is NativeVendorPaymentState.Idle || it is NativeVendorPaymentState.Loading) NativeVendorPaymentState.Loading::class else it::class },
+            ) { state -> when (state) {
                 NativeVendorPaymentState.Idle,
                 NativeVendorPaymentState.Loading,
                 -> VendorPaymentLoadingBody(
@@ -81,6 +85,7 @@ fun ManagerPaySupplierEntryScreen(
                     leaveGuard = leaveGuard,
                     contentPadding = padding,
                 )
+            }
             }
         }
         VendorPaymentDiscardDialog(leaveGuard)

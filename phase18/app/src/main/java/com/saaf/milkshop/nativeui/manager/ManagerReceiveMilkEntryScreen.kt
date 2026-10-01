@@ -15,6 +15,7 @@ import com.saaf.milkshop.application.operations.NativeReceiveMilkPreview
 import com.saaf.milkshop.application.operations.NativeReceiveMilkRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.operations.NativeReceiveMilkState
 import com.saaf.milkshop.nativeui.operations.ReceiveMilkDiscardDialog
@@ -66,7 +67,10 @@ fun ManagerReceiveMilkEntryScreen(
             snackbarHostState,
             Modifier.fillMaxSize(),
         ) { padding ->
-            when (state) {
+            NativeSectionTransition(
+                targetState = state,
+                contentKey = { if (it is NativeReceiveMilkState.Idle || it is NativeReceiveMilkState.Loading) NativeReceiveMilkState.Loading::class else it::class },
+            ) { state -> when (state) {
                 NativeReceiveMilkState.Idle,
                 NativeReceiveMilkState.Loading,
                 -> ReceiveMilkLoadingBody(
@@ -91,6 +95,7 @@ fun ManagerReceiveMilkEntryScreen(
                     leaveGuard = leaveGuard,
                     contentPadding = padding,
                 )
+            }
             }
         }
         ReceiveMilkDiscardDialog(leaveGuard)

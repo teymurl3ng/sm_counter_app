@@ -70,6 +70,7 @@ import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import java.util.Locale
 
 @Composable
@@ -104,7 +105,10 @@ fun RecordSpoilageScreen(
         if (canLeave) leaveGuard.requestLeave(onBackToHome)
     }
     workScaffold(snackbarHostState, modifier) { padding ->
-        when (state) {
+        NativeSectionTransition(
+            targetState = state,
+            contentKey = { if (it is NativeRecordSpoilageState.Idle || it is NativeRecordSpoilageState.Loading) NativeRecordSpoilageState.Loading::class else it::class },
+        ) { state -> when (state) {
             NativeRecordSpoilageState.Idle,
             NativeRecordSpoilageState.Loading,
             -> RecordSpoilageLoadingBody(
@@ -133,6 +137,7 @@ fun RecordSpoilageScreen(
                 leaveGuard = leaveGuard,
                 contentPadding = padding,
             )
+        }
         }
     }
     RecordSpoilageDiscardDialog(leaveGuard)

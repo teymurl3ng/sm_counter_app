@@ -14,6 +14,7 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.operations.NativeRecordSpoilageRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.operations.NativeRecordSpoilageState
 import com.saaf.milkshop.nativeui.operations.RecordSpoilageDiscardDialog
@@ -67,7 +68,10 @@ fun ManagerRecordSpoilageEntryScreen(
             snackbarHostState,
             Modifier.fillMaxSize(),
         ) { padding ->
-            when (state) {
+            NativeSectionTransition(
+                targetState = state,
+                contentKey = { if (it is NativeRecordSpoilageState.Idle || it is NativeRecordSpoilageState.Loading) NativeRecordSpoilageState.Loading::class else it::class },
+            ) { state -> when (state) {
                 NativeRecordSpoilageState.Idle,
                 NativeRecordSpoilageState.Loading,
                 -> RecordSpoilageLoadingBody(
@@ -94,6 +98,7 @@ fun ManagerRecordSpoilageEntryScreen(
                     leaveGuard = leaveGuard,
                     contentPadding = padding,
                 )
+            }
             }
         }
         RecordSpoilageDiscardDialog(leaveGuard)

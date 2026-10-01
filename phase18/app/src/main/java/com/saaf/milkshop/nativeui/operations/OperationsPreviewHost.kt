@@ -8,6 +8,11 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExitTransition
+<<<<<<< HEAD
+=======
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+>>>>>>> 3a1df6f (DEMO: destination swaps crossfade both ways - no instant snap on open or close)
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.togetherWith
@@ -223,7 +228,7 @@ fun OperationsPreviewHost(
             transitionSpec = {
                 // Single fade-in on destination change: the old screen snaps
                 // away (opaque pane background), the new one fades in once.
-                fadeIn(tween(200)) togetherWith ExitTransition.None
+                fadeIn(tween(200)) togetherWith fadeOut(tween(200))
             },
             label = "work_destination",
         ) { _ ->

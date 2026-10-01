@@ -55,9 +55,10 @@ class NativeReceiveMilkViewModel(
 
     fun open(nextSessionHandle: String) {
         if (sessionHandle == nextSessionHandle && _state.value !is NativeReceiveMilkState.Idle) {
-            // Warm re-entry: keep the content on screen and re-validate in
-            // place (thin refresh bar) instead of showing stale data.
-            refresh()
+            // Warm re-entry: refresh reference data silently — keep the
+            // visible form exactly as the user left it, update data in
+            // place only when something actually changed.
+            silentRefresh()
             return
         }
         sessionHandle = nextSessionHandle
@@ -84,6 +85,39 @@ class NativeReceiveMilkViewModel(
                         error = error.message ?: publicMessage(error),
                     )
                 }
+            }
+        }
+    }
+
+    /**
+     * Warm-open reload: revalidates reference data without announcing it —
+     * no refreshing flag, no state replacement unless the fresh data differs.
+     * User selections survive if still valid; failures leave the form as-is.
+     */
+    private fun silentRefresh() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeReceiveMilkState.Ready ?: return
+        scope.launch {
+            try {
+                val fresh = withContext(Dispatchers.IO) { facade.load(session) }
+                if (sessionHandle != session) return@launch
+                val latest = _state.value as? NativeReceiveMilkState.Ready ?: return@launch
+                val selectedVendor = latest.selectedVendor?.let { selection ->
+                    fresh.vendors.singleOrNull { it.accountId == selection.accountId }
+                }
+                val merged = latest.copy(
+                    context = fresh,
+                    selectedVendor = selectedVendor,
+                    refreshing = false,
+                )
+                if (merged != _state.value) _state.value = merged
+            } catch (error: SecurityFailure.SessionExpired) {
+                sessionHandle = null
+                _state.value = NativeReceiveMilkState.Idle
+                onSessionExpired()
+            } catch (error: Throwable) {
+                // Silent: the displayed data stays; it will revalidate on
+                // the next entry or day-state change.
             }
         }
     }

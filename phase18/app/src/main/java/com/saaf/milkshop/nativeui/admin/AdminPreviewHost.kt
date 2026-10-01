@@ -1,6 +1,11 @@
 package com.saaf.milkshop.nativeui.admin
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -275,13 +280,23 @@ fun AdminPreviewHost(
             businessDate = businessDate,
             postingOpen = (ownerMoreState as? NativeOwnerMoreState.Ready)?.context?.postingOpen ?: true,
         )
-        NativeSectionTransition<Pair<AdminSection, NativeAdminWorkDestination?>>(
-            targetState = adminSection to workDestination,
+        NativeSectionTransition(
+            targetState = adminSection,
             contentKey = { it },
             modifier = Modifier.weight(1f),
-        ) { pane ->
-            val (section, paneDestination) = pane
-        sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}:$paneDestination") {
+        ) { section ->
+        sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}") {
+        AnimatedContent(
+            targetState = workDestination,
+            contentKey = { it },
+            transitionSpec = {
+                // No alpha: the incoming pane is fully opaque from frame 1 and
+                // just settles 96%->100%, so there is never a blank/flash frame.
+                // The old pane is covered instantly by the opaque new one.
+                scaleIn(initialScale = 0.96f, animationSpec = tween(200)) togetherWith ExitTransition.None
+            },
+            label = "admin_work_destination",
+        ) { _ ->
         when {
             section == AdminSection.Work &&
                 workDestination == NativeAdminWorkDestination.RecordExpense -> {
@@ -504,6 +519,7 @@ fun AdminPreviewHost(
                     },
                 )
             }
+        }
         }
         }
         }

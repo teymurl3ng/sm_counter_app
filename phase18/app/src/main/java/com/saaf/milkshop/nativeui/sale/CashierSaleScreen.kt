@@ -1820,7 +1820,7 @@ private fun SaleChequePane(
         }
         val press = rememberPressSource()
         Button(
-            onClick = { context.hapticTap(); onStartNextSale() },
+            onClick = { context.hapticCommit(); onStartNextSale() },
             colors = ButtonDefaults.buttonColors(
                 containerColor = SaafYellow,
                 contentColor = SaafInk,

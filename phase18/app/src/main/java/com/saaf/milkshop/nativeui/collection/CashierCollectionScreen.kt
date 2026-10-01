@@ -65,6 +65,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
@@ -90,6 +91,7 @@ import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.hapticCommit
 import com.saaf.milkshop.nativeui.common.hapticConfirm
 import com.saaf.milkshop.nativeui.common.imePaddingExcludingNavBar
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
@@ -569,9 +571,13 @@ private fun CollectionForm(
             )
         }
 
+        val hapticContext = LocalContext.current
         val press = rememberPressSource()
         Button(
-            onClick = onSubmit,
+            onClick = {
+                hapticContext.hapticCommit()
+                onSubmit()
+            },
             enabled = validRequest,
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (advancePaisa > 0L) SaafYellow else MaterialTheme.colorScheme.primary,
@@ -844,10 +850,14 @@ private fun AdvanceConfirmationDialog(
             }
         },
         confirmButton = {
+            val hapticContext = LocalContext.current
             val press = rememberPressSource()
             Button(
                 interactionSource = press,
-                onClick = onConfirm,
+                onClick = {
+                    hapticContext.hapticCommit()
+                    onConfirm()
+                },
                 enabled = !saving,
                 modifier = Modifier.pressScale(press).testTag(NativeUiTags.CollectConfirmAdvance),
                 colors = ButtonDefaults.buttonColors(

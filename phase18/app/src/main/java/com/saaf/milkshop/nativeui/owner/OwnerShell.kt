@@ -61,7 +61,7 @@ internal fun OwnerScaffold(
 }
 
 @Composable
-private fun OwnerNavigationRail(
+internal fun OwnerNavigationRail(
     selected: OwnerSection,
     onNavigate: (OwnerSection) -> Unit,
 ) {

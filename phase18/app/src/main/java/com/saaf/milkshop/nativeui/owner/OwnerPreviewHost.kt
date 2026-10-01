@@ -1,9 +1,17 @@
 package com.saaf.milkshop.nativeui.owner
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,7 +19,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.activity.NativeActivityFacade
+import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
+import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.collection.NativeCollectionFacade
@@ -33,8 +47,11 @@ import com.saaf.milkshop.nativeui.operations.NativeReceiveMilkState
 import com.saaf.milkshop.nativeui.operations.NativeReceiveMilkViewModel
 import com.saaf.milkshop.nativeui.operations.NativeRecordSpoilageState
 import com.saaf.milkshop.nativeui.operations.NativeRecordSpoilageViewModel
+import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
+import com.saaf.milkshop.nativeui.sale.LocalPaneHeaderEnabled
 import com.saaf.milkshop.nativeui.sale.NativeSaleState
 import com.saaf.milkshop.nativeui.sale.NativeSaleViewModel
+import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.salarypayment.NativeSalaryPaymentState
 import com.saaf.milkshop.nativeui.salarypayment.NativeSalaryPaymentViewModel
 import com.saaf.milkshop.nativeui.theme.SaafTheme
@@ -441,9 +458,66 @@ fun OwnerPreviewHost(
             }
         }
         val sectionStateHolder = rememberSaveableStateHolder()
+        val ownerWorkReady = ownerWorkState as? NativeOwnerWorkState.Ready
+        val ownerMoreDestination =
+            (ownerMoreState as? NativeOwnerMoreState.Ready)?.destination
+        // Static chrome (Cashier pattern): one scaffold + one header at the
+        // host, outside the pane transition — nav and header never reload.
+        var activeEntryGuard by remember { mutableStateOf<EntryLeaveGuard?>(null) }
+        val guardedNavigateOwner: (OwnerSection) -> Unit = { section ->
+            val guard = activeEntryGuard
+            if (guard != null) guard.requestLeave { navigateOwner(section) } else navigateOwner(section)
+        }
+        val headerTitle = when {
+            ownerSection == OwnerSection.Overview ->
+                if (ownerReportsState !is NativeOwnerReportsState.Idle) "Month reports" else "Overview"
+            ownerSection == OwnerSection.Records -> "Records"
+            ownerSection == OwnerSection.More -> when (ownerMoreDestination) {
+                NativeOwnerMoreDestination.Sync -> "Sync"
+                NativeOwnerMoreDestination.PersonalSecurity -> "Personal security"
+                NativeOwnerMoreDestination.Products -> "Products"
+                NativeOwnerMoreDestination.Customers -> "Customers"
+                NativeOwnerMoreDestination.Suppliers -> "Suppliers"
+                NativeOwnerMoreDestination.Employees -> "Employees"
+                NativeOwnerMoreDestination.CostingPlans -> "Costing & plans"
+                NativeOwnerMoreDestination.ShopSettings -> "Shop settings"
+                NativeOwnerMoreDestination.UsersRoles -> "Users & roles"
+                NativeOwnerMoreDestination.SecurityHistory -> "Security history"
+                NativeOwnerMoreDestination.Backup -> "Backup & restore"
+                else -> "More"
+            }
+            ownerWorkDestination == NativeOwnerWorkDestination.RecordSale -> "New sale"
+            ownerWorkDestination == NativeOwnerWorkDestination.RecordPayment -> "Collect payment"
+            ownerWorkDestination == NativeOwnerWorkDestination.RecordExpense -> "Record expense"
+            ownerWorkDestination == NativeOwnerWorkDestination.PaySupplier -> "Pay supplier"
+            ownerWorkDestination == NativeOwnerWorkDestination.PaySalary -> "Pay salary"
+            ownerWorkDestination == NativeOwnerWorkDestination.CashCountAndClose -> "Cash count & close"
+            ownerWorkDestination == NativeOwnerWorkDestination.ReceiveMilk -> "Receive milk"
+            ownerWorkDestination == NativeOwnerWorkDestination.MakeYogurt -> "Make yogurt"
+            ownerWorkDestination == NativeOwnerWorkDestination.RecordSpoilage -> "Record spoilage"
+            ownerWorkDestination == NativeOwnerWorkDestination.Deliveries -> "Active deliveries"
+            else -> "Work"
+        }
+        AdaptiveNavigationScaffold(
+            snackbarHostState = snackbarHostState,
+            modifier = Modifier.fillMaxSize(),
+            containerColor = MaterialTheme.colorScheme.background,
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            compactNavigation = { OwnerNavigation(selected = ownerSection, onNavigate = guardedNavigateOwner) },
+            expandedNavigation = { OwnerNavigationRail(selected = ownerSection, onNavigate = guardedNavigateOwner) },
+        ) { hostPadding ->
+            Column(Modifier.fillMaxSize().padding(hostPadding)) {
+        CashierScreenHeader(
+            title = headerTitle,
+            displayName = identity.displayName,
+            roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+            businessDate = ownerWorkReady?.context?.businessDate ?: "",
+            postingOpen = ownerWorkReady?.context?.postingOpen ?: true,
+        )
         NativeSectionTransition<Pair<OwnerSection, NativeOwnerWorkDestination?>>(
             targetState = ownerSection to ownerWorkDestination,
             contentKey = { it },
+            modifier = Modifier.weight(1f),
         ) { pane ->
             val (section, paneDestination) = pane
         sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}:$paneDestination") {
@@ -579,14 +653,12 @@ fun OwnerPreviewHost(
                     onEnrollPhoneSecurity = ownerMoreViewModel::enrollPhoneSecurity,
                     onSwitchAccount = onLeaveToAccountPicker,
                     onSignOut = onLeaveToWelcome,
-                    hostedScaffold = { s, m, wrapNav, content ->
-                        OwnerScaffold(
-                            snackbarHostState = s,
-                            section = OwnerSection.More,
-                            onNavigate = { section -> wrapNav { navigateOwner(section) } },
-                            modifier = m,
-                            content = content,
-                        )
+                    hostedScaffold = { _, m, _, content ->
+                        Box(modifier = m.testTag(NativeUiTags.OwnerShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                     onLeaveConfirmed = onLeaveToWelcome,
                 )
@@ -602,14 +674,12 @@ fun OwnerPreviewHost(
                     onOpenLedger = ownerRecordsViewModel::openLedger,
                     onBackFromLedger = ownerRecordsViewModel::clearLedger,
                     onLeaveConfirmed = onLeaveToWelcome,
-                    hostedScaffold = { snackbar, mod, wrapNav, content ->
-                        OwnerScaffold(
-                            snackbarHostState = snackbar,
-                            section = OwnerSection.Records,
-                            onNavigate = { section -> wrapNav { navigateOwner(section) } },
-                            modifier = mod,
-                            content = content,
-                        )
+                    hostedScaffold = { _, mod, _, content ->
+                        Box(modifier = mod.testTag(NativeUiTags.OwnerShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                     roleLabel = "Owner",
                     onSelectGroup = ownerRecordsViewModel::setActiveGroup,
@@ -632,13 +702,11 @@ fun OwnerPreviewHost(
                     onStartNextSale = saleViewModel::startNextSale,
                     onBackToWork = { returnOwnerWorkHome() },
                     ownScaffold = { s, m, content ->
-                        OwnerScaffold(
-                            snackbarHostState = s,
-                            section = OwnerSection.Work,
-                            onNavigate = navigateOwner,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OwnerShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                 )
             }
@@ -659,13 +727,11 @@ fun OwnerPreviewHost(
                     },
                     onBackToWork = { returnOwnerWorkHome() },
                     ownScaffold = { s, m, content ->
-                        OwnerScaffold(
-                            snackbarHostState = s,
-                            section = OwnerSection.Work,
-                            onNavigate = navigateOwner,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OwnerShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                 )
             }
@@ -680,13 +746,11 @@ fun OwnerPreviewHost(
                     onRecordAnother = expenseViewModel::recordAnother,
                     onBackToWork = { returnOwnerWorkHome() },
                     ownScaffold = { s, m, content ->
-                        OwnerScaffold(
-                            snackbarHostState = s,
-                            section = OwnerSection.Work,
-                            onNavigate = navigateOwner,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OwnerShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                 )
             }
@@ -701,13 +765,11 @@ fun OwnerPreviewHost(
                     onRecordAnother = vendorPaymentViewModel::recordAnother,
                     onBackToWork = { returnOwnerWorkHome() },
                     ownScaffold = { s, m, content ->
-                        OwnerScaffold(
-                            snackbarHostState = s,
-                            section = OwnerSection.Work,
-                            onNavigate = navigateOwner,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OwnerShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                 )
             }
@@ -722,13 +784,11 @@ fun OwnerPreviewHost(
                     onRecordAnother = salaryPaymentViewModel::recordAnother,
                     onBackToWork = { returnOwnerWorkHome() },
                     ownScaffold = { s, m, content ->
-                        OwnerScaffold(
-                            snackbarHostState = s,
-                            section = OwnerSection.Work,
-                            onNavigate = navigateOwner,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OwnerShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                 )
             }
@@ -744,13 +804,11 @@ fun OwnerPreviewHost(
                     onReopenDay = cashCloseViewModel::reopenDay,
                     onBackToWork = { returnOwnerWorkHome() },
                     ownScaffold = { s, m, content ->
-                        OwnerScaffold(
-                            snackbarHostState = s,
-                            section = OwnerSection.Work,
-                            onNavigate = navigateOwner,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OwnerShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                 )
             }
@@ -769,13 +827,11 @@ fun OwnerPreviewHost(
                     onReceiveAnother = receiveMilkViewModel::receiveAnother,
                     onBackToWork = { returnOwnerWorkHome() },
                     ownScaffold = { s, m, content ->
-                        OwnerScaffold(
-                            snackbarHostState = s,
-                            section = OwnerSection.Work,
-                            onNavigate = navigateOwner,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OwnerShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                 )
             }
@@ -790,13 +846,11 @@ fun OwnerPreviewHost(
                     onMakeAnother = makeYogurtViewModel::makeAnother,
                     onBackToWork = { returnOwnerWorkHome() },
                     ownScaffold = { s, m, content ->
-                        OwnerScaffold(
-                            snackbarHostState = s,
-                            section = OwnerSection.Work,
-                            onNavigate = navigateOwner,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OwnerShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                 )
             }
@@ -817,13 +871,11 @@ fun OwnerPreviewHost(
                     onRecordAnother = recordSpoilageViewModel::recordAnother,
                     onBackToWork = { returnOwnerWorkHome() },
                     ownScaffold = { s, m, content ->
-                        OwnerScaffold(
-                            snackbarHostState = s,
-                            section = OwnerSection.Work,
-                            onNavigate = navigateOwner,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OwnerShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                 )
             }
@@ -847,13 +899,11 @@ fun OwnerPreviewHost(
                         onLinkSale = deliveriesViewModel::linkSale,
                     onBackToWork = { returnOwnerWorkHome() },
                     ownScaffold = { s, m, content ->
-                        OwnerScaffold(
-                            snackbarHostState = s,
-                            section = OwnerSection.Work,
-                            onNavigate = navigateOwner,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OwnerShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                 )
             }
@@ -866,13 +916,11 @@ fun OwnerPreviewHost(
                     onBackToHome = { returnOwnerWorkHome() },
                     onLeaveConfirmed = onLeaveToWelcome,
                     ownScaffold = { s, m, content ->
-                        OwnerScaffold(
-                            snackbarHostState = s,
-                            section = OwnerSection.Work,
-                            onNavigate = navigateOwner,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.OwnerShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                 )
             }
@@ -887,14 +935,12 @@ fun OwnerPreviewHost(
                         onSelectPreset = ownerReportsViewModel::selectPreset,
                         onCustomRangePreview = {},
                         onSelectCustomRange = ownerReportsViewModel::selectCustomRange,
-                        hostedScaffold = { snackbar, mod, wrapNav, content ->
-                            OwnerScaffold(
-                                snackbarHostState = snackbar,
-                                section = OwnerSection.Overview,
-                                onNavigate = { section -> wrapNav { navigateOwner(section) } },
-                                modifier = mod,
-                                content = content,
-                            )
+                        hostedScaffold = { _, mod, _, content ->
+                            Box(modifier = mod.testTag(NativeUiTags.OwnerShellRoot)) {
+                                CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                    content(PaddingValues(0.dp))
+                                }
+                            }
                         },
                     )
                 } else {
@@ -914,17 +960,17 @@ fun OwnerPreviewHost(
                         },
                         onOpenMonthReports = { ownerReportsViewModel.open(sessionHandle) },
                         ownScaffold = { s, m, content ->
-                            OwnerScaffold(
-                                snackbarHostState = s,
-                                section = OwnerSection.Overview,
-                                onNavigate = navigateOwner,
-                                modifier = m,
-                                content = content,
-                            )
+                            Box(modifier = m.testTag(NativeUiTags.OwnerShellRoot)) {
+                                CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                    content(PaddingValues(0.dp))
+                                }
+                            }
                         },
                     )
                 }
             }
+        }
+        }
         }
         }
         }

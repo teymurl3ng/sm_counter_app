@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -13,6 +14,7 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.operations.NativeReceiveMilkPreview
 import com.saaf.milkshop.application.operations.NativeReceiveMilkRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.operations.NativeReceiveMilkState
@@ -37,10 +39,15 @@ fun OwnerReceiveMilkEntryScreen(
     onRecord: (NativeReceiveMilkRequest) -> Unit,
     onReceiveAnother: () -> Unit,
     onBackToWork: () -> Unit,
+    onRegisterGuard: (EntryLeaveGuard?) -> Unit = {},
     ownScaffold: OwnScaffold,
     modifier: Modifier = Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
+    DisposableEffect(leaveGuard) {
+        onRegisterGuard(leaveGuard)
+        onDispose { onRegisterGuard(null) }
+    }
     val canLeave = (state as? NativeReceiveMilkState.Ready)?.saving != true
 
     LaunchedEffect(state is NativeReceiveMilkState.Ready) {

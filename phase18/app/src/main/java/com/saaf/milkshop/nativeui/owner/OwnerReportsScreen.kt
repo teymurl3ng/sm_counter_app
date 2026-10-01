@@ -41,6 +41,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerReportsProductRow
 import com.saaf.milkshop.application.owner.NativeOwnerReportsSnapshot
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
+import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
@@ -62,51 +63,42 @@ fun OwnerReportsScreen(
     onSelectPreset: (NativeOwnerReportsPreset) -> Unit,
     onCustomRangePreview: () -> Unit,
     onSelectCustomRange: (String, String) -> Unit = { _, _ -> },
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
     modifier: Modifier = Modifier,
 ) {
     var customRangeOpen by remember { mutableStateOf(false) }
     var customStart by remember { mutableStateOf("") }
     var customEnd by remember { mutableStateOf("") }
     BackHandler(onBack = onBackToOverview)
-    OwnerScaffold(snackbarHostState, OwnerSection.Overview, onNavigate, modifier) { padding ->
+    val snapshot = (state as? NativeOwnerReportsState.Ready)?.snapshot
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .testTag(NativeUiTags.OwnerReportsRoot),
         ) {
+            CashierScreenHeader(
+                title = "Month reports",
+                displayName = snapshot?.shopName ?: identity.displayName,
+                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                businessDate = snapshot?.businessDate ?: "",
+                postingOpen = snapshot?.postingOpen ?: true,
+                showDayChip = false,
+            )
             NativeSectionTransition(
                 targetState = state,
                 contentKey = { if (it is NativeOwnerReportsState.Idle || it is NativeOwnerReportsState.Loading) NativeOwnerReportsState.Loading::class else it::class },
             ) { state -> when (state) {
                 NativeOwnerReportsState.Idle,
                 NativeOwnerReportsState.Loading,
-                -> {
-                    CashierScreenHeader(
-                        title = "Month reports",
-                        displayName = identity.displayName,
-                        roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                        businessDate = "",
-                        postingOpen = true,
-                        showDayChip = false,
-                    )
-                    NativeColdLoadingPane(
-                        label = "Loading reports…",
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .testTag(NativeUiTags.OwnerReportsLoading),
-                    )
-                }
-                is NativeOwnerReportsState.LoadFailure -> {
-                    CashierScreenHeader(
-                        title = "Month reports",
-                        displayName = identity.displayName,
-                        roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                        businessDate = "",
-                        postingOpen = true,
-                        showDayChip = false,
-                    )
+                -> NativeColdLoadingPane(
+                    label = "Loading reports…",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag(NativeUiTags.OwnerReportsLoading),
+                )
+                is NativeOwnerReportsState.LoadFailure ->
                     Column(
                         Modifier
                             .fillMaxSize()
@@ -125,16 +117,8 @@ fun OwnerReportsScreen(
                             modifier = Modifier.testTag(NativeUiTags.OwnerReportsRetry),
                         ) { Text("Try again") }
                     }
-                }
                 is NativeOwnerReportsState.Ready -> {
                     val snapshot = state.snapshot
-                    CashierScreenHeader(
-                        title = "Month reports",
-                        displayName = snapshot.shopName,
-                        roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                        businessDate = snapshot.businessDate,
-                        postingOpen = snapshot.postingOpen,
-                    )
                     Row(
                         Modifier
                             .fillMaxWidth()

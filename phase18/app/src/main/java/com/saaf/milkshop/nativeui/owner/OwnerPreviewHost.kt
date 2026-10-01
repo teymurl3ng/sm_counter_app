@@ -780,11 +780,8 @@ fun OwnerPreviewHost(
                     onNavigate = navigateOwner,
                 )
             }
-            else -> NativeSectionTransition(
-                targetState = ownerReportsState is NativeOwnerReportsState.Idle,
-                contentKey = { it },
-            ) { overviewRoot ->
-                if (!overviewRoot) {
+            else -> {
+                if (ownerReportsState !is NativeOwnerReportsState.Idle) {
                     OwnerReportsScreen(
                         snackbarHostState = snackbarHostState,
                         identity = identity,
@@ -794,7 +791,15 @@ fun OwnerPreviewHost(
                         onSelectPreset = ownerReportsViewModel::selectPreset,
                         onCustomRangePreview = {},
                         onSelectCustomRange = ownerReportsViewModel::selectCustomRange,
-                        onNavigate = navigateOwner,
+                        hostedScaffold = { snackbar, mod, wrapNav, content ->
+                            OwnerScaffold(
+                                snackbarHostState = snackbar,
+                                section = OwnerSection.Overview,
+                                onNavigate = { section -> wrapNav { navigateOwner(section) } },
+                                modifier = mod,
+                                content = content,
+                            )
+                        },
                     )
                 } else {
                     OwnerOverviewScreen(

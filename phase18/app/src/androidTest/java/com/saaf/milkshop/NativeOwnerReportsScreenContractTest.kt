@@ -21,6 +21,7 @@ import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.owner.NativeOwnerReportsState
 import com.saaf.milkshop.nativeui.owner.OwnerReportsScreen
+import com.saaf.milkshop.nativeui.owner.OwnerScaffold
 import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertEquals
@@ -126,7 +127,6 @@ class NativeOwnerReportsScreenContractTest {
         onSelectPreset: (NativeOwnerReportsPreset) -> Unit = {},
         onCustomRangePreview: () -> Unit = {},
         onSelectCustomRange: (String, String) -> Unit = { _, _ -> },
-        onNavigate: (OwnerSection) -> Unit = {},
     ) {
         composeRule.setContent {
             SaafTheme {
@@ -145,7 +145,15 @@ class NativeOwnerReportsScreenContractTest {
                     onSelectPreset = onSelectPreset,
                     onCustomRangePreview = onCustomRangePreview,
                     onSelectCustomRange = onSelectCustomRange,
-                    onNavigate = onNavigate,
+                    hostedScaffold = { snackbar, modifier, _, content ->
+                        OwnerScaffold(
+                            snackbarHostState = snackbar,
+                            section = OwnerSection.Overview,
+                            onNavigate = {},
+                            modifier = modifier,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

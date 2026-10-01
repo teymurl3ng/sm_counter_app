@@ -857,7 +857,15 @@ fun OwnerPreviewHost(
                     onOpenDestination = ownerWorkViewModel::openDestination,
                     onBackToHome = { returnOwnerWorkHome() },
                     onLeaveConfirmed = onLeaveToWelcome,
-                    onNavigate = navigateOwner,
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = navigateOwner,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             else -> {
@@ -888,7 +896,6 @@ fun OwnerPreviewHost(
                         section = ownerSection,
                         onRetry = ownerOverviewViewModel::refresh,
                         onLeaveConfirmed = onLeaveToWelcome,
-                        onNavigate = navigateOwner,
                         onAttentionReview = {
                             onOwnerSectionChange(OwnerSection.Work)
                             ownerWorkViewModel.openDestination(NativeOwnerWorkDestination.CashCountAndClose)
@@ -898,6 +905,15 @@ fun OwnerPreviewHost(
                             ownerWorkViewModel.openDestination(NativeOwnerWorkDestination.CashCountAndClose)
                         },
                         onOpenMonthReports = { ownerReportsViewModel.open(sessionHandle) },
+                        ownScaffold = { s, m, content ->
+                            OwnerScaffold(
+                                snackbarHostState = s,
+                                section = OwnerSection.Overview,
+                                onNavigate = navigateOwner,
+                                modifier = m,
+                                content = content,
+                            )
+                        },
                     )
                 }
             }

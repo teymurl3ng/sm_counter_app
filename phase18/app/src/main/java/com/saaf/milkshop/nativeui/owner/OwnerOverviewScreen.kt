@@ -43,10 +43,10 @@ fun OwnerOverviewScreen(
     section: OwnerSection,
     onRetry: () -> Unit,
     onLeaveConfirmed: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
     onAttentionReview: () -> Unit = {},
     onOpenCashCount: () -> Unit = {},
     onOpenMonthReports: () -> Unit = {},
+    ownScaffold: OwnScaffold,
     modifier: Modifier = Modifier,
 ) {
     when (section) {
@@ -56,7 +56,7 @@ fun OwnerOverviewScreen(
         ) { state -> when (state) {
             NativeOwnerOverviewState.Idle,
             NativeOwnerOverviewState.Loading,
-            -> OwnerScaffold(snackbarHostState, section, onNavigate, modifier) {
+            -> ownScaffold(snackbarHostState, modifier) {
                 NativeColdLoadingPane(
                     label = "Loading overview…",
                     modifier = Modifier
@@ -64,8 +64,9 @@ fun OwnerOverviewScreen(
                         .testTag(NativeUiTags.OwnerOverviewLoading),
                 )
             }
-            is NativeOwnerOverviewState.LoadFailure -> OwnerScaffold(
-                snackbarHostState, section, onNavigate, modifier,
+            is NativeOwnerOverviewState.LoadFailure -> ownScaffold(
+                snackbarHostState,
+                modifier,
             ) { padding ->
                 Column(
                     Modifier
@@ -83,7 +84,7 @@ fun OwnerOverviewScreen(
             }
             is NativeOwnerOverviewState.Ready -> {
                 BackHandler(onBack = onLeaveConfirmed)
-                OwnerScaffold(snackbarHostState, section, onNavigate, modifier) { padding ->
+                ownScaffold(snackbarHostState, modifier) { padding ->
                     Column(
                         Modifier
                             .fillMaxSize().nativeRefreshOverlay(state.refreshing)
@@ -110,7 +111,7 @@ fun OwnerOverviewScreen(
             }
         }
         }
-        OwnerSection.Work -> OwnerScaffold(snackbarHostState, section, onNavigate, modifier) {
+        OwnerSection.Work -> ownScaffold(snackbarHostState, modifier) {
             Column(
                 Modifier
                     .fillMaxSize()
@@ -125,7 +126,7 @@ fun OwnerOverviewScreen(
                 Text("Opening work…")
             }
         }
-        OwnerSection.More -> OwnerScaffold(snackbarHostState, section, onNavigate, modifier) {
+        OwnerSection.More -> ownScaffold(snackbarHostState, modifier) {
             Column(
                 Modifier
                     .fillMaxSize()
@@ -140,7 +141,7 @@ fun OwnerOverviewScreen(
                 Text("Opening more…")
             }
         }
-        OwnerSection.Records -> OwnerScaffold(snackbarHostState, section, onNavigate, modifier) {
+        OwnerSection.Records -> ownScaffold(snackbarHostState, modifier) {
             Column(
                 Modifier
                     .fillMaxSize()

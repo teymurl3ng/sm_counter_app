@@ -59,7 +59,7 @@ fun OwnerWorkScreen(
     onOpenDestination: (NativeOwnerWorkDestination) -> Unit,
     onBackToHome: () -> Unit,
     onLeaveConfirmed: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    ownScaffold: OwnScaffold,
     modifier: Modifier = Modifier,
 ) {
     NativeSectionTransition(
@@ -68,7 +68,7 @@ fun OwnerWorkScreen(
     ) { state -> when (state) {
         NativeOwnerWorkState.Idle,
         NativeOwnerWorkState.Loading,
-        -> OwnerScaffold(snackbarHostState, OwnerSection.Work, onNavigate, modifier) {
+        -> ownScaffold(snackbarHostState, modifier) {
             NativeColdLoadingPane(
                 label = "Loading work…",
                 modifier = Modifier
@@ -76,8 +76,9 @@ fun OwnerWorkScreen(
                     .testTag(NativeUiTags.OwnerWorkLoading),
             )
         }
-        is NativeOwnerWorkState.LoadFailure -> OwnerScaffold(
-            snackbarHostState, OwnerSection.Work, onNavigate, modifier,
+        is NativeOwnerWorkState.LoadFailure -> ownScaffold(
+            snackbarHostState,
+            modifier,
         ) { padding ->
             Column(
                 Modifier
@@ -99,7 +100,7 @@ fun OwnerWorkScreen(
             onOpenDestination = onOpenDestination,
             onBackToHome = onBackToHome,
             onLeaveConfirmed = onLeaveConfirmed,
-            onNavigate = onNavigate,
+            ownScaffold = ownScaffold,
             modifier = modifier,
         )
     }
@@ -113,13 +114,13 @@ private fun ReadyWork(
     onOpenDestination: (NativeOwnerWorkDestination) -> Unit,
     onBackToHome: () -> Unit,
     onLeaveConfirmed: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    ownScaffold: OwnScaffold,
     modifier: Modifier,
 ) {
     when (state.destination) {
         NativeOwnerWorkDestination.Home -> {
             BackHandler(onBack = onLeaveConfirmed)
-            OwnerScaffold(snackbarHostState, OwnerSection.Work, onNavigate, modifier) { padding ->
+            ownScaffold(snackbarHostState, modifier) { padding ->
                 Column(
                     Modifier
                         .fillMaxSize().nativeRefreshOverlay(state.refreshing)
@@ -156,7 +157,7 @@ private fun ReadyWork(
         -> {
             // Hosted by NativePreviewActivity via existing entry screens.
             BackHandler(onBack = onBackToHome)
-            OwnerScaffold(snackbarHostState, OwnerSection.Work, onNavigate, modifier) { padding ->
+            ownScaffold(snackbarHostState, modifier) { padding ->
                 Column(
                     Modifier
                         .fillMaxSize()

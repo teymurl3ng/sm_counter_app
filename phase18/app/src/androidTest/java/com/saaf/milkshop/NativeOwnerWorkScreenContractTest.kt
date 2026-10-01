@@ -15,6 +15,7 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.owner.NativeOwnerWorkDestination
 import com.saaf.milkshop.nativeui.owner.NativeOwnerWorkState
 import com.saaf.milkshop.nativeui.owner.OwnerSection
+import com.saaf.milkshop.nativeui.owner.OwnerScaffold
 import com.saaf.milkshop.nativeui.owner.OwnerWorkScreen
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertEquals
@@ -210,7 +211,15 @@ class NativeOwnerWorkScreenContractTest {
                     onOpenDestination = onOpenDestination,
                     onBackToHome = onBackToHome,
                     onLeaveConfirmed = {},
-                    onNavigate = onNavigate,
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = onNavigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

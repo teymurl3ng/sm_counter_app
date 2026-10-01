@@ -18,6 +18,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerOverviewStockLine
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.owner.NativeOwnerOverviewState
 import com.saaf.milkshop.nativeui.owner.OwnerOverviewScreen
+import com.saaf.milkshop.nativeui.owner.OwnerScaffold
 import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertEquals
@@ -146,7 +147,15 @@ class NativeOwnerOverviewScreenContractTest {
                     section = section,
                     onRetry = {},
                     onLeaveConfirmed = {},
-                    onNavigate = onNavigate,
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = section,
+                            onNavigate = onNavigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

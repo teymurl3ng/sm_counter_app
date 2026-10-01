@@ -206,13 +206,12 @@ fun OperationsPreviewHost(
             businessDate = workReady?.context?.businessDate ?: "",
             postingOpen = workReady?.context?.postingOpen ?: true,
         )
-        NativeSectionTransition<Pair<OperationsSection, NativeOperationsWorkDestination?>>(
-            targetState = operationsSection to (operationsWorkState as? NativeOperationsWorkState.Ready)?.destination,
+        NativeSectionTransition(
+            targetState = operationsSection,
             contentKey = { it },
             modifier = Modifier.weight(1f),
-        ) { pane ->
-            val (section, paneDestination) = pane
-        sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}:$paneDestination") {
+        ) { section ->
+        sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}") {
         when {
             section == OperationsSection.Deliveries -> {
                 DeliveriesScreen(

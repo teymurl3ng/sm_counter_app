@@ -101,6 +101,7 @@ fun OwnerBackupScreen(
     onInspectCloud: (String, CharArray?) -> Unit = { _, _ -> },
     onConfirmCloudRestore: (Boolean) -> Unit = {},
     hostedScaffold: HostedScaffold,
+    showHeader: Boolean = true,
     backToHubLabel: String = "Back to More",
     localExportOnly: Boolean = false,
     cloudOpen: Boolean = false,

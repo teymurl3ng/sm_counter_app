@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +38,7 @@ import com.saaf.milkshop.nativeui.owner.costingPlansActions
 import com.saaf.milkshop.nativeui.owner.NativeOwnerRecordsState
 import com.saaf.milkshop.nativeui.owner.NativeOwnerRecordsViewModel
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
+import com.saaf.milkshop.nativeui.sale.LocalPaneHeaderEnabled
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import java.time.LocalDate
 
@@ -283,13 +285,11 @@ fun AdminPreviewHost(
                     onBackToWork = { returnAdminWorkHome() },
                     onRegisterGuard = { activeEntryGuard = it },
                     admScaffold = { s, m, content ->
-                        AdminScaffold(
-                            snackbarHostState = s,
-                            section = AdminSection.Work,
-                            onNavigate = guardedNavigate,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.AdminShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                 )
             }
@@ -319,13 +319,11 @@ fun AdminPreviewHost(
                         // Stay on Work home; session remains authenticated.
                     },
                     admScaffold = { s, m, content ->
-                        AdminScaffold(
-                            snackbarHostState = s,
-                            section = AdminSection.Work,
-                            onNavigate = guardedNavigate,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.AdminShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                 )
             }
@@ -383,13 +381,11 @@ fun AdminPreviewHost(
                     onBackFromEmployeeEdit = ownerMoreViewModel::clearEmployeeEdit,
                     onUpdateEmployee = ownerMoreViewModel::updateEmployee,
                     admScaffold = { s, m, content ->
-                        AdminScaffold(
-                            snackbarHostState = s,
-                            section = AdminSection.People,
-                            onNavigate = guardedNavigate,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.AdminShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                 )
             }
@@ -426,13 +422,11 @@ fun AdminPreviewHost(
                     onUpdateCorrection = ownerRecordsViewModel::updateCorrection,
                     onSaveCorrection = ownerRecordsViewModel::saveCorrection,
                     admScaffold = { s, m, content ->
-                        AdminScaffold(
-                            snackbarHostState = s,
-                            section = AdminSection.Records,
-                            onNavigate = guardedNavigate,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.AdminShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                 )
             }
@@ -492,13 +486,11 @@ fun AdminPreviewHost(
                     onSwitchAccount = onLeaveToAccountPicker,
                     onSignOut = onLeaveToWelcome,
                     admScaffold = { s, m, content ->
-                        AdminScaffold(
-                            snackbarHostState = s,
-                            section = AdminSection.More,
-                            onNavigate = guardedNavigate,
-                            modifier = m,
-                            content = content,
-                        )
+                        Box(modifier = m.testTag(NativeUiTags.AdminShellRoot)) {
+                            CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                content(PaddingValues(0.dp))
+                            }
+                        }
                     },
                 )
             }

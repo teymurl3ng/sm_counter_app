@@ -63,6 +63,7 @@ fun OwnerSecurityHistoryScreen(
     onOpenAudit: (Long) -> Unit,
     onBackFromDetail: () -> Unit,
     hostedScaffold: HostedScaffold,
+    showHeader: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     if (auditDetail != null) {

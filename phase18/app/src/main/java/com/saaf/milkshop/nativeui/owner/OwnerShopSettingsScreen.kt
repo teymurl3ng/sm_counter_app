@@ -110,6 +110,7 @@ fun OwnerShopSettingsScreen(
     onSubmitOpeningReauth: (CharArray) -> Unit = {},
     onCancelOpeningReauth: () -> Unit = {},
     hostedScaffold: HostedScaffold,
+    showHeader: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     if (openingReauthOpen) {

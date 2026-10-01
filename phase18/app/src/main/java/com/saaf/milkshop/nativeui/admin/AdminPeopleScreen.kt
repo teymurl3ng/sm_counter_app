@@ -177,6 +177,7 @@ fun AdminPeopleScreen(
                     .testTag(NativeUiTags.AdminUsersRolesRoot),
             ) {
                 OwnerUsersRolesScreen(
+                    showHeader = false,
                     snackbarHostState = snackbarHostState,
                     identity = identity,
                     context = state.context,
@@ -220,6 +221,7 @@ fun AdminPeopleScreen(
                     .testTag(NativeUiTags.AdminCustomersRoot),
             ) {
                 OwnerCustomersScreen(
+                    showHeader = false,
                     snackbarHostState = snackbarHostState,
                     identity = identity,
                     context = state.context,
@@ -251,6 +253,7 @@ fun AdminPeopleScreen(
                     .testTag(NativeUiTags.AdminSuppliersRoot),
             ) {
                 OwnerSuppliersScreen(
+                    showHeader = false,
                     snackbarHostState = snackbarHostState,
                     identity = identity,
                     context = state.context,
@@ -282,6 +285,7 @@ fun AdminPeopleScreen(
                     .testTag(NativeUiTags.AdminEmployeesRoot),
             ) {
                 OwnerEmployeesScreen(
+                    showHeader = false,
                     snackbarHostState = snackbarHostState,
                     identity = identity,
                     context = state.context,

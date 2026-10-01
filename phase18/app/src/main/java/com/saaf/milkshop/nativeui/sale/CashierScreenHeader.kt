@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -22,6 +23,13 @@ import com.saaf.milkshop.nativeui.theme.SaafYellow
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+
+/**
+ * Static-chrome switch: hosts that draw the single green band themselves set
+ * this to false around their panes, so any legacy in-pane header call inside
+ * those panes renders nothing instead of doubling the band.
+ */
+val LocalPaneHeaderEnabled = compositionLocalOf { true }
 
 /**
  * Shared Cashier chrome: green identity band used by Sell, Collect, and Activity.
@@ -38,6 +46,7 @@ fun CashierScreenHeader(
     onDayStatusClick: (() -> Unit)? = null,
     showDayChip: Boolean = true,
 ) {
+    if (!LocalPaneHeaderEnabled.current) return
     val dayStatusAction = onDayStatusClick ?: LocalDayStatusAction.current
     Surface(
         modifier = modifier.fillMaxWidth(),

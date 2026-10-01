@@ -225,6 +225,7 @@ fun AdminMoreScreen(
                     .testTag(NativeUiTags.AdminProductsRoot),
             ) {
                 OwnerProductsScreen(
+                    showHeader = false,
                     snackbarHostState = snackbarHostState,
                     identity = identity,
                     context = state.context,
@@ -262,6 +263,7 @@ fun AdminMoreScreen(
                     .testTag(NativeUiTags.AdminCostingPlansRoot),
             ) {
                 OwnerCostingPlansScreen(
+                    showHeader = false,
                     snackbarHostState = snackbarHostState,
                     identity = identity,
                     context = state.context,
@@ -333,6 +335,7 @@ fun AdminMoreScreen(
                     .testTag(NativeUiTags.AdminShopSettingsRoot),
             ) {
                 OwnerShopSettingsScreen(
+                    showHeader = false,
                     snackbarHostState = snackbarHostState,
                     identity = identity,
                     context = state.context,
@@ -390,6 +393,7 @@ fun AdminMoreScreen(
                     .testTag(NativeUiTags.AdminLocalExportRoot),
             ) {
                 OwnerBackupScreen(
+                    showHeader = false,
                     snackbarHostState = snackbarHostState,
                     identity = identity,
                     context = state.context,

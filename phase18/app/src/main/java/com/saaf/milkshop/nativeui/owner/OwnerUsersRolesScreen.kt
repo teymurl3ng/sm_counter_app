@@ -103,6 +103,7 @@ fun OwnerUsersRolesScreen(
     onSubmitReauth: (CharArray) -> Unit,
     onCancelReauth: () -> Unit,
     hostedScaffold: HostedScaffold,
+    showHeader: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     when {

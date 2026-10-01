@@ -108,6 +108,7 @@ fun AdminRecordsScreen(
                 .testTag(NativeUiTags.AdminBusinessRecordsRoot),
         ) {
             OwnerRecordsScreen(
+            showHeader = false,
                 snackbarHostState = snackbarHostState,
                 state = ownerRecordsState,
                 onRetry = onRetryRecords,
@@ -150,6 +151,7 @@ fun AdminRecordsScreen(
                         .testTag(NativeUiTags.AdminSecurityHistoryRoot),
                 ) {
                     OwnerSecurityHistoryScreen(
+                        showHeader = false,
                         snackbarHostState = snackbarHostState,
                         identity = identity,
                         context = ready.context,

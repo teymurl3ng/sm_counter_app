@@ -6,6 +6,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
@@ -212,6 +217,16 @@ fun OperationsPreviewHost(
             modifier = Modifier.weight(1f),
         ) { section ->
         sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}") {
+        AnimatedContent(
+            targetState = workReady?.destination,
+            contentKey = { it },
+            transitionSpec = {
+                // Single fade-in on destination change: the old screen snaps
+                // away (opaque pane background), the new one fades in once.
+                fadeIn(tween(200)) togetherWith ExitTransition.None
+            },
+            label = "work_destination",
+        ) { _ ->
         when {
             section == OperationsSection.Deliveries -> {
                 DeliveriesScreen(
@@ -375,6 +390,7 @@ fun OperationsPreviewHost(
                     },
                 )
             }
+        }
         }
         }
         }

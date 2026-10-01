@@ -22,6 +22,7 @@ import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.owner.OwnerSaleEntryScreen
+import com.saaf.milkshop.nativeui.owner.OwnerScaffold
 import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.sale.NativeSaleState
 import com.saaf.milkshop.nativeui.theme.SaafTheme
@@ -92,7 +93,15 @@ class NativeOwnerSaleEntryScreenContractTest {
             onSendAsDelivery = {},
             onStartNextSale = {},
                     onBackToWork = {},
-                    onNavigate = {},
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = {},
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }
@@ -121,7 +130,15 @@ class NativeOwnerSaleEntryScreenContractTest {
             onSendAsDelivery = {},
             onStartNextSale = {},
                     onBackToWork = {},
-                    onNavigate = onNavigate,
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = {},
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

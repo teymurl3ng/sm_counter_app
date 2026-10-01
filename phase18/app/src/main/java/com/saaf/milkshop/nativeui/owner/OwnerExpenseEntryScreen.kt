@@ -32,7 +32,7 @@ fun OwnerExpenseEntryScreen(
     onRecordExpense: (NativeExpenseRequest) -> Unit,
     onRecordAnother: () -> Unit,
     onBackToWork: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    ownScaffold: OwnScaffold,
     modifier: Modifier = Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -50,15 +50,9 @@ fun OwnerExpenseEntryScreen(
             .fillMaxSize()
             .testTag(NativeUiTags.OwnerExpenseEntryRoot),
     ) {
-        OwnerScaffold(
-            snackbarHostState = snackbarHostState,
-            section = OwnerSection.Work,
-            onNavigate = { section ->
-                if (canLeave) {
-                    leaveGuard.requestLeave { onNavigate(section) }
-                }
-            },
-            modifier = Modifier.fillMaxSize(),
+        ownScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
         ) { padding ->
             NativeSectionTransition(
                 targetState = state,

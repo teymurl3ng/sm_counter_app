@@ -20,6 +20,8 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.operations.NativeDeliveriesDraftActions
 import com.saaf.milkshop.nativeui.operations.NativeDeliveriesState
 import com.saaf.milkshop.nativeui.owner.OwnerDeliveriesEntryScreen
+import com.saaf.milkshop.nativeui.owner.OwnerScaffold
+import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -66,7 +68,15 @@ class NativeOwnerDeliveriesEntryScreenContractTest {
             draftActions = NativeDeliveriesDraftActions({}, {}, {}, {}, {}, {}),
             onArchive = {},
                     onBackToWork = {},
-                    onNavigate = {},
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = {},
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }
@@ -92,7 +102,15 @@ class NativeOwnerDeliveriesEntryScreenContractTest {
             draftActions = NativeDeliveriesDraftActions({}, {}, {}, {}, {}, {}),
             onArchive = {},
                     onBackToWork = {},
-                    onNavigate = {},
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = {},
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

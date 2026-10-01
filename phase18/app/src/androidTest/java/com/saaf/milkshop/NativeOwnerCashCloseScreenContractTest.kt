@@ -24,6 +24,7 @@ import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.cashclose.NativeCashCloseState
 import com.saaf.milkshop.nativeui.owner.OwnerCashCloseEntryScreen
+import com.saaf.milkshop.nativeui.owner.OwnerScaffold
 import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertEquals
@@ -149,7 +150,15 @@ class NativeOwnerCashCloseScreenContractTest {
                     onCloseDay = {},
                     onReopenDay = { _, _ -> },
                     onBackToWork = {},
-                    onNavigate = {},
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = {},
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }
@@ -178,7 +187,15 @@ class NativeOwnerCashCloseScreenContractTest {
                     onCloseDay = {},
                     onReopenDay = onReopenDay,
                     onBackToWork = {},
-                    onNavigate = onNavigate,
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = {},
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

@@ -623,7 +623,15 @@ fun OwnerPreviewHost(
                     onSendAsDelivery = saleViewModel::sendAsDelivery,
                     onStartNextSale = saleViewModel::startNextSale,
                     onBackToWork = { returnOwnerWorkHome() },
-                    onNavigate = navigateOwner,
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = navigateOwner,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == OwnerSection.Work &&
@@ -642,7 +650,15 @@ fun OwnerPreviewHost(
                         )
                     },
                     onBackToWork = { returnOwnerWorkHome() },
-                    onNavigate = navigateOwner,
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = navigateOwner,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == OwnerSection.Work &&
@@ -655,7 +671,15 @@ fun OwnerPreviewHost(
                     onRecordExpense = expenseViewModel::record,
                     onRecordAnother = expenseViewModel::recordAnother,
                     onBackToWork = { returnOwnerWorkHome() },
-                    onNavigate = navigateOwner,
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = navigateOwner,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == OwnerSection.Work &&
@@ -668,7 +692,15 @@ fun OwnerPreviewHost(
                     onRecordPayment = vendorPaymentViewModel::record,
                     onRecordAnother = vendorPaymentViewModel::recordAnother,
                     onBackToWork = { returnOwnerWorkHome() },
-                    onNavigate = navigateOwner,
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = navigateOwner,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == OwnerSection.Work &&
@@ -681,7 +713,15 @@ fun OwnerPreviewHost(
                     onRecordPayment = salaryPaymentViewModel::record,
                     onRecordAnother = salaryPaymentViewModel::recordAnother,
                     onBackToWork = { returnOwnerWorkHome() },
-                    onNavigate = navigateOwner,
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = navigateOwner,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == OwnerSection.Work &&
@@ -695,7 +735,15 @@ fun OwnerPreviewHost(
                     onCloseDay = cashCloseViewModel::closeDay,
                     onReopenDay = cashCloseViewModel::reopenDay,
                     onBackToWork = { returnOwnerWorkHome() },
-                    onNavigate = navigateOwner,
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = navigateOwner,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == OwnerSection.Work &&
@@ -712,7 +760,15 @@ fun OwnerPreviewHost(
                     onRecord = receiveMilkViewModel::record,
                     onReceiveAnother = receiveMilkViewModel::receiveAnother,
                     onBackToWork = { returnOwnerWorkHome() },
-                    onNavigate = navigateOwner,
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = navigateOwner,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == OwnerSection.Work &&
@@ -725,7 +781,15 @@ fun OwnerPreviewHost(
                     onRecord = makeYogurtViewModel::record,
                     onMakeAnother = makeYogurtViewModel::makeAnother,
                     onBackToWork = { returnOwnerWorkHome() },
-                    onNavigate = navigateOwner,
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = navigateOwner,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == OwnerSection.Work &&
@@ -744,7 +808,15 @@ fun OwnerPreviewHost(
                     onRecord = recordSpoilageViewModel::record,
                     onRecordAnother = recordSpoilageViewModel::recordAnother,
                     onBackToWork = { returnOwnerWorkHome() },
-                    onNavigate = navigateOwner,
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = navigateOwner,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == OwnerSection.Work &&
@@ -766,7 +838,15 @@ fun OwnerPreviewHost(
                     onArchive = deliveriesViewModel::archiveDelivery,
                         onLinkSale = deliveriesViewModel::linkSale,
                     onBackToWork = { returnOwnerWorkHome() },
-                    onNavigate = navigateOwner,
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = navigateOwner,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == OwnerSection.Work -> {

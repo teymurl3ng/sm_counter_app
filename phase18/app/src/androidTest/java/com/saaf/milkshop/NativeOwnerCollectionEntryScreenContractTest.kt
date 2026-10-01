@@ -24,6 +24,7 @@ import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.collection.NativeCollectionState
 import com.saaf.milkshop.nativeui.owner.OwnerCollectionEntryScreen
+import com.saaf.milkshop.nativeui.owner.OwnerScaffold
 import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertEquals
@@ -100,7 +101,15 @@ class NativeOwnerCollectionEntryScreenContractTest {
                     onCollectAnother = {},
                     onViewRecord = {},
                     onBackToWork = {},
-                    onNavigate = {},
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = {},
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }
@@ -129,7 +138,15 @@ class NativeOwnerCollectionEntryScreenContractTest {
                     onCollectAnother = {},
                     onViewRecord = {},
                     onBackToWork = {},
-                    onNavigate = onNavigate,
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = {},
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

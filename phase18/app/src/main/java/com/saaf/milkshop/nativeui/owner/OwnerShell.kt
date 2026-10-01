@@ -27,6 +27,13 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.hapticTap
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 
+/** Injected shell for Owner panes; mirrors common/HostedScaffold minus the nav-action wrap. */
+typealias OwnScaffold = @Composable (
+    snackbarHostState: SnackbarHostState,
+    modifier: Modifier,
+    content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit,
+) -> Unit
+
 @Composable
 internal fun OwnerScaffold(
     snackbarHostState: SnackbarHostState,

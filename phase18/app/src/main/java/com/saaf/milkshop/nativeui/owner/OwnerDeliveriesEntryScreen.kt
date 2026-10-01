@@ -31,7 +31,7 @@ fun OwnerDeliveriesEntryScreen(
     draftActions: NativeDeliveriesDraftActions,
     onArchive: (Long) -> Unit,
     onBackToWork: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    ownScaffold: OwnScaffold,
     modifier: Modifier = Modifier,
 ) {
     BackHandler(onBack = onBackToWork)
@@ -41,11 +41,9 @@ fun OwnerDeliveriesEntryScreen(
             .fillMaxSize()
             .testTag(NativeUiTags.OwnerDeliveriesEntryRoot),
     ) {
-        OwnerScaffold(
-            snackbarHostState = snackbarHostState,
-            section = OwnerSection.Work,
-            onNavigate = onNavigate,
-            modifier = Modifier.fillMaxSize(),
+        ownScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
         ) { padding ->
             NativeSectionTransition(
                 targetState = state,

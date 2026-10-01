@@ -23,6 +23,7 @@ import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.expense.NativeExpenseState
 import com.saaf.milkshop.nativeui.owner.OwnerExpenseEntryScreen
+import com.saaf.milkshop.nativeui.owner.OwnerScaffold
 import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertEquals
@@ -90,7 +91,15 @@ class NativeOwnerExpenseScreenContractTest {
                     onRecordExpense = {},
                     onRecordAnother = {},
                     onBackToWork = {},
-                    onNavigate = {},
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = {},
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }
@@ -117,7 +126,15 @@ class NativeOwnerExpenseScreenContractTest {
                     onRecordExpense = {},
                     onRecordAnother = {},
                     onBackToWork = {},
-                    onNavigate = onNavigate,
+                    ownScaffold = { s, m, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.Work,
+                            onNavigate = {},
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

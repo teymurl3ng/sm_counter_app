@@ -137,17 +137,11 @@ fun AdminMoreScreen(
     onEnrollPhoneSecurity: (CharArray, CharArray?) -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
-    onNavigate: (AdminSection) -> Unit,
+    admScaffold: AdmScaffold,
     modifier: Modifier = Modifier,
 ) {
-    val adminMoreShell: HostedScaffold = { snackbar, mod, wrapNav, content ->
-        AdminScaffold(
-            snackbarHostState = snackbar,
-            section = AdminSection.More,
-            onNavigate = { section -> wrapNav { onNavigate(section) } },
-            modifier = mod,
-            content = content,
-        )
+    val adminMoreShell: HostedScaffold = { snackbar, mod, _, content ->
+        admScaffold(snackbar, mod, content)
     }
 
     NativeSectionTransition(
@@ -156,7 +150,7 @@ fun AdminMoreScreen(
     ) { state -> when (state) {
         NativeOwnerMoreState.Idle,
         NativeOwnerMoreState.Loading,
-        -> AdminScaffold(snackbarHostState, AdminSection.More, onNavigate, modifier) {
+        -> admScaffold(snackbarHostState, modifier) {
             NativeColdLoadingPane(
                 label = "Loading…",
                 modifier = Modifier
@@ -166,12 +160,7 @@ fun AdminMoreScreen(
             )
         }
 
-        is NativeOwnerMoreState.LoadFailure -> AdminScaffold(
-            snackbarHostState,
-            AdminSection.More,
-            onNavigate,
-            modifier,
-        ) { padding ->
+        is NativeOwnerMoreState.LoadFailure -> admScaffold(snackbarHostState, modifier) { padding ->
             Column(
                 Modifier
                     .fillMaxSize()
@@ -214,7 +203,7 @@ fun AdminMoreScreen(
                 onUnenrollSync = onUnenrollSync,
                 onSwitchAccount = onSwitchAccount,
                 onSignOut = onSignOut,
-                onNavigate = onNavigate,
+                admScaffold = admScaffold,
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.PersonalSecurity -> AdminMorePersonalSecurityScreen(
@@ -227,7 +216,7 @@ fun AdminMoreScreen(
                 onRemove = onRemoveQuickUnlock,
                 onEnrollPin = onEnrollQuickPin,
                 onEnrollPhone = onEnrollPhoneSecurity,
-                onNavigate = onNavigate,
+                admScaffold = admScaffold,
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.Products -> Box(
@@ -458,7 +447,7 @@ fun AdminMoreScreen(
                     onUnenrollSync = onUnenrollSync,
                     onSwitchAccount = onSwitchAccount,
                     onSignOut = onSignOut,
-                    onNavigate = onNavigate,
+                    admScaffold = admScaffold,
                     modifier = modifier,
                 )
             }
@@ -486,10 +475,10 @@ private fun AdminMoreMenuScreen(
     onUnenrollSync: () -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
-    onNavigate: (AdminSection) -> Unit,
+    admScaffold: AdmScaffold,
     modifier: Modifier,
 ) {
-    AdminScaffold(snackbarHostState, AdminSection.More, onNavigate, modifier) { padding ->
+    admScaffold(snackbarHostState, modifier) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
@@ -577,7 +566,7 @@ private fun AdminMorePersonalSecurityScreen(
     onRemove: (CharArray) -> Unit,
     onEnrollPin: (CharArray, CharArray) -> Unit,
     onEnrollPhone: (CharArray, CharArray?) -> Unit,
-    onNavigate: (AdminSection) -> Unit,
+    admScaffold: AdmScaffold,
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBack)
@@ -606,7 +595,7 @@ private fun AdminMorePersonalSecurityScreen(
         )
     }
 
-    AdminScaffold(snackbarHostState, AdminSection.More, onNavigate, modifier) { padding ->
+    admScaffold(snackbarHostState, modifier) { padding ->
         Column(
             Modifier
                 .fillMaxSize()

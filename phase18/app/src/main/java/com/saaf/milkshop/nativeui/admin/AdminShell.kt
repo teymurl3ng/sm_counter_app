@@ -49,7 +49,7 @@ internal fun AdminScaffold(
 }
 
 @Composable
-private fun AdminNavigationRail(
+internal fun AdminNavigationRail(
     selected: AdminSection,
     onNavigate: (AdminSection) -> Unit,
 ) {

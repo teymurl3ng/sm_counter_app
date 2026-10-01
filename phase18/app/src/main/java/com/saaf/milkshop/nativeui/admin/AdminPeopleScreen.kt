@@ -112,17 +112,11 @@ fun AdminPeopleScreen(
     onOpenEmployeeEdit: () -> Unit,
     onBackFromEmployeeEdit: () -> Unit,
     onUpdateEmployee: (String, EmployeeProfileInput) -> Unit,
-    onNavigate: (AdminSection) -> Unit,
+    admScaffold: AdmScaffold,
     modifier: Modifier = Modifier,
 ) {
-    val adminPeopleShell: HostedScaffold = { snackbar, mod, wrapNav, content ->
-        AdminScaffold(
-            snackbarHostState = snackbar,
-            section = AdminSection.People,
-            onNavigate = { section -> wrapNav { onNavigate(section) } },
-            modifier = mod,
-            content = content,
-        )
+    val adminPeopleShell: HostedScaffold = { snackbar, mod, _, content ->
+        admScaffold(snackbar, mod, content)
     }
 
     NativeSectionTransition(
@@ -131,7 +125,7 @@ fun AdminPeopleScreen(
     ) { state -> when (state) {
         NativeOwnerMoreState.Idle,
         NativeOwnerMoreState.Loading,
-        -> AdminScaffold(snackbarHostState, AdminSection.People, onNavigate, modifier) {
+        -> admScaffold(snackbarHostState, modifier) {
             NativeColdLoadingPane(
                 label = "Loading…",
                 modifier = Modifier
@@ -141,12 +135,7 @@ fun AdminPeopleScreen(
             )
         }
 
-        is NativeOwnerMoreState.LoadFailure -> AdminScaffold(
-            snackbarHostState,
-            AdminSection.People,
-            onNavigate,
-            modifier,
-        ) { padding ->
+        is NativeOwnerMoreState.LoadFailure -> admScaffold(snackbarHostState, modifier) { padding ->
             Column(
                 Modifier
                     .fillMaxSize()
@@ -179,7 +168,7 @@ fun AdminPeopleScreen(
                 onOpenCustomers = onOpenCustomers,
                 onOpenSuppliers = onOpenSuppliers,
                 onOpenEmployees = onOpenEmployees,
-                onNavigate = onNavigate,
+                admScaffold = admScaffold,
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.UsersRoles -> Box(
@@ -329,7 +318,7 @@ fun AdminPeopleScreen(
                     onOpenCustomers = onOpenCustomers,
                     onOpenSuppliers = onOpenSuppliers,
                     onOpenEmployees = onOpenEmployees,
-                    onNavigate = onNavigate,
+                    admScaffold = admScaffold,
                     modifier = modifier,
                 )
             }
@@ -348,10 +337,10 @@ private fun AdminPeopleHubScreen(
     onOpenCustomers: () -> Unit,
     onOpenSuppliers: () -> Unit,
     onOpenEmployees: () -> Unit,
-    onNavigate: (AdminSection) -> Unit,
+    admScaffold: AdmScaffold,
     modifier: Modifier,
 ) {
-    AdminScaffold(snackbarHostState, AdminSection.People, onNavigate, modifier) { padding ->
+    admScaffold(snackbarHostState, modifier) { padding ->
         Column(
             Modifier
                 .fillMaxSize()

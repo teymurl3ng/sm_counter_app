@@ -2,7 +2,10 @@ package com.saaf.milkshop.nativeui.admin
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -12,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
@@ -20,7 +24,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
+import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
+import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.expense.NativeExpenseState
 import com.saaf.milkshop.nativeui.expense.NativeExpenseViewModel
 import com.saaf.milkshop.nativeui.owner.NativeOwnerMoreDestination
@@ -225,9 +232,41 @@ fun AdminPreviewHost(
 
         val businessDate = LocalDate.now().toString()
         val sectionStateHolder = rememberSaveableStateHolder()
+        // Static chrome (Cashier pattern): one scaffold + one header at the
+        // host, outside the pane transition — nav and header never reload.
+        var activeEntryGuard by remember { mutableStateOf<EntryLeaveGuard?>(null) }
+        val guardedNavigate: (AdminSection) -> Unit = { section ->
+            val guard = activeEntryGuard
+            if (guard != null) guard.requestLeave { navigate(section) } else navigate(section)
+        }
+        val headerTitle = when {
+            adminSection == AdminSection.Work &&
+                workDestination == NativeAdminWorkDestination.RecordExpense -> "Record expense"
+            adminSection == AdminSection.Work -> "Work desk"
+            adminSection == AdminSection.People -> "People"
+            adminSection == AdminSection.Records -> "Records"
+            else -> "More"
+        }
+        AdaptiveNavigationScaffold(
+            snackbarHostState = snackbarHostState,
+            modifier = Modifier.fillMaxSize(),
+            containerColor = MaterialTheme.colorScheme.background,
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            compactNavigation = { AdminNavigation(selected = adminSection, onNavigate = guardedNavigate) },
+            expandedNavigation = { AdminNavigationRail(selected = adminSection, onNavigate = guardedNavigate) },
+        ) { hostPadding ->
+            Column(Modifier.fillMaxSize().padding(hostPadding)) {
+        CashierScreenHeader(
+            title = headerTitle,
+            displayName = identity.displayName,
+            roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+            businessDate = businessDate,
+            postingOpen = (ownerMoreState as? NativeOwnerMoreState.Ready)?.context?.postingOpen ?: true,
+        )
         NativeSectionTransition<Pair<AdminSection, NativeAdminWorkDestination?>>(
             targetState = adminSection to workDestination,
             contentKey = { it },
+            modifier = Modifier.weight(1f),
         ) { pane ->
             val (section, paneDestination) = pane
         sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}:$paneDestination") {
@@ -242,7 +281,16 @@ fun AdminPreviewHost(
                     onRecordExpense = expenseViewModel::record,
                     onRecordAnother = expenseViewModel::recordAnother,
                     onBackToWork = { returnAdminWorkHome() },
-                    onNavigate = navigate,
+                    onRegisterGuard = { activeEntryGuard = it },
+                    admScaffold = { s, m, content ->
+                        AdminScaffold(
+                            snackbarHostState = s,
+                            section = AdminSection.Work,
+                            onNavigate = guardedNavigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == AdminSection.Work -> {
@@ -270,7 +318,15 @@ fun AdminPreviewHost(
                     onLeaveConfirmed = {
                         // Stay on Work home; session remains authenticated.
                     },
-                    onNavigate = navigate,
+                    admScaffold = { s, m, content ->
+                        AdminScaffold(
+                            snackbarHostState = s,
+                            section = AdminSection.Work,
+                            onNavigate = guardedNavigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == AdminSection.People -> {
@@ -326,7 +382,15 @@ fun AdminPreviewHost(
                     onOpenEmployeeEdit = ownerMoreViewModel::openEmployeeEdit,
                     onBackFromEmployeeEdit = ownerMoreViewModel::clearEmployeeEdit,
                     onUpdateEmployee = ownerMoreViewModel::updateEmployee,
-                    onNavigate = navigate,
+                    admScaffold = { s, m, content ->
+                        AdminScaffold(
+                            snackbarHostState = s,
+                            section = AdminSection.People,
+                            onNavigate = guardedNavigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == AdminSection.Records -> {
@@ -361,7 +425,15 @@ fun AdminPreviewHost(
                     onBackFromCorrection = ownerRecordsViewModel::clearCorrection,
                     onUpdateCorrection = ownerRecordsViewModel::updateCorrection,
                     onSaveCorrection = ownerRecordsViewModel::saveCorrection,
-                    onNavigate = navigate,
+                    admScaffold = { s, m, content ->
+                        AdminScaffold(
+                            snackbarHostState = s,
+                            section = AdminSection.Records,
+                            onNavigate = guardedNavigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             else -> {
@@ -419,9 +491,19 @@ fun AdminPreviewHost(
                     onEnrollPhoneSecurity = ownerMoreViewModel::enrollPhoneSecurity,
                     onSwitchAccount = onLeaveToAccountPicker,
                     onSignOut = onLeaveToWelcome,
-                    onNavigate = navigate,
+                    admScaffold = { s, m, content ->
+                        AdminScaffold(
+                            snackbarHostState = s,
+                            section = AdminSection.More,
+                            onNavigate = guardedNavigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
+        }
+        }
         }
         }
     }

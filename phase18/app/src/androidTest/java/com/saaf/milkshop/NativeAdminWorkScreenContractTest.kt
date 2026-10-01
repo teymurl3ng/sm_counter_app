@@ -10,6 +10,8 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.admin.NativeAdminWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.admin.AdminScaffold
+import com.saaf.milkshop.nativeui.admin.AdminSection
 import com.saaf.milkshop.nativeui.admin.AdminWorkScreen
 import com.saaf.milkshop.nativeui.admin.NativeAdminWorkDestination
 import com.saaf.milkshop.nativeui.admin.NativeAdminWorkState
@@ -100,7 +102,15 @@ class NativeAdminWorkScreenContractTest {
             onOpenEmployeeLinks = onOpenEmployeeLinks,
                     onBackToHome = {},
                     onLeaveConfirmed = {},
-                    onNavigate = {},
+                    admScaffold = { s, m, content ->
+                        AdminScaffold(
+                            snackbarHostState = s,
+                            section = AdminSection.Work,
+                            onNavigate = {},
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

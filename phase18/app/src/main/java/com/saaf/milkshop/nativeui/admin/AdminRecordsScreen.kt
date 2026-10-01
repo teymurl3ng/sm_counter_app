@@ -82,17 +82,11 @@ fun AdminRecordsScreen(
     onBackFromCorrection: () -> Unit = {},
     onUpdateCorrection: ((NativeCorrectionEditorState) -> NativeCorrectionEditorState) -> Unit = {},
     onSaveCorrection: () -> Unit = {},
-    onNavigate: (AdminSection) -> Unit,
+    admScaffold: AdmScaffold,
     modifier: Modifier = Modifier,
 ) {
-    val adminRecordsShell: HostedScaffold = { snackbar, mod, wrapNav, content ->
-        AdminScaffold(
-            snackbarHostState = snackbar,
-            section = AdminSection.Records,
-            onNavigate = { section -> wrapNav { onNavigate(section) } },
-            modifier = mod,
-            content = content,
-        )
+    val adminRecordsShell: HostedScaffold = { snackbar, mod, _, content ->
+        admScaffold(snackbar, mod, content)
     }
 
     NativeSectionTransition(
@@ -105,7 +99,7 @@ fun AdminRecordsScreen(
             postingOpen = (ownerMoreState as? NativeOwnerMoreState.Ready)?.context?.postingOpen ?: true,
             onOpenBusiness = onOpenBusiness,
             onOpenSecurityHistory = onOpenSecurityHistory,
-            onNavigate = onNavigate,
+            admScaffold = admScaffold,
             modifier = modifier,
         )
         AdminRecordsDestination.Business -> Box(
@@ -140,7 +134,7 @@ fun AdminRecordsScreen(
             val ready = ownerMoreState as? NativeOwnerMoreState.Ready
             if (ready == null) {
                 BackHandler(onBack = onBackToHub)
-                AdminScaffold(snackbarHostState, AdminSection.Records, onNavigate, modifier) {
+                admScaffold(snackbarHostState, modifier) {
                     NativeColdLoadingPane(
                         label = "Loading…",
                         modifier = Modifier
@@ -184,10 +178,10 @@ private fun AdminRecordsHubScreen(
     postingOpen: Boolean,
     onOpenBusiness: () -> Unit,
     onOpenSecurityHistory: () -> Unit,
-    onNavigate: (AdminSection) -> Unit,
+    admScaffold: AdmScaffold,
     modifier: Modifier,
 ) {
-    AdminScaffold(snackbarHostState, AdminSection.Records, onNavigate, modifier) { padding ->
+    admScaffold(snackbarHostState, modifier) { padding ->
         Column(
             Modifier
                 .fillMaxSize()

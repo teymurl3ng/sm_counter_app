@@ -50,6 +50,13 @@ import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
  * Admin Work desk — setup / administration health first; daily Expense as secondary launcher.
  * Never mounts Owner Overview.
  */
+/** Injected shell for Admin panes; mirrors common/HostedScaffold minus the nav-action wrap. */
+typealias AdmScaffold = @Composable (
+    snackbarHostState: SnackbarHostState,
+    modifier: Modifier,
+    content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit,
+) -> Unit
+
 @Composable
 fun AdminWorkScreen(
     snackbarHostState: SnackbarHostState,
@@ -62,7 +69,7 @@ fun AdminWorkScreen(
     onOpenEmployeeLinks: () -> Unit,
     onBackToHome: () -> Unit,
     onLeaveConfirmed: () -> Unit,
-    onNavigate: (AdminSection) -> Unit,
+    admScaffold: AdmScaffold,
     modifier: Modifier = Modifier,
 ) {
     NativeSectionTransition(
@@ -71,7 +78,7 @@ fun AdminWorkScreen(
     ) { state -> when (state) {
         NativeAdminWorkState.Idle,
         NativeAdminWorkState.Loading,
-        -> AdminScaffold(snackbarHostState, AdminSection.Work, onNavigate, modifier) {
+        -> admScaffold(snackbarHostState, modifier) {
             NativeColdLoadingPane(
                 label = "Loading setup health…",
                 modifier = Modifier
@@ -79,9 +86,7 @@ fun AdminWorkScreen(
                     .testTag(NativeUiTags.AdminWorkLoading),
             )
         }
-        is NativeAdminWorkState.LoadFailure -> AdminScaffold(
-            snackbarHostState, AdminSection.Work, onNavigate, modifier,
-        ) { padding ->
+        is NativeAdminWorkState.LoadFailure -> admScaffold(snackbarHostState, modifier) { padding ->
             Column(
                 Modifier
                     .fillMaxSize()
@@ -106,7 +111,7 @@ fun AdminWorkScreen(
             onOpenEmployeeLinks = onOpenEmployeeLinks,
             onBackToHome = onBackToHome,
             onLeaveConfirmed = onLeaveConfirmed,
-            onNavigate = onNavigate,
+            admScaffold = admScaffold,
             modifier = modifier,
         )
     }
@@ -124,13 +129,13 @@ private fun ReadyWork(
     onOpenEmployeeLinks: () -> Unit,
     onBackToHome: () -> Unit,
     onLeaveConfirmed: () -> Unit,
-    onNavigate: (AdminSection) -> Unit,
+    admScaffold: AdmScaffold,
     modifier: Modifier,
 ) {
     when (state.destination) {
         NativeAdminWorkDestination.Home -> {
             BackHandler(onBack = onLeaveConfirmed)
-            AdminScaffold(snackbarHostState, AdminSection.Work, onNavigate, modifier) { padding ->
+            admScaffold(snackbarHostState, modifier) { padding ->
                 Column(
                     Modifier
                         .fillMaxSize().nativeRefreshOverlay(state.refreshing)
@@ -160,7 +165,7 @@ private fun ReadyWork(
         }
         NativeAdminWorkDestination.RecordExpense -> {
             BackHandler(onBack = onBackToHome)
-            AdminScaffold(snackbarHostState, AdminSection.Work, onNavigate, modifier) { padding ->
+            admScaffold(snackbarHostState, modifier) { padding ->
                 Column(
                     Modifier
                         .fillMaxSize()

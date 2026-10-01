@@ -25,6 +25,8 @@ import com.saaf.milkshop.application.operations.NativeDeliveryReference
 import com.saaf.milkshop.nativeui.operations.DeliveriesScreen
 import com.saaf.milkshop.nativeui.operations.NativeDeliveriesDraftActions
 import com.saaf.milkshop.nativeui.operations.NativeDeliveriesState
+import com.saaf.milkshop.nativeui.operations.OperationsSection
+import com.saaf.milkshop.nativeui.operations.WorkScaffold
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -205,7 +207,15 @@ class NativeDeliveriesScreenContractTest {
                     onLinkSale = onLinkSale,
                     draftActions = draftActions,
                     onArchive = onArchive,
-                    onNavigate = {},
+                    workScaffold = { s, m, content ->
+                        WorkScaffold(
+                            snackbarHostState = s,
+                            section = OperationsSection.Deliveries,
+                            onNavigate = {},
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                     onLeaveConfirmed = {},
                 )
             }

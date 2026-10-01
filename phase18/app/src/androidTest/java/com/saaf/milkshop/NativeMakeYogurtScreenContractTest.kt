@@ -24,6 +24,8 @@ import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.operations.MakeYogurtScreen
 import com.saaf.milkshop.nativeui.operations.NativeMakeYogurtState
+import com.saaf.milkshop.nativeui.operations.OperationsSection
+import com.saaf.milkshop.nativeui.operations.WorkScaffold
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -123,7 +125,15 @@ class NativeMakeYogurtScreenContractTest {
                     onRecord = onRecord,
                     onMakeAnother = onMakeAnother,
                     onBackToHome = {},
-                    onNavigate = {},
+                    workScaffold = { s, m, content ->
+                        WorkScaffold(
+                            snackbarHostState = s,
+                            section = OperationsSection.Work,
+                            onNavigate = {},
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

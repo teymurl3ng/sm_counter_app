@@ -60,6 +60,13 @@ import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 
+/** Injected shell for Operations panes; mirrors common/HostedScaffold minus the nav-action wrap. */
+typealias OpsScaffold = @Composable (
+    snackbarHostState: SnackbarHostState,
+    modifier: Modifier,
+    content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit,
+) -> Unit
+
 @Composable
 fun OperationsWorkScreen(
     snackbarHostState: SnackbarHostState,
@@ -72,7 +79,7 @@ fun OperationsWorkScreen(
     onOpenRecordSpoilage: () -> Unit,
     onBackToHome: () -> Unit,
     onLeaveConfirmed: () -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
+    workScaffold: OpsScaffold,
     modifier: Modifier = Modifier,
 ) {
     when (section) {
@@ -82,7 +89,7 @@ fun OperationsWorkScreen(
         ) { state -> when (state) {
             NativeOperationsWorkState.Idle,
             NativeOperationsWorkState.Loading,
-            -> WorkScaffold(snackbarHostState, section, onNavigate, modifier) {
+            -> workScaffold(snackbarHostState, modifier) {
                 NativeColdLoadingPane(
                     label = "Loading work…",
                     modifier = Modifier
@@ -90,8 +97,8 @@ fun OperationsWorkScreen(
                         .testTag(NativeUiTags.OpsWorkLoading),
                 )
             }
-            is NativeOperationsWorkState.LoadFailure -> WorkScaffold(
-                snackbarHostState, section, onNavigate, modifier,
+            is NativeOperationsWorkState.LoadFailure -> workScaffold(
+                snackbarHostState, modifier,
             ) { padding ->
                 Column(
                     Modifier
@@ -116,14 +123,14 @@ fun OperationsWorkScreen(
                 onOpenRecordSpoilage = onOpenRecordSpoilage,
                 onBackToHome = onBackToHome,
                 onLeaveConfirmed = onLeaveConfirmed,
-                onNavigate = onNavigate,
+                workScaffold = workScaffold,
                 modifier = modifier,
             )
         }
         }
         OperationsSection.Deliveries -> {
             // Hosted by NativePreviewActivity via DeliveriesScreen.
-            WorkScaffold(snackbarHostState, section, onNavigate, modifier) { padding ->
+            workScaffold(snackbarHostState, modifier) { padding ->
                 Column(
                     Modifier
                         .fillMaxSize()
@@ -140,7 +147,7 @@ fun OperationsWorkScreen(
         }
         OperationsSection.Attendance -> {
             // Hosted by NativePreviewActivity via AttendanceScreen.
-            WorkScaffold(snackbarHostState, section, onNavigate, modifier) { padding ->
+            workScaffold(snackbarHostState, modifier) { padding ->
                 Column(
                     Modifier
                         .fillMaxSize()
@@ -157,7 +164,7 @@ fun OperationsWorkScreen(
         }
         OperationsSection.More -> {
             // Hosted by NativePreviewActivity via OperationsMoreScreen.
-            WorkScaffold(snackbarHostState, section, onNavigate, modifier) { padding ->
+            workScaffold(snackbarHostState, modifier) { padding ->
                 Column(
                     Modifier
                         .fillMaxSize()
@@ -185,13 +192,13 @@ private fun ReadyWork(
     onOpenRecordSpoilage: () -> Unit,
     onBackToHome: () -> Unit,
     onLeaveConfirmed: () -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
+    workScaffold: OpsScaffold,
     modifier: Modifier = Modifier,
 ) {
     when (state.destination) {
         NativeOperationsWorkDestination.Home -> {
             BackHandler(onBack = onLeaveConfirmed)
-            WorkScaffold(snackbarHostState, OperationsSection.Work, onNavigate, modifier) { padding ->
+            workScaffold(snackbarHostState, modifier) { padding ->
                 Column(
                     Modifier
                         .fillMaxSize().nativeRefreshOverlay(state.refreshing)
@@ -225,7 +232,7 @@ private fun ReadyWork(
         -> {
             // Hosted by NativePreviewActivity via dedicated entry screens.
             BackHandler(onBack = onBackToHome)
-            WorkScaffold(snackbarHostState, OperationsSection.Work, onNavigate, modifier) { padding ->
+            workScaffold(snackbarHostState, modifier) { padding ->
                 Column(
                     Modifier
                         .fillMaxSize()

@@ -17,6 +17,8 @@ import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.operations.AttendanceScreen
 import com.saaf.milkshop.nativeui.operations.NativeAttendanceState
+import com.saaf.milkshop.nativeui.operations.OperationsSection
+import com.saaf.milkshop.nativeui.operations.WorkScaffold
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -85,7 +87,15 @@ class NativeAttendanceScreenContractTest {
                     state = state,
                     onRetry = {},
                     onMarkPresent = onMarkPresent,
-                    onNavigate = {},
+                    attendanceScaffold = { s, m, content ->
+                        WorkScaffold(
+                            snackbarHostState = s,
+                            section = OperationsSection.Attendance,
+                            onNavigate = {},
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                     onLeaveConfirmed = {},
                 )
             }

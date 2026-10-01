@@ -18,6 +18,7 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.operations.NativeOperationsWorkState
 import com.saaf.milkshop.nativeui.operations.OperationsSection
 import com.saaf.milkshop.nativeui.operations.OperationsWorkScreen
+import com.saaf.milkshop.nativeui.operations.WorkScaffold
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -151,7 +152,15 @@ class NativeOperationsWorkScreenContractTest {
                     onOpenRecordSpoilage = onOpenRecordSpoilage,
                     onBackToHome = {},
                     onLeaveConfirmed = {},
-                    onNavigate = onNavigate,
+                    workScaffold = { s, m, content ->
+                        WorkScaffold(
+                            snackbarHostState = s,
+                            section = OperationsSection.Work,
+                            onNavigate = onNavigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

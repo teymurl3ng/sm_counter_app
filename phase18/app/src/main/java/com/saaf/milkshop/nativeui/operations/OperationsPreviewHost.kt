@@ -10,6 +10,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
+import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import com.saaf.milkshop.nativeui.operations.NativeDeliveriesDraftActions
@@ -177,7 +178,15 @@ fun OperationsPreviewHost(
                     ),
                     onArchive = deliveriesViewModel::archiveDelivery,
                     onLinkSale = deliveriesViewModel::linkSale,
-                    onNavigate = navigateOps,
+                    workScaffold = { s, m, content ->
+                        WorkScaffold(
+                            snackbarHostState = s,
+                            section = OperationsSection.Deliveries,
+                            onNavigate = navigateOps,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                     onLeaveConfirmed = onLeaveToWelcome,
                 )
             }
@@ -188,7 +197,15 @@ fun OperationsPreviewHost(
                     state = attendanceState,
                     onRetry = attendanceViewModel::refresh,
                     onMarkPresent = attendanceViewModel::markPresent,
-                    onNavigate = navigateOps,
+                    attendanceScaffold = { s, m, content ->
+                        WorkScaffold(
+                            snackbarHostState = s,
+                            section = OperationsSection.Attendance,
+                            onNavigate = navigateOps,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                     onLeaveConfirmed = onLeaveToWelcome,
                 )
             }
@@ -208,7 +225,15 @@ fun OperationsPreviewHost(
                     onEnrollPhoneSecurity = operationsMoreViewModel::enrollPhoneSecurity,
                     onSwitchAccount = onLeaveToAccountPicker,
                     onSignOut = onLeaveToWelcome,
-                    onNavigate = navigateOps,
+                    moreScaffold = { s, m, content ->
+                        OpsMoreScaffold(
+                            snackbarHostState = s,
+                            onNavigate = navigateOps,
+                            modifier = m,
+                            rootTag = NativeUiTags.OpsMoreRoot,
+                            content = content,
+                        )
+                    },
                     onLeaveConfirmed = onLeaveToWelcome,
                 )
             }
@@ -228,7 +253,15 @@ fun OperationsPreviewHost(
                     onBackToHome = {
                         operationsWorkViewModel.backToHome()
                     },
-                    onNavigate = navigateOps,
+                    workScaffold = { s, m, content ->
+                        WorkScaffold(
+                            snackbarHostState = s,
+                            section = OperationsSection.Work,
+                            onNavigate = navigateOps,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == OperationsSection.Work &&
@@ -243,7 +276,15 @@ fun OperationsPreviewHost(
                     onBackToHome = {
                         operationsWorkViewModel.backToHome()
                     },
-                    onNavigate = navigateOps,
+                    workScaffold = { s, m, content ->
+                        WorkScaffold(
+                            snackbarHostState = s,
+                            section = OperationsSection.Work,
+                            onNavigate = navigateOps,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == OperationsSection.Work &&
@@ -264,7 +305,15 @@ fun OperationsPreviewHost(
                     onBackToHome = {
                         operationsWorkViewModel.backToHome()
                     },
-                    onNavigate = navigateOps,
+                    workScaffold = { s, m, content ->
+                        WorkScaffold(
+                            snackbarHostState = s,
+                            section = OperationsSection.Work,
+                            onNavigate = navigateOps,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             else -> {
@@ -288,7 +337,15 @@ fun OperationsPreviewHost(
                     },
                     onBackToHome = operationsWorkViewModel::backToHome,
                     onLeaveConfirmed = onLeaveToWelcome,
-                    onNavigate = navigateOps,
+                    workScaffold = { s, m, content ->
+                        WorkScaffold(
+                            snackbarHostState = s,
+                            section = OperationsSection.Work,
+                            onNavigate = navigateOps,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

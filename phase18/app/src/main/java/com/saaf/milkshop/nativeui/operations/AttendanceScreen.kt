@@ -56,8 +56,8 @@ fun AttendanceScreen(
     state: NativeAttendanceState,
     onRetry: () -> Unit,
     onMarkPresent: () -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
     onLeaveConfirmed: () -> Unit,
+    attendanceScaffold: OpsScaffold,
     modifier: Modifier = Modifier,
 ) {
     NativeSectionTransition(
@@ -66,13 +66,13 @@ fun AttendanceScreen(
     ) { state -> when (state) {
         NativeAttendanceState.Idle,
         NativeAttendanceState.Loading,
-        -> AttendanceLoading(snackbarHostState, onNavigate, onLeaveConfirmed, modifier)
+        -> AttendanceLoading(snackbarHostState, attendanceScaffold, onLeaveConfirmed, modifier)
 
         is NativeAttendanceState.LoadFailure -> AttendanceLoadFailure(
             snackbarHostState = snackbarHostState,
             message = state.message,
             onRetry = onRetry,
-            onNavigate = onNavigate,
+            attendanceScaffold = attendanceScaffold,
             onLeaveConfirmed = onLeaveConfirmed,
             modifier = modifier,
         )
@@ -82,7 +82,7 @@ fun AttendanceScreen(
             identity = identity,
             state = state,
             onMarkPresent = onMarkPresent,
-            onNavigate = onNavigate,
+            attendanceScaffold = attendanceScaffold,
             onLeaveConfirmed = onLeaveConfirmed,
             modifier = modifier,
         )
@@ -93,11 +93,11 @@ fun AttendanceScreen(
 @Composable
 private fun AttendanceLoading(
     snackbarHostState: SnackbarHostState,
-    onNavigate: (OperationsSection) -> Unit,
+    attendanceScaffold: OpsScaffold,
     onLeaveConfirmed: () -> Unit,
     modifier: Modifier,
 ) {
-    WorkScaffold(snackbarHostState, OperationsSection.Attendance, onNavigate, modifier) {
+    attendanceScaffold(snackbarHostState, modifier) {
         NativeColdLoadingPane(
             label = "Loading attendance…",
             modifier = Modifier.fillMaxSize().padding(it).testTag(NativeUiTags.OpsAttendanceLoading),
@@ -110,11 +110,11 @@ private fun AttendanceLoadFailure(
     snackbarHostState: SnackbarHostState,
     message: String,
     onRetry: () -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
+    attendanceScaffold: OpsScaffold,
     onLeaveConfirmed: () -> Unit,
     modifier: Modifier,
 ) {
-    WorkScaffold(snackbarHostState, OperationsSection.Attendance, onNavigate, modifier) { padding ->
+    attendanceScaffold(snackbarHostState, modifier) { padding ->
         NativeLoadFailurePane(
             message = message,
             onRetry = onRetry,
@@ -130,11 +130,11 @@ private fun AttendanceReady(
     identity: NativeSignedInIdentity,
     state: NativeAttendanceState.Ready,
     onMarkPresent: () -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
+    attendanceScaffold: OpsScaffold,
     onLeaveConfirmed: () -> Unit,
     modifier: Modifier,
 ) {
-    WorkScaffold(snackbarHostState, OperationsSection.Attendance, onNavigate, modifier) { padding ->
+    attendanceScaffold(snackbarHostState, modifier) { padding ->
         Column(
             Modifier
                 .fillMaxSize().nativeRefreshOverlay(state.refreshing)

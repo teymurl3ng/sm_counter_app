@@ -87,20 +87,20 @@ fun OperationsMoreScreen(
     onEnrollPhoneSecurity: (CharArray, CharArray?) -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
     onLeaveConfirmed: () -> Unit,
+    moreScaffold: OpsScaffold,
     modifier: Modifier = Modifier,
 ) {
     when (state) {
         NativeOperationsMoreState.Idle,
         NativeOperationsMoreState.Loading,
-        -> OpsMoreLoadingScreen(snackbarHostState, onNavigate, modifier)
+        -> OpsMoreLoadingScreen(snackbarHostState, moreScaffold, modifier)
 
         is NativeOperationsMoreState.LoadFailure -> OpsMoreLoadFailureScreen(
             snackbarHostState = snackbarHostState,
             message = state.message,
             onRetry = onRetry,
-            onNavigate = onNavigate,
+            moreScaffold = moreScaffold,
             modifier = modifier,
         )
 
@@ -119,7 +119,7 @@ fun OperationsMoreScreen(
                         onOpenPersonalSecurity = onOpenPersonalSecurity,
                         onSwitchAccount = onSwitchAccount,
                         onSignOut = onSignOut,
-                        onNavigate = onNavigate,
+                        moreScaffold = moreScaffold,
                         modifier = modifier,
                     )
                     NativeOperationsMoreDestination.TodayWork -> OpsMoreTodayWorkScreen(
@@ -127,7 +127,7 @@ fun OperationsMoreScreen(
                         identity = identity,
                         state = state,
                         onBack = onBackToMenu,
-                        onNavigate = onNavigate,
+                        moreScaffold = moreScaffold,
                         modifier = modifier,
                     )
                     NativeOperationsMoreDestination.PersonalSecurity -> OpsMorePersonalSecurityScreen(
@@ -140,7 +140,7 @@ fun OperationsMoreScreen(
                         onRemove = onRemoveQuickUnlock,
                         onEnrollPin = onEnrollQuickPin,
                         onEnrollPhone = onEnrollPhoneSecurity,
-                        onNavigate = onNavigate,
+                        moreScaffold = moreScaffold,
                         modifier = modifier,
                     )
                 }
@@ -150,7 +150,7 @@ fun OperationsMoreScreen(
 }
 
 @Composable
-private fun OpsMoreScaffold(
+internal fun OpsMoreScaffold(
     snackbarHostState: SnackbarHostState,
     onNavigate: (OperationsSection) -> Unit,
     modifier: Modifier,
@@ -171,10 +171,10 @@ private fun OpsMoreScaffold(
 @Composable
 private fun OpsMoreLoadingScreen(
     snackbarHostState: SnackbarHostState,
-    onNavigate: (OperationsSection) -> Unit,
+    moreScaffold: OpsScaffold,
     modifier: Modifier,
 ) {
-    OpsMoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.OpsMoreRoot) { padding ->
+    moreScaffold(snackbarHostState, modifier) { padding ->
         NativeColdLoadingPane(
             label = "Loading…",
             modifier = Modifier
@@ -190,10 +190,10 @@ private fun OpsMoreLoadFailureScreen(
     snackbarHostState: SnackbarHostState,
     message: String,
     onRetry: () -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
+    moreScaffold: OpsScaffold,
     modifier: Modifier,
 ) {
-    OpsMoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.OpsMoreRoot) { padding ->
+    moreScaffold(snackbarHostState, modifier) { padding ->
         NativeLoadFailurePane(
             message = message,
             onRetry = onRetry,
@@ -212,10 +212,10 @@ private fun OpsMoreMenuScreen(
     onOpenPersonalSecurity: () -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
+    moreScaffold: OpsScaffold,
     modifier: Modifier,
 ) {
-    OpsMoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.OpsMoreRoot) { padding ->
+    moreScaffold(snackbarHostState, modifier) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             OpsMoreHeader(identity, state.context)
             Column(
@@ -266,16 +266,17 @@ private fun OpsMoreTodayWorkScreen(
     identity: NativeSignedInIdentity,
     state: NativeOperationsMoreState.Ready,
     onBack: () -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
+    moreScaffold: OpsScaffold,
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBack)
-    OpsMoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.OpsMoreTodayWorkScreen) { padding ->
+    moreScaffold(snackbarHostState, modifier) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .imePadding(),
+                .imePadding()
+                .testTag(NativeUiTags.OpsMoreTodayWorkScreen),
         ) {
             OpsMoreHeader(identity, state.context)
             Column(
@@ -359,7 +360,7 @@ private fun OpsMorePersonalSecurityScreen(
     onRemove: (CharArray) -> Unit,
     onEnrollPin: (CharArray, CharArray) -> Unit,
     onEnrollPhone: (CharArray, CharArray?) -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
+    moreScaffold: OpsScaffold,
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBack)
@@ -389,12 +390,13 @@ private fun OpsMorePersonalSecurityScreen(
         )
     }
 
-    OpsMoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.OpsMoreSecurityScreen) { padding ->
+    moreScaffold(snackbarHostState, modifier) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .imePadding(),
+                .imePadding()
+                .testTag(NativeUiTags.OpsMoreSecurityScreen),
         ) {
             OpsMoreHeader(identity, state.context)
             Column(

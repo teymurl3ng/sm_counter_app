@@ -84,7 +84,7 @@ fun ReceiveMilkScreen(
     onRecord: (NativeReceiveMilkRequest) -> Unit,
     onReceiveAnother: () -> Unit,
     onBackToHome: () -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
+    workScaffold: OpsScaffold,
     modifier: Modifier = Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -95,14 +95,7 @@ fun ReceiveMilkScreen(
     BackHandler {
         if (canLeave) leaveGuard.requestLeave(onBackToHome)
     }
-    WorkScaffold(
-        snackbarHostState = snackbarHostState,
-        section = OperationsSection.Work,
-        onNavigate = { section ->
-            if (canLeave) leaveGuard.requestLeave { onNavigate(section) }
-        },
-        modifier = modifier,
-    ) { padding ->
+    workScaffold(snackbarHostState, modifier) { padding ->
         when (state) {
             NativeReceiveMilkState.Idle,
             NativeReceiveMilkState.Loading,

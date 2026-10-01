@@ -85,16 +85,11 @@ fun DeliveriesScreen(
     onLinkSale: (Long, String) -> Unit,
     draftActions: NativeDeliveriesDraftActions,
     onArchive: (Long) -> Unit,
-    onNavigate: (OperationsSection) -> Unit,
     onLeaveConfirmed: () -> Unit,
+    workScaffold: OpsScaffold,
     modifier: Modifier = Modifier,
 ) {
-    WorkScaffold(
-        snackbarHostState = snackbarHostState,
-        section = OperationsSection.Deliveries,
-        onNavigate = onNavigate,
-        modifier = modifier,
-    ) { padding ->
+    workScaffold(snackbarHostState, modifier) { padding ->
         NativeSectionTransition(
             targetState = state,
             contentKey = { if (it is NativeDeliveriesState.Idle || it is NativeDeliveriesState.Loading) NativeDeliveriesState.Loading::class else it::class },

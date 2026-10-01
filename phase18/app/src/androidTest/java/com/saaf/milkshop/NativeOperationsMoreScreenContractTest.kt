@@ -17,6 +17,7 @@ import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.operations.NativeOperationsMoreDestination
 import com.saaf.milkshop.nativeui.operations.NativeOperationsMoreState
+import com.saaf.milkshop.nativeui.operations.OpsMoreScaffold
 import com.saaf.milkshop.nativeui.operations.OperationsMoreScreen
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertTrue
@@ -104,7 +105,15 @@ class NativeOperationsMoreScreenContractTest {
                     onEnrollPhoneSecurity = { _, _ -> },
                     onSwitchAccount = onSwitchAccount,
                     onSignOut = onSignOut,
-                    onNavigate = {},
+                    moreScaffold = { s, m, content ->
+                        OpsMoreScaffold(
+                            snackbarHostState = s,
+                            onNavigate = {},
+                            modifier = m,
+                            rootTag = NativeUiTags.OpsMoreRoot,
+                            content = content,
+                        )
+                    },
                     onLeaveConfirmed = {},
                 )
             }

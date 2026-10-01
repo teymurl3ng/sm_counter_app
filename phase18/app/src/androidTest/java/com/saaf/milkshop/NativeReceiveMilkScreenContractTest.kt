@@ -25,7 +25,9 @@ import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.operations.NativeReceiveMilkState
+import com.saaf.milkshop.nativeui.operations.OperationsSection
 import com.saaf.milkshop.nativeui.operations.ReceiveMilkScreen
+import com.saaf.milkshop.nativeui.operations.WorkScaffold
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -150,7 +152,15 @@ class NativeReceiveMilkScreenContractTest {
                     onRecord = onRecord,
                     onReceiveAnother = onReceiveAnother,
                     onBackToHome = {},
-                    onNavigate = {},
+                    workScaffold = { s, m, content ->
+                        WorkScaffold(
+                            snackbarHostState = s,
+                            section = OperationsSection.Work,
+                            onNavigate = {},
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

@@ -49,7 +49,7 @@ internal fun ManagerScaffold(
 }
 
 @Composable
-private fun ManagerNavigationRail(
+internal fun ManagerNavigationRail(
     selected: ManagerSection,
     onNavigate: (ManagerSection) -> Unit,
 ) {

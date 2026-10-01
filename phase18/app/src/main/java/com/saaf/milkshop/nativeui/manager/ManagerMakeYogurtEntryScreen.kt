@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.operations.NativeMakeYogurtRequest
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 import com.saaf.milkshop.nativeui.operations.MakeYogurtDiscardDialog
 import com.saaf.milkshop.nativeui.operations.MakeYogurtLoadFailureBody
@@ -32,10 +34,15 @@ fun ManagerMakeYogurtEntryScreen(
     onRecord: (NativeMakeYogurtRequest) -> Unit,
     onMakeAnother: () -> Unit,
     onBackToWork: () -> Unit,
+    onRegisterGuard: (EntryLeaveGuard?) -> Unit = {},
     mgrScaffold: MgrScaffold,
     modifier: Modifier = Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
+    DisposableEffect(leaveGuard) {
+        onRegisterGuard(leaveGuard)
+        onDispose { onRegisterGuard(null) }
+    }
     val canLeave = (state as? NativeMakeYogurtState.Ready)?.saving != true
 
     LaunchedEffect(state is NativeMakeYogurtState.Ready) {

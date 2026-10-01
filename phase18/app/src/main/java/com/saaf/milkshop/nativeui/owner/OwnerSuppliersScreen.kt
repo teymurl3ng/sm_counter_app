@@ -84,6 +84,7 @@ fun OwnerSuppliersScreen(
     onBackFromEdit: () -> Unit,
     onUpdateSupplier: (String, VendorProfileInput) -> Unit,
     hostedScaffold: HostedScaffold,
+    showHeader: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     if (supplierCreateOpen) {
@@ -140,13 +141,15 @@ fun OwnerSuppliersScreen(
                 .padding(padding)
                 .testTag(NativeUiTags.OwnerSuppliersRoot),
         ) {
-            CashierScreenHeader(
-                title = "Suppliers",
-                displayName = context.shopName,
-                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                businessDate = context.businessDate,
-                postingOpen = context.postingOpen,
-            )
+            if (showHeader) {
+                CashierScreenHeader(
+                    title = "Suppliers",
+                    displayName = context.shopName,
+                    roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                    businessDate = context.businessDate,
+                    postingOpen = context.postingOpen,
+                )
+            }
             when {
                 suppliersLoading && suppliers.isEmpty() && suppliersError == null -> {
                     Box(

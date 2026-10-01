@@ -49,7 +49,6 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.hapticTap
 import com.saaf.milkshop.nativeui.common.pressScale
 import com.saaf.milkshop.nativeui.common.rememberPressSource
-import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 
 /** Injected shell for Manager panes; mirrors common/HostedScaffold minus the nav-action wrap. */
 typealias MgrScaffold = @Composable (
@@ -141,13 +140,6 @@ private fun ReadyWork(
                         .padding(padding)
                         .testTag(NativeUiTags.ManagerWorkRoot),
                 ) {
-                    CashierScreenHeader(
-                        title = "Today's work",
-                        displayName = state.context.shopName,
-                        roleLabel = "Manager",
-                        businessDate = state.context.businessDate,
-                        postingOpen = state.context.postingOpen,
-                    )
                     WorkHomeBody(
                         context = state.context,
                         onOpenDestination = onOpenDestination,

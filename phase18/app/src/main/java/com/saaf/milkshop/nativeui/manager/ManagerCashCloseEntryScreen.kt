@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -18,6 +19,7 @@ import com.saaf.milkshop.nativeui.cashclose.CashCloseEntryContent
 import com.saaf.milkshop.nativeui.cashclose.CashCloseLoadFailureBody
 import com.saaf.milkshop.nativeui.cashclose.CashCloseLoadingBody
 import com.saaf.milkshop.nativeui.cashclose.NativeCashCloseState
+import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
 
 /**
@@ -33,10 +35,15 @@ fun ManagerCashCloseEntryScreen(
     onRecordCount: (NativeCashCloseCountRequest) -> Unit,
     onCloseDay: (NativeCashCloseDayRequest) -> Unit,
     onBackToWork: () -> Unit,
+    onRegisterGuard: (EntryLeaveGuard?) -> Unit = {},
     mgrScaffold: MgrScaffold,
     modifier: Modifier = Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
+    DisposableEffect(leaveGuard) {
+        onRegisterGuard(leaveGuard)
+        onDispose { onRegisterGuard(null) }
+    }
     val canLeave = (state as? NativeCashCloseState.Ready)?.saving != true
 
     LaunchedEffect(state is NativeCashCloseState.Ready) {

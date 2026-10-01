@@ -86,6 +86,7 @@ fun OwnerRecordsScreen(
     onBackFromCorrection: () -> Unit = {},
     onUpdateCorrection: ((NativeCorrectionEditorState) -> NativeCorrectionEditorState) -> Unit = {},
     onSaveCorrection: () -> Unit = {},
+    showHeader: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     NativeSectionTransition(
@@ -143,6 +144,7 @@ fun OwnerRecordsScreen(
                         onSave = onSaveCorrection,
                         hostedScaffold = hostedScaffold,
                         roleLabel = roleLabel,
+                        showHeader = showHeader,
                         modifier = modifier,
                     )
                 }
@@ -156,6 +158,7 @@ fun OwnerRecordsScreen(
                         onOpenCorrection = onOpenCorrection,
                         hostedScaffold = hostedScaffold,
                         roleLabel = roleLabel,
+                        showHeader = showHeader,
                         modifier = modifier,
                     )
                 }
@@ -168,6 +171,7 @@ fun OwnerRecordsScreen(
                         onBack = onBackFromLedger,
                         hostedScaffold = hostedScaffold,
                         roleLabel = roleLabel,
+                        showHeader = showHeader,
                         modifier = modifier,
                     )
                 }
@@ -180,6 +184,7 @@ fun OwnerRecordsScreen(
                     onLeaveConfirmed = onLeaveConfirmed,
                     hostedScaffold = hostedScaffold,
                     roleLabel = roleLabel,
+                    showHeader = showHeader,
                     rootTag = rootTag,
                     onDeferredGroup = onDeferredGroup,
                     onSelectGroup = onSelectGroup,
@@ -202,6 +207,7 @@ private fun RecordsListBody(
     onLeaveConfirmed: () -> Unit,
     hostedScaffold: HostedScaffold,
     roleLabel: String,
+    showHeader: Boolean,
     rootTag: String,
     onDeferredGroup: (String) -> Unit,
     onSelectGroup: (NativeRecordsGroup) -> Unit,
@@ -216,13 +222,15 @@ private fun RecordsListBody(
                 .padding(padding)
                 .testTag(rootTag),
         ) {
-            CashierScreenHeader(
-                title = "Records",
-                displayName = state.snapshot.context.shopName,
-                roleLabel = roleLabel,
-                businessDate = state.snapshot.context.businessDate,
-                postingOpen = state.snapshot.context.postingOpen,
-            )
+            if (showHeader) {
+                CashierScreenHeader(
+                    title = "Records",
+                    displayName = state.snapshot.context.shopName,
+                    roleLabel = roleLabel,
+                    businessDate = state.snapshot.context.businessDate,
+                    postingOpen = state.snapshot.context.postingOpen,
+                )
+            }
             Column(
                 Modifier
                     .fillMaxWidth()
@@ -463,18 +471,21 @@ private fun RecordsLedgerBody(
     onBack: () -> Unit,
     hostedScaffold: HostedScaffold,
     roleLabel: String,
+    showHeader: Boolean,
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBack)
     hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
-            CashierScreenHeader(
-                title = ledger.displayName,
-                displayName = context.shopName,
-                roleLabel = roleLabel,
-                businessDate = context.businessDate,
-                postingOpen = context.postingOpen,
-            )
+            if (showHeader) {
+                CashierScreenHeader(
+                    title = ledger.displayName,
+                    displayName = context.shopName,
+                    roleLabel = roleLabel,
+                    businessDate = context.businessDate,
+                    postingOpen = context.postingOpen,
+                )
+            }
             Row(
                 Modifier.fillMaxWidth().padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.End,
@@ -526,6 +537,7 @@ private fun RecordsDetailBody(
     onOpenCorrection: (NativeCorrectionPrefill) -> Unit,
     hostedScaffold: HostedScaffold,
     roleLabel: String,
+    showHeader: Boolean,
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBack)
@@ -536,13 +548,15 @@ private fun RecordsDetailBody(
                 .padding(padding)
                 .testTag(NativeUiTags.OwnerRecordsDetail),
         ) {
-            CashierScreenHeader(
-                title = "Records",
-                displayName = context.shopName,
-                roleLabel = roleLabel,
-                businessDate = context.businessDate,
-                postingOpen = context.postingOpen,
-            )
+            if (showHeader) {
+                CashierScreenHeader(
+                    title = "Records",
+                    displayName = context.shopName,
+                    roleLabel = roleLabel,
+                    businessDate = context.businessDate,
+                    postingOpen = context.postingOpen,
+                )
+            }
             Column(
                 Modifier
                     .fillMaxSize()
@@ -626,6 +640,7 @@ private fun RecordsCorrectionBody(
     onSave: () -> Unit,
     hostedScaffold: HostedScaffold,
     roleLabel: String,
+    showHeader: Boolean,
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -654,13 +669,15 @@ private fun RecordsCorrectionBody(
                     .padding(padding)
                     .testTag(NativeUiTags.OwnerRecordsCorrectionRoot),
             ) {
-                CashierScreenHeader(
-                    title = "Records",
-                    displayName = context.shopName,
-                    roleLabel = roleLabel,
-                    businessDate = context.businessDate,
-                    postingOpen = context.postingOpen,
-                )
+                if (showHeader) {
+                    CashierScreenHeader(
+                        title = "Records",
+                        displayName = context.shopName,
+                        roleLabel = roleLabel,
+                        businessDate = context.businessDate,
+                        postingOpen = context.postingOpen,
+                    )
+                }
                 Column(
                     Modifier
                         .fillMaxSize()

@@ -85,6 +85,7 @@ fun OwnerCustomersScreen(
     onBackFromEdit: () -> Unit,
     onUpdateCustomer: (String, CustomerProfileInput) -> Unit,
     hostedScaffold: HostedScaffold,
+    showHeader: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     if (customerCreateOpen) {
@@ -141,13 +142,15 @@ fun OwnerCustomersScreen(
                 .padding(padding)
                 .testTag(NativeUiTags.OwnerCustomersRoot),
         ) {
-            CashierScreenHeader(
-                title = "Customers",
-                displayName = context.shopName,
-                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                businessDate = context.businessDate,
-                postingOpen = context.postingOpen,
-            )
+            if (showHeader) {
+                CashierScreenHeader(
+                    title = "Customers",
+                    displayName = context.shopName,
+                    roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                    businessDate = context.businessDate,
+                    postingOpen = context.postingOpen,
+                )
+            }
             when {
                 customersLoading && customers.isEmpty() && customersError == null -> {
                     Box(

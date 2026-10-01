@@ -69,8 +69,6 @@ import com.saaf.milkshop.nativeui.owner.OwnerCustomersScreen
 import com.saaf.milkshop.nativeui.owner.OwnerEmployeesScreen
 import com.saaf.milkshop.nativeui.owner.OwnerProductsScreen
 import com.saaf.milkshop.nativeui.owner.OwnerSuppliersScreen
-import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
-import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 
 /**
  * Manager More — bounded shop tools + personal security under ManagerScaffold.
@@ -244,6 +242,7 @@ fun ManagerMoreScreen(
                     onArchiveProduct = onArchiveProduct,
                     onUnarchiveProduct = onUnarchiveProduct,
                     hostedScaffold = managerShell,
+                    showHeader = false,
                     modifier = modifier,
                 )
             }
@@ -275,6 +274,7 @@ fun ManagerMoreScreen(
                     onBackFromEdit = onBackFromCustomerEdit,
                     onUpdateCustomer = onUpdateCustomer,
                     hostedScaffold = managerShell,
+                    showHeader = false,
                     modifier = modifier,
                 )
             }
@@ -306,6 +306,7 @@ fun ManagerMoreScreen(
                     onBackFromEdit = onBackFromSupplierEdit,
                     onUpdateSupplier = onUpdateSupplier,
                     hostedScaffold = managerShell,
+                    showHeader = false,
                     modifier = modifier,
                 )
             }
@@ -337,6 +338,7 @@ fun ManagerMoreScreen(
                     onBackFromEdit = onBackFromEmployeeEdit,
                     onUpdateEmployee = onUpdateEmployee,
                     hostedScaffold = managerShell,
+                    showHeader = false,
                     modifier = modifier,
                 )
             }
@@ -385,7 +387,6 @@ private fun ManagerMoreMenuScreen(
                 .padding(padding)
                 .testTag(NativeUiTags.ManagerMoreRoot),
         ) {
-            ManagerMoreHeader(identity, state.context)
             Column(
                 Modifier
                     .fillMaxSize()
@@ -505,7 +506,6 @@ private fun ManagerMorePersonalSecurityScreen(
                 .imePadding()
                 .testTag(NativeUiTags.ManagerMoreSecurityScreen),
         ) {
-            ManagerMoreHeader(identity, state.context)
             Column(
                 Modifier
                     .weight(1f)
@@ -576,17 +576,6 @@ private fun ManagerMorePersonalSecurityScreen(
             }
         }
     }
-}
-
-@Composable
-private fun ManagerMoreHeader(identity: NativeSignedInIdentity, context: NativeOwnerMoreContext) {
-    CashierScreenHeader(
-        title = "More",
-        displayName = context.shopName,
-        roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-        businessDate = context.businessDate,
-        postingOpen = context.postingOpen,
-    )
 }
 
 @Composable

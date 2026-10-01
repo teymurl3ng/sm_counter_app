@@ -86,6 +86,7 @@ fun OwnerEmployeesScreen(
     onBackFromEdit: () -> Unit,
     onUpdateEmployee: (String, EmployeeProfileInput) -> Unit,
     hostedScaffold: HostedScaffold,
+    showHeader: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     if (employeeCreateOpen) {
@@ -142,13 +143,15 @@ fun OwnerEmployeesScreen(
                 .padding(padding)
                 .testTag(NativeUiTags.OwnerEmployeesRoot),
         ) {
-            CashierScreenHeader(
-                title = "Employees",
-                displayName = context.shopName,
-                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                businessDate = context.businessDate,
-                postingOpen = context.postingOpen,
-            )
+            if (showHeader) {
+                CashierScreenHeader(
+                    title = "Employees",
+                    displayName = context.shopName,
+                    roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                    businessDate = context.businessDate,
+                    postingOpen = context.postingOpen,
+                )
+            }
             when {
                 employeesLoading && employees.isEmpty() && employeesError == null -> {
                     Box(

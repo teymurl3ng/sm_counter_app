@@ -94,6 +94,7 @@ fun OwnerProductsScreen(
     onArchiveProduct: () -> Unit,
     onUnarchiveProduct: () -> Unit,
     hostedScaffold: HostedScaffold,
+    showHeader: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     if (productCreateOpen) {
@@ -157,13 +158,15 @@ fun OwnerProductsScreen(
                 .padding(padding)
                 .testTag(NativeUiTags.OwnerProductsRoot),
         ) {
-            CashierScreenHeader(
-                title = "Products",
-                displayName = context.shopName,
-                roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-                businessDate = context.businessDate,
-                postingOpen = context.postingOpen,
-            )
+            if (showHeader) {
+                CashierScreenHeader(
+                    title = "Products",
+                    displayName = context.shopName,
+                    roleLabel = formatCashierRoleLabel(identity.role.wireValue),
+                    businessDate = context.businessDate,
+                    postingOpen = context.postingOpen,
+                )
+            }
             when {
                 productsLoading && products.isEmpty() && productsError == null -> {
                     Box(

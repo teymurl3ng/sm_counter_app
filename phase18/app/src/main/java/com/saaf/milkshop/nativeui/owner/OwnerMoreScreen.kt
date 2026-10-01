@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -72,6 +71,7 @@ import com.saaf.milkshop.domain.ProductCatalogInput
 import com.saaf.milkshop.domain.StoreIdentityInput
 import com.saaf.milkshop.domain.VendorProfileInput
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
@@ -214,7 +214,7 @@ fun OwnerMoreScreen(
     onEnrollPhoneSecurity: (CharArray, CharArray?) -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
     onLeaveConfirmed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -224,7 +224,7 @@ fun OwnerMoreScreen(
     ) { state -> when (state) {
         NativeOwnerMoreState.Idle,
         NativeOwnerMoreState.Loading,
-        -> OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) {
+        -> hostedScaffold(snackbarHostState, modifier, { it() }) {
             NativeColdLoadingPane(
                 label = "Loading…",
                 modifier = Modifier
@@ -234,12 +234,7 @@ fun OwnerMoreScreen(
             )
         }
 
-        is NativeOwnerMoreState.LoadFailure -> OwnerScaffold(
-            snackbarHostState,
-            OwnerSection.More,
-            onNavigate,
-            modifier,
-        ) { padding ->
+        is NativeOwnerMoreState.LoadFailure -> hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
             Column(
                 Modifier
                     .fillMaxSize()
@@ -282,7 +277,7 @@ fun OwnerMoreScreen(
                 onOpenSync = onOpenSync,
                 onSwitchAccount = onSwitchAccount,
                 onSignOut = onSignOut,
-                onNavigate = onNavigate,
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.PersonalSecurity -> OwnerMorePersonalSecurityScreen(
@@ -295,7 +290,7 @@ fun OwnerMoreScreen(
                 onRemove = onRemoveQuickUnlock,
                 onEnrollPin = onEnrollQuickPin,
                 onEnrollPhone = onEnrollPhoneSecurity,
-                onNavigate = onNavigate,
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.Products -> OwnerProductsScreen(
@@ -326,16 +321,7 @@ fun OwnerMoreScreen(
                 onUpdateProduct = onUpdateProduct,
                 onArchiveProduct = onArchiveProduct,
                 onUnarchiveProduct = onUnarchiveProduct,
-                hostedScaffold = { snackbar, mod, wrapNav, content ->
-                    OwnerScaffold(
-                        snackbarHostState = snackbar,
-                        section = OwnerSection.More,
-                        onNavigate = { section -> wrapNav { onNavigate(section) } },
-                        modifier = mod,
-                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                        content = content,
-                    )
-                },
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.Customers -> OwnerCustomersScreen(
@@ -360,16 +346,7 @@ fun OwnerMoreScreen(
                 onOpenEdit = onOpenCustomerEdit,
                 onBackFromEdit = onBackFromCustomerEdit,
                 onUpdateCustomer = onUpdateCustomer,
-                hostedScaffold = { snackbar, mod, wrapNav, content ->
-                    OwnerScaffold(
-                        snackbarHostState = snackbar,
-                        section = OwnerSection.More,
-                        onNavigate = { section -> wrapNav { onNavigate(section) } },
-                        modifier = mod,
-                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                        content = content,
-                    )
-                },
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.Suppliers -> OwnerSuppliersScreen(
@@ -394,16 +371,7 @@ fun OwnerMoreScreen(
                 onOpenEdit = onOpenSupplierEdit,
                 onBackFromEdit = onBackFromSupplierEdit,
                 onUpdateSupplier = onUpdateSupplier,
-                hostedScaffold = { snackbar, mod, wrapNav, content ->
-                    OwnerScaffold(
-                        snackbarHostState = snackbar,
-                        section = OwnerSection.More,
-                        onNavigate = { section -> wrapNav { onNavigate(section) } },
-                        modifier = mod,
-                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                        content = content,
-                    )
-                },
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.Employees -> OwnerEmployeesScreen(
@@ -428,16 +396,7 @@ fun OwnerMoreScreen(
                 onOpenEdit = onOpenEmployeeEdit,
                 onBackFromEdit = onBackFromEmployeeEdit,
                 onUpdateEmployee = onUpdateEmployee,
-                hostedScaffold = { snackbar, mod, wrapNav, content ->
-                    OwnerScaffold(
-                        snackbarHostState = snackbar,
-                        section = OwnerSection.More,
-                        onNavigate = { section -> wrapNav { onNavigate(section) } },
-                        modifier = mod,
-                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                        content = content,
-                    )
-                },
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.CostingPlans -> OwnerCostingPlansScreen(
@@ -514,16 +473,7 @@ fun OwnerMoreScreen(
                         start.plusMonths(1)
                     }
                 },
-                hostedScaffold = { snackbar, mod, wrapNav, content ->
-                    OwnerScaffold(
-                        snackbarHostState = snackbar,
-                        section = OwnerSection.More,
-                        onNavigate = { section -> wrapNav { onNavigate(section) } },
-                        modifier = mod,
-                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                        content = content,
-                    )
-                },
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.ShopSettings -> OwnerShopSettingsScreen(
@@ -565,16 +515,7 @@ fun OwnerMoreScreen(
                 onSaveOpening = onSaveOpening,
                 onSubmitOpeningReauth = onSubmitOpeningReauth,
                 onCancelOpeningReauth = onCancelOpeningReauth,
-                hostedScaffold = { snackbar, mod, wrapNav, content ->
-                    OwnerScaffold(
-                        snackbarHostState = snackbar,
-                        section = OwnerSection.More,
-                        onNavigate = { section -> wrapNav { onNavigate(section) } },
-                        modifier = mod,
-                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                        content = content,
-                    )
-                },
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.UsersRoles -> OwnerUsersRolesScreen(
@@ -613,16 +554,7 @@ fun OwnerMoreScreen(
                 onResumeCredentialSetup = onResumeCredentialSetup,
                 onSubmitReauth = onSubmitUsersRolesReauth,
                 onCancelReauth = onCancelUsersRolesReauth,
-                hostedScaffold = { snackbar, mod, wrapNav, content ->
-                    OwnerScaffold(
-                        snackbarHostState = snackbar,
-                        section = OwnerSection.More,
-                        onNavigate = { section -> wrapNav { onNavigate(section) } },
-                        modifier = mod,
-                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                        content = content,
-                    )
-                },
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.SecurityHistory -> OwnerSecurityHistoryScreen(
@@ -637,16 +569,7 @@ fun OwnerMoreScreen(
                 onRetry = onRetrySecurityHistory,
                 onOpenAudit = onOpenSecurityAudit,
                 onBackFromDetail = onBackFromSecurityAuditDetail,
-                hostedScaffold = { snackbar, mod, wrapNav, content ->
-                    OwnerScaffold(
-                        snackbarHostState = snackbar,
-                        section = OwnerSection.More,
-                        onNavigate = { section -> wrapNav { onNavigate(section) } },
-                        modifier = mod,
-                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                        content = content,
-                    )
-                },
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.Sync -> OwnerSyncScreen(
@@ -664,16 +587,7 @@ fun OwnerMoreScreen(
                 onSyncNow = onSyncNow,
                 onUnenroll = onUnenrollSync,
                 allowDevEnvironment = com.saaf.milkshop.BuildConfig.DEBUG,
-                hostedScaffold = { snackbar, mod, wrapNav, content ->
-                    OwnerScaffold(
-                        snackbarHostState = snackbar,
-                        section = OwnerSection.More,
-                        onNavigate = { section -> wrapNav { onNavigate(section) } },
-                        modifier = mod,
-                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                        content = content,
-                    )
-                },
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
 
@@ -717,16 +631,7 @@ fun OwnerMoreScreen(
                 onRefreshCloud = onRefreshCloudBackups,
                 onInspectCloud = onInspectCloudBackup,
                 onConfirmCloudRestore = onConfirmCloudBackupRestore,
-                hostedScaffold = { snackbar, mod, wrapNav, content ->
-                    OwnerScaffold(
-                        snackbarHostState = snackbar,
-                        section = OwnerSection.More,
-                        onNavigate = { section -> wrapNav { onNavigate(section) } },
-                        modifier = mod,
-                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                        content = content,
-                    )
-                },
+                hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )
             }
@@ -753,10 +658,10 @@ private fun OwnerMoreMenuScreen(
     onOpenSync: () -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
     modifier: Modifier,
 ) {
-    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
@@ -908,7 +813,7 @@ private fun OwnerMorePersonalSecurityScreen(
     onRemove: (CharArray) -> Unit,
     onEnrollPin: (CharArray, CharArray) -> Unit,
     onEnrollPhone: (CharArray, CharArray?) -> Unit,
-    onNavigate: (OwnerSection) -> Unit,
+    hostedScaffold: HostedScaffold,
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBack)
@@ -940,7 +845,7 @@ private fun OwnerMorePersonalSecurityScreen(
         )
     }
 
-    OwnerScaffold(snackbarHostState, OwnerSection.More, onNavigate, modifier) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()

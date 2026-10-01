@@ -579,7 +579,15 @@ fun OwnerPreviewHost(
                     onEnrollPhoneSecurity = ownerMoreViewModel::enrollPhoneSecurity,
                     onSwitchAccount = onLeaveToAccountPicker,
                     onSignOut = onLeaveToWelcome,
-                    onNavigate = navigateOwner,
+                    hostedScaffold = { s, m, wrapNav, content ->
+                        OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.More,
+                            onNavigate = { section -> wrapNav { navigateOwner(section) } },
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                     onLeaveConfirmed = onLeaveToWelcome,
                 )
             }

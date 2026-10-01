@@ -403,7 +403,15 @@ class NativeOwnerMoreScreenContractTest {
                     onEnrollPhoneSecurity = { _, _ -> },
                     onSwitchAccount = onSwitchAccount,
                     onSignOut = onSignOut,
-                    onNavigate = onNavigate,
+                    hostedScaffold = { s, m, wrapNav, content ->
+                        com.saaf.milkshop.nativeui.owner.OwnerScaffold(
+                            snackbarHostState = s,
+                            section = OwnerSection.More,
+                            onNavigate = { section -> wrapNav { onNavigate(section) } },
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                     onLeaveConfirmed = {},
                 )
             }

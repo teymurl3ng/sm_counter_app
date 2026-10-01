@@ -285,7 +285,7 @@ fun ManagerPreviewHost(
             title = headerTitle,
             displayName = identity.displayName,
             roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-            businessDate = workReady?.context?.businessDate ?: "",
+            businessDate = workReady?.context?.businessDate ?: java.time.LocalDate.now().toString(),
             postingOpen = workReady?.context?.postingOpen ?: true,
         )
         NativeSectionTransition(

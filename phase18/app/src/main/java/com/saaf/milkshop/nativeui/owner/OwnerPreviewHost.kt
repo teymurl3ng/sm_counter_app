@@ -517,7 +517,7 @@ fun OwnerPreviewHost(
             title = headerTitle,
             displayName = identity.displayName,
             roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-            businessDate = ownerWorkReady?.context?.businessDate ?: "",
+            businessDate = ownerWorkReady?.context?.businessDate ?: java.time.LocalDate.now().toString(),
             postingOpen = ownerWorkReady?.context?.postingOpen ?: true,
         )
         NativeSectionTransition(

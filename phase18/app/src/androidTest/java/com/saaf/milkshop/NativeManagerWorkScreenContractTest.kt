@@ -12,6 +12,8 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.manager.NativeManagerWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.manager.ManagerScaffold
+import com.saaf.milkshop.nativeui.manager.ManagerSection
 import com.saaf.milkshop.nativeui.manager.ManagerWorkScreen
 import com.saaf.milkshop.nativeui.manager.NativeManagerWorkDestination
 import com.saaf.milkshop.nativeui.manager.NativeManagerWorkState
@@ -217,7 +219,15 @@ class NativeManagerWorkScreenContractTest {
                     onOpenClose = onOpenClose,
                     onBackToHome = {},
                     onLeaveConfirmed = {},
-                    onNavigate = {},
+                    mgrScaffold = { s, m, content ->
+                        ManagerScaffold(
+                            snackbarHostState = s,
+                            section = ManagerSection.Work,
+                            onNavigate = {},
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

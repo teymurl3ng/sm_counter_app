@@ -32,7 +32,7 @@ fun ManagerPaySupplierEntryScreen(
     onRecordPayment: (NativeVendorPaymentRequest) -> Unit,
     onRecordAnother: () -> Unit,
     onBackToWork: () -> Unit,
-    onNavigate: (ManagerSection) -> Unit,
+    mgrScaffold: MgrScaffold,
     modifier: Modifier = Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -50,15 +50,9 @@ fun ManagerPaySupplierEntryScreen(
             .fillMaxSize()
             .testTag(NativeUiTags.ManagerPaySupplierEntryRoot),
     ) {
-        ManagerScaffold(
-            snackbarHostState = snackbarHostState,
-            section = ManagerSection.Work,
-            onNavigate = { section ->
-                if (canLeave) {
-                    leaveGuard.requestLeave { onNavigate(section) }
-                }
-            },
-            modifier = Modifier.fillMaxSize(),
+        mgrScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
         ) { padding ->
             when (state) {
                 NativeVendorPaymentState.Idle,

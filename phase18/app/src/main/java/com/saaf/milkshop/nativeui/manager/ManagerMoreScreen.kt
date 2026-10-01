@@ -134,23 +134,17 @@ fun ManagerMoreScreen(
     onEnrollPhoneSecurity: (CharArray, CharArray?) -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
-    onNavigate: (ManagerSection) -> Unit,
+    mgrScaffold: MgrScaffold,
     modifier: Modifier = Modifier,
 ) {
-    val managerShell: HostedScaffold = { snackbar, mod, wrapNav, content ->
-        ManagerScaffold(
-            snackbarHostState = snackbar,
-            section = ManagerSection.More,
-            onNavigate = { section -> wrapNav { onNavigate(section) } },
-            modifier = mod,
-            content = content,
-        )
+    val managerShell: HostedScaffold = { snackbar, mod, _, content ->
+        mgrScaffold(snackbar, mod, content)
     }
 
     when (state) {
         NativeOwnerMoreState.Idle,
         NativeOwnerMoreState.Loading,
-        -> ManagerScaffold(snackbarHostState, ManagerSection.More, onNavigate, modifier) {
+        -> mgrScaffold(snackbarHostState, modifier) {
             NativeColdLoadingPane(
                 label = "Loading…",
                 modifier = Modifier
@@ -160,10 +154,8 @@ fun ManagerMoreScreen(
             )
         }
 
-        is NativeOwnerMoreState.LoadFailure -> ManagerScaffold(
+        is NativeOwnerMoreState.LoadFailure -> mgrScaffold(
             snackbarHostState,
-            ManagerSection.More,
-            onNavigate,
             modifier,
         ) { padding ->
             Column(
@@ -202,7 +194,7 @@ fun ManagerMoreScreen(
                 onOpenEmployees = onOpenEmployees,
                 onSwitchAccount = onSwitchAccount,
                 onSignOut = onSignOut,
-                onNavigate = onNavigate,
+                mgrScaffold = mgrScaffold,
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.PersonalSecurity -> ManagerMorePersonalSecurityScreen(
@@ -215,7 +207,7 @@ fun ManagerMoreScreen(
                 onRemove = onRemoveQuickUnlock,
                 onEnrollPin = onEnrollQuickPin,
                 onEnrollPhone = onEnrollPhoneSecurity,
-                onNavigate = onNavigate,
+                mgrScaffold = mgrScaffold,
                 modifier = modifier,
             )
             NativeOwnerMoreDestination.Products -> Box(
@@ -362,7 +354,7 @@ fun ManagerMoreScreen(
                     onOpenEmployees = onOpenEmployees,
                     onSwitchAccount = onSwitchAccount,
                     onSignOut = onSignOut,
-                    onNavigate = onNavigate,
+                    mgrScaffold = mgrScaffold,
                     modifier = modifier,
                 )
             }
@@ -383,10 +375,10 @@ private fun ManagerMoreMenuScreen(
     onOpenEmployees: () -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
-    onNavigate: (ManagerSection) -> Unit,
+    mgrScaffold: MgrScaffold,
     modifier: Modifier,
 ) {
-    ManagerScaffold(snackbarHostState, ManagerSection.More, onNavigate, modifier) { padding ->
+    mgrScaffold(snackbarHostState, modifier) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
@@ -476,7 +468,7 @@ private fun ManagerMorePersonalSecurityScreen(
     onRemove: (CharArray) -> Unit,
     onEnrollPin: (CharArray, CharArray) -> Unit,
     onEnrollPhone: (CharArray, CharArray?) -> Unit,
-    onNavigate: (ManagerSection) -> Unit,
+    mgrScaffold: MgrScaffold,
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBack)
@@ -505,7 +497,7 @@ private fun ManagerMorePersonalSecurityScreen(
         )
     }
 
-    ManagerScaffold(snackbarHostState, ManagerSection.More, onNavigate, modifier) { padding ->
+    mgrScaffold(snackbarHostState, modifier) { padding ->
         Column(
             Modifier
                 .fillMaxSize()

@@ -32,7 +32,7 @@ fun ManagerExpenseEntryScreen(
     onRecordExpense: (NativeExpenseRequest) -> Unit,
     onRecordAnother: () -> Unit,
     onBackToWork: () -> Unit,
-    onNavigate: (ManagerSection) -> Unit,
+    mgrScaffold: MgrScaffold,
     modifier: Modifier = Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -50,15 +50,9 @@ fun ManagerExpenseEntryScreen(
             .fillMaxSize()
             .testTag(NativeUiTags.ManagerExpenseEntryRoot),
     ) {
-        ManagerScaffold(
-            snackbarHostState = snackbarHostState,
-            section = ManagerSection.Work,
-            onNavigate = { section ->
-                if (canLeave) {
-                    leaveGuard.requestLeave { onNavigate(section) }
-                }
-            },
-            modifier = Modifier.fillMaxSize(),
+        mgrScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
         ) { padding ->
             when (state) {
                 NativeExpenseState.Idle,

@@ -254,7 +254,15 @@ fun ManagerPreviewHost(
                     onSendAsDelivery = saleViewModel::sendAsDelivery,
                     onStartNextSale = saleViewModel::startNextSale,
                     onBackToWork = { returnManagerWorkHome() },
-                    onNavigate = navigate,
+                    mgrScaffold = { s, m, content ->
+                        ManagerScaffold(
+                            snackbarHostState = s,
+                            section = ManagerSection.Work,
+                            onNavigate = navigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == ManagerSection.Work &&
@@ -273,7 +281,15 @@ fun ManagerPreviewHost(
                         )
                     },
                     onBackToWork = { returnManagerWorkHome() },
-                    onNavigate = navigate,
+                    mgrScaffold = { s, m, content ->
+                        ManagerScaffold(
+                            snackbarHostState = s,
+                            section = ManagerSection.Work,
+                            onNavigate = navigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == ManagerSection.Work &&
@@ -286,7 +302,15 @@ fun ManagerPreviewHost(
                     onRecordExpense = expenseViewModel::record,
                     onRecordAnother = expenseViewModel::recordAnother,
                     onBackToWork = { returnManagerWorkHome() },
-                    onNavigate = navigate,
+                    mgrScaffold = { s, m, content ->
+                        ManagerScaffold(
+                            snackbarHostState = s,
+                            section = ManagerSection.Work,
+                            onNavigate = navigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == ManagerSection.Work &&
@@ -299,7 +323,15 @@ fun ManagerPreviewHost(
                     onRecordPayment = vendorPaymentViewModel::record,
                     onRecordAnother = vendorPaymentViewModel::recordAnother,
                     onBackToWork = { returnManagerWorkHome() },
-                    onNavigate = navigate,
+                    mgrScaffold = { s, m, content ->
+                        ManagerScaffold(
+                            snackbarHostState = s,
+                            section = ManagerSection.Work,
+                            onNavigate = navigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == ManagerSection.Work &&
@@ -316,7 +348,15 @@ fun ManagerPreviewHost(
                     onRecord = receiveMilkViewModel::record,
                     onReceiveAnother = receiveMilkViewModel::receiveAnother,
                     onBackToWork = { returnManagerWorkHome() },
-                    onNavigate = navigate,
+                    mgrScaffold = { s, m, content ->
+                        ManagerScaffold(
+                            snackbarHostState = s,
+                            section = ManagerSection.Work,
+                            onNavigate = navigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == ManagerSection.Work &&
@@ -329,7 +369,15 @@ fun ManagerPreviewHost(
                     onRecord = makeYogurtViewModel::record,
                     onMakeAnother = makeYogurtViewModel::makeAnother,
                     onBackToWork = { returnManagerWorkHome() },
-                    onNavigate = navigate,
+                    mgrScaffold = { s, m, content ->
+                        ManagerScaffold(
+                            snackbarHostState = s,
+                            section = ManagerSection.Work,
+                            onNavigate = navigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == ManagerSection.Work &&
@@ -348,7 +396,15 @@ fun ManagerPreviewHost(
                     onRecord = recordSpoilageViewModel::record,
                     onRecordAnother = recordSpoilageViewModel::recordAnother,
                     onBackToWork = { returnManagerWorkHome() },
-                    onNavigate = navigate,
+                    mgrScaffold = { s, m, content ->
+                        ManagerScaffold(
+                            snackbarHostState = s,
+                            section = ManagerSection.Work,
+                            onNavigate = navigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == ManagerSection.Work &&
@@ -370,7 +426,15 @@ fun ManagerPreviewHost(
                     onArchive = deliveriesViewModel::archiveDelivery,
                         onLinkSale = deliveriesViewModel::linkSale,
                     onBackToWork = { returnManagerWorkHome() },
-                    onNavigate = navigate,
+                    mgrScaffold = { s, m, content ->
+                        ManagerScaffold(
+                            snackbarHostState = s,
+                            section = ManagerSection.Work,
+                            onNavigate = navigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == ManagerSection.Close -> {
@@ -384,7 +448,15 @@ fun ManagerPreviewHost(
                     onBackToWork = {
                         onManagerSectionChange(ManagerSection.Work)
                     },
-                    onNavigate = navigate,
+                    mgrScaffold = { s, m, content ->
+                        ManagerScaffold(
+                            snackbarHostState = s,
+                            section = ManagerSection.Close,
+                            onNavigate = navigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == ManagerSection.Work -> {
@@ -398,7 +470,15 @@ fun ManagerPreviewHost(
                     onLeaveConfirmed = {
                         // Stay on Work home; session remains authenticated.
                     },
-                    onNavigate = navigate,
+                    mgrScaffold = { s, m, content ->
+                        ManagerScaffold(
+                            snackbarHostState = s,
+                            section = ManagerSection.Work,
+                            onNavigate = navigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
             section == ManagerSection.Records -> {
@@ -489,7 +569,15 @@ fun ManagerPreviewHost(
                     onEnrollPhoneSecurity = ownerMoreViewModel::enrollPhoneSecurity,
                     onSwitchAccount = onLeaveToAccountPicker,
                     onSignOut = onLeaveToWelcome,
-                    onNavigate = navigate,
+                    mgrScaffold = { s, m, content ->
+                        ManagerScaffold(
+                            snackbarHostState = s,
+                            section = ManagerSection.More,
+                            onNavigate = navigate,
+                            modifier = m,
+                            content = content,
+                        )
+                    },
                 )
             }
         }

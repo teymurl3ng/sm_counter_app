@@ -34,7 +34,7 @@ fun ManagerCollectionEntryScreen(
     onCollectAnother: () -> Unit,
     onViewRecord: (Long) -> Unit,
     onBackToWork: () -> Unit,
-    onNavigate: (ManagerSection) -> Unit,
+    mgrScaffold: MgrScaffold,
     modifier: Modifier = Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -52,15 +52,9 @@ fun ManagerCollectionEntryScreen(
             .fillMaxSize()
             .testTag(NativeUiTags.ManagerCollectionEntryRoot),
     ) {
-        ManagerScaffold(
-            snackbarHostState = snackbarHostState,
-            section = ManagerSection.Work,
-            onNavigate = { section ->
-                if (canLeave) {
-                    leaveGuard.requestLeave { onNavigate(section) }
-                }
-            },
-            modifier = Modifier.fillMaxSize(),
+        mgrScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
         ) { padding ->
             when (state) {
                 NativeCollectionState.Idle,

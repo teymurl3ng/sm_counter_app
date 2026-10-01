@@ -31,7 +31,7 @@ fun ManagerDeliveriesEntryScreen(
     draftActions: NativeDeliveriesDraftActions,
     onArchive: (Long) -> Unit,
     onBackToWork: () -> Unit,
-    onNavigate: (ManagerSection) -> Unit,
+    mgrScaffold: MgrScaffold,
     modifier: Modifier = Modifier,
 ) {
     BackHandler(onBack = onBackToWork)
@@ -41,11 +41,9 @@ fun ManagerDeliveriesEntryScreen(
             .fillMaxSize()
             .testTag(NativeUiTags.ManagerDeliveriesEntryRoot),
     ) {
-        ManagerScaffold(
-            snackbarHostState = snackbarHostState,
-            section = ManagerSection.Work,
-            onNavigate = onNavigate,
-            modifier = Modifier.fillMaxSize(),
+        mgrScaffold(
+            snackbarHostState,
+            Modifier.fillMaxSize(),
         ) { padding ->
             when (state) {
                 NativeDeliveriesState.Idle,

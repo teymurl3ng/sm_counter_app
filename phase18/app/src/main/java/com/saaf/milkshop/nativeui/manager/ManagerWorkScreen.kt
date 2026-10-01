@@ -51,6 +51,13 @@ import com.saaf.milkshop.nativeui.common.pressScale
 import com.saaf.milkshop.nativeui.common.rememberPressSource
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 
+/** Injected shell for Manager panes; mirrors common/HostedScaffold minus the nav-action wrap. */
+typealias MgrScaffold = @Composable (
+    snackbarHostState: SnackbarHostState,
+    modifier: Modifier,
+    content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit,
+) -> Unit
+
 /**
  * Manager Work desk — Owner Work launcher density under Manager chrome.
  * Product IA excludes Pay salary, costing, shop settings, users, backup, reopen.
@@ -65,7 +72,7 @@ fun ManagerWorkScreen(
     onOpenClose: () -> Unit,
     onBackToHome: () -> Unit,
     onLeaveConfirmed: () -> Unit,
-    onNavigate: (ManagerSection) -> Unit,
+    mgrScaffold: MgrScaffold,
     modifier: Modifier = Modifier,
 ) {
     NativeSectionTransition(
@@ -74,7 +81,7 @@ fun ManagerWorkScreen(
     ) { state -> when (state) {
         NativeManagerWorkState.Idle,
         NativeManagerWorkState.Loading,
-        -> ManagerScaffold(snackbarHostState, ManagerSection.Work, onNavigate, modifier) {
+        -> mgrScaffold(snackbarHostState, modifier) {
             NativeColdLoadingPane(
                 label = "Loading today's work…",
                 modifier = Modifier
@@ -82,8 +89,8 @@ fun ManagerWorkScreen(
                     .testTag(NativeUiTags.ManagerWorkLoading),
             )
         }
-        is NativeManagerWorkState.LoadFailure -> ManagerScaffold(
-            snackbarHostState, ManagerSection.Work, onNavigate, modifier,
+        is NativeManagerWorkState.LoadFailure -> mgrScaffold(
+            snackbarHostState, modifier,
         ) { padding ->
             Column(
                 Modifier
@@ -106,7 +113,7 @@ fun ManagerWorkScreen(
             onOpenClose = onOpenClose,
             onBackToHome = onBackToHome,
             onLeaveConfirmed = onLeaveConfirmed,
-            onNavigate = onNavigate,
+            mgrScaffold = mgrScaffold,
             modifier = modifier,
         )
     }
@@ -121,13 +128,13 @@ private fun ReadyWork(
     onOpenClose: () -> Unit,
     onBackToHome: () -> Unit,
     onLeaveConfirmed: () -> Unit,
-    onNavigate: (ManagerSection) -> Unit,
+    mgrScaffold: MgrScaffold,
     modifier: Modifier,
 ) {
     when (state.destination) {
         NativeManagerWorkDestination.Home -> {
             BackHandler(onBack = onLeaveConfirmed)
-            ManagerScaffold(snackbarHostState, ManagerSection.Work, onNavigate, modifier) { padding ->
+            mgrScaffold(snackbarHostState, modifier) { padding ->
                 Column(
                     Modifier
                         .fillMaxSize().nativeRefreshOverlay(state.refreshing)
@@ -163,7 +170,7 @@ private fun ReadyWork(
         -> {
             // Hosted by ManagerPreviewHost via Manager*EntryScreen wrappers.
             BackHandler(onBack = onBackToHome)
-            ManagerScaffold(snackbarHostState, ManagerSection.Work, onNavigate, modifier) { padding ->
+            mgrScaffold(snackbarHostState, modifier) { padding ->
                 Column(
                     Modifier
                         .fillMaxSize()

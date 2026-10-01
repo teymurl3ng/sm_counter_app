@@ -85,7 +85,6 @@ fun DeliveriesScreen(
     onLinkSale: (Long, String) -> Unit,
     draftActions: NativeDeliveriesDraftActions,
     onArchive: (Long) -> Unit,
-    onLeaveConfirmed: () -> Unit,
     workScaffold: OpsScaffold,
     modifier: Modifier = Modifier,
 ) {

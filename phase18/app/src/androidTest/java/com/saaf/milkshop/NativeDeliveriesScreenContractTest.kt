@@ -216,7 +216,6 @@ class NativeDeliveriesScreenContractTest {
                             content = content,
                         )
                     },
-                    onLeaveConfirmed = {},
                 )
             }
         }

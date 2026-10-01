@@ -412,7 +412,6 @@ class NativeOwnerMoreScreenContractTest {
                             content = content,
                         )
                     },
-                    onLeaveConfirmed = {},
                 )
             }
         }

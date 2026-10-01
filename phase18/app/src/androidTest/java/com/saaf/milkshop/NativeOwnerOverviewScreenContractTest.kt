@@ -146,7 +146,6 @@ class NativeOwnerOverviewScreenContractTest {
                     state = state,
                     section = section,
                     onRetry = {},
-                    onLeaveConfirmed = {},
                     ownScaffold = { s, m, content ->
                         OwnerScaffold(
                             snackbarHostState = s,

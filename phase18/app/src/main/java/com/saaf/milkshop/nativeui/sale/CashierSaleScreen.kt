@@ -138,14 +138,12 @@ fun CashierSaleScreen(
     onRecordSale: (NativeSaleRequest) -> Unit,
     onSendAsDelivery: (String) -> Unit,
     onStartNextSale: () -> Unit,
-    onLeaveConfirmed: () -> Unit,
     onNavigate: (CashierSection) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onRegisterGuard: (EntryLeaveGuard?) -> Unit = {},
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
-    val canLeave = (state as? NativeSaleState.Ready)?.saving != true
     LaunchedEffect(state is NativeSaleState.Ready) {
         if (state !is NativeSaleState.Ready) leaveGuard.clear()
     }
@@ -153,9 +151,9 @@ fun CashierSaleScreen(
         onRegisterGuard(leaveGuard)
         onDispose { onRegisterGuard(null) }
     }
-    BackHandler {
-        if (canLeave) leaveGuard.requestLeave(onLeaveConfirmed)
-    }
+    // T17: back at the Sell root is swallowed, dirty draft included —
+    // back must never discard a sale or end the session.
+    BackHandler { }
     Column(modifier = modifier.fillMaxSize().padding(contentPadding)) {
         NativeSectionTransition(
             targetState = state,

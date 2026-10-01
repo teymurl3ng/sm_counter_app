@@ -86,7 +86,6 @@ fun OperationsMoreScreen(
     onEnrollPhoneSecurity: (CharArray, CharArray?) -> Unit,
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
-    onLeaveConfirmed: () -> Unit,
     moreScaffold: OpsScaffold,
     modifier: Modifier = Modifier,
 ) {

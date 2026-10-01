@@ -39,7 +39,6 @@ fun OwnerOverviewScreen(
     state: NativeOwnerOverviewState,
     section: OwnerSection,
     onRetry: () -> Unit,
-    onLeaveConfirmed: () -> Unit,
     onAttentionReview: () -> Unit = {},
     onOpenCashCount: () -> Unit = {},
     onOpenMonthReports: () -> Unit = {},
@@ -80,7 +79,8 @@ fun OwnerOverviewScreen(
                 }
             }
             is NativeOwnerOverviewState.Ready -> {
-                BackHandler(onBack = onLeaveConfirmed)
+                // T17: back at a section root is swallowed — the session stays.
+                BackHandler { }
                 ownScaffold(snackbarHostState, modifier) { padding ->
                     Column(
                         Modifier

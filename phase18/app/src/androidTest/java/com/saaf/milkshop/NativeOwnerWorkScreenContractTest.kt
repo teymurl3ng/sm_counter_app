@@ -210,7 +210,6 @@ class NativeOwnerWorkScreenContractTest {
                     onRetry = onRetry,
                     onOpenDestination = onOpenDestination,
                     onBackToHome = onBackToHome,
-                    onLeaveConfirmed = {},
                     ownScaffold = { s, m, content ->
                         OwnerScaffold(
                             snackbarHostState = s,

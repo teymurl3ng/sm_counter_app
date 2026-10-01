@@ -222,7 +222,6 @@ class NativeOwnerRecordsScreenContractTest {
                     onSearchQueryChange = onSearchQueryChange,
                     onOpenRecord = onOpenRecord,
                     onBackFromDetail = onBackFromDetail,
-                    onLeaveConfirmed = {},
                     hostedScaffold = { snackbar, mod, wrapNav, content ->
                         com.saaf.milkshop.nativeui.owner.OwnerScaffold(
                             snackbarHostState = snackbar,

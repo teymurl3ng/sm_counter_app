@@ -114,7 +114,6 @@ class NativeOperationsMoreScreenContractTest {
                             content = content,
                         )
                     },
-                    onLeaveConfirmed = {},
                 )
             }
         }

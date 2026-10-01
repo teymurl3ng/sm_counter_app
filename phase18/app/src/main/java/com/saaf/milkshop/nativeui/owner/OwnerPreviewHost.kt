@@ -279,15 +279,14 @@ fun OwnerPreviewHost(
                 !ownerReportsOwnsBack,
         ) {
             when (ownerSection) {
-                OwnerSection.Overview -> onLeaveToWelcome()
+                // T17: back at a section root is swallowed — the session stays.
+                OwnerSection.Overview -> Unit
                 OwnerSection.Work -> {
                     val ready = ownerWorkState as? NativeOwnerWorkState.Ready
                     if (ready != null &&
                         ready.destination != NativeOwnerWorkDestination.Home
                     ) {
                         returnOwnerWorkHome()
-                    } else {
-                        onLeaveToWelcome()
                     }
                 }
                 OwnerSection.Records -> {
@@ -295,7 +294,6 @@ fun OwnerPreviewHost(
                     when {
                         ready?.correction != null -> ownerRecordsViewModel.clearCorrection()
                         ready?.detail != null -> ownerRecordsViewModel.clearDetail()
-                        else -> onLeaveToWelcome()
                     }
                 }
                 OwnerSection.More -> {
@@ -399,7 +397,8 @@ fun OwnerPreviewHost(
                             }
                         NativeOwnerMoreDestination.Sync ->
                             ownerMoreViewModel.backToMenu()
-                        else -> onLeaveToWelcome()
+                        // T17: More root is a section root — swallow, no sign-out.
+                        else -> Unit
                     }
                 }
             }
@@ -677,7 +676,6 @@ fun OwnerPreviewHost(
                             }
                         }
                     },
-                    onLeaveConfirmed = onLeaveToWelcome,
                 )
             }
             section == OwnerSection.Records -> {
@@ -690,7 +688,6 @@ fun OwnerPreviewHost(
                     onBackFromDetail = ownerRecordsViewModel::clearDetail,
                     onOpenLedger = ownerRecordsViewModel::openLedger,
                     onBackFromLedger = ownerRecordsViewModel::clearLedger,
-                    onLeaveConfirmed = onLeaveToWelcome,
                     hostedScaffold = { _, mod, _, content ->
                         Box(modifier = mod.testTag(NativeUiTags.OwnerShellRoot)) {
                             CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
@@ -931,7 +928,6 @@ fun OwnerPreviewHost(
                     onRetry = ownerWorkViewModel::refresh,
                     onOpenDestination = ownerWorkViewModel::openDestination,
                     onBackToHome = { returnOwnerWorkHome() },
-                    onLeaveConfirmed = onLeaveToWelcome,
                     ownScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.OwnerShellRoot)) {
                             CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
@@ -966,7 +962,6 @@ fun OwnerPreviewHost(
                         state = ownerOverviewState,
                         section = ownerSection,
                         onRetry = ownerOverviewViewModel::refresh,
-                        onLeaveConfirmed = onLeaveToWelcome,
                         onAttentionReview = {
                             onOwnerSectionChange(OwnerSection.Work)
                             ownerWorkViewModel.openDestination(NativeOwnerWorkDestination.CashCountAndClose)

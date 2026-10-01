@@ -74,7 +74,6 @@ fun OwnerRecordsScreen(
     onBackFromDetail: () -> Unit,
     onOpenLedger: (Long) -> Unit = {},
     onBackFromLedger: () -> Unit = {},
-    onLeaveConfirmed: () -> Unit,
     hostedScaffold: HostedScaffold,
     roleLabel: String = "Owner",
     rootTag: String = NativeUiTags.OwnerRecordsRoot,
@@ -180,7 +179,6 @@ fun OwnerRecordsScreen(
                     onSearchQueryChange = onSearchQueryChange,
                     onOpenRecord = onOpenRecord,
                     onOpenLedger = onOpenLedger,
-                    onLeaveConfirmed = onLeaveConfirmed,
                     hostedScaffold = hostedScaffold,
                     roleLabel = roleLabel,
                     showHeader = showHeader,
@@ -203,7 +201,6 @@ private fun RecordsListBody(
     onSearchQueryChange: (String) -> Unit,
     onOpenRecord: (Long) -> Unit,
     onOpenLedger: (Long) -> Unit,
-    onLeaveConfirmed: () -> Unit,
     hostedScaffold: HostedScaffold,
     roleLabel: String,
     showHeader: Boolean,
@@ -212,7 +209,8 @@ private fun RecordsListBody(
     onSelectGroup: (NativeRecordsGroup) -> Unit,
     modifier: Modifier,
 ) {
-    BackHandler(onBack = onLeaveConfirmed)
+    // T17: back at a section root is swallowed — the session stays.
+    BackHandler { }
     hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier

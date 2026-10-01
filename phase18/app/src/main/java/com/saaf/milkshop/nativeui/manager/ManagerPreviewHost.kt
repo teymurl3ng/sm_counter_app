@@ -523,7 +523,6 @@ fun ManagerPreviewHost(
                     onBackFromDetail = ownerRecordsViewModel::clearDetail,
                     onOpenLedger = ownerRecordsViewModel::openLedger,
                     onBackFromLedger = ownerRecordsViewModel::clearLedger,
-                    onLeaveConfirmed = { onManagerSectionChange(ManagerSection.Work) },
                     hostedScaffold = { snackbar, mod, wrapNav, content ->
                         ManagerScaffold(
                             snackbarHostState = snackbar,

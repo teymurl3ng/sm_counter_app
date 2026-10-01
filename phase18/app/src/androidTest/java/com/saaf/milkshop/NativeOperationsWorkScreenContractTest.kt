@@ -151,7 +151,6 @@ class NativeOperationsWorkScreenContractTest {
                     onOpenMakeYogurt = onOpenMakeYogurt,
                     onOpenRecordSpoilage = onOpenRecordSpoilage,
                     onBackToHome = {},
-                    onLeaveConfirmed = {},
                     workScaffold = { s, m, content ->
                         WorkScaffold(
                             snackbarHostState = s,

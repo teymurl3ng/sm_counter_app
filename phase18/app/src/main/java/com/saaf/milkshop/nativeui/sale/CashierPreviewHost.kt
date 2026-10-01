@@ -180,7 +180,8 @@ fun CashierPreviewHost(
                         onCashierSectionChange(CashierSection.Sell)
                     }
                 }
-                else -> onLeaveToWelcome()
+                // T17: Sell/other roots are section roots — swallow, no sign-out.
+                else -> Unit
             }
         }
         val moreDestination = (moreState as? NativeMoreState.Ready)?.destination
@@ -301,7 +302,6 @@ fun CashierPreviewHost(
                 onRecordSale = saleViewModel::record,
                     onSendAsDelivery = saleViewModel::sendAsDelivery,
                     onStartNextSale = saleViewModel::startNextSale,
-                onLeaveConfirmed = onLeaveToWelcome,
                 onNavigate = navigateCashier,
             )
             CashierSection.Collect -> CashierCollectionScreen(

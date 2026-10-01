@@ -96,7 +96,6 @@ class NativeAttendanceScreenContractTest {
                             content = content,
                         )
                     },
-                    onLeaveConfirmed = {},
                 )
             }
         }

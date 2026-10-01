@@ -126,9 +126,8 @@ fun OperationsPreviewHost(
                         ready.destination != NativeOperationsWorkDestination.Home
                     ) {
                         operationsWorkViewModel.backToHome()
-                    } else {
-                        onLeaveToWelcome()
                     }
+                    // T17: Work root is a section root — swallow, no sign-out.
                 }
                 OperationsSection.More -> {
                     val ready = operationsMoreState as? NativeOperationsMoreState.Ready
@@ -251,7 +250,6 @@ fun OperationsPreviewHost(
                             content(PaddingValues(0.dp))
                         }
                     },
-                    onLeaveConfirmed = onLeaveToWelcome,
                 )
             }
             section == OperationsSection.Attendance -> {
@@ -266,7 +264,6 @@ fun OperationsPreviewHost(
                             content(PaddingValues(0.dp))
                         }
                     },
-                    onLeaveConfirmed = onLeaveToWelcome,
                 )
             }
             section == OperationsSection.More -> {
@@ -290,7 +287,6 @@ fun OperationsPreviewHost(
                             content(PaddingValues(0.dp))
                         }
                     },
-                    onLeaveConfirmed = onLeaveToWelcome,
                 )
             }
             section == OperationsSection.Work &&
@@ -383,7 +379,6 @@ fun OperationsPreviewHost(
                         recordSpoilageViewModel.open(sessionHandle)
                     },
                     onBackToHome = operationsWorkViewModel::backToHome,
-                    onLeaveConfirmed = onLeaveToWelcome,
                     workScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.OpsWorkRoot)) {
                             content(PaddingValues(0.dp))

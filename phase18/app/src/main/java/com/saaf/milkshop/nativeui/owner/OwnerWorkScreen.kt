@@ -55,7 +55,6 @@ fun OwnerWorkScreen(
     onRetry: () -> Unit,
     onOpenDestination: (NativeOwnerWorkDestination) -> Unit,
     onBackToHome: () -> Unit,
-    onLeaveConfirmed: () -> Unit,
     ownScaffold: OwnScaffold,
     modifier: Modifier = Modifier,
 ) {
@@ -96,7 +95,6 @@ fun OwnerWorkScreen(
             state = state,
             onOpenDestination = onOpenDestination,
             onBackToHome = onBackToHome,
-            onLeaveConfirmed = onLeaveConfirmed,
             ownScaffold = ownScaffold,
             modifier = modifier,
         )
@@ -110,13 +108,13 @@ private fun ReadyWork(
     state: NativeOwnerWorkState.Ready,
     onOpenDestination: (NativeOwnerWorkDestination) -> Unit,
     onBackToHome: () -> Unit,
-    onLeaveConfirmed: () -> Unit,
     ownScaffold: OwnScaffold,
     modifier: Modifier,
 ) {
     when (state.destination) {
         NativeOwnerWorkDestination.Home -> {
-            BackHandler(onBack = onLeaveConfirmed)
+            // T17: back at a section root is swallowed — the session stays.
+            BackHandler { }
             ownScaffold(snackbarHostState, modifier) { padding ->
                 Column(
                     Modifier

@@ -76,7 +76,6 @@ fun OperationsWorkScreen(
     onOpenMakeYogurt: () -> Unit,
     onOpenRecordSpoilage: () -> Unit,
     onBackToHome: () -> Unit,
-    onLeaveConfirmed: () -> Unit,
     workScaffold: OpsScaffold,
     modifier: Modifier = Modifier,
 ) {
@@ -120,7 +119,6 @@ fun OperationsWorkScreen(
                 onOpenMakeYogurt = onOpenMakeYogurt,
                 onOpenRecordSpoilage = onOpenRecordSpoilage,
                 onBackToHome = onBackToHome,
-                onLeaveConfirmed = onLeaveConfirmed,
                 workScaffold = workScaffold,
                 modifier = modifier,
             )
@@ -165,13 +163,13 @@ private fun ReadyWork(
     onOpenMakeYogurt: () -> Unit,
     onOpenRecordSpoilage: () -> Unit,
     onBackToHome: () -> Unit,
-    onLeaveConfirmed: () -> Unit,
     workScaffold: OpsScaffold,
     modifier: Modifier = Modifier,
 ) {
     when (state.destination) {
         NativeOperationsWorkDestination.Home -> {
-            BackHandler(onBack = onLeaveConfirmed)
+            // T17: back at the Work root is swallowed — the session stays.
+            BackHandler { }
             workScaffold(snackbarHostState, modifier) { padding ->
                 Column(
                     Modifier

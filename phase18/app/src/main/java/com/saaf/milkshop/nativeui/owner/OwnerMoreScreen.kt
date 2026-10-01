@@ -214,7 +214,6 @@ fun OwnerMoreScreen(
     onSwitchAccount: () -> Unit,
     onSignOut: () -> Unit,
     hostedScaffold: HostedScaffold,
-    onLeaveConfirmed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     NativeSectionTransition(

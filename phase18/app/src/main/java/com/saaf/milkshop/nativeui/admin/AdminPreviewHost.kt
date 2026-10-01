@@ -435,7 +435,6 @@ fun AdminPreviewHost(
                     onRetrySecurityHistory = ownerMoreViewModel::refreshSecurityHistory,
                     onOpenSecurityAudit = ownerMoreViewModel::openSecurityAuditDetail,
                     onBackFromSecurityAuditDetail = ownerMoreViewModel::clearSecurityAuditDetail,
-                    onLeaveConfirmed = { onAdminSectionChange(AdminSection.Work) },
                     onDeferredGroup = { group ->
                         onShowNotice(
                             "$group comes next in the Admin Records family.",

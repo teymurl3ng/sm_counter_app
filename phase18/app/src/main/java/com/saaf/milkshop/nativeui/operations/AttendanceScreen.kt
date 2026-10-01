@@ -56,7 +56,6 @@ fun AttendanceScreen(
     state: NativeAttendanceState,
     onRetry: () -> Unit,
     onMarkPresent: () -> Unit,
-    onLeaveConfirmed: () -> Unit,
     attendanceScaffold: OpsScaffold,
     modifier: Modifier = Modifier,
 ) {
@@ -66,14 +65,13 @@ fun AttendanceScreen(
     ) { state -> when (state) {
         NativeAttendanceState.Idle,
         NativeAttendanceState.Loading,
-        -> AttendanceLoading(snackbarHostState, attendanceScaffold, onLeaveConfirmed, modifier)
+        -> AttendanceLoading(snackbarHostState, attendanceScaffold, modifier)
 
         is NativeAttendanceState.LoadFailure -> AttendanceLoadFailure(
             snackbarHostState = snackbarHostState,
             message = state.message,
             onRetry = onRetry,
             attendanceScaffold = attendanceScaffold,
-            onLeaveConfirmed = onLeaveConfirmed,
             modifier = modifier,
         )
 
@@ -83,7 +81,6 @@ fun AttendanceScreen(
             state = state,
             onMarkPresent = onMarkPresent,
             attendanceScaffold = attendanceScaffold,
-            onLeaveConfirmed = onLeaveConfirmed,
             modifier = modifier,
         )
     }
@@ -94,7 +91,6 @@ fun AttendanceScreen(
 private fun AttendanceLoading(
     snackbarHostState: SnackbarHostState,
     attendanceScaffold: OpsScaffold,
-    onLeaveConfirmed: () -> Unit,
     modifier: Modifier,
 ) {
     attendanceScaffold(snackbarHostState, modifier) {
@@ -111,7 +107,6 @@ private fun AttendanceLoadFailure(
     message: String,
     onRetry: () -> Unit,
     attendanceScaffold: OpsScaffold,
-    onLeaveConfirmed: () -> Unit,
     modifier: Modifier,
 ) {
     attendanceScaffold(snackbarHostState, modifier) { padding ->
@@ -131,7 +126,6 @@ private fun AttendanceReady(
     state: NativeAttendanceState.Ready,
     onMarkPresent: () -> Unit,
     attendanceScaffold: OpsScaffold,
-    onLeaveConfirmed: () -> Unit,
     modifier: Modifier,
 ) {
     attendanceScaffold(snackbarHostState, modifier) { padding ->

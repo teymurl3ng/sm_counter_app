@@ -204,17 +204,16 @@ class NativeFoundationUiTest {
     }
 
     @Test
-    fun cashierSystemBackEndsSessionBeforeReturningToAccountPicker() {
+    fun cashierSystemBackKeepsSessionOnSellRoot() {
         openCashier()
 
         composeRule.activityRule.scenario.onActivity { activity ->
             activity.onBackPressedDispatcher.onBackPressed()
-            assertNull((activity.application as MilkShopApplication).currentSessionId)
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
         }
 
-        composeRule.onNodeWithText("Saaf Milk").assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.WelcomeContinue).performClick()
-        waitForText("Who is using Saaf?")
+        // T17: back at the Sell root is swallowed — the session stays put.
+        composeRule.onNodeWithText("New sale").assertIsDisplayed()
     }
 
     @Test
@@ -2205,18 +2204,16 @@ class NativeFoundationUiTest {
     }
 
     @Test
-    fun operationsWorkHardwareBackEndsSessionLikeSell() {
+    fun operationsWorkHardwareBackKeepsSessionOnWorkRoot() {
         openOperationsWork()
 
         composeRule.activityRule.scenario.onActivity { activity ->
-            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
             activity.onBackPressedDispatcher.onBackPressed()
-            assertNull((activity.application as MilkShopApplication).currentSessionId)
+            assertNotNull((activity.application as MilkShopApplication).currentSessionId)
         }
 
-        composeRule.onNodeWithText("Saaf Milk").assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.WelcomeContinue).performClick()
-        waitForText("Who is using Saaf?")
+        // T17: back at the Work root is swallowed — the session stays put.
+        composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).assertIsDisplayed()
     }
 
     @Test
@@ -2655,19 +2652,16 @@ class NativeFoundationUiTest {
     }
 
     @Test
-    fun editedDraftRequiresExplicitBackChoice() {
+    fun editedDraftSurvivesSystemBack() {
         openCashier()
         composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).performTextReplacement("3.5")
         composeRule.waitForIdle()
 
+        // T17: back at the Sell root is swallowed, dirty draft included —
+        // no discard dialog, no sign-out, the draft stays.
         composeRule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
-        composeRule.onNodeWithText("Discard this sale draft?").assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.CashierKeepDraft).performClick()
+        composeRule.onNodeWithText("New sale").assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).assertTextEquals("3.5")
-
-        composeRule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
-        composeRule.onNodeWithTag(NativeUiTags.CashierDiscardDraft).performClick()
-        composeRule.onNodeWithText("Saaf Milk").assertIsDisplayed()
     }
 
     private fun openCashier() {

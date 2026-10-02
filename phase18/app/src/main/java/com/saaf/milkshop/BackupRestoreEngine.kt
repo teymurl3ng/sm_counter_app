@@ -148,9 +148,21 @@ internal class BackupRestoreEngine(
                     backupDao.backfillVendorProfiles()
                     backupDao.backfillEmployeeProfiles()
                     backupDao.backfillExpenseCategoryProfiles()
-                    // The pull cursor rides in the snapshot so a replaced
-                    // device resumes exactly where its backup left off.
-                    backupDao.insertSyncPullState(readSyncPullState(data.optJSONArray("sync_pull_state")))
+                    // C1: the restore path resets the pull cursor to 0 rather
+                    // than resuming from the snapshot's cursor — parked rows
+                    // do not ride in backups, so a full idempotent re-pull is
+                    // what guarantees nothing was lost, and a stale cursor can
+                    // never skip server rows a fresh device has not seen.
+                    backupDao.insertSyncPullState(
+                        listOf(
+                            com.saaf.milkshop.data.SyncPullStateEntity(
+                                stateId = 1,
+                                lastServerSeq = 0L,
+                                updatedAt = java.time.Instant.now().toString(),
+                            ),
+                        ),
+                    )
+                    database.syncParkedRowDao().clear()
                     Phase3CostingMigrationSql.immutableTriggers.forEach { executeSQL(it) }
                     SyncMigrationSql.captureTriggers.forEach { executeSQL(it) }
                     if (includeSecurity) {

@@ -35,6 +35,11 @@ class SyncServerClient(
         val body = JSONObject()
             .put("device_id", SyncIdentity.currentOrNull())
             .put("envelopes", JSONArray(envelopes))
+            // C1 true-conflict detection: the server compares each existing
+            // row's server_seq against this cursor — a pusher overwriting a
+            // version it never saw is a conflict; one re-pushing its own
+            // echo is not. Pre-migration servers ignore the extra key.
+            .put("pull_cursor", database.syncPullStateDao().find()?.lastServerSeq ?: 0L)
             .apply {
                 shopIdProvider?.invoke()?.takeIf { it.isNotEmpty() }?.let { shopId -> put("shop_id", shopId) }
             }

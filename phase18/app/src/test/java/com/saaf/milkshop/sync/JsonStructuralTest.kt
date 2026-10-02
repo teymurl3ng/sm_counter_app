@@ -65,4 +65,24 @@ class JsonStructuralTest {
         val arrB = JSONArray().put(2).put(1)
         assertFalse(jsonStructurallyEqual(arrA, arrB))
     }
+
+    @Test
+    fun largeLongs_aboveDoublePrecision_compareExactly() {
+        // Review finding (go 7): a double round-trip collapses distinct Longs
+        // above 2^53. Two epoch-style longs one apart must stay unequal.
+        val base = 9_000_000_000_000_000_001L // > 2^63? no — > 2^53, < Long.MAX
+        val a = JSONObject().put("v", base)
+        val b = JSONObject().put("v", base + 1)
+        assertFalse(jsonStructurallyEqual(a, b))
+        // Cross-width integer equality stays exact (Int vs Long).
+        assertTrue(jsonStructurallyEqual(
+            JSONObject().put("v", 10),
+            JSONObject().put("v", 10L),
+        ))
+        // "10" (string) vs 10 (number) stays unequal — deliberate.
+        assertFalse(jsonStructurallyEqual(
+            JSONObject().put("v", "10"),
+            JSONObject().put("v", 10),
+        ))
+    }
 }

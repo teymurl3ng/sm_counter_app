@@ -71,6 +71,13 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                     val result = applyOne(record)
                     executeSQL("RELEASE record_apply")
                     result
+                } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                    executeSQL("ROLLBACK TO record_apply")
+                    executeSQL("RELEASE record_apply")
+                    // Review finding (go 7): cancellation is not a record
+                    // failure — never convert it to a skip/audit; rethrow so
+                    // the worker stops and the batch retries whole.
+                    throw cancelled
                 } catch (failure: Throwable) {
                     executeSQL("ROLLBACK TO record_apply")
                     executeSQL("RELEASE record_apply")
@@ -133,6 +140,9 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                 "store_profile" -> applyStoreProfile(payload)
                 else -> PerRecord.SKIPPED
             }
+        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+            // Cancellation propagates to the batch loop's savepoint handler.
+            throw cancelled
         } catch (failure: Throwable) {
             auditSkip(record, failure.message ?: failure.javaClass.simpleName)
             PerRecord.SKIPPED
@@ -154,7 +164,12 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                     rowUid = record.rowUid,
                     payloadJson = record.payload.toString(),
                     serverSeq = record.serverSeq,
-                    retryCount = existing?.retryCount ?: 0,
+                    // Review finding (go 7): a re-park is a FRESH pulled chance
+                    // to resolve — an exhausted older park must not strand its
+                    // newer version above the retry ceiling. The bounded-retry
+                    // accounting itself lives in retryParksPass, which
+                    // overwrites this via park.copy(retryCount = attempts).
+                    retryCount = 0,
                     parkedAt = Instant.now().toString(),
                 ),
             )

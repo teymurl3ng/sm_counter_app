@@ -33,7 +33,12 @@ internal fun jsonStructurallyEqual(a: JSONArray, b: JSONArray): Boolean {
 private fun jsonStructurallyEqual(a: Any?, b: Any?): Boolean = when {
     a is JSONObject && b is JSONObject -> jsonStructurallyEqual(a, b)
     a is JSONArray && b is JSONArray -> jsonStructurallyEqual(a, b)
-    a is Number && b is Number -> a.toDouble() == b.toDouble()
+    a is Number && b is Number ->
+        // Integral values must compare exactly: org.json yields Int/Long for
+        // integer literals, and a double round-trip collapses distinct Longs
+        // anywhere above 2^53 (review finding, go 7).
+        if ((a is Int || a is Long) && (b is Int || b is Long)) a.toLong() == b.toLong()
+        else a.toDouble() == b.toDouble()
     a == null || a === JSONObject.NULL -> b == null || b === JSONObject.NULL
     else -> a == b
 }

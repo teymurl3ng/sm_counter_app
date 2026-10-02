@@ -62,7 +62,21 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         SyncMigrationSql.triggerNames.forEach { name -> executeSQL("DROP TRIGGER IF EXISTS $name") }
         try {
             for (record in records) {
-                val outcome = applyOne(record)
+                // Per-record savepoint: a mid-record failure rolls back to a
+                // clean boundary so a half-applied record (header without its
+                // ledger children) can never commit — idempotent re-apply of
+                // a skipped uid would otherwise never repair it.
+                executeSQL("SAVEPOINT record_apply")
+                val outcome: PerRecord = try {
+                    val result = applyOne(record)
+                    executeSQL("RELEASE record_apply")
+                    result
+                } catch (failure: Throwable) {
+                    executeSQL("ROLLBACK TO record_apply")
+                    executeSQL("RELEASE record_apply")
+                    auditSkip(record, failure.message ?: failure.javaClass.simpleName)
+                    PerRecord.SKIPPED
+                }
                 when (outcome) {
                     PerRecord.APPLIED -> applied += 1
                     PerRecord.UPDATED -> updated += 1

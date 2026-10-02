@@ -45,6 +45,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         val applied: Int,
         val updated: Int,
         val skipped: Int,
+        val parked: Int,
         val conflicts: Int,
         val latestServerSeq: Long,
     )
@@ -53,6 +54,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         var applied = 0
         var updated = 0
         var skipped = 0
+        var parked = 0
         var conflicts = 0
 
         // Capture triggers stay down for the whole batch: pulled rows are
@@ -65,6 +67,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                     PerRecord.APPLIED -> applied += 1
                     PerRecord.UPDATED -> updated += 1
                     PerRecord.SKIPPED -> skipped += 1
+                    PerRecord.PARKED -> parked += 1
                     PerRecord.CONFLICT -> conflicts += 1
                 }
             }
@@ -78,12 +81,13 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
             applied = applied,
             updated = updated,
             skipped = skipped,
+            parked = parked,
             conflicts = conflicts,
             latestServerSeq = records.maxOfOrNull { it.serverSeq } ?: 0L,
         )
     }
 
-    private enum class PerRecord { APPLIED, UPDATED, SKIPPED, CONFLICT }
+    private enum class PerRecord { APPLIED, UPDATED, SKIPPED, PARKED, CONFLICT }
 
     private suspend fun applyOne(record: SyncPulledRecord): PerRecord {
         val payload = record.payload

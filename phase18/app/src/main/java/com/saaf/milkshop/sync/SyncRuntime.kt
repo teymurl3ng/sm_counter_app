@@ -58,8 +58,10 @@ class SyncRuntime(
 
     /**
      * Pulls and applies everything the server has beyond the local cursor,
-     * batch by batch in server_seq order. Enrolled devices pull before
-     * pushing (shop convergence first), matching the locked decisions.
+     * batch by batch in server_seq order. Callers drain (push) BEFORE
+     * pulling (C1 decision record): a local edit must reach the server
+     * before a pull can overwrite it; the apply engine's pending-edit guard
+     * and parked rows cover the remaining windows.
      */
     suspend fun pullOnce(): SyncPullSummary {
         val config = SyncServerConfigStore.load(context) ?: return SyncPullSummary.NotEnrolled
@@ -71,6 +73,7 @@ class SyncRuntime(
         var applied = 0
         var updated = 0
         var skipped = 0
+        var parked = 0
         var conflicts = 0
 
         while (true) {
@@ -85,11 +88,12 @@ class SyncRuntime(
             }
             when (outcome) {
                 is SyncPullOutcome.Fetched -> {
-                    if (outcome.batch.records.isEmpty()) return SyncPullSummary.Done(applied, updated, skipped, conflicts)
+                    if (outcome.batch.records.isEmpty()) return SyncPullSummary.Done(applied, updated, skipped, parked, conflicts)
                     val report = applyEngine.apply(outcome.batch.records)
                     applied += report.applied
                     updated += report.updated
                     skipped += report.skipped
+                    parked += report.parked
                     conflicts += report.conflicts
                     database.syncPullStateDao().upsert(
                         com.saaf.milkshop.data.SyncPullStateEntity(
@@ -97,12 +101,12 @@ class SyncRuntime(
                             updatedAt = java.time.Instant.now().toString(),
                         ),
                     )
-                    if (!outcome.hasMore) return SyncPullSummary.Done(applied, updated, skipped, conflicts)
+                    if (!outcome.hasMore) return SyncPullSummary.Done(applied, updated, skipped, parked, conflicts)
                 }
                 SyncPullOutcome.NotConfigured -> return SyncPullSummary.NotEnrolled
                 is SyncPullOutcome.RetryLater -> {
                     return if (applied + updated > 0) {
-                        SyncPullSummary.Done(applied, updated, skipped, conflicts)
+                        SyncPullSummary.Done(applied, updated, skipped, parked, conflicts)
                     } else {
                         SyncPullSummary.RetryLater(outcome.reason)
                     }
@@ -112,7 +116,13 @@ class SyncRuntime(
     }
 
     sealed interface SyncPullSummary {
-        data class Done(val applied: Int, val updated: Int, val skipped: Int, val conflicts: Int) : SyncPullSummary
+        data class Done(
+            val applied: Int,
+            val updated: Int,
+            val skipped: Int,
+            val parked: Int,
+            val conflicts: Int,
+        ) : SyncPullSummary
         data class RetryLater(val reason: String) : SyncPullSummary
         data object NotEnrolled : SyncPullSummary
     }

@@ -146,11 +146,13 @@ internal class OwnerSyncController(
         runtime.updateReady { it.copy(syncState = it.syncState.copy(busy = true, error = null, notice = null)) }
         runtime.scope.launch {
             try {
-                val pull = withContext(Dispatchers.IO) { facade.pull() }
+                // Push before pull (C1): local edits reach the server before
+                // any pull can overwrite them.
                 val push = withContext(Dispatchers.IO) { facade.push() }
+                val pull = withContext(Dispatchers.IO) { facade.pull() }
                 val pullSummary = when (pull) {
                     is SyncRuntime.SyncPullSummary.Done ->
-                        "applied=${pull.applied} updated=${pull.updated} skipped=${pull.skipped} conflicts=${pull.conflicts}"
+                        "applied=${pull.applied} updated=${pull.updated} skipped=${pull.skipped} parked=${pull.parked} conflicts=${pull.conflicts}"
                     is SyncRuntime.SyncPullSummary.RetryLater -> "will retry (${pull.reason})"
                     SyncRuntime.SyncPullSummary.NotEnrolled -> "not enrolled"
                 }
@@ -159,7 +161,7 @@ internal class OwnerSyncController(
                     it.copy(
                         syncState = it.syncState.copy(
                             busy = false,
-                            notice = "Pull: $pullSummary · Push: ${push.javaClass.simpleName}",
+                            notice = "Push: ${push.javaClass.simpleName} · Pull: $pullSummary",
                         ),
                     )
                 }

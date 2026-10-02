@@ -184,6 +184,9 @@ dependencies {
     ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)
+    // Real JSON-java for JVM tests: android.jar's org.json is a stub that
+    // throws on host unit tests, and the C1 ack comparer tests need it.
+    testImplementation("org.json:json:20240303")
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.core)

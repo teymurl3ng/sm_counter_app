@@ -63,8 +63,9 @@ class SyncPushEngine(
             val (envelopes, effectiveRows) = buildFor(batch)
             when (val result = activeTransport.push(envelopes, effectiveRows)) {
                 is SyncPushResult.Success -> {
-                    delete(effectiveRows)
-                    pushedTotal += effectiveRows.size
+                    val acked = ackedEntries(effectiveRows, envelopes)
+                    delete(acked)
+                    pushedTotal += acked.size
                 }
                 is SyncPushResult.Transient ->
                     return if (pushedTotal > 0) DrainOutcome.Drained(pushedTotal) else DrainOutcome.RetryLater(0)
@@ -80,8 +81,9 @@ class SyncPushEngine(
                         }
                         when (val single = activeTransport.push(singleEnvelopes, singleRows)) {
                             is SyncPushResult.Success -> {
-                                delete(singleRows)
-                                pushedTotal += 1
+                                val acked = ackedEntries(singleRows, singleEnvelopes)
+                                delete(acked)
+                                pushedTotal += acked.size
                             }
                             is SyncPushResult.Transient ->
                                 return if (pushedTotal > 0) {
@@ -120,6 +122,25 @@ class SyncPushEngine(
     private suspend fun delete(rows: List<SyncOutboxEntity>) {
         if (rows.isEmpty()) return
         database.syncOutboxDao().deleteByIds(rows.map { it.outboxId })
+    }
+
+    /**
+     * C1 ack equality: an outbox entry may leave the queue only when the
+     * live row still structurally equals the envelope the server just
+     * accepted. An edit that landed mid-push keeps its entry (the rebuilt
+     * envelope differs), so it re-pushes with the newer content instead of
+     * being silently acked away; a row that vanished at either build keeps
+     * its entry one more cycle and is orphan-dropped by the next drain.
+     */
+    private suspend fun ackedEntries(rows: List<SyncOutboxEntity>, pushed: List<JSONObject>): List<SyncOutboxEntity> {
+        val rebuilt = buildFor(rows)
+        val rebuiltByUid = rebuilt.first.associateBy { it.getString("uid") }
+        val pushedByUid = pushed.associateBy { it.getString("uid") }
+        return rows.filter { row ->
+            val original = pushedByUid[row.rowUid] ?: return@filter false
+            val current = rebuiltByUid[row.rowUid] ?: return@filter false
+            !jsonStructurallyEqual(original, current)
+        }
     }
 
     private suspend fun onHalted(failure: SyncPushResult.Permanent, queueDepth: Int) {

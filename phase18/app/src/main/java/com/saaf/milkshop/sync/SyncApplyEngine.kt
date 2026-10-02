@@ -123,7 +123,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                 "products" -> applyProduct(record.rowUid, payload)
                 "accounts" -> applyAccount(record.rowUid, payload)
                 "settings" -> applySetting(payload)
-                "events" -> applyEvent(record.rowUid, payload)
+                "events" -> applyEvent(record)
                 "deliveries" -> applyDelivery(record.rowUid, payload)
                 "attendance_records" -> applyAttendance(record.rowUid, payload)
                 "budget_plans", "collections_targets" -> PerRecord.SKIPPED // planning rows: pulled but not applied until planning sync lands
@@ -272,15 +272,17 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         }
     }
 
-    private suspend fun applyEvent(uid: String, payload: JSONObject): PerRecord {
+    private suspend fun applyEvent(record: SyncPulledRecord): PerRecord {
+        val uid = record.rowUid
+        val payload = record.payload
         val existing = database.syncEnvelopeDao().eventsByUid(listOf(uid)).firstOrNull()
-        if (existing != null) return PerRecord.SKIPPED // events are immutable history
+        if (existing != null) return PerRecord.PRESENT // events are immutable history
 
         val correctsUid = payload.optNullableString("corrects_event_uid")
         var correctsLocalId: Long? = null
         if (correctsUid != null) {
             val target = database.syncEnvelopeDao().eventsByUid(listOf(correctsUid)).firstOrNull()
-                ?: return skipUnresolved("correction target $correctsUid not local yet")
+                ?: return park(record, "correction target $correctsUid not local yet")
             // P1 sibling guard: the target already carries a different
             // correction — never double-count; leave the owner to resolve.
             val existingChild = database.syncEnvelopeDao().correctionsOf(target.eventId)
@@ -290,6 +292,41 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                 return PerRecord.CONFLICT
             }
             correctsLocalId = target.eventId
+        }
+
+        // C1 parse-first: every ledger child resolves BEFORE anything is
+        // inserted, so a missing product/account parks the whole event —
+        // a header without its ledger rows can never be committed, and an
+        // unresolvable child can never be silently dropped.
+        val inventoryRows = ArrayList<Pair<Long, Double>>()
+        val financialRows = ArrayList<Pair<Long, Double>>()
+        val spoilageRows = ArrayList<Triple<Long, Double, String>>()
+        payload.optJSONArray("inventory_logs")?.let { rows ->
+            for (index in 0 until rows.length()) {
+                val row = rows.optJSONObject(index) ?: continue
+                val productUid = row.optString("product_uid")
+                val productId = resolveProduct(productUid)
+                    ?: return park(record, "inventory product $productUid not local yet")
+                inventoryRows += productId to row.getDouble("quantity")
+            }
+        }
+        payload.optJSONArray("financial_logs")?.let { rows ->
+            for (index in 0 until rows.length()) {
+                val row = rows.optJSONObject(index) ?: continue
+                val accountUid = row.optString("account_uid")
+                val accountId = resolveAccount(accountUid)
+                    ?: return park(record, "financial account $accountUid not local yet")
+                financialRows += accountId to row.getDouble("amount")
+            }
+        }
+        payload.optJSONArray("spoilage_details")?.let { rows ->
+            for (index in 0 until rows.length()) {
+                val row = rows.optJSONObject(index) ?: continue
+                val productUid = row.optString("product_uid")
+                val productId = resolveProduct(productUid)
+                    ?: return park(record, "spoilage product $productUid not local yet")
+                spoilageRows += Triple(productId, row.getDouble("quantity"), row.getString("reason"))
+            }
         }
 
         val event = EventEntity(
@@ -324,37 +361,25 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         )
         val eventId = database.eventDao().insert(event)
 
-        payload.optJSONArray("inventory_logs")?.let { rows ->
-            for (index in 0 until rows.length()) {
-                val row = rows.optJSONObject(index) ?: continue
-                val productId = resolveProduct(row.optString("product_uid")) ?: continue
-                database.inventoryLogDao().insert(
-                    InventoryLogEntity(eventId = eventId, productId = productId, quantity = row.getDouble("quantity")),
-                )
-            }
+        inventoryRows.forEach { (productId, quantity) ->
+            database.inventoryLogDao().insert(
+                InventoryLogEntity(eventId = eventId, productId = productId, quantity = quantity),
+            )
         }
-        payload.optJSONArray("financial_logs")?.let { rows ->
-            for (index in 0 until rows.length()) {
-                val row = rows.optJSONObject(index) ?: continue
-                val accountId = resolveAccount(row.optString("account_uid")) ?: continue
-                database.financialLogDao().insert(
-                    FinancialLogEntity(eventId = eventId, accountId = accountId, amount = row.getDouble("amount")),
-                )
-            }
+        financialRows.forEach { (accountId, amount) ->
+            database.financialLogDao().insert(
+                FinancialLogEntity(eventId = eventId, accountId = accountId, amount = amount),
+            )
         }
-        payload.optJSONArray("spoilage_details")?.let { rows ->
-            for (index in 0 until rows.length()) {
-                val row = rows.optJSONObject(index) ?: continue
-                val productId = resolveProduct(row.optString("product_uid")) ?: continue
-                database.spoilageDao().insert(
-                    SpoilageDetailEntity(
-                        eventId = eventId,
-                        productId = productId,
-                        quantity = row.getDouble("quantity"),
-                        reason = row.getString("reason"),
-                    ),
-                )
-            }
+        spoilageRows.forEach { (productId, quantity, reason) ->
+            database.spoilageDao().insert(
+                SpoilageDetailEntity(
+                    eventId = eventId,
+                    productId = productId,
+                    quantity = quantity,
+                    reason = reason,
+                ),
+            )
         }
 
         // Actor attribution is best-effort cross-device: app users are

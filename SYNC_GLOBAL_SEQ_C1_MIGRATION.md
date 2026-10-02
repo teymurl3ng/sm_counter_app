@@ -73,7 +73,7 @@ Server-side consequence of owner-only enrollment: the server sees a device-level
 3. **Seq burn on existing-row envelopes (benign, no action):** the `BEFORE INSERT` trigger fires before conflict redirection, so every envelope for an existing row burns one `nextval()` on the discarded insert tuple before the `DO UPDATE` leg (which burns a second one only when the payload actually changed). No row ever carries a burned seq, so this is invisible to clients — it only widens future gaps (bigint). Order==commit per shop is unaffected (advisory lock serializes assignment).
 4. **Comment correction:** an unchanged/append-only-refused envelope hits `continue` BEFORE the `applied` counter, so refused append-only rows are NOT counted in the response's `applied` (the original comment claimed they were). The client never branches on `applied` (it counts its own envelopes), so behavior is fine — comment corrected below.
 
-DEV-verified end state (go 5): 8 REST scenarios PASS (legacy 3-key no-op, C1-kill propagation, pull_cursor conflict with loser payload preserved, parked_seq conflict, append-only refusal, insert via trigger, unknown-table refusal, full ordered pull); §7 re-sequence PASS (dense 1..N, per-shop order preserved); §8 rollback dry-run PASS (rolled back, state intact). **Verified function hash on DEV after rehearsal: `sync_push(jsonb,text,uuid,bigint)` md5(pg_get_functiondef) = `6a6066c53fab81df98088d186da254ef` — the PROD apply must reproduce this hash.**
+DEV-verified end state (go 5): 8 REST scenarios PASS (legacy 3-key no-op, C1-kill propagation, pull_cursor conflict with loser payload preserved, parked_seq conflict, append-only refusal, insert via trigger, unknown-table refusal, full ordered pull); §7 re-sequence PASS (dense 1..N, per-shop order preserved); §8 rollback dry-run PASS (rolled back, state intact). **Canonical function hash: applying §6.5 VERBATIM (comments included — `pg_get_functiondef` embeds comments, so hash comparisons only work against byte-identical text) yields md5 = `cc681db1a8a41e61971876750b908da8`; PROD and DEV were both verified at this hash on 2026-10-03.** Any future re-apply must use the §6.5 text unchanged or the hash will differ even when behavior is identical.
 
 ```sql
 begin;
@@ -295,6 +295,9 @@ Repairs existing divergence: renumbers all rows in current seq order so both pho
 begin;
 alter table public.sync_records disable trigger sync_records_assign_seq;
 
+create temp table reseq_old_max as
+  select coalesce(max(server_seq), 0) as m from public.sync_records;
+
 update public.sync_records
    set server_seq = server_seq + (select max(server_seq) from public.sync_records);
 
@@ -307,8 +310,13 @@ update public.sync_records sr
   from ordered
  where sr.server_seq = ordered.shifted;
 
+-- erratum 5 (go 6): the dense renumber lands BELOW old cursors whenever the old
+-- identity skipped values (PROD: rows 2..37 -> 1..36). The sequence must not be
+-- left below the highest cursor any device could hold (= old max), or the next
+-- assigned seq would be invisible to fully-drained devices (a C1b-class drop).
 select setval('public.sync_records_server_seq_seq',
-              (select max(server_seq) from public.sync_records));
+              greatest((select max(server_seq) from public.sync_records),
+                       (select m from reseq_old_max)));
 
 alter table public.sync_records enable trigger sync_records_assign_seq;
 commit;

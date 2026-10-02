@@ -66,11 +66,16 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                 when (outcome) {
                     PerRecord.APPLIED -> applied += 1
                     PerRecord.UPDATED -> updated += 1
-                    PerRecord.SKIPPED -> skipped += 1
+                    PerRecord.PRESENT, PerRecord.SKIPPED -> skipped += 1
                     PerRecord.PARKED -> parked += 1
                     PerRecord.CONFLICT -> conflicts += 1
                 }
             }
+            // C1: parked rows from earlier pulls get one recovery attempt per
+            // batch — parents that arrived since may have closed the gap. The
+            // cursor already advanced past them; this pass is the only thing
+            // standing between a parked row and permanent loss.
+            applied += retryParksPass()
         } finally {
             SyncMigrationSql.captureTriggers.forEach { create -> executeSQL(create) }
         }
@@ -87,7 +92,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         )
     }
 
-    private enum class PerRecord { APPLIED, UPDATED, SKIPPED, PARKED, CONFLICT }
+    private enum class PerRecord { APPLIED, UPDATED, PRESENT, SKIPPED, PARKED, CONFLICT }
 
     private suspend fun applyOne(record: SyncPulledRecord): PerRecord {
         val payload = record.payload
@@ -110,6 +115,92 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
             auditSkip(record, failure.message ?: failure.javaClass.simpleName)
             PerRecord.SKIPPED
         }
+    }
+
+    /**
+     * C1 parking: keep a pulled row the engine cannot apply YET, so the pull
+     * cursor can advance without losing it. Newest pulled version wins;
+     * applying any version for the uid, or its dependency resolving, clears
+     * the park (see [retryParksPass] and the apply paths).
+     */
+    private suspend fun park(record: SyncPulledRecord, reason: String): PerRecord {
+        val existing = database.syncParkedRowDao().find(record.tableName, record.rowUid)
+        if (existing == null || record.serverSeq >= existing.serverSeq) {
+            database.syncParkedRowDao().upsert(
+                com.saaf.milkshop.data.SyncParkedRowEntity(
+                    tableName = record.tableName,
+                    rowUid = record.rowUid,
+                    payloadJson = record.payload.toString(),
+                    serverSeq = record.serverSeq,
+                    retryCount = existing?.retryCount ?: 0,
+                    parkedAt = Instant.now().toString(),
+                ),
+            )
+        }
+        runCatching {
+            database.securityAuditDao().insert(
+                com.saaf.milkshop.data.SecurityAuditEntryEntity(
+                    auditId = 0,
+                    occurredAt = Instant.now().toString(),
+                    action = "sync_apply_parked",
+                    result = "warning",
+                    reasonCode = reason,
+                    details = "table=${record.tableName};uid=${record.rowUid};seq=${record.serverSeq}",
+                ),
+            )
+        }
+        return PerRecord.PARKED
+    }
+
+    /**
+     * One recovery attempt per parked row per batch. Any resolved outcome
+     * (applied, updated, already-present, sibling conflict) clears the park;
+     * a re-park counts a retry, with a bounded number of attempts before the
+     * park stops consuming effort (the row stays as evidence, audited once).
+     * A park whose uid still has a pending local outbox edit defers without
+     * consuming retries — only its push resolves it.
+     */
+    private suspend fun retryParksPass(): Int {
+        var recovered = 0
+        for (park in database.syncParkedRowDao().all()) {
+            if (park.retryCount >= MAX_PARK_RETRIES) continue
+            if (database.syncOutboxDao().countByTableAndUid(park.tableName, park.rowUid) > 0) continue
+            val record = SyncPulledRecord(
+                serverSeq = park.serverSeq,
+                shopId = null,
+                tableName = park.tableName,
+                rowUid = park.rowUid,
+                payload = JSONObject(park.payloadJson),
+                originDevice = null,
+            )
+            val outcome = applyOne(record)
+            when (outcome) {
+                PerRecord.APPLIED, PerRecord.UPDATED, PerRecord.PRESENT, PerRecord.CONFLICT -> {
+                    database.syncParkedRowDao().delete(park.tableName, park.rowUid)
+                    if (outcome != PerRecord.PRESENT) recovered += 1
+                }
+                PerRecord.PARKED -> {
+                    val attempts = park.retryCount + 1
+                    database.syncParkedRowDao().upsert(park.copy(retryCount = attempts))
+                    if (attempts == MAX_PARK_RETRIES) {
+                        runCatching {
+                            database.securityAuditDao().insert(
+                                com.saaf.milkshop.data.SecurityAuditEntryEntity(
+                                    auditId = 0,
+                                    occurredAt = Instant.now().toString(),
+                                    action = "sync_park_unresolved",
+                                    result = "warning",
+                                    reasonCode = "retries_exhausted",
+                                    details = "table=${park.tableName};uid=${park.rowUid};seq=${park.serverSeq}",
+                                ),
+                            )
+                        }
+                    }
+                }
+                PerRecord.SKIPPED -> Unit // semantic refusal: keep the park as evidence, stop retrying it
+            }
+        }
+        return recovered
     }
 
     private suspend fun applyProduct(uid: String, payload: JSONObject): PerRecord {
@@ -498,6 +589,10 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                 ),
             )
         }
+    }
+
+    private companion object {
+        const val MAX_PARK_RETRIES = 5
     }
 }
 

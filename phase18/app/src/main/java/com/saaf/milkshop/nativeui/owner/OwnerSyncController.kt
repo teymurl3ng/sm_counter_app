@@ -236,6 +236,7 @@ internal class OwnerSyncController(
         "disabled" -> "This account is disabled on the server."
         "not_authorized" -> "This account has no staff profile on the server."
         "no_shops" -> "This account is not assigned to any shop."
+        "owner_enrollment_required" -> "Only an owner account can connect this phone to the server."
         else -> "Could not reach the server (${outcome.reason}). Try again."
     }
 }

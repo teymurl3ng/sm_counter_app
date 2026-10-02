@@ -42,6 +42,14 @@ class SyncEnrollment(
             AccountAuthResult.NotAuthorized -> return Outcome.Failed("not_authorized")
             is AccountAuthResult.Unknown -> return Outcome.Failed("unknown:${result.reason}")
         }
+        // C1/M9: the enrollment's account is this installation's push
+        // identity for every local user, so it must hold the role the sync
+        // contract requires — owner (ACCOUNT_BRIDGE_PHASE1_SPEC: "Enrollment
+        // requires ALLOWED, role owner"; master-data write gating server-side
+        // assumes it).
+        if (auth.role != "owner") {
+            return Outcome.Failed("owner_enrollment_required")
+        }
 
         val target = shopId?.let { wanted -> auth.shops.firstOrNull { it.shopId == wanted } }
             ?: auth.shops.singleOrNull()

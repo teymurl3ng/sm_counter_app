@@ -61,11 +61,17 @@ class SyncPushEngine(
             val batch = database.syncOutboxDao().nextBatch(batchSize)
             if (batch.isEmpty()) return DrainOutcome.Drained(pushedTotal)
             val (envelopes, effectiveRows) = buildFor(batch)
+            attachParkHints(envelopes)
             when (val result = activeTransport.push(envelopes, effectiveRows)) {
                 is SyncPushResult.Success -> {
                     val acked = ackedEntries(effectiveRows, envelopes)
                     delete(acked)
                     pushedTotal += acked.size
+                    acked.forEach { row ->
+                        // The local edit won and is now on the server; the held
+                        // remote version is preserved in the sync_conflict audit.
+                        database.syncParkedRowDao().delete(row.tableName, row.rowUid)
+                    }
                 }
                 is SyncPushResult.Transient ->
                     return if (pushedTotal > 0) DrainOutcome.Drained(pushedTotal) else DrainOutcome.RetryLater(0)
@@ -79,11 +85,15 @@ class SyncPushEngine(
                             delete(singleRows) // row's local record vanished mid-drain
                             continue
                         }
+                        attachParkHints(singleEnvelopes)
                         when (val single = activeTransport.push(singleEnvelopes, singleRows)) {
                             is SyncPushResult.Success -> {
                                 val acked = ackedEntries(singleRows, singleEnvelopes)
                                 delete(acked)
                                 pushedTotal += acked.size
+                                acked.forEach { r ->
+                                    database.syncParkedRowDao().delete(r.tableName, r.rowUid)
+                                }
                             }
                             is SyncPushResult.Transient ->
                                 return if (pushedTotal > 0) {
@@ -122,6 +132,25 @@ class SyncPushEngine(
     private suspend fun delete(rows: List<SyncOutboxEntity>) {
         if (rows.isEmpty()) return
         database.syncOutboxDao().deleteByIds(rows.map { it.outboxId })
+    }
+
+    /**
+     * C1 conflict evidence: an envelope for a uid holding a park (a remote
+     * version we saw but refused to apply over an unpushed local edit)
+     * carries the parked server_seq as a hint. The server then audits the
+     * overwrite with the losing payload even though our pull cursor has
+     * already advanced past that version. Stripped server-side before
+     * storage; ignored by pre-migration servers.
+     */
+    private suspend fun attachParkHints(envelopes: List<JSONObject>) {
+        if (envelopes.isEmpty()) return
+        val parks = database.syncParkedRowDao().all()
+        if (parks.isEmpty()) return
+        val byKey = parks.associateBy { it.tableName to it.rowUid }
+        envelopes.forEach { envelope ->
+            val park = byKey[envelope.getString("table") to envelope.getString("uid")] ?: return@forEach
+            envelope.put("parked_seq", park.serverSeq)
+        }
     }
 
     /**

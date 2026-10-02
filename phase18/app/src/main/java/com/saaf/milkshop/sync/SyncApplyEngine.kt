@@ -124,12 +124,12 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                 "accounts" -> applyAccount(record.rowUid, payload)
                 "settings" -> applySetting(payload)
                 "events" -> applyEvent(record)
-                "deliveries" -> applyDelivery(record.rowUid, payload)
-                "attendance_records" -> applyAttendance(record.rowUid, payload)
+                "deliveries" -> applyDelivery(record)
+                "attendance_records" -> applyAttendance(record)
                 "budget_plans", "collections_targets" -> PerRecord.SKIPPED // planning rows: pulled but not applied until planning sync lands
-                "delivery_status_history" -> applyDeliveryStatus(record.rowUid, payload)
-                "physical_cash_counts" -> applyCashCount(record.rowUid, payload)
-                "daily_close_actions" -> applyCloseAction(record.rowUid, payload)
+                "delivery_status_history" -> applyDeliveryStatus(record)
+                "physical_cash_counts" -> applyCashCount(record)
+                "daily_close_actions" -> applyCloseAction(record)
                 "store_profile" -> applyStoreProfile(payload)
                 else -> PerRecord.SKIPPED
             }
@@ -422,11 +422,13 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         if (uid.isEmpty()) null
         else database.syncEnvelopeDao().physicalCashCountsByUid(listOf(uid)).firstOrNull()?.countId
 
-    private suspend fun applyDelivery(uid: String, payload: JSONObject): PerRecord {
+    private suspend fun applyDelivery(record: SyncPulledRecord): PerRecord {
+        val uid = record.rowUid
+        val payload = record.payload
         val customerUid = payload.optString("customer_uid")
         val productUid = payload.optString("product_uid")
-        val customerId = resolveAccount(customerUid) ?: return skipUnresolved("delivery customer $customerUid not local")
-        val productId = resolveProduct(productUid) ?: return skipUnresolved("delivery product $productUid not local")
+        val customerId = resolveAccount(customerUid) ?: return park(record, "delivery customer $customerUid not local yet")
+        val productId = resolveProduct(productUid) ?: return park(record, "delivery product $productUid not local yet")
         val saleId = payload.optNullableString("sale_event_uid")?.let { resolveEvent(it) }
         val existing = database.syncEnvelopeDao().deliveriesByUid(listOf(uid)).firstOrNull()
         return if (existing == null) {
@@ -462,11 +464,18 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         }
     }
 
-    private suspend fun applyAttendance(uid: String, payload: JSONObject): PerRecord {
+    private suspend fun applyAttendance(record: SyncPulledRecord): PerRecord {
+        val uid = record.rowUid
+        val payload = record.payload
         val employeeUid = payload.optString("employee_uid")
-        val employeeId = resolveAccount(employeeUid) ?: return skipUnresolved("attendance employee $employeeUid not local")
-        val supersedes = payload.optNullableString("supersedes_uid")
-            ?.let { database.syncEnvelopeDao().attendanceByUid(listOf(it)).firstOrNull()?.attendanceId }
+        val employeeId = resolveAccount(employeeUid) ?: return park(record, "attendance employee $employeeUid not local yet")
+        val supersedesUid = payload.optNullableString("supersedes_uid")
+        // A present-but-unresolvable supersedes is a dependency, not a null
+        // (C1: silent nulls made correction chains diverge across devices).
+        val supersedes = supersedesUid?.let {
+            database.syncEnvelopeDao().attendanceByUid(listOf(it)).firstOrNull()?.attendanceId
+                ?: return park(record, "attendance supersedes $it not local yet")
+        }
         val existing = database.syncEnvelopeDao().attendanceByUid(listOf(uid)).firstOrNull()
         return if (existing == null) {
             database.attendanceDao().insert(
@@ -496,11 +505,13 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         }
     }
 
-    private suspend fun applyDeliveryStatus(uid: String, payload: JSONObject): PerRecord {
+    private suspend fun applyDeliveryStatus(record: SyncPulledRecord): PerRecord {
+        val uid = record.rowUid
+        val payload = record.payload
         val deliveryUid = payload.optString("delivery_uid")
-        val deliveryId = resolveDelivery(deliveryUid) ?: return skipUnresolved("status delivery $deliveryUid not local")
+        val deliveryId = resolveDelivery(deliveryUid) ?: return park(record, "status delivery $deliveryUid not local yet")
         val existing = database.syncEnvelopeDao().deliveryStatusesByUid(listOf(uid)).firstOrNull()
-        if (existing != null) return PerRecord.SKIPPED
+        if (existing != null) return PerRecord.PRESENT
         database.deliveryDao().insertStatus(
             com.saaf.milkshop.data.DeliveryStatusEntity(
                 deliveryId = deliveryId,
@@ -513,10 +524,12 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         return PerRecord.APPLIED
     }
 
-    private suspend fun applyCashCount(uid: String, payload: JSONObject): PerRecord {
-        if (database.syncEnvelopeDao().physicalCashCountsByUid(listOf(uid)).isNotEmpty()) return PerRecord.SKIPPED
+    private suspend fun applyCashCount(record: SyncPulledRecord): PerRecord {
+        val uid = record.rowUid
+        val payload = record.payload
+        if (database.syncEnvelopeDao().physicalCashCountsByUid(listOf(uid)).isNotEmpty()) return PerRecord.PRESENT
         val accountUid = payload.optString("account_uid")
-        val accountId = resolveAccount(accountUid) ?: return skipUnresolved("cash count account $accountUid not local")
+        val accountId = resolveAccount(accountUid) ?: return park(record, "cash count account $accountUid not local yet")
         database.backupDataDao().insertPhysicalCashCount(
             PhysicalCashCountEntity(
                 accountId = accountId,
@@ -530,11 +543,21 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         return PerRecord.APPLIED
     }
 
-    private suspend fun applyCloseAction(uid: String, payload: JSONObject): PerRecord {
-        if (database.syncEnvelopeDao().dailyCloseActionsByUid(listOf(uid)).isNotEmpty()) return PerRecord.SKIPPED
-        val countId = payload.optNullableString("count_uid")?.let { resolveCashCount(it) }
-        val supersedesId = payload.optNullableString("supersedes_action_uid")
-            ?.let { database.syncEnvelopeDao().dailyCloseActionsByUid(listOf(it)).firstOrNull()?.actionId }
+    private suspend fun applyCloseAction(record: SyncPulledRecord): PerRecord {
+        val uid = record.rowUid
+        val payload = record.payload
+        if (database.syncEnvelopeDao().dailyCloseActionsByUid(listOf(uid)).isNotEmpty()) return PerRecord.PRESENT
+        // A present-but-unresolvable count link is a dependency, not a null
+        // (C1: silent nulls made close/count associations diverge).
+        val countUid = payload.optNullableString("count_uid")
+        val countId = countUid?.let {
+            resolveCashCount(it) ?: return park(record, "close action count $it not local yet")
+        }
+        val supersedesUid = payload.optNullableString("supersedes_action_uid")
+        val supersedesId = supersedesUid?.let {
+            database.syncEnvelopeDao().dailyCloseActionsByUid(listOf(it)).firstOrNull()?.actionId
+                ?: return park(record, "close action supersedes $it not local yet")
+        }
         database.backupDataDao().insertDailyCloseAction(
             DailyCloseActionEntity(
                 businessDate = payload.getString("business_date"),
@@ -588,11 +611,6 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         }
     }
 
-    private suspend fun skipUnresolved(reason: String): PerRecord {
-        auditSkipReason(reason)
-        return PerRecord.SKIPPED
-    }
-
     private suspend fun auditSkip(record: SyncPulledRecord, reason: String) {
         runCatching {
             database.securityAuditDao().insert(
@@ -603,21 +621,6 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                     result = "warning",
                     reasonCode = "skipped",
                     details = "table=${record.tableName};uid=${record.rowUid};seq=${record.serverSeq};reason=$reason",
-                ),
-            )
-        }
-    }
-
-    private suspend fun auditSkipReason(reason: String) {
-        runCatching {
-            database.securityAuditDao().insert(
-                com.saaf.milkshop.data.SecurityAuditEntryEntity(
-                    auditId = 0,
-                    occurredAt = Instant.now().toString(),
-                    action = "sync_apply_skipped",
-                    result = "warning",
-                    reasonCode = "unresolved_reference",
-                    details = "reason=$reason",
                 ),
             )
         }

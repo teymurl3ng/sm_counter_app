@@ -321,15 +321,16 @@ class SyncTransportTest {
             )
             database.eventDao().insert(event)
             val rows = database.syncOutboxDao().nextBatch(1000).filter { it.tableName == "events" }
+            val envelopes = SyncEnvelopeFactory(database).build(rows).envelopes
 
             // No session yet: transient, nothing sent.
-            assertEquals(SyncPushResult.Transient("no_session"), client.push(rows))
+            assertEquals(SyncPushResult.Transient("no_session"), client.push(envelopes, rows))
             assertEquals(0, http.requests.size)
 
             store.save(SyncTokenStore.Session("jwt-token-1", null, null))
 
             http.handler = { SyncHttpResponse(200, """{"ok":true,"server_time_epoch_ms":1800000000000}""".toByteArray()) }
-            val success = client.push(rows)
+            val success = client.push(envelopes, rows)
             assertTrue(success.toString(), success is SyncPushResult.Success)
             assertTrue(Math.abs((TrustedTime.trustedNowEpochMs() ?: 0) - 1800000000000) < 10_000)
             val pushRequest = http.requests.single()
@@ -348,23 +349,23 @@ class SyncTransportTest {
                     """{"ok":false,"error":{"code":"correction_privilege_required","message":"Correcting recorded history requires an owner or admin account"}}""".toByteArray(),
                 )
             }
-            val refused = client.push(rows)
+            val refused = client.push(envelopes, rows)
             assertTrue(refused.toString(), refused is SyncPushResult.Permanent)
             assertEquals("correction_privilege_required", (refused as SyncPushResult.Permanent).reasonCode)
 
             http.handler = { SyncHttpResponse(403, """{"error":{"code":"policy_rejected"}}""".toByteArray()) }
-            val permanent = client.push(rows)
+            val permanent = client.push(envelopes, rows)
             assertTrue(permanent is SyncPushResult.Permanent)
             assertEquals("policy_rejected", (permanent as SyncPushResult.Permanent).reasonCode)
 
             http.handler = { SyncHttpResponse(401, null) }
-            assertTrue(client.push(rows) is SyncPushResult.Transient)
+            assertTrue(client.push(envelopes, rows) is SyncPushResult.Transient)
 
             http.handler = { SyncHttpResponse(503, null) }
-            assertTrue(client.push(rows) is SyncPushResult.Transient)
+            assertTrue(client.push(envelopes, rows) is SyncPushResult.Transient)
 
             http.handler = { throw IOException("offline") }
-            assertTrue(client.push(rows) is SyncPushResult.Transient)
+            assertTrue(client.push(envelopes, rows) is SyncPushResult.Transient)
         } finally {
             database.close()
         }

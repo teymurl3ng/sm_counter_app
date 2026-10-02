@@ -48,7 +48,7 @@ class SyncPushEngineTest {
             val seenIds = mutableListOf<Long>()
             val engine = SyncPushEngine(
                 database,
-                SyncPushTransport { rows ->
+                SyncPushTransport { _, rows ->
                     seenIds += rows.map { it.outboxId }
                     SyncPushResult.Success(rows.size)
                 },
@@ -73,7 +73,7 @@ class SyncPushEngineTest {
         try {
             enqueueEvents(database, 2)
             val initial = database.syncOutboxDao().count()
-            val engine = SyncPushEngine(database, SyncPushTransport { SyncPushResult.Transient("timeout") })
+            val engine = SyncPushEngine(database, SyncPushTransport { _, _ -> SyncPushResult.Transient("timeout") })
 
             val outcome = engine.drainOnce()
 
@@ -94,7 +94,7 @@ class SyncPushEngineTest {
             var haltReasons = 0
             val engine = SyncPushEngine(
                 database,
-                SyncPushTransport { rows ->
+                SyncPushTransport { _, rows ->
                     when {
                         rows.any { it.rowUid == refused } ->
                             SyncPushResult.Permanent("policy_rejected", "row refused")

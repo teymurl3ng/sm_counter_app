@@ -131,10 +131,10 @@ class SyncRuntime(
     private fun withSessionRefresh(
         transport: SyncPushTransport,
         config: SyncServerConfig,
-    ): SyncPushTransport = SyncPushTransport { rows: List<SyncOutboxEntity> ->
-        val first = transport.push(rows)
+    ): SyncPushTransport = SyncPushTransport { envelopes, rows ->
+        val first = transport.push(envelopes, rows)
         if (first is SyncPushResult.Transient && first.reason == "unauthorized") {
-            if (refreshSession(config)) transport.push(rows) else first
+            if (refreshSession(config)) transport.push(envelopes, rows) else first
         } else {
             first
         }

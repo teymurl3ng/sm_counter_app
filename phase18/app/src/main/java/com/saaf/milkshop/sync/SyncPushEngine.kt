@@ -3,6 +3,7 @@ package com.saaf.milkshop.sync
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.data.SecurityAuditEntryEntity
 import com.saaf.milkshop.data.SyncOutboxEntity
+import org.json.JSONObject
 import java.time.Instant
 
 /**
@@ -17,11 +18,12 @@ sealed interface SyncPushResult {
 }
 
 /**
- * Transport seam for the push engine. The real HTTPS transport (sync Phase
- * 4/5) loads each row's payload by uid and POSTs it; tests install fakes.
+ * Transport seam for the push engine. The engine owns envelope construction
+ * (so it can re-serialize at ack time and structurally compare), the
+ * transport owns the wire. Tests install fakes over both halves.
  */
 fun interface SyncPushTransport {
-    suspend fun push(rows: List<SyncOutboxEntity>): SyncPushResult
+    suspend fun push(envelopes: List<JSONObject>, rows: List<SyncOutboxEntity>): SyncPushResult
 }
 
 /**
@@ -58,10 +60,11 @@ class SyncPushEngine(
         while (true) {
             val batch = database.syncOutboxDao().nextBatch(batchSize)
             if (batch.isEmpty()) return DrainOutcome.Drained(pushedTotal)
-            when (val result = activeTransport.push(batch)) {
+            val (envelopes, effectiveRows) = buildFor(batch)
+            when (val result = activeTransport.push(envelopes, effectiveRows)) {
                 is SyncPushResult.Success -> {
-                    delete(batch)
-                    pushedTotal += batch.size
+                    delete(effectiveRows)
+                    pushedTotal += effectiveRows.size
                 }
                 is SyncPushResult.Transient ->
                     return if (pushedTotal > 0) DrainOutcome.Drained(pushedTotal) else DrainOutcome.RetryLater(0)
@@ -69,10 +72,15 @@ class SyncPushEngine(
                     // The batch contains at least one row the server refuses.
                     // Retry one by one, in order, so everything ahead of the
                     // offender still leaves — then halt exactly at its head.
-                    for (row in batch) {
-                        when (val single = activeTransport.push(listOf(row))) {
+                    for (row in effectiveRows) {
+                        val (singleEnvelopes, singleRows) = buildFor(listOf(row))
+                        if (singleEnvelopes.isEmpty()) {
+                            delete(singleRows) // row's local record vanished mid-drain
+                            continue
+                        }
+                        when (val single = activeTransport.push(singleEnvelopes, singleRows)) {
                             is SyncPushResult.Success -> {
-                                delete(listOf(row))
+                                delete(singleRows)
                                 pushedTotal += 1
                             }
                             is SyncPushResult.Transient ->
@@ -92,6 +100,21 @@ class SyncPushEngine(
                 }
             }
         }
+    }
+
+    /**
+     * Builds envelopes for the queued rows and drops orphans whose local
+     * record has vanished (nothing to push; their queue slots must not block
+     * dependents). Returns the wire envelopes with the rows that produced
+     * them — the engine keeps both so it can re-serialize at ack time.
+     */
+    private suspend fun buildFor(rows: List<SyncOutboxEntity>): Pair<List<JSONObject>, List<SyncOutboxEntity>> {
+        val build = SyncEnvelopeFactory(database).build(rows)
+        if (build.skippedRows.isNotEmpty()) {
+            database.syncOutboxDao().deleteByIds(build.skippedRows.map { it.outboxId })
+        }
+        val skippedIds = build.skippedRows.map { it.outboxId }.toSet()
+        return build.envelopes to rows.filter { it.outboxId !in skippedIds }
     }
 
     private suspend fun delete(rows: List<SyncOutboxEntity>) {

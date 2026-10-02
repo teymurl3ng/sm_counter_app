@@ -126,28 +126,35 @@ internal object SyncMigrationSql {
             add(profileTrigger(profile, "insert"))
             add(profileTrigger(profile, "update"))
         }
-        add(
-            """
-            CREATE TRIGGER IF NOT EXISTS sync_capture_store_profile_insert AFTER INSERT ON store_profile
-            BEGIN
-                DELETE FROM sync_outbox WHERE table_name = 'store_profile' AND row_uid = 'u1_singleton_store_profile';
-                INSERT INTO sync_outbox(table_name, row_uid, enqueued_at)
-                    VALUES ('store_profile', 'u1_singleton_store_profile', $NOW);
-            END
-            """.trimIndent(),
-        )
+        add(storeProfileTrigger())
     }
 
     val triggerNames: List<String> = captureTriggers.map { sql ->
         sql.substringAfter("CREATE TRIGGER IF NOT EXISTS ").substringBefore(" AFTER").trim()
     }
 
+    /**
+     * Every outbox write is position-preserving: an entry that is still
+     * queued keeps its original slot, so a parent edited after children
+     * exist never moves behind them (halt-at-head depends on that order).
+     * The write is INSERT … SELECT … WHERE NOT EXISTS — no conflict clause,
+     * because the outer statement's conflict clause can override a trigger's
+     * own clause on some SQLite builds, and the expense-category path inserts
+     * with ABORT — a re-enqueue must never inherit it.
+     */
+    private fun outboxEnqueue(table: String, uidExpression: String): String = buildString {
+        append("    INSERT INTO sync_outbox(table_name, row_uid, enqueued_at)\n")
+        append("        SELECT '$table', $uidExpression, $NOW\n")
+        append("        WHERE NOT EXISTS (\n")
+        append("            SELECT 1 FROM sync_outbox\n")
+        append("            WHERE table_name = '$table' AND row_uid = $uidExpression\n")
+        append("        );\n")
+    }
+
     private fun insertTrigger(captured: CaptureTable): String = buildString {
         append("CREATE TRIGGER IF NOT EXISTS sync_capture_${captured.table}_insert AFTER INSERT ON ${captured.table}\n")
         append("BEGIN\n")
-        append("    DELETE FROM sync_outbox WHERE table_name = '${captured.table}' AND row_uid = NEW.${captured.uidColumn};\n")
-        append("    INSERT INTO sync_outbox(table_name, row_uid, enqueued_at)\n")
-        append("        VALUES ('${captured.table}', NEW.${captured.uidColumn}, $NOW);\n")
+        append(outboxEnqueue(captured.table, "NEW.${captured.uidColumn}"))
         if (captured.stampsUpdated) {
             append("    UPDATE ${captured.table} SET sync_updated_at = $NOW\n")
             append("        WHERE ${captured.pkColumn} = NEW.${captured.pkColumn} AND sync_updated_at = '';\n")
@@ -155,22 +162,14 @@ internal object SyncMigrationSql {
         append("END")
     }
 
-    /**
-     * The guard skips updates that only change sync_updated_at, which is what
-     * stops the trigger's own stamp UPDATE from recursing: each real update
-     * enqueues exactly once. The outbox write is an explicit DELETE + INSERT
-     * (not INSERT OR REPLACE) because the outer statement's conflict clause
-     * can override a trigger's own clause on some SQLite builds, and the
-     * expense-category path inserts with ABORT — a re-enqueue must never
-     * inherit it.
-     */
+    /** The guard skips updates that only change sync_updated_at, which is
+     *  what stops the trigger's own stamp UPDATE from recursing: each real
+     *  update enqueues exactly once, keeping its original queue position. */
     private fun updateTrigger(captured: CaptureTable): String = buildString {
         append("CREATE TRIGGER IF NOT EXISTS sync_capture_${captured.table}_update AFTER UPDATE ON ${captured.table}\n")
         append("WHEN NEW.sync_updated_at = OLD.sync_updated_at\n")
         append("BEGIN\n")
-        append("    DELETE FROM sync_outbox WHERE table_name = '${captured.table}' AND row_uid = NEW.${captured.uidColumn};\n")
-        append("    INSERT INTO sync_outbox(table_name, row_uid, enqueued_at)\n")
-        append("        VALUES ('${captured.table}', NEW.${captured.uidColumn}, $NOW);\n")
+        append(outboxEnqueue(captured.table, "NEW.${captured.uidColumn}"))
         append("END")
     }
 
@@ -178,23 +177,24 @@ internal object SyncMigrationSql {
         """
         CREATE TRIGGER IF NOT EXISTS sync_capture_settings_$kind AFTER $kind ON settings
         BEGIN
-            DELETE FROM sync_outbox WHERE table_name = 'settings' AND row_uid = 'setting:' || NEW.setting_key;
-            INSERT INTO sync_outbox(table_name, row_uid, enqueued_at)
-                VALUES ('settings', 'setting:' || NEW.setting_key, $NOW);
-        END
+        ${outboxEnqueue("settings", "'setting:' || NEW.setting_key")}END
         """.trimIndent()
 
     private fun profileTrigger(profile: ProfileTable, kind: String): String =
         """
         CREATE TRIGGER IF NOT EXISTS sync_capture_${profile.table}_$kind AFTER $kind ON ${profile.table}
         BEGIN
-            DELETE FROM sync_outbox WHERE table_name = '${profile.parentTable}'
-                AND row_uid = (SELECT parent.uid FROM ${profile.parentTable} parent WHERE parent.${profile.parentKey} = NEW.${profile.parentKey});
-            INSERT INTO sync_outbox(table_name, row_uid, enqueued_at)
-                SELECT '${profile.parentTable}', parent.uid, $NOW
-                FROM ${profile.parentTable} parent
-                WHERE parent.${profile.parentKey} = NEW.${profile.parentKey};
-        END
+        ${outboxEnqueue(
+            profile.parentTable,
+            "(SELECT parent.uid FROM ${profile.parentTable} parent WHERE parent.${profile.parentKey} = NEW.${profile.parentKey})",
+        )}END
+        """.trimIndent()
+
+    private fun storeProfileTrigger(): String =
+        """
+        CREATE TRIGGER IF NOT EXISTS sync_capture_store_profile_insert AFTER INSERT ON store_profile
+        BEGIN
+        ${outboxEnqueue("store_profile", "'u1_singleton_store_profile'")}END
         """.trimIndent()
 
     /**

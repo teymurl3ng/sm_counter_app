@@ -66,6 +66,15 @@ Server-side consequence of owner-only enrollment: the server sees a device-level
 
 > Names of the JSON body keys (`envelopes`, `device_id`, `shop_id`) MUST be re-verified against the client's request body before applying (pre-flight). Runs as ONE transaction. No overloads survive.
 
+**Rehearsal errata (go 5, DEV-verified 2026-10-03 — ALREADY APPLIED in the SQL below; the SQL is what actually runs).** The DEV rehearsal on a shape-faithful PROD-data copy found three plpgsql traps in the originally drafted §6.5/§8, all fixed and re-verified over REST:
+
+1. **`nullif(shop_id, '')` broke every call** (`22P02 invalid input syntax for type uuid: ""`): the untyped `''` coerces to the `uuid` param at plan time. The param is already uuid; PostgREST cannot bind an empty string into it, and the app client only sends non-empty shops (`SyncServerClient` guards `isNotEmpty`). Fixed to `v_shop := shop_id;` in BOTH §6.5 and §8.
+2. **plpgsql param/column name collision** (`42702 column reference "shop_id" is ambiguous`): the `shop_id` PARAMETER (name required for PostgREST body-key binding) collides with the `shop_id` COLUMN. Fixed by qualifying the `v_existing` lookup's column refs AND targeting `on conflict on constraint sync_records_shop_table_uid` (the same constraint-name lesson phase 5 recorded).
+3. **Seq burn on existing-row envelopes (benign, no action):** the `BEFORE INSERT` trigger fires before conflict redirection, so every envelope for an existing row burns one `nextval()` on the discarded insert tuple before the `DO UPDATE` leg (which burns a second one only when the payload actually changed). No row ever carries a burned seq, so this is invisible to clients — it only widens future gaps (bigint). Order==commit per shop is unaffected (advisory lock serializes assignment).
+4. **Comment correction:** an unchanged/append-only-refused envelope hits `continue` BEFORE the `applied` counter, so refused append-only rows are NOT counted in the response's `applied` (the original comment claimed they were). The client never branches on `applied` (it counts its own envelopes), so behavior is fine — comment corrected below.
+
+DEV-verified end state (go 5): 8 REST scenarios PASS (legacy 3-key no-op, C1-kill propagation, pull_cursor conflict with loser payload preserved, parked_seq conflict, append-only refusal, insert via trigger, unknown-table refusal, full ordered pull); §7 re-sequence PASS (dense 1..N, per-shop order preserved); §8 rollback dry-run PASS (rolled back, state intact). **Verified function hash on DEV after rehearsal: `sync_push(jsonb,text,uuid,bigint)` md5(pg_get_functiondef) = `6a6066c53fab81df98088d186da254ef` — the PROD apply must reproduce this hash.**
+
 ```sql
 begin;
 
@@ -138,7 +147,8 @@ begin
       'code', 'not_authorized', 'message', 'No active staff profile'));
   end if;
 
-  v_shop := nullif(shop_id, '');
+  -- erratum 1: nullif(shop_id,'') casts '' to the uuid param at plan time (22P02)
+  v_shop := shop_id;
   if v_shop is null or v_shop not in (select public.sync_staff_shop_ids()) then
     return jsonb_build_object('ok', false, 'error', jsonb_build_object(
       'code', 'shop_required', 'message',
@@ -185,8 +195,11 @@ begin
         'Correcting recorded history requires an owner or admin account'));
     end if;
 
+    -- erratum 2: qualify columns (unqualified shop_id collides with the param, 42702)
     select * into v_existing from public.sync_records
-     where shop_id = v_shop and table_name = v_table and row_uid = v_uid;
+     where public.sync_records.shop_id    = v_shop
+       and public.sync_records.table_name = v_table
+       and public.sync_records.row_uid    = v_uid;
 
     if found then
       -- INVARIANT 4: append-only tables are insert-only
@@ -201,7 +214,7 @@ begin
                   jsonb_build_object('table', v_table, 'uid', v_uid,
                                      'shop', v_shop, 'device', device_id));
         end if;
-        continue;  -- insert-only: never update, count as applied (idempotent no-op)
+        continue;  -- insert-only: never update; NOT counted in 'applied' (erratum 4)
       end if;
 
       -- master-data role gate
@@ -243,7 +256,8 @@ begin
     values (
       (select business_id from public.shops where id = v_shop),
       v_shop, v_table, v_uid, v_payload, device_id)
-    on conflict (shop_id, table_name, row_uid) do update
+    -- erratum 3: constraint-name target (inference cols collide with the param)
+    on conflict on constraint sync_records_shop_table_uid do update
       set payload       = excluded.payload,
           origin_device = excluded.origin_device,
           received_at   = now()
@@ -331,7 +345,8 @@ begin
       'code', 'not_authorized', 'message', 'No active staff profile'));
   end if;
 
-  v_shop := nullif(shop_id, '');
+  -- erratum 1 (same as §6.5): no nullif on the uuid param
+  v_shop := shop_id;
   if v_shop is null or v_shop not in (select public.sync_staff_shop_ids()) then
     return jsonb_build_object('ok', false, 'error', jsonb_build_object(
       'code', 'shop_required', 'message', 'shop required'));
@@ -371,7 +386,7 @@ begin
       (nextval('public.sync_records_server_seq_seq'),
        (select business_id from public.shops where id = v_shop),
        v_shop, v_table, v_uid, v_env->'payload', device_id)
-    on conflict (shop_id, table_name, row_uid) do update
+    on conflict on constraint sync_records_shop_table_uid do update
       set payload = excluded.payload,
           origin_device = excluded.origin_device,
           received_at = now();

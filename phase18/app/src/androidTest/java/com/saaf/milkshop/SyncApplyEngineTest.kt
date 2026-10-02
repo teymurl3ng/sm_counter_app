@@ -173,4 +173,126 @@ class SyncApplyEngineTest {
             target.close()
         }
     }
+
+    /**
+     * C1: a pulled row whose uid still has an unpushed local outbox edit is
+     * parked — never applied. The local row must stay untouched, the outbox
+     * entry must survive, and the park must exist with the pending reason.
+     */
+    @Test
+    fun pendingEditGuard_parksInsteadOfOverwriting() = runBlocking {
+        val target = MilkShopDatabase.createInMemory()
+        try {
+            val productId = target.productDao().insert(
+                com.saaf.milkshop.data.ProductEntity(name = "Desi Ghee", unit = "Kg", uid = "u1_test_ghee"),
+            )
+            // The device edited this product offline: the same DAO update the
+            // local edit path uses fires the capture trigger, unpushed.
+            target.productDao().updateIdentity(productId, "Desi Ghee Premium", "Kg")
+            assertEquals(1, target.syncOutboxDao().countByTableAndUid("products", "u1_test_ghee"))
+
+            val remote = SyncPulledRecord(
+                serverSeq = 50, shopId = null, tableName = "products",
+                rowUid = "u1_test_ghee",
+                payload = JSONObject().put("name", "Desi Ghee (remote rename)").put("unit", "Kg"),
+                originDevice = "other-device",
+            )
+            val report = SyncApplyEngine(target).apply(listOf(remote))
+            assertEquals(1, report.parked)
+            assertEquals(0, report.updated)
+            // The local edit's row is untouched and its outbox entry intact.
+            assertEquals("Desi Ghee Premium", target.productDao().findByName("Desi Ghee Premium")!!.name)
+            assertEquals(1, target.syncOutboxDao().countByTableAndUid("products", "u1_test_ghee"))
+            // The park exists for this uid.
+            assertNotNull(target.syncParkedRowDao().find("products", "u1_test_ghee"))
+        } finally {
+            target.close()
+        }
+    }
+
+    /**
+     * C1: a pulled delivery referencing a customer that is not local yet is
+     * PARKED (cursor-safe), and once the customer arrives the retry pass
+     * applies the parked row and clears the park — no permanent loss.
+     */
+    @Test
+    fun dependencyPark_resolvesWhenParentArrives() = runBlocking {
+        val target = MilkShopDatabase.createInMemory()
+        try {
+            val milkUid = "u1_seed_products_Milk"
+            val deliveryUid = "u1_test_delivery_1"
+            val early = SyncPulledRecord(
+                serverSeq = 10, shopId = null, tableName = "deliveries", rowUid = deliveryUid,
+                payload = JSONObject()
+                    .put("customer_uid", "u1_missing_customer")
+                    .put("product_uid", milkUid)
+                    .put("quantity", 3.5)
+                    .put("business_date", "2026-10-01")
+                    .put("created_at", "2026-10-01T07:30:00Z"),
+                originDevice = "other-device",
+            )
+            val first = SyncApplyEngine(target).apply(listOf(early))
+            assertEquals(1, first.parked)
+            assertNull(target.syncEnvelopeDao().deliveriesByUid(listOf(deliveryUid)).firstOrNull())
+            assertNotNull(target.syncParkedRowDao().find("deliveries", deliveryUid))
+
+            // The customer arrives in a later batch; the retry pass at the
+            // end of that batch must resolve the parked delivery.
+            val customer = SyncPulledRecord(
+                serverSeq = 11, shopId = null, tableName = "accounts", rowUid = "u1_missing_customer",
+                payload = JSONObject()
+                    .put("name", "Customer: Late Account")
+                    .put("type", "Asset")
+                    .put("category", "Customer"),
+                originDevice = "other-device",
+            )
+            val second = SyncApplyEngine(target).apply(listOf(customer))
+            // The customer applies, and the batch-end retry pass recovers the
+            // parked delivery — both count as applied.
+            assertEquals(2, second.applied)
+            assertEquals(0, second.parked)
+            assertEquals(0, target.syncParkedRowDao().count())
+            val resolved = target.syncEnvelopeDao().deliveriesByUid(listOf(deliveryUid)).single()
+            assertEquals(3.5, resolved.quantity, 1e-9)
+            assertEquals(
+                "u1_missing_customer",
+                target.syncEnvelopeDao().accountsByIds(listOf(resolved.customerAccountId)).single().uid,
+            )
+        } finally {
+            target.close()
+        }
+    }
+
+    /**
+     * C1: a park that can never resolve stops consuming retries at
+     * MAX_PARK_RETRIES, keeps the row as evidence, and audits the
+     * exhaustion exactly once.
+     */
+    @Test
+    fun dependencyPark_exhaustsBoundedRetriesWithOneAudit() = runBlocking {
+        val target = MilkShopDatabase.createInMemory()
+        try {
+            val doomed = SyncPulledRecord(
+                serverSeq = 7, shopId = null, tableName = "deliveries", rowUid = "u1_test_delivery_doomed",
+                payload = JSONObject()
+                    .put("customer_uid", "u1_never_arrives")
+                    .put("product_uid", "u1_seed_products_Milk")
+                    .put("quantity", 1.0)
+                    .put("business_date", "2026-10-01")
+                    .put("created_at", "2026-10-01T07:30:00Z"),
+                originDevice = "other-device",
+            )
+            SyncApplyEngine(target).apply(listOf(doomed))
+            repeat(6) { SyncApplyEngine(target).apply(emptyList()) }
+            // The park survives as evidence; the exhaustion was audited once.
+            val park = target.syncParkedRowDao().find("deliveries", "u1_test_delivery_doomed")
+            assertNotNull(park)
+            assertEquals(5, park!!.retryCount)
+            val exhaustionAudits = target.backupDataDao().securityAuditEntries()
+                .count { it.action == "sync_park_unresolved" }
+            assertEquals(1, exhaustionAudits)
+        } finally {
+            target.close()
+        }
+    }
 }

@@ -96,6 +96,14 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
 
     private suspend fun applyOne(record: SyncPulledRecord): PerRecord {
         val payload = record.payload
+        // C1 pending-edit guard: a pulled row whose uid still has an unpushed
+        // local edit is parked, never applied — the local edit must reach the
+        // server first. Pushing it later clears the park (and sends the
+        // parked_seq conflict hint so the overwritten remote version is
+        // audited server-side).
+        if (database.syncOutboxDao().countByTableAndUid(record.tableName, record.rowUid) > 0) {
+            return park(record, "pending_local_edit")
+        }
         return try {
             when (record.tableName) {
                 "products" -> applyProduct(record.rowUid, payload)

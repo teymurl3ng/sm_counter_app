@@ -55,14 +55,17 @@ class FakeSyncContractServer {
             val key = "$table|$uid"
             val existing = rows[key]
             if (existing != null) {
+                // The real A′ SQL compares NORMALIZED payloads (volatile
+                // per-device stamps stripped) — seed echoes from another
+                // device are not changes and must not be conflicts.
+                val changed = normalized(existing.payload).toString() != normalized(payload).toString()
                 if (table in APPEND_ONLY_TABLES) {
-                    if (existing.payload.toString() != payload.toString()) {
+                    if (changed) {
                         appendOnlyRefusals += "$table/$uid"
                     }
                     applied += 1 // insert-only: idempotent no-op either way
                     continue
                 }
-                val changed = existing.payload.toString() != payload.toString()
                 if (changed &&
                     existing.originDevice != deviceId &&
                     (existing.seq > pullCursor || env.has("parked_seq"))
@@ -86,6 +89,9 @@ class FakeSyncContractServer {
         }
         return applied
     }
+
+    private fun normalized(p: JSONObject): JSONObject =
+        JSONObject(p.toString()).apply { remove("sync_updated_at") }
 
     /** Records with seq > sinceSeq, ordered by seq — the sync_pull contract. */
     fun syncPull(sinceSeq: Long): List<SyncPulledRecord> =

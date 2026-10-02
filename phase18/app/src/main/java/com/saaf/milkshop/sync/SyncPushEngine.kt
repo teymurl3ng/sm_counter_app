@@ -168,10 +168,17 @@ class SyncPushEngine(
         return rows.filter { row ->
             val original = pushedByUid[row.rowUid] ?: return@filter false
             val current = rebuiltByUid[row.rowUid] ?: return@filter false
-            !jsonStructurallyEqual(original, current)
+            // parked_seq is transport-only conflict-evidence metadata (the
+            // server strips it before storage); it must never break ack
+            // equality, or hint-carrying rows would re-push forever.
+            val originalState = if (original.has("parked_seq")) {
+                JSONObject(original.toString()).apply { remove("parked_seq") }
+            } else {
+                original
+            }
+            jsonStructurallyEqual(originalState, current)
         }
     }
-
     private suspend fun onHalted(failure: SyncPushResult.Permanent, queueDepth: Int) {
         val now = System.currentTimeMillis()
         if (now - lastHaltAuditEpochMs >= HALT_AUDIT_INTERVAL_MS) {

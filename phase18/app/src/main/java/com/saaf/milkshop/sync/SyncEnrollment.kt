@@ -86,18 +86,20 @@ class SyncEnrollment(
         )
         SyncShopBindingStore.save(context, binding)
         (target.timezone ?: auth.shopTimezone)?.let(BusinessClock::setZone)
-        // Re-baseline for the newly enrolled server: the complete local
-        // history is enqueued (idempotent — rows already queued or already
-        // on the server change nothing), and the pull cursor restarts at
-        // zero so the device converges with the server from the beginning.
-        // go 8 EXCEPTION: a format-5 restore already imported its outbox —
-        // enqueueAll here would re-enqueue the WHOLE snapshot and defeat the
-        // classified pull-first flow. The restored entries classify against
-        // the server on the first drain (SyncRuntime), then only unseed rows
-        // push.
+        // Re-baseline for the newly enrolled server: the pull cursor restarts
+        // at zero so the device converges with the server from the beginning.
+        // go 8 Z-leg: a PLAIN enrollment enqueues the complete local history
+        // PRE-HELD (flag first, then the enqueue — both crash gaps self-heal)
+        // and the first drain classifies it against server row bodies: blind
+        // push-first would clobber a server that may be the newer party
+        // (after a rollback this device legitimately holds newer rows; after
+        // an offline gap the server does). A format-5 restore instead runs
+        // the origin-based classified flow on its imported outbox — enqueueAll
+        // here would defeat it.
         database?.let { db ->
             if (!rebaseline.restoredRebaseline) {
-                SyncBaseline.enqueueAll(db)
+                rebaseline.liveRebaselinePending = true
+                SyncBaseline.enqueueAllHeld(db)
             }
             db.syncPullStateDao().upsert(
                 com.saaf.milkshop.data.SyncPullStateEntity(

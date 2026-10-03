@@ -36,4 +36,18 @@ object SyncBaseline {
         // not fire the AFTER INSERT capture triggers for already-queued rows.
         enqueueStatements.forEach { executeSQL(it) }
     }
+
+    /**
+     * go 8 option Z: a PLAIN enrollment enqueues the full local history
+     * PRE-HELD — the first drain classifies it against server row bodies
+     * (release what the server lacks / drop in-sync rows / hold differing
+     * rows) before anything pushes. Only entries inserted HERE are held:
+     * max(outbox_id) taken before the enqueue marks the boundary, so
+     * pending edits captured earlier keep held=0 and push normally.
+     */
+    suspend fun enqueueAllHeld(database: MilkShopDatabase) = database.withWriteTransaction {
+        val boundary = database.syncOutboxDao().maxOutboxId()
+        enqueueStatements.forEach { executeSQL(it) }
+        database.syncOutboxDao().holdAllAfter(boundary)
+    }
 }

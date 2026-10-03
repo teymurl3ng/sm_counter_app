@@ -147,6 +147,14 @@ interface SyncOutboxDao {
     @Query("UPDATE sync_outbox SET held = :held WHERE table_name = :tableName AND row_uid = :rowUid")
     suspend fun setHeld(tableName: String, rowUid: String, held: Boolean)
 
+    /** Boundary marker for the option-Z live re-baseline enqueue. */
+    @Query("SELECT COALESCE(MAX(outbox_id), 0) FROM sync_outbox")
+    suspend fun maxOutboxId(): Long
+
+    /** Holds exactly the entries inserted after [id] — pre-existing pending edits keep held=0. */
+    @Query("UPDATE sync_outbox SET held = 1 WHERE outbox_id > :id")
+    suspend fun holdAllAfter(id: Long)
+
     @Query("DELETE FROM sync_outbox WHERE outbox_id IN (:ids)")
     suspend fun deleteByIds(ids: List<Long>)
 

@@ -46,6 +46,7 @@ class SyncRuntime(
         if (tokenStore.load() == null) return SyncPushEngine.DrainOutcome.NotConfigured
 
         runRestoredRebaselineIfPending()
+        runLiveRebaselineIfPending()
 
         val baseTransport = SyncServerClient(http, config, database, tokenStore) { binding.shopId }
         val notifier = SyncNotifier(context)
@@ -105,6 +106,51 @@ class SyncRuntime(
     }
 
     /**
+     * go 8 option Z (2026-10-04 owner decision): the FIRST drain after a
+     * plain enrollment must NOT blind-push the enqueued history (LWW would
+     * let whichever side is newer lose silently — this device after a
+     * server rollback, the server after this device's offline gap). The
+     * enrollment enqueued everything PRE-HELD; this gate runs the pull-0
+     * with body collection (the guard parks every server version, since
+     * every local uid has an entry) and classifies: release / drop-equal /
+     * hold-differ — then the normal drain pushes only what was released.
+     * Pre-held entries must never blind-push, so unlike the restore path
+     * the crash fallback RE-RUNS the classification from cursor 0 — it is
+     * idempotent: released entries are already unheld, dropped entries are
+     * gone, holds re-upsert.
+     */
+    private suspend fun runLiveRebaselineIfPending() {
+        val rebaseline = SyncRebaselineStore(context)
+        if (!rebaseline.liveRebaselinePending) return
+        val cursor = database.syncPullStateDao().find()?.lastServerSeq ?: 0L
+        if (cursor != 0L) {
+            database.syncPullStateDao().upsert(
+                com.saaf.milkshop.data.SyncPullStateEntity(
+                    lastServerSeq = 0,
+                    updatedAt = java.time.Instant.now().toString(),
+                ),
+            )
+        }
+        val collector = HashMap<String, SyncRebaseline.SeenServerRow>()
+        val pull = pullOnce(collector)
+        if (pull !is SyncPullSummary.Done) return
+        val report = SyncRebaseline.classifyLiveAndApply(database, collector)
+        rebaseline.liveRebaselinePending = false
+        runCatching {
+            database.securityAuditDao().insert(
+                com.saaf.milkshop.data.SecurityAuditEntryEntity(
+                    auditId = 0,
+                    occurredAt = java.time.Instant.now().toString(),
+                    action = "sync_rebaseline_classified",
+                    result = "info",
+                    reasonCode = "live_rebaseline",
+                    details = report.describe(),
+                ),
+            )
+        }
+    }
+
+    /**
      * Pulls and applies everything the server has beyond the local cursor,
      * batch by batch in server_seq order. Callers drain (push) BEFORE
      * pulling (C1 decision record): a local edit must reach the server
@@ -149,7 +195,11 @@ class SyncRuntime(
                     originCollector?.let { collector ->
                         outcome.batch.records.forEach { record ->
                             collector[SyncRebaseline.seenKey(record.tableName, record.rowUid)] =
-                                SyncRebaseline.SeenServerRow(record.originDevice, record.serverSeq)
+                                SyncRebaseline.SeenServerRow(
+                                    record.originDevice,
+                                    record.serverSeq,
+                                    record.payload,
+                                )
                         }
                     }
                     val report = applyEngine.apply(outcome.batch.records)

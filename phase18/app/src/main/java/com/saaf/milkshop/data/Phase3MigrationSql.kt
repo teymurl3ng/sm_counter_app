@@ -143,23 +143,23 @@ internal object Phase3MigrationSql {
     val backfillStatements = listOf(
         """
         INSERT OR IGNORE INTO product_profiles(product_id, inventory_tracking, archived, created_at)
-        SELECT product_id, 1, 0, CURRENT_TIMESTAMP FROM products
+        SELECT product_id, 1, 0, '2026-01-01 00:00:00' FROM products
         """.trimIndent(),
         """
         INSERT OR IGNORE INTO customer_profiles(account_id, active, created_at)
-        SELECT account_id, 1, CURRENT_TIMESTAMP FROM accounts WHERE category = 'Customer'
+        SELECT account_id, 1, '2026-01-01 00:00:00' FROM accounts WHERE category = 'Customer'
         """.trimIndent(),
         """
         INSERT OR IGNORE INTO vendor_profiles(account_id, active, created_at)
-        SELECT account_id, 1, CURRENT_TIMESTAMP FROM accounts WHERE category = 'Vendor'
+        SELECT account_id, 1, '2026-01-01 00:00:00' FROM accounts WHERE category = 'Vendor'
         """.trimIndent(),
         """
         INSERT OR IGNORE INTO employee_profiles(account_id, active, created_at)
-        SELECT account_id, 1, CURRENT_TIMESTAMP FROM accounts WHERE category = 'Salary'
+        SELECT account_id, 1, '2026-01-01 00:00:00' FROM accounts WHERE category = 'Salary'
         """.trimIndent(),
         """
         INSERT OR IGNORE INTO expense_category_profiles(account_id, display_name, active, created_at)
-        SELECT account_id, substr(name, length('Expense: ') + 1), 1, CURRENT_TIMESTAMP
+        SELECT account_id, substr(name, length('Expense: ') + 1), 1, '2026-01-01 00:00:00'
         FROM accounts WHERE category = 'Operating Expense'
         """.trimIndent(),
     )

@@ -111,6 +111,9 @@ interface BackupDataDao {
     @Query("DELETE FROM budget_plans") suspend fun deleteBudgets()
     @Query("DELETE FROM collections_targets") suspend fun deleteCollectionsTargets()
     @Query("DELETE FROM sync_outbox") suspend fun deleteSyncOutbox()
+    // go 8 format 5: restored outbox entries ride in the backup so unsynced-
+    // at-backup edits survive; IGNORE honors the unique (table_name, row_uid).
+    @Insert(onConflict = OnConflictStrategy.IGNORE) suspend fun insertSyncOutbox(rows: List<SyncOutboxEntity>)
     @Query("DELETE FROM sync_pull_state") suspend fun deleteSyncPullState()
 
     @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertProducts(rows: List<ProductEntity>)

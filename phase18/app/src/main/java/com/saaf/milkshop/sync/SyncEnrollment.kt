@@ -59,6 +59,19 @@ class SyncEnrollment(
                 Outcome.ShopsAvailable(auth.shops)
             }
 
+        // go 8: a restore/reset marks the installation for a fresh identity —
+        // consume it here, on the definitive enrollment path, so the restored
+        // device never pushes as the id that wrote its backup (same-origin
+        // pushes escape the server's conflict audit). The replaced id was
+        // already recorded as prev_device_id by the restore for outbox
+        // classification. Ordinary enrollments (environment switch) keep
+        // their identity.
+        val rebaseline = SyncRebaselineStore(context)
+        if (rebaseline.needsFreshIdentity) {
+            SyncIdentity.regenerate(context)
+            rebaseline.needsFreshIdentity = false
+        }
+
         SyncServerConfigStore.save(context, config)
         SyncTokenStore(context).save(
             SyncTokenStore.Session(auth.accessToken, auth.refreshToken, auth.accessTokenExpiresAtEpochMs),

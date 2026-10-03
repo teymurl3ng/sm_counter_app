@@ -85,6 +85,12 @@ interface SyncOutboxDao {
     @Query("SELECT * FROM sync_outbox ORDER BY outbox_id LIMIT :limit")
     suspend fun nextBatch(limit: Int): List<SyncOutboxEntity>
 
+    @Query("SELECT * FROM sync_outbox ORDER BY outbox_id")
+    suspend fun all(): List<SyncOutboxEntity>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertAll(rows: List<SyncOutboxEntity>)
+
     @Query("DELETE FROM sync_outbox WHERE outbox_id IN (:ids)")
     suspend fun deleteByIds(ids: List<Long>)
 

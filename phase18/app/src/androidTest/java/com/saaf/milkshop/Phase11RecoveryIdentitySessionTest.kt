@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.saaf.milkshop.sync.SyncRebaselineStore
 import com.saaf.milkshop.cloud.CloudAccountIdentity
 import com.saaf.milkshop.cloud.CloudBackupCoordinator
 import com.saaf.milkshop.cloud.CloudBackupCryptography
@@ -61,6 +62,9 @@ class Phase11RecoveryIdentitySessionTest {
                         current = JSONObject(replacement?.toString() ?: "{}")
                         applied += current.optString("mode")
                     },
+                    rebaselineStore = SyncRebaselineStore(
+                        InstrumentationRegistry.getInstrumentation().targetContext,
+                    ),
                 )
                 val backup = JSONObject().put(
                     "data",

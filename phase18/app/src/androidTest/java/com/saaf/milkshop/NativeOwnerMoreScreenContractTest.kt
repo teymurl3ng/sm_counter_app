@@ -23,9 +23,11 @@ import com.saaf.milkshop.nativeui.owner.OwnerMoreScreen
 import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.theme.SaafTheme
 import com.saaf.milkshop.nativeui.owner.OwnerSyncState
+import com.saaf.milkshop.sync.NativeSyncHold
 import com.saaf.milkshop.sync.NativeSyncStatus
 import com.saaf.milkshop.sync.NativeSyncShopChoice
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -269,6 +271,7 @@ class NativeOwnerMoreScreenContractTest {
         onEnrollSync: (String, CharArray, String) -> Unit = { _, _, _ -> },
         onEnrollSyncInShop: (String, String, CharArray, String) -> Unit = { _, _, _, _ -> },
         onSyncNow: () -> Unit = {},
+        onResolveHoldSync: (String, String, Boolean) -> Unit = { _, _, _ -> },
         onUnenrollSync: () -> Unit = {},
         onBackToMenu: () -> Unit = {},
         onSwitchAccount: () -> Unit = {},
@@ -303,6 +306,7 @@ class NativeOwnerMoreScreenContractTest {
                     onEnrollSync = onEnrollSync,
                     onEnrollSyncInShop = onEnrollSyncInShop,
                     onSyncNow = onSyncNow,
+                    onResolveHoldSync = onResolveHoldSync,
                     onUnenrollSync = onUnenrollSync,
                     onBackToMenu = onBackToMenu,
                     onRetryProducts = {},
@@ -494,6 +498,82 @@ class NativeOwnerMoreScreenContractTest {
             .performScrollTo()
             .performClick()
         assertTrue(pressed)
+    }
+
+    @Test
+    fun restoredHoldsListedForReview() {
+        setScreen(
+            NativeOwnerMoreState.Ready(
+                context = openContext(),
+                destination = NativeOwnerMoreDestination.Sync,
+                syncState = OwnerSyncState(
+                    status = syncStatus(),
+                    holds = listOf(
+                        NativeSyncHold(
+                            tableName = "products",
+                            rowUid = "u1_seed_products_Milk",
+                            originDevice = "deviceabc",
+                            heldAt = "2026-10-03T10:00:00Z",
+                        ),
+                    ),
+                ),
+            ),
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncHolds)
+            .performScrollTo()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun keepMineReleasesEntryToPush() {
+        var resolvedTable = ""
+        var resolvedUid = ""
+        var resolvedKeep = false
+        setScreen(
+            NativeOwnerMoreState.Ready(
+                context = openContext(),
+                destination = NativeOwnerMoreDestination.Sync,
+                syncState = OwnerSyncState(
+                    status = syncStatus(),
+                    holds = listOf(
+                        NativeSyncHold("products", "u1_seed_products_Milk", "deviceabc", "2026-10-03T10:00:00Z"),
+                    ),
+                ),
+            ),
+            onResolveHoldSync = { table, uid, keepMine ->
+                resolvedTable = table
+                resolvedUid = uid
+                resolvedKeep = keepMine
+            },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncHoldKeep)
+            .performScrollTo()
+            .performClick()
+        assertEquals("products", resolvedTable)
+        assertEquals("u1_seed_products_Milk", resolvedUid)
+        assertTrue(resolvedKeep)
+    }
+
+    @Test
+    fun takeServerDropsEntrySoParkApplies() {
+        var resolvedKeep = true
+        setScreen(
+            NativeOwnerMoreState.Ready(
+                context = openContext(),
+                destination = NativeOwnerMoreDestination.Sync,
+                syncState = OwnerSyncState(
+                    status = syncStatus(),
+                    holds = listOf(
+                        NativeSyncHold("accounts", "u1_acc", "deviceabc", "2026-10-03T10:00:00Z"),
+                    ),
+                ),
+            ),
+            onResolveHoldSync = { _, _, keepMine -> resolvedKeep = keepMine },
+        )
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncHoldTake)
+            .performScrollTo()
+            .performClick()
+        assertFalse(resolvedKeep)
     }
 
     @Test

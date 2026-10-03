@@ -211,12 +211,14 @@ internal class OwnerSyncController(
         runtime.scope.launch {
             try {
                 val status = withContext(Dispatchers.IO) { facade.status() }
+                val holds = withContext(Dispatchers.IO) { facade.holds() }
                 if (!runtime.isCurrent(token)) return@launch
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (latest.destination != NativeOwnerMoreDestination.Sync) return@launch
                 runtime.state.value = latest.copy(
                     syncState = latest.syncState.copy(
                         status = status,
+                        holds = holds,
                         busy = false,
                         error = null,
                     ),
@@ -226,6 +228,43 @@ internal class OwnerSyncController(
                 if (!runtime.isCurrent(token)) return@launch
                 runtime.updateReady {
                     it.copy(syncState = it.syncState.copy(busy = false, error = error.message ?: "Failed to load"))
+                }
+            }
+        }
+    }
+
+    /**
+     * go 8 sync-review: rules on a held restored entry. keep-mine releases it
+     * into the push (audited); take-server drops it and lets the server
+     * version apply. Reloads the hold list afterwards.
+     */
+    fun resolveHold(tableName: String, rowUid: String, keepMine: Boolean) {
+        val token = runtime.captureSession() ?: return
+        val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
+        if (current.destination != NativeOwnerMoreDestination.Sync) return
+        runtime.updateReady { it.copy(syncState = it.syncState.copy(busy = true, error = null)) }
+        runtime.scope.launch {
+            try {
+                withContext(Dispatchers.IO) { facade.resolveHold(tableName, rowUid, keepMine) }
+                if (!runtime.isCurrent(token)) return@launch
+                runtime.updateReady {
+                    it.copy(
+                        syncState = it.syncState.copy(
+                            busy = false,
+                            notice = if (keepMine) {
+                                "Your version will upload with the next sync."
+                            } else {
+                                "The server version will be applied with the next sync."
+                            },
+                        ),
+                    )
+                }
+                loadStatus(token)
+            } catch (error: Throwable) {
+                if (runtime.isCurrent(token)) {
+                    runtime.updateReady {
+                        it.copy(syncState = it.syncState.copy(busy = false, error = error.message ?: "Failed"))
+                    }
                 }
             }
         }

@@ -43,6 +43,7 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
+import com.saaf.milkshop.sync.NativeSyncHold
 import com.saaf.milkshop.sync.NativeSyncShopChoice
 import com.saaf.milkshop.sync.NativeSyncStatus
 import com.saaf.milkshop.sync.SyncServerConfig
@@ -70,6 +71,10 @@ fun OwnerSyncScreen(
     onSyncNow: () -> Unit,
     onUnenroll: () -> Unit,
     allowDevEnvironment: Boolean = false,
+    // go 8 sync-review: restored entries held for an owner decision. Defaults
+    // keep the admin-role composition silent (holds are owner decisions).
+    holds: List<NativeSyncHold> = emptyList(),
+    onResolveHold: (String, String, Boolean) -> Unit = { _, _, _ -> },
     hostedScaffold: HostedScaffold,
     modifier: Modifier = Modifier,
 ) {
@@ -128,6 +133,8 @@ fun OwnerSyncScreen(
                 status != null -> OwnerSyncEnrolledBody(
                     status = status,
                     busy = busy,
+                    holds = holds,
+                    onResolveHold = onResolveHold,
                     onRefresh = onRefresh,
                     onSyncNow = onSyncNow,
                     onUnenroll = { unenrollConfirmOpen = true },
@@ -244,6 +251,8 @@ fun OwnerSyncScreen(
 private fun OwnerSyncEnrolledBody(
     status: NativeSyncStatus,
     busy: Boolean,
+    holds: List<NativeSyncHold>,
+    onResolveHold: (String, String, Boolean) -> Unit,
     onRefresh: () -> Unit,
     onSyncNow: () -> Unit,
     onUnenroll: () -> Unit,
@@ -256,6 +265,42 @@ private fun OwnerSyncEnrolledBody(
         OwnerSyncStatusRow("Trusted time", if (status.trustedTimeAnchored) "server-anchored" else "phone clock only")
         OwnerSyncStatusRow("Waiting to upload", status.outboxCount.toString())
         OwnerSyncStatusRow("Last pulled record", status.pullCursor.toString())
+    }
+    if (holds.isNotEmpty()) {
+        Spacer(Modifier.height(16.dp))
+        Text(
+            "Needs review — entries restored from a backup that the server " +
+                "holds newer versions of. Nothing uploads until you decide.",
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.testTag(NativeUiTags.OwnerSyncHolds),
+        )
+        holds.forEach { hold ->
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            Column(Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                Text(
+                    "${hold.tableName} · ${hold.rowUid}",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                Text(
+                    "Server version from ${hold.originDevice ?: "an unknown device"}" +
+                        " · held ${hold.heldAt.take(10)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Button(
+                        onClick = { onResolveHold(hold.tableName, hold.rowUid, true) },
+                        enabled = !busy,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerSyncHoldKeep),
+                    ) { Text("Keep mine") }
+                    OutlinedButton(
+                        onClick = { onResolveHold(hold.tableName, hold.rowUid, false) },
+                        enabled = !busy,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerSyncHoldTake),
+                    ) { Text("Take server") }
+                }
+            }
+        }
     }
     Spacer(Modifier.height(16.dp))
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {

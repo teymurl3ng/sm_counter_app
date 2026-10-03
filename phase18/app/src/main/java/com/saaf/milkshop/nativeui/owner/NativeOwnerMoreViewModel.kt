@@ -401,6 +401,9 @@ class NativeOwnerMoreViewModel internal constructor(
 
     fun syncNow() = syncController.syncNow()
 
+    fun resolveSyncHold(tableName: String, rowUid: String, keepMine: Boolean) =
+        syncController.resolveHold(tableName, rowUid, keepMine)
+
     fun unenrollSync() = syncController.unenroll()
 
     fun refreshBackup() = backupController.refreshBackup()

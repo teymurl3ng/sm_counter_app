@@ -36,6 +36,7 @@ class SyncRuntime(
             trustedTimeAnchored = TrustedTime.isAnchored(),
             outboxCount = database.syncOutboxDao().count(),
             pullCursor = database.syncPullStateDao().find()?.lastServerSeq ?: 0L,
+            holdCount = database.syncRebaselineHoldDao().count(),
         )
     }
 

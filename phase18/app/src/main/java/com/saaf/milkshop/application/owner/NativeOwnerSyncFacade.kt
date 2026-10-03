@@ -2,6 +2,7 @@ package com.saaf.milkshop.application.owner
 
 import android.content.Context
 import com.saaf.milkshop.data.MilkShopDatabase
+import com.saaf.milkshop.sync.NativeSyncHold
 import com.saaf.milkshop.sync.NativeSyncStatus
 import com.saaf.milkshop.sync.SyncEndpoints
 import com.saaf.milkshop.sync.SyncEnrollment
@@ -43,4 +44,26 @@ class NativeOwnerSyncFacade(
 
     /** Drains the outbox to the server. */
     suspend fun push(): SyncPushEngine.DrainOutcome = runtime.drainOnce()
+
+    /** go 8: restored entries held out of the push for an owner decision. */
+    suspend fun holds(): List<NativeSyncHold> =
+        database.syncRebaselineHoldDao().all().map {
+            NativeSyncHold(it.tableName, it.rowUid, it.originDevice, it.heldAt)
+        }
+
+    /**
+     * go 8: rules on a held restored entry. keep-mine releases the entry back
+     * into the push (the local row still holds its backup-era values — the
+     * park never applied — so this pushes and is audited server-side);
+     * take-server deletes the entry, unblocking its park so the next pull
+     * applies the server version over the local row.
+     */
+    suspend fun resolveHold(tableName: String, rowUid: String, keepMine: Boolean) {
+        if (keepMine) {
+            database.syncOutboxDao().setHeld(tableName, rowUid, false)
+        } else {
+            database.syncOutboxDao().deleteEntry(tableName, rowUid)
+        }
+        database.syncRebaselineHoldDao().delete(tableName, rowUid)
+    }
 }

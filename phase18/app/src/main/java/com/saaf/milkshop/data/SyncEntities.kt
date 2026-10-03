@@ -12,10 +12,10 @@ import androidx.room3.Query
 /**
  * Row-level change feed for sync push. Capture triggers on the synced tables
  * enqueue (table, row uid) pairs here; nothing consumes the queue until the
- * push engine exists. `INSERT OR REPLACE` moves a re-enqueued row to the
- * tail, so draining by outbox_id preserves strict first-change order for the
- * dependencies that matter — an event always precedes the daily close that
- * covers it, and an original always precedes its correction.
+ * push engine exists. Re-enqueue keeps the original slot (position-preserving
+ * triggers), so draining by outbox_id preserves strict first-change order for
+ * the dependencies that matter — a parent row always precedes the events that
+ * reference it, and an original always precedes its correction.
  */
 @Entity(
     tableName = "sync_outbox",
@@ -31,6 +31,37 @@ data class SyncOutboxEntity(
     val rowUid: String,
     @ColumnInfo(name = "enqueued_at")
     val enqueuedAt: String,
+)
+
+/**
+ * Pulled rows the apply engine could not apply YET, kept so the pull cursor
+ * can advance without losing them (C1). Two park reasons:
+ *  - dependency failure: a referenced parent row is not local yet;
+ *  - pending-edit guard: a local outbox entry for this uid still holds an
+ *    unpushed edit that a pulled update must not overwrite.
+ * Lifecycle: applying ANY version for the uid clears the park; a successful
+ * push of the uid clears it (after the parked_seq conflict hint reached the
+ * server); only dependency parks are retry-applied, with bounded retries.
+ * Parks are transient retry state, not data — restore clears them and
+ * resets the pull cursor so everything re-pulls.
+ */
+@Entity(
+    tableName = "sync_parked_rows",
+    primaryKeys = ["table_name", "row_uid"],
+)
+data class SyncParkedRowEntity(
+    @ColumnInfo(name = "table_name")
+    val tableName: String,
+    @ColumnInfo(name = "row_uid")
+    val rowUid: String,
+    @ColumnInfo(name = "payload_json")
+    val payloadJson: String,
+    @ColumnInfo(name = "server_seq")
+    val serverSeq: Long,
+    @ColumnInfo(name = "retry_count")
+    val retryCount: Int,
+    @ColumnInfo(name = "parked_at")
+    val parkedAt: String,
 )
 
 /**
@@ -62,6 +93,31 @@ interface SyncOutboxDao {
 
     @Query("DELETE FROM sync_outbox")
     suspend fun deleteAll()
+
+    /** Nonzero when a pulled row's uid still has an unpushed local edit (C1 pending-edit guard). */
+    @Query("SELECT COUNT(*) FROM sync_outbox WHERE table_name = :tableName AND row_uid = :rowUid")
+    suspend fun countByTableAndUid(tableName: String, rowUid: String): Int
+}
+
+@Dao
+interface SyncParkedRowDao {
+    @Query("SELECT * FROM sync_parked_rows ORDER BY server_seq")
+    suspend fun all(): List<SyncParkedRowEntity>
+
+    @Query("SELECT * FROM sync_parked_rows WHERE table_name = :tableName AND row_uid = :rowUid")
+    suspend fun find(tableName: String, rowUid: String): SyncParkedRowEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(park: SyncParkedRowEntity)
+
+    @Query("DELETE FROM sync_parked_rows WHERE table_name = :tableName AND row_uid = :rowUid")
+    suspend fun delete(tableName: String, rowUid: String)
+
+    @Query("DELETE FROM sync_parked_rows")
+    suspend fun clear()
+
+    @Query("SELECT COUNT(*) FROM sync_parked_rows")
+    suspend fun count(): Int
 }
 
 @Dao

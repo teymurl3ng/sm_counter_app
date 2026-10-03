@@ -7,17 +7,17 @@ import org.json.JSONObject
 import java.io.IOException
 
 /**
- * The production push transport (sync Phase 4): builds envelopes for queued
- * rows and POSTs them to the Account Server's `sync_push` RPC (added by sync
- * Phase 5). Outcome mapping feeds the Phase-3 engine directly:
+ * The production push transport (sync Phase 4): POSTs the engine-built
+ * envelopes to the Account Server's `sync_push` RPC (added by sync Phase 5).
+ * Outcome mapping feeds the Phase-3 engine directly:
  *  - 2xx → Success (rows may leave the queue);
  *  - network/429/5xx/401 → Transient (retry later; 401 means the session
  *    needs refresh or re-enrollment, never a data verdict);
  *  - 403/422 → Permanent with the server's stable reason code (or a status
  *    fallback) — the engine halts at the offending row and alerts the owner.
- * Outbox rows whose local record has vanished are dropped: there is nothing
- * to push for them and their queue slots must not block dependents.
- * Every 2xx feeds the trusted-time anchor.
+ * Envelope construction and orphan handling live in the engine (C1 ack
+ * equality re-serializes from the live rows). Every 2xx feeds the
+ * trusted-time anchor.
  */
 class SyncServerClient(
     private val http: SyncHttp,
@@ -28,18 +28,18 @@ class SyncServerClient(
     private val shopIdProvider: (() -> String?)? = null,
 ) : SyncPushTransport {
 
-    override suspend fun push(rows: List<SyncOutboxEntity>): SyncPushResult {
+    override suspend fun push(envelopes: List<JSONObject>, rows: List<SyncOutboxEntity>): SyncPushResult {
         val session = tokenStore.load() ?: return SyncPushResult.Transient("no_session")
-
-        val build = SyncEnvelopeFactory(database).build(rows)
-        if (build.skippedRows.isNotEmpty()) {
-            database.syncOutboxDao().deleteByIds(build.skippedRows.map { it.outboxId })
-        }
-        if (build.envelopes.isEmpty()) return SyncPushResult.Success(0)
+        if (envelopes.isEmpty()) return SyncPushResult.Success(0)
 
         val body = JSONObject()
             .put("device_id", SyncIdentity.currentOrNull())
-            .put("envelopes", JSONArray(build.envelopes))
+            .put("envelopes", JSONArray(envelopes))
+            // C1 true-conflict detection: the server compares each existing
+            // row's server_seq against this cursor — a pusher overwriting a
+            // version it never saw is a conflict; one re-pushing its own
+            // echo is not. Pre-migration servers ignore the extra key.
+            .put("pull_cursor", database.syncPullStateDao().find()?.lastServerSeq ?: 0L)
             .apply {
                 shopIdProvider?.invoke()?.takeIf { it.isNotEmpty() }?.let { shopId -> put("shop_id", shopId) }
             }
@@ -93,6 +93,6 @@ class SyncServerClient(
                 message = error?.optString("message")?.takeIf { it.isNotEmpty() } ?: "Server refused the batch",
             )
         }
-        return SyncPushResult.Success(build.envelopes.size)
+        return SyncPushResult.Success(envelopes.size)
     }
 }

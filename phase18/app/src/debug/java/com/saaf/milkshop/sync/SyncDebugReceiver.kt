@@ -110,15 +110,7 @@ class SyncDebugReceiver : BroadcastReceiver() {
             Log.i(TAG, "DRAIN needs the app process")
             return
         }
-        // Pull first (shop convergence), then push the outbox.
-        when (val pull = app.syncRuntime.pullOnce()) {
-            is com.saaf.milkshop.sync.SyncRuntime.SyncPullSummary.Done ->
-                Log.i(TAG, "PULL: applied=${pull.applied} updated=${pull.updated} skipped=${pull.skipped} conflicts=${pull.conflicts}")
-            is com.saaf.milkshop.sync.SyncRuntime.SyncPullSummary.RetryLater ->
-                Log.i(TAG, "PULL: retry later (${pull.reason})")
-            com.saaf.milkshop.sync.SyncRuntime.SyncPullSummary.NotEnrolled ->
-                Log.i(TAG, "PULL: not enrolled")
-        }
+        // Push first (local edits reach the server first — C1), then pull.
         Log.i(TAG, "Draining outbox…")
         when (val outcome = app.syncRuntime.drainOnce()) {
             SyncPushEngine.DrainOutcome.NotConfigured -> Log.i(TAG, "DRAIN: not enrolled")
@@ -128,6 +120,14 @@ class SyncDebugReceiver : BroadcastReceiver() {
                 Log.i(TAG, "DRAIN: retry later (transient; pushed ${outcome.pushed})")
             is SyncPushEngine.DrainOutcome.Halted ->
                 Log.i(TAG, "DRAIN: HALTED (${outcome.reasonCode}; pushed ${outcome.pushed}) — see security history")
+        }
+        when (val pull = app.syncRuntime.pullOnce()) {
+            is com.saaf.milkshop.sync.SyncRuntime.SyncPullSummary.Done ->
+                Log.i(TAG, "PULL: applied=${pull.applied} updated=${pull.updated} skipped=${pull.skipped} parked=${pull.parked} conflicts=${pull.conflicts}")
+            is com.saaf.milkshop.sync.SyncRuntime.SyncPullSummary.RetryLater ->
+                Log.i(TAG, "PULL: retry later (${pull.reason})")
+            com.saaf.milkshop.sync.SyncRuntime.SyncPullSummary.NotEnrolled ->
+                Log.i(TAG, "PULL: not enrolled")
         }
     }
 

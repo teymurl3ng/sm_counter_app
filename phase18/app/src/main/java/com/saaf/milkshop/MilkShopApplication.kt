@@ -43,9 +43,13 @@ class MilkShopApplication : Application() {
         }
         timeTrustScope.launch {
             runCatching { TimeTrustMonitor.check(applicationContext, database) }
-            // Enrolled devices pull before pushing: converge with the shop
-            // first, then drain the outbox (kicked below).
+            // Enrolled devices push before pulling: a local edit reaches the
+            // server before any pull can overwrite it (C1 decision record,
+            // SYNC_GLOBAL_SEQ_C1_MIGRATION.md §5). The scheduler kick below
+            // stays for retry scheduling; this drain already cleared the
+            // queue, so it is normally a no-op.
             if (SyncServerConfigStore.load(applicationContext) != null) {
+                runCatching { syncRuntime.drainOnce() }
                 runCatching { syncRuntime.pullOnce() }
             }
         }

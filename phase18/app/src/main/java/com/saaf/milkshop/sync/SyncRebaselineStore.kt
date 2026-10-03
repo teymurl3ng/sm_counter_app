@@ -16,6 +16,12 @@ import android.content.Context
  *  - [restoredRebaseline]: a format-5 restore imported outbox rows, so the
  *    next enrollment runs the classified pull-first flow; formats 3/4 keep
  *    the legacy push-first flow (enqueueAll).
+ *  - [liveRebaselinePending]: option-Z live re-baseline (2026-10-04 owner
+ *    decision). A PLAIN enrollment enqueued the whole local history
+ *    pre-held; the first drain classifies it against server row BODIES
+ *    (release new work / drop in-sync rows / hold differing rows for owner
+ *    review) before any push. Restore-origin enrollment keeps the
+ *    origin-based flow and never sets this flag.
  */
 class SyncRebaselineStore(private val context: Context) {
 
@@ -33,6 +39,10 @@ class SyncRebaselineStore(private val context: Context) {
         get() = prefs.getBoolean(KEY_RESTORED_REBASELINE, false)
         set(value) { check(prefs.edit().putBoolean(KEY_RESTORED_REBASELINE, value).commit()) }
 
+    var liveRebaselinePending: Boolean
+        get() = prefs.getBoolean(KEY_LIVE_REBASELINE, false)
+        set(value) { check(prefs.edit().putBoolean(KEY_LIVE_REBASELINE, value).commit()) }
+
     fun clear() {
         check(prefs.edit().clear().commit())
     }
@@ -42,5 +52,6 @@ class SyncRebaselineStore(private val context: Context) {
         const val KEY_NEEDS_FRESH = "needs_fresh_identity"
         const val KEY_PREV_DEVICE = "prev_device_id"
         const val KEY_RESTORED_REBASELINE = "restored_rebaseline"
+        const val KEY_LIVE_REBASELINE = "live_rebaseline_pending"
     }
 }

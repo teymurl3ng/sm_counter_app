@@ -3,6 +3,7 @@ package com.saaf.milkshop.sync
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.data.SyncOutboxEntity
 import com.saaf.milkshop.data.SyncRebaselineHoldEntity
+import org.json.JSONObject
 import java.time.Instant
 
 /**
@@ -30,10 +31,13 @@ import java.time.Instant
  */
 object SyncRebaseline {
 
-    /** A server row observed during the re-baseline pull-0 pass. */
+    /** A server row observed during the re-baseline pull-0 pass. [payload]
+     * is captured only for the live re-baseline — the equality decision
+     * needs the server's row body, not just its origin. */
     data class SeenServerRow(
         val originDevice: String?,
         val serverSeq: Long,
+        val payload: JSONObject? = null,
     )
 
     enum class Action { KEEP, DROP_OWN_ORIGIN, DROP_CURRENT_ORIGIN, HOLD_FOREIGN_ORIGIN }
@@ -136,5 +140,131 @@ object SyncRebaseline {
             }
         }
         return Report(kept, droppedOwn, droppedCurrent, heldForeign)
+    }
+
+    // ------------------------------------------------------------------
+    // Live re-baseline (option Z decision, 2026-10-04): a PLAIN enrollment
+    // enqueues the whole local history pre-held, and the first drain
+    // classifies each held entry against the server row BODY, not its
+    // origin (after a server rollback the device may be the newer party —
+    // the restore path's origin rule points the wrong way there):
+    //
+    //  - server lacks the uid .............. RELEASE (new local work; pushes)
+    //  - payloads equal (ignoring
+    //    sync_updated_at) .................. DROP_EQUAL (in sync; nothing
+    //                                        pushes, no seq burn, the park
+    //                                        self-clears on the next apply)
+    //  - payloads differ ................... HOLD_DIFFER (ambiguous
+    //                                        direction — owner rules in the
+    //                                        review surface instead of either
+    //                                        side silently clobbering the
+    //                                        other)
+    //
+    // Entries WITHOUT the held flag (pending edits captured before the
+    // enrollment) are excluded here: they push untouched, per the direction
+    // rule. Restore-origin enrollment keeps the origin classification above
+    // — the device is provably stale there, so the server wins.
+    enum class LiveAction { RELEASE, DROP_EQUAL, HOLD_DIFFER }
+
+    data class LiveDecision(
+        val entry: SyncOutboxEntity,
+        val action: LiveAction,
+        val seen: SeenServerRow?,
+    )
+
+    data class LiveReport(
+        val released: Int,
+        val droppedEqual: Int,
+        val heldDiffer: Int,
+    ) {
+        fun describe(): String =
+            "live_rebaseline: released=$released noopEqual=$droppedEqual heldDiffer=$heldDiffer"
+    }
+
+    /**
+     * Pure live classification — JVM-tested. Only HELD entries decide;
+     * equality must be PROVEN to skip a push, so a missing device or server
+     * payload holds defensively.
+     */
+    fun decideLive(
+        entries: List<SyncOutboxEntity>,
+        devicePayloads: Map<String, JSONObject>,
+        seen: Map<String, SeenServerRow>,
+    ): List<LiveDecision> = entries.filter { it.held }.map { entry ->
+        val key = seenKey(entry.tableName, entry.rowUid)
+        val row = seen[key]
+        val action = when {
+            row == null -> LiveAction.RELEASE
+            row.payload == null || !devicePayloads.containsKey(key) -> LiveAction.HOLD_DIFFER
+            livePayloadsEqual(devicePayloads.getValue(key), row.payload) -> LiveAction.DROP_EQUAL
+            else -> LiveAction.HOLD_DIFFER
+        }
+        LiveDecision(entry, action, row)
+    }
+
+    /**
+     * Server normalize_payload semantics mirrored client-side:
+     * sync_updated_at is first-touch transport metadata, never a content
+     * difference.
+     */
+    fun livePayloadsEqual(device: JSONObject, server: JSONObject): Boolean =
+        jsonStructurallyEqual(
+            JSONObject(device.toString()).apply { remove("sync_updated_at") },
+            JSONObject(server.toString()).apply { remove("sync_updated_at") },
+        )
+
+    /**
+     * Applies the live decisions. MUST run after the pull-0 pass completed —
+     * every local uid had a held entry then, so the pending-edit guard
+     * parked each server version and the local rows still carry the
+     * pre-enroll values the device payloads are built from.
+     */
+    suspend fun classifyLiveAndApply(
+        database: MilkShopDatabase,
+        seen: Map<String, SeenServerRow>,
+    ): LiveReport {
+        val entries = database.syncOutboxDao().all().filter { it.held }
+        if (entries.isEmpty()) return LiveReport(0, 0, 0)
+        val devicePayloads = SyncEnvelopeFactory(database)
+            .build(entries)
+            .envelopes
+            .mapNotNull { envelope ->
+                envelope.optJSONObject("payload")?.let {
+                    seenKey(envelope.optString("table"), envelope.optString("uid")) to it
+                }
+            }
+            .toMap()
+        val decisions = decideLive(entries, devicePayloads, seen)
+        var released = 0
+        var droppedEqual = 0
+        var heldDiffer = 0
+        for (decision in decisions) {
+            val entry = decision.entry
+            when (decision.action) {
+                LiveAction.RELEASE -> {
+                    database.syncOutboxDao().setHeld(entry.tableName, entry.rowUid, false)
+                    released += 1
+                }
+                LiveAction.DROP_EQUAL -> {
+                    database.syncOutboxDao().deleteEntry(entry.tableName, entry.rowUid)
+                    droppedEqual += 1
+                }
+                LiveAction.HOLD_DIFFER -> {
+                    database.syncRebaselineHoldDao().upsert(
+                        SyncRebaselineHoldEntity(
+                            tableName = entry.tableName,
+                            rowUid = entry.rowUid,
+                            payloadJson = devicePayloads[seenKey(entry.tableName, entry.rowUid)]
+                                ?.toString() ?: "",
+                            originDevice = decision.seen?.originDevice,
+                            serverSeq = decision.seen?.serverSeq ?: 0L,
+                            heldAt = Instant.now().toString(),
+                        ),
+                    )
+                    heldDiffer += 1
+                }
+            }
+        }
+        return LiveReport(released, droppedEqual, heldDiffer)
     }
 }

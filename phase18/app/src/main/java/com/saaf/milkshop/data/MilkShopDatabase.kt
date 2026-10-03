@@ -8,7 +8,7 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import androidx.sqlite.execSQL
 
 @Database(
-    version = 11,
+    version = 12,
     exportSchema = true,
     entities = [
         ProductEntity::class,
@@ -52,6 +52,7 @@ import androidx.sqlite.execSQL
         SyncOutboxEntity::class,
         SyncPullStateEntity::class,
         SyncParkedRowEntity::class,
+        SyncRebaselineHoldEntity::class,
     ],
     views = [
         CurrentStockView::class,
@@ -98,6 +99,7 @@ abstract class MilkShopDatabase : RoomDatabase() {
     abstract fun syncOutboxDao(): SyncOutboxDao
     abstract fun syncPullStateDao(): SyncPullStateDao
     abstract fun syncParkedRowDao(): SyncParkedRowDao
+    abstract fun syncRebaselineHoldDao(): SyncRebaselineHoldDao
     abstract fun syncEnvelopeDao(): SyncEnvelopeDao
     abstract fun syncApplyDao(): SyncApplyDao
 
@@ -242,13 +244,37 @@ abstract class MilkShopDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_11_12 = object : androidx.room3.migration.Migration(11, 12) {
+            override suspend fun migrate(connection: androidx.sqlite.SQLiteConnection) {
+                // go 8: HELD outbox entries (excluded from pushes, still guard-
+                // visible) and the re-baseline hold queue for restored entries
+                // whose server row was last written by another device.
+                connection.execSQL(
+                    "ALTER TABLE sync_outbox ADD COLUMN held INTEGER NOT NULL DEFAULT 0",
+                )
+                connection.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS sync_rebaseline_holds (
+                        table_name TEXT NOT NULL,
+                        row_uid TEXT NOT NULL,
+                        payload_json TEXT NOT NULL,
+                        origin_device TEXT,
+                        server_seq INTEGER NOT NULL,
+                        held_at TEXT NOT NULL,
+                        PRIMARY KEY(table_name, row_uid)
+                    )
+                    """.trimIndent(),
+                )
+            }
+        }
+
         fun create(context: Context): MilkShopDatabase =
             Room.databaseBuilder<MilkShopDatabase>(
                 context = context.applicationContext,
                 name = DATABASE_NAME,
             )
                 .setDriver(BundledSQLiteDriver())
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12)
                 .addCallback(DatabaseCallback())
                 .build()
 
@@ -256,7 +282,7 @@ abstract class MilkShopDatabase : RoomDatabase() {
         fun createInMemory(): MilkShopDatabase =
             Room.inMemoryDatabaseBuilder<MilkShopDatabase>()
                 .setDriver(BundledSQLiteDriver())
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12)
                 .addCallback(DatabaseCallback())
                 .build()
     }

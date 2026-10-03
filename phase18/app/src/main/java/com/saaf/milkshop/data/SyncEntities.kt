@@ -31,6 +31,14 @@ data class SyncOutboxEntity(
     val rowUid: String,
     @ColumnInfo(name = "enqueued_at")
     val enqueuedAt: String,
+    // go 8: a HELD entry is excluded from pushes (halt-at-head FIFO order is
+    // preserved for everything else) and stays visible to the pending-edit
+    // guard, so its park keeps the local row protected until the owner rules
+    // on it in the sync-review surface. keep-mine clears the flag (the entry
+    // pushes, audited server-side); take-server deletes the entry (the park
+    // unblocks and the server version applies).
+    @ColumnInfo(name = "held", defaultValue = "0")
+    val held: Boolean = false,
 )
 
 /**
@@ -65,6 +73,48 @@ data class SyncParkedRowEntity(
 )
 
 /**
+ * go 8: a restored outbox entry whose server row was last written by ANOTHER
+ * device is probably doubly stale — it is held out of the push for an owner
+ * decision instead of auto-pushing (LWW would make it win, audited but
+ * likely wrong). The payload snapshot is display material for the review
+ * surface; the authoritative local row stays untouched (its park holds until
+ * the owner rules), so keep-mine simply clears the outbox held flag.
+ */
+@Entity(
+    tableName = "sync_rebaseline_holds",
+    primaryKeys = ["table_name", "row_uid"],
+)
+data class SyncRebaselineHoldEntity(
+    @ColumnInfo(name = "table_name")
+    val tableName: String,
+    @ColumnInfo(name = "row_uid")
+    val rowUid: String,
+    @ColumnInfo(name = "payload_json")
+    val payloadJson: String,
+    @ColumnInfo(name = "origin_device")
+    val originDevice: String?,
+    @ColumnInfo(name = "server_seq")
+    val serverSeq: Long,
+    @ColumnInfo(name = "held_at")
+    val heldAt: String,
+)
+
+@androidx.room3.Dao
+interface SyncRebaselineHoldDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(hold: SyncRebaselineHoldEntity)
+
+    @Query("SELECT * FROM sync_rebaseline_holds ORDER BY held_at")
+    suspend fun all(): List<SyncRebaselineHoldEntity>
+
+    @Query("DELETE FROM sync_rebaseline_holds WHERE table_name = :tableName AND row_uid = :rowUid")
+    suspend fun delete(tableName: String, rowUid: String)
+
+    @Query("SELECT COUNT(*) FROM sync_rebaseline_holds")
+    suspend fun count(): Int
+}
+
+/**
  * Cursor of the last applied pull batch (singleton row, state_id = 1). It
  * rides inside backup format 4 so a replaced device resumes exactly where
  * its snapshot left off instead of re-pulling history.
@@ -82,7 +132,7 @@ data class SyncPullStateEntity(
 
 @Dao
 interface SyncOutboxDao {
-    @Query("SELECT * FROM sync_outbox ORDER BY outbox_id LIMIT :limit")
+    @Query("SELECT * FROM sync_outbox WHERE held = 0 ORDER BY outbox_id LIMIT :limit")
     suspend fun nextBatch(limit: Int): List<SyncOutboxEntity>
 
     @Query("SELECT * FROM sync_outbox ORDER BY outbox_id")
@@ -90,6 +140,12 @@ interface SyncOutboxDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(rows: List<SyncOutboxEntity>)
+
+    @Query("DELETE FROM sync_outbox WHERE table_name = :tableName AND row_uid = :rowUid")
+    suspend fun deleteEntry(tableName: String, rowUid: String)
+
+    @Query("UPDATE sync_outbox SET held = :held WHERE table_name = :tableName AND row_uid = :rowUid")
+    suspend fun setHeld(tableName: String, rowUid: String, held: Boolean)
 
     @Query("DELETE FROM sync_outbox WHERE outbox_id IN (:ids)")
     suspend fun deleteByIds(ids: List<Long>)

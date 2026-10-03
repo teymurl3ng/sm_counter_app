@@ -90,8 +90,15 @@ class SyncEnrollment(
         // history is enqueued (idempotent — rows already queued or already
         // on the server change nothing), and the pull cursor restarts at
         // zero so the device converges with the server from the beginning.
+        // go 8 EXCEPTION: a format-5 restore already imported its outbox —
+        // enqueueAll here would re-enqueue the WHOLE snapshot and defeat the
+        // classified pull-first flow. The restored entries classify against
+        // the server on the first drain (SyncRuntime), then only unseed rows
+        // push.
         database?.let { db ->
-            SyncBaseline.enqueueAll(db)
+            if (!rebaseline.restoredRebaseline) {
+                SyncBaseline.enqueueAll(db)
+            }
             db.syncPullStateDao().upsert(
                 com.saaf.milkshop.data.SyncPullStateEntity(
                     lastServerSeq = 0,

@@ -33,6 +33,8 @@ class SyncDebugReceiver : BroadcastReceiver() {
                     ACTION_STATUS -> status(context)
                     ACTION_DRAIN -> drain(context)
                     ACTION_UNENROLL -> unenroll(context)
+                    ACTION_SNAPSHOT -> snapshot(context)
+                    ACTION_RESTORE_LATEST -> restoreLatest(context)
                     else -> Log.i(TAG, "Unknown action: ${intent.action}")
                 }
             } catch (error: Throwable) {
@@ -136,12 +138,78 @@ class SyncDebugReceiver : BroadcastReceiver() {
         Log.i(TAG, "UNENROLLED — push scheduling off, config/session/binding cleared.")
     }
 
+    /**
+     * go 8 test hooks (debug builds never ship): create a local f5 snapshot,
+     * or restore the newest local snapshot through the REAL restore engine
+     * (same hooks as the production manager, minus the user-setup guard —
+     * this is the same-installation QA path for the standing restore test:
+     * snapshot with a pending outbox -> server edits -> restore -> re-enroll
+     * -> classified pull-first re-baseline).
+     */
+    private suspend fun snapshot(context: Context) {
+        val app = context.applicationContext as? com.saaf.milkshop.MilkShopApplication
+        if (app == null) {
+            Log.i(TAG, "SNAPSHOT needs the app process")
+            return
+        }
+        val manager = com.saaf.milkshop.BackupManager(context)
+        val meta = manager.createLocalSnapshot(app.database).getOrThrow()
+        Log.i(TAG, "SNAPSHOT created: ${meta.fileName} (format ${meta.formatVersion})")
+    }
+
+    private suspend fun restoreLatest(context: Context) {
+        val app = context.applicationContext as? com.saaf.milkshop.MilkShopApplication
+        if (app == null) {
+            Log.i(TAG, "RESTORE needs the app process")
+            return
+        }
+        val manager = com.saaf.milkshop.BackupManager(context)
+        val newest = manager.localBackups().firstOrNull()?.first
+        if (newest == null) {
+            Log.i(TAG, "RESTORE failed: no local snapshots")
+            return
+        }
+        val crypto = com.saaf.milkshop.BackupCryptography(context)
+        val json = crypto.readLocalAndVerify(newest.readBytes())
+        val engine = com.saaf.milkshop.BackupRestoreEngine(
+            createSafetySnapshot = { database -> manager.createLocalSnapshot(database).getOrThrow() },
+            buildVerifiedBytes = { database, _, _ ->
+                manager.buildCompleteSnapshotBytes(database)
+            },
+            capturePreferences = { org.json.JSONObject() },
+            restorePreferences = { },
+            rebaselineStore = SyncRebaselineStore(context),
+            afterRestore = {
+                SyncTokenStore(context).clear()
+                SyncScheduler.warmUp(context)
+            },
+        )
+        engine.restore(
+            app.database,
+            json,
+            com.saaf.milkshop.BackupManager.RestoreSelection(
+                business = true,
+                planning = true,
+                preferences = false,
+                security = false,
+            ),
+            includeSecurity = false,
+        )
+        Log.i(
+            TAG,
+            "RESTORED ${newest.name}: outbox=${app.database.syncOutboxDao().count()} rows imported; " +
+                "re-baseline flags set (fresh identity + classified pull-first on next enroll)",
+        )
+    }
+
     private companion object {
         const val TAG = "SaafSync"
         const val ACTION_ENROLL = "com.saaf.milkshop.sync.ENROLL"
         const val ACTION_STATUS = "com.saaf.milkshop.sync.STATUS"
         const val ACTION_DRAIN = "com.saaf.milkshop.sync.DRAIN"
         const val ACTION_UNENROLL = "com.saaf.milkshop.sync.UNENROLL"
+        const val ACTION_SNAPSHOT = "com.saaf.milkshop.sync.SNAPSHOT"
+        const val ACTION_RESTORE_LATEST = "com.saaf.milkshop.sync.RESTORE_LATEST"
         const val EXTRA_USERNAME = "username"
         const val EXTRA_CREDENTIAL = "credential"
         const val EXTRA_SHOP_ID = "shop_id"

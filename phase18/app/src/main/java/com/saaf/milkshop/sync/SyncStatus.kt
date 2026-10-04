@@ -9,6 +9,21 @@ data class NativeSyncStatus(
     val trustedTimeAnchored: Boolean,
     val outboxCount: Long,
     val pullCursor: Long,
+    // go 8: restored entries held for an owner decision in the sync-review
+    // surface (they never auto-push).
+    val holdCount: Int = 0,
+)
+
+/** One held restored entry, for the sync-review list. */
+data class NativeSyncHold(
+    val tableName: String,
+    val rowUid: String,
+    val originDevice: String?,
+    val heldAt: String,
+    // Human-readable title derived from the hold's payload snapshot
+    // (SyncHoldLabels); blank when the snapshot is missing, so callers
+    // fall back to the table + short uid.
+    val label: String = "",
 )
 
 data class NativeSyncShopChoice(

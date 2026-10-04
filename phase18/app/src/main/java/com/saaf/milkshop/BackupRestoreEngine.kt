@@ -11,6 +11,7 @@ internal class BackupRestoreEngine(
     private val buildVerifiedBytes: suspend (MilkShopDatabase, Boolean, Int) -> ByteArray,
     private val capturePreferences: () -> JSONObject,
     private val restorePreferences: (JSONObject?) -> Unit,
+    private val rebaselineStore: com.saaf.milkshop.sync.SyncRebaselineStore,
     private val afterRestore: suspend () -> Unit = {},
 ) {
     suspend fun restore(
@@ -22,6 +23,11 @@ internal class BackupRestoreEngine(
         // Safety snapshot is created before touching current state.
         createSafetySnapshot(database)
         val previousPreferences = if (selection.preferences) capturePreferences() else null
+        // go 8: captured before the transaction so the re-baseline state is
+        // written only after a successful restore.
+        val formatVersion = json.getJSONObject("metadata").optInt("format_version", 0)
+        val prevDeviceId = json.getJSONObject("metadata").optString("device_id").takeIf { it.isNotEmpty() }
+        val restoredOutbox = readSyncOutboxRows(json.getJSONObject("data").optJSONArray("sync_outbox"))
         try {
             database.withWriteTransaction<Unit> {
                 val data = json.getJSONObject("data")
@@ -163,6 +169,13 @@ internal class BackupRestoreEngine(
                         ),
                     )
                     database.syncParkedRowDao().clear()
+                    if (formatVersion >= 5) {
+                        // go 8: format-5 restores carry the outbox so edits that
+                        // were unsynced at backup time survive; the next
+                        // enrollment classifies them against the server
+                        // (own-origin drops, foreign-origin holds for review).
+                        backupDao.insertSyncOutbox(restoredOutbox)
+                    }
                     Phase3CostingMigrationSql.immutableTriggers.forEach { executeSQL(it) }
                     SyncMigrationSql.captureTriggers.forEach { executeSQL(it) }
                     if (includeSecurity) {
@@ -192,6 +205,16 @@ internal class BackupRestoreEngine(
             // Account Bridge spec §8: every restore deletes persisted remote
             // tokens. Cleanup failure never masks a successful restore.
             runCatching { afterRestore() }
+            // go 8: re-baseline state for the forced re-enrollment that follows
+            // any restore. EVERY restore marks the installation for a fresh
+            // device identity at enrollment (a restored device must never push
+            // as the id that wrote its backup — same-origin overwrites escape
+            // the server's conflict audit). Format-5 restores also carried the
+            // outbox + prev id, so the next enrollment runs the classified
+            // pull-first flow; formats 3/4 keep the legacy push-first flow.
+            rebaselineStore.needsFreshIdentity = true
+            rebaselineStore.prevDeviceId = prevDeviceId
+            rebaselineStore.restoredRebaseline = formatVersion >= 5
         } catch (error: Throwable) {
             if (previousPreferences != null) {
                 runCatching { restorePreferences(previousPreferences) }

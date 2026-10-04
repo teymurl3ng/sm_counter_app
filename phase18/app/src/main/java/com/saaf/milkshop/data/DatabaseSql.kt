@@ -756,12 +756,12 @@ internal object DatabaseSql {
         seedAccount("Expense: Poly bags", "Expense", "Operating Expense"),
         seedAccount("Expense: LPG", "Expense", "Operating Expense"),
         seedAccount("Expense: Other", "Expense", "Operating Expense"),
-        "INSERT INTO settings (setting_key, setting_value, updated_at) VALUES ('milk_rate_vdr', 170.0, CURRENT_TIMESTAMP)",
-        "INSERT INTO settings (setting_key, setting_value, updated_at) VALUES ('delivery_fee_vdr', 11.0, CURRENT_TIMESTAMP)",
-        "INSERT INTO settings (setting_key, setting_value, updated_at) VALUES ('ts_standard', 13.00, CURRENT_TIMESTAMP)",
-        "INSERT INTO settings (setting_key, setting_value, updated_at) VALUES ('retail_rate_milk', 190.0, CURRENT_TIMESTAMP)",
-        "INSERT INTO settings (setting_key, setting_value, updated_at) VALUES ('retail_rate_yogurt', 280.0, CURRENT_TIMESTAMP)",
-        "INSERT INTO settings (setting_key, setting_value, updated_at) VALUES ('default_delivery_surcharge', 50.0, CURRENT_TIMESTAMP)",
+        "INSERT INTO settings (setting_key, setting_value, updated_at) VALUES ('milk_rate_vdr', 170.0, '2026-01-01 00:00:00')",
+        "INSERT INTO settings (setting_key, setting_value, updated_at) VALUES ('delivery_fee_vdr', 11.0, '2026-01-01 00:00:00')",
+        "INSERT INTO settings (setting_key, setting_value, updated_at) VALUES ('ts_standard', 13.00, '2026-01-01 00:00:00')",
+        "INSERT INTO settings (setting_key, setting_value, updated_at) VALUES ('retail_rate_milk', 190.0, '2026-01-01 00:00:00')",
+        "INSERT INTO settings (setting_key, setting_value, updated_at) VALUES ('retail_rate_yogurt', 280.0, '2026-01-01 00:00:00')",
+        "INSERT INTO settings (setting_key, setting_value, updated_at) VALUES ('default_delivery_surcharge', 50.0, '2026-01-01 00:00:00')",
     )
 
     /**

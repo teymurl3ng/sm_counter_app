@@ -44,8 +44,9 @@ class BackupManager(
         buildVerifiedBytes = { database, includeSecurity, formatVersion ->
             buildBackupBytes(database, includeSecurity, formatVersion)
         },
-        capturePreferences = ::preferencesJson,
-        restorePreferences = ::restorePreferences,
+            capturePreferences = ::preferencesJson,
+            restorePreferences = ::restorePreferences,
+            rebaselineStore = com.saaf.milkshop.sync.SyncRebaselineStore(context),
         // Account Bridge spec §8: every restore deletes persisted remote
         // tokens; the installation re-verifies (re-enrolls) before its next
         // pull or push. Device identity/config/binding live outside Room and
@@ -58,7 +59,15 @@ class BackupManager(
 
     companion object {
         const val LEGACY_FORMAT_VERSION = 1
-        const val FORMAT_VERSION = 4
+
+        /**
+         * Format 5 (go 8): the snapshot carries `sync_outbox` (so edits that
+         * were unsynced at backup time survive a restore and the next
+         * enrollment can classify them against the server) and metadata
+         * `device_id` (becomes prev_device_id for the restore's fresh
+         * identity). Formats 3/4 restore via the legacy push-first path.
+         */
+        const val FORMAT_VERSION = 5
         const val CURRENT_SCHEMA_VERSION = 10
 
         /**
@@ -444,6 +453,7 @@ class BackupManager(
             put("app_version", BuildConfig.VERSION_NAME)
             put("created_at", now.toString())
             put("file_name", displayName(context, now))
+            put("device_id", com.saaf.milkshop.sync.SyncIdentity.currentOrNull())
         })
         root.put("data", JSONObject().apply {
             put("products", JSONArray(dao.products().map(::productJson)))
@@ -470,6 +480,9 @@ class BackupManager(
             put("opening_account_entries", JSONArray(dao.openingAccountEntries().map(::openingAccountEntryJson)))
             put("daily_close_actions", JSONArray(dao.dailyCloseActions().map { dailyCloseActionJson(it, includeSecurity) }))
             put("sync_pull_state", JSONArray(listOfNotNull(database.syncPullStateDao().find()).map(::syncPullStateJson)))
+            if (formatVersion >= 5) {
+                put("sync_outbox", JSONArray(database.syncOutboxDao().all().map(::syncOutboxJson)))
+            }
             put("preferences", preferencesJson())
             if (includeSecurity) {
                 put("app_users", JSONArray(dao.appUsers().map(::appUserJson)))

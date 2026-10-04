@@ -36,6 +36,7 @@ class SyncRuntime(
             trustedTimeAnchored = TrustedTime.isAnchored(),
             outboxCount = database.syncOutboxDao().count(),
             pullCursor = database.syncPullStateDao().find()?.lastServerSeq ?: 0L,
+            holdCount = database.syncRebaselineHoldDao().count(),
         )
     }
 
@@ -43,6 +44,9 @@ class SyncRuntime(
         val config = SyncServerConfigStore.load(context) ?: return SyncPushEngine.DrainOutcome.NotConfigured
         val binding = SyncShopBindingStore.load(context) ?: return SyncPushEngine.DrainOutcome.NotConfigured
         if (tokenStore.load() == null) return SyncPushEngine.DrainOutcome.NotConfigured
+
+        runRestoredRebaselineIfPending()
+        runLiveRebaselineIfPending()
 
         val baseTransport = SyncServerClient(http, config, database, tokenStore) { binding.shopId }
         val notifier = SyncNotifier(context)
@@ -57,13 +61,112 @@ class SyncRuntime(
     }
 
     /**
+     * go 8 classified re-baseline: after a format-5 restore the FIRST drain
+     * must NOT push the restored snapshot first (LWW would make stale rows
+     * win). Instead: pull-0 to exhaustion with origin collection (the
+     * pending-edit guard parks every restored uid's server version, so
+     * nothing overwrites the local rows during the pass), then classify the
+     * outbox entries against the observed origins (keep/drop/hold), and only
+     * then fall through to the normal push. The flag clears only after a
+     * completed classification; a failed pull retries pull-first next drain.
+     * If the cursor already advanced (crash mid-re-baseline), the flag is
+     * cleared and the remaining entries push normally — audited server-side,
+     * because the restored device identity is fresh by then.
+     */
+    private suspend fun runRestoredRebaselineIfPending() {
+        val rebaseline = SyncRebaselineStore(context)
+        if (!rebaseline.restoredRebaseline) return
+        val cursor = database.syncPullStateDao().find()?.lastServerSeq ?: 0L
+        if (cursor != 0L) {
+            rebaseline.restoredRebaseline = false
+            return
+        }
+        val collector = HashMap<String, SyncRebaseline.SeenServerRow>()
+        val pull = pullOnce(collector)
+        if (pull !is SyncPullSummary.Done) return
+        val report = SyncRebaseline.classifyAndApply(
+            database = database,
+            seen = collector,
+            prevDeviceId = rebaseline.prevDeviceId,
+            currentDeviceId = SyncIdentity.currentOrNull().takeIf { it.isNotEmpty() },
+        )
+        rebaseline.restoredRebaseline = false
+        runCatching {
+            database.securityAuditDao().insert(
+                com.saaf.milkshop.data.SecurityAuditEntryEntity(
+                    auditId = 0,
+                    occurredAt = java.time.Instant.now().toString(),
+                    action = "sync_rebaseline_classified",
+                    result = "info",
+                    reasonCode = "restored_rebaseline",
+                    details = report.describe(),
+                ),
+            )
+        }
+    }
+
+    /**
+     * go 8 option Z (2026-10-04 owner decision): the FIRST drain after a
+     * plain enrollment must NOT blind-push the enqueued history (LWW would
+     * let whichever side is newer lose silently — this device after a
+     * server rollback, the server after this device's offline gap). The
+     * enrollment enqueued everything PRE-HELD; this gate runs the pull-0
+     * with body collection (the guard parks every server version, since
+     * every local uid has an entry) and classifies: release / drop-equal /
+     * hold-differ — then the normal drain pushes only what was released.
+     * Pre-held entries must never blind-push, so unlike the restore path
+     * the crash fallback RE-RUNS the classification from cursor 0 — it is
+     * idempotent: released entries are already unheld, dropped entries are
+     * gone, holds re-upsert.
+     */
+    private suspend fun runLiveRebaselineIfPending() {
+        val rebaseline = SyncRebaselineStore(context)
+        if (!rebaseline.liveRebaselinePending) return
+        val cursor = database.syncPullStateDao().find()?.lastServerSeq ?: 0L
+        if (cursor != 0L) {
+            database.syncPullStateDao().upsert(
+                com.saaf.milkshop.data.SyncPullStateEntity(
+                    lastServerSeq = 0,
+                    updatedAt = java.time.Instant.now().toString(),
+                ),
+            )
+        }
+        val collector = HashMap<String, SyncRebaseline.SeenServerRow>()
+        val pull = pullOnce(collector)
+        if (pull !is SyncPullSummary.Done) return
+        val report = SyncRebaseline.classifyLiveAndApply(database, collector)
+        rebaseline.liveRebaselinePending = false
+        runCatching {
+            database.securityAuditDao().insert(
+                com.saaf.milkshop.data.SecurityAuditEntryEntity(
+                    auditId = 0,
+                    occurredAt = java.time.Instant.now().toString(),
+                    action = "sync_rebaseline_classified",
+                    result = "info",
+                    reasonCode = "live_rebaseline",
+                    details = report.describe(),
+                ),
+            )
+        }
+    }
+
+    /**
      * Pulls and applies everything the server has beyond the local cursor,
      * batch by batch in server_seq order. Callers drain (push) BEFORE
      * pulling (C1 decision record): a local edit must reach the server
      * before a pull can overwrite it; the apply engine's pending-edit guard
      * and parked rows cover the remaining windows.
      */
-    suspend fun pullOnce(): SyncPullSummary {
+    suspend fun pullOnce(): SyncPullSummary = pullOnce(originCollector = null)
+
+    /**
+     * [originCollector], when non-null, receives (table, uid) -> origin for
+     * EVERY record the server delivers — the classified re-baseline's raw
+     * material (local tables do not store origin_device).
+     */
+    private suspend fun pullOnce(
+        originCollector: MutableMap<String, SyncRebaseline.SeenServerRow>?,
+    ): SyncPullSummary {
         val config = SyncServerConfigStore.load(context) ?: return SyncPullSummary.NotEnrolled
         val binding = SyncShopBindingStore.load(context) ?: return SyncPullSummary.NotEnrolled
         if (tokenStore.load() == null) return SyncPullSummary.NotEnrolled
@@ -89,6 +192,16 @@ class SyncRuntime(
             when (outcome) {
                 is SyncPullOutcome.Fetched -> {
                     if (outcome.batch.records.isEmpty()) return SyncPullSummary.Done(applied, updated, skipped, parked, conflicts)
+                    originCollector?.let { collector ->
+                        outcome.batch.records.forEach { record ->
+                            collector[SyncRebaseline.seenKey(record.tableName, record.rowUid)] =
+                                SyncRebaseline.SeenServerRow(
+                                    record.originDevice,
+                                    record.serverSeq,
+                                    record.payload,
+                                )
+                        }
+                    }
                     val report = applyEngine.apply(outcome.batch.records)
                     applied += report.applied
                     updated += report.updated

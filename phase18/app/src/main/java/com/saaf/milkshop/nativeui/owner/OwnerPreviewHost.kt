@@ -559,6 +559,7 @@ fun OwnerPreviewHost(
                     onEnrollSync = ownerMoreViewModel::enrollSync,
                     onEnrollSyncInShop = ownerMoreViewModel::enrollSyncInShop,
                     onSyncNow = ownerMoreViewModel::syncNow,
+                    onResolveHoldSync = ownerMoreViewModel::resolveSyncHold,
                     onUnenrollSync = ownerMoreViewModel::unenrollSync,
                     onBackToMenu = ownerMoreViewModel::backToMenu,
                     onRetryProducts = ownerMoreViewModel::refreshProducts,

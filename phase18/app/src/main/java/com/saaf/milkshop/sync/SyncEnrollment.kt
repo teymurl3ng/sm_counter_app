@@ -59,6 +59,19 @@ class SyncEnrollment(
                 Outcome.ShopsAvailable(auth.shops)
             }
 
+        // go 8: a restore/reset marks the installation for a fresh identity —
+        // consume it here, on the definitive enrollment path, so the restored
+        // device never pushes as the id that wrote its backup (same-origin
+        // pushes escape the server's conflict audit). The replaced id was
+        // already recorded as prev_device_id by the restore for outbox
+        // classification. Ordinary enrollments (environment switch) keep
+        // their identity.
+        val rebaseline = SyncRebaselineStore(context)
+        if (rebaseline.needsFreshIdentity) {
+            SyncIdentity.regenerate(context)
+            rebaseline.needsFreshIdentity = false
+        }
+
         SyncServerConfigStore.save(context, config)
         SyncTokenStore(context).save(
             SyncTokenStore.Session(auth.accessToken, auth.refreshToken, auth.accessTokenExpiresAtEpochMs),
@@ -73,12 +86,21 @@ class SyncEnrollment(
         )
         SyncShopBindingStore.save(context, binding)
         (target.timezone ?: auth.shopTimezone)?.let(BusinessClock::setZone)
-        // Re-baseline for the newly enrolled server: the complete local
-        // history is enqueued (idempotent — rows already queued or already
-        // on the server change nothing), and the pull cursor restarts at
-        // zero so the device converges with the server from the beginning.
+        // Re-baseline for the newly enrolled server: the pull cursor restarts
+        // at zero so the device converges with the server from the beginning.
+        // go 8 Z-leg: a PLAIN enrollment enqueues the complete local history
+        // PRE-HELD (flag first, then the enqueue — both crash gaps self-heal)
+        // and the first drain classifies it against server row bodies: blind
+        // push-first would clobber a server that may be the newer party
+        // (after a rollback this device legitimately holds newer rows; after
+        // an offline gap the server does). A format-5 restore instead runs
+        // the origin-based classified flow on its imported outbox — enqueueAll
+        // here would defeat it.
         database?.let { db ->
-            SyncBaseline.enqueueAll(db)
+            if (!rebaseline.restoredRebaseline) {
+                rebaseline.liveRebaselinePending = true
+                SyncBaseline.enqueueAllHeld(db)
+            }
             db.syncPullStateDao().upsert(
                 com.saaf.milkshop.data.SyncPullStateEntity(
                     lastServerSeq = 0,

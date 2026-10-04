@@ -189,6 +189,24 @@ internal fun syncPullStateJson(v: SyncPullStateEntity) = JSONObject().apply {
     put("state_id", v.stateId); put("last_server_seq", v.lastServerSeq); put("updated_at", v.updatedAt)
 }
 
+// go 8 format 5: the outbox rides in the backup (uid/table/timestamp only —
+// the data rows are already in the snapshot) so edits that were unsynced at
+// backup time survive the restore and the next enrollment can classify them.
+internal fun syncOutboxJson(v: SyncOutboxEntity) = JSONObject().apply {
+    put("table_name", v.tableName); put("row_uid", v.rowUid); put("enqueued_at", v.enqueuedAt)
+}
+
+internal fun readSyncOutboxRows(array: JSONArray?): List<SyncOutboxEntity> =
+    (0 until (array?.length() ?: 0)).map { index ->
+        array!!.getJSONObject(index).let {
+            SyncOutboxEntity(
+                tableName = it.getString("table_name"),
+                rowUid = it.getString("row_uid"),
+                enqueuedAt = it.getString("enqueued_at"),
+            )
+        }
+    }
+
 internal fun JSONObject.putNullable(key: String, value: Any?) { put(key, value ?: JSONObject.NULL) }
 
 /**

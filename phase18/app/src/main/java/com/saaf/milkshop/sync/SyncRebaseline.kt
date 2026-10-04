@@ -113,13 +113,18 @@ object SyncRebaseline {
         for (decision in decisions) {
             val entry = decision.entry
             when (decision.action) {
-                Action.KEEP -> kept += 1
+                Action.KEEP -> {
+                    database.syncRebaselineHoldDao().delete(entry.tableName, entry.rowUid)
+                    kept += 1
+                }
                 Action.DROP_OWN_ORIGIN -> {
                     database.syncOutboxDao().deleteEntry(entry.tableName, entry.rowUid)
+                    database.syncRebaselineHoldDao().delete(entry.tableName, entry.rowUid)
                     droppedOwn += 1
                 }
                 Action.DROP_CURRENT_ORIGIN -> {
                     database.syncOutboxDao().deleteEntry(entry.tableName, entry.rowUid)
+                    database.syncRebaselineHoldDao().delete(entry.tableName, entry.rowUid)
                     droppedCurrent += 1
                 }
                 Action.HOLD_FOREIGN_ORIGIN -> {
@@ -243,10 +248,14 @@ object SyncRebaseline {
             when (decision.action) {
                 LiveAction.RELEASE -> {
                     database.syncOutboxDao().setHeld(entry.tableName, entry.rowUid, false)
+                    // A stale hold row from an earlier classification round
+                    // must not outlive its entry (ghost in the review UI).
+                    database.syncRebaselineHoldDao().delete(entry.tableName, entry.rowUid)
                     released += 1
                 }
                 LiveAction.DROP_EQUAL -> {
                     database.syncOutboxDao().deleteEntry(entry.tableName, entry.rowUid)
+                    database.syncRebaselineHoldDao().delete(entry.tableName, entry.rowUid)
                     droppedEqual += 1
                 }
                 LiveAction.HOLD_DIFFER -> {

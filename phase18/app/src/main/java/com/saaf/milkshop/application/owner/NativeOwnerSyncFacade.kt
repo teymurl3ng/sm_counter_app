@@ -6,6 +6,7 @@ import com.saaf.milkshop.sync.NativeSyncHold
 import com.saaf.milkshop.sync.NativeSyncStatus
 import com.saaf.milkshop.sync.SyncEndpoints
 import com.saaf.milkshop.sync.SyncEnrollment
+import com.saaf.milkshop.sync.SyncHoldLabels
 import com.saaf.milkshop.sync.SyncPushEngine
 import com.saaf.milkshop.sync.SyncRuntime
 import com.saaf.milkshop.sync.SyncServerConfig
@@ -48,7 +49,13 @@ class NativeOwnerSyncFacade(
     /** go 8: restored entries held out of the push for an owner decision. */
     suspend fun holds(): List<NativeSyncHold> =
         database.syncRebaselineHoldDao().all().map {
-            NativeSyncHold(it.tableName, it.rowUid, it.originDevice, it.heldAt)
+            NativeSyncHold(
+                tableName = it.tableName,
+                rowUid = it.rowUid,
+                originDevice = it.originDevice,
+                heldAt = it.heldAt,
+                label = SyncHoldLabels.holdLabel(it.tableName, it.payloadJson, it.rowUid),
+            )
         }
 
     /**

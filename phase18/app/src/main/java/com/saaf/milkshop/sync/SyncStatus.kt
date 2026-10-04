@@ -20,6 +20,10 @@ data class NativeSyncHold(
     val rowUid: String,
     val originDevice: String?,
     val heldAt: String,
+    // Human-readable title derived from the hold's payload snapshot
+    // (SyncHoldLabels); blank when the snapshot is missing, so callers
+    // fall back to the table + short uid.
+    val label: String = "",
 )
 
 data class NativeSyncShopChoice(

@@ -278,9 +278,16 @@ private fun OwnerSyncEnrolledBody(
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             Column(Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                 Text(
-                    "${hold.tableName} · ${hold.rowUid}",
+                    hold.label.ifBlank { "${hold.tableName} · ${hold.rowUid}" },
                     style = MaterialTheme.typography.bodyMedium,
                 )
+                if (hold.label.isNotBlank()) {
+                    Text(
+                        hold.rowUid,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
                 Text(
                     "Server version from ${hold.originDevice ?: "an unknown device"}" +
                         " · held ${hold.heldAt.take(10)}",

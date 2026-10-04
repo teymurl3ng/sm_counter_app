@@ -42,8 +42,10 @@ object SyncHoldLabels {
             }
         }
         "events" -> join(
-            str(p, "event_type")?.replaceFirstChar { it.uppercase() } ?: "Event",
-            str(p, "amount") ?: str(p, "amount_owed") ?: str(p, "raw_liters"),
+            humanize(str(p, "event_type") ?: "Event"),
+            str(p, "amount") ?: str(p, "amount_owed"),
+            str(p, "sale_quantity")?.let { "qty $it" },
+            str(p, "raw_liters")?.let { "$it L" },
         )
         "settings" -> str(p, "setting_key")
         "store_profile" -> str(p, "store_name")
@@ -80,6 +82,12 @@ object SyncHoldLabels {
         "daily_close_actions" -> "Daily close"
         "physical_cash_counts" -> "Cash count"
         else -> tableName.replaceFirstChar { it.uppercase() }
+    }
+
+    /** "PRODUCTION"/"SALE" (stored enum wire values) read as "Production"/"Sale". */
+    private fun humanize(value: String): String {
+        val base = if (value.any { it.isLowerCase() }) value else value.lowercase()
+        return base.replaceFirstChar { it.uppercase() }
     }
 
     /** org.json returns "null" for JSON null and "" for missing. */

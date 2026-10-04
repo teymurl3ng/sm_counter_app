@@ -48,6 +48,31 @@ class SyncHoldLabelsTest {
     }
 
     @Test
+    fun eventLabel_quantityWhenAmountAbsent() {
+        // Real DEV seed shape: a SALE event carries sale_quantity, not amount.
+        assertEquals(
+            "Event — Sale · qty 1.5",
+            SyncHoldLabels.holdLabel(
+                "events",
+                """{"event_type":"SALE","sale_quantity":1.5,"occurred_at":"2026-09-28"}""",
+                "u1_e5ce23f6ae4543b89672f03aa64c5cbc",
+            ),
+        )
+    }
+
+    @Test
+    fun eventLabel_typeOnlyWhenNothingNumeric() {
+        assertEquals(
+            "Event — Production",
+            SyncHoldLabels.holdLabel(
+                "events",
+                """{"event_type":"PRODUCTION","occurred_at":"2026-09-28"}""",
+                "u1_aacd6a97ddd74beb8719486aece73bc4",
+            ),
+        )
+    }
+
+    @Test
     fun settingsLabel_usesKey() {
         assertEquals(
             "Setting — milk_rate_vdr",

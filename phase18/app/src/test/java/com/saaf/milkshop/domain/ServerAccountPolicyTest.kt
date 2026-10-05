@@ -103,6 +103,23 @@ class ServerAccountPolicyTest {
     }
 
     @Test
+    fun `verification refresh respects the throttle and clock-carrying statuses`() {
+        val throttle = ServerAccountPolicy.VERIFICATION_REFRESH_THROTTLE_MS
+        // fresh clock: no refresh
+        assertFalse(ServerAccountPolicy.shouldRefreshVerification("verified", 0L, throttle - 1))
+        // exactly at the window: refresh
+        assertTrue(ServerAccountPolicy.shouldRefreshVerification("verified", 0L, throttle))
+        // offline_grace carries the clock too (stale → refresh)
+        assertTrue(ServerAccountPolicy.shouldRefreshVerification("offline_grace", 0L, throttle * 5))
+        // non-clock-carrying statuses never refresh (enrollment links them)
+        assertFalse(ServerAccountPolicy.shouldRefreshVerification("restored_unverified", 0L, throttle * 5))
+        assertFalse(ServerAccountPolicy.shouldRefreshVerification("pending", 0L, throttle * 5))
+        assertFalse(ServerAccountPolicy.shouldRefreshVerification("revoked", 0L, throttle * 5))
+        // no timestamp: nothing to refresh
+        assertFalse(ServerAccountPolicy.shouldRefreshVerification("verified", null, Long.MAX_VALUE / 2))
+    }
+
+    @Test
     fun `freshly verified link blocks nothing`() {
         val fresh = ServerIdentityLinkEntity(
             localUserId = 1L,

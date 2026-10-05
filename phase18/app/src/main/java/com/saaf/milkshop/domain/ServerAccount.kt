@@ -22,6 +22,8 @@ object ServerAccountPolicy {
     const val GRACE_DAYS = 7L
     const val GRACE_DURATION_MS = GRACE_DAYS * 24L * 60L * 60L * 1000L
     const val REASON_SERVER_GRACE_EXPIRED = "server_grace_expired"
+    const val REASON_SERVER_GRACE_RECOVERED = "server_grace_recovered"
+    const val VERIFICATION_REFRESH_THROTTLE_MS = 24L * 60L * 60L * 1000L
 
     object BindingStatus {
         const val PENDING = "pending"
@@ -79,6 +81,19 @@ object ServerAccountPolicy {
         } else {
             GraceDecision.BLOCK_WRITE
         }
+
+    /**
+     * H13: true when a successful authenticated server exchange should
+     * refresh this link's verification clock — clock-carrying statuses only
+     * (VERIFIED, OFFLINE_GRACE), a timestamp must exist, and at most one
+     * refresh per throttle window. Other statuses (restored-unverified,
+     * pending, …) stay untouched: enrollment links them. Pure — JVM-tested.
+     */
+    fun shouldRefreshVerification(status: String, verifiedAtEpochMs: Long?, nowEpochMs: Long): Boolean {
+        if (status != LinkStatus.VERIFIED && status != LinkStatus.OFFLINE_GRACE) return false
+        val verifiedAt = verifiedAtEpochMs ?: return false
+        return nowEpochMs - verifiedAt >= VERIFICATION_REFRESH_THROTTLE_MS
+    }
 
     /** The full requirePermission verdict: does THIS permission block for THIS link now? */
     fun graceWriteBlocked(

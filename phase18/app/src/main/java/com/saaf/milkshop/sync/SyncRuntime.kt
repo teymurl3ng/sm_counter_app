@@ -3,6 +3,7 @@ package com.saaf.milkshop.sync
 import android.content.Context
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.data.SyncOutboxEntity
+import com.saaf.milkshop.domain.ServerAccountPolicy
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 /**
@@ -72,6 +73,17 @@ class SyncRuntime(
         runRestoredRebaselineIfPending()
         runLiveRebaselineIfPending()
 
+        val outcome = engineDrainLocked(config, binding)
+        if (outcome != SyncPushEngine.DrainOutcome.NotConfigured) {
+            refreshLinkVerificationIfDue()
+        }
+        return outcome
+    }
+
+    private suspend fun engineDrainLocked(
+        config: SyncServerConfig,
+        binding: SyncShopBinding,
+    ): SyncPushEngine.DrainOutcome {
         val baseTransport = SyncServerClient(http, config, database, tokenStore) { binding.shopId }
         val notifier = SyncNotifier(context)
         val engine = SyncPushEngine(
@@ -181,7 +193,47 @@ class SyncRuntime(
      * before a pull can overwrite it; the apply engine's pending-edit guard
      * and parked rows cover the remaining windows.
      */
-    suspend fun pullOnce(): SyncPullSummary = gate.withLock { pullOnce(originCollector = null) }
+    suspend fun pullOnce(): SyncPullSummary = gate.withLock {
+        val summary = pullOnce(originCollector = null)
+        if (summary is SyncPullSummary.Done) {
+            refreshLinkVerificationIfDue()
+        }
+        summary
+    }
+
+    /**
+     * H13: a successful authenticated exchange is a live server entitlement
+     * proof — refresh the link's verification clock (throttled) so a device
+     * that was offline past its grace unblocks as soon as it is genuinely
+     * back online. Only the blocked→unblocked transition is audited; routine
+     * bumps stay silent. Runs under the H2 gate; never touches refresh
+     * (H1) or permission (H5) logic.
+     */
+    private suspend fun refreshLinkVerificationIfDue() {
+        runCatching {
+            val now = System.currentTimeMillis()
+            val link = database.serverAccountDao().identityLinks()
+                .firstOrNull {
+                    ServerAccountPolicy.shouldRefreshVerification(it.status, it.verifiedAtEpochMs, now)
+                } ?: return
+            val wasBlocked = ServerAccountPolicy.writeBlockedByGrace(link.status, link.verifiedAtEpochMs, now)
+            database.serverAccountDao().updateIdentityLinkStatus(
+                link.localUserId, link.status, now, link.lastErrorCode,
+            )
+            if (wasBlocked) {
+                database.securityAuditDao().insert(
+                    com.saaf.milkshop.data.SecurityAuditEntryEntity(
+                        auditId = 0,
+                        occurredAt = java.time.Instant.now().toString(),
+                        action = "server_verification_recovered",
+                        result = "info",
+                        reasonCode = ServerAccountPolicy.REASON_SERVER_GRACE_RECOVERED,
+                        details = "link=${link.localUserId}",
+                    ),
+                )
+            }
+        }
+    }
 
     /**
      * [originCollector], when non-null, receives (table, uid) -> origin for

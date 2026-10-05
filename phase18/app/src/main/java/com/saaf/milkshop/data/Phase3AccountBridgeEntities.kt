@@ -5,6 +5,7 @@ import androidx.room3.Entity
 import androidx.room3.ForeignKey
 import androidx.room3.Index
 import androidx.room3.Insert
+import androidx.room3.Update
 import androidx.room3.PrimaryKey
 import androidx.room3.Query
 import androidx.room3.ColumnInfo
@@ -132,6 +133,10 @@ interface ServerAccountDao {
 
     @Query("UPDATE server_identity_links SET status = :status, verified_at_epoch_ms = :verifiedAtEpochMs, last_error_code = :lastErrorCode WHERE local_user_id = :localUserId")
     suspend fun updateIdentityLinkStatus(localUserId: Long, status: String, verifiedAtEpochMs: Long?, lastErrorCode: String?)
+
+    /** H13: full-row refresh of a verified link (all snapshots + fresh clock). */
+    @Update
+    suspend fun updateIdentityLink(link: ServerIdentityLinkEntity)
 
     @Query("DELETE FROM server_identity_links")
     suspend fun deleteIdentityLinks()

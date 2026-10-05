@@ -33,8 +33,9 @@ class NativeOwnerSyncFacade(
         credential: CharArray,
         shopId: String?,
         environment: String = SyncServerConfig.ENVIRONMENT_PROD,
+        localUserId: Long? = null,
     ): SyncEnrollment.Outcome = SyncEnrollment(appContext, database = database)
-        .enroll(SyncEndpoints.forEnvironment(environment), username, credential, shopId)
+        .enroll(SyncEndpoints.forEnvironment(environment), username, credential, shopId, localUserId)
 
     fun unenroll() {
         SyncEnrollment(appContext, database = database).unenroll()

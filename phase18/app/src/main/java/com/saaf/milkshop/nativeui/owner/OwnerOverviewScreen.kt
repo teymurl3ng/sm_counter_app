@@ -165,9 +165,12 @@ private fun OverviewBody(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 snapshot.attention.forEach { item ->
+                    // H11 (audit 2026-10-02): the translucent yellow + ink
+                    // pair composites to ~2.2:1 in dark mode; the scheme's
+                    // container pair is theme-aware and passes both modes.
                     Surface(
-                        color = SaafYellow.copy(alpha = 0.35f),
-                        contentColor = SaafInk,
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                         shape = MaterialTheme.shapes.medium,
                         modifier = Modifier.fillMaxWidth(),
                     ) {

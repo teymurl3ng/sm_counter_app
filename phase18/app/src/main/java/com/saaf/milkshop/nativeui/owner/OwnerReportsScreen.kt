@@ -284,13 +284,19 @@ fun OwnerReportsScreen(
 @Composable
 private fun CoverageBanner(snapshot: NativeOwnerReportsSnapshot) {
     val complete = snapshot.coverageKind == NativeOwnerReportsCoverageKind.Complete
+    // H11 (audit 2026-10-02): solid scheme containers — the alpha hacks
+    // composite to ~1.4:1 (complete) / ~2.2:1 (attention) in dark mode.
     Surface(
         color = if (complete) {
-            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f)
+            MaterialTheme.colorScheme.primaryContainer
         } else {
-            SaafYellow.copy(alpha = 0.35f)
+            MaterialTheme.colorScheme.secondaryContainer
         },
-        contentColor = SaafInk,
+        contentColor = if (complete) {
+            MaterialTheme.colorScheme.onPrimaryContainer
+        } else {
+            MaterialTheme.colorScheme.onSecondaryContainer
+        },
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier
             .fillMaxWidth()

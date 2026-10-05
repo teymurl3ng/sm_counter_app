@@ -22,6 +22,7 @@ Context: C1 fix program merged to main (852a38b → bd03f2e, tag c1-go8-merged);
 - **H9 · close with pending deliveries freezes them — OPEN.** Close-blocker warning; same decision cluster as H8.
 - **H10 · close_actions enqueued before cash_counts — FIXED (via M11 fix, 5b7a8c1).** Apply now parks on unresolved refs instead of nulling count_uid, so links resolve on a later pass; the enqueue order itself is still inverted (cosmetic once parking handles it).
 - **H11 · dark-mode contrast on money banners — OPEN.** Two call sites (OwnerOverview attention banner, Reports complete banner ≈1.4:1). Small; pre-pilot gate.
+- **H13 · grace clock never resets — OPEN (discovered 2026-10-05 during H5 scoping).** Nothing in the app ever writes `verified_at` or transitions the server-link status (only BackupSnapshotCodec restores them), so offline-grace expiry is a one-way trip: after the H5 fix devices can read and sign in forever, but writes stay blocked with NO in-app recovery — not even re-enrollment refreshes the clock. Proposed fix: a successful sync enrollment (or re-enrollment) refreshes the link's `verified_at`; the deferred verification flow otherwise owns this.
 - **H12 · demo-crossfade parallel line — RESOLVED.** ui-touchups-anims-dark merged to main (b0c2d7c); go-8 merged (bd03f2e); demo-crossfade verified superseded (its 6 commits are intermediate steps of work that landed on main) — deletable on owner word.
 
 ## MEDIUM

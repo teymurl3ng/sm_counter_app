@@ -97,7 +97,10 @@ sealed class SecurityFailure(message: String) : IllegalArgumentException(message
     class Validation(message: String) : SecurityFailure(message)
     class Authentication : SecurityFailure(GENERIC_AUTH_FAILURE)
     class SessionExpired : SecurityFailure("Your session expired. Sign in again.")
-    class PermissionDenied : SecurityFailure("You do not have permission to perform this action.")
+    // H5: optional stable reason code (e.g. ServerAccountPolicy.REASON_*)
+    // so callers can distinguish grace expiry from role denial without new
+    // failure types; null = plain role denial.
+    class PermissionDenied(val reasonCode: String? = null) : SecurityFailure("You do not have permission to perform this action.")
     class RecentAuthenticationRequired : SecurityFailure("Enter your passphrase again to perform this sensitive action.")
 
     companion object {
@@ -456,13 +459,16 @@ class UserSecurityService(
             audit(actor, ACTION_PERMISSION_DENIED, RESULT_FAILURE, permission.name, actor.userId)
             throw SecurityFailure.PermissionDenied()
         }
-        // Account Bridge offline grace (frozen 7 days): a linked user whose
-        // verified server entitlement has expired may read but not write.
-        // Unbound installations and non-verified link states are unaffected.
+        // Account Bridge offline grace (frozen 7 days; spec §6 "writes
+        // blocked, reads allowed"): a linked user whose verified server
+        // entitlement has expired may READ (VIEW_* family) but not write.
+        // H5 fix: the old gate blocked every permission — login itself died
+        // on VIEW_OPERATIONAL. Unbound installations and non-verified link
+        // states are unaffected; the grace clock is untouched here.
         val serverLink = database.serverAccountDao().findIdentityLink(actor.userId)
-        if (serverLink != null && ServerAccountPolicy.linkWriteBlocked(serverLink, nowEpochMs())) {
+        if (serverLink != null && ServerAccountPolicy.graceWriteBlocked(serverLink, permission, nowEpochMs())) {
             audit(actor, ACTION_SERVER_VERIFICATION_EXPIRED, RESULT_FAILURE, ServerAccountPolicy.REASON_SERVER_GRACE_EXPIRED, actor.userId)
-            throw SecurityFailure.PermissionDenied()
+            throw SecurityFailure.PermissionDenied(ServerAccountPolicy.REASON_SERVER_GRACE_EXPIRED)
         }
         return actor
     }

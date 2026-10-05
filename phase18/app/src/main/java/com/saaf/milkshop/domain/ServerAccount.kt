@@ -55,4 +55,37 @@ object ServerAccountPolicy {
 
     fun linkWriteBlocked(link: ServerIdentityLinkEntity, nowEpochMs: Long): Boolean =
         writeBlockedByGrace(link.status, link.verifiedAtEpochMs, nowEpochMs)
+
+    /**
+     * H5 (audit 2026-10-02; spec §6 "writes blocked, reads allowed"): the
+     * read-family permissions that survive offline-grace expiry. Everything
+     * else stays blocked until the link verifies again — including
+     * CREATE_EXPORT_BACKUP (an export is not an ERP write, but it is also
+     * not a read) and reads gated on management permissions such as the
+     * Users list (MANAGE_STAFF_USERS).
+     */
+    val GRACE_READ_PERMISSIONS: Set<AppPermission> = setOf(
+        AppPermission.VIEW_OPERATIONAL,
+        AppPermission.VIEW_FULL_FINANCIAL,
+        AppPermission.VIEW_SECURITY_AUDIT,
+    )
+
+    enum class GraceDecision { ALLOW, BLOCK_WRITE }
+
+    /** Pure decision — JVM-tested. Not expired ⇒ everything allows. */
+    fun graceDecision(permission: AppPermission, expired: Boolean): GraceDecision =
+        if (!expired || permission in GRACE_READ_PERMISSIONS) {
+            GraceDecision.ALLOW
+        } else {
+            GraceDecision.BLOCK_WRITE
+        }
+
+    /** The full requirePermission verdict: does THIS permission block for THIS link now? */
+    fun graceWriteBlocked(
+        link: ServerIdentityLinkEntity,
+        permission: AppPermission,
+        nowEpochMs: Long,
+    ): Boolean =
+        writeBlockedByGrace(link.status, link.verifiedAtEpochMs, nowEpochMs) &&
+            graceDecision(permission, expired = true) == GraceDecision.BLOCK_WRITE
 }

@@ -1,5 +1,7 @@
 package com.saaf.milkshop.domain
 
+import com.saaf.milkshop.data.ServerIdentityLinkEntity
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -49,5 +51,69 @@ class ServerAccountPolicyTest {
     fun `grace is exactly seven days`() {
         assertTrue(ServerAccountPolicy.GRACE_DAYS == 7L)
         assertTrue(ServerAccountPolicy.GRACE_DURATION_MS == 7L * 24L * 60L * 60L * 1000L)
+    }
+
+    // ---------------- H5: reads survive grace expiry, writes do not ----------------
+
+    private val expiredLink = ServerIdentityLinkEntity(
+        localUserId = 1L,
+        serverStaffId = "staff-1",
+        businessId = "biz-1",
+        status = ServerAccountPolicy.LinkStatus.OFFLINE_GRACE,
+        verifiedAtEpochMs = 0L,
+    )
+
+    @Test
+    fun `expired grace allows exactly the read family`() {
+        val reads = setOf(
+            AppPermission.VIEW_OPERATIONAL,
+            AppPermission.VIEW_FULL_FINANCIAL,
+            AppPermission.VIEW_SECURITY_AUDIT,
+        )
+        for (permission in AppPermission.entries) {
+            val expected = if (permission in reads) {
+                ServerAccountPolicy.GraceDecision.ALLOW
+            } else {
+                ServerAccountPolicy.GraceDecision.BLOCK_WRITE
+            }
+            assertEquals(expected, ServerAccountPolicy.graceDecision(permission, expired = true))
+        }
+    }
+
+    @Test
+    fun `unexpired grace allows everything`() {
+        for (permission in AppPermission.entries) {
+            assertEquals(
+                ServerAccountPolicy.GraceDecision.ALLOW,
+                ServerAccountPolicy.graceDecision(permission, expired = false),
+            )
+        }
+    }
+
+    @Test
+    fun `expired link blocks writes and spares reads end-to-end`() {
+        val now = 8L * 24L * 60L * 60L * 1000L // beyond the 7-day grace
+        assertTrue(ServerAccountPolicy.graceWriteBlocked(expiredLink, AppPermission.EXPENSE, now))
+        assertTrue(ServerAccountPolicy.graceWriteBlocked(expiredLink, AppPermission.CASH_COUNT_AND_CLOSE, now))
+        assertTrue(ServerAccountPolicy.graceWriteBlocked(expiredLink, AppPermission.CREATE_EXPORT_BACKUP, now))
+        assertTrue(ServerAccountPolicy.graceWriteBlocked(expiredLink, AppPermission.MANAGE_STAFF_USERS, now))
+        assertFalse(ServerAccountPolicy.graceWriteBlocked(expiredLink, AppPermission.VIEW_OPERATIONAL, now))
+        assertFalse(ServerAccountPolicy.graceWriteBlocked(expiredLink, AppPermission.VIEW_FULL_FINANCIAL, now))
+        assertFalse(ServerAccountPolicy.graceWriteBlocked(expiredLink, AppPermission.VIEW_SECURITY_AUDIT, now))
+    }
+
+    @Test
+    fun `freshly verified link blocks nothing`() {
+        val fresh = ServerIdentityLinkEntity(
+            localUserId = 1L,
+            serverStaffId = "staff-1",
+            businessId = "biz-1",
+            status = ServerAccountPolicy.LinkStatus.VERIFIED,
+            verifiedAtEpochMs = 0L,
+        )
+        val now = 1L * 24L * 60L * 60L * 1000L // day 1 of 7
+        for (permission in AppPermission.entries) {
+            assertFalse(ServerAccountPolicy.graceWriteBlocked(fresh, permission, now))
+        }
     }
 }

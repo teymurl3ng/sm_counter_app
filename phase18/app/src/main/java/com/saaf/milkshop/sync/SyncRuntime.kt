@@ -265,10 +265,17 @@ class SyncRuntime(
                 true
             }
             else -> {
-                // Sessions are cache material: drop it and let the next
-                // enrollment-lifetime flow (or re-enroll) restore access.
-                tokenStore.clear()
-                SyncScheduler.setSchedulingEnabled(false)
+                // H1 (audit 2026-10-02; spec §5 "UNKNOWN never revoke"): only
+                // a DEFINITIVE verdict clears the session — revoked account,
+                // rejected credential, or a server-stated dead refresh
+                // token. Transient failures (timeout, 5xx, rate limit, any
+                // unrecognized rejection) keep the tokens; the next drain
+                // retries and this same decision runs again. Scheduling is
+                // deliberately left enabled: warmUp re-enables it on app
+                // start anyway, and a worker that finds no session no-ops.
+                if (RefreshDisposition.from(result) == RefreshDisposition.CLEAR) {
+                    tokenStore.clear()
+                }
                 false
             }
         }

@@ -40,6 +40,9 @@ class SyncEnrollment(
             AccountAuthResult.InvalidCredentials -> return Outcome.Failed("invalid_credentials")
             AccountAuthResult.Disabled -> return Outcome.Failed("disabled")
             AccountAuthResult.NotAuthorized -> return Outcome.Failed("not_authorized")
+            // Refresh-only verdict: sign-in can never produce it (the
+            // sign-in 400 branch never maps to it); typed exhaustiveness.
+            AccountAuthResult.RefreshTokenInvalid -> return Outcome.Failed("refresh_token_invalid")
             is AccountAuthResult.Unknown -> return Outcome.Failed("unknown:${result.reason}")
         }
         // C1/M9: the enrollment's account is this installation's push

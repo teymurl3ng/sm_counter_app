@@ -3,6 +3,8 @@ package com.saaf.milkshop.sync
 import android.content.Context
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.data.SyncOutboxEntity
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 /**
  * Phase 6 runtime glue: builds the production transport from the stored
  * config/session/binding and drains the outbox. An expired access token is
@@ -18,6 +20,11 @@ class SyncRuntime(
 ) {
 
     private val tokenStore = SyncTokenStore(context)
+
+    companion object {
+        /** See [drainOnceLocked] — process-wide drain/pull serialization. */
+        private val gate = Mutex()
+    }
 
     fun isEnrolled(): Boolean =
         SyncServerConfigStore.load(context) != null &&
@@ -40,7 +47,24 @@ class SyncRuntime(
         )
     }
 
-    suspend fun drainOnce(): SyncPushEngine.DrainOutcome {
+    suspend fun drainOnce(): SyncPushEngine.DrainOutcome = gate.withLock {
+        drainOnceLocked()
+    }
+
+    /**
+     * H2 (audit 2026-10-02): every drain/pull entry point in the process
+     * serializes on [gate] — the start-up kick, the WorkManager worker, the
+     * owner's Sync-now, the debug receiver, and the facade's second runtime
+     * instance all funnel through this one gate. Without it, two concurrent
+     * 401s fire two refresh POSTs and, under token rotation, the losing
+     * refresher could delete the winner's fresh tokens mid-flight. Acquired
+     * ONLY at the public entry points: the internals (including
+     * refreshSession, which runs under an already-held lock) must never
+     * re-acquire — Kotlin's Mutex is not reentrant. PROCESS-WIDE on purpose
+     * (companion): NativeOwnerSyncFacade builds its own SyncRuntime instance,
+     * and per-instance locks would leave those two draining concurrently.
+     */
+    private suspend fun drainOnceLocked(): SyncPushEngine.DrainOutcome {
         val config = SyncServerConfigStore.load(context) ?: return SyncPushEngine.DrainOutcome.NotConfigured
         val binding = SyncShopBindingStore.load(context) ?: return SyncPushEngine.DrainOutcome.NotConfigured
         if (tokenStore.load() == null) return SyncPushEngine.DrainOutcome.NotConfigured
@@ -157,7 +181,7 @@ class SyncRuntime(
      * before a pull can overwrite it; the apply engine's pending-edit guard
      * and parked rows cover the remaining windows.
      */
-    suspend fun pullOnce(): SyncPullSummary = pullOnce(originCollector = null)
+    suspend fun pullOnce(): SyncPullSummary = gate.withLock { pullOnce(originCollector = null) }
 
     /**
      * [originCollector], when non-null, receives (table, uid) -> origin for

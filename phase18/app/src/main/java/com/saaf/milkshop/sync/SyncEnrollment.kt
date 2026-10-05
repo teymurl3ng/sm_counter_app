@@ -2,6 +2,7 @@ package com.saaf.milkshop.sync
 
 import android.content.Context
 import com.saaf.milkshop.data.MilkShopDatabase
+import com.saaf.milkshop.domain.ServerAccountPolicy
 
 /**
  * Enrollment (Account Bridge spec §6, minimal sync form): prove the server
@@ -34,12 +35,16 @@ class SyncEnrollment(
         username: String,
         credential: CharArray,
         shopId: String? = null,
+        localUserId: Long? = null,
     ): Outcome {
         val auth = when (val result = AccountAuthClient(http, config).signIn(username, credential)) {
             is AccountAuthResult.Allowed -> result
             AccountAuthResult.InvalidCredentials -> return Outcome.Failed("invalid_credentials")
             AccountAuthResult.Disabled -> return Outcome.Failed("disabled")
             AccountAuthResult.NotAuthorized -> return Outcome.Failed("not_authorized")
+            // Refresh-only verdict: sign-in can never produce it (the
+            // sign-in 400 branch never maps to it); typed exhaustiveness.
+            AccountAuthResult.RefreshTokenInvalid -> return Outcome.Failed("refresh_token_invalid")
             is AccountAuthResult.Unknown -> return Outcome.Failed("unknown:${result.reason}")
         }
         // C1/M9: the enrollment's account is this installation's push
@@ -110,7 +115,69 @@ class SyncEnrollment(
         }
         SyncScheduler.setSchedulingEnabled(true)
         SyncScheduler.requestPush()
+        linkVerifiedOwner(auth, username, localUserId)
         return Outcome.Enrolled(binding, target.timezone ?: auth.shopTimezone)
+    }
+
+    /**
+     * H13 (spec §6.5 step 5): enrollment IS the online verification — link
+     * the verified owner to the local owner and start the grace clock
+     * fresh. [localUserId] comes from the signed-in session when the caller
+     * has one; otherwise the bootstrap invariant resolves it (exactly one
+     * active owner per installation). With zero or several owners and no
+     * session there is nothing unambiguous to link: skip (audited) and
+     * leave linking to the bridge verification flow.
+     */
+    private suspend fun linkVerifiedOwner(
+        auth: AccountAuthResult.Allowed,
+        username: String,
+        localUserId: Long?,
+    ) {
+        val db = database ?: return
+        val target = localUserId ?: run {
+            db.appUserDao().all()
+                .filter { it.role == "owner" && it.status == "active" }
+                .singleOrNull()?.userId
+        }
+        if (target == null) {
+            runCatching {
+                db.securityAuditDao().insert(
+                    com.saaf.milkshop.data.SecurityAuditEntryEntity(
+                        auditId = 0,
+                        occurredAt = java.time.Instant.now().toString(),
+                        action = "sync_identity_link",
+                        result = "warning",
+                        reasonCode = "identity_link_skipped",
+                        details = "no unambiguous local owner for the verified server account",
+                    ),
+                )
+            }
+            return
+        }
+        val now = System.currentTimeMillis()
+        val existing = db.serverAccountDao().findIdentityLink(target)
+        val fresh = (existing ?: com.saaf.milkshop.data.ServerIdentityLinkEntity(
+            localUserId = target,
+            serverStaffId = auth.staffId,
+            businessId = auth.businessId,
+            status = ServerAccountPolicy.LinkStatus.VERIFIED,
+        )).copy(
+            serverStaffId = auth.staffId,
+            businessId = auth.businessId,
+            usernameSnapshot = username,
+            roleSnapshot = auth.role,
+            status = ServerAccountPolicy.LinkStatus.VERIFIED,
+            verifiedAtEpochMs = now,
+        )
+        if (existing == null) {
+            db.serverAccountDao().insertIdentityLink(fresh)
+        } else {
+            // Server is the authority (spec §5 "Verify/update link"): any
+            // prior state — suspended, revoked, restored-unverified — yields
+            // to a fresh ALLOWED verification; the old error code survives
+            // the copy as history.
+            db.serverAccountDao().updateIdentityLink(fresh)
+        }
     }
 
     fun unenroll() {

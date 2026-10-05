@@ -9,7 +9,9 @@ import com.saaf.milkshop.domain.DailyCloseService
 import com.saaf.milkshop.domain.NativeSessionManager
 import com.saaf.milkshop.domain.PhysicalCashCountInput
 import com.saaf.milkshop.domain.PhysicalCashCountService
+import com.saaf.milkshop.data.ServerIdentityLinkEntity
 import com.saaf.milkshop.domain.RolePermissions
+import com.saaf.milkshop.domain.ServerAccountPolicy
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.domain.VerifiedDailyCloseInput
@@ -176,6 +178,44 @@ class Phase3UserSecurityTest {
     fun migrationBoundaryLeavesLegacyDailyCloseActorUnverified() = runBlocking {
         assertNull(database.dailyCloseDao().currentAction(DATE))
         assertEquals(0L, database.appUserDao().count())
+    }
+
+    @Test
+    fun offlineGraceExpired_ownerSignInAndReadsSurvive_writesBlockWithGraceReason() = runBlocking {
+        // H5 (audit 2026-10-02; spec §6): offline-grace expiry must block
+        // WRITES only — the old gate killed VIEW_OPERATIONAL inside the
+        // login path's identity() resolution, locking an offline owner out
+        // of the app entirely. Simulate the H13 clock: link the owner and
+        // drive verified_at past the 7-day grace.
+        val service = UserSecurityService(database)
+        val bootstrapped = service.bootstrapOwner("grace.owner", "Grace Owner", OWNER_PASSWORD.toCharArray())
+        database.serverAccountDao().insertIdentityLink(
+            ServerIdentityLinkEntity(
+                localUserId = bootstrapped.user.userId,
+                serverStaffId = "staff-1",
+                businessId = "biz-1",
+                status = ServerAccountPolicy.LinkStatus.VERIFIED,
+                verifiedAtEpochMs = System.currentTimeMillis() - ServerAccountPolicy.GRACE_DURATION_MS - 1,
+            ),
+        )
+        // The exact call the login path makes (NativeAuthenticationFacade.identity) succeeds:
+        service.requirePermission(
+            service.login("grace.owner", OWNER_PASSWORD.toCharArray()).sessionId,
+            AppPermission.VIEW_OPERATIONAL,
+        )
+        // Other reads survive too...
+        val session = service.login("grace.owner", OWNER_PASSWORD.toCharArray())
+        service.requirePermission(session.sessionId, AppPermission.VIEW_FULL_FINANCIAL)
+        service.requirePermission(session.sessionId, AppPermission.VIEW_SECURITY_AUDIT)
+        // ...while a write blocks with the grace reason code, not a role denial:
+        val failure = runCatching {
+            service.requirePermission(session.sessionId, AppPermission.EXPENSE)
+        }.exceptionOrNull()
+        assertTrue("expected PermissionDenied", failure is SecurityFailure.PermissionDenied)
+        assertEquals(
+            ServerAccountPolicy.REASON_SERVER_GRACE_EXPIRED,
+            (failure as SecurityFailure.PermissionDenied).reasonCode,
+        )
     }
 
     private suspend fun assertRejected(block: suspend () -> Unit) {

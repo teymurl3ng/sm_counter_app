@@ -30,6 +30,11 @@ sealed interface AccountAuthResult {
     /** Auth explicitly returned the stable invalid-credential code. */
     data object InvalidCredentials : AccountAuthResult
 
+    /** Refresh-only verdict: the server itself states the refresh token is
+     *  dead (invalid_grant / refresh_token_not_found). Definitive — the
+     *  session cannot recover; sign-in classification is unaffected. */
+    data object RefreshTokenInvalid : AccountAuthResult
+
     /** Auth identity has no staff profile. */
     data object NotAuthorized : AccountAuthResult
 
@@ -135,9 +140,14 @@ class AccountAuthClient(
                 // A refreshed token still needs a definitive profile check.
                 verifyProfile(tokens)
             } ?: AccountAuthResult.Unknown("malformed_token_response")
-            400 -> when (stableErrorCode(response)) {
+            400 -> when (val code = refreshErrorCodeOf(response)) {
                 CODE_INVALID_CREDENTIALS -> AccountAuthResult.InvalidCredentials
-                else -> AccountAuthResult.Unknown("refresh_rejected")
+                CODE_INVALID_GRANT, CODE_REFRESH_TOKEN_NOT_FOUND ->
+                    AccountAuthResult.RefreshTokenInvalid
+                else -> {
+                    val detail = code?.let { "_$it" } ?: ""
+                    AccountAuthResult.Unknown("refresh_rejected$detail")
+                }
             }
             429 -> AccountAuthResult.Unknown("rate_limited")
             in 500..599 -> AccountAuthResult.Unknown("server_${response.status}")
@@ -282,6 +292,8 @@ class AccountAuthClient(
         const val HEADER_APIKEY = "apikey"
         const val HEADER_AUTHORIZATION = "Authorization"
         const val CODE_INVALID_CREDENTIALS = "invalid_credentials"
+        const val CODE_INVALID_GRANT = "invalid_grant"
+        const val CODE_REFRESH_TOKEN_NOT_FOUND = "refresh_token_not_found"
     }
 }
 
@@ -295,6 +307,22 @@ internal fun stableErrorCodeOf(response: SyncHttpResponse): String? {
             ?: json.optJSONObject("error")?.optString("code")?.takeIf { it.isNotEmpty() }
     }.getOrNull()
 }
+
+/**
+ * Refresh-only error code: Supabase's token endpoint reports dead refresh
+ * tokens as a top-level STRING error (`{"error":"invalid_grant", ...}`) —
+ * a stable code, not message text — which [stableErrorCodeOf] (built for
+ * `error_code` / `error.code` objects) cannot see. Sign-in parsing is
+ * untouched; only refresh classification reads this.
+ */
+internal fun refreshErrorCodeOf(response: SyncHttpResponse): String? =
+    stableErrorCodeOf(response) ?: run {
+        val text = response.bodyText()?.trim().orEmpty()
+        if (text.isEmpty()) return null
+        runCatching {
+            (JSONObject(text).opt("error") as? String)?.takeIf { it.isNotBlank() }
+        }.getOrNull()
+    }
 
 /**
  * Feeds [TrustedTime] from any server response: an explicit

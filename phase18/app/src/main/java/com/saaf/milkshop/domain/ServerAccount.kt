@@ -22,6 +22,8 @@ object ServerAccountPolicy {
     const val GRACE_DAYS = 7L
     const val GRACE_DURATION_MS = GRACE_DAYS * 24L * 60L * 60L * 1000L
     const val REASON_SERVER_GRACE_EXPIRED = "server_grace_expired"
+    const val REASON_SERVER_GRACE_RECOVERED = "server_grace_recovered"
+    const val VERIFICATION_REFRESH_THROTTLE_MS = 24L * 60L * 60L * 1000L
 
     object BindingStatus {
         const val PENDING = "pending"
@@ -55,4 +57,50 @@ object ServerAccountPolicy {
 
     fun linkWriteBlocked(link: ServerIdentityLinkEntity, nowEpochMs: Long): Boolean =
         writeBlockedByGrace(link.status, link.verifiedAtEpochMs, nowEpochMs)
+
+    /**
+     * H5 (audit 2026-10-02; spec §6 "writes blocked, reads allowed"): the
+     * read-family permissions that survive offline-grace expiry. Everything
+     * else stays blocked until the link verifies again — including
+     * CREATE_EXPORT_BACKUP (an export is not an ERP write, but it is also
+     * not a read) and reads gated on management permissions such as the
+     * Users list (MANAGE_STAFF_USERS).
+     */
+    val GRACE_READ_PERMISSIONS: Set<AppPermission> = setOf(
+        AppPermission.VIEW_OPERATIONAL,
+        AppPermission.VIEW_FULL_FINANCIAL,
+        AppPermission.VIEW_SECURITY_AUDIT,
+    )
+
+    enum class GraceDecision { ALLOW, BLOCK_WRITE }
+
+    /** Pure decision — JVM-tested. Not expired ⇒ everything allows. */
+    fun graceDecision(permission: AppPermission, expired: Boolean): GraceDecision =
+        if (!expired || permission in GRACE_READ_PERMISSIONS) {
+            GraceDecision.ALLOW
+        } else {
+            GraceDecision.BLOCK_WRITE
+        }
+
+    /**
+     * H13: true when a successful authenticated server exchange should
+     * refresh this link's verification clock — clock-carrying statuses only
+     * (VERIFIED, OFFLINE_GRACE), a timestamp must exist, and at most one
+     * refresh per throttle window. Other statuses (restored-unverified,
+     * pending, …) stay untouched: enrollment links them. Pure — JVM-tested.
+     */
+    fun shouldRefreshVerification(status: String, verifiedAtEpochMs: Long?, nowEpochMs: Long): Boolean {
+        if (status != LinkStatus.VERIFIED && status != LinkStatus.OFFLINE_GRACE) return false
+        val verifiedAt = verifiedAtEpochMs ?: return false
+        return nowEpochMs - verifiedAt >= VERIFICATION_REFRESH_THROTTLE_MS
+    }
+
+    /** The full requirePermission verdict: does THIS permission block for THIS link now? */
+    fun graceWriteBlocked(
+        link: ServerIdentityLinkEntity,
+        permission: AppPermission,
+        nowEpochMs: Long,
+    ): Boolean =
+        writeBlockedByGrace(link.status, link.verifiedAtEpochMs, nowEpochMs) &&
+            graceDecision(permission, expired = true) == GraceDecision.BLOCK_WRITE
 }

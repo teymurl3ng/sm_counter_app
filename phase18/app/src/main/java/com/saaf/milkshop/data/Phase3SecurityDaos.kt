@@ -70,6 +70,16 @@ interface SecurityAuditDao {
         """
     )
     suspend fun absorbedDaysSealedBy(sealedBy: String): List<String>
+
+    /** H8: refused pushes since the given ISO instant (closed-day refusals surface as halts). */
+    @Query(
+        """
+        SELECT COUNT(*) FROM security_audit_entries
+        WHERE action = 'sync_push_halted'
+          AND occurred_at >= :sinceIso
+        """
+    )
+    suspend fun refusalsSince(sinceIso: String): Int
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(entry: SecurityAuditEntryEntity): Long
 

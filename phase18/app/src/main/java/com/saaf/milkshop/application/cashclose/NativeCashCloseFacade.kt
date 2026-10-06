@@ -57,6 +57,8 @@ data class NativeCashCloseContext(
     val lastSyncedLabel: String = "Unknown",
     /** H8: reverse consequence for the reopen confirmation (null = nothing absorbed). */
     val reopenNote: String? = null,
+    /** H8: refused pushes in the last 24 h (closed-day refusals arrive as halts). */
+    val refusalCount: Int = 0,
 )
 
 data class NativeCashCloseCountRequest(
@@ -169,6 +171,9 @@ class NativeCashCloseFacade(
                 absorbedDays.map { it.businessDate },
             ),
             lastSyncedLabel = lastSyncedLabel(),
+            refusalCount = database.securityAuditDao().refusalsSince(
+                java.time.Instant.now().minusSeconds(24 * 3600).toString(),
+            ),
             reopenNote = if (!postingOpen) {
                 CloseSemanticsLabels.reopenLine(
                     businessDate,

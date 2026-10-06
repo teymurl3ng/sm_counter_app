@@ -452,6 +452,14 @@ private fun CashCloseForm(
                 )
             }
             if (state.context.postingOpen) {
+                if (state.context.refusalCount > 0) {
+                    Text(
+                        state.context.refusalCount.toString() + " sync refusal(s) in the last 24 h — see Security History.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseRefusalCount),
+                    )
+                }
                 Text(
                     state.context.lastSyncedLabel,
                     style = MaterialTheme.typography.bodySmall,

@@ -4,6 +4,7 @@ import com.saaf.milkshop.application.bridge.ReconciliationBridgeCommandService
 import com.saaf.milkshop.application.readmodels.money
 import com.saaf.milkshop.data.MilkShopDatabase
 import androidx.room3.withWriteTransaction
+import com.saaf.milkshop.application.operations.NativeDeliveriesFacade
 import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.PhysicalCashCountInput
 import com.saaf.milkshop.domain.PhysicalCashCountService
@@ -21,6 +22,11 @@ data class NativeCashCloseCountSnapshot(
     val expectedCashPaisa: Long,
     val variancePaisa: Long,
     val countedAt: String,
+)
+
+data class NativeCashClosePendingDelivery(
+    val deliveryId: Long,
+    val label: String,
 )
 
 data class NativeCashCloseAbsorbedDay(
@@ -43,6 +49,8 @@ data class NativeCashCloseContext(
     val reopenDeferredNotice: String? = null,
     /** H8: open days earlier than the close date that today's close will absorb. */
     val absorbedDays: List<NativeCashCloseAbsorbedDay> = emptyList(),
+    /** H9: today's pending deliveries, listed in the dock with one-tap resolve. */
+    val pendingDeliveries: List<NativeCashClosePendingDelivery> = emptyList(),
 )
 
 data class NativeCashCloseCountRequest(
@@ -115,6 +123,24 @@ class NativeCashCloseFacade(
                 countedAt = snapshot.count.countedAt,
             )
         }
+        val pendingDeliveries = if (postingOpen) {
+            database.deliveryDao().activeDeliveries()
+                .filter { it.businessDate == businessDate }
+                .mapNotNull { delivery ->
+                    val status = database.deliveryDao().latestStatus(delivery.deliveryId)?.status
+                    if (status != "pending") return@mapNotNull null
+                    val customer = database.accountDao().findById(delivery.customerAccountId)?.name
+                        ?: "Customer #${delivery.customerAccountId}"
+                    val product = database.productDao().findById(delivery.productId)?.name
+                        ?: "Product #${delivery.productId}"
+                    NativeCashClosePendingDelivery(
+                        deliveryId = delivery.deliveryId,
+                        label = "$product for $customer (${delivery.quantity})",
+                    )
+                }
+        } else {
+            emptyList()
+        }
         val absorbedDays = if (postingOpen) {
             database.dailyCloseDao().absorbedOpenDays(businessDate).map {
                 NativeCashCloseAbsorbedDay(it.businessDate, it.eventCount)
@@ -131,6 +157,7 @@ class NativeCashCloseFacade(
             latestCount = latest,
             reopenDeferredNotice = null,
             absorbedDays = absorbedDays,
+            pendingDeliveries = pendingDeliveries,
         )
     }
 
@@ -228,6 +255,21 @@ class NativeCashCloseFacade(
             ),
             refreshedContext = load(sessionHandle, date),
         )
+    }
+
+    /**
+     * H9: one-tap resolve from the close dock. Today is still open at this
+     * moment (the dock only shows this pre-close), so the deliveries
+     * facade's posting-open gate passes.
+     */
+    suspend fun resolvePendingDelivery(
+        sessionHandle: String,
+        deliveryId: Long,
+        date: LocalDate = BusinessClock.today(),
+    ): NativeCashCloseContext {
+        val deliveries = NativeDeliveriesFacade(database, security)
+        deliveries.markDelivered(sessionHandle, deliveryId, date)
+        return load(sessionHandle, date)
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.saaf.milkshop.nativeui.cashclose
 
+import com.saaf.milkshop.application.cashclose.CloseSemanticsLabels
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -138,6 +139,7 @@ internal fun CashCloseEntryContent(
     state: NativeCashCloseState.Ready,
     onRecordCount: (NativeCashCloseCountRequest) -> Unit,
     onCloseDay: (NativeCashCloseDayRequest) -> Unit,
+    onResolveDelivery: (Long) -> Unit = {},
     onReopenDay: (String, CharArray) -> Unit,
     onBack: () -> Unit,
     leaveGuard: EntryLeaveGuard,
@@ -271,6 +273,7 @@ private fun CashCloseForm(
     onReopenPassphraseChange: (String) -> Unit,
     onRecordCount: () -> Unit,
     onCloseDay: () -> Unit,
+    onResolveDelivery: (Long) -> Unit = {},
     onReopenDay: () -> Unit,
     allowReopen: Boolean = true,
     modifier: Modifier = Modifier,
@@ -433,6 +436,48 @@ private fun CashCloseForm(
                 )
             }
             if (state.context.postingOpen) {
+                // H8: enumerate what today's close absorbs BEFORE the write.
+                val absorbedLine: String? = CloseSemanticsLabels.absorbedDaysLine(
+                    state.context.absorbedDays.map { it.businessDate to it.eventCount },
+                )
+                if (absorbedLine != null) {
+                    Text(
+                        absorbedLine,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseAbsorbedDays),
+                    )
+                    Spacer(Modifier.height(8.dp))
+                }
+                // H9: pending deliveries freeze at close — list them with a
+                // one-tap resolve. The close proceeds either way; after close
+                // the only remedy is an owner reopen.
+                if (state.context.pendingDeliveries.isNotEmpty()) {
+                    Text(
+                        "Pending deliveries — they cannot be confirmed after close " +
+                            "(the remedy then is an owner reopen):",
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashClosePendingDeliveries),
+                    )
+                    state.context.pendingDeliveries.forEach { pending ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(
+                                pending.label,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.weight(1f),
+                            )
+                            Button(
+                                onClick = { hapticContext.hapticCommit(); onResolveDelivery(pending.deliveryId) },
+                                enabled = !state.saving,
+                                modifier = Modifier.testTag(NativeUiTags.CashCloseDeliveryResolve),
+                            ) { Text("Mark delivered") }
+                        }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
                 val press1 = rememberPressSource()
                 Button(
                     onClick = { hapticContext.hapticCommit(); onCloseDay() },

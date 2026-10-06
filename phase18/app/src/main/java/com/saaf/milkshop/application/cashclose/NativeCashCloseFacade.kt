@@ -3,6 +3,7 @@ package com.saaf.milkshop.application.cashclose
 import com.saaf.milkshop.application.bridge.ReconciliationBridgeCommandService
 import com.saaf.milkshop.application.readmodels.money
 import com.saaf.milkshop.data.MilkShopDatabase
+import androidx.room3.withWriteTransaction
 import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.PhysicalCashCountInput
 import com.saaf.milkshop.domain.PhysicalCashCountService
@@ -22,6 +23,11 @@ data class NativeCashCloseCountSnapshot(
     val countedAt: String,
 )
 
+data class NativeCashCloseAbsorbedDay(
+    val businessDate: String,
+    val eventCount: Int,
+)
+
 data class NativeCashCloseContext(
     val businessDate: String,
     val postingOpen: Boolean,
@@ -35,6 +41,8 @@ data class NativeCashCloseContext(
      * Retained for binary compatibility with earlier contract fixtures.
      */
     val reopenDeferredNotice: String? = null,
+    /** H8: open days earlier than the close date that today's close will absorb. */
+    val absorbedDays: List<NativeCashCloseAbsorbedDay> = emptyList(),
 )
 
 data class NativeCashCloseCountRequest(
@@ -107,6 +115,13 @@ class NativeCashCloseFacade(
                 countedAt = snapshot.count.countedAt,
             )
         }
+        val absorbedDays = if (postingOpen) {
+            database.dailyCloseDao().absorbedOpenDays(businessDate).map {
+                NativeCashCloseAbsorbedDay(it.businessDate, it.eventCount)
+            }
+        } else {
+            emptyList()
+        }
         return NativeCashCloseContext(
             businessDate = businessDate,
             postingOpen = postingOpen,
@@ -115,6 +130,7 @@ class NativeCashCloseFacade(
             expectedCashPaisa = expectedCashPaisa,
             latestCount = latest,
             reopenDeferredNotice = null,
+            absorbedDays = absorbedDays,
         )
     }
 
@@ -177,6 +193,28 @@ class NativeCashCloseFacade(
                 varianceReason = request.varianceReason?.trim()?.takeIf { it.isNotEmpty() },
             ),
         )
+        // H8: record HOW each absorbed day was sealed — audit rows that say
+        // "absorbed by this close, with no count of its own", so reports can
+        // tell closed-with-count apart from absorbed. Written immediately
+        // after the close action (its own audit already exists); a crash in
+        // this window loses the seal rows, never the close itself.
+        if (context.absorbedDays.isNotEmpty()) {
+            val actor = security.requirePermission(sessionHandle, AppPermission.CASH_COUNT_AND_CLOSE)
+            database.withWriteTransaction {
+                context.absorbedDays.forEach { day ->
+                    database.securityAuditDao().insert(
+                        com.saaf.milkshop.data.SecurityAuditEntryEntity(
+                            auditId = 0,
+                            occurredAt = java.time.Instant.now().toString(),
+                            action = "daily_close_seal_absorbed",
+                            result = "info",
+                            reasonCode = day.businessDate,
+                            details = "sealed_by=${context.businessDate};events=${day.eventCount};actor=${actor.userId}",
+                        ),
+                    )
+                }
+            }
+        }
         val counted = result.countedCash ?: latest.countedCashPaisa / 100.0
         val expected = result.expectedCash ?: latest.expectedCashPaisa / 100.0
         val variance = result.variance ?: (counted - expected)

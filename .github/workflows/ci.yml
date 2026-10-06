@@ -1,0 +1,51 @@
+# Saaf Milk CI (audit finding C2).
+#
+# Runs the host-side gates on every push and PR: the full JVM unit-test suite
+# (~900 tests incl. the sync decision/label/contract suites) plus the two
+# cross-platform python gates. qaFast's powershell sub-gates stay local for
+# now (Windows-bound scripts); the money-core JVM harness (Sale/DailyClose/
+# Correction through the real Room database) is pending a harness decision —
+# the JVM-Room spike hit a class-identity wall (see FINDINGS_STATUS.md C2).
+#
+# NOTE: this workflow activates when the repository is pushed to GitHub —
+# nothing has been pushed yet (local main is ~140 commits ahead of origin).
+
+name: ci
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  host-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Android SDK (platform 36)
+        uses: android-actions/setup-android@v3
+        with:
+          packages: "platforms;android-36"
+
+      - name: Set up Gradle (cached)
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: JVM unit tests
+        working-directory: phase18
+        run: ./gradlew :app:testDebugUnitTest --continue
+
+      - name: Bridge contract gate
+        working-directory: phase18
+        run: ./gradlew verifyBridgeContract
+
+      - name: UI cleanup gate
+        working-directory: phase18
+        run: ./gradlew verifyUiCleanup

@@ -110,7 +110,6 @@ class NativeCashCloseSemanticsContractTest {
     }
 
     @Test
-    @Ignore("owed: resolve callback not reaching the recorded capture — trace the onResolveDelivery thread through CashCloseForm")
     fun closeDockListsPendingDeliveries() {
         setContent(
             ready(
@@ -146,7 +145,6 @@ class NativeCashCloseSemanticsContractTest {
     }
 
     @Test
-    @Ignore("owed: coverage note not found post-signal-relocation — verify the note's gate placement in CashCloseForm")
     fun varianceScreenShowsMultiDayCoverageNote() {
         setContent(ready(context(coverageNote = "This count covers Tue 6 Oct + Mon 5 Oct — the variance is multi-day.", withCount = true)))
         composeRule.onNodeWithTag(NativeUiTags.CashCloseCoverageNote)

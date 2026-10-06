@@ -241,6 +241,7 @@ internal fun CashCloseEntryContent(
                     )
                     draftTouched = false
                 },
+                    onResolveDelivery = onResolveDelivery,
                 onReopenDay = {
                     if (reopenReason.trim().isEmpty() || reopenPassphrase.isBlank()) return@CashCloseForm
                     val secret = reopenPassphrase.toCharArray()
@@ -421,6 +422,14 @@ private fun CashCloseForm(
             )
         }
 
+            if (!state.context.postingOpen && state.context.reopenNote != null) {
+                Text(
+                    state.context.reopenNote,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseReopenNote),
+                )
+            }
             if (state.context.postingOpen) {
                 if (state.context.refusalCount > 0) {
                     Text(
@@ -500,14 +509,6 @@ private fun CashCloseForm(
                     minLines = 2,
                     maxLines = 4,
                     modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseVarianceReason),
-                )
-            }
-            if (!state.context.postingOpen && state.context.reopenNote != null) {
-                Text(
-                    state.context.reopenNote,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseReopenNote),
                 )
             }
             if (state.context.postingOpen) {

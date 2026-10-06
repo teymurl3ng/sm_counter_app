@@ -421,36 +421,6 @@ private fun CashCloseForm(
             )
         }
 
-        if (activeCount != null) {
-            state.context.coverageNote?.let { coverageNote ->
-                Text(
-                    coverageNote,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseCoverageNote),
-                )
-            }
-            VariancePanel(count = activeCount)
-            if (needsReason && state.context.postingOpen) {
-                OutlinedTextField(
-                    value = varianceReason,
-                    onValueChange = onVarianceReasonChange,
-                    enabled = !state.saving,
-                    label = { Text("Explain the cash difference") },
-                    supportingText = { Text("Required before closing · ${varianceReason.length}/240") },
-                    minLines = 2,
-                    maxLines = 4,
-                    modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseVarianceReason),
-                )
-            }
-            if (!state.context.postingOpen && state.context.reopenNote != null) {
-                Text(
-                    state.context.reopenNote,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseReopenNote),
-                )
-            }
             if (state.context.postingOpen) {
                 if (state.context.refusalCount > 0) {
                     Text(
@@ -509,6 +479,38 @@ private fun CashCloseForm(
                     }
                     Spacer(Modifier.height(8.dp))
                 }
+            }
+        if (activeCount != null) {
+            state.context.coverageNote?.let { coverageNote ->
+                Text(
+                    coverageNote,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseCoverageNote),
+                )
+            }
+            VariancePanel(count = activeCount)
+            if (needsReason && state.context.postingOpen) {
+                OutlinedTextField(
+                    value = varianceReason,
+                    onValueChange = onVarianceReasonChange,
+                    enabled = !state.saving,
+                    label = { Text("Explain the cash difference") },
+                    supportingText = { Text("Required before closing · ${varianceReason.length}/240") },
+                    minLines = 2,
+                    maxLines = 4,
+                    modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseVarianceReason),
+                )
+            }
+            if (!state.context.postingOpen && state.context.reopenNote != null) {
+                Text(
+                    state.context.reopenNote,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseReopenNote),
+                )
+            }
+            if (state.context.postingOpen) {
                 val press1 = rememberPressSource()
                 Button(
                     onClick = { hapticContext.hapticCommit(); onCloseDay() },

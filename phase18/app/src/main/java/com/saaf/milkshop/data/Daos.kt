@@ -139,7 +139,8 @@ interface AnalyticsReadDao {
     @Query("""
         SELECT
             COUNT(*) AS eventCount,
-            COALESCE(SUM(CASE WHEN event_type = 'SALE' THEN COALESCE(sale_value, 0) ELSE 0 END), 0) AS salesValue,
+            COALESCE(SUM(CASE WHEN event_type = 'SALE' THEN COALESCE(sale_value, 0) ELSE 0 END), 0)
+              + COALESCE(SUM(CASE WHEN event_type = 'SALE' THEN COALESCE(surcharge_applied, 0) ELSE 0 END), 0) AS salesValue,
             COALESCE(SUM(CASE WHEN event_type = 'SALE' THEN COALESCE(sale_quantity, 0) ELSE 0 END), 0) AS saleQuantity,
             COALESCE(SUM(CASE WHEN event_type = 'PURCHASE_RECEIPT' THEN COALESCE(amount_owed, 0) ELSE 0 END), 0) AS purchaseAmount,
             COALESCE(SUM(CASE WHEN event_type = 'PURCHASE_RECEIPT' THEN COALESCE(raw_liters, 0) ELSE 0 END), 0) AS purchasedMilkLiters,

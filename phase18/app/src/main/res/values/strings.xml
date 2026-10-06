@@ -481,6 +481,8 @@ Schema version: %3$d</string>
     <string name="native_stock_effect">Stock −2.0 L</string>
     <string name="native_cash_effect">Cash +PKR 600</string>
     <string name="native_sale_summary_format">%1$s %2$s %3$s · %4$s</string>
+    <string name="native_sale_surcharge_label">Delivery surcharge</string>
+    <string name="native_sale_surcharge_amount">Surcharge amount</string>
     <string name="native_sale_total_format">PKR %1$s</string>
     <string name="native_stock_effect_format">Stock −%1$s %2$s</string>
     <string name="native_cash_effect_format">Cash +PKR %1$s</string>

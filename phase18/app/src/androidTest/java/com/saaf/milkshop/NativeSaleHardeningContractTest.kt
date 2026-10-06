@@ -17,6 +17,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.unit.Density
@@ -24,6 +26,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.sale.NativeSaleAccount
 import com.saaf.milkshop.application.sale.NativeSaleContext
+import com.saaf.milkshop.application.sale.NativeSaleRequest
 import com.saaf.milkshop.application.sale.NativeSaleProduct
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.RolePermissions
@@ -31,6 +34,8 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.sale.CashierSaleScreen
 import com.saaf.milkshop.nativeui.sale.NativeSaleState
 import com.saaf.milkshop.nativeui.theme.SaafTheme
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -140,7 +145,53 @@ class NativeSaleHardeningContractTest {
         composeRule.onNodeWithText("Customer 30").assertIsDisplayed()
     }
 
-    private fun setSaleContent(saleContext: NativeSaleContext) {
+
+    @Test
+    fun surchargeTogglePrefillsDefaultAndCarriesIntoRequest() {
+        var recorded: NativeSaleRequest? = null
+        setSaleContent(context(defaultSurchargeRs = 50.0), onRecordSale = { recorded = it })
+
+        composeRule.onNodeWithTag(NativeUiTags.CashierProductMilk).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.CashierSurchargeToggle)
+            .performScrollTo()
+            .performClick()
+        composeRule.onNodeWithTag(NativeUiTags.CashierSurchargeAmount).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).performTextInput("2")
+        composeRule.onNodeWithTag(NativeUiTags.CashierRecordSale)
+            .performScrollTo()
+            .performClick()
+
+        val sent = recorded
+        assertTrue(sent?.surchargeEnabled == true)
+        assertEquals(50.0, sent?.surchargeAmountRs)
+    }
+
+    @Test
+    fun surchargeEditedAmountWinsOverDefault() {
+        var recorded: NativeSaleRequest? = null
+        setSaleContent(context(defaultSurchargeRs = 50.0), onRecordSale = { recorded = it })
+
+        composeRule.onNodeWithTag(NativeUiTags.CashierProductMilk).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.CashierSurchargeToggle)
+            .performScrollTo()
+            .performClick()
+        composeRule.onNodeWithTag(NativeUiTags.CashierSurchargeAmount)
+            .performScrollTo()
+            .performTextReplacement("75")
+        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).performTextInput("2")
+        composeRule.onNodeWithTag(NativeUiTags.CashierRecordSale)
+            .performScrollTo()
+            .performClick()
+
+        val sent = recorded
+        assertTrue(sent?.surchargeEnabled == true)
+        assertEquals(75.0, sent?.surchargeAmountRs)
+    }
+
+    private fun setSaleContent(
+        saleContext: NativeSaleContext,
+        onRecordSale: (NativeSaleRequest) -> Unit = {},
+    ) {
         composeRule.setContent {
             SaafTheme(darkTheme = false) {
                 CashierSaleScreen(
@@ -149,7 +200,7 @@ class NativeSaleHardeningContractTest {
                     state = NativeSaleState.Ready(saleContext),
                     onRetry = {},
                     onClearFeedback = {},
-                    onRecordSale = {},
+                    onRecordSale = onRecordSale,
             onSendAsDelivery = {},
             onStartNextSale = {},
                     onNavigate = {},
@@ -167,6 +218,7 @@ class NativeSaleHardeningContractTest {
         customers: List<NativeSaleAccount> = listOf(NativeSaleAccount(20L, "Ahmed Store")),
         paymentAccounts: List<NativeSaleAccount> = listOf(NativeSaleAccount(10L, "Cash")),
         defaultPaymentAccountId: Long? = paymentAccounts.firstOrNull()?.accountId,
+        defaultSurchargeRs: Double = 50.0,
     ) = NativeSaleContext(
         businessDate = "2026-09-19",
         postingOpen = postingOpen,
@@ -176,6 +228,7 @@ class NativeSaleHardeningContractTest {
         defaultPaymentAccountId = defaultPaymentAccountId,
         defaultPaymentAccountBalancePaisa = 125000L,
         todaySalesPaisa = 50000L,
+            defaultSurchargeRs = defaultSurchargeRs,
     )
 
     private companion object {

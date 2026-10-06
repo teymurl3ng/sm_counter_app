@@ -181,6 +181,7 @@ class NativeSaleScreenContractTest {
         defaultPaymentAccountId = null,
         defaultPaymentAccountBalancePaisa = null,
         todaySalesPaisa = 0L,
+        defaultSurchargeRs = 50.0,
     )
 
     private fun followUp(eventId: Long) = NativeSaleDeliveryFollowUp(

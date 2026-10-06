@@ -484,6 +484,7 @@ fun ManagerPreviewHost(
                     onRetry = cashCloseViewModel::refresh,
                     onRecordCount = cashCloseViewModel::recordCount,
                     onCloseDay = cashCloseViewModel::closeDay,
+                    onResolveDelivery = cashCloseViewModel::resolveDelivery,
                     onBackToWork = {
                         onManagerSectionChange(ManagerSection.Work)
                     },

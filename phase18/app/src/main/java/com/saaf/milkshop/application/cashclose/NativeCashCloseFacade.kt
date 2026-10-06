@@ -3,6 +3,8 @@ package com.saaf.milkshop.application.cashclose
 import com.saaf.milkshop.application.bridge.ReconciliationBridgeCommandService
 import com.saaf.milkshop.application.readmodels.money
 import com.saaf.milkshop.data.MilkShopDatabase
+import androidx.room3.withWriteTransaction
+import com.saaf.milkshop.application.operations.NativeDeliveriesFacade
 import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.PhysicalCashCountInput
 import com.saaf.milkshop.domain.PhysicalCashCountService
@@ -22,6 +24,16 @@ data class NativeCashCloseCountSnapshot(
     val countedAt: String,
 )
 
+data class NativeCashClosePendingDelivery(
+    val deliveryId: Long,
+    val label: String,
+)
+
+data class NativeCashCloseAbsorbedDay(
+    val businessDate: String,
+    val eventCount: Int,
+)
+
 data class NativeCashCloseContext(
     val businessDate: String,
     val postingOpen: Boolean,
@@ -35,6 +47,18 @@ data class NativeCashCloseContext(
      * Retained for binary compatibility with earlier contract fixtures.
      */
     val reopenDeferredNotice: String? = null,
+    /** H8: open days earlier than the close date that today's close will absorb. */
+    val absorbedDays: List<NativeCashCloseAbsorbedDay> = emptyList(),
+    /** H9: today's pending deliveries, listed in the dock with one-tap resolve. */
+    val pendingDeliveries: List<NativeCashClosePendingDelivery> = emptyList(),
+    /** H8: one-line multi-day coverage note for the variance screen (null = single day). */
+    val coverageNote: String? = null,
+    /** H8: "Last synced N min ago" signal for the pre-close decision. */
+    val lastSyncedLabel: String = "Unknown",
+    /** H8: reverse consequence for the reopen confirmation (null = nothing absorbed). */
+    val reopenNote: String? = null,
+    /** H8: refused pushes in the last 24 h (closed-day refusals arrive as halts). */
+    val refusalCount: Int = 0,
 )
 
 data class NativeCashCloseCountRequest(
@@ -107,6 +131,31 @@ class NativeCashCloseFacade(
                 countedAt = snapshot.count.countedAt,
             )
         }
+        val pendingDeliveries = if (postingOpen) {
+            database.deliveryDao().activeDeliveries()
+                .filter { it.businessDate == businessDate }
+                .mapNotNull { delivery ->
+                    val status = database.deliveryDao().latestStatus(delivery.deliveryId)?.status
+                    if (status != "pending") return@mapNotNull null
+                    val customer = database.accountDao().findById(delivery.customerAccountId)?.name
+                        ?: "Customer #${delivery.customerAccountId}"
+                    val product = database.productDao().findById(delivery.productId)?.name
+                        ?: "Product #${delivery.productId}"
+                    NativeCashClosePendingDelivery(
+                        deliveryId = delivery.deliveryId,
+                        label = "$product for $customer (${delivery.quantity})",
+                    )
+                }
+        } else {
+            emptyList()
+        }
+        val absorbedDays = if (postingOpen) {
+            database.dailyCloseDao().absorbedOpenDays(businessDate).map {
+                NativeCashCloseAbsorbedDay(it.businessDate, it.eventCount)
+            }
+        } else {
+            emptyList()
+        }
         return NativeCashCloseContext(
             businessDate = businessDate,
             postingOpen = postingOpen,
@@ -115,6 +164,24 @@ class NativeCashCloseFacade(
             expectedCashPaisa = expectedCashPaisa,
             latestCount = latest,
             reopenDeferredNotice = null,
+            absorbedDays = absorbedDays,
+            pendingDeliveries = pendingDeliveries,
+            coverageNote = CloseSemanticsLabels.coverageLine(
+                businessDate,
+                absorbedDays.map { it.businessDate },
+            ),
+            lastSyncedLabel = lastSyncedLabel(),
+            refusalCount = database.securityAuditDao().refusalsSince(
+                java.time.Instant.now().minusSeconds(24 * 3600).toString(),
+            ),
+            reopenNote = if (!postingOpen) {
+                CloseSemanticsLabels.reopenLine(
+                    businessDate,
+                    database.securityAuditDao().absorbedDaysSealedBy(businessDate),
+                )
+            } else {
+                null
+            },
         )
     }
 
@@ -177,6 +244,28 @@ class NativeCashCloseFacade(
                 varianceReason = request.varianceReason?.trim()?.takeIf { it.isNotEmpty() },
             ),
         )
+        // H8: record HOW each absorbed day was sealed — audit rows that say
+        // "absorbed by this close, with no count of its own", so reports can
+        // tell closed-with-count apart from absorbed. Written immediately
+        // after the close action (its own audit already exists); a crash in
+        // this window loses the seal rows, never the close itself.
+        if (context.absorbedDays.isNotEmpty()) {
+            val actor = security.requirePermission(sessionHandle, AppPermission.CASH_COUNT_AND_CLOSE)
+            database.withWriteTransaction {
+                context.absorbedDays.forEach { day ->
+                    database.securityAuditDao().insert(
+                        com.saaf.milkshop.data.SecurityAuditEntryEntity(
+                            auditId = 0,
+                            occurredAt = java.time.Instant.now().toString(),
+                            action = "daily_close_seal_absorbed",
+                            result = "info",
+                            reasonCode = day.businessDate,
+                            details = "sealed_by=${context.businessDate};events=${day.eventCount};actor=${actor.userId}",
+                        ),
+                    )
+                }
+            }
+        }
         val counted = result.countedCash ?: latest.countedCashPaisa / 100.0
         val expected = result.expectedCash ?: latest.expectedCashPaisa / 100.0
         val variance = result.variance ?: (counted - expected)
@@ -190,6 +279,42 @@ class NativeCashCloseFacade(
             ),
             refreshedContext = load(sessionHandle, date),
         )
+    }
+
+    /**
+     * H8: "Last synced N min ago" from the newer of the pull-state write and
+     * the newest outbox send (an honest live-contact signal for the pre-close
+     * decision — the reviewer's anti-refusal measure for the offline-tablet
+     * workflow). "Unknown" when the installation has never contacted.
+     */
+    private suspend fun lastSyncedLabel(): String {
+        val pullAt = database.syncPullStateDao().find()?.updatedAt
+        val pushAt = database.syncOutboxDao().all().maxOfOrNull { it.enqueuedAt }
+        val stamps = listOfNotNull(pullAt, pushAt)
+            .mapNotNull { runCatching { java.time.Instant.parse(it).toEpochMilli() }.getOrNull() }
+        val newest = stamps.maxOrNull() ?: return "Unknown"
+        val minutes = (System.currentTimeMillis() - newest) / 60_000
+        return when {
+            minutes < 1 -> "Last synced moments ago"
+            minutes < 60 -> "Last synced $minutes min ago"
+            minutes < 24 * 60 -> "Last synced ${minutes / 60} h ago"
+            else -> "Last synced ${minutes / (24 * 60)} days ago"
+        }
+    }
+
+    /**
+     * H9: one-tap resolve from the close dock. Today is still open at this
+     * moment (the dock only shows this pre-close), so the deliveries
+     * facade's posting-open gate passes.
+     */
+    suspend fun resolvePendingDelivery(
+        sessionHandle: String,
+        deliveryId: Long,
+        date: LocalDate = BusinessClock.today(),
+    ): NativeCashCloseContext {
+        val deliveries = NativeDeliveriesFacade(database, security)
+        deliveries.markDelivered(sessionHandle, deliveryId, date)
+        return load(sessionHandle, date)
     }
 
     /**

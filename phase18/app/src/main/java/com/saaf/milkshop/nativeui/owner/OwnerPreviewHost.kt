@@ -816,6 +816,7 @@ fun OwnerPreviewHost(
                     onRetry = cashCloseViewModel::refresh,
                     onRecordCount = cashCloseViewModel::recordCount,
                     onCloseDay = cashCloseViewModel::closeDay,
+                    onResolveDelivery = cashCloseViewModel::resolveDelivery,
                     onReopenDay = cashCloseViewModel::reopenDay,
                     onBackToWork = { returnOwnerWorkHome() },
                     ownScaffold = { s, m, content ->

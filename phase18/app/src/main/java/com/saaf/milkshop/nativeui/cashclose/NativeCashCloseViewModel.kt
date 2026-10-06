@@ -134,6 +134,29 @@ class NativeCashCloseViewModel(
         }
     }
 
+    fun resolveDelivery(deliveryId: Long) {
+        val session = sessionHandle ?: return
+        scope.launch {
+            runCatching {
+                withContext(Dispatchers.IO) { facade.resolvePendingDelivery(session, deliveryId) }
+            }.fold(
+                onSuccess = { refreshed ->
+                    val current = _state.value
+                    if (current is NativeCashCloseState.Ready) {
+                        _state.value = current.copy(context = refreshed)
+                    }
+                },
+                onFailure = { error ->
+                    val current = _state.value
+                    if (current is NativeCashCloseState.Ready) {
+                        _state.value = current.copy(error = error.message ?: "Could not resolve the delivery.")
+                    }
+                },
+            )
+        }
+    }
+
+
     fun closeDay(request: NativeCashCloseDayRequest) {
         val session = sessionHandle ?: return
         val current = _state.value as? NativeCashCloseState.Ready ?: return

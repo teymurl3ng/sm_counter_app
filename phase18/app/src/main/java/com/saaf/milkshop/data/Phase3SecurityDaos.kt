@@ -59,6 +59,17 @@ interface SavedRecoveryCodeDao {
 
 @Dao
 interface SecurityAuditDao {
+
+    /** H8: dates absorbed (sealed) by the given day's close, in seal order. */
+    @Query(
+        """
+        SELECT reason_code FROM security_audit_entries
+        WHERE action = 'daily_close_seal_absorbed'
+          AND details LIKE '%' || 'sealed_by=' || :sealedBy || '%'
+        ORDER BY reason_code
+        """
+    )
+    suspend fun absorbedDaysSealedBy(sealedBy: String): List<String>
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(entry: SecurityAuditEntryEntity): Long
 

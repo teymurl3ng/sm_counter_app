@@ -51,6 +51,12 @@ data class NativeCashCloseContext(
     val absorbedDays: List<NativeCashCloseAbsorbedDay> = emptyList(),
     /** H9: today's pending deliveries, listed in the dock with one-tap resolve. */
     val pendingDeliveries: List<NativeCashClosePendingDelivery> = emptyList(),
+    /** H8: one-line multi-day coverage note for the variance screen (null = single day). */
+    val coverageNote: String? = null,
+    /** H8: "Last synced N min ago" signal for the pre-close decision. */
+    val lastSyncedLabel: String = "Unknown",
+    /** H8: reverse consequence for the reopen confirmation (null = nothing absorbed). */
+    val reopenNote: String? = null,
 )
 
 data class NativeCashCloseCountRequest(
@@ -158,6 +164,19 @@ class NativeCashCloseFacade(
             reopenDeferredNotice = null,
             absorbedDays = absorbedDays,
             pendingDeliveries = pendingDeliveries,
+            coverageNote = CloseSemanticsLabels.coverageLine(
+                businessDate,
+                absorbedDays.map { it.businessDate },
+            ),
+            lastSyncedLabel = lastSyncedLabel(),
+            reopenNote = if (!postingOpen) {
+                CloseSemanticsLabels.reopenLine(
+                    businessDate,
+                    database.securityAuditDao().absorbedDaysSealedBy(businessDate),
+                )
+            } else {
+                null
+            },
         )
     }
 
@@ -255,6 +274,27 @@ class NativeCashCloseFacade(
             ),
             refreshedContext = load(sessionHandle, date),
         )
+    }
+
+    /**
+     * H8: "Last synced N min ago" from the newer of the pull-state write and
+     * the newest outbox send (an honest live-contact signal for the pre-close
+     * decision — the reviewer's anti-refusal measure for the offline-tablet
+     * workflow). "Unknown" when the installation has never contacted.
+     */
+    private suspend fun lastSyncedLabel(): String {
+        val pullAt = database.syncPullStateDao().find()?.updatedAt
+        val pushAt = database.syncOutboxDao().all().maxOfOrNull { it.enqueuedAt }
+        val stamps = listOfNotNull(pullAt, pushAt)
+            .mapNotNull { runCatching { java.time.Instant.parse(it).toEpochMilli() }.getOrNull() }
+        val newest = stamps.maxOrNull() ?: return "Unknown"
+        val minutes = (System.currentTimeMillis() - newest) / 60_000
+        return when {
+            minutes < 1 -> "Last synced moments ago"
+            minutes < 60 -> "Last synced $minutes min ago"
+            minutes < 24 * 60 -> "Last synced ${minutes / 60} h ago"
+            else -> "Last synced ${minutes / (24 * 60)} days ago"
+        }
     }
 
     /**

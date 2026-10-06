@@ -49,6 +49,8 @@ object NativeUiTags {
     const val CashierSaleNote = "cashier_sale_note"
     const val CashierRecordSale = "cashier_record_sale"
     const val CashCloseAbsorbedDays = "cashier_close_absorbed_days"
+    const val CashCloseCoverageNote = "cashier_close_coverage_note"
+    const val CashCloseReopenNote = "cashier_close_reopen_note"
     const val CashClosePendingDeliveries = "cashier_close_pending_deliveries"
     const val CashCloseDeliveryResolve = "cashier_close_delivery_resolve"
     const val CashCloseLastSynced = "cashier_close_last_synced"

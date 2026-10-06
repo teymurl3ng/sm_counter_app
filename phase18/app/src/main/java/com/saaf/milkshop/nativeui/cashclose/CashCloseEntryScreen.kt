@@ -422,6 +422,14 @@ private fun CashCloseForm(
         }
 
         if (activeCount != null) {
+            state.context.coverageNote?.let { coverageNote ->
+                Text(
+                    coverageNote,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseCoverageNote),
+                )
+            }
             VariancePanel(count = activeCount)
             if (needsReason && state.context.postingOpen) {
                 OutlinedTextField(
@@ -435,7 +443,22 @@ private fun CashCloseForm(
                     modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseVarianceReason),
                 )
             }
+            if (!state.context.postingOpen && state.context.reopenNote != null) {
+                Text(
+                    state.context.reopenNote,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseReopenNote),
+                )
+            }
             if (state.context.postingOpen) {
+                Text(
+                    state.context.lastSyncedLabel,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseLastSynced),
+                )
+                Spacer(Modifier.height(8.dp))
                 // H8: enumerate what today's close absorbs BEFORE the write.
                 val absorbedLine: String? = CloseSemanticsLabels.absorbedDaysLine(
                     state.context.absorbedDays.map { it.businessDate to it.eventCount },

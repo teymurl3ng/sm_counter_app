@@ -169,5 +169,6 @@ class NativeOwnerSaleEntryScreenContractTest {
         defaultPaymentAccountId = 4L,
         defaultPaymentAccountBalancePaisa = 125000L,
         todaySalesPaisa = 0L,
+        defaultSurchargeRs = 50.0,
     )
 }

@@ -122,6 +122,7 @@ import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import java.util.Locale
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.foundation.layout.FlowRow
 
 private enum class EntryMode { Quantity, Amount }
@@ -243,6 +244,10 @@ internal fun SaleEntryContent(
     var saleNote by rememberSaveable { mutableStateOf("") }
     var wholesale by rememberSaveable { mutableStateOf(false) }
     var wholesaleRateText by rememberSaveable { mutableStateOf("") }
+    // H7: Delivery Surcharge (spec §7) — optional toggle, editable amount,
+    // prefilled from the shop's default_surcharge setting.
+    var surchargeEnabled by rememberSaveable { mutableStateOf(false) }
+    var surchargeText by rememberSaveable { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
     val useStackedLayout = LocalDensity.current.fontScale >= 1.3f
 
@@ -329,6 +334,8 @@ internal fun SaleEntryContent(
                         saleNote = ""
                         wholesale = false
                         wholesaleRateText = ""
+                        surchargeEnabled = false
+                        surchargeText = ""
                         leaveGuard.clear()
                         onStartNextSale()
                     },
@@ -499,6 +506,43 @@ internal fun SaleEntryContent(
                     )
                 }
                 Spacer(Modifier.height(8.dp))
+                // H7: Delivery Surcharge — first-class input per spec §7.
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(stringResource(R.string.native_sale_surcharge_label))
+                        if (surchargeEnabled) {
+                            OutlinedTextField(
+                                value = surchargeText,
+                                onValueChange = { next ->
+                                    if (isValidDecimalInput(next)) {
+                                        surchargeText = next
+                                        leaveGuard.markDirty()
+                                        onClearFeedback()
+                                    }
+                                },
+                                enabled = surchargeEnabled,
+                                singleLine = true,
+                                label = { Text(stringResource(R.string.native_sale_surcharge_amount)) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag(NativeUiTags.CashierSurchargeAmount),
+                            )
+                        }
+                    }
+                    Switch(
+                        checked = surchargeEnabled,
+                        onCheckedChange = { next ->
+                            surchargeEnabled = next
+                            if (next && surchargeText.isBlank()) {
+                                surchargeText = formatAmount(context.defaultSurchargeRs)
+                            }
+                            leaveGuard.markDirty()
+                            onClearFeedback()
+                        },
+                        modifier = Modifier.testTag(NativeUiTags.CashierSurchargeToggle),
+                    )
+                }
+                Spacer(Modifier.height(8.dp))
                 SecondaryDetails(
                     expanded = secondaryDetailsExpanded,
                     onToggle = { secondaryDetailsExpanded = !secondaryDetailsExpanded },
@@ -589,6 +633,9 @@ internal fun SaleEntryContent(
                                 notes = saleNote.trim().takeIf { it.isNotEmpty() },
                                 wholesale = wholesale,
                                 wholesaleRatePaisa = wholesaleRatePaisa,
+                                surchargeEnabled = surchargeEnabled,
+                                surchargeAmountRs = surchargeText.toDoubleOrNull()
+                                    ?.takeIf { surchargeEnabled },
                             ),
                         )
                     },

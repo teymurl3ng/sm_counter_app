@@ -33,6 +33,8 @@ data class NativeSaleContext(
     val defaultPaymentAccountId: Long?,
     val defaultPaymentAccountBalancePaisa: Long?,
     val todaySalesPaisa: Long,
+    /** H7: the shop's default Delivery Surcharge (spec §7), rupees. */
+    val defaultSurchargeRs: Double,
 )
 
 enum class NativeSaleEntryMode { QUANTITY, AMOUNT }
@@ -51,6 +53,9 @@ data class NativeSaleRequest(
      *  operator-entered rate instead of the stored retail rate. */
     val wholesale: Boolean = false,
     val wholesaleRatePaisa: Long? = null,
+    /** H7: Delivery Surcharge (spec §7) — optional toggle, editable amount. */
+    val surchargeEnabled: Boolean = false,
+    val surchargeAmountRs: Double? = null,
 )
 
 data class NativeSaleReceipt(
@@ -112,6 +117,9 @@ class NativeSaleFacade(
             defaultPaymentAccountId = defaultAccount?.accountId,
             defaultPaymentAccountBalancePaisa = defaultBalance,
             todaySalesPaisa = cashier.salesValuePaisa,
+            defaultSurchargeRs = database.settingsDao()
+                .getValue(com.saaf.milkshop.domain.SettingKeys.DEFAULT_DELIVERY_SURCHARGE)
+                ?: 50.0,
         )
     }
 
@@ -174,6 +182,8 @@ class NativeSaleFacade(
                 value = request.enteredValue.takeIf { request.entryMode == NativeSaleEntryMode.AMOUNT },
                 payment = payment,
                 notes = request.notes?.trim()?.takeIf { it.isNotEmpty() },
+                surchargeEnabled = request.surchargeEnabled,
+                surchargeAmount = request.surchargeAmountRs,
             ),
         )
         return NativeSaleSubmission(

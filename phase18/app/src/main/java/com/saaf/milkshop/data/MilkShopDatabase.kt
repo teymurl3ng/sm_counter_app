@@ -279,9 +279,15 @@ abstract class MilkShopDatabase : RoomDatabase() {
                 .build()
 
         /** Test-only database builder. It uses the exact same schema callback. */
-        fun createInMemory(): MilkShopDatabase =
+        /**
+         * C2: optional driver seam for the JVM harness. Default keeps the
+         * production bundled driver; passing null lets Robolectric tests use
+         * the framework driver (the -jvm/Android native split makes the
+         * bundled driver unloadable on the host JVM — see C2 ledger).
+         */
+        fun createInMemory(driver: androidx.sqlite.SQLiteDriver? = BundledSQLiteDriver()): MilkShopDatabase =
             Room.inMemoryDatabaseBuilder<MilkShopDatabase>()
-                .setDriver(BundledSQLiteDriver())
+                .apply { if (driver != null) setDriver(driver) }
                 .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12)
                 .addCallback(DatabaseCallback())
                 .build()

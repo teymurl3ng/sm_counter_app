@@ -120,6 +120,15 @@ android {
     }
 }
 
+// Unit tests (Robolectric) run on JDK 17: Robolectric 4.14.1's ASM fails with
+// "Unsupported class file major version 69" when instrumenting JDK 25 classes.
+// JDK 17 also matches the CI workflow's setup.
+tasks.withType<Test>().configureEach {
+    javaLauncher.set(
+        javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) },
+    )
+}
+
 val verifyHybridWebAssets by tasks.registering {
     group = "verification"
     description = "Checks that the separately built Phase 7 web bundle is ready for APK packaging."
@@ -187,6 +196,8 @@ dependencies {
     // Real JSON-java for JVM tests: android.jar's org.json is a stub that
     // throws on host unit tests, and the C1 ack comparer tests need it.
     testImplementation("org.json:json:20240303")
+    // C2: Robolectric money-core harness (test-only, never ships).
+    testImplementation("org.robolectric:robolectric:4.14.1")
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.core)

@@ -3,6 +3,7 @@ package com.saaf.milkshop.data
 import com.saaf.milkshop.domain.CorrectionInput
 import com.saaf.milkshop.domain.CorrectionResult
 import com.saaf.milkshop.domain.CorrectionService
+import com.saaf.milkshop.sync.BusinessDateGuard
 
 /**
  * Application-facing boundary for correction execution.
@@ -14,5 +15,10 @@ class CorrectionDataRepository(
 ) {
     private val service = CorrectionService(database)
 
-    suspend fun correct(input: CorrectionInput): CorrectionResult = service.correct(input)
+    suspend fun correct(input: CorrectionInput): CorrectionResult {
+        // H4: corrections backdate to the corrected event's date by design —
+        // the horizon guard only blocks future-beyond-horizon dates.
+        BusinessDateGuard.requireHappenedWithinHorizon(input.occurredAt)
+        return service.correct(input)
+    }
 }

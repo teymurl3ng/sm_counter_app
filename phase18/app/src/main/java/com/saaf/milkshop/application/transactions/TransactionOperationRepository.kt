@@ -22,6 +22,7 @@ import com.saaf.milkshop.domain.VendorPurchaseService
 import com.saaf.milkshop.domain.YogurtProductionInput
 import com.saaf.milkshop.domain.YogurtProductionResult
 import com.saaf.milkshop.domain.YogurtProductionService
+import com.saaf.milkshop.sync.BusinessDateGuard
 
 /**
  * Application-facing transaction operation contract.
@@ -40,28 +41,48 @@ interface TransactionOperationRepository {
     suspend fun recordSalaryPayment(input: SalaryPaymentInput): SalaryPaymentResult
 }
 
-/** Production implementation that composes the existing domain services. */
+/**
+ * Production implementation that composes the existing domain services.
+ * H4: this legacy path bypasses the bridge command layer, so the trusted-date
+ * horizon guard is applied here — a wrong device clock can no longer post an
+ * arbitrarily future date while a trusted anchor exists (backdating to open
+ * days stays allowed, mirroring the bridge layer).
+ */
 class DomainTransactionOperationRepository(
     private val database: MilkShopDatabase,
 ) : TransactionOperationRepository {
     override suspend fun recordPurchase(input: VendorPurchaseInput): VendorPurchaseResult =
-        VendorPurchaseService(database).record(input)
+        BusinessDateGuard.requireHappenedWithinHorizon(input.occurredAt).let {
+            VendorPurchaseService(database).record(input)
+        }
 
     override suspend fun recordSale(input: SaleInput): SaleResult =
-        SaleService(database).record(input)
+        BusinessDateGuard.requireHappenedWithinHorizon(input.occurredAt).let {
+            SaleService(database).record(input)
+        }
 
     override suspend fun recordProduction(input: YogurtProductionInput): YogurtProductionResult =
-        YogurtProductionService(database).record(input)
+        BusinessDateGuard.requireHappenedWithinHorizon(input.occurredAt).let {
+            YogurtProductionService(database).record(input)
+        }
 
     override suspend fun recordVendorPayment(input: VendorPaymentInput): VendorPaymentResult =
-        VendorPaymentService(database).record(input)
+        BusinessDateGuard.requireHappenedWithinHorizon(input.occurredAt).let {
+            VendorPaymentService(database).record(input)
+        }
 
     override suspend fun recordCreditCollection(input: CreditCollectionInput): CreditCollectionResult =
-        CreditCollectionService(database).record(input)
+        BusinessDateGuard.requireHappenedWithinHorizon(input.occurredAt).let {
+            CreditCollectionService(database).record(input)
+        }
 
     override suspend fun recordExpense(input: ExpenseInput): ExpenseResult =
-        ExpenseService(database).record(input)
+        BusinessDateGuard.requireHappenedWithinHorizon(input.occurredAt).let {
+            ExpenseService(database).record(input)
+        }
 
     override suspend fun recordSalaryPayment(input: SalaryPaymentInput): SalaryPaymentResult =
-        SalaryPaymentService(database).record(input)
+        BusinessDateGuard.requireHappenedWithinHorizon(input.occurredAt).let {
+            SalaryPaymentService(database).record(input)
+        }
 }

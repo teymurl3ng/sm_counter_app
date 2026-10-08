@@ -40,6 +40,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -61,6 +63,8 @@ import com.saaf.milkshop.application.more.NativeBlindCashCountReceipt
 import com.saaf.milkshop.application.more.NativeMoreContext
 import com.saaf.milkshop.application.more.NativeMoreSecurityStatus
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.hapticCommit
+import com.saaf.milkshop.nativeui.common.hapticConfirm
 import com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
@@ -388,6 +392,8 @@ private fun MoreCountCashScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 if (state.countReceipt != null) {
+                    val confirmContext = LocalContext.current
+                    LaunchedEffect(state.countReceipt) { confirmContext.hapticConfirm() }
                     CountSuccess(state.countReceipt)
                 } else {
                     OutlinedTextField(
@@ -415,9 +421,11 @@ private fun MoreCountCashScreen(
                     state.error?.let {
                         Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag(NativeUiTags.MoreError))
                     }
+                    val hapticContext = LocalContext.current
                     Button(
                         onClick = {
                             val amount = amountPaisa ?: return@Button
+                            hapticContext.hapticCommit()
                             onRecord(amount, notes)
                         },
                         enabled = canRecord,

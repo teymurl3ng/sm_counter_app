@@ -59,6 +59,7 @@ import com.saaf.milkshop.domain.EmployeeProfileInput
 import com.saaf.milkshop.domain.ProductCatalogInput
 import com.saaf.milkshop.domain.VendorProfileInput
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
@@ -394,6 +395,7 @@ private fun ManagerMoreMenuScreen(
                 Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
+                    .nativeRefreshOverlay(state.refreshing)
                     .testTag(NativeUiTags.ManagerMoreMenu),
             ) {
                 ManagerMoreSectionLabel("Things you sell")

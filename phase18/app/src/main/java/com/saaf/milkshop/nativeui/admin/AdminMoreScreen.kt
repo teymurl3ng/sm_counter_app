@@ -62,6 +62,7 @@ import com.saaf.milkshop.domain.ProductCatalogInput
 import com.saaf.milkshop.domain.StoreIdentityInput
 import com.saaf.milkshop.domain.YieldPolicyInput
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
@@ -493,6 +494,7 @@ private fun AdminMoreMenuScreen(
                 Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
+                    .nativeRefreshOverlay(state.refreshing)
                     .testTag(NativeUiTags.AdminMoreMenu),
             ) {
                 AdminMoreSectionLabel("System tools")

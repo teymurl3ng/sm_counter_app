@@ -455,6 +455,7 @@ object NativeUiTags {
     const val OwnerSyncStatus = "owner_sync_status"
     const val OwnerSyncNow = "owner_sync_now"
     const val OwnerSyncRefresh = "owner_sync_refresh"
+    const val OwnerSyncRetryLoad = "owner_sync_retry_load"
     const val OwnerSyncUnenroll = "owner_sync_unenroll"
     const val OwnerSyncUnenrollConfirm = "owner_sync_unenroll_confirm"
     const val OwnerSyncHolds = "owner_sync_holds"

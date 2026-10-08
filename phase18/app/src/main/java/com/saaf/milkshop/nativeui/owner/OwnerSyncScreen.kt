@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
@@ -140,7 +141,8 @@ fun OwnerSyncScreen(
                     onUnenroll = { unenrollConfirmOpen = true },
                 )
 
-                else -> OwnerSyncEnrollBody(
+                else -> {
+                    OwnerSyncEnrollBody(
                     username = username,
                     onUsernameChange = { username = it },
                     credential = credential,
@@ -158,6 +160,18 @@ fun OwnerSyncScreen(
                         onEnroll(username, chars, environment)
                     },
                 )
+                    // M26: a cold-load failure used to render only as a small
+                    // red line under the enroll form with no way back. The
+                    // existing refresh path IS the retry — surface it.
+                    if (error != null) {
+                        NativeLoadFailurePane(
+                            message = error,
+                            onRetry = onRefresh,
+                            retryTestTag = NativeUiTags.OwnerSyncRetryLoad,
+                        )
+                        Spacer(Modifier.height(12.dp))
+                    }
+                }
             }
 
             if (shopChoices.isNotEmpty()) {
@@ -207,7 +221,7 @@ fun OwnerSyncScreen(
                     modifier = Modifier.testTag(NativeUiTags.OwnerSyncNotice),
                 )
             }
-            error?.let {
+            if (status != null) error?.let {
                 Spacer(Modifier.height(12.dp))
                 Text(
                     it,

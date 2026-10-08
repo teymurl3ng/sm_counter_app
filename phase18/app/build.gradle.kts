@@ -1,5 +1,11 @@
 import java.util.Properties
 
+// Before-pilot provenance: the commit this artifact was built from. Resolved
+// once at configuration time (tens of ms); empty when git is unavailable.
+val buildGitSha = providers.exec {
+    commandLine("git", "rev-parse", "--short", "HEAD")
+}.standardOutput.asText.get().trim()
+
 plugins {
     id("com.android.application")
     id("com.google.devtools.ksp")
@@ -42,6 +48,7 @@ android {
         versionCode = 4
         versionName = "0.4.0"
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$escapedGoogleWebClientId\"")
+        buildConfigField("String", "GIT_SHA", "\"$buildGitSha\"")
         buildConfigField("boolean", "ENABLE_NATIVE_PREVIEW_FIXTURES", "false")
         buildConfigField("String", "NATIVE_PREVIEW_SHARED_PASSPHRASE", "\"\"")
 

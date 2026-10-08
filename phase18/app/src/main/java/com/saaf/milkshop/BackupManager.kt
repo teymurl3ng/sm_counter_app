@@ -451,6 +451,7 @@ class BackupManager(
             put("format_version", formatVersion)
             put("schema_version", CURRENT_SCHEMA_VERSION)
             put("app_version", BuildConfig.VERSION_NAME)
+            put("git_sha", BuildConfig.GIT_SHA)
             put("created_at", now.toString())
             put("file_name", displayName(context, now))
             put("device_id", com.saaf.milkshop.sync.SyncIdentity.currentOrNull())

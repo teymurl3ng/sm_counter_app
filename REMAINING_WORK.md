@@ -19,6 +19,11 @@ in place, never delete.
   ships: a shared, publicly-accessible device must not carry an owner-level sync credential. The
   tablet also raises the shared-device question for the local account model (single device PIN +
   cashier role vs per-person passcodes). See IDENTITY_DECISION_MEMO.md tablet note.
+  **TIER BUILT + VERIFIED (2026-10-09)**: enrollment accepts a cashier server account as a
+  counter device; server account `counter` created (cashier, Shop 1) and verified live (sign-in
+  200, sync_pull 200 with records, admin API 403 = least privilege proven). Credential: Desktop
+  counter_cred.txt (owner stores it). Tablet setup when it arrives: install build → Sync → sign
+  in as counter → pick Shop 1. Per-person Quick PINs decided for the tablet's local logins.
 - **14.8.6 cutover finish** (the gate to the pilot week):
   1. M27 — notification taps open the retired WebView shell (MainActivity); BLOCKS the
      retirement gate. Point notifications at the native activity.

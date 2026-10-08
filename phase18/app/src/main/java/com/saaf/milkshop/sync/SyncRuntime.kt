@@ -50,7 +50,8 @@ class SyncRuntime(
             pullCursor = database.syncPullStateDao().find()?.lastServerSeq ?: 0L,
             holdCount = database.syncRebaselineHoldDao().count(),
             identityStatus = link?.status
-                ?: (roomBinding?.status ?: ServerAccountPolicy.BindingStatus.ACTIVE)
+                ?: if (binding.role == "cashier") "counter_device"
+                else (roomBinding?.status ?: ServerAccountPolicy.BindingStatus.ACTIVE)
                     .let { if (it == ServerAccountPolicy.BindingStatus.ACTIVE) "active_unlinked" else it },
             identityServerUsername = link?.usernameSnapshot,
             identityOwnerName = linkedOwner?.displayName,

@@ -315,6 +315,7 @@ private fun OwnerSyncEnrolledBody(
             ServerAccountPolicy.LinkStatus.SUSPENDED -> "suspended on the server"
             ServerAccountPolicy.LinkStatus.REVOKED -> "revoked on the server"
             "active_unlinked" -> "connected - owner link pending"
+            "counter_device" -> "counter device (cashier sync)"
             else -> null
         }
         if (identityLabel != null) {

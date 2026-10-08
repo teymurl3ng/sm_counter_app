@@ -86,8 +86,13 @@ Full plan approved by owner; Claude review adopted. Tracks:
   Lock/switch user; sync heading "Business sync connection". **A0 survey: NO user-facing hard-deletes exist on synced
   tables** (products/categories/deliveries archive; ledger append-only; only restore-path and sync-internal DELETEs) —
   standing invariant recorded: never add a hard delete to a synced table without a tombstone.
-- **PENDING UX VERIFICATION**: the chooser + identity card + degraded-mode copy are device-untested (build + walk the
-  enrollment flow on a phone before the cutover); khan (admin) exists server-side for testing a linked-clerk flow later.
+- **CASHIER TIER BUILT + VERIFIED (2026-10-09)**: enrollment accepts a cashier server account as a
+  COUNTER DEVICE (binding-only, no owner link — the binding clock carries the entitlement; server gates
+  refuse corrections/master-data from cashier role); server account `counter` created and VERIFIED live:
+  sign-in 200, sync_pull 200 (records returned), admin API 403 (least privilege proven). Credential handed
+  to owner (Desktop counter_cred.txt) for tablet setup. **PENDING UX VERIFICATION**: the chooser + identity
+  card + degraded-mode copy are device-untested (build + walk the enrollment flow on a phone before the
+  cutover); khan (admin) exists server-side for testing a linked-clerk flow later.
 - **TRACK 2 · Server correctness (approved, pending)**: verify admin-RPC exposure from sync tokens; staff.active check
   on every sync_push/sync_pull; anchor the undocked sync RPC SQL into a repo; identity DR dumps; Admin Viewer auth review;
   keep-alive 60-day auto-disable mitigation; P9/P10 fixtures. Decision point after evidence: devices table +

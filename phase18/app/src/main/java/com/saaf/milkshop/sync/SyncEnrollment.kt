@@ -56,23 +56,35 @@ class SyncEnrollment(
         // contract requires — owner (ACCOUNT_BRIDGE_PHASE1_SPEC: "Enrollment
         // requires ALLOWED, role owner"; master-data write gating server-side
         // assumes it).
-        if (auth.role != "owner") {
-            return Outcome.Failed("owner_enrollment_required")
+        // Roles: owner = the full enrollment (identity link + classified
+        // re-baseline). CASHIER = counter device (Track 2 decision: the
+        // shared shop tablet syncs under a cashier-scoped identity) —
+        // binding-only, NO identity link (the binding clock carries the
+        // entitlement), and server-side gates already refuse corrections and
+        // master-data from a cashier role. Anything else is unsupported.
+        val isCounterDevice = auth.role == "cashier"
+        if (auth.role != "owner" && !isCounterDevice) {
+            return Outcome.Failed("unsupported_server_role")
         }
 
-        // Track 1 A2' (Claude review): link resolution is a REQUIRED,
-        // fail-closed step. The grace clock belongs to the enrollment, so it
-        // must never depend on an ambiguous link. Zero owners cannot happen
-        // post-bootstrap; two or more require an explicit choice.
-        val activeOwners = database?.appUserDao()?.all()
-            ?.filter { it.role == "owner" && it.status == "active" }
-            .orEmpty()
-        val resolvedLocalUserId = localUserId ?: when {
-            activeOwners.size == 1 -> activeOwners.single().userId
-            activeOwners.isEmpty() -> return Outcome.Failed("owner_link_unresolved")
-            else -> return Outcome.OwnersAvailable(
-                activeOwners.map { OwnerChoice(it.userId, it.displayName) },
-            )
+        // A2' (owner enrollment only): link resolution is a REQUIRED,
+        // fail-closed step. The grace clock lives on the enrollment binding,
+        // but an owner device must still know WHICH local owner is the
+        // verified server identity. Zero owners cannot happen
+        // post-bootstrap; two or more require an explicit choice. Counter
+        // devices never link.
+        var resolvedLocalUserId: Long? = localUserId
+        if (!isCounterDevice) {
+            val activeOwners = database?.appUserDao()?.all()
+                ?.filter { it.role == "owner" && it.status == "active" }
+                .orEmpty()
+            resolvedLocalUserId = localUserId ?: when {
+                activeOwners.size == 1 -> activeOwners.single().userId
+                activeOwners.isEmpty() -> return Outcome.Failed("owner_link_unresolved")
+                else -> return Outcome.OwnersAvailable(
+                    activeOwners.map { OwnerChoice(it.userId, it.displayName) },
+                )
+            }
         }
 
         val target = shopId?.let { wanted -> auth.shops.firstOrNull { it.shopId == wanted } }
@@ -154,7 +166,9 @@ class SyncEnrollment(
         }
         SyncScheduler.setSchedulingEnabled(true)
         SyncScheduler.requestPush()
-        linkVerifiedOwner(auth, username, resolvedLocalUserId)
+        if (!isCounterDevice) {
+            linkVerifiedOwner(auth, username, resolvedLocalUserId)
+        }
         return Outcome.Enrolled(binding, target.timezone ?: auth.shopTimezone)
     }
 

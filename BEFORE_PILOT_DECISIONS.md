@@ -22,8 +22,17 @@ Existing devices keep their stamps (one more self-converging churn each). Client
 ## 3. Tiered deferred list (reviewer's tiering adopted)
 **Before any pilot phone leaves:**
   - Item 1 package (b′ + backup-format bump + fresh device_id + restore-origin tag + epoch-with-cursor).
-  - The two ledger-correctness spec decisions: offline-authored events for a day another device closed (currently
-    skipped, only counted), and unit/price changes vs historical events.
+  - ~~The two ledger-correctness spec decisions~~ — **BOTH DECIDED (2026-10-08, owner):**
+    - *Offline-authored events for a day another device closed:* **reopen-as-remedy is the spec.** A
+      refused push halts at head (existing) and surfaces in the close-dock refusal count (built, H8/H9
+      package); the remedy is to reopen the closed day on the closing device — which unblocks the
+      refused rows so they drain — then re-close with a fresh count. NO auto-conversion to
+      corrections; the "re-record as correction on an open day" item stays LATER/deferred.
+    - *Unit/price changes vs historical events:* **events freeze their rates at write time — that is
+      the spec.** `unit_rate`, `milk_rate_used`, `delivery_fee_used`, `ts_standard_used` are columns
+      on the event row, so price edits never rewrite history and per-event reports/costing are
+      already correct. A settings-change audit trail (who changed the price, when) is NOT built
+      pre-pilot; deferred as a post-pilot nicety.
   - Per-device revocation + a lower-privilege credential tier (a lost counter phone currently carries owner
     credentials).
   - Build-embedded git SHA (cheap provenance).

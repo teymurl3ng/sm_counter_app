@@ -43,6 +43,7 @@ import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 import com.saaf.milkshop.nativeui.common.hapticTap
 import com.saaf.milkshop.nativeui.common.pressScale
 import com.saaf.milkshop.nativeui.common.rememberPressSource
@@ -88,19 +89,12 @@ fun ManagerWorkScreen(
         is NativeManagerWorkState.LoadFailure -> mgrScaffold(
             snackbarHostState, modifier,
         ) { padding ->
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Text(state.message, style = MaterialTheme.typography.bodyLarge)
-                Button(
-                    onClick = onRetry,
-                    modifier = Modifier.testTag(NativeUiTags.ManagerWorkRetryLoad),
-                ) { Text("Try again") }
-            }
+            NativeLoadFailurePane(
+                    message = state.message,
+                    onRetry = onRetry,
+                    retryTestTag = NativeUiTags.ManagerWorkRetryLoad,
+                    modifier = Modifier.padding(padding),
+                    )
         }
         is NativeManagerWorkState.Ready -> ReadyWork(
             snackbarHostState = snackbarHostState,

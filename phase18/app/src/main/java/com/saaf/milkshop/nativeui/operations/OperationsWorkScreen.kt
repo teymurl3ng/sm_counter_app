@@ -47,6 +47,7 @@ import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.operations.NativeOperationsAttendanceStatus
 import com.saaf.milkshop.application.operations.NativeOperationsWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 import com.saaf.milkshop.nativeui.common.pressScale
 import com.saaf.milkshop.nativeui.common.rememberPressSource
 import androidx.compose.ui.platform.LocalContext
@@ -98,19 +99,12 @@ fun OperationsWorkScreen(
             is NativeOperationsWorkState.LoadFailure -> workScaffold(
                 snackbarHostState, modifier,
             ) { padding ->
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    Text(state.message, style = MaterialTheme.typography.bodyLarge)
-                    Button(
-                        onClick = onRetry,
-                        modifier = Modifier.testTag(NativeUiTags.OpsWorkRetryLoad),
-                    ) { Text("Try again") }
-                }
+                NativeLoadFailurePane(
+                        message = state.message,
+                        onRetry = onRetry,
+                        retryTestTag = NativeUiTags.OpsWorkRetryLoad,
+                        modifier = Modifier.padding(padding),
+                        )
             }
             is NativeOperationsWorkState.Ready -> ReadyWork(
                 snackbarHostState = snackbarHostState,

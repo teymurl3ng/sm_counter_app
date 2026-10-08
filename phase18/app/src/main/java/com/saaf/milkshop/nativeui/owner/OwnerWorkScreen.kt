@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.application.owner.NativeOwnerWorkContext
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.hapticTap
 import com.saaf.milkshop.nativeui.common.pressScale
@@ -76,19 +77,12 @@ fun OwnerWorkScreen(
             snackbarHostState,
             modifier,
         ) { padding ->
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Text(state.message, style = MaterialTheme.typography.bodyLarge)
-                Button(
-                    onClick = onRetry,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerWorkRetryLoad),
-                ) { Text("Try again") }
-            }
+            NativeLoadFailurePane(
+                    message = state.message,
+                    onRetry = onRetry,
+                    retryTestTag = NativeUiTags.OwnerWorkRetryLoad,
+                    modifier = Modifier.padding(padding),
+                    )
         }
         is NativeOwnerWorkState.Ready -> ReadyWork(
             snackbarHostState = snackbarHostState,

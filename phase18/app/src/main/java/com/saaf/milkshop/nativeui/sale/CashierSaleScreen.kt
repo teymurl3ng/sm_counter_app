@@ -784,19 +784,12 @@ internal fun SaleLoadFailureBody(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(message, style = MaterialTheme.typography.bodyLarge)
-        Spacer(Modifier.height(16.dp))
-        Button(onClick = onRetry, modifier = Modifier.testTag(NativeUiTags.CashierRetryLoad)) {
-            Text("Try again")
-        }
-    }
+    NativeLoadFailurePane(
+        message = message,
+        onRetry = onRetry,
+        modifier = modifier,
+        retryTestTag = NativeUiTags.CashierRetryLoad,
+    )
 }
 
 @Composable

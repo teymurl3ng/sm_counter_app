@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saaf.milkshop.application.owner.NativeOwnerOverviewSnapshot
 import com.saaf.milkshop.nativeui.NativeUiTags
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
@@ -64,19 +65,12 @@ fun OwnerOverviewScreen(
                 snackbarHostState,
                 modifier,
             ) { padding ->
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    Text(state.message, style = MaterialTheme.typography.bodyLarge)
-                    Button(
-                        onClick = onRetry,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerOverviewRetryLoad),
-                    ) { Text("Try again") }
-                }
+                NativeLoadFailurePane(
+                        message = state.message,
+                        onRetry = onRetry,
+                        retryTestTag = NativeUiTags.OwnerOverviewRetryLoad,
+                        modifier = Modifier.padding(padding),
+                        )
             }
             is NativeOwnerOverviewState.Ready -> {
                 // T17: back at a section root is swallowed — the session stays.

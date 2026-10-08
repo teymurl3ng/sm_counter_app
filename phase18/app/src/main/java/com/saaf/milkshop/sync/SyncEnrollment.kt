@@ -112,6 +112,26 @@ class SyncEnrollment(
                     updatedAt = java.time.Instant.now().toString(),
                 ),
             )
+            // Track 1 A2'/A6: the ENROLLMENT carries the grace clock — the
+            // Room binding row is its authoritative storage (the binding
+            // file stays the sync-runtime source). ACTIVE + fresh clock
+            // here also re-arms enforcement after a restore's
+            // RESTORED_UNVERIFIED, independent of the owner link.
+            val nowMs = System.currentTimeMillis()
+            val nowIso = java.time.Instant.now().toString()
+            db.serverAccountDao().deleteBindings()
+            db.serverAccountDao().insertBinding(
+                com.saaf.milkshop.data.AccountInstallationBindingEntity(
+                    environment = config.environment,
+                    businessId = binding.businessId,
+                    shopId = binding.shopId,
+                    shopNameSnapshot = binding.shopName ?: target.shopName ?: "Shop ${binding.shopId}",
+                    status = ServerAccountPolicy.BindingStatus.ACTIVE,
+                    verifiedAtEpochMs = nowMs,
+                    createdAt = nowIso,
+                    updatedAt = nowIso,
+                ),
+            )
         }
         SyncScheduler.setSchedulingEnabled(true)
         SyncScheduler.requestPush()

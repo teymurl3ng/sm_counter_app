@@ -460,16 +460,41 @@ class UserSecurityService(
             audit(actor, ACTION_PERMISSION_DENIED, RESULT_FAILURE, permission.name, actor.userId)
             throw SecurityFailure.PermissionDenied()
         }
-        // Account Bridge offline grace (frozen 7 days; spec §6 "writes
-        // blocked, reads allowed"): a linked user whose verified server
-        // entitlement has expired may READ (VIEW_* family) but not write.
-        // H5 fix: the old gate blocked every permission — login itself died
-        // on VIEW_OPERATIONAL. Unbound installations and non-verified link
-        // states are unaffected; the grace clock is untouched here.
-        val serverLink = database.serverAccountDao().findIdentityLink(actor.userId)
-        if (serverLink != null && ServerAccountPolicy.graceWriteBlocked(serverLink, permission, nowEpochMs())) {
+        // Account Bridge offline grace — DEGRADED MODE (2026-10-08 reform;
+        // was: 7 days then read-only, which contradicted offline-first).
+        // The clock belongs to the ENROLLMENT (Room installation-binding
+        // row): 14 days after the last verified server contact, privileged
+        // actions block (restore, user management, enrollment-adjacent
+        // settings, owner drawings, reopen, master data, export) while
+        // daily entry — sales, collections, cash count/close, deliveries,
+        // purchases, expenses, payroll, production, spoilage, attendance,
+        // corrections — and all reads keep working. Unbound installations
+        // are unaffected; expiry never deletes anything.
+        val binding = database.serverAccountDao().findBinding()
+        if (binding != null &&
+            ServerAccountPolicy.graceWriteBlockedBinding(
+                binding.status, binding.verifiedAtEpochMs, permission, nowEpochMs(),
+            )
+        ) {
             audit(actor, ACTION_SERVER_VERIFICATION_EXPIRED, RESULT_FAILURE, ServerAccountPolicy.REASON_SERVER_GRACE_EXPIRED, actor.userId)
             throw SecurityFailure.PermissionDenied(ServerAccountPolicy.REASON_SERVER_GRACE_EXPIRED)
+        }
+        // A1' (display-only while ENFORCE_LINK_STATES = false): server
+        // revocation verdicts recorded via the link row surface here once
+        // the guardrails ship.
+        if (ServerAccountPolicy.ENFORCE_LINK_STATES) {
+            val serverLink = database.serverAccountDao().findIdentityLink(actor.userId)
+            if (serverLink != null &&
+                ServerAccountPolicy.linkStateBlocked(
+                    serverLink.status,
+                    expired = ServerAccountPolicy.bindingGraceExpired(
+                        binding?.status ?: "", binding?.verifiedAtEpochMs, nowEpochMs(),
+                    ),
+                )
+            ) {
+                audit(actor, ACTION_SERVER_VERIFICATION_EXPIRED, RESULT_FAILURE, "server_link_${serverLink.status}", actor.userId)
+                throw SecurityFailure.PermissionDenied("server_link_${serverLink.status}")
+            }
         }
         return actor
     }

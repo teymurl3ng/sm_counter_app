@@ -212,6 +212,55 @@ class SyncRuntime(
     private suspend fun refreshLinkVerificationIfDue() {
         runCatching {
             val now = System.currentTimeMillis()
+            // The BINDING clock is authoritative for the grace (Track 1
+            // A2'/A6): bump it first, then mirror the bump onto the link row
+            // for display. The recovered audit fires on the binding's
+            // blocked→unblocked transition.
+            var binding = database.serverAccountDao().findBinding()
+            if (binding == null) {
+                // Clock backfill for devices enrolled before Track 1: the
+                // sync-runtime binding file carries shop/staff snapshots;
+                // mirror it into the Room row with a FRESH clock so the
+                // 14-day degraded-grace window starts from this build.
+                SyncShopBindingStore.load(context)?.let { fileBinding ->
+                    val nowIso = java.time.Instant.now().toString()
+                    database.serverAccountDao().insertBinding(
+                        com.saaf.milkshop.data.AccountInstallationBindingEntity(
+                            environment = fileBinding.environment,
+                            businessId = fileBinding.businessId,
+                            shopId = fileBinding.shopId,
+                            shopNameSnapshot = fileBinding.shopName ?: fileBinding.shopId,
+                            status = ServerAccountPolicy.BindingStatus.ACTIVE,
+                            verifiedAtEpochMs = now,
+                            createdAt = nowIso,
+                            updatedAt = nowIso,
+                        ),
+                    )
+                    binding = database.serverAccountDao().findBinding()
+                }
+            }
+            if (binding != null &&
+                ServerAccountPolicy.shouldRefreshBindingVerification(binding.status, binding.verifiedAtEpochMs, now)
+            ) {
+                val wasBlocked = ServerAccountPolicy.bindingGraceExpired(
+                    binding.status, binding.verifiedAtEpochMs, now,
+                )
+                database.serverAccountDao().updateBindingStatus(
+                    binding.bindingId, binding.status, now, java.time.Instant.now().toString(),
+                )
+                if (wasBlocked) {
+                    database.securityAuditDao().insert(
+                        com.saaf.milkshop.data.SecurityAuditEntryEntity(
+                            auditId = 0,
+                            occurredAt = java.time.Instant.now().toString(),
+                            action = "server_verification_recovered",
+                            result = "info",
+                            reasonCode = ServerAccountPolicy.REASON_SERVER_GRACE_RECOVERED,
+                            details = "binding=${binding.bindingId}",
+                        ),
+                    )
+                }
+            }
             val link = database.serverAccountDao().identityLinks()
                 .firstOrNull {
                     ServerAccountPolicy.shouldRefreshVerification(it.status, it.verifiedAtEpochMs, now)

@@ -219,7 +219,18 @@ class SyncEnrollment(
         }
     }
 
-    fun unenroll() {
+    suspend fun unenroll() {
+        // A4': stop-syncing is the honest "server logout" moment — revoke
+        // this device's session (scope=local) before the files go. The
+        // access token may outlive the call (platform behavior), so this is
+        // hygiene, not a security control.
+        runCatching {
+            val config = SyncServerConfigStore.load(context)
+            val session = SyncTokenStore(context).load()
+            if (config != null && session != null) {
+                AccountAuthClient(http, config).logout(session.accessToken)
+            }
+        }
         SyncServerConfigStore.clear(context)
         SyncShopBindingStore.clear(context)
         SyncTokenStore(context).clear()

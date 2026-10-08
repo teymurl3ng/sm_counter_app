@@ -139,7 +139,11 @@ class SyncDebugReceiver : BroadcastReceiver() {
     }
 
     private fun unenroll(context: Context) {
-        SyncEnrollment(context).unenroll()
+        // Best-effort device logout is inside unenroll(); the debug path has
+        // no coroutine here, so run it on a detached dispatcher.
+        kotlinx.coroutines.runBlocking {
+            SyncEnrollment(context).unenroll()
+        }
         Log.i(TAG, "UNENROLLED — push scheduling off, config/session/binding cleared.")
     }
 

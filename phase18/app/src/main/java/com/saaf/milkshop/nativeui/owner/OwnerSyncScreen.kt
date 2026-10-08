@@ -435,7 +435,7 @@ private fun OwnerSyncEnrollBody(
     onEnroll: () -> Unit,
 ) {
     Column {
-        Text("Connect this phone to your shop", style = MaterialTheme.typography.titleMedium)
+        Text("Business sync connection", style = MaterialTheme.typography.titleMedium)
         Text(
             "Once connected, entries recorded on this phone upload to your shop's " +
                 "online record automatically whenever internet is available.",

@@ -797,8 +797,8 @@ private fun OwnerMoreMenuScreen(
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 OwnerMoreMenuRow(
                     icon = Icons.AutoMirrored.Outlined.Logout,
-                    title = "Sign out",
-                    subtitle = "Return to Welcome",
+                    title = "Lock / switch user",
+                    subtitle = "Locks this phone's session - sync enrollment is separate",
                     tag = NativeUiTags.OwnerMoreSignOut,
                     onClick = onSignOut,
                 )

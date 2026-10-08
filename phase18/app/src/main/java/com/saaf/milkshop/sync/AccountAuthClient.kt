@@ -172,12 +172,17 @@ class AccountAuthClient(
         false
     }
 
-    /** Best-effort session termination; result is diagnostics only (probe P7). */
+    /**
+     * Best-effort session termination; result is diagnostics only (probe P7).
+     * scope=local: kill ONLY this device's refresh token — the Supabase
+     * default scope is global, and both phones share the owner identity, so
+     * a global logout from one phone would sever the other's sync session.
+     */
     suspend fun logout(accessToken: String): Boolean = try {
         val response = http.execute(
             SyncHttpRequest(
                 method = "POST",
-                url = config.url("/auth/v1/logout"),
+                url = config.url("/auth/v1/logout?scope=local"),
                 headers = mapOf(
                     HEADER_APIKEY to config.publishableKey,
                     HEADER_AUTHORIZATION to "Bearer $accessToken",

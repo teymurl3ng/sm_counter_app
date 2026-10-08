@@ -72,12 +72,22 @@ Full plan approved by owner; Claude review adopted. Tracks:
   the generic dead-end; incident note recorded in SETUP-CHECKLIST.md. Standing risk recorded: GitHub auto-deploy for
   `sm-server-view` does NOT fire on push — deploys are manual/Vercel-API (`create_deployment` with gitSource works);
   reset-credential and terminate share the same key and were equally broken until this fix.
-- **TRACK 1 · App truth fixes (approved, pending)**: A0 resurrection audit (soft-delete/hide survivors); A2' fail-closed
-  enrollment link (required chooser) + grace clock moved to the binding; A3 server-identity card with grace countdown;
-  A1' verdicts recorded + displayed ONLY (enforcement flag default OFF; Claude's guardrails documented); A4' "Sign out" →
-  Lock/Switch user (no server call, no token discard) + scope=local server logout ONLY on unenroll; A6 degraded grace
-  (operational writes allowed, privileged blocked; 14-day threshold; warning ladder day 3/5/6; config threshold with
-  local floor/ceiling); UI shrink ("Business sync connection" naming).
+- **TRACK 1 · App truth fixes — DONE (2026-10-08; commits a740e46, ac41dd2, d4e259d, 99ec9d4 + A0 survey).**
+  A6: grace reformed to DEGRADED MODE — 14-day threshold (was 7), operational writes survive expiry (sales, collections,
+  cash count/close, deliveries, purchases, expenses, payroll, production, spoilage, attendance, corrections), privileged
+  family blocks (restore, user mgmt, settings, drawings, reopen, master data, export); proportional warning ladder
+  (25/50/85%) exposed on the Sync screen. A2': grace clock moved to the ENROLLMENT (Room binding row ACTIVE + verifiedAt;
+  enrollment writes it, H13 refresh bumps it, backfill seeds pre-Track-1 devices from the binding file); link resolution
+  FAIL-CLOSED at enrollment (1 owner auto-links; 2+ → OwnersAvailable chooser on the Sync screen; 0 → explicit failure —
+  the silent audit-only skip is gone). A3: server-identity card (link status chip, server account, linked owner,
+  offline-operation countdown + warning ladder). A1': Disabled → SUSPENDED, NotAuthorized/InvalidCredentials → REVOKED
+  recorded + displayed behind ENFORCE_LINK_STATES=false (Claude's guardrails in the policy KDoc). A4': server logout
+  scope=local ONLY on unenroll (Supabase default is GLOBAL — both phones share the owner identity); "Sign out" renamed
+  Lock/switch user; sync heading "Business sync connection". **A0 survey: NO user-facing hard-deletes exist on synced
+  tables** (products/categories/deliveries archive; ledger append-only; only restore-path and sync-internal DELETEs) —
+  standing invariant recorded: never add a hard delete to a synced table without a tombstone.
+- **PENDING UX VERIFICATION**: the chooser + identity card + degraded-mode copy are device-untested (build + walk the
+  enrollment flow on a phone before the cutover); khan (admin) exists server-side for testing a linked-clerk flow later.
 - **TRACK 2 · Server correctness (approved, pending)**: verify admin-RPC exposure from sync tokens; staff.active check
   on every sync_push/sync_pull; anchor the undocked sync RPC SQL into a repo; identity DR dumps; Admin Viewer auth review;
   keep-alive 60-day auto-disable mitigation; P9/P10 fixtures. Decision point after evidence: devices table +

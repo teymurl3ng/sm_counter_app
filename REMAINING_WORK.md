@@ -9,9 +9,11 @@ in place, never delete.
 
 ## 1 · BEFORE THE PILOT (engineering)
 
-- **Per-device revocation + lower-privilege credential tier** — a lost counter phone currently
-  carries OWNER credentials. Highest-risk open item. M17 (cashier holds CASH_COUNT_AND_CLOSE at
-  service layer) folds into this.
+- **Per-device revocation + lower-privilege credential tier + staff linking** — a lost counter
+  phone currently carries OWNER credentials, and clerks exist per-phone only. One combined identity
+  decision after the Track 2 evidence memo (devices table, device-scoped keys, per-clerk server
+  identities with by-person revocation; SUSPENDED/REVOKED display wiring already shipped, enforcement
+  flag documented off). M17 folds in.
 - **14.8.6 cutover finish** (the gate to the pilot week):
   1. M27 — notification taps open the retired WebView shell (MainActivity); BLOCKS the
      retirement gate. Point notifications at the native activity.

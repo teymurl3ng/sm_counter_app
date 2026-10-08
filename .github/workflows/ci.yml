@@ -1,11 +1,10 @@
 # Saaf Milk CI (audit finding C2).
 #
 # Runs the host-side gates on every push and PR: the full JVM unit-test suite
-# (~900 tests incl. the sync decision/label/contract suites) plus the two
-# cross-platform python gates. qaFast's powershell sub-gates stay local for
-# now (Windows-bound scripts); the money-core JVM harness (Sale/DailyClose/
-# Correction through the real Room database) is pending a harness decision —
-# the JVM-Room spike hit a class-identity wall (see FINDINGS_STATUS.md C2).
+# (~900 tests incl. the sync decision/label/contract suites and the money-core
+# Robolectric harness — Sale/DailyClose/Correction/closed-day-refusal through
+# the real Room database) plus the two cross-platform python gates. qaFast's
+# powershell sub-gates stay local for now (Windows-bound scripts).
 #
 # NOTE: this workflow activates when the repository is pushed to GitHub —
 # nothing has been pushed yet (local main is ~140 commits ahead of origin).
@@ -37,6 +36,15 @@ jobs:
 
       - name: Set up Gradle (cached)
         uses: gradle/actions/setup-gradle@v4
+
+      # Robolectric downloads android-all jars into ~/.m2 at test runtime —
+      # outside the Gradle cache — so cache that subtree separately.
+      - name: Cache Robolectric android-all jars
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/org/robolectric
+          key: robolectric-android-all-${{ runner.os }}-v1
+          restore-keys: robolectric-android-all-${{ runner.os }}-
 
       - name: JVM unit tests
         working-directory: phase18

@@ -39,3 +39,9 @@ __pycache__/
 # Sync release signing (never commit)
 keystore.properties
 phase18/keystore/
+
+# Local agent workspace + one-off leftovers (never commit)
+.zcode/
+.zcodeignore
+before_state.png
+phase18/edit_h8e.py

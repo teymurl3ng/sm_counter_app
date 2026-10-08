@@ -6,8 +6,9 @@
 # the real Room database) plus the two cross-platform python gates. qaFast's
 # powershell sub-gates stay local for now (Windows-bound scripts).
 #
-# NOTE: this workflow activates when the repository is pushed to GitHub —
-# nothing has been pushed yet (local main is ~140 commits ahead of origin).
+# NOTE: the repository exists (private) and was pushed once on 2026-09-27;
+# this workflow first ACTIVATES with the 2026-10-08 push — every push/PR from
+# now on runs it.
 
 name: ci
 

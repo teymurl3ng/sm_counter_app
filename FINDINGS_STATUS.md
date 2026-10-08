@@ -81,7 +81,10 @@ Full plan approved by owner; Claude review adopted. Tracks:
 - **TRACK 2 · Server correctness (approved, pending)**: verify admin-RPC exposure from sync tokens; staff.active check
   on every sync_push/sync_pull; anchor the undocked sync RPC SQL into a repo; identity DR dumps; Admin Viewer auth review;
   keep-alive 60-day auto-disable mitigation; P9/P10 fixtures. Decision point after evidence: devices table +
-  device-scoped credential (correct revocation unit) vs accept for pilot.
+  device-scoped credential (correct revocation unit) vs accept for pilot. **Staff linking (Account Bridge sec. 6) folds
+  into this same decision** - per-clerk server identity so actions are attributable and revocable BY PERSON across
+  devices (today only the owner is linked; clerks exist per-phone); needs the enrollment UI extended + the C1 admin gate;
+  SUSPENDED/REVOKED enforcement (Track 1 A1') ships before it so a linked-clerk revocation actually bites.
 - **TRACK 3 · Verification (pending)**: actor-attribution snapshot check; two-device cash-close review; owner restore
   drill (export + Drive) pre-pilot; divergence detector post-pilot.
 - **Phase C deferred**: one-directory (pull-only staff directory, device-enforced offline, local verifiers,

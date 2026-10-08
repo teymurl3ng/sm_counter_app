@@ -55,3 +55,35 @@ Mostly hygiene, open. Fixed as a side effect: `settings.updated_at` seed-stamp f
 3. **Polish pass #2:** M20–M26 cluster (+ H4 guard wiring can ride here or with the gate).
 4. **Folded into 14.8.6 cutover:** M27, M29 (+ H7 if not done before).
 5. **Post-pilot / deliberate:** M28, M30, M31, M32, M35 notes, Low/Info hygiene.
+
+## ACCOUNT/SERVER PROGRAM — started 2026-10-08 (reconciled plan; supersedes the three prior drafts)
+
+Full plan approved by owner; Claude review adopted. Tracks:
+
+- **TRACK 0 · Admin Viewer create-staff failure — FIXED (2026-10-08).** Root cause: `ACCOUNT_SERVER_ADMIN_KEY`
+  on the Vercel deployment (set 2026-09-28) was invalid for PROD — gateway logged `POST /auth/v1/admin/users → 401`
+  at 14:32/14:56 UTC; nothing reached the DB (no audit/reconciliation/orphan rows; only `teimur` staff/auth exist).
+  Fix: owner supplied the PROD `acc server` secret key (both PROD secrets verified 200 against the admin API first);
+  key wired into Vercel Production via MCP (`edit_project_env`), production redeployed twice (redeploy for the key +
+  a fresh build for the hardening commit). End-to-end verified: admin-API create (digits-only 15-char credential
+  accepted — PROD password policy now VERIFIED, closing the DEV-only-verification gap) + delete, both 200, zero residue.
+  Hardening deployed: `sm-server-view` create-staff route now returns SELF-DIAGNOSING messages (FORBIDDEN = admin key
+  rejected for project; INVALID_INPUT = credential rejected by password policy; RATE_LIMITED; UNREACHABLE) instead of
+  the generic dead-end; incident note recorded in SETUP-CHECKLIST.md. Standing risk recorded: GitHub auto-deploy for
+  `sm-server-view` does NOT fire on push — deploys are manual/Vercel-API (`create_deployment` with gitSource works);
+  reset-credential and terminate share the same key and were equally broken until this fix.
+- **TRACK 1 · App truth fixes (approved, pending)**: A0 resurrection audit (soft-delete/hide survivors); A2' fail-closed
+  enrollment link (required chooser) + grace clock moved to the binding; A3 server-identity card with grace countdown;
+  A1' verdicts recorded + displayed ONLY (enforcement flag default OFF; Claude's guardrails documented); A4' "Sign out" →
+  Lock/Switch user (no server call, no token discard) + scope=local server logout ONLY on unenroll; A6 degraded grace
+  (operational writes allowed, privileged blocked; 14-day threshold; warning ladder day 3/5/6; config threshold with
+  local floor/ceiling); UI shrink ("Business sync connection" naming).
+- **TRACK 2 · Server correctness (approved, pending)**: verify admin-RPC exposure from sync tokens; staff.active check
+  on every sync_push/sync_pull; anchor the undocked sync RPC SQL into a repo; identity DR dumps; Admin Viewer auth review;
+  keep-alive 60-day auto-disable mitigation; P9/P10 fixtures. Decision point after evidence: devices table +
+  device-scoped credential (correct revocation unit) vs accept for pilot.
+- **TRACK 3 · Verification (pending)**: actor-attribution snapshot check; two-device cash-close review; owner restore
+  drill (export + Drive) pre-pilot; divergence detector post-pilot.
+- **Phase C deferred**: one-directory (pull-only staff directory, device-enforced offline, local verifiers,
+  admin-issued activation codes; optional signed assertion) — trigger: 3+ devices or a second person needing centrally
+  revocable access. Also deferred: staff MFA, leaked-password protection, self-service reset, business management.

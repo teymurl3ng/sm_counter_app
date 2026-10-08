@@ -296,10 +296,10 @@ fun AdminPreviewHost(
                 scaleIn(initialScale = 0.96f, animationSpec = tween(200)) togetherWith ExitTransition.None
             },
             label = "admin_work_destination",
-        ) { _ ->
+        ) { destination ->
         when {
             section == AdminSection.Work &&
-                workDestination == NativeAdminWorkDestination.RecordExpense -> {
+                destination == NativeAdminWorkDestination.RecordExpense -> {
                 AdminExpenseEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,

@@ -543,7 +543,7 @@ fun OwnerPreviewHost(
                 scaleIn(initialScale = 0.96f, animationSpec = tween(200)) togetherWith ExitTransition.None
             },
             label = "owner_work_destination",
-        ) { _ ->
+        ) { workDestination ->
         when {
             section == OwnerSection.More -> {
                 OwnerMoreScreen(
@@ -712,7 +712,7 @@ fun OwnerPreviewHost(
                 )
             }
             section == OwnerSection.Work &&
-                ownerWorkDestination == NativeOwnerWorkDestination.RecordSale -> {
+                workDestination == NativeOwnerWorkDestination.RecordSale -> {
                 OwnerSaleEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,

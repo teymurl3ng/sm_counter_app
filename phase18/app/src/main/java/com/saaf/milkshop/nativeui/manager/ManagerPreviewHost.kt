@@ -304,10 +304,10 @@ fun ManagerPreviewHost(
                 scaleIn(initialScale = 0.96f, animationSpec = tween(200)) togetherWith ExitTransition.None
             },
             label = "manager_work_destination",
-        ) { _ ->
+        ) { destination ->
         when {
             section == ManagerSection.Work &&
-                workDestination == NativeManagerWorkDestination.RecordSale -> {
+                destination == NativeManagerWorkDestination.RecordSale -> {
                 ManagerSaleEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,

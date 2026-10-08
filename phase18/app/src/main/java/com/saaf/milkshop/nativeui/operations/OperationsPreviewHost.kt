@@ -226,7 +226,7 @@ fun OperationsPreviewHost(
                 scaleIn(initialScale = 0.96f, animationSpec = tween(200)) togetherWith ExitTransition.None
             },
             label = "work_destination",
-        ) { _ ->
+        ) { destination ->
         when {
             section == OperationsSection.Deliveries -> {
                 DeliveriesScreen(
@@ -290,7 +290,7 @@ fun OperationsPreviewHost(
                 )
             }
             section == OperationsSection.Work &&
-                workReady?.destination == NativeOperationsWorkDestination.ReceiveMilk -> {
+                destination == NativeOperationsWorkDestination.ReceiveMilk -> {
                 ReceiveMilkScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,

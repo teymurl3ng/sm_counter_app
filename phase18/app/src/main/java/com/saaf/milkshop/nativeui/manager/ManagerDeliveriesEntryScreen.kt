@@ -1,6 +1,11 @@
 package com.saaf.milkshop.nativeui.manager
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
+import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
+import com.saaf.milkshop.nativeui.expense.ExpenseDiscardDialog
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -32,10 +37,32 @@ fun ManagerDeliveriesEntryScreen(
     draftActions: NativeDeliveriesDraftActions,
     onArchive: (Long) -> Unit,
     onBackToWork: () -> Unit,
+    onRegisterGuard: (EntryLeaveGuard?) -> Unit = {},
     mgrScaffold: MgrScaffold,
     modifier: Modifier = Modifier,
 ) {
-    BackHandler(onBack = onBackToWork)
+    val leaveGuard = rememberEntryLeaveGuard()
+    DisposableEffect(leaveGuard) {
+        onRegisterGuard(leaveGuard)
+        onDispose { onRegisterGuard(null) }
+    }
+    val ready = state as? NativeDeliveriesState.Ready
+    // M24: the draft (customer/product/quantity/route/notes) is real work —
+    // leaving mid-draft must ask before discarding, mirroring the expense flow.
+    val draftDirty = ready != null && (
+        ready.draftCustomerId != null ||
+            ready.draftProductId != null ||
+            ready.draftQuantity.isNotBlank() ||
+            ready.draftRoute.isNotBlank() ||
+            ready.draftNotes.isNotBlank()
+        )
+    val canLeave = ready?.creating != true
+    LaunchedEffect(draftDirty) {
+        if (draftDirty) leaveGuard.markDirty() else leaveGuard.clear()
+    }
+    BackHandler {
+        if (canLeave) leaveGuard.requestLeave(onBackToWork)
+    }
 
     Box(
         modifier
@@ -72,5 +99,6 @@ fun ManagerDeliveriesEntryScreen(
             }
             }
         }
+        ExpenseDiscardDialog(leaveGuard)
     }
 }

@@ -469,6 +469,7 @@ fun ManagerPreviewHost(
                     onArchive = deliveriesViewModel::archiveDelivery,
                         onLinkSale = deliveriesViewModel::linkSale,
                     onBackToWork = { returnManagerWorkHome() },
+                    onRegisterGuard = { activeEntryGuard = it },
                     mgrScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.ManagerShellRoot)) {
                             content(PaddingValues(0.dp))

@@ -939,6 +939,7 @@ fun OwnerPreviewHost(
                     onArchive = deliveriesViewModel::archiveDelivery,
                         onLinkSale = deliveriesViewModel::linkSale,
                     onBackToWork = { returnOwnerWorkHome() },
+                    onRegisterGuard = { activeEntryGuard = it },
                     ownScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.OwnerShellRoot)) {
                             CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {

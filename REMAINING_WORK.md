@@ -14,6 +14,11 @@ in place, never delete.
   decision after the Track 2 evidence memo (devices table, device-scoped keys, per-clerk server
   identities with by-person revocation; SUSPENDED/REVOKED display wiring already shipped, enforcement
   flag documented off). M17 folds in.
+  **NEW (2026-10-08, owner plan): the shop tablet will be CASHIER-ONLY and SHARED** — everyone
+  records daily entries on it. That makes the lower-privilege tier REQUIRED before the tablet
+  ships: a shared, publicly-accessible device must not carry an owner-level sync credential. The
+  tablet also raises the shared-device question for the local account model (single device PIN +
+  cashier role vs per-person passcodes). See IDENTITY_DECISION_MEMO.md tablet note.
 - **14.8.6 cutover finish** (the gate to the pilot week):
   1. M27 — notification taps open the retired WebView shell (MainActivity); BLOCKS the
      retirement gate. Point notifications at the native activity.
@@ -45,6 +50,9 @@ in place, never delete.
 
 - S24: reconnect → unenroll DEV → re-enroll PROD (folds into the walkthrough above); verify no
   leftover qa.tests packages (`adb shell pm list packages | grep saaf`).
+- Shop tablet (NEW, nothing installed): target role = CASHIER, shared by everyone for daily
+  entries. Requires the lower-privilege sync credential tier first (§1). Shared-device local
+  account model needs deciding (single device PIN vs per-person).
 - A06: push current preview build (on 0.3.0-preview, product code identical); battery →
   Unrestricted; reconnect USB for the authoritative full instrumented re-run (stay-awake or
   unlocked; S24 triage found no product bug — wide-device shape debt + sleep cascade).

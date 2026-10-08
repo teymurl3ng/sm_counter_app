@@ -52,6 +52,14 @@ display-only). Sequence AFTER the pilot unless a cashier problem forces it earli
 **Recommended:** Option A for the pilot, then Option B + C together as one identity
 migration (they share the devices/staff schema work).
 
+**TABLET UPDATE (2026-10-08, after this memo was drafted):** the shop tablet is planned as
+CASHIER-ONLY and SHARED — everyone records daily entries on it. That changes the calculus:
+the tablet must NOT hold an owner-level sync credential (a shared, publicly-accessible
+device carrying owner sync powers is the exact risk §2 describes). The tablet therefore
+needs the Option B/C mechanism (cashier-scoped sync credential or device-scoped key) before
+it ships — or it stays off-sync until that tier exists. The owner's S24 can remain
+owner-scoped (it stays with the owner).
+
 ## Standing items from this pass
 
 - **Identity DR**: staff/roles/shop bindings/Auth users exist only in Supabase (free tier =

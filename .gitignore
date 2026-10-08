@@ -45,3 +45,5 @@ phase18/keystore/
 .zcodeignore
 before_state.png
 phase18/edit_h8e.py
+counter_access.txt
+counter_token.json

@@ -965,6 +965,8 @@ ownermore	owner_sync_refresh	owner_sync_refresh	ACTION	refreshReloadsStatus	ACTI
 ownermore	owner_sync_unenroll	owner_sync_unenroll	ACTION	unenrollOpensConfirm	ACTION	UNTESTED
 ownermore	owner_sync_unenroll_confirm	owner_sync_unenroll_confirm	ACTION	confirmStopsSyncing	ACTION	UNTESTED
 ownermore	owner_sync_holds	owner_sync_holds	VIEW	restoredHoldsListedForReview	VIEW	UNTESTED
+ownermore	owner_sync_owner_picker	owner_sync_owner_picker	NAVIGATION	pending (connected run next device go)	NAVIGATION	PREVIEW
+ownermore	owner_sync_owner_pick	owner_sync_owner_pick	WRITE	pending (money-core policy tests cover the link; connected run next device go)	WRITE	PREVIEW
 ownermore	owner_sync_hold_keep	owner_sync_hold_keep	ACTION	keepMineReleasesEntryToPush	ACTION	UNTESTED
 ownermore	owner_sync_hold_take	owner_sync_hold_take	ACTION	takeServerDropsEntrySoParkApplies	ACTION	UNTESTED
 ownermore	owner_sync_enroll	owner_sync_enroll	ACTION	enrollConnectsPhone	ACTION	UNTESTED

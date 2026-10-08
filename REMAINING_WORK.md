@@ -76,11 +76,11 @@ in place, never delete.
 
 ## 6 · PARKED FEATURES / POST-PILOT
 
-- **Phase 14.9 Credit & Reminders** — owner: MUST-DO. Four locked decisions + the T1–T13 task
-  menu survive ONLY in memory ([[credit-reminders-phase-14-9]]); the blueprint doc was never
-  committed. FIRST STEP: write PHASE14_9_CREDIT_REMINDERS_BLUEPRINT.md from the memory before
-  anything else touches 14.9. Deferred sub-items: WA Business API, JazzCash/EasyPaisa links,
-  delivery auto-pause at limit, bulk reminders.
+- **Phase 14.9 Credit & Reminders** — owner: MUST-DO. Blueprint now IN the repo:
+  `PHASE14_9_CREDIT_REMINDERS_BLUEPRINT.md` (restored 2026-10-08 from the preserved session
+  record after the original write was lost; numbering is 14.9 because Phase 15 = reserved
+  Shopkeeper QA). Task menu T1–T13 inside. Deferred sub-items: WA Business API,
+  JazzCash/EasyPaisa links, delivery auto-pause at limit, bulk reminders.
 - M28 MainActivity dead-weight removal (scoping decision; M27 must land first).
 - M30 879-line mega-state · M31 manual DI cascade · M32 toolchain reproducibility guard
   (verification metadata + pinned versions — cheap if wanted early) · M35 preview-machinery

@@ -29,6 +29,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerYieldPolicyRow
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.sync.NativeSyncHold
 import com.saaf.milkshop.sync.NativeSyncShopChoice
+import com.saaf.milkshop.sync.NativeSyncOwnerChoice
 import com.saaf.milkshop.sync.NativeSyncStatus
 
 enum class NativeOwnerMoreDestination {
@@ -207,6 +208,7 @@ data class OwnerBackupState(
 data class OwnerSyncState(
     val status: NativeSyncStatus? = null,
     val shopChoices: List<NativeSyncShopChoice> = emptyList(),
+    val ownerChoices: List<NativeSyncOwnerChoice> = emptyList(),
     val holds: List<NativeSyncHold> = emptyList(),
     val busy: Boolean = false,
     val error: String? = null,

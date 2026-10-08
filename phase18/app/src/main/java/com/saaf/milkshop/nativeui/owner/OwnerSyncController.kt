@@ -2,6 +2,7 @@ package com.saaf.milkshop.nativeui.owner
 
 import com.saaf.milkshop.application.owner.NativeOwnerSyncFacade
 import com.saaf.milkshop.sync.NativeSyncShopChoice
+import com.saaf.milkshop.sync.NativeSyncOwnerChoice
 import com.saaf.milkshop.sync.SyncRuntime
 import com.saaf.milkshop.sync.SyncEnrollment
 import kotlinx.coroutines.Dispatchers
@@ -80,6 +81,50 @@ internal class OwnerSyncController(
                                 ),
                             )
                         }
+                    is SyncEnrollment.Outcome.OwnersAvailable ->
+                        runtime.updateReady {
+                            it.copy(
+                                syncState = it.syncState.copy(
+                                    busy = false,
+                                    ownerChoices = outcome.owners.map { owner ->
+                                        NativeSyncOwnerChoice(owner.userId, owner.displayName)
+                                    },
+                                ),
+                            )
+                        }
+                    is SyncEnrollment.Outcome.OwnersAvailable ->
+                        runtime.updateReady {
+                            it.copy(
+                                syncState = it.syncState.copy(
+                                    busy = false,
+                                    ownerChoices = outcome.owners.map { owner ->
+                                        NativeSyncOwnerChoice(owner.userId, owner.displayName)
+                                    },
+                                ),
+                            )
+                        }
+                    is SyncEnrollment.Outcome.OwnersAvailable ->
+                        runtime.updateReady {
+                            it.copy(
+                                syncState = it.syncState.copy(
+                                    busy = false,
+                                    ownerChoices = outcome.owners.map { owner ->
+                                        NativeSyncOwnerChoice(owner.userId, owner.displayName)
+                                    },
+                                ),
+                            )
+                        }
+                    is SyncEnrollment.Outcome.OwnersAvailable ->
+                        runtime.updateReady {
+                            it.copy(
+                                syncState = it.syncState.copy(
+                                    busy = false,
+                                    ownerChoices = outcome.owners.map { owner ->
+                                        NativeSyncOwnerChoice(owner.userId, owner.displayName)
+                                    },
+                                ),
+                            )
+                        }
                     is SyncEnrollment.Outcome.Failed ->
                         runtime.updateReady {
                             it.copy(syncState = it.syncState.copy(busy = false, error = describeFailure(outcome)))
@@ -120,6 +165,17 @@ internal class OwnerSyncController(
                         }
                         loadStatus(token)
                     }
+                    is SyncEnrollment.Outcome.OwnersAvailable ->
+                        runtime.updateReady {
+                            it.copy(
+                                syncState = it.syncState.copy(
+                                    busy = false,
+                                    ownerChoices = outcome.owners.map { owner ->
+                                        NativeSyncOwnerChoice(owner.userId, owner.displayName)
+                                    },
+                                ),
+                            )
+                        }
                     // Single-shop path already handled elsewhere; a second
                     // ambiguous answer here keeps the choices on screen.
                     is SyncEnrollment.Outcome.ShopsAvailable ->

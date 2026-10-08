@@ -76,6 +76,11 @@ class SyncDebugReceiver : BroadcastReceiver() {
                     "(${outcome.binding.shopId}); timezone=${outcome.shopTimezone ?: "unset"}. " +
                     "Push is live — record entries in the app and watch sync_records on DEV.",
             )
+            is SyncEnrollment.Outcome.OwnersAvailable -> {
+                Log.i(TAG, "Several local owners — re-run with an explicit --es owner pick " +
+                    "through the app's Sync screen, or keep only one active owner: " +
+                    outcome.owners.joinToString { it.displayName })
+            }
             is SyncEnrollment.Outcome.ShopsAvailable -> {
                 Log.i(TAG, "Pick one shop and re-run with --es shop_id <uuid>:")
                 outcome.shops.forEach { Log.i(TAG, "  ${it.shopId}  ${it.shopName ?: "(unnamed)"}") }

@@ -36,6 +36,10 @@ class SyncRuntime(
     suspend fun status(): NativeSyncStatus? {
         val config = SyncServerConfigStore.load(context) ?: return null
         val binding = SyncShopBindingStore.load(context) ?: return null
+        val roomBinding = database.serverAccountDao().findBinding()
+        val link = database.serverAccountDao().identityLinks().firstOrNull()
+        val linkedOwner = link?.let { database.appUserDao().findById(it.localUserId) }
+        val now = System.currentTimeMillis()
         return NativeSyncStatus(
             environment = config.environment,
             shopName = binding.shopName,
@@ -45,6 +49,18 @@ class SyncRuntime(
             outboxCount = database.syncOutboxDao().count(),
             pullCursor = database.syncPullStateDao().find()?.lastServerSeq ?: 0L,
             holdCount = database.syncRebaselineHoldDao().count(),
+            identityStatus = link?.status
+                ?: (roomBinding?.status ?: ServerAccountPolicy.BindingStatus.ACTIVE)
+                    .let { if (it == ServerAccountPolicy.BindingStatus.ACTIVE) "active_unlinked" else it },
+            identityServerUsername = link?.usernameSnapshot,
+            identityOwnerName = linkedOwner?.displayName,
+            graceDaysLeft = roomBinding?.verifiedAtEpochMs?.let { verifiedAt ->
+                val remaining = ServerAccountPolicy.GRACE_DURATION_MS - (now - verifiedAt)
+                if (remaining <= 0) 0 else ((remaining + 86_400_000L - 1) / 86_400_000L).toInt()
+            },
+            graceWarningLevel = ServerAccountPolicy.graceWarningLevel(
+                roomBinding?.verifiedAtEpochMs, now,
+            ),
         )
     }
 
@@ -400,6 +416,30 @@ class SyncRuntime(
                 // start anyway, and a worker that finds no session no-ops.
                 if (RefreshDisposition.from(result) == RefreshDisposition.CLEAR) {
                     tokenStore.clear()
+                }
+                // Track 1 A1' — verdicts RECORD + DISPLAY only while
+                // ENFORCE_LINK_STATES is false: a server disable is a
+                // SUSPENDED entitlement, a rejected credential or dead
+                // refresh is REVOKED. Enforcement ships behind the
+                // policy flag, not here.
+                runCatching {
+                    val newStatus = when (result) {
+                        is AccountAuthResult.Disabled ->
+                            ServerAccountPolicy.LinkStatus.SUSPENDED
+                        is AccountAuthResult.InvalidCredentials,
+                        is AccountAuthResult.NotAuthorized,
+                        is AccountAuthResult.RefreshTokenInvalid,
+                        -> ServerAccountPolicy.LinkStatus.REVOKED
+                        else -> null
+                    }
+                    if (newStatus != null) {
+                        val link = database.serverAccountDao().identityLinks().firstOrNull()
+                        if (link != null && link.status != newStatus) {
+                            database.serverAccountDao().updateIdentityLinkStatus(
+                                link.localUserId, newStatus, link.verifiedAtEpochMs, "server_verdict",
+                            )
+                        }
+                    }
                 }
                 false
             }

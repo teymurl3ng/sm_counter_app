@@ -27,8 +27,12 @@ class SyncEnrollment(
         /** shop_id was omitted and the account sees several shops: pick one. */
         data class ShopsAvailable(val shops: List<AuthShop>) : Outcome
 
+        data class OwnersAvailable(val owners: List<OwnerChoice>) : Outcome
         data class Failed(val reason: String) : Outcome
     }
+
+    /** One linkable local owner, for the enrollment chooser. */
+    data class OwnerChoice(val userId: Long, val displayName: String)
 
     suspend fun enroll(
         config: SyncServerConfig,
@@ -54,6 +58,21 @@ class SyncEnrollment(
         // assumes it).
         if (auth.role != "owner") {
             return Outcome.Failed("owner_enrollment_required")
+        }
+
+        // Track 1 A2' (Claude review): link resolution is a REQUIRED,
+        // fail-closed step. The grace clock belongs to the enrollment, so it
+        // must never depend on an ambiguous link. Zero owners cannot happen
+        // post-bootstrap; two or more require an explicit choice.
+        val activeOwners = database?.appUserDao()?.all()
+            ?.filter { it.role == "owner" && it.status == "active" }
+            .orEmpty()
+        val resolvedLocalUserId = localUserId ?: when {
+            activeOwners.size == 1 -> activeOwners.single().userId
+            activeOwners.isEmpty() -> return Outcome.Failed("owner_link_unresolved")
+            else -> return Outcome.OwnersAvailable(
+                activeOwners.map { OwnerChoice(it.userId, it.displayName) },
+            )
         }
 
         val target = shopId?.let { wanted -> auth.shops.firstOrNull { it.shopId == wanted } }
@@ -135,7 +154,7 @@ class SyncEnrollment(
         }
         SyncScheduler.setSchedulingEnabled(true)
         SyncScheduler.requestPush()
-        linkVerifiedOwner(auth, username, localUserId)
+        linkVerifiedOwner(auth, username, resolvedLocalUserId)
         return Outcome.Enrolled(binding, target.timezone ?: auth.shopTimezone)
     }
 

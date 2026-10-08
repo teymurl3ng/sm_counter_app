@@ -319,6 +319,9 @@ owner	expense_payment_cancel	expense_payment_cancel	NAVIGATION	readyUsesOwnerChr
 owner	expense_note_toggle	expense_note_toggle	VISUAL	readyUsesOwnerChromeAndExcludesCashierNavigation	VISUAL	COVERED
 owner	expense_note_input	expense_note_input	TEXT_INPUT	readyUsesOwnerChromeAndExcludesCashierNavigation	TEXT_INPUT	COVERED
 owner	expense_record	expense_record	WRITE	ownerExpenseOpensUnderOwnerChrome	WRITE	COVERED
+owner	owner_work_record_drawing	owner_work_record_drawing	NAVIGATION	pending (connected run next device go)	NAVIGATION	PREVIEW
+owner	owner_drawing_entry_root	owner_drawing_entry_root	NAVIGATION	pending (connected run next device go)	NAVIGATION	PREVIEW
+owner	drawing_record	drawing_record	WRITE	pending (money-core OwnerDrawingTest covers the booking; connected UI run next device go)	WRITE	PREVIEW
 owner	expense_success	expense_success	WRITE	ownerExpenseOpensUnderOwnerChrome	WRITE	COVERED
 owner	expense_error	expense_error	WRITE	loadFailureRetainsOwnerShellAndRetries	WRITE	COVERED
 owner	expense_another	expense_another	NAVIGATION	ownerExpenseOpensUnderOwnerChrome	NAVIGATION	COVERED

@@ -15,6 +15,7 @@ import com.saaf.milkshop.domain.CorrectionResult
 import com.saaf.milkshop.domain.CreditCollectionService
 import com.saaf.milkshop.domain.ExpenseService
 import com.saaf.milkshop.domain.OpeningStateService
+import com.saaf.milkshop.domain.OwnerDrawingService
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.domain.SalaryPaymentService
 import com.saaf.milkshop.domain.SaleService
@@ -591,6 +592,7 @@ class NativeOwnerRecordsFacade(
         ExpenseService.EVENT_TYPE_EXPENSE -> "Expense"
         VendorPaymentService.EVENT_TYPE_VENDOR_PAYMENT -> "Supplier payment"
         SalaryPaymentService.EVENT_TYPE_SALARY_PAYMENT -> "Salary payment"
+        OwnerDrawingService.EVENT_TYPE_OWNER_DRAWING -> "Owner drawing"
         OpeningStateService.EVENT_TYPE_OPENING_STATE -> "Opening balance"
         else -> eventType.replace('_', ' ').lowercase(Locale.US)
             .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.US) else it.toString() }
@@ -623,6 +625,7 @@ class NativeOwnerRecordsFacade(
             ExpenseService.EVENT_TYPE_EXPENSE,
             VendorPaymentService.EVENT_TYPE_VENDOR_PAYMENT,
             SalaryPaymentService.EVENT_TYPE_SALARY_PAYMENT,
+            OwnerDrawingService.EVENT_TYPE_OWNER_DRAWING,
             -> entity.amount?.let { "PKR ${formatMoney(money(it))}" }
             VendorPurchaseService.EVENT_TYPE_PURCHASE_RECEIPT ->
                 entity.rawLiters?.let { "${formatQuantity(it)} L" }

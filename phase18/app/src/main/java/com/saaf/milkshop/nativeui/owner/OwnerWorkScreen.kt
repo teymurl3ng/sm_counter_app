@@ -143,6 +143,7 @@ private fun ReadyWork(
         NativeOwnerWorkDestination.ReceiveMilk,
         NativeOwnerWorkDestination.RecordPayment,
         NativeOwnerWorkDestination.RecordExpense,
+        NativeOwnerWorkDestination.RecordDrawing,
         NativeOwnerWorkDestination.PaySupplier,
         NativeOwnerWorkDestination.PaySalary,
         NativeOwnerWorkDestination.CashCountAndClose,
@@ -229,6 +230,12 @@ private fun WorkHomeBody(
                     icon = Icons.Outlined.ReceiptLong,
                     tag = NativeUiTags.OwnerWorkRecordExpense,
                     onClick = { onOpenDestination(NativeOwnerWorkDestination.RecordExpense) },
+                )
+                PrimaryAction(
+                    label = "Owner drawing",
+                    icon = Icons.Outlined.AccountBalanceWallet,
+                    tag = NativeUiTags.OwnerWorkRecordDrawing,
+                    onClick = { onOpenDestination(NativeOwnerWorkDestination.RecordDrawing) },
                 )
             }
         }
@@ -380,6 +387,7 @@ private fun openingLabel(destination: NativeOwnerWorkDestination): String = when
     NativeOwnerWorkDestination.RecordSale -> "Opening record sale…"
     NativeOwnerWorkDestination.RecordPayment -> "Opening record payment…"
     NativeOwnerWorkDestination.RecordExpense -> "Opening record expense…"
+    NativeOwnerWorkDestination.RecordDrawing -> "Opening owner drawing…"
     NativeOwnerWorkDestination.PaySupplier -> "Opening pay supplier…"
     NativeOwnerWorkDestination.PaySalary -> "Opening pay salary…"
     NativeOwnerWorkDestination.CashCountAndClose -> "Opening cash count and close…"

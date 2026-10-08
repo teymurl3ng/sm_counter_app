@@ -91,7 +91,7 @@ internal object DatabaseSql {
                 WHEN NEW.event_type NOT IN (
                     'PURCHASE_RECEIPT', 'VENDOR_PAYMENT', 'PRODUCTION', 'SALE',
                     'CREDIT_COLLECTION', 'EXPENSE', 'SALARY_PAYMENT', 'SPOILAGE',
-                    'OPENING_STATE'
+                    'OPENING_STATE', 'OWNER_DRAWING'
                 )
                     THEN RAISE(ABORT, 'Invalid event type')
                 WHEN NEW.channel IS NOT NULL AND NEW.channel NOT IN (
@@ -159,7 +159,7 @@ internal object DatabaseSql {
                          NEW.yogurt_kg_produced IS NOT NULL
                      )
                     THEN RAISE(ABORT, 'PRODUCTION is missing required fields')
-                WHEN NEW.event_type IN ('VENDOR_PAYMENT', 'CREDIT_COLLECTION', 'EXPENSE', 'SALARY_PAYMENT')
+                WHEN NEW.event_type IN ('VENDOR_PAYMENT', 'CREDIT_COLLECTION', 'EXPENSE', 'SALARY_PAYMENT', 'OWNER_DRAWING')
                      AND NEW.amount IS NULL
                     THEN RAISE(ABORT, 'Money-only event is missing amount')
             END;
@@ -703,6 +703,19 @@ internal object DatabaseSql {
                            AND category IN ('Cash/Bank', 'Salary')
                      )
                     THEN RAISE(ABORT, 'SALARY_PAYMENT must affect Cash/Bank or Salary')
+
+                -- M18: an owner drawing leaves the drawer with no counter-leg
+                -- account — the event itself documents where the money went.
+                WHEN (SELECT event_type FROM events WHERE event_id = NEW.event_id) = 'OWNER_DRAWING'
+                     AND (
+                         NOT EXISTS (
+                             SELECT 1 FROM accounts
+                             WHERE account_id = NEW.account_id
+                               AND category = 'Cash/Bank'
+                         )
+                         OR COALESCE(NEW.amount, 0) >= 0
+                     )
+                    THEN RAISE(ABORT, 'OWNER_DRAWING must decrease a Cash/Bank account')
 
                 WHEN (SELECT event_type FROM events WHERE event_id = NEW.event_id) = 'OPENING_STATE'
                      AND NOT EXISTS (

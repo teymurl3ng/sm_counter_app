@@ -30,6 +30,7 @@ internal class OperationsBridgeHandler(
         HybridBridgeActions.RECORD_VENDOR_PAYMENT -> recordVendorPayment(request)
         HybridBridgeActions.RECORD_CREDIT_COLLECTION -> recordCreditCollection(request)
         HybridBridgeActions.RECORD_EXPENSE -> recordExpense(request)
+        HybridBridgeActions.RECORD_OWNER_DRAWING -> recordOwnerDrawing(request)
         HybridBridgeActions.RECORD_SALARY_PAYMENT -> recordSalaryPayment(request)
         HybridBridgeActions.SPOILAGE_HISTORY -> spoilageHistory(request)
         HybridBridgeActions.RECORD_SPOILAGE -> recordSpoilage(request)
@@ -224,6 +225,26 @@ internal class OperationsBridgeHandler(
             expenseCategoryAccountId = request.payload.requiredId("expenseCategoryAccountId"),
             paymentAccountId = request.payload.requiredId("paymentAccountId"),
             amount = BigDecimal(amountPaisa).movePointLeft(2).toDouble(),
+            occurredAt = request.payload.requiredDate("occurredAt"),
+            notes = request.payload.optionalString("notes"),
+        )
+        return JSONObject().put("eventId", result.eventId.toString())
+    }
+
+    private suspend fun recordOwnerDrawing(request: BridgeRequest): JSONObject {
+        strictObject(
+            request.payload,
+            required = setOf("amountPaisa", "occurredAt"),
+            allowed = setOf("amountPaisa", "occurredAt", "notes", "paymentAccountId"),
+        )
+        val amountPaisa = request.payload.requiredPaisa("amountPaisa")
+        if (amountPaisa <= 0L) {
+            throw BridgeProtocolFailure("validation_failed", "Drawing amount must be greater than zero", "amountPaisa")
+        }
+        val result = commands.recordOwnerDrawing(
+            request.requireSession(),
+            amount = BigDecimal(amountPaisa).movePointLeft(2).toDouble(),
+            paymentAccountId = request.payload.optionalId("paymentAccountId"),
             occurredAt = request.payload.requiredDate("occurredAt"),
             notes = request.payload.optionalString("notes"),
         )

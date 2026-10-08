@@ -41,6 +41,9 @@ import com.saaf.milkshop.domain.UserSecurityService
 import com.saaf.milkshop.nativeui.collection.NativeCollectionState
 import com.saaf.milkshop.nativeui.collection.NativeCollectionViewModel
 import com.saaf.milkshop.nativeui.expense.NativeExpenseState
+import com.saaf.milkshop.nativeui.drawing.NativeDrawingState
+import com.saaf.milkshop.nativeui.drawing.NativeDrawingViewModel
+import com.saaf.milkshop.nativeui.drawing.OwnerDrawingEntryScreen
 import com.saaf.milkshop.nativeui.expense.NativeExpenseViewModel
 import com.saaf.milkshop.nativeui.cashclose.NativeCashCloseState
 import com.saaf.milkshop.nativeui.cashclose.NativeCashCloseViewModel
@@ -98,7 +101,9 @@ fun OwnerPreviewHost(
     collectionState: NativeCollectionState,
     collectionViewModel: NativeCollectionViewModel,
     expenseState: NativeExpenseState,
+    drawingState: NativeDrawingState,
     expenseViewModel: NativeExpenseViewModel,
+    drawingViewModel: NativeDrawingViewModel,
     vendorPaymentState: NativeVendorPaymentState,
     vendorPaymentViewModel: NativeVendorPaymentViewModel,
     salaryPaymentState: NativeSalaryPaymentState,
@@ -225,6 +230,7 @@ fun OwnerPreviewHost(
                     NativeOwnerWorkDestination.RecordSale -> saleViewModel.open(sessionHandle)
                     NativeOwnerWorkDestination.RecordPayment -> collectionViewModel.open(sessionHandle)
                     NativeOwnerWorkDestination.RecordExpense -> expenseViewModel.open(sessionHandle)
+                    NativeOwnerWorkDestination.RecordDrawing -> drawingViewModel.open(sessionHandle)
                     NativeOwnerWorkDestination.PaySupplier -> vendorPaymentViewModel.open(sessionHandle)
                     NativeOwnerWorkDestination.PaySalary -> salaryPaymentViewModel.open(sessionHandle)
                     NativeOwnerWorkDestination.CashCountAndClose -> cashCloseViewModel.open(sessionHandle)
@@ -495,6 +501,7 @@ fun OwnerPreviewHost(
             ownerWorkDestination == NativeOwnerWorkDestination.RecordSale -> "New sale"
             ownerWorkDestination == NativeOwnerWorkDestination.RecordPayment -> "Collect payment"
             ownerWorkDestination == NativeOwnerWorkDestination.RecordExpense -> "Record expense"
+            ownerWorkDestination == NativeOwnerWorkDestination.RecordDrawing -> "Owner drawing"
             ownerWorkDestination == NativeOwnerWorkDestination.PaySupplier -> "Pay supplier"
             ownerWorkDestination == NativeOwnerWorkDestination.PaySalary -> "Pay salary"
             ownerWorkDestination == NativeOwnerWorkDestination.CashCountAndClose -> "Cash count & close"
@@ -751,6 +758,24 @@ fun OwnerPreviewHost(
                 )
             }
             section == OwnerSection.Work &&
+                ownerWorkDestination == NativeOwnerWorkDestination.RecordDrawing -> {
+                    OwnerDrawingEntryScreen(
+                        snackbarHostState = snackbarHostState,
+                        identity = identity,
+                        state = drawingState,
+                        onRetry = drawingViewModel::refresh,
+                        onRecordDrawing = drawingViewModel::record,
+                        onRecordAnother = drawingViewModel::recordAnother,
+                        onBackToWork = { returnOwnerWorkHome() },
+                        ownScaffold = { s, m, content ->
+                            Box(modifier = m.testTag(NativeUiTags.OwnerShellRoot)) {
+                                CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
+                                    content(PaddingValues(0.dp))
+                                }
+                            }
+                        },
+                    )
+                }
                 ownerWorkDestination == NativeOwnerWorkDestination.RecordExpense -> {
                 OwnerExpenseEntryScreen(
                     snackbarHostState = snackbarHostState,

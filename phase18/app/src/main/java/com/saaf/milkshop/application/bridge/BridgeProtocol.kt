@@ -56,6 +56,7 @@ internal object HybridBridgeActions {
     const val RECORD_VENDOR_PAYMENT = "command.recordVendorPayment"
     const val RECORD_CREDIT_COLLECTION = "command.recordCreditCollection"
     const val RECORD_EXPENSE = "command.recordExpense"
+    const val RECORD_OWNER_DRAWING = "command.recordOwnerDrawing"
     const val RECORD_SALARY_PAYMENT = "command.recordSalaryPayment"
     const val SPOILAGE_HISTORY = "query.spoilageHistory"
     const val RECORD_SPOILAGE = "command.recordSpoilage"
@@ -303,6 +304,11 @@ internal fun JSONObject.requiredId(name: String): Long {
     val raw = requiredString(name)
     if (!Regex("[1-9][0-9]*").matches(raw)) throw BridgeProtocolFailure("validation_failed", "$name must be a positive record ID", name)
     return raw.toLongOrNull() ?: throw BridgeProtocolFailure("validation_failed", "$name is outside the supported range", name)
+}
+
+internal fun JSONObject.optionalId(name: String): Long? {
+    if (!has(name) || isNull(name)) return null
+    return requiredId(name)
 }
 
 internal fun JSONObject.nullableDecimal(name: String): BigDecimal? {

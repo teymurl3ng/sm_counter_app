@@ -11,6 +11,9 @@ import com.saaf.milkshop.domain.CreditCollectionService
 import com.saaf.milkshop.domain.ExpenseInput
 import com.saaf.milkshop.domain.ExpenseResult
 import com.saaf.milkshop.domain.ExpenseService
+import com.saaf.milkshop.domain.OwnerDrawingInput
+import com.saaf.milkshop.domain.OwnerDrawingResult
+import com.saaf.milkshop.domain.OwnerDrawingService
 import com.saaf.milkshop.domain.SaleInput
 import com.saaf.milkshop.domain.SalePayment
 import com.saaf.milkshop.domain.SaleResult
@@ -185,6 +188,32 @@ internal class OperationsBridgeCommandService(
         result
     }.also { SyncScheduler.requestPush() }
 
+    suspend fun recordOwnerDrawing(
+        sessionHandle: String,
+        amount: Double,
+        paymentAccountId: Long?,
+        occurredAt: String,
+        notes: String?,
+    ): OwnerDrawingResult = database.withWriteTransaction {
+        val actor = security.requirePermission(sessionHandle, AppPermission.OWNER_DRAWING)
+        if (database.dailyCloseDao().isPostingClosed(occurredAt)) {
+            throw BridgeCommandDayClosed("This business day is closed. Reopen it before recording the drawing.")
+        }
+        BusinessDateGuard.requireHappenedWithinHorizon(occurredAt)
+        val result = OwnerDrawingService(database).record(
+            OwnerDrawingInput(amount, paymentAccountId, occurredAt, notes)
+        )
+        attribute(result.eventId, actor.userId, actor.displayName, actor.role)
+        audit(
+            ACTION_RECORD_OWNER_DRAWING,
+            "event_id=${result.eventId};payment_account_id=${paymentAccountId ?: "default_cash"}",
+            actor.userId,
+            actor.displayName,
+            actor.role,
+        )
+        result
+    }.also { SyncScheduler.requestPush() }
+
     suspend fun recordVendorPayment(
         sessionHandle: String,
         input: VendorPaymentInput,
@@ -337,6 +366,7 @@ internal class OperationsBridgeCommandService(
         const val ACTION_RECORD_SALE = "bridge_record_sale"
         const val ACTION_RECORD_PRODUCTION = "bridge_record_production"
         const val ACTION_RECORD_EXPENSE = "bridge_record_expense"
+        const val ACTION_RECORD_OWNER_DRAWING = "bridge_record_owner_drawing"
         const val ACTION_RECORD_VENDOR_PAYMENT = "bridge_record_vendor_payment"
         const val ACTION_RECORD_CREDIT_COLLECTION = "bridge_record_credit_collection"
         const val ACTION_RECORD_SALARY_PAYMENT = "bridge_record_salary_payment"

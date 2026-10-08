@@ -5,6 +5,7 @@ import com.saaf.milkshop.cloud.CloudBackupSettingsStore
 import com.saaf.milkshop.cloud.CloudBackupState
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
+import com.saaf.milkshop.domain.OwnerDrawingService
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.CostCoverageCode
 import com.saaf.milkshop.domain.CreditCollectionService
@@ -195,6 +196,7 @@ class NativeOwnerOverviewFacade(
             CreditCollectionService.EVENT_TYPE_CREDIT_COLLECTION -> "Collection · #C-${event.eventId}"
             VendorPurchaseService.EVENT_TYPE_PURCHASE_RECEIPT -> "Milk receipt · #R-${event.eventId}"
             YogurtProductionService.EVENT_TYPE_PRODUCTION -> "Yogurt batch · #Y-${event.eventId}"
+            OwnerDrawingService.EVENT_TYPE_OWNER_DRAWING -> "Owner drawing · #${event.eventId}"
             else -> "${event.eventType.replace('_', ' ')} · #${event.eventId}"
         }
         val trailing = when (event.eventType) {
@@ -203,6 +205,8 @@ class NativeOwnerOverviewFacade(
                 "PKR ${formatMoney(money(total))}"
             }
             CreditCollectionService.EVENT_TYPE_CREDIT_COLLECTION ->
+                event.amount?.let { "PKR ${formatMoney(money(it))}" }
+            OwnerDrawingService.EVENT_TYPE_OWNER_DRAWING ->
                 event.amount?.let { "PKR ${formatMoney(money(it))}" }
             VendorPurchaseService.EVENT_TYPE_PURCHASE_RECEIPT ->
                 event.rawLiters?.let { "${formatQuantity(it)} L" }

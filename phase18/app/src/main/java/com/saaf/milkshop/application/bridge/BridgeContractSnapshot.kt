@@ -11,7 +11,7 @@ data class BridgeEndpointContract(
 
 object BridgeContractSnapshot {
     const val VERSION = 5
-    const val CONTRACT_SHA256 = "50CBB9E0DD21B703EBEB400DBF415BFD259A3A14DC1C0A5EF73D9EC056ECCBBA"
+    const val CONTRACT_SHA256 = "276C3C9B263322EC90091834F659B068E920659D47E71B1F195D7AD4DA46906F"
     val errorCodes = setOf(
         "invalid_request",
         "validation_failed",
@@ -83,6 +83,7 @@ object BridgeContractSnapshot {
         BridgeEndpointContract("command.recordVendorPayment", "command", "session", "SUPPLIER_PAYMENT", "EventMutationResultDto"),
         BridgeEndpointContract("command.recordCreditCollection", "command", "session", "SALE_AND_COLLECTION", "EventMutationResultDto"),
         BridgeEndpointContract("command.recordExpense", "command", "session", "EXPENSE", "EventMutationResultDto"),
+        BridgeEndpointContract("command.recordOwnerDrawing", "command", "session", "OWNER_DRAWING", "EventMutationResultDto"),
         BridgeEndpointContract("command.recordSalaryPayment", "command", "session", "SALARY_PAYMENT", "EventMutationResultDto"),
         BridgeEndpointContract("command.recordSpoilage", "command", "session", "PRODUCTION_AND_SPOILAGE", "EventMutationResultDto"),
         BridgeEndpointContract("command.correctEvent", "command", "session", "CORRECTION", "EventMutationResultDto"),

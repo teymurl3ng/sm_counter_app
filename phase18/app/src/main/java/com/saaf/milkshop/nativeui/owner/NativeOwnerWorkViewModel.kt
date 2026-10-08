@@ -27,6 +27,7 @@ enum class NativeOwnerWorkDestination {
     RecordSpoilage,
     Deliveries,
     RecordExpense,
+    RecordDrawing,
     PaySupplier,
     PaySalary,
     CashCountAndClose,

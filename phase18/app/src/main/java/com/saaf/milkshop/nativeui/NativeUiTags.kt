@@ -466,6 +466,8 @@ object NativeUiTags {
     const val OwnerSyncCredential = "owner_sync_credential"
     const val OwnerSyncEnvironment = "owner_sync_environment"
     const val OwnerSyncShopPicker = "owner_sync_shop_picker"
+    const val OwnerSyncOwnerPicker = "owner_sync_owner_picker"
+    const val OwnerSyncOwnerPick = "owner_sync_owner_pick"
     const val OwnerSyncShopPick = "owner_sync_shop_pick"
     const val OwnerSyncNotice = "owner_sync_notice"
     const val OwnerSyncError = "owner_sync_error"

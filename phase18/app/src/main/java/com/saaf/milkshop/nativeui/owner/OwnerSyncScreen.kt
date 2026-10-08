@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -43,9 +44,11 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
+import com.saaf.milkshop.domain.ServerAccountPolicy
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
 import com.saaf.milkshop.sync.NativeSyncHold
 import com.saaf.milkshop.sync.NativeSyncShopChoice
+import com.saaf.milkshop.sync.NativeSyncOwnerChoice
 import com.saaf.milkshop.sync.NativeSyncStatus
 import com.saaf.milkshop.sync.SyncServerConfig
 
@@ -63,12 +66,14 @@ fun OwnerSyncScreen(
     context: NativeOwnerMoreContext,
     status: NativeSyncStatus?,
     shopChoices: List<NativeSyncShopChoice>,
+    ownerChoices: List<NativeSyncOwnerChoice>,
     busy: Boolean,
     error: String?,
     notice: String?,
     onRefresh: () -> Unit,
     onEnroll: (username: String, credential: CharArray, environment: String) -> Unit,
-    onEnrollInShop: (shopId: String, username: String, credential: CharArray, environment: String) -> Unit,
+    onEnrollInShop: (shopId: String, username: String, credential: CharArray, environment: String, localUserId: Long?) -> Unit,
+    onEnrollAs: (localUserId: Long, username: String, credential: CharArray, environment: String) -> Unit,
     onSyncNow: () -> Unit,
     onUnenroll: () -> Unit,
     allowDevEnvironment: Boolean = false,
@@ -83,6 +88,7 @@ fun OwnerSyncScreen(
     // Holds the credential between a first (possibly ambiguous) attempt
     // and the shop pick, so the owner does not retype it. Wiped on use.
     var lastCredential by remember { mutableStateOf<CharArray?>(null) }
+    var pickedOwnerId by remember { mutableStateOf<Long?>(null) }
 
     hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         var username by rememberSaveable { mutableStateOf("") }
@@ -174,6 +180,35 @@ fun OwnerSyncScreen(
                 }
             }
 
+            if (ownerChoices.isNotEmpty()) {
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    "Several local owners use this app. Pick who this phone syncs as:",
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.testTag(NativeUiTags.OwnerSyncOwnerPicker),
+                )
+                ownerChoices.forEach { owner ->
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp)
+                            .clickable {
+                                pickedOwnerId = owner.userId
+                                val chars = takeCredential()
+                                lastCredential = chars
+                                onEnrollAs(owner.userId, username, chars, environment)
+                            }
+                            .testTag(NativeUiTags.OwnerSyncOwnerPick),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(owner.displayName, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                        Text("Choose", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelLarge)
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+            }
+
             if (shopChoices.isNotEmpty()) {
                 Spacer(Modifier.height(16.dp))
                 Text(
@@ -201,7 +236,7 @@ fun OwnerSyncScreen(
                         Button(
                             onClick = {
                                 val chars = takeCredential()
-                                onEnrollInShop(choice.shopId, username, chars, environment)
+                                onEnrollInShop(choice.shopId, username, chars, environment, pickedOwnerId)
                                 chars.fill(' ')
                                 lastCredential = null
                             },
@@ -275,6 +310,28 @@ private fun OwnerSyncEnrolledBody(
         OwnerSyncStatusRow("Server", status.environment.uppercase())
         OwnerSyncStatusRow("Shop", status.shopName ?: "—")
         OwnerSyncStatusRow("Signed in as", status.role)
+        val identityLabel = when (status.identityStatus) {
+            ServerAccountPolicy.LinkStatus.VERIFIED -> "verified"
+            ServerAccountPolicy.LinkStatus.SUSPENDED -> "suspended on the server"
+            ServerAccountPolicy.LinkStatus.REVOKED -> "revoked on the server"
+            "active_unlinked" -> "connected - owner link pending"
+            else -> null
+        }
+        if (identityLabel != null) {
+            OwnerSyncStatusRow("Identity", identityLabel)
+        }
+        status.identityServerUsername?.let {
+            OwnerSyncStatusRow("Server account", it)
+        }
+        status.identityOwnerName?.let {
+            OwnerSyncStatusRow("Linked owner", it)
+        }
+        status.graceDaysLeft?.let { daysLeft ->
+            OwnerSyncStatusRow(
+                "Offline operation",
+                if (status.graceWarningLevel >= 3) "URGENT - $daysLeft day(s) left before limited mode" else "$daysLeft day(s) of full operation left",
+            )
+        }
         OwnerSyncStatusRow("Session", if (status.sessionPresent) "active" else "needs sign-in again")
         OwnerSyncStatusRow("Trusted time", if (status.trustedTimeAnchored) "server-anchored" else "phone clock only")
         OwnerSyncStatusRow("Waiting to upload", status.outboxCount.toString())

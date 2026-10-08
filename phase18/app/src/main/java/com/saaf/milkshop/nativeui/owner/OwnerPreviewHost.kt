@@ -563,8 +563,16 @@ fun OwnerPreviewHost(
                     onOpenBackup = ownerMoreViewModel::openBackup,
                     onOpenSync = ownerMoreViewModel::openSync,
                     onRefreshSync = ownerMoreViewModel::refreshSync,
-                    onEnrollSync = ownerMoreViewModel::enrollSync,
-                    onEnrollSyncInShop = ownerMoreViewModel::enrollSyncInShop,
+                    onEnrollSync = { username, chars, env, localUserId ->
+                        ownerMoreViewModel.enrollSync(username, chars, env, localUserId)
+                    },
+                    onEnrollSyncInShop = { shopId, username, chars, env, localUserId ->
+                        ownerMoreViewModel.enrollSyncInShop(shopId, username, chars, env, localUserId)
+                    },
+                    ownerChoices = (ownerMoreState as? NativeOwnerMoreState.Ready)?.syncState?.ownerChoices ?: emptyList(),
+                    onEnrollAs = { localUserId, username, chars, env ->
+                        ownerMoreViewModel.enrollSync(username, chars, env, localUserId)
+                    },
                     onSyncNow = ownerMoreViewModel::syncNow,
                     onResolveHoldSync = ownerMoreViewModel::resolveSyncHold,
                     onUnenrollSync = ownerMoreViewModel::unenrollSync,

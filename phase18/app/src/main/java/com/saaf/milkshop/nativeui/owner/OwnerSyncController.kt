@@ -45,7 +45,7 @@ internal class OwnerSyncController(
         loadStatus(token)
     }
 
-    fun enroll(username: String, credential: CharArray, environment: String) {
+    fun enroll(username: String, credential: CharArray, environment: String, localUserId: Long? = null) {
         val token = runtime.captureSession() ?: return
         val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.Sync) return
@@ -53,7 +53,7 @@ internal class OwnerSyncController(
         runtime.scope.launch {
             try {
                 val outcome = withContext(Dispatchers.IO) {
-                    facade.enroll(username, credential, shopId = null, environment = environment)
+                    facade.enroll(username, credential, shopId = null, environment = environment, localUserId = localUserId)
                 }
                 if (!runtime.isCurrent(token)) return@launch
                 when (outcome) {
@@ -140,7 +140,7 @@ internal class OwnerSyncController(
         }
     }
 
-    fun enrollInShop(shopId: String, username: String, credential: CharArray, environment: String) {
+    fun enrollInShop(shopId: String, username: String, credential: CharArray, environment: String, localUserId: Long? = null) {
         val token = runtime.captureSession() ?: return
         val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.Sync) return
@@ -148,7 +148,7 @@ internal class OwnerSyncController(
         runtime.scope.launch {
             try {
                 val outcome = withContext(Dispatchers.IO) {
-                    facade.enroll(username, credential, shopId = shopId, environment = environment)
+                    facade.enroll(username, credential, shopId = shopId, environment = environment, localUserId = localUserId)
                 }
                 if (!runtime.isCurrent(token)) return@launch
                 when (outcome) {

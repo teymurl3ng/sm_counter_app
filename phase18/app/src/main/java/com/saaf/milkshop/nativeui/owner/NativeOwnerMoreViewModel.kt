@@ -393,11 +393,11 @@ class NativeOwnerMoreViewModel internal constructor(
 
     fun refreshSync() = syncController.refreshSync()
 
-    fun enrollSync(username: String, credential: CharArray, environment: String) =
-        syncController.enroll(username, credential, environment)
+    fun enrollSync(username: String, credential: CharArray, environment: String, localUserId: Long? = null) =
+        syncController.enroll(username, credential, environment, localUserId)
 
-    fun enrollSyncInShop(shopId: String, username: String, credential: CharArray, environment: String) =
-        syncController.enrollInShop(shopId, username, credential, environment)
+    fun enrollSyncInShop(shopId: String, username: String, credential: CharArray, environment: String, localUserId: Long? = null) =
+        syncController.enrollInShop(shopId, username, credential, environment, localUserId)
 
     fun syncNow() = syncController.syncNow()
 

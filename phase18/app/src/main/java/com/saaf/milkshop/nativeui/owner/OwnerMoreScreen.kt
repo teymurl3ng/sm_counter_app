@@ -76,6 +76,7 @@ import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
+import com.saaf.milkshop.sync.NativeSyncOwnerChoice
 
 /**
  * Owner More — leadership business-control menu under OwnerScaffold.
@@ -188,8 +189,10 @@ fun OwnerMoreScreen(
     onConfirmBackupRestore: (Boolean) -> Unit,
     onOpenBackupConnect: () -> Unit,
     onRefreshSync: () -> Unit,
-    onEnrollSync: (String, CharArray, String) -> Unit,
-    onEnrollSyncInShop: (String, String, CharArray, String) -> Unit,
+    onEnrollSync: (String, CharArray, String, Long?) -> Unit,
+    onEnrollSyncInShop: (String, String, CharArray, String, Long?) -> Unit,
+    ownerChoices: List<NativeSyncOwnerChoice> = emptyList(),
+    onEnrollAs: (Long, String, CharArray, String) -> Unit = { _, _, _, _ -> },
     onSyncNow: () -> Unit,
     onResolveHoldSync: (String, String, Boolean) -> Unit = { _, _, _ -> },
     onUnenrollSync: () -> Unit,
@@ -577,12 +580,14 @@ fun OwnerMoreScreen(
                 context = state.context,
                 status = state.syncState.status,
                 shopChoices = state.syncState.shopChoices,
+                ownerChoices = state.syncState.ownerChoices,
                 busy = state.syncState.busy,
                 error = state.syncState.error,
                 notice = state.syncState.notice,
                 onRefresh = onRefreshSync,
-                onEnroll = onEnrollSync,
-                onEnrollInShop = onEnrollSyncInShop,
+                onEnroll = { username, chars, env -> onEnrollSync(username, chars, env, null) },
+                onEnrollInShop = { shopId, username, chars, env, localUserId -> onEnrollSyncInShop(shopId, username, chars, env, localUserId) },
+                onEnrollAs = onEnrollAs,
                 onSyncNow = onSyncNow,
                 holds = state.syncState.holds,
                 onResolveHold = onResolveHoldSync,

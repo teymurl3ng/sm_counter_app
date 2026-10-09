@@ -25,12 +25,14 @@ in place, never delete.
   counter_cred.txt (owner stores it). Tablet setup when it arrives: install build → Sync → sign
   in as counter → pick Shop 1. Per-person Quick PINs decided for the tablet's local logins.
 - **14.8.6 cutover finish** (the gate to the pilot week):
-  1. M27 — notification taps open the retired WebView shell (MainActivity); BLOCKS the
-     retirement gate. Point notifications at the native activity.
+  1. M27 — **DONE (2026-10-09, d8798d6)**: notification taps repointed to the native
+     activity; no production path opens the WebView shell anymore.
   2. Enrollment screen folded into the release app — bootstrap-on-first-launch + minimal
      enrollment (owner signaled "retire the WebView now"; formal confirmation of the revised
      order still owed, see §4).
-  3. M29 — bridge/ retirement refactor (8 live files; a refactor, not a delete).
+  3. M29 — **DONE (2026-10-09, d8798d6)**: the 5 live command services extracted to
+     `application/commands/`; remaining `application/bridge/` files are dormant WebView
+     transport, deleted with the shell post-pilot (M28).
   4. Release-build regression connected run (the cutover run was lost and never re-run).
   5. Signed rebuild from current main (v0.4.0 predates ~200 commits incl. all audit fixes).
   6. S24 walkthrough: bootstrap → Sync → enroll PROD → Shop 1 → Sync now (also retires the

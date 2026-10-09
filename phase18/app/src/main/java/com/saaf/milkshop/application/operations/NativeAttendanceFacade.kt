@@ -1,6 +1,6 @@
 package com.saaf.milkshop.application.operations
 
-import com.saaf.milkshop.application.bridge.EmployeeBridgeCommandService
+import com.saaf.milkshop.application.commands.EmployeeBridgeCommandService
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.AttendanceInput

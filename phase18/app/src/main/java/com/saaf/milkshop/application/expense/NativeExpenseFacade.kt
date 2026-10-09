@@ -1,6 +1,6 @@
 package com.saaf.milkshop.application.expense
 
-import com.saaf.milkshop.application.bridge.OperationsBridgeCommandService
+import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
 import com.saaf.milkshop.application.readmodels.HybridReadModelService
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission

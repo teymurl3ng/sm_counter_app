@@ -2357,5 +2357,20 @@
    "application/owner/NativeOwnerOverviewFacade.kt",
    "application/owner/NativeOwnerShopSettingsFacade.kt"
   ]
+ },
+ "command.recordOwnerDrawing": {
+  "ids": [
+   "recordOwnerDrawing",
+   "optionalId",
+   "optionalString",
+   "requiredPaisa",
+   "requiredDate"
+  ],
+  "native_files": [
+   "nativeui/owner/NativeOwnerMoreViewModel.kt",
+   "nativeui/drawing/NativeDrawingViewModel.kt",
+   "application/drawing/NativeDrawingFacade.kt",
+   "application/bridge/OperationsBridgeCommandService.kt"
+  ]
  }
 }

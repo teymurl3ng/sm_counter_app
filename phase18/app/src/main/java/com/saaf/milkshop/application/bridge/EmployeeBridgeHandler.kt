@@ -1,6 +1,7 @@
 package com.saaf.milkshop.application.bridge
 
 import com.saaf.milkshop.application.readmodels.HybridReadModelService
+import com.saaf.milkshop.application.commands.EmployeeBridgeCommandService
 import com.saaf.milkshop.domain.AttendanceInput
 import com.saaf.milkshop.domain.AttendanceService
 import com.saaf.milkshop.domain.EmployeeProfileInput

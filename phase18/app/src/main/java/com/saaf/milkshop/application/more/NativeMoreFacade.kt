@@ -1,6 +1,6 @@
 package com.saaf.milkshop.application.more
 
-import com.saaf.milkshop.application.bridge.ReconciliationBridgeCommandService
+import com.saaf.milkshop.application.commands.ReconciliationBridgeCommandService
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.PhysicalCashCountInput

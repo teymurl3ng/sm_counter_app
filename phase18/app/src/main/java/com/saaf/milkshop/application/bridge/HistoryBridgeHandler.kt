@@ -1,6 +1,7 @@
 package com.saaf.milkshop.application.bridge
 
 import com.saaf.milkshop.application.readmodels.HybridReadModelService
+import com.saaf.milkshop.application.commands.HistoryBridgeCommandService
 import com.saaf.milkshop.domain.CorrectionInput
 import org.json.JSONArray
 import org.json.JSONObject

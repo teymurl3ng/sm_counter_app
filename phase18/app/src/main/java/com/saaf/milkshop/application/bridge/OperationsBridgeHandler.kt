@@ -3,6 +3,7 @@ package com.saaf.milkshop.application.bridge
 import com.saaf.milkshop.application.readmodels.HybridReadModelService
 import com.saaf.milkshop.application.readmodels.decimal
 import com.saaf.milkshop.application.readmodels.money
+import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
 import com.saaf.milkshop.domain.VendorPurchaseInput
 import com.saaf.milkshop.domain.VendorPaymentInput
 import com.saaf.milkshop.domain.CreditCollectionInput

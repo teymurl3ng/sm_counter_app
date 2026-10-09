@@ -1,6 +1,6 @@
 package com.saaf.milkshop.application.owner
 
-import com.saaf.milkshop.application.bridge.HistoryBridgeCommandService
+import com.saaf.milkshop.application.commands.HistoryBridgeCommandService
 import com.saaf.milkshop.application.readmodels.EventHistoryDto
 import com.saaf.milkshop.application.readmodels.FinancialMovementDto
 import com.saaf.milkshop.application.readmodels.HybridReadModelService

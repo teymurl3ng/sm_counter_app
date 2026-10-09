@@ -37,7 +37,9 @@ class SyncNotifier(private val context: Context) {
         val openApp = PendingIntent.getActivity(
             context,
             0,
-            Intent(context, com.saaf.milkshop.hybrid.HybridActivity::class.java),
+            // M27: the retired WebView shell is no longer a notification
+            // target — taps land on the native launcher activity.
+            Intent(context, com.saaf.milkshop.nativeui.NativePreviewActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)

@@ -3,6 +3,11 @@ package com.saaf.milkshop.application.bridge
 import android.util.Log
 import com.saaf.milkshop.BuildConfig
 import com.saaf.milkshop.application.readmodels.HybridReadModelService
+import com.saaf.milkshop.application.commands.DeliveryBridgeCommandService
+import com.saaf.milkshop.application.commands.EmployeeBridgeCommandService
+import com.saaf.milkshop.application.commands.HistoryBridgeCommandService
+import com.saaf.milkshop.application.commands.ReconciliationBridgeCommandService
+import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.SecurityFailure
 import org.json.JSONObject

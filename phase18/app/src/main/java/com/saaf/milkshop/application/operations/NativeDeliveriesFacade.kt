@@ -1,6 +1,6 @@
 package com.saaf.milkshop.application.operations
 
-import com.saaf.milkshop.application.bridge.DeliveryBridgeCommandService
+import com.saaf.milkshop.application.commands.DeliveryBridgeCommandService
 import com.saaf.milkshop.application.preview.NativePreviewSampleData
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission

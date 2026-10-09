@@ -24,6 +24,12 @@ Validate, against the live DEV Supabase project, the exact header shapes and res
 | P7 | Logout | `POST /auth/v1/logout`, `Bearer {access_token}` | `204` (best effort) | Session termination shape |
 | P8 | Malformed body | sign-in with `{}` | `400` non-`invalid_credentials` validation error | UNKNOWN/malformed classification boundary |
 | P9 | NOT_AUTHORIZED fixture | sign-in as an Auth identity with no staff row | Auth `200`, `my_profile` → `null` | Requires a fixture account — **pending manual setup** |
+
+> **P9/P10 CLOSED 2026-10-09 (verified live on PROD):** an Auth identity without a staff row
+> grants tokens but `my_profile` returns null — the client maps that to NOT_AUTHORIZED; and a
+> cashier-scoped token invoking `admin_disable_staff` is refused 403 (least privilege proven).
+> DISABLED classification is additionally covered by contract Group 2 on DEV. Both probes done;
+> no open probe items remain.
 | P10 | DISABLED fixture | sign-in as an active-auth but `active=false` staff | Auth `200`, profile with `active=false` | Requires disabling a fixture — **pending manual setup, DEV only** |
 
 P9/P10 need account fixtures that only the (currently gated) admin channel can create safely; they stay pending until the C1 gate or a documented DEV seed script provides them. They are not blockers for freezing header/response shapes (P0–P8), only for closing the full five-way evidence file.
@@ -49,7 +55,7 @@ Run of 2026-09-25, script `scripts/probe_account_bridge_dev.py`, DEV project (`s
 | P6 | **PASS** | `200`; new access token differs from P1's |
 | P7 | **FAIL (expectation), contract met** | logout returned the contracted `204`, but the P1 access token still called `my_profile` successfully (`200`) afterward. Supabase logout revokes the session/refresh token; the access JWT stays cryptographically valid until natural expiry (measured: 3600 s). **Consequence:** token revocation must never be an authorization control on Android — see §5. |
 | P8 | **PASS** | `400`; `error_code='validation_failed'` — distinct from `invalid_credentials` |
-| P9 | PENDING | needs Auth-only fixture (manual) |
+| P9 | **CLOSED 2026-10-09** — verified live on PROD (staffless Auth identity: token grant 200, `my_profile` null → NOT_AUTHORIZED) |
 | P10 | PENDING | needs disabled-staff fixture (manual, DEV) |
 
 Additional observations (both classify as `UNKNOWN` inputs, correctly not treated as identity decisions):

@@ -88,8 +88,16 @@ class NativeSaleFacade(
             "milk" to references.retailMilkRatePaisaPerUnit,
             "yogurt" to references.retailYogurtRatePaisaPerUnit,
         )
+        // Name-prefix match: probe renames (e.g. "Milk (Z-leg probe)") and
+        // suffix variants still resolve to their retail-rate default instead
+        // of silently dropping off the sale form.
+        fun defaultRateFor(name: String): Long? {
+            val normalized = name.trim().lowercase()
+            return ratesByName[normalized]
+                ?: ratesByName.entries.firstOrNull { normalized.startsWith(it.key) }?.value
+        }
         val products = references.products.mapNotNull { product ->
-            val rate = ratesByName[product.name.trim().lowercase()] ?: return@mapNotNull null
+            val rate = defaultRateFor(product.name) ?: return@mapNotNull null
             NativeSaleProduct(
                 productId = product.productId,
                 name = product.name,

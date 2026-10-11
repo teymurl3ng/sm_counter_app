@@ -1,0 +1,4 @@
+    versionCode=5 minSdk=26 targetSdk=36
+    versionName=0.4.1-qa
+    lastUpdateTime=2026-10-11 05:55:01
+      firstInstallTime=2026-10-10 16:31:46

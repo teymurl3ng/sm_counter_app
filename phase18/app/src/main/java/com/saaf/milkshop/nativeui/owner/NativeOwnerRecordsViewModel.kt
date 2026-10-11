@@ -133,8 +133,10 @@ class NativeOwnerRecordsViewModel(
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 // Merge: keeps an open detail, ledger, or correction editor on
                 // screen through a warm refresh.
-                val filtered = facade.filterRecords(snapshot.records, previousQuery, previousGroup)
-                _state.value = previous?.copy(
+                val latest = _state.value as? NativeOwnerRecordsState.Ready
+                val filtered = facade.filterRecords(snapshot.records,
+                    latest?.searchQuery ?: previousQuery, latest?.activeGroup ?: previousGroup)
+                _state.value = (_state.value as? NativeOwnerRecordsState.Ready)?.copy(
                     snapshot = snapshot,
                     visibleRecords = filtered,
                     refreshing = false,
@@ -150,7 +152,7 @@ class NativeOwnerRecordsViewModel(
                 if (error is SecurityFailure.SessionExpired || previous == null) {
                     handleLoadFailure(error)
                 } else {
-                    _state.value = previous.copy(
+                    _state.value = ((_state.value as? NativeOwnerRecordsState.Ready) ?: previous).copy(
                         refreshing = false,
                         error = error.message ?: "Records could not refresh. Try again.",
                     )

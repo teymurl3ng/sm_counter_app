@@ -1,0 +1,127 @@
+
+> Configure project :app
+WARNING: The option setting 'android.disallowKotlinSourceSets=false' is experimental.
+The current default is 'true'.
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :checkFrozenBaselines
+OK phase18/milk-shop-core-logic-spec-v2.md
+OK phase18/milk_shop_schema_sql_only_final_v2.sql
+FROZEN_BASELINES: PASS
+
+> Task :checkGoldenLedgerContract
+Golden ledger host contract OK (instrumented execution is enforced by qaScreen/qaCheckpoint).
+GOLDEN_LEDGER_CONTRACT: PASS
+
+> Task :checkNativeInventory
+inventory rows=1001 untested=0 orphans=0
+NATIVE_INVENTORY: PASS
+UNTESTED_COUNT=0
+
+> Task :checkUiOnly
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+LOGIC EXCEPTION ACTIVE
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Protected files changed with allow.logic override:
+  - phase18/app/src/main/java/com/saaf/milkshop/data/BudgetDataRepository.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/data/Phase3SecurityDaos.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/data/SyncEntities.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/domain/BudgetManagement.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/domain/Costing.kt
+CHECK_UI_ONLY: PASS_WITH_LOGIC_EXCEPTION
+
+> Task :verifyBridgeContract
+Bridge contract OK: v5, 92 endpoints, SHA-256 276C3C9B263322EC90091834F659B068E920659D47E71B1F195D7AD4DA46906F
+
+> Task :verifyUiCleanup
+UI cleanup gate OK: 88 active TypeScript/TSX files; 23 prototype paths and 6 dependencies absent; 3 packaged files scanned.
+
+> Task :app:verifyHybridWebAssets
+> Task :app:preBuild
+> Task :app:preDebugBuild
+> Task :app:generateDebugBuildConfig
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:processDebugNavigationResources
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
+
+> Task :app:kspDebugKotlin UP-TO-DATE
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :app:preDebugAndroidTestBuild SKIPPED
+> Task :app:processDebugAndroidTestManifest
+> Task :app:generateDebugAndroidTestBuildConfig
+> Task :app:generateDebugAndroidTestResources UP-TO-DATE
+> Task :app:packageDebugAndroidTestResources UP-TO-DATE
+> Task :app:processDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :app:parseDebugAndroidTestLocalResources UP-TO-DATE
+> Task :app:generateDebugAndroidTestRFile UP-TO-DATE
+> Task :app:preDebugUnitTestBuild
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:mergeDebugNativeLibs UP-TO-DATE
+> Task :app:stripDebugDebugSymbols UP-TO-DATE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:processDebugManifestForPackage
+> Task :app:processDebugResources
+
+> Task :app:compileDebugKotlin
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/hybrid/HybridActivity.kt:177:60 'static field SOFT_INPUT_ADJUST_RESIZE: Int' is deprecated. Deprecated in Java.
+
+> Task :app:compileDebugJavaWithJavac
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:dexBuilderDebug
+> Task :app:mergeDebugGlobalSynthetics UP-TO-DATE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:bundleDebugClassesToRuntimeJar
+
+> Task :app:kspDebugUnitTestKotlin
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :app:kspDebugAndroidTestKotlin
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :app:compileDebugUnitTestKotlin
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
+> Task :app:compileDebugAndroidTestKotlin
+> Task :app:mergeProjectDexDebug
+> Task :app:testDebugUnitTest
+
+> Task :qaFast
+QA_FAST: PASS
+
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect
+> Task :app:assembleDebug
+
+BUILD SUCCESSFUL in 28s
+63 actionable tasks: 31 executed, 32 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.3.0/userguide/configuration_cache_enabling.html

@@ -1,0 +1,243 @@
+[
+  {
+    "file": "activity\\CashierActivityScreen.kt",
+    "line": 318,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "admin\\AdminMoreScreen.kt",
+    "line": 676,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "admin\\AdminPeopleScreen.kt",
+    "line": 432,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "admin\\AdminRecordsScreen.kt",
+    "line": 255,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "admin\\AdminWorkScreen.kt",
+    "line": 359,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "auth\\NativeAuthenticationScreens.kt",
+    "line": 272,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "collection\\CashierCollectionScreen.kt",
+    "line": 773,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "collection\\CashierCollectionScreen.kt",
+    "line": 817,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "expense\\ExpenseEntryScreen.kt",
+    "line": 557,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "expense\\ExpenseEntryScreen.kt",
+    "line": 602,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "manager\\ManagerMoreScreen.kt",
+    "line": 609,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "manager\\ManagerWorkScreen.kt",
+    "line": 407,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "more\\CashierMoreScreen.kt",
+    "line": 437,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "more\\CashierMoreScreen.kt",
+    "line": 618,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "operations\\DeliveriesScreen.kt",
+    "line": 496,
+    "content_geometry_nearby": false,
+    "manual_review": "NativeDeliveryPickerDialog TextButton uses explicit shared 16dp horizontal / 12dp vertical contentPadding; full-width selected row surface."
+  },
+  {
+    "file": "operations\\OperationsMoreScreen.kt",
+    "line": 319,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "operations\\OperationsMoreScreen.kt",
+    "line": 484,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "operations\\ReceiveMilkScreen.kt",
+    "line": 533,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "operations\\RecordSpoilageScreen.kt",
+    "line": 543,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "operations\\RecordSpoilageScreen.kt",
+    "line": 580,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerCostingPlanningScreens.kt",
+    "line": 972,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerCostingPlansScreen.kt",
+    "line": 1332,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerCustomersScreen.kt",
+    "line": 816,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerEmployeesScreen.kt",
+    "line": 804,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerMoreScreen.kt",
+    "line": 977,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerOpeningCostBasisScreen.kt",
+    "line": 143,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerOverviewScreen.kt",
+    "line": 209,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerOverviewScreen.kt",
+    "line": 249,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerOverviewScreen.kt",
+    "line": 285,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerProductsScreen.kt",
+    "line": 903,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerRecordsScreen.kt",
+    "line": 406,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerRecordsScreen.kt",
+    "line": 445,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerRecordsScreen.kt",
+    "line": 504,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerRecordsScreen.kt",
+    "line": 956,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerReportsScreen.kt",
+    "line": 326,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerSecurityHistoryScreen.kt",
+    "line": 246,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerShopSettingsScreen.kt",
+    "line": 557,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerSuppliersScreen.kt",
+    "line": 746,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerSyncScreen.kt",
+    "line": 199,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerSyncScreen.kt",
+    "line": 227,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerUsersRolesScreen.kt",
+    "line": 1062,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "owner\\OwnerWorkScreen.kt",
+    "line": 349,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "salarypayment\\SalaryPaymentEntryScreen.kt",
+    "line": 541,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "salarypayment\\SalaryPaymentEntryScreen.kt",
+    "line": 586,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "sale\\CashierSaleScreen.kt",
+    "line": 773,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "sale\\CashierSaleScreen.kt",
+    "line": 1498,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "vendorpayment\\VendorPaymentEntryScreen.kt",
+    "line": 541,
+    "content_geometry_nearby": true
+  },
+  {
+    "file": "vendorpayment\\VendorPaymentEntryScreen.kt",
+    "line": 586,
+    "content_geometry_nearby": true
+  }
+]

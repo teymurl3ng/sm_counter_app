@@ -44,7 +44,7 @@ class HybridActivity : FragmentActivity() {
         configureSystemBars()
 
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
-            showFatalError("This phone's Android WebView must be updated before Saaf Milk can open safely.")
+            showFatalError("This phone's Android WebView must be updated before the shop can open safely.")
             return
         }
 
@@ -202,7 +202,7 @@ class HybridActivity : FragmentActivity() {
         configureFailureSystemBars()
         setContentView(createHybridFailureView(
             context = this,
-            title = "Saaf Milk cannot open",
+            title = "The shop cannot open",
             message = message,
         ))
     }

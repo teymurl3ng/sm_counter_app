@@ -1,0 +1,14 @@
+{
+  "scenario": "account-picker-light",
+  "screen": "auth",
+  "device": "samsung SM-A065F",
+  "packageName": "com.saaf.milkshop.qa.tests",
+  "capturedAt": "2026-10-11T00:08:36.140388Z",
+  "orientation": "portrait",
+  "fontScale": "1.0",
+  "theme": "light",
+  "workflowId": "access-recovery",
+  "evidenceFilename": "account-picker-light.png",
+  "reviewStatus": "UNREVIEWED",
+  "note": "Portrait presentation fixture; demo account\/code only. Owner review pending."
+}

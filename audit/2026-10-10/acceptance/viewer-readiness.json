@@ -1,0 +1,44 @@
+{
+  "local_url": "http://127.0.0.1:3100/login",
+  "configured_environment": "dev",
+  "configured_server_url": "https://tghzmofkkdsaasvnixps.supabase.co",
+  "bind_address": "127.0.0.1",
+  "checks": [
+    {
+      "path": "/login",
+      "status": 200,
+      "dev_badge": true,
+      "password_field": true
+    },
+    {
+      "path": "/api/health",
+      "status": 401,
+      "unauthenticated_access_denied": true,
+      "body": {
+        "ok": false,
+        "code": "UNAUTHENTICATED"
+      }
+    },
+    {
+      "path": "/api/overview",
+      "status": 401,
+      "unauthenticated_access_denied": true,
+      "body": {
+        "ok": false,
+        "env": "dev",
+        "contract": "v1.2.0-write-admin",
+        "server": {
+          "status": "unavailable",
+          "pingOk": false
+        },
+        "overview": null,
+        "error": {
+          "code": "UNAUTHENTICATED",
+          "message": "Sign in required."
+        }
+      }
+    }
+  ],
+  "real_auth_session_verified": false,
+  "authenticated_health_verified": false
+}

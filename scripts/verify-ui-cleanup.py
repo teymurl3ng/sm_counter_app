@@ -153,6 +153,16 @@ def verify_opening_explanation() -> None:
         raise CleanupError("OpeningStatePanel must explain why unlike account balances are not totaled")
 
 
+def verify_packaged_contract_hash(package_files: list[Path]) -> None:
+    generated = (SOURCE_ROOT / "bridge" / "contract.generated.ts").read_text(encoding="utf-8")
+    match = re.search(r'BRIDGE_CONTRACT_SHA256\s*=\s*"([A-F0-9]{64})"', generated)
+    if match is None:
+        raise CleanupError("Generated bridge contract hash is missing")
+    expected = match.group(1)
+    if not any(expected in path.read_text(encoding="utf-8") for path in package_files if path.suffix == ".js"):
+        raise CleanupError("Packaged web assets use a stale bridge contract. Run scripts/build-web-ui.ps1 before building Android.")
+
+
 def verify(*, source_only: bool = False) -> tuple[int, int]:
     if not SOURCE_ROOT.is_dir():
         raise CleanupError(f"Missing UI source root: {SOURCE_ROOT}")
@@ -171,6 +181,8 @@ def verify(*, source_only: bool = False) -> tuple[int, int]:
     verify_json_boundary(source_files)
     verify_active_entry()
     verify_opening_explanation()
+    if not source_only:
+        verify_packaged_contract_hash(package_files)
 
     failures = forbidden_matches(source_files, SOURCE_RULES)
     if not source_only:

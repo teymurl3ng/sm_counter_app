@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeFoundationUiTest" tests="3" failures="0" errors="0" skipped="0" time="24.14" timestamp="2026-10-10T17:03:53" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="switchAccountHardwareBackKeepsSessionAndReturnsToMore" classname="com.saaf.milkshop.NativeFoundationUiTest" time="10.124" />
+  <testcase name="ownerPaySupplierOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="7.951" />
+  <testcase name="adminBusinessRecordsHardwareBackReturnsToRecordsHub" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.824" />
+</testsuite>

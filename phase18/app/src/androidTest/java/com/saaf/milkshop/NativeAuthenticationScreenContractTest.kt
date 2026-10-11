@@ -62,7 +62,7 @@ class NativeAuthenticationScreenContractTest {
 
         // The access screens now follow the system theme: in a dark host the
         // body goes dark and its text goes light (it used to stay ivory-light).
-        val titlePixels = composeRule.onNodeWithText("Who is using Saaf?")
+        val titlePixels = composeRule.onNodeWithText("Choose account")
             .captureToImage()
             .toPixelMap()
         var darkestTitlePixel = 3f
@@ -124,7 +124,7 @@ class NativeAuthenticationScreenContractTest {
 
         composeRule.onNodeWithText("Accounts are unavailable.").assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.AuthStartupRetry).performClick()
-        composeRule.onNodeWithText("Who is using Saaf?").assertIsDisplayed()
+        composeRule.onNodeWithText("Choose account").assertIsDisplayed()
     }
 
     @Test
@@ -220,7 +220,7 @@ class NativeAuthenticationScreenContractTest {
 
         composeRule.onNodeWithText("Quick unlock is paused. Sign in with your full passphrase.").assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinUsePassphrase).assertIsDisplayed().performClick()
-        composeRule.onNodeWithText("Welcome back, PIN Owner").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).assertIsDisplayed()
     }
 }

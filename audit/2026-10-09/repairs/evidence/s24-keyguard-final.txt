@@ -1,0 +1,3 @@
+  mCurrentFocus=Window{42b9d76 u0 Bouncer}
+    mShowingDream=false mDreamingLockscreen=true
+    isKeyguardShowing=true

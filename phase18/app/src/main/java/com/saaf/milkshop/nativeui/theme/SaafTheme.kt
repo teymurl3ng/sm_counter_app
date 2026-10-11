@@ -20,13 +20,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.saaf.milkshop.R
 
-val SaafIvory = Color(0xFFF4F1E8)
+val SaafIvory = Color(0xFFECE7DA)
 val SaafSurface = Color(0xFFFFFDF7)
 val SaafGreen = Color(0xFF173F32)
 val SaafYellow = Color(0xFFF2C85B)
 val SaafInk = Color(0xFF17201B)
-val SaafMuted = Color(0xFF68726C)
-val SaafLine = Color(0xFFD6D0C3)
+val SaafMuted = Color(0xFF515F55)
+val SaafLine = Color(0xFF878171)
 val SaafError = Color(0xFFB3261E)
 
 val SaafFontFamily = FontFamily(
@@ -53,7 +53,7 @@ private val LightColors = lightColorScheme(
     surfaceVariant = Color(0xFFEBE7DC),
     onSurfaceVariant = SaafMuted,
     outline = SaafLine,
-    outlineVariant = Color(0xFFE6E1D7),
+    outlineVariant = Color(0xFFC9C3B3),
     error = SaafError,
     onError = Color.White,
 )
@@ -74,7 +74,7 @@ private val DarkColors = darkColorScheme(
     surfaceVariant = Color(0xFF253029),
     onSurfaceVariant = Color(0xFFC5CEC8),
     outline = Color(0xFF7D8981),
-    outlineVariant = Color(0xFF39443D),
+    outlineVariant = Color(0xFF435248),
     error = Color(0xFFFFB4AB),
     onError = Color(0xFF690005),
 )

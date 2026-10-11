@@ -1,0 +1,4 @@
+/sdcard/Download/phase14-native-evidence/native-ux-a06/: 49 files pulled, 0 skipped. 6.8 MB/s (1759868 bytes in 0.245s)
+Pulled PNG count (current run): 24
+Pulled review sidecar count (current run): 24
+EVIDENCE_PULL: PASS

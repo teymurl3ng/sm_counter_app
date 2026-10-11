@@ -216,8 +216,13 @@ internal class OwnerEmployeesController(
         if (current.employeeCreating) return
         runtime.state.value = current.copy(employeeCreating = true, employeesError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) { facade.createEmployee(session, name) }
+                runtime.updateCurrent(token, NativeOwnerMoreDestination.Employees) { it.copy(employeeCreateOpen = false, employeeCreating = false) }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Employee added")
+                com.saaf.milkshop.nativeui.DataChangeBus.notifyDataChanged()
                 val snapshot = withContext(Dispatchers.IO) { facade.loadEmployees(session) }
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
@@ -233,7 +238,7 @@ internal class OwnerEmployeesController(
                     employeesLoading = false,
                 )
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, if (saved && error !is com.saaf.milkshop.domain.SecurityFailure) IllegalStateException("Saved on this phone. The latest list could not refresh; try Refresh.", error) else error)
             }
         }
     }
@@ -270,10 +275,15 @@ internal class OwnerEmployeesController(
         if (current.employeeUpdating) return
         runtime.state.value = current.copy(employeeUpdating = true, employeesError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.updateEmployee(session, accountId, name, profile)
                 }
+                runtime.updateCurrent(token, NativeOwnerMoreDestination.Employees) { it.copy(employeeEditOpen = false, employeeUpdating = false) }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Employee saved")
+                com.saaf.milkshop.nativeui.DataChangeBus.notifyDataChanged()
                 val detail = withContext(Dispatchers.IO) {
                     facade.loadDetail(session, accountId)
                 }
@@ -290,7 +300,7 @@ internal class OwnerEmployeesController(
                     employeesLoading = false,
                 )
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, if (saved && error !is com.saaf.milkshop.domain.SecurityFailure) IllegalStateException("Saved on this phone. The latest list could not refresh; try Refresh.", error) else error)
             }
         }
     }

@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" tests="5" failures="4" errors="0" skipped="0" time="2.598" timestamp="2026-10-10T01:18:39" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-S921W - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="collectionReauthorizationFailureCannotLeaveSavedCollection" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.212">
+    <failure>java.lang.AssertionError: expected:&lt;0&gt; but was:&lt;1&gt;
+at org.junit.Assert.fail(Assert.java:89)
+at org.junit.Assert.failNotEquals(Assert.java:835)
+at org.junit.Assert.assertEquals(Assert.java:120)
+at org.junit.Assert.assertEquals(Assert.java:146)
+at com.saaf.milkshop.NativeReceiptAtomicityRegressionTest$collectionReauthorizationFailureCannotLeaveSavedCollection$1.invokeSuspend(NativeReceiptAtomicityRegressionTest.kt:66)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at com.saaf.milkshop.NativeReceiptAtomicityRegressionTest.collectionReauthorizationFailureCannotLeaveSavedCollection(NativeReceiptAtomicityRegressionTest.kt:54)
+</failure>
+  </testcase>
+  <testcase name="drawingReceiptReadFailureCannotLeaveSavedDrawing" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.194">
+    <failure>java.lang.AssertionError: expected:&lt;0&gt; but was:&lt;1&gt;
+at org.junit.Assert.fail(Assert.java:89)
+at org.junit.Assert.failNotEquals(Assert.java:835)
+at org.junit.Assert.assertEquals(Assert.java:120)
+at org.junit.Assert.assertEquals(Assert.java:146)
+at com.saaf.milkshop.NativeReceiptAtomicityRegressionTest$drawingReceiptReadFailureCannotLeaveSavedDrawing$1.invokeSuspend(NativeReceiptAtomicityRegressionTest.kt:47)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at com.saaf.milkshop.NativeReceiptAtomicityRegressionTest.drawingReceiptReadFailureCannotLeaveSavedDrawing(NativeReceiptAtomicityRegressionTest.kt:35)
+</failure>
+  </testcase>
+  <testcase name="successfulAbsorptionReturnsReceiptAndDurableSealEvidence" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.267" />
+  <testcase name="failedAbsorptionAuditRollsBackClose" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.277">
+    <failure>java.lang.AssertionError
+at org.junit.Assert.fail(Assert.java:87)
+at org.junit.Assert.assertTrue(Assert.java:42)
+at org.junit.Assert.assertFalse(Assert.java:65)
+at org.junit.Assert.assertFalse(Assert.java:75)
+at com.saaf.milkshop.NativeReceiptAtomicityRegressionTest$failedAbsorptionAuditRollsBackClose$1.invokeSuspend(NativeReceiptAtomicityRegressionTest.kt:103)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at com.saaf.milkshop.NativeReceiptAtomicityRegressionTest.failedAbsorptionAuditRollsBackClose(NativeReceiptAtomicityRegressionTest.kt:95)
+</failure>
+  </testcase>
+  <testcase name="countReceiptReadFailureCannotLeaveSavedCount" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.229">
+    <failure>org.junit.ComparisonFailure: expected:&lt;[Cash]&gt; but was:&lt;[Receipt fault drawer]&gt;
+at org.junit.Assert.assertEquals(Assert.java:117)
+at org.junit.Assert.assertEquals(Assert.java:146)
+at com.saaf.milkshop.NativeReceiptAtomicityRegressionTest$countReceiptReadFailureCannotLeaveSavedCount$1.invokeSuspend(NativeReceiptAtomicityRegressionTest.kt:79)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at com.saaf.milkshop.NativeReceiptAtomicityRegressionTest.countReceiptReadFailureCannotLeaveSavedCount(NativeReceiptAtomicityRegressionTest.kt:72)
+</failure>
+  </testcase>
+</testsuite>

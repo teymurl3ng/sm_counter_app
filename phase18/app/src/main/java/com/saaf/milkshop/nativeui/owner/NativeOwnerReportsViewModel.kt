@@ -8,6 +8,8 @@ import com.saaf.milkshop.application.owner.NativeOwnerReportsSnapshot
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
 import com.saaf.milkshop.nativeui.DayStateBus
+import com.saaf.milkshop.nativeui.DataChangeBus
+import com.saaf.milkshop.sync.BusinessClock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -38,6 +40,7 @@ class NativeOwnerReportsViewModel(
     private val _state = MutableStateFlow<NativeOwnerReportsState>(NativeOwnerReportsState.Idle)
     private var sessionHandle: String? = null
     private var preset: NativeOwnerReportsPreset = NativeOwnerReportsPreset.ThisMonth
+    private var customRange: Pair<String, String>? = null
     private val loadGate = SessionRequestGate()
     val state: StateFlow<NativeOwnerReportsState> = _state.asStateFlow()
 
@@ -47,18 +50,23 @@ class NativeOwnerReportsViewModel(
                 if (sessionHandle != null) refresh()
             }
         }
+        scope.launch {
+            DataChangeBus.changes.collect { if (sessionHandle != null) refresh() }
+        }
     }
 
-    fun open(nextSessionHandle: String, today: LocalDate = LocalDate.now()) {
+    fun open(nextSessionHandle: String, today: LocalDate = BusinessClock.today()) {
         if (
             sessionHandle == nextSessionHandle &&
             (_state.value is NativeOwnerReportsState.Ready ||
                 _state.value is NativeOwnerReportsState.Loading)
         ) {
+            if (_state.value is NativeOwnerReportsState.Ready) refresh(today)
             return
         }
         sessionHandle = nextSessionHandle
         preset = NativeOwnerReportsPreset.ThisMonth
+        customRange = null
         refresh(today)
     }
 
@@ -66,19 +74,20 @@ class NativeOwnerReportsViewModel(
         loadGate.invalidate()
         sessionHandle = null
         preset = NativeOwnerReportsPreset.ThisMonth
+        customRange = null
         _state.value = NativeOwnerReportsState.Idle
     }
 
-    fun selectPreset(next: NativeOwnerReportsPreset, today: LocalDate = LocalDate.now()) {
-        if (preset == next && _state.value is NativeOwnerReportsState.Ready) return
+    fun selectPreset(next: NativeOwnerReportsPreset, today: LocalDate = BusinessClock.today()) {
         preset = next
+        if (next != NativeOwnerReportsPreset.Custom) customRange = null
         refresh(today)
     }
 
     fun selectCustomRange(
         startInclusive: String,
         endInclusive: String,
-        today: LocalDate = LocalDate.now(),
+        today: LocalDate = BusinessClock.today(),
     ) {
         val range = try {
             facade.validateRange(startInclusive, endInclusive)
@@ -88,13 +97,15 @@ class NativeOwnerReportsViewModel(
             return
         }
         preset = NativeOwnerReportsPreset.Custom
+        customRange = range
         load(range.first, range.second, today)
     }
 
-    fun refresh(today: LocalDate = LocalDate.now()) {
+    fun refresh(today: LocalDate = BusinessClock.today()) {
         val current = _state.value as? NativeOwnerReportsState.Ready
-        if (preset == NativeOwnerReportsPreset.Custom && current != null) {
-            load(current.snapshot.startInclusive, current.snapshot.endExclusive, today)
+        if (preset == NativeOwnerReportsPreset.Custom && (customRange != null || current != null)) {
+            val range = customRange ?: (current!!.snapshot.startInclusive to current.snapshot.endExclusive)
+            load(range.first, range.second, today)
         } else {
             val (start, end) = facade.rangeForPreset(preset, today)
             load(start, end, today)
@@ -104,17 +115,19 @@ class NativeOwnerReportsViewModel(
     private fun load(start: String, end: String, today: LocalDate) {
         val session = sessionHandle ?: return
         val request = loadGate.begin(session)
+        val selectedPreset = preset
         val previous = _state.value as? NativeOwnerReportsState.Ready
         _state.value = previous?.copy(refreshing = true, error = null)
             ?: NativeOwnerReportsState.Loading
         scope.launch {
             try {
                 val snapshot = withContext(Dispatchers.IO) {
-                    facade.load(session, start, end, preset, today)
+                    facade.load(session, start, end, selectedPreset, today)
                 }
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 _state.value = NativeOwnerReportsState.Ready(snapshot = snapshot)
             } catch (error: Throwable) {
+                if (error is kotlinx.coroutines.CancellationException) throw error
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 if (error is SecurityFailure.SessionExpired) {
                     handleLoadFailure(error)

@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeSurfaceGeometryTest" tests="22" failures="1" errors="0" skipped="0" time="88.427" timestamp="2026-10-10T21:38:53" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="lightDefaultRows" classname="com.saaf.milkshop.NativeSurfaceGeometryTest" time="2.729" />
+  <testcase name="darkLargeTextRows" classname="com.saaf.milkshop.NativeSurfaceGeometryTest" time="1.718" />
+  <testcase name="lightLargeTextRows" classname="com.saaf.milkshop.NativeSurfaceGeometryTest" time="1.596" />
+  <testcase name="darkDefaultRows" classname="com.saaf.milkshop.NativeSurfaceGeometryTest" time="1.592" />
+  <testcase name="portraitAccessAndRecoveryLightEvidence" classname="com.saaf.milkshop.NativeAccessEvidenceTest" time="11.478" />
+  <testcase name="portraitAccessAndRecoveryDarkEvidence" classname="com.saaf.milkshop.NativeAccessEvidenceTest" time="9.378" />
+  <testcase name="methodPickerShowsOnlyEnrolledPhoneSecurityAndSurfacesCancellation" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.263" />
+  <testcase name="darkSystemHostKeepsTheBrandedAccountPickerContrast" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.205" />
+  <testcase name="rateLimitedQuickPinKeepsFullPassphraseRecoveryVisibleAndWorking" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.41" />
+  <testcase name="startupFailureRetryChangesToTheRequestedVisibleState" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.182" />
+  <testcase name="startupExposesOnlyActiveAccountsWithCompletedCredentialSetup" classname="com.saaf.milkshop.NativeAuthenticationFacadeTest" time="0.567" />
+  <testcase name="ownerBootstrapAndFullPassphraseSignInReturnTypedMemorySessions" classname="com.saaf.milkshop.NativeAuthenticationFacadeTest" time="1.411" />
+  <testcase name="managerReceiveMilkHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.632" />
+  <testcase name="managerCollectionOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.113" />
+  <testcase name="managerRecordSpoilageOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.063" />
+  <testcase name="managerRecordsHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.505" />
+  <testcase name="ownerPaySalaryOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="6.607" />
+  <testcase name="operationsNavPreviewDestinationsShowExplicitNotices" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.867" />
+  <testcase name="managerCashCloseOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.995" />
+  <testcase name="phonePortraitLockSurvivesRotationRequest" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.619" />
+  <testcase name="managerCollectionHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.965" />
+  <testcase name="managerShellHardwareBackStaysOnWorkAndKeepsSession" classname="com.saaf.milkshop.NativeFoundationUiTest" time="1.231">
+    <failure></failure>
+  </testcase>
+  <system-err>Test run failed to complete. Instrumentation run failed due to Process crashed.
+</system-err>
+</testsuite>

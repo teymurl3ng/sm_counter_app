@@ -182,8 +182,14 @@ internal class OwnerShopSettingsController(
         if (current.shopSettingsIdentitySaving) return
         runtime.state.value = current.copy(shopSettingsIdentitySaving = true, shopSettingsError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) { facade.saveIdentity(session, input) }
+                runtime.updateCurrent(token, NativeOwnerMoreDestination.ShopSettings) { it.copy(shopSettingsIdentityEditOpen = false, shopSettingsIdentitySaving = false) }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Shop details saved")
+                com.saaf.milkshop.nativeui.DataChangeBus.notifyDataChanged()
+                com.saaf.milkshop.nativeui.DataChangeBus.notifyDataChanged()
                 val snapshot = withContext(Dispatchers.IO) { facade.load(session) }
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
@@ -196,7 +202,7 @@ internal class OwnerShopSettingsController(
                     shopSettingsLoading = false,
                 )
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, if (saved && error !is com.saaf.milkshop.domain.SecurityFailure) IllegalStateException("Saved on this phone. The latest list could not refresh; try Refresh.", error) else error)
             }
         }
     }
@@ -245,8 +251,13 @@ internal class OwnerShopSettingsController(
         if (current.shopSettingsRatesSaving) return
         runtime.state.value = current.copy(shopSettingsRatesSaving = true, shopSettingsError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) { facade.updateRates(session, settings) }
+                runtime.updateCurrent(token, NativeOwnerMoreDestination.ShopSettings) { it.copy(shopSettingsRatesEditOpen = false, shopSettingsRatesSaving = false) }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Prices saved")
+                com.saaf.milkshop.nativeui.DataChangeBus.notifyDataChanged()
                 val snapshot = withContext(Dispatchers.IO) { facade.load(session) }
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
@@ -259,7 +270,7 @@ internal class OwnerShopSettingsController(
                     shopSettingsLoading = false,
                 )
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, if (saved && error !is com.saaf.milkshop.domain.SecurityFailure) IllegalStateException("Saved on this phone. The latest list could not refresh; try Refresh.", error) else error)
             }
         }
     }
@@ -307,10 +318,15 @@ internal class OwnerShopSettingsController(
         if (current.shopSettingsCategoryCreating) return
         runtime.state.value = current.copy(shopSettingsCategoryCreating = true, shopSettingsError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.createExpenseCategory(session, name)
                 }
+                runtime.updateCurrent(token, NativeOwnerMoreDestination.ShopSettings) { it.copy(shopSettingsCategoryCreateOpen = false, shopSettingsCategoryCreating = false) }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Expense category added")
+                com.saaf.milkshop.nativeui.DataChangeBus.notifyDataChanged()
                 val snapshot = withContext(Dispatchers.IO) { facade.load(session) }
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
@@ -323,7 +339,7 @@ internal class OwnerShopSettingsController(
                     shopSettingsLoading = false,
                 )
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, if (saved && error !is com.saaf.milkshop.domain.SecurityFailure) IllegalStateException("Saved on this phone. The latest list could not refresh; try Refresh.", error) else error)
             }
         }
     }
@@ -388,10 +404,15 @@ internal class OwnerShopSettingsController(
         if (current.shopSettingsCategoryArchiving) return
         runtime.state.value = current.copy(shopSettingsCategoryArchiving = true, shopSettingsError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.setExpenseCategoryArchived(session, accountId, archived)
                 }
+                runtime.updateCurrent(token, NativeOwnerMoreDestination.ShopSettings) { it.copy(shopSettingsCategoryArchiving = false) }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Expense category updated")
+                com.saaf.milkshop.nativeui.DataChangeBus.notifyDataChanged()
                 val detail = withContext(Dispatchers.IO) {
                     facade.loadCategoryDetail(session, accountId)
                 }
@@ -407,7 +428,7 @@ internal class OwnerShopSettingsController(
                     shopSettingsLoading = false,
                 )
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, if (saved && error !is com.saaf.milkshop.domain.SecurityFailure) IllegalStateException("Saved on this phone. The latest list could not refresh; try Refresh.", error) else error)
             }
         }
     }
@@ -456,6 +477,7 @@ internal class OwnerShopSettingsController(
         val correction = current.shopSettingsOpeningCorrection
         runtime.state.value = current.copy(shopSettingsOpeningSaving = true, shopSettingsError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     if (correction) {
@@ -464,6 +486,8 @@ internal class OwnerShopSettingsController(
                         facade.recordOpening(session, input)
                     }
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Opening balances saved")
                 val snapshot = withContext(Dispatchers.IO) { facade.load(session) }
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
@@ -493,7 +517,7 @@ internal class OwnerShopSettingsController(
                         shopSettingsError = null,
                     )
                 } else {
-                    handleFailure(token, error)
+                    handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
                 }
             }
         }
@@ -523,6 +547,7 @@ internal class OwnerShopSettingsController(
         val correction = pendingOpeningCorrection
         runtime.state.value = current.copy(shopSettingsOpeningReauthBusy = true, shopSettingsError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.reauthenticate(session, passphrase)
@@ -534,6 +559,8 @@ internal class OwnerShopSettingsController(
                         facade.recordOpening(session, pending)
                     }
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Opening balances saved")
                 val snapshot = withContext(Dispatchers.IO) { facade.load(session) }
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
@@ -550,7 +577,7 @@ internal class OwnerShopSettingsController(
                     shopSettingsLoading = false,
                 )
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
             } finally {
                 passphrase.fill('\u0000')
             }

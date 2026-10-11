@@ -1,10 +1,11 @@
 package com.saaf.milkshop.nativeui.owner
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.scaleIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -524,7 +525,7 @@ fun OwnerPreviewHost(
             title = headerTitle,
             displayName = identity.displayName,
             roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-            businessDate = ownerWorkReady?.context?.businessDate ?: java.time.LocalDate.now().toString(),
+            businessDate = ownerWorkReady?.context?.businessDate ?: com.saaf.milkshop.sync.BusinessClock.today().toString(),
             postingOpen = ownerWorkReady?.context?.postingOpen ?: true,
         )
         NativeSectionTransition(
@@ -533,17 +534,12 @@ fun OwnerPreviewHost(
             modifier = Modifier.weight(1f),
         ) { section ->
         sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}") {
-        AnimatedContent(
+        androidx.compose.runtime.CompositionLocalProvider(com.saaf.milkshop.nativeui.sale.LocalPaneHeaderEnabled provides false) {
+        NativeSectionTransition(
             targetState = ownerWorkReady?.destination,
             contentKey = { it },
-            transitionSpec = {
-                // No alpha: the incoming pane is fully opaque from frame 1 and
-                // just settles 96%->100%, so there is never a blank/flash frame.
-                // The old pane is covered instantly by the opaque new one.
-                scaleIn(initialScale = 0.96f, animationSpec = tween(200)) togetherWith ExitTransition.None
-            },
-            label = "owner_work_destination",
         ) { workDestination ->
+        val registerPaneGuard = com.saaf.milkshop.nativeui.common.rememberPaneGuardRegistration({ activeEntryGuard }) { activeEntryGuard = it }
         when {
             section == OwnerSection.More -> {
                 OwnerMoreScreen(
@@ -741,7 +737,7 @@ fun OwnerPreviewHost(
                 )
             }
             section == OwnerSection.Work &&
-                ownerWorkDestination == NativeOwnerWorkDestination.RecordPayment -> {
+                workDestination == NativeOwnerWorkDestination.RecordPayment -> {
                 OwnerCollectionEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -766,7 +762,7 @@ fun OwnerPreviewHost(
                 )
             }
             section == OwnerSection.Work &&
-                ownerWorkDestination == NativeOwnerWorkDestination.RecordDrawing -> {
+                workDestination == NativeOwnerWorkDestination.RecordDrawing -> {
                     OwnerDrawingEntryScreen(
                         snackbarHostState = snackbarHostState,
                         identity = identity,
@@ -784,7 +780,7 @@ fun OwnerPreviewHost(
                         },
                     )
                 }
-                ownerWorkDestination == NativeOwnerWorkDestination.RecordExpense -> {
+                workDestination == NativeOwnerWorkDestination.RecordExpense -> {
                 OwnerExpenseEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -803,7 +799,7 @@ fun OwnerPreviewHost(
                 )
             }
             section == OwnerSection.Work &&
-                ownerWorkDestination == NativeOwnerWorkDestination.PaySupplier -> {
+                workDestination == NativeOwnerWorkDestination.PaySupplier -> {
                 OwnerPaySupplierEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -822,7 +818,7 @@ fun OwnerPreviewHost(
                 )
             }
             section == OwnerSection.Work &&
-                ownerWorkDestination == NativeOwnerWorkDestination.PaySalary -> {
+                workDestination == NativeOwnerWorkDestination.PaySalary -> {
                 OwnerPaySalaryEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -841,7 +837,7 @@ fun OwnerPreviewHost(
                 )
             }
             section == OwnerSection.Work &&
-                ownerWorkDestination == NativeOwnerWorkDestination.CashCountAndClose -> {
+                workDestination == NativeOwnerWorkDestination.CashCountAndClose -> {
                 OwnerCashCloseEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -862,7 +858,7 @@ fun OwnerPreviewHost(
                 )
             }
             section == OwnerSection.Work &&
-                ownerWorkDestination == NativeOwnerWorkDestination.ReceiveMilk -> {
+                workDestination == NativeOwnerWorkDestination.ReceiveMilk -> {
                 OwnerReceiveMilkEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -885,7 +881,7 @@ fun OwnerPreviewHost(
                 )
             }
             section == OwnerSection.Work &&
-                ownerWorkDestination == NativeOwnerWorkDestination.MakeYogurt -> {
+                workDestination == NativeOwnerWorkDestination.MakeYogurt -> {
                 OwnerMakeYogurtEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -904,7 +900,7 @@ fun OwnerPreviewHost(
                 )
             }
             section == OwnerSection.Work &&
-                ownerWorkDestination == NativeOwnerWorkDestination.RecordSpoilage -> {
+                workDestination == NativeOwnerWorkDestination.RecordSpoilage -> {
                 OwnerRecordSpoilageEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -929,7 +925,7 @@ fun OwnerPreviewHost(
                 )
             }
             section == OwnerSection.Work &&
-                ownerWorkDestination == NativeOwnerWorkDestination.Deliveries -> {
+                workDestination == NativeOwnerWorkDestination.Deliveries -> {
                 OwnerDeliveriesEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -947,7 +943,7 @@ fun OwnerPreviewHost(
                     onArchive = deliveriesViewModel::archiveDelivery,
                         onLinkSale = deliveriesViewModel::linkSale,
                     onBackToWork = { returnOwnerWorkHome() },
-                    onRegisterGuard = { activeEntryGuard = it },
+                    onRegisterGuard = registerPaneGuard,
                     ownScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.OwnerShellRoot)) {
                             CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
@@ -1017,6 +1013,7 @@ fun OwnerPreviewHost(
                     )
                 }
             }
+        }
         }
         }
         }

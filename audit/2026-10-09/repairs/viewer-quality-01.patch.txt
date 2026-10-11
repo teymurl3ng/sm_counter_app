@@ -1,0 +1,57 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/app/(app)/activity/activity-list-panel.tsx
+@@
+   const [data, setData] = useState<ActivityListApiResponse | null>(peeked);
+   const [selected, setSelected] = useState<ActivityListItem | null>(null);
+ 
+-  useEffect(() => {
++  const filterIdentity = `${target}|${from}|${to}`;
++  const [previousFilters, setPreviousFilters] = useState(filterIdentity);
++  if (previousFilters !== filterIdentity) {
++    setPreviousFilters(filterIdentity);
+     setDraftTarget(target);
+     setDraftFrom(from);
+     setDraftTo(to);
+-  }, [target, from, to]);
++  }
+ 
+   const queryKey = useMemo(
+     () => `${group}|${target}|${from}|${to}|${offset}`,
+@@
+     [group, target, from, to, offset, pathname],
+   );
+ 
+-  const load = useCallback(async () => {
++  const load = useCallback(async (isCurrent: () => boolean = () => true) => {
+     const qs = new URLSearchParams();
+     qs.set("limit", String(ACTIVITY_PAGE_SIZE_DEFAULT));
+     if (group !== "all") qs.set("group", group);
+@@
+     if (offset > 0) qs.set("offset", String(offset));
+     const qsStr = qs.toString();
+     const apply = (status: number, json: ActivityListApiResponse) => {
++      if (!isCurrent()) return;
+       if (
+         status === 401 ||
+         json.error?.code === "UNAUTHENTICATED" ||
+@@
+       });
+       apply(result.status, result.body as ActivityListApiResponse);
+     } catch {
++      if (!isCurrent()) return;
+       setData({
+         ok: false,
+         env: "unknown",
+@@
+   }, [group, target, from, to, offset, router]);
+ 
+   useEffect(() => {
+-    void load();
++    let disposed = false;
++    // Subscribe after commit; cleanup fences cache and network completions alike.
++    queueMicrotask(() => { if (!disposed) void load(() => !disposed); });
++    return () => { disposed = true; };
+   }, [load, queryKey]);
+ 
+   function applyFilters(e: FormEvent) {
+*** End Patch

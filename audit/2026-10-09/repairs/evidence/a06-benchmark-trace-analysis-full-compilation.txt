@@ -1,0 +1,13 @@
+
+Loading trace: 0.00 MB
+
+Loading trace: 24.12 MB
+[719.020]     common_flags.cc:525 Trace loaded: 24.12 MB in 1.26s (19.1 MB/s)
+[719.026]            query.cc:191 Query execution time: 2 ms
+"process","jank_type","jank_tag","present_type","on_time_finish","frames","average_ms","max_ms"
+
+"thread","scheduled_cpu_ms"
+
+"thread","name","slices","average_ms","max_ms"
+
+"name","severity","value"

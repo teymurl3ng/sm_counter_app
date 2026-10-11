@@ -3,7 +3,7 @@ package com.saaf.milkshop.nativeui.admin
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.saaf.milkshop.application.admin.NativeAdminWorkContext
-import com.saaf.milkshop.application.admin.NativeAdminWorkFacade
+import com.saaf.milkshop.application.admin.NativeAdminWorkOperations
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
 import com.saaf.milkshop.nativeui.DataChangeBus
@@ -36,7 +36,7 @@ sealed interface NativeAdminWorkState {
 }
 
 class NativeAdminWorkViewModel(
-    private val facade: NativeAdminWorkFacade,
+    private val facade: NativeAdminWorkOperations,
     private val onSessionExpired: () -> Unit,
 ) : ViewModel() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -82,8 +82,6 @@ class NativeAdminWorkViewModel(
         val session = sessionHandle ?: return
         val request = loadGate.begin(session)
         val previous = _state.value as? NativeAdminWorkState.Ready
-        val previousDestination =
-            previous?.destination ?: NativeAdminWorkDestination.Home
         _state.value = previous?.copy(refreshing = true, error = null)
             ?: NativeAdminWorkState.Loading
         scope.launch {
@@ -92,7 +90,8 @@ class NativeAdminWorkViewModel(
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 _state.value = NativeAdminWorkState.Ready(
                     context = context,
-                    destination = previousDestination,
+                    destination = (_state.value as? NativeAdminWorkState.Ready)?.destination
+                        ?: NativeAdminWorkDestination.Home,
                     refreshing = false,
                 )
             } catch (error: Throwable) {
@@ -100,7 +99,7 @@ class NativeAdminWorkViewModel(
                 if (error is SecurityFailure.SessionExpired || previous == null) {
                     handleLoadFailure(error)
                 } else {
-                    _state.value = previous.copy(
+                    _state.value = ((_state.value as? NativeAdminWorkState.Ready) ?: previous).copy(
                         refreshing = false,
                         error = error.message ?: "Work could not open. Try again.",
                     )
@@ -135,7 +134,7 @@ class NativeAdminWorkViewModel(
     }
 
     class Factory(
-        private val facade: NativeAdminWorkFacade,
+        private val facade: NativeAdminWorkOperations,
         private val onSessionExpired: () -> Unit,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")

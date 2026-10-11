@@ -28,6 +28,11 @@ object NativeUiTags {
 
     fun authAccount(loginName: String): String = "auth_account_$loginName"
 
+    const val CashierProductPickerOpen = "cashier_product_picker_open"
+    const val CashierProductSearch = "cashier_product_search"
+    const val CashierProductPickerCancel = "cashier_product_picker_cancel"
+    fun cashierProductPick(id: Long): String = "cashier_product_pick_$id"
+
     const val CashierProductMilk = "cashier_product_milk"
     const val CashierProductYogurt = "cashier_product_yogurt"
     const val CashierModeQuantity = "cashier_mode_quantity"
@@ -177,6 +182,7 @@ object NativeUiTags {
     const val MoreLoading = "more_loading"
     const val MoreRetryLoad = "more_retry_load"
     const val MoreMenu = "more_menu"
+    const val MoreCloseDay = "more_close_day"
     const val MoreCountCash = "more_count_cash"
     const val MoreExpense = "more_expense"
     const val MorePersonalSecurity = "more_personal_security"
@@ -191,6 +197,7 @@ object NativeUiTags {
     const val MoreCountNotes = "more_count_notes"
     const val MoreCountRecord = "more_count_record"
     const val MoreCountSuccess = "more_count_success"
+    const val MoreCountDone = "more_count_done"
     const val MoreSecurityScreen = "more_security_screen"
     const val MoreSecurityStatus = "more_security_status"
     const val MoreSecurityPassphrase = "more_security_passphrase"
@@ -381,6 +388,9 @@ object NativeUiTags {
     const val CashCloseRecordCount = "cash_close_record_count"
     const val CashCloseVariancePanel = "cash_close_variance_panel"
     const val CashCloseVarianceReason = "cash_close_variance_reason"
+    const val CashCloseConfirm = "cash_close_confirm"
+    const val CashCloseCancel = "cash_close_cancel"
+    const val CashCloseDone = "cash_close_done"
     const val CashCloseCloseDay = "cash_close_close_day"
     const val CashCloseNeedCount = "cash_close_need_count"
     const val CashCloseSuccess = "cash_close_success"

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Saaf Milk</string>
+    <string name="app_name">Counter Ledger</string>
     <string name="dashboard_title">Milk Shop</string>
     <string name="dashboard_subtitle">Current stock and money balances</string>
     <string name="stock_title">Stock</string>
@@ -349,7 +349,7 @@ Schema version: %3$d</string>
     <string name="manage_users_button">Manage Users</string>
     <string name="change_passphrase_button">Change My Passphrase</string>
     <string name="logout_button">Log Out</string>
-    <string name="login_title">Sign in to Saaf Milk</string>
+    <string name="login_title">Sign in to your shop</string>
     <string name="first_owner_title">Create the Owner Account</string>
     <string name="login_name_hint">Login name</string>
     <string name="display_name_hint">Display name</string>
@@ -427,7 +427,7 @@ Schema version: %3$d</string>
     <string name="budget_collections_target_label">Collections target</string>
 
     <!-- Counter Ledger native migration foundation. -->
-    <string name="native_app_name">Saaf Milk</string>
+    <string name="native_app_name">Counter Ledger</string>
     <string name="native_welcome_tagline">Your shop, ready for the day.</string>
     <string name="native_offline_assurance">Daily work works offline</string>
     <string name="native_private_access_assurance">Private account access</string>
@@ -499,6 +499,6 @@ Schema version: %3$d</string>
     <string name="native_nav_activity_notice">Activity is not connected in this native preview yet.</string>
     <string name="native_nav_more_notice">More is not connected in this native preview yet.</string>
     <string name="native_collection_view_record_notice">Activity will open this record when the native Activity screen is connected.</string>
-    <string name="native_brand_mark">Saaf Milk mark</string>
+    <string name="native_brand_mark">Shop mark</string>
 
 </resources>

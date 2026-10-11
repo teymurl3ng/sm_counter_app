@@ -1,0 +1,10 @@
+
+com.saaf.milkshop.NativeOwnerCollectionEntryScreenContractTest:.
+com.saaf.milkshop.NativeOwnerPaySupplierScreenContractTest:.
+com.saaf.milkshop.NativeOwnerPaySalaryScreenContractTest:.
+
+Time: 13.539
+
+OK (3 tests)
+
+

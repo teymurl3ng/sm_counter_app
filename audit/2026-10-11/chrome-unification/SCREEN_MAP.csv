@@ -1,0 +1,64 @@
+file,header_calls,treatment,priority,visual_review
+activity\CashierActivityScreen.kt,0,Role host band retained; remove in-flow detail refresh strip,P1,pending; source map is not exhaustive runtime evidence
+admin\AdminExpenseEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+admin\AdminMoreScreen.kt,1,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+admin\AdminPeopleScreen.kt,1,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+admin\AdminRecordsScreen.kt,1,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+admin\AdminWorkScreen.kt,1,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+auth\NativeAuthenticationScreens.kt,0,Shared fixed access band; shorten titles; instructions scroll in body; fixed Back slot,P0,pending; source map is not exhaustive runtime evidence
+cashclose\CashCloseEntryScreen.kt,1,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+collection\CashierCollectionScreen.kt,1,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+drawing\DrawingEntryScreen.kt,1,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+expense\ExpenseEntryScreen.kt,1,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+manager\ManagerCashCloseEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+manager\ManagerCollectionEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+manager\ManagerDeliveriesEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+manager\ManagerExpenseEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+manager\ManagerMakeYogurtEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+manager\ManagerMoreScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+manager\ManagerPaySupplierEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+manager\ManagerReceiveMilkEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+manager\ManagerRecordSpoilageEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+manager\ManagerSaleEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+manager\ManagerWorkScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+more\CashierExpenseEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+more\CashierMoreScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+operations\AttendanceScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+operations\DeliveriesScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+operations\MakeYogurtScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+operations\OperationsMoreScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+operations\OperationsWorkScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+operations\ReceiveMilkScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+operations\RecordSpoilageScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerBackupScreen.kt,6,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerCashCloseEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerCollectionEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerCostingPlanningScreens.kt,3,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerCostingPlansScreen.kt,3,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerCustomersScreen.kt,4,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerDeliveriesEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerEmployeesScreen.kt,4,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerExpenseEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerMakeYogurtEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerMoreScreen.kt,1,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerOpeningCostBasisScreen.kt,1,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerOverviewScreen.kt,1,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerPaySalaryEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerPaySupplierEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerProductsScreen.kt,3,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerReceiveMilkEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerRecordSpoilageEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerRecordsScreen.kt,4,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerReportsScreen.kt,1,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerSaleEntryScreen.kt,0,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerSecurityHistoryScreen.kt,2,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerShopSettingsScreen.kt,7,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerSuppliersScreen.kt,4,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerSyncScreen.kt,1,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerUsersRolesScreen.kt,5,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+owner\OwnerWorkScreen.kt,1,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+salarypayment\SalaryPaymentEntryScreen.kt,1,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+sale\CashierSaleScreen.kt,1,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+sale\CashierScreenHeader.kt,1,P0 shared band; fixed title/context/action slots,P0,pending; source map is not exhaustive runtime evidence
+vendorpayment\VendorPaymentEntryScreen.kt,1,Inherit shared work band and role navigation; content headings remain scrollable,P1,pending; source map is not exhaustive runtime evidence
+welcome\WelcomeScreen.kt,0,Same band geometry; scroll welcome content; pin Continue footer,P1,pending; source map is not exhaustive runtime evidence

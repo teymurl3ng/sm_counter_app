@@ -1,0 +1,14 @@
+{
+  "scenario": "recovery-code-dark",
+  "screen": "auth",
+  "device": "samsung SM-A065F",
+  "packageName": "com.saaf.milkshop.qa.tests",
+  "capturedAt": "2026-10-10T21:40:33.120536Z",
+  "orientation": "portrait",
+  "fontScale": "1.0",
+  "theme": "dark",
+  "workflowId": "access-recovery",
+  "evidenceFilename": "recovery-code-dark.png",
+  "reviewStatus": "UNREVIEWED",
+  "note": "Portrait presentation fixture; demo account\/code only. Owner review pending."
+}

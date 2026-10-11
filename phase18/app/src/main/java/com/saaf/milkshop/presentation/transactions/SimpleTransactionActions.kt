@@ -127,7 +127,7 @@ class SimpleTransactionActions(
                 authorize(AppPermission.PRODUCTION_AND_SPOILAGE)
                 val result = transactionOperations.recordProduction(
                     YogurtProductionInput(
-                        occurredAt = LocalDate.now().toString(),
+                        occurredAt = com.saaf.milkshop.sync.BusinessClock.today().toString(),
                         milkLitersUsed = milkUsed!!,
                         yogurtKgProduced = yogurtProduced!!,
                     )
@@ -193,7 +193,7 @@ class SimpleTransactionActions(
                         vendorAccountId = vendorAccountId,
                         paymentAccountId = paymentAccountId,
                         amount = amount!!,
-                        occurredAt = LocalDate.now().toString(),
+                        occurredAt = com.saaf.milkshop.sync.BusinessClock.today().toString(),
                     )
                 )
 
@@ -256,7 +256,7 @@ class SimpleTransactionActions(
                         customerAccountId = customerAccountId,
                         paymentAccountId = paymentAccountId,
                         amount = amount!!,
-                        occurredAt = LocalDate.now().toString(),
+                        occurredAt = com.saaf.milkshop.sync.BusinessClock.today().toString(),
                     )
                 )
 
@@ -319,7 +319,7 @@ class SimpleTransactionActions(
                         category = category!!,
                         paymentAccountId = paymentAccountId,
                         amount = amount!!,
-                        occurredAt = LocalDate.now().toString(),
+                        occurredAt = com.saaf.milkshop.sync.BusinessClock.today().toString(),
                     )
                 )
 
@@ -382,7 +382,7 @@ class SimpleTransactionActions(
                         employeeAccountId = employeeAccountId,
                         paymentAccountId = paymentAccountId,
                         amount = amount!!,
-                        occurredAt = LocalDate.now().toString(),
+                        occurredAt = com.saaf.milkshop.sync.BusinessClock.today().toString(),
                     )
                 )
 

@@ -1,0 +1,3 @@
+
+    topResumedActivity=ActivityRecord{190324469 u0 com.saaf.milkshop.preview/com.saaf.milkshop.Main t34545}
+

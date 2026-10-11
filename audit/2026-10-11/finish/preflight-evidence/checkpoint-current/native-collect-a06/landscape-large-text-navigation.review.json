@@ -1,0 +1,14 @@
+{
+  "scenario": "landscape-large-text-navigation",
+  "screen": "collect",
+  "device": "samsung SM-A065F",
+  "packageName": "com.saaf.milkshop.qa.tests",
+  "capturedAt": "2026-10-10T19:24:33.052101Z",
+  "orientation": "landscape",
+  "fontScale": "1.0",
+  "theme": "light",
+  "workflowId": "collect",
+  "evidenceFilename": "landscape-large-text-navigation.png",
+  "reviewStatus": "UNREVIEWED",
+  "note": "150% text; amount and record remain scroll-reachable; four navigation actions visible"
+}

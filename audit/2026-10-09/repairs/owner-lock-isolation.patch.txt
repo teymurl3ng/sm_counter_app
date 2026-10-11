@@ -1,0 +1,20 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/migration_c1_6_integrity.sql
+@@
+-  -- All competing owner removals serialize on the same business row.
+-  PERFORM id FROM public.businesses WHERE id = OLD.business_id FOR UPDATE;
++  -- Version the business row as well as locking it. A competing removal
++  -- under REPEATABLE READ must serialize/retry, not count its old snapshot.
++  UPDATE public.businesses SET name = name WHERE id = OLD.business_id;
+*** Update File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/supabase/migrations/20261010120000_c1_6_integrity.sql
+@@
+-  -- All competing owner removals serialize on the same business row.
+-  PERFORM id FROM public.businesses WHERE id = OLD.business_id FOR UPDATE;
++  -- Version the business row as well as locking it. A competing removal
++  -- under REPEATABLE READ must serialize/retry, not count its old snapshot.
++  UPDATE public.businesses SET name = name WHERE id = OLD.business_id;
+*** Update File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/BOOTSTRAP_AND_REPAIR.md
+@@
+-The database owner trigger covers CLI/service-role writes as well as Viewer RPCs. Concurrent competing removals serialize by business; mixed lock order with older RPCs can abort one transaction as a deadlock, preserving the owner. Retry a failed transaction after reloading staff state.
++The database owner trigger covers CLI/service-role writes as well as Viewer RPCs. Concurrent competing removals lock and version the business row; repeatable-read conflicts must retry rather than rely on a stale owner count. Mixed lock order with older RPCs can abort one transaction as a deadlock, preserving the owner. Retry a failed transaction after reloading staff state. Concurrent execution remains a required rehearsal.
+*** End Patch

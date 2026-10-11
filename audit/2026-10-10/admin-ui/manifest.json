@@ -1,0 +1,67 @@
+[
+  {
+    "path": "src/app/(app)/activity/activity-list-panel.tsx",
+    "before": "5cfc5540b6c8bdac3410ce72f06f8ef6942555273618d90f676df6769ebb6548",
+    "after": "2b58ae1e0d28b76ea6cea6f9ac06952a9a20c1bffc983bf70568099e5162b591"
+  },
+  {
+    "path": "src/app/(app)/layout.tsx",
+    "before": "4d56b34dff5c4e55e26ba00c64f239e61877e2cd3daa4c75f580ac4dede90002",
+    "after": "3fb1fd4db8007734b7f119f0d700bb81e749dae87958c09bf30a028b7674851f"
+  },
+  {
+    "path": "src/app/(app)/nav-highlight.tsx",
+    "before": "cb8e975e2469b0ecbf07a939a55706dd22119d2fb56c12926a9b0faf5be9909a",
+    "after": "222b595f17d2a1f9036bd9c592bb1102d37aa8e88a130875a534dd16a34a4e66"
+  },
+  {
+    "path": "src/app/(app)/shops/[shopId]/page.tsx",
+    "before": "4ab86d6522b221acc79264d28f731bcea569b6f978bd59e83ea7c4e4aec7d67e",
+    "after": "6d55ebd3e097e23b7acc3d5d302d3969d0dcf27fd40ab16e8901055517eb55fe"
+  },
+  {
+    "path": "src/app/(app)/shops/shops-list-panel.tsx",
+    "before": "5e9aac6951d674a02465fdbc813397372d5ea140b9bfe6755f3264012f79ba28",
+    "after": "b344157cb2b1b6f93b398f0937db619bf6e3cdca5a20a3e6997fa6bbf0c0d991"
+  },
+  {
+    "path": "src/app/(app)/staff/[staffId]/page.tsx",
+    "before": "7cafbb9582fe58735f6ed460173d46e8000532c603583bb7ae87387b54a17d6a",
+    "after": "bb76cc7fa61a11057cc783838c7888d6cf5e60c398aaba74f108009ab180f9dc"
+  },
+  {
+    "path": "src/app/(app)/staff/create/page.tsx",
+    "before": "a7677932bd4fafdb4175b83232dacef13f67dd2aa137dcfa42e9aaad4236a3d4",
+    "after": "925e6984f11e9bb8e6a78a38bc40639771af1d33172b2b2951b4e596b94b9a0e"
+  },
+  {
+    "path": "src/app/(app)/staff/staff-list-panel.tsx",
+    "before": "c0a8d1ec80371aed05b676a42620fd3816ececed3abeba654b034c62c19fe475",
+    "after": "f42507400aedded4e3872ebf8d6226e5e5606114f1f3335013024ed632ec385f"
+  },
+  {
+    "path": "src/app/globals.css",
+    "before": "2c497c02d8c60f9bc2c5d480c93339f63c85f6a48e8abef2b036579e6899c8d4",
+    "after": "9068d1ae9b15df60e90e342abad7ce23231d54832bfe15fe4c91bb197815bbac"
+  },
+  {
+    "path": "src/app/login/login-form.tsx",
+    "before": "13fba6c7e2340c553e4a0265f6121c642169fc234ea50463a2aa2bb275c70193",
+    "after": "6b6fcf63bd4edb6df2008122aef3119924235afc0646f758c7d0b477a1e91a92"
+  },
+  {
+    "path": "src/app/login/page.tsx",
+    "before": "4a4485f9e1752731bd47902f373a9300aa113288ca3d6bca62ea150cd283864e",
+    "after": "2e073112f16ce50fb3e9e246b037b3ac571844020d19e296d3fb35c80038477c"
+  },
+  {
+    "path": "src/app/page.tsx",
+    "before": "04ce9cf733144523312bddb36e85191727c04e344c1a18432ed87fbdffb1c5b3",
+    "after": "51a3b25da164dadc670367446c674075f5a58906942bcdf87d5b8489f9bc463a"
+  },
+  {
+    "path": "src/app/theme-toggle.tsx",
+    "before": "a00fffb0b2dd69d40e5e2cc5e2aca5ae557bc4b079ae37cb0bf5e3c9f537bf6b",
+    "after": "83c5bc48678c545d3c9c52a4c1b4032ebfe824c508633c7357c8d90c15f997e6"
+  }
+]

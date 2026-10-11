@@ -2,6 +2,7 @@ package com.saaf.milkshop
 
 import android.content.pm.ActivityInfo
 import android.os.SystemClock
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.assertIsNotSelected
@@ -24,6 +25,10 @@ import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.printToString
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.lifecycle.Lifecycle
@@ -53,6 +58,175 @@ class NativeFoundationUiTest {
     val composeRule = createAndroidComposeRule<NativePreviewActivity>()
 
     @Test
+    fun phonePortraitLockSurvivesRotationRequest() {
+        assertEquals(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT, composeRule.activity.requestedOrientation)
+        val device = androidx.test.uiautomator.UiDevice.getInstance(androidx.test.platform.app.InstrumentationRegistry.getInstrumentation())
+        try {
+            device.setOrientationLeft()
+            composeRule.waitForIdle()
+            org.junit.Assert.assertTrue("Phone content must remain portrait", device.displayHeight > device.displayWidth)
+            captureUx("phone-portrait-lock")
+        } finally {
+            device.setOrientationNatural()
+            device.unfreezeRotation()
+        }
+    }
+
+    @Test
+    fun submenuClicksReachTheDeviceVibrator() {
+        openCashier()
+        dismissTransientNotice()
+        val context = composeRule.activity
+        val enabled = android.provider.Settings.System.getInt(context.contentResolver,
+            android.provider.Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0
+        val rows = mutableListOf<String>()
+        fun history(): Set<String> {
+            val automation = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().uiAutomation
+            return android.os.ParcelFileDescriptor.AutoCloseInputStream(automation.executeShellCommand("dumpsys vibrator_manager"))
+                .bufferedReader().use { it.readText() }.lineSequence()
+                .filter { it.contains(context.packageName + " (uid=") && it.contains("finished") }.toSet()
+        }
+        fun checkPulse(label: String, action: () -> Unit) {
+            val before = history()
+            action()
+            if (enabled) {
+                composeRule.waitUntil(4_000) { (history() - before).isNotEmpty() }
+                rows += "$label: " + (history() - before).joinToString("\n")
+            } else {
+                SystemClock.sleep(200)
+                assertEquals("System disabled touch feedback must be respected", before, history())
+                rows += "$label: system feedback disabled; no pulse"
+            }
+        }
+        checkPulse("More navigation") { composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).performClick() }
+        checkPulse("Close-day submenu") { composeRule.onNodeWithTag(NativeUiTags.MoreCloseDay).performScrollTo().performClick() }
+        composeRule.waitUntil(10_000) { composeRule.onAllNodesWithTag(NativeUiTags.CashCloseAmountInput).fetchSemanticsNodes().size == 1 }
+        println("QA_HAPTIC_EVIDENCE\n" + rows.joinToString("\n"))
+    }
+
+    @Test
+    fun uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens() {
+        openOwnerWork()
+        dismissTransientNotice()
+        repeat(10) { cycle ->
+            composeRule.onNodeWithTag(NativeUiTags.OwnerWorkReceiveMilk).performScrollTo().performClick()
+            composeRule.waitUntil(10_000) {
+                composeRule.onAllNodesWithTag(NativeUiTags.OwnerReceiveMilkEntryRoot).fetchSemanticsNodes().size == 1
+            }
+            assertEquals(1, composeRule.onAllNodesWithTag(NativeUiTags.OwnerNavWork).fetchSemanticsNodes().size)
+            if (cycle == 9) {
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkLiters).assertIsDisplayed()
+                composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkFat).assertIsDisplayed()
+                val litersBounds = composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkLiters).fetchSemanticsNode().boundsInRoot
+                val fatBounds = composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkFat).fetchSemanticsNode().boundsInRoot
+                org.junit.Assert.assertTrue("Measurement fields must be stacked without overlap", litersBounds.bottom <= fatBounds.top)
+                captureUx("receive-milk-tenth-entry")
+            }
+            pressHardwareBack()
+            assertReturnedToOwnerWorkHome()
+            composeRule.onNodeWithTag(NativeUiTags.OwnerWorkDeliveries).performScrollTo().performClick()
+            try {
+                composeRule.waitUntil(10_000) {
+                    composeRule.onAllNodesWithTag(NativeUiTags.OwnerDeliveriesEntryRoot).fetchSemanticsNodes().size == 1
+                }
+            } catch (failure: Throwable) {
+                println("Repeated entry failure cycle=$cycle: " + composeRule.onRoot(useUnmergedTree = true).printToString())
+                throw failure
+            }
+            assertEquals(1, composeRule.onAllNodesWithTag(NativeUiTags.OwnerNavWork).fetchSemanticsNodes().size)
+            if (cycle == 9) captureUx("deliveries-tenth-entry")
+            pressHardwareBack()
+            assertReturnedToOwnerWorkHome()
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreProducts).performScrollTo().performClick()
+        composeRule.waitUntil(10_000) {
+            composeRule.onAllNodesWithTag(NativeUiTags.OwnerProductsRoot).fetchSemanticsNodes().size == 1
+        }
+        captureUx("products-list")
+    }
+
+    private fun captureUx(scenario: String, workflowId: String = "uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens") {
+        composeRule.waitForIdle()
+        com.saaf.milkshop.qa.NativeEvidenceCapture.captureWholeWindow(composeRule.activity,
+            com.saaf.milkshop.qa.NativeEvidenceCapture.CaptureSpec(
+                screen = "ux", scenario = scenario,
+                workflowId = workflowId,
+                note = "Isolated A06 QA fixture; settled appearance. This PNG alone does not prove motion quality.",
+            ))
+    }
+
+    @Test
+    fun cashierCountsClosesDayAndCannotReopen() {
+        try {
+            openCashier()
+            dismissTransientNotice()
+            composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).performClick()
+            composeRule.onNodeWithTag(NativeUiTags.MoreCloseDay).performScrollTo().performClick()
+            composeRule.waitUntil(10_000) {
+                composeRule.onAllNodesWithTag(NativeUiTags.CashCloseAmountInput).fetchSemanticsNodes().size == 1
+            }
+            val expected = runBlocking {
+                AnalyticsService(app().database).currentPosition().accountBalances.single { it.name == "Cash" }.balance
+            }
+            composeRule.onNodeWithTag(NativeUiTags.CashCloseAmountInput).performScrollTo()
+                .performTextReplacement(String.format(Locale.US, "%.2f", expected))
+            composeRule.onNodeWithTag(NativeUiTags.CashCloseRecordCount).performScrollTo().performClick()
+            try {
+                composeRule.waitUntil(10_000) {
+                    composeRule.onAllNodesWithTag(NativeUiTags.CashCloseVariancePanel).fetchSemanticsNodes().size == 1
+                }
+            } catch (failure: Throwable) {
+                println("Closing count failure expected=$expected: " + composeRule.onRoot(useUnmergedTree = true).printToString())
+                throw failure
+            }
+            composeRule.onNodeWithTag(NativeUiTags.CashCloseCloseDay).performScrollTo().performClick()
+            composeRule.onNodeWithTag(NativeUiTags.CashCloseCancel).performClick()
+            assertNull(runBlocking { app().database.dailyCloseDao().currentAction(com.saaf.milkshop.sync.BusinessClock.today().toString()) })
+            composeRule.onNodeWithTag(NativeUiTags.CashCloseCloseDay).performScrollTo().performClick()
+            composeRule.onNodeWithTag(NativeUiTags.CashCloseConfirm).performClick()
+            composeRule.waitUntil(10_000) {
+                composeRule.onAllNodesWithTag(NativeUiTags.CashCloseSuccess).fetchSemanticsNodes().size == 1
+            }
+            val close = runBlocking { app().database.dailyCloseDao().currentAction(com.saaf.milkshop.sync.BusinessClock.today().toString()) }
+            assertNotNull(close)
+            assertEquals(com.saaf.milkshop.domain.AppRole.CASHIER, com.saaf.milkshop.domain.AppRole.parse(close!!.actorRole))
+            SystemClock.sleep(4_300)
+            composeRule.onNodeWithTag(NativeUiTags.CashCloseSuccess).assertIsDisplayed()
+            composeRule.onNodeWithTag(NativeUiTags.CashCloseReopenDay).assertDoesNotExist()
+            composeRule.onNodeWithTag(NativeUiTags.CashCloseDone).performScrollTo().performClick()
+            composeRule.onNodeWithTag(NativeUiTags.MoreMenu).assertIsDisplayed()
+        } finally {
+            // This real UI close must not leave later shared-database tests on a locked date.
+            // Restore through the authorized Owner boundary, preserving the close audit record.
+            runBlocking {
+                val fixtureApp = app()
+                val date = com.saaf.milkshop.sync.BusinessClock.today()
+                if (fixtureApp.database.dailyCloseDao().isPostingClosed(date.toString())) {
+                    val owner = fixtureApp.userSecurity.login(
+                        SaafMilkTestRunner.TEST_LOGIN,
+                        SaafMilkTestRunner.TEST_PASSPHRASE.toCharArray(),
+                    )
+                    try {
+                        com.saaf.milkshop.application.cashclose.NativeCashCloseFacade(
+                            fixtureApp.database, fixtureApp.userSecurity,
+                        ).reopenDay(
+                            sessionHandle = owner.sessionId,
+                            reason = "Restore open date after cashier-close UI test",
+                            passphrase = SaafMilkTestRunner.TEST_PASSPHRASE.toCharArray(),
+                            date = date,
+                        )
+                        assertEquals(false, fixtureApp.database.dailyCloseDao().isPostingClosed(date.toString()))
+                        println("QA_POSTING_DATE_RESTORED=$date")
+                    } finally {
+                        fixtureApp.userSecurity.logout(owner.sessionId)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun welcomeAccountPickerAndFullPassphraseOpenCashierSale() {
         openCashier()
         composeRule.onNodeWithTag(NativeUiTags.CashierNavSell).assertIsSelected()
@@ -64,66 +238,66 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithText("Owner · Quick PIN, full passphrase").assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.AuthBackToWelcome).performClick()
-        composeRule.onNodeWithText("Saaf Milk").assertIsDisplayed()
+        composeRule.onNodeWithText(runBlocking { app().database.storeProfileDao().get()?.storeName?.trim()?.takeIf(String::isNotEmpty) ?: "Your shop" }).assertIsDisplayed()
         openAccountPicker()
 
         composeRule.activityRule.scenario.onActivity { activity ->
             activity.onBackPressedDispatcher.onBackPressed()
         }
-        composeRule.onNodeWithText("Saaf Milk").assertIsDisplayed()
+        composeRule.onNodeWithText(runBlocking { app().database.storeProfileDao().get()?.storeName?.trim()?.takeIf(String::isNotEmpty) ?: "Your shop" }).assertIsDisplayed()
         openAccountPicker()
 
         composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_LOGIN)).performClick()
-        composeRule.onNodeWithText("Unlock Instrumentation Owner").assertIsDisplayed()
+        composeRule.onNodeWithText("Sign-in method").assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinMethod).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.AuthPhoneSecurityMethod).assertDoesNotExist()
         composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.AuthMethodBack).performClick()
-        waitForText("Who is using Saaf?")
+        waitForText("Choose account")
 
         composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_LOGIN)).performClick()
         composeRule.onNodeWithTag(NativeUiTags.AuthChooseAnotherAccount).performClick()
-        waitForText("Who is using Saaf?")
+        waitForText("Choose account")
 
         composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_LOGIN)).performClick()
-        composeRule.onNodeWithText("Unlock Instrumentation Owner").assertIsDisplayed()
+        composeRule.onNodeWithText("Sign-in method").assertIsDisplayed()
         composeRule.activityRule.scenario.onActivity { activity ->
             activity.onBackPressedDispatcher.onBackPressed()
         }
-        waitForText("Who is using Saaf?")
+        waitForText("Choose account")
 
         composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_LOGIN)).performClick()
         composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinMethod).performClick()
-        composeRule.onNodeWithText("Enter Quick PIN").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinInput).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinSubmit).assertIsNotEnabled()
         composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinBack).performClick()
-        composeRule.onNodeWithText("Unlock Instrumentation Owner").assertIsDisplayed()
+        composeRule.onNodeWithText("Sign-in method").assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinMethod).performClick()
-        composeRule.onNodeWithText("Enter Quick PIN").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinInput).assertIsDisplayed()
         composeRule.activityRule.scenario.onActivity { activity ->
             activity.onBackPressedDispatcher.onBackPressed()
         }
-        composeRule.onNodeWithText("Unlock Instrumentation Owner").assertIsDisplayed()
+        composeRule.onNodeWithText("Sign-in method").assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinMethod).performClick()
         composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinUsePassphrase).performClick()
-        composeRule.onNodeWithText("Welcome back, Instrumentation Owner").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.AuthSignIn).assertIsNotEnabled()
         composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseBack).performClick()
-        composeRule.onNodeWithText("Unlock Instrumentation Owner").assertIsDisplayed()
+        composeRule.onNodeWithText("Sign-in method").assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).performClick()
         composeRule.onNodeWithTag(NativeUiTags.AuthChooseAnotherAccount).performClick()
-        waitForText("Who is using Saaf?")
+        waitForText("Choose account")
 
         composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_LOGIN)).performClick()
         composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).performClick()
-        composeRule.onNodeWithText("Welcome back, Instrumentation Owner").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).assertIsDisplayed()
         composeRule.activityRule.scenario.onActivity { activity ->
             activity.onBackPressedDispatcher.onBackPressed()
         }
-        composeRule.onNodeWithText("Unlock Instrumentation Owner").assertIsDisplayed()
+        composeRule.onNodeWithText("Sign-in method").assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).performClick()
         composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput)
@@ -131,7 +305,7 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithTag(NativeUiTags.AuthSignIn).performClick()
 
         waitForText("The login name or passphrase is incorrect, or this account is unavailable.")
-        composeRule.onNodeWithText("Welcome back, Instrumentation Owner").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput)
             .performTextReplacement(SaafMilkTestRunner.TEST_PASSPHRASE)
@@ -177,7 +351,7 @@ class NativeFoundationUiTest {
             "That Quick PIN did not unlock Instrumentation Owner. " +
                 "Check the selected account or use the full passphrase.",
         )
-        composeRule.onNodeWithText("Enter Quick PIN").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinInput).assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinInput)
             .performTextReplacement(SaafMilkTestRunner.TEST_PIN)
@@ -272,6 +446,7 @@ class NativeFoundationUiTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OpsMoreMenu).assertIsDisplayed()
+        captureUx("operations-more-surfaces", workflowId = "operationsMoreOpensConnectedEntry")
         composeRule.onNodeWithTag(NativeUiTags.OpsMoreTodayWork).assertIsDisplayed()
         composeRule.onNodeWithText("Count cash").assertDoesNotExist()
         composeRule.onNodeWithTag(NativeUiTags.OpsNavMore).assertIsSelected()
@@ -725,6 +900,7 @@ class NativeFoundationUiTest {
 
         composeRule.onNodeWithTag(NativeUiTags.ManagerMoreRoot).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.ManagerMoreMenu).assertIsDisplayed()
+        captureUx("manager-more-surfaces", workflowId = "managerMoreOpensUnderManagerChrome")
         composeRule.onNodeWithTag(NativeUiTags.ManagerMoreProducts).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.ManagerMorePersonalSecurity)
             .performScrollTo()
@@ -1145,6 +1321,7 @@ class NativeFoundationUiTest {
         openAdminMore()
         composeRule.onNodeWithTag(NativeUiTags.AdminMoreRoot).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.AdminMoreMenu).assertIsDisplayed()
+        captureUx("admin-more-surfaces", workflowId = "adminMoreOpensUnderAdminChrome")
         composeRule.onNodeWithTag(NativeUiTags.AdminMoreCosting).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.AdminMoreShopSettings)
             .performScrollTo()
@@ -1400,6 +1577,7 @@ class NativeFoundationUiTest {
 
         composeRule.onNodeWithTag(NativeUiTags.OwnerMoreRoot).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerMoreMenu).assertIsDisplayed()
+        captureUx("owner-more-surfaces", workflowId = "ownerMoreOpensUnderOwnerChrome")
         composeRule.onNodeWithTag(NativeUiTags.OwnerMoreProducts).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerMorePersonalSecurity)
             .performScrollTo()
@@ -2139,9 +2317,24 @@ class NativeFoundationUiTest {
             composeRule.onAllNodesWithText("Dawn", substring = true).fetchSemanticsNodes().isNotEmpty()
         }
         composeRule.onAllNodesWithText("Dawn", substring = true)[0].performClick()
+        composeRule.waitUntil(5_000) {
+            composeRule.onAllNodesWithTag(NativeUiTags.OpsReceiveMilkSupplierPicker)
+                .fetchSemanticsNodes().isEmpty()
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkSupplier)
+            .assert(hasText("Dawn", substring = true))
         enterReceiveMilkMeasurement(NativeUiTags.OpsReceiveMilkLiters, "30")
         enterReceiveMilkMeasurement(NativeUiTags.OpsReceiveMilkFat, "4")
         enterReceiveMilkMeasurement(NativeUiTags.OpsReceiveMilkLr, "28")
+        com.saaf.milkshop.qa.NativeLayoutImeEvidence.dismissImeAndWait(composeRule.activity, composeRule)
+        for ((tag, value) in listOf(
+            NativeUiTags.OpsReceiveMilkLiters to "30",
+            NativeUiTags.OpsReceiveMilkFat to "4",
+            NativeUiTags.OpsReceiveMilkLr to "28",
+        )) {
+            composeRule.onNode(hasTestTag(tag) and hasSetTextAction(), useUnmergedTree = true)
+                .assertTextEquals(value)
+        }
         composeRule.onNodeWithTag(NativeUiTags.OpsReceiveMilkRecord).performScrollTo()
         composeRule.waitUntil(10_000) {
             runCatching {
@@ -2329,7 +2522,7 @@ class NativeFoundationUiTest {
 
         composeRule.onNodeWithTag(NativeUiTags.CashierModeAmount).performClick().assertIsSelected()
         // Empty entry stays empty across the mode switch; typing drives the rest.
-        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).assertTextEquals("")
+        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).assert(androidx.compose.ui.test.SemanticsMatcher.expectValue(androidx.compose.ui.semantics.SemanticsProperties.EditableText, androidx.compose.ui.text.AnnotatedString("")))
         composeRule.onNodeWithText("PKR").assertIsDisplayed()
 
         composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).performTextReplacement(threeUnits)
@@ -2376,7 +2569,7 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).assertTextEquals("725")
         composeRule.onNodeWithTag(NativeUiTags.CashierPaymentCustomer).performScrollTo().assertIsSelected()
         composeRule.onNodeWithText("Ahmed Store").assertIsDisplayed()
-        composeRule.onNodeWithText("Counter pickup").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashierSaleNote).performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -2388,7 +2581,7 @@ class NativeFoundationUiTest {
         application.nativeSessions.invalidateAll()
         composeRule.activityRule.scenario.moveToState(Lifecycle.State.RESUMED)
 
-        waitForText("Who is using Saaf?")
+        waitForText("Choose account")
         composeRule.onNodeWithText("Your session expired. Sign in again.").assertIsDisplayed()
         composeRule.onNodeWithText("New sale").assertDoesNotExist()
         assertNull(application.currentSessionId)
@@ -2579,12 +2772,12 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).performScrollTo().performTextReplacement("2")
         composeRule.onNodeWithTag(NativeUiTags.CashierRecordSale).performScrollTo().performClick()
         composeRule.waitUntil(15_000) {
-            composeRule.onAllNodesWithText("Record sale").fetchSemanticsNodes().isNotEmpty() &&
-                runCatching {
+            runCatching {
                     composeRule.onNodeWithTag(NativeUiTags.CashierSaleCheque).fetchSemanticsNode()
                 }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.CashierSaleCheque).assertIsDisplayed()
+        captureUx("sale-committed-receipt")
 
         val sale = app.database.eventDao().findAllDescending().single {
             it.eventId > priorEventId && it.eventType == "SALE"
@@ -2910,12 +3103,23 @@ class NativeFoundationUiTest {
     }
 
     private fun openOwnerPaySupplier() {
+        runBlocking {
+            if (app().database.accountDao().findByCategory("Vendor").isEmpty()) {
+                VendorManagementService(app().database).create("QA supplier")
+            }
+        }
         openOwnerWork()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkPaySupplier).performClick()
-        composeRule.waitUntil(timeoutMillis = 15_000) {
-            runCatching {
-                composeRule.onNodeWithTag(NativeUiTags.VendorPaymentVendorSelector).fetchSemanticsNode()
-            }.isSuccess
+        dismissTransientNotice()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkPaySupplier).performScrollTo().performClick()
+        try {
+            composeRule.waitUntil(timeoutMillis = 15_000) {
+                runCatching {
+                    composeRule.onNodeWithTag(NativeUiTags.VendorPaymentVendorSelector).fetchSemanticsNode()
+                }.isSuccess
+            }
+        } catch (failure: Throwable) {
+            println("UX Supplier failure: " + composeRule.onRoot(useUnmergedTree = true).printToString())
+            throw failure
         }
         composeRule.onNodeWithTag(NativeUiTags.OwnerPaySupplierEntryRoot).assertIsDisplayed()
     }
@@ -3321,7 +3525,10 @@ class NativeFoundationUiTest {
 
     private fun openAdminExpense() {
         openAdminWork()
-        composeRule.onNodeWithTag(NativeUiTags.AdminWorkRecordExpense).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.AdminWorkRecordExpense)
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
         composeRule.waitUntil(timeoutMillis = 15_000) {
             runCatching {
                 composeRule.onNodeWithTag(NativeUiTags.ExpenseCategorySelector).fetchSemanticsNode()
@@ -3520,6 +3727,7 @@ class NativeFoundationUiTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OpsWorkHome).assertIsDisplayed()
+        dismissTransientNotice()
     }
 
     private fun enterReceiveMilkMeasurement(tag: String, value: String) {
@@ -3550,19 +3758,41 @@ class NativeFoundationUiTest {
     }
 
     private fun waitForMoreMenu() {
-        composeRule.waitUntil(timeoutMillis = 10_000) {
-            runCatching { composeRule.onNodeWithTag(NativeUiTags.MoreMenu).fetchSemanticsNode() }.isSuccess
+        try {
+            composeRule.waitUntil(timeoutMillis = 10_000) {
+                runCatching { composeRule.onNodeWithTag(NativeUiTags.MoreMenu).fetchSemanticsNode() }.isSuccess
+            }
+        } catch (failure: Throwable) {
+            println("UX More failure: " + composeRule.onRoot(useUnmergedTree = true).printToString())
+            throw failure
+        }
+    }
+
+    private fun dismissTransientNotice() {
+        val dismissible = SemanticsMatcher.keyIsDefined(SemanticsActions.Dismiss)
+        if (composeRule.onAllNodes(dismissible).fetchSemanticsNodes().size == 1) {
+            composeRule.onNode(dismissible).performSemanticsAction(SemanticsActions.Dismiss) { dismiss -> dismiss() }
+            composeRule.waitForIdle()
         }
     }
 
     private fun openSwitchAccountPicker() {
-        composeRule.onNodeWithTag(NativeUiTags.MoreSwitchAccount).performClick()
-        waitForText("Switch account")
+        dismissTransientNotice()
+        composeRule.onNodeWithTag(NativeUiTags.MoreSwitchAccount).performScrollTo().performClick()
+        try {
+        composeRule.waitUntil(timeoutMillis = 10_000) {
+            runCatching { composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_CASHIER_LOGIN)).fetchSemanticsNode() }.isSuccess
+        }
+        } catch (failure: Throwable) {
+            println("UX Picker failure: " + composeRule.onRoot(useUnmergedTree = true).printToString())
+            throw failure
+        }
+        composeRule.waitForIdle()
     }
 
     private fun openAccountPicker() {
         composeRule.onNodeWithTag(NativeUiTags.WelcomeContinue).performClick()
-        waitForText("Who is using Saaf?")
+        waitForText("Choose account")
     }
 
     private fun waitForText(text: String) {

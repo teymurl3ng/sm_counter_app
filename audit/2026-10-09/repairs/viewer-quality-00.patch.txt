@@ -1,0 +1,30 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/lib/viewer-cache.ts
+@@
+ } as const;
+ 
+ type CacheEntry = {
++  url: string;
+   status: number;
+   body: unknown;
+   fetchedAt: number;
+@@
+ export function viewerCacheInvalidate(prefixes: string[]): void {
+   generation += 1;
+   inflight.clear();
+-  for (const key of store.keys()) {
+-    const path = key.slice(key.indexOf("::") + 2);
++  for (const [key, entry] of store) {
++    const path = entry.url;
+     if (prefixes.some(p => path.startsWith(p))) {
+       store.delete(key);
+     }
+@@
+   // Only cache successful JSON payloads (2xx).
+   if (fresh.status >= 200 && fresh.status < 300) {
+     store.set(k, {
++      url,
+       status: fresh.status,
+       body: fresh.body,
+       fetchedAt: Date.now(),
+*** End Patch

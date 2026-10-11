@@ -1,0 +1,14 @@
+{
+  "tests": 48,
+  "passed": 48,
+  "failed": 0,
+  "status": "PASS",
+  "resolvedCheckpointCases": [
+    "com.saaf.milkshop.NativeFoundationUiTest#adminExpenseHardwareBackReturnsToWorkHome",
+    "com.saaf.milkshop.NativeFoundationUiTest#adminExpenseOpensUnderAdminChrome",
+    "com.saaf.milkshop.NativeOwnerExpenseScreenContractTest#dirtyOwnerNavigationRequiresDiscardConfirmation",
+    "com.saaf.milkshop.NativeOwnerOverviewScreenContractTest#overviewShowsDecisionSummaryAndKeepsOverviewNavSelected"
+  ],
+  "productionChangesSinceCheckpoint": false,
+  "scope": "surfaces plus two Admin expense routes and complete Owner overview/expense contract classes"
+}

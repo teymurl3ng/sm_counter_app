@@ -1,0 +1,692 @@
+--- a/src/app/(app)/activity/activity-list-panel.tsx
++++ b/src/app/(app)/activity/activity-list-panel.tsx
+@@ -373,7 +373,7 @@
+                 onClick={() => router.replace(buildHref({ group: g.id, offset: 0 }))}
+                 className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors duration-150 ${
+                   active
+-                    ? "bg-[var(--accent)] text-white shadow-sm"
++                    ? "bg-[var(--accent)] text-[var(--on-accent)] shadow-sm"
+                     : "border border-[var(--line)] bg-[var(--card)] text-[var(--muted)] hover:bg-[var(--bg)]"
+                 }`}
+               >
+@@ -468,7 +468,7 @@
+           ) : (
+             <>
+               {/* Desktop table */}
+-              <div className="hidden overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--card)] shadow-sm md:block">
++              <div className="hidden overflow-x-auto rounded-xl border border-[var(--line)] bg-[var(--card)] shadow-sm md:block">
+                 <table className="w-full text-left text-sm">
+                   <thead className="border-b border-[var(--line)] bg-[var(--bg)] text-xs tracking-wide text-[var(--muted)] uppercase">
+                     <tr>
+--- a/src/app/(app)/layout.tsx
++++ b/src/app/(app)/layout.tsx
+@@ -49,14 +49,17 @@
+     .slice(0, 2);
+ 
+   return (
+-    <div className="min-h-screen md:grid md:grid-cols-[240px_1fr]">
++    <div className="min-h-screen md:grid md:grid-cols-[240px_minmax(0,1fr)]">
++      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-[var(--card)] focus:px-4 focus:py-2">
++        Skip to content
++      </a>
+       <ViewerCacheSessionBinder username={session.profile.username} />
+       <NavHighlight />
+       <aside className="border-b border-[var(--line)] bg-[var(--card)] md:border-b-0 md:border-r">
+         <div className="flex flex-col gap-0 p-4 md:min-h-screen">
+           {/* Brand */}
+           <div className="flex items-center gap-3 px-2 pb-5">
+-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--accent)] text-sm font-bold text-white">
++            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--accent)] text-sm font-bold text-[var(--on-accent)]">
+               S
+             </div>
+             <div>
+@@ -66,7 +69,7 @@
+           </div>
+ 
+           {/* Navigation */}
+-          <nav className="flex gap-1 overflow-x-auto px-1 pb-4 md:flex-col md:overflow-visible">
++          <nav aria-label="Main navigation" className="flex gap-1 overflow-x-auto px-1 pb-4 md:flex-col md:overflow-visible">
+             {NAV.map((item) => (
+               <Link
+                 key={item.href}
+@@ -111,7 +114,7 @@
+           </div>
+         </div>
+       </aside>
+-      <main className="p-6 md:p-8">{children}</main>
++      <main id="main-content" tabIndex={-1} className="min-w-0 p-4 sm:p-6 md:p-8">{children}</main>
+     </div>
+   );
+ }
+--- a/src/app/(app)/nav-highlight.tsx
++++ b/src/app/(app)/nav-highlight.tsx
+@@ -12,7 +12,10 @@
+       const href = link.getAttribute("href");
+       const isActive =
+         href === pathname ||
+-        (href !== "/" && pathname.startsWith(href!));
++        (href !== null && href !== "/" && pathname.startsWith(`${href}/`));
++      link.dataset.active = String(isActive);
++      if (isActive) link.setAttribute("aria-current", "page");
++      else link.removeAttribute("aria-current");
+       if (isActive) {
+         link.classList.remove(
+           "text-[var(--muted)]",
+--- a/src/app/(app)/shops/[shopId]/page.tsx
++++ b/src/app/(app)/shops/[shopId]/page.tsx
+@@ -160,7 +160,7 @@
+       <div>
+         <Link
+           href="/shops"
+-          className="inline-flex items-center gap-1 text-sm font-medium text-[var(--accent)] transition-colors duration-150 hover:text-[#025a8a]"
++          className="inline-flex items-center gap-1 text-sm font-medium text-[var(--accent)] transition-colors duration-150 hover:underline"
+         >
+           ← Back to Shops
+         </Link>
+--- a/src/app/(app)/shops/shops-list-panel.tsx
++++ b/src/app/(app)/shops/shops-list-panel.tsx
+@@ -200,7 +200,7 @@
+           ) : (
+             <>
+               {/* Desktop table */}
+-              <div className="hidden overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--card)] shadow-sm md:block">
++              <div className="hidden overflow-x-auto rounded-xl border border-[var(--line)] bg-[var(--card)] shadow-sm md:block">
+                 <table className="w-full text-left text-sm">
+                   <thead className="border-b border-[var(--line)] bg-[var(--bg)] text-xs tracking-wide text-[var(--muted)] uppercase">
+                     <tr>
+--- a/src/app/(app)/staff/[staffId]/page.tsx
++++ b/src/app/(app)/staff/[staffId]/page.tsx
+@@ -185,7 +185,7 @@
+       if (!assignJson.ok) {
+         alert(`Failed to assign shop: ${assignJson.error?.message || "Unknown error"}`);
+       } else {
+-        viewerCacheInvalidate([`/api/staff/${staff.staff_id}`, `/api/shops`]);
++        viewerCacheInvalidate(["/api/staff", "/api/shops"]);
+         await load();
+       }
+     } catch {
+@@ -210,7 +210,7 @@
+       if (!json.ok) {
+         alert(`Failed to unassign shop: ${json.error?.message || "Unknown error"}`);
+       } else {
+-        viewerCacheInvalidate([`/api/staff/${staff.staff_id}`, `/api/shops`]);
++        viewerCacheInvalidate(["/api/staff", "/api/shops"]);
+         await load();
+       }
+     } catch {
+@@ -284,7 +284,7 @@
+       <div>
+         <Link
+           href="/staff"
+-          className="inline-flex items-center gap-1 text-sm font-medium text-[var(--accent)] transition-colors duration-150 hover:text-[#025a8a]"
++          className="inline-flex items-center gap-1 text-sm font-medium text-[var(--accent)] transition-colors duration-150 hover:underline"
+         >
+           ← Back to Staff
+         </Link>
+@@ -369,11 +369,11 @@
+             </div>
+             
+             {resetCredential && (
+-              <div className="mb-6 rounded-xl border border-[var(--success)]/30 bg-[#e6f4ea] p-4 text-center dark:bg-[#1e2e22]">
+-                <p className="text-sm font-semibold text-[#137333] dark:text-[#81c995]">Credential Reset Successfully</p>
++              <div className="mb-6 rounded-xl border border-[var(--success)]/30 bg-[var(--success-bg)] p-4 text-center">
++                <p className="text-sm font-semibold text-[var(--success)]">Credential Reset Successfully</p>
+                 <p className="mt-1 text-xs text-[var(--ink)]">Please provide this temporary credential to the user.</p>
+-                <div className="my-3 inline-block rounded-lg border border-[#137333]/30 bg-white p-3 dark:bg-black/20">
+-                  <p className="font-mono text-xl font-bold tracking-widest text-[var(--ink)]">
++                <div className="my-3 inline-block rounded-lg border border-[var(--success)]/30 bg-[var(--card)] p-3">
++                  <p className="font-mono text-lg font-bold sm:text-xl sm:tracking-widest text-[var(--ink)]">
+                     {formatCredentialDisplay(resetCredential)}
+                   </p>
+                 </div>
+@@ -434,7 +434,8 @@
+                 <dd className="mt-1 font-medium text-[var(--ink)]">
+                   {!staff.terminated_at ? (
+                     <select
+-                      defaultValue={staff.role}
++                      aria-label="Staff role"
++                      value={staff.role}
+                       onChange={handleRoleChange}
+                       disabled={isUpdatingStatus}
+                       className="rounded border border-[var(--line)] bg-[var(--bg)] px-2 py-1 text-sm font-medium text-[var(--ink)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] disabled:opacity-50"
+@@ -534,7 +535,7 @@
+                   type="button"
+                   onClick={handleTerminate}
+                   disabled={isUpdatingStatus}
+-                  className="rounded-lg bg-[var(--danger)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
++                  className="rounded-lg bg-[var(--danger)] px-4 py-2 text-sm font-medium text-[var(--on-danger)] hover:opacity-90 disabled:opacity-50"
+                 >
+                   Terminate
+                 </button>
+--- a/src/app/(app)/staff/create/page.tsx
++++ b/src/app/(app)/staff/create/page.tsx
+@@ -4,11 +4,14 @@
+ import { useState, useEffect } from "react";
+ import { formatCredentialDisplay } from "@/lib/credential";
+ import { viewerCacheInvalidate } from "@/lib/viewer-cache";
++import type { ShopListApiResponse } from "@/lib/shops";
+ import { STAFF_ROLES } from "@/lib/staff-status";
+ 
+ export default function CreateStaffPage() {
+   const [shops, setShops] = useState<{ shop_id: string; name: string }[]>([]);
+   const [loadingShops, setLoadingShops] = useState(true);
++  const [shopsError, setShopsError] = useState<string | null>(null);
++  const [shopsAttempt, setShopsAttempt] = useState(0);
+ 
+   // Form state
+   const [username, setUsername] = useState("");
+@@ -22,22 +25,41 @@
+   const [result, setResult] = useState<{ staff_id: string; credential: string } | null>(null);
+ 
+   useEffect(() => {
++    const controller = new AbortController();
+     async function loadShops() {
+       try {
+-        const res = await fetch("/api/shops?limit=100");
+-        const json = await res.json();
+-        if (json.ok && json.shops) setShops(json.shops);
+-      } catch {
+-        // ignore
++        const options: { shop_id: string; name: string }[] = [];
++        let offset = 0;
++        while (!controller.signal.aborted) {
++          const res = await fetch(`/api/shops?limit=100&offset=${offset}`, { signal: controller.signal });
++          const json: ShopListApiResponse = await res.json();
++          if (!res.ok || !json.ok || !json.shops) {
++            throw new Error(json.error?.message || "Could not load shops.");
++          }
++          options.push(...json.shops);
++          if (!json.page.hasMore) break;
++          if (json.shops.length === 0) throw new Error("Could not load all shops.");
++          offset += json.shops.length;
++        }
++        if (!controller.signal.aborted) {
++          setShops(options);
++          setShopsError(null);
++        }
++      } catch (error) {
++        if (!controller.signal.aborted) {
++          setShopsError(error instanceof Error ? error.message : "Could not load shops.");
++        }
+       } finally {
+-        setLoadingShops(false);
++        if (!controller.signal.aborted) setLoadingShops(false);
+       }
+     }
+     void loadShops();
+-  }, []);
++    return () => controller.abort();
++  }, [shopsAttempt]);
+ 
+   async function handleSubmit(e: React.FormEvent) {
+     e.preventDefault();
++    if (isSubmitting) return;
+     if (!username.trim() || !displayName.trim()) {
+       setError("Username and Display Name are required.");
+       return;
+@@ -61,7 +83,7 @@
+         }),
+       });
+       const json = await res.json();
+-      if (!json.ok) {
++      if (!res.ok || !json.ok) {
+         setError(json.error?.message || "Failed to create staff.");
+       } else {
+         viewerCacheInvalidate(["/api/staff"]);
+@@ -81,12 +103,12 @@
+   if (result) {
+     return (
+       <div className="mx-auto max-w-2xl space-y-6">
+-        <section className="rounded-xl border border-[var(--success)]/30 bg-[#e6f4ea] p-6 text-center dark:bg-[#1e2e22]">
+-          <h1 className="text-2xl font-bold text-[#137333] dark:text-[#81c995]">Staff Created Successfully</h1>
++        <section className="rounded-xl border border-[var(--success)]/30 bg-[var(--success-bg)] p-6 text-center">
++          <h1 className="text-2xl font-bold text-[var(--success)]">Staff Created Successfully</h1>
+           <p className="mt-2 text-sm text-[var(--ink)]">Please provide this temporary credential to the user.</p>
+           
+-          <div className="mt-6 inline-block rounded-xl border-2 border-dashed border-[#137333]/30 bg-white p-6 dark:bg-black/20">
+-            <p className="font-mono text-3xl font-bold tracking-widest text-[var(--ink)]">
++          <div className="mt-6 inline-block max-w-full rounded-xl border-2 border-dashed border-[var(--success)]/30 bg-[var(--card)] p-3 sm:p-6">
++            <p className="font-mono text-lg font-bold sm:text-3xl sm:tracking-widest text-[var(--ink)]">
+               {formatCredentialDisplay(result.credential)}
+             </p>
+           </div>
+@@ -113,7 +135,7 @@
+       <div>
+         <Link
+           href="/staff"
+-          className="inline-flex items-center gap-1 text-sm font-medium text-[var(--accent)] transition-colors duration-150 hover:text-[#025a8a]"
++          className="inline-flex items-center gap-1 text-sm font-medium text-[var(--accent)] transition-colors duration-150 hover:underline"
+         >
+           ← Back to Staff
+         </Link>
+@@ -125,76 +147,95 @@
+ 
+       <form onSubmit={handleSubmit} className="space-y-6 rounded-xl border border-[var(--line)] bg-[var(--card)] p-5">
+         {error && (
+-          <div className="rounded-md bg-[var(--danger-bg)] p-3 text-sm text-[var(--danger)]">
++          <div role="alert" className="rounded-md bg-[var(--danger-bg)] p-3 text-sm text-[var(--danger)]">
+             {error}
+           </div>
+         )}
+         
+-        <div>
+-          <label className="mb-1 block text-sm font-medium text-[var(--ink)]">Username</label>
+-          <input
+-            type="text"
+-            required
+-            value={username}
+-            onChange={e => setUsername(e.target.value)}
+-            className="w-full rounded border border-[var(--line)] bg-[var(--bg)] px-3 py-2 text-sm text-[var(--ink)] focus:border-[var(--accent)] focus:outline-none"
+-            placeholder="e.g. john.doe"
+-          />
+-        </div>
++        <fieldset disabled={isSubmitting} className="space-y-6">
++          <div>
++            <label htmlFor="staff-username" className="mb-1 block text-sm font-medium text-[var(--ink)]">Username</label>
++            <input
++              type="text"
++              required
++              id="staff-username"
++              name="username"
++              autoCapitalize="none"
++              spellCheck={false}
++              minLength={3}
++              maxLength={32}
++              value={username}
++              onChange={e => setUsername(e.target.value)}
++              className="w-full rounded border border-[var(--line)] bg-[var(--bg)] px-3 py-2 text-sm text-[var(--ink)] focus:border-[var(--accent)] focus:outline-none"
++              placeholder="e.g. john.doe"
++            />
++          </div>
+         
+-        <div>
+-          <label className="mb-1 block text-sm font-medium text-[var(--ink)]">Display Name</label>
+-          <input
+-            type="text"
+-            required
+-            value={displayName}
+-            onChange={e => setDisplayName(e.target.value)}
+-            className="w-full rounded border border-[var(--line)] bg-[var(--bg)] px-3 py-2 text-sm text-[var(--ink)] focus:border-[var(--accent)] focus:outline-none"
+-            placeholder="e.g. John Doe"
+-          />
+-        </div>
+-
+-        <div>
+-          <label className="mb-1 block text-sm font-medium text-[var(--ink)]">Role</label>
+-          <select
+-            value={role}
+-            onChange={e => setRole(e.target.value)}
+-            className="w-full rounded border border-[var(--line)] bg-[var(--bg)] px-3 py-2 text-sm text-[var(--ink)] focus:border-[var(--accent)] focus:outline-none"
+-          >
+-            {STAFF_ROLES.map(r => (
+-              <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
+-            ))}
+-          </select>
+-        </div>
+-
+-        {role !== "owner" && (
+           <div>
+-            <label className="mb-1 block text-sm font-medium text-[var(--ink)]">Shops (Select at least one)</label>
+-            {loadingShops ? (
+-              <p className="text-sm text-[var(--muted)]">Loading shops...</p>
+-            ) : shops.length === 0 ? (
+-              <p className="text-sm text-[var(--muted)]">No shops available.</p>
+-            ) : (
+-              <div className="max-h-48 overflow-y-auto rounded border border-[var(--line)] p-2">
+-                {shops.map(s => (
+-                  <label key={s.shop_id} className="flex items-center gap-2 p-1">
+-                    <input
+-                      type="checkbox"
+-                      checked={selectedShops.includes(s.shop_id)}
+-                      onChange={() => toggleShop(s.shop_id)}
+-                      className="rounded border-[var(--line)] text-[var(--accent)]"
+-                    />
+-                    <span className="text-sm text-[var(--ink)]">{s.name}</span>
+-                  </label>
+-                ))}
+-              </div>
+-            )}
+-          </div>
++            <label htmlFor="staff-name" className="mb-1 block text-sm font-medium text-[var(--ink)]">Display Name</label>
++            <input
++              type="text"
++              required
++              id="staff-name"
++              name="display_name"
++              minLength={2}
++              maxLength={100}
++              value={displayName}
++              onChange={e => setDisplayName(e.target.value)}
++              className="w-full rounded border border-[var(--line)] bg-[var(--bg)] px-3 py-2 text-sm text-[var(--ink)] focus:border-[var(--accent)] focus:outline-none"
++              placeholder="e.g. John Doe"
++            />
++          </div>
++
++          <div>
++            <label htmlFor="staff-role" className="mb-1 block text-sm font-medium text-[var(--ink)]">Role</label>
++            <select
++              id="staff-role"
++              name="role"
++              value={role}
++              onChange={e => setRole(e.target.value)}
++              className="w-full rounded border border-[var(--line)] bg-[var(--bg)] px-3 py-2 text-sm text-[var(--ink)] focus:border-[var(--accent)] focus:outline-none"
++            >
++              {STAFF_ROLES.map(r => (
++                <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
++              ))}
++            </select>
++          </div>
++
++          {role !== "owner" && (
++            <fieldset>
++              <legend className="mb-1 block text-sm font-medium text-[var(--ink)]">Shops (Select at least one)</legend>
++              {loadingShops ? (
++                <p className="text-sm text-[var(--muted)]">Loading shops...</p>
++              ) : shopsError ? (
++                <div role="alert" className="space-y-2 text-sm text-[var(--danger)]">
++                  <p>{shopsError}</p>
++                  <button type="button" className="underline" onClick={() => { setLoadingShops(true); setShopsError(null); setShopsAttempt(n => n + 1); }}>Retry loading shops</button>
++                </div>
++              ) : shops.length === 0 ? (
++                <p className="text-sm text-[var(--muted)]">No shops available.</p>
++              ) : (
++                <div className="max-h-48 overflow-y-auto rounded border border-[var(--line)] p-2">
++                  {shops.map(s => (
++                    <label key={s.shop_id} className="flex items-center gap-2 p-1">
++                      <input
++                        type="checkbox"
++                        checked={selectedShops.includes(s.shop_id)}
++                        onChange={() => toggleShop(s.shop_id)}
++                        className="rounded border-[var(--line)] text-[var(--accent)]"
++                      />
++                      <span className="text-sm text-[var(--ink)]">{s.name}</span>
++                    </label>
++                  ))}
++                </div>
++              )}
++          </fieldset>
+         )}
++        </fieldset>
+ 
+         <button
+           type="submit"
+-          disabled={isSubmitting}
++          disabled={isSubmitting || (role !== "owner" && (loadingShops || !!shopsError || selectedShops.length === 0))}
+           className="w-full rounded-lg bg-[var(--ink)] py-2 text-sm font-medium text-[var(--bg)] hover:opacity-90 disabled:opacity-50"
+         >
+           {isSubmitting ? "Creating..." : "Create Staff Account"}
+--- a/src/app/(app)/staff/staff-list-panel.tsx
++++ b/src/app/(app)/staff/staff-list-panel.tsx
+@@ -242,8 +242,8 @@
+         className="rounded-xl border border-[var(--line)] bg-[var(--card)] p-4 shadow-sm"
+         aria-label="Search and filters"
+       >
+-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+-          <label className="block flex-1 text-sm">
++        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
++          <label className="block min-w-0 text-sm">
+             <span className="text-xs font-medium tracking-wide text-[var(--muted)] uppercase">Search</span>
+             <input
+               type="search"
+@@ -260,7 +260,7 @@
+               className="mt-1.5 w-full rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-2 text-[var(--ink)] placeholder:text-[var(--muted)]/60"
+             />
+           </label>
+-          <label className="block text-sm sm:w-36">
++          <label className="block min-w-0 text-sm">
+             <span className="text-xs font-medium tracking-wide text-[var(--muted)] uppercase">Status</span>
+             <select
+               value={urlStatus}
+@@ -273,7 +273,7 @@
+               <option value="terminated">Terminated</option>
+             </select>
+           </label>
+-          <label className="block text-sm sm:w-36">
++          <label className="block min-w-0 text-sm">
+             <span className="text-xs font-medium tracking-wide text-[var(--muted)] uppercase">Role</span>
+             <select
+               value={urlRole}
+@@ -288,7 +288,7 @@
+               ))}
+             </select>
+           </label>
+-          <label className="block text-sm sm:min-w-40 sm:flex-1">
++          <label className="block min-w-0 text-sm">
+             <span className="text-xs font-medium tracking-wide text-[var(--muted)] uppercase">Shop</span>
+             <select
+               value={urlShop}
+@@ -346,7 +346,7 @@
+           ) : (
+             <>
+               {/* Desktop table */}
+-              <div className="hidden overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--card)] shadow-sm md:block">
++              <div className="hidden overflow-x-auto rounded-xl border border-[var(--line)] bg-[var(--card)] shadow-sm md:block">
+                 <table className="w-full text-left text-sm">
+                   <thead className="border-b border-[var(--line)] bg-[var(--bg)] text-xs tracking-wide text-[var(--muted)] uppercase">
+                     <tr>
+--- a/src/app/globals.css
++++ b/src/app/globals.css
+@@ -7,13 +7,17 @@
+   --card: #ffffff;
+   --line: #cbd5e1;
+   --accent: #0369a1;
++  --on-accent: #ffffff;
+   --accent-light: #e0f2fe;
+   --orange: #ea580c;
+   --orange-light: #fff7ed;
+   --danger: #dc2626;
+   --danger-bg: #fef2f2;
+-  --warn: #d97706;
+-  --success: #059669;
++  --warn: #b45309;
++  --success: #047857;
++  --success-bg: #e6f4ea;
++  --on-danger: #ffffff;
++  color-scheme: light;
+   --radius: 0.5rem;
+   --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+ }
+@@ -25,6 +29,7 @@
+   --card: #1e293b;
+   --line: #334155;
+   --accent: #38bdf8;
++  --on-accent: #0c1929;
+   --accent-light: #0c2d48;
+   --orange: #fb923c;
+   --orange-light: #2a1a0a;
+@@ -32,38 +37,60 @@
+   --danger-bg: #2a1215;
+   --warn: #fbbf24;
+   --success: #34d399;
++  --success-bg: #1e2e22;
++  --on-danger: #0c1929;
++  color-scheme: dark;
+   --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+ }
+ 
+-body {
+-  background: var(--bg);
+-  color: var(--ink);
+-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+-  min-height: 100vh;
+-  line-height: 1.6;
+-  transition: background-color 200ms ease, color 200ms ease;
++/* Element defaults must not outrank Tailwind's layered utilities. */
++@layer base {
++  body {
++    background: var(--bg);
++    color: var(--ink);
++    font-family: var(--font-geist-sans), system-ui, sans-serif;
++    min-height: 100vh;
++    line-height: 1.6;
++    transition: background-color 200ms ease, color 200ms ease;
++  }
++
++  a {
++    color: inherit;
++    text-decoration: none;
++    transition: color 150ms ease;
++  }
++
++  input,
++  button,
++  select {
++    font: inherit;
++    transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
++  }
++
++  button {
++    cursor: pointer;
++  }
++
++  button:disabled {
++    cursor: not-allowed;
++  }
++
++  :where(a, button, input, select):focus-visible {
++    outline: 2px solid var(--accent);
++    outline-offset: 3px;
++  }
++
++  input:focus,
++  select:focus {
++    outline: none;
++    border-color: var(--accent);
++    box-shadow: 0 0 0 3px var(--accent-light);
++  }
+ }
+ 
+-a {
+-  color: inherit;
+-  text-decoration: none;
+-  transition: color 150ms ease;
++@media (prefers-reduced-motion: reduce) {
++  *, *::before, *::after {
++    animation: none !important;
++    transition: none !important;
++  }
+ }
+-
+-input,
+-button,
+-select {
+-  font: inherit;
+-  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+-}
+-
+-button {
+-  cursor: pointer;
+-}
+-
+-input:focus,
+-select:focus {
+-  outline: none;
+-  border-color: var(--accent);
+-  box-shadow: 0 0 0 3px var(--accent-light);
+-}
+--- a/src/app/login/login-form.tsx
++++ b/src/app/login/login-form.tsx
+@@ -23,6 +23,8 @@
+   const [message, setMessage] = useState<string | null>(
+     search.get("error") === "denied"
+       ? "This account does not have access to the Admin Viewer."
++      : search.get("error") === "session"
++        ? "Your session has expired. Please sign in again."
+       : null,
+   );
+   const [code, setCode] = useState<LoginErrorCode | null>(
+@@ -86,10 +88,11 @@
+         />
+       </label>
+ 
+-      <label className="flex flex-col gap-1.5 text-sm">
+-        <span className="font-medium text-[var(--ink)]">Server credential</span>
++      <div className="flex flex-col gap-1.5 text-sm">
++        <label htmlFor="server-credential" className="font-medium text-[var(--ink)]">Server credential</label>
+         <div className="flex gap-2">
+           <input
++            id="server-credential"
+             name="credential"
+             type={showCred ? "text" : "password"}
+             autoComplete="current-password"
+@@ -113,7 +116,7 @@
+             {showCred ? "Hide" : "Show"}
+           </button>
+         </div>
+-      </label>
++      </div>
+ 
+       {message ? (
+         <div
+@@ -132,7 +135,7 @@
+       <button
+         type="submit"
+         disabled={loading}
+-        className="mt-2 rounded-lg bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-[var(--accent)]/80 hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
++        className="mt-2 rounded-lg bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-[var(--on-accent)] shadow-sm transition-all duration-150 hover:bg-[var(--accent)]/80 hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+       >
+         {loading ? "Signing in…" : "Sign in"}
+       </button>
+--- a/src/app/login/page.tsx
++++ b/src/app/login/page.tsx
+@@ -26,7 +26,7 @@
+       </div>
+       <header className="space-y-3 text-center">
+         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent)] shadow-sm">
+-          <span className="text-lg font-bold text-white">S</span>
++          <span className="text-lg font-bold text-[var(--on-accent)]">S</span>
+         </div>
+         <div>
+           <h1 className="text-2xl font-semibold tracking-tight text-[var(--ink)]">
+--- a/src/app/page.tsx
++++ b/src/app/page.tsx
+@@ -27,7 +27,7 @@
+         <div className="space-y-6">
+           <div className="space-y-2">
+             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--accent)] shadow-lg">
+-              <span className="text-2xl font-bold text-white">S</span>
++              <span className="text-2xl font-bold text-[var(--on-accent)]">S</span>
+             </div>
+             <h1 className="text-4xl font-bold tracking-tight text-[var(--ink)]">
+               Saaf Milk
+@@ -43,7 +43,7 @@
+           <div className="flex flex-col items-center gap-3 pt-4">
+             <Link
+               href="/login"
+-              className="inline-flex w-full items-center justify-center rounded-lg bg-[var(--accent)] px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-[var(--accent)]/80 hover:shadow-md active:scale-[0.98]"
++              className="inline-flex w-full items-center justify-center rounded-lg bg-[var(--accent)] px-6 py-3 text-sm font-semibold text-[var(--on-accent)] shadow-sm transition-all duration-150 hover:bg-[var(--accent)]/80 hover:shadow-md active:scale-[0.98]"
+             >
+               Continue to Login
+             </Link>
+--- a/src/app/theme-toggle.tsx
++++ b/src/app/theme-toggle.tsx
+@@ -6,9 +6,13 @@
+ 
+ function getInitialTheme(): "light" | "dark" {
+   if (typeof window === "undefined") return "light";
+-  const stored = localStorage.getItem(STORAGE_KEY);
+-  if (stored === "dark" || stored === "light") return stored;
+-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
++  try {
++    const stored = localStorage.getItem(STORAGE_KEY);
++    if (stored === "dark" || stored === "light") return stored;
++  } catch {
++    // Theme switching still works when browser storage is unavailable.
++  }
++  return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+ }
+ 
+ const subscribeMounted = () => () => {};
+@@ -27,7 +31,11 @@
+   useEffect(() => {
+     if (!mounted) return;
+     document.documentElement.setAttribute("data-theme", theme);
+-    localStorage.setItem(STORAGE_KEY, theme);
++    try {
++      localStorage.setItem(STORAGE_KEY, theme);
++    } catch {
++      // Keep the current in-memory preference.
++    }
+   }, [theme, mounted]);
+ 
+   if (!mounted) {

@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <application>
+        <activity android:name="androidx.activity.ComponentActivity"
+            android:theme="@style/Theme.SaafMilk.Native" tools:replace="android:theme" />
         <receiver
             android:name=".sync.SyncDebugReceiver"
             android:exported="true">

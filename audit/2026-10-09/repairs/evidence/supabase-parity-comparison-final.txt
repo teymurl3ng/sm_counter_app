@@ -1,0 +1,22 @@
+{
+  "dev_prod_function_definitions_lexically_equal_after_documented_normalization": true,
+  "dev_prod_function_count": 34,
+  "dev_prod_schema_policy_privilege_trigger_differences": [],
+  "fresh_columns_and_profile_now_match_live": true,
+  "prepared_c1_6_functions_missing_live": [
+    "admin_verify_created_identity(p_reconciliation_id uuid)",
+    "protect_last_active_owner()"
+  ],
+  "prepared_function_definition_differences": [
+    "admin_record_auth_reconciliation(p_business_id uuid, p_operation text, p_auth_user_id uuid, p_target_username text, p_performed_by uuid, p_performed_by_username text, p_error_code text, p_correlation_id uuid)",
+    "redact_json_secrets(p_val jsonb)",
+    "sync_records_assign_seq()"
+  ],
+  "constraint_differences": {
+    "fresh_payload_object_check": "Prepared fresh schema enforces object payloads; live currently has no such check",
+    "sync_foreign_key_deletion": "Fresh schema uses NO ACTION; live uses ON DELETE CASCADE. Preserve live history/deletion behavior pending an explicit policy decision."
+  },
+  "index_name_difference": "sync_records_shop_seq_idx (fresh) vs sync_records_shop_seq (live); same indexed columns",
+  "method_limit": "Lexical comparison is not a SQL equivalence proof; PostgreSQL 17/18 catalog formatting is normalized only where documented."
+}
+SUPABASE_METADATA_COMPARISON: PASS (identified gaps remain explicit)

@@ -1,0 +1,13 @@
+source	line	text	classification
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/auth/NativeAuthenticationScreens.kt	98	"message = ""Checking this phone’s Saaf access…"","	REVIEW_LITERAL_NOT_AUTOMATIC_REPLACE
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/auth/NativeAuthenticationScreens.kt	175	"title = if (cancelReturnsToSession) ""Switch account"" else ""Who is using Saaf?"","	REVIEW_LITERAL_NOT_AUTOMATIC_REPLACE
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/auth/NativeAuthenticationScreens.kt	282	"subtitle = ""Sign in with the full Saaf passphrase for this account."","	REVIEW_LITERAL_NOT_AUTOMATIC_REPLACE
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/auth/NativeAuthenticationScreens.kt	379	"supporting = ""Always available for this Saaf account"","	REVIEW_LITERAL_NOT_AUTOMATIC_REPLACE
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/auth/NativeAuthenticationScreens.kt	503	"subtitle = ""This is the first private account for this Saaf data vault."","	REVIEW_LITERAL_NOT_AUTOMATIC_REPLACE
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/auth/NativeAuthenticationScreens.kt	579	"subtitle = ""$displayName, store this code somewhere private. Saaf shows it only now."","	REVIEW_LITERAL_NOT_AUTOMATIC_REPLACE
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/auth/NativeAuthenticationViewModel.kt	553	"else -> ""Saaf could not load account access. Try again."""	REVIEW_LITERAL_NOT_AUTOMATIC_REPLACE
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/cashclose/CashCloseEntryScreen.kt	573	"""Quick PIN cannot authorize reopen. Enter your full Saaf passphrase."","	REVIEW_LITERAL_NOT_AUTOMATIC_REPLACE
+phase18/app/src/main/res/values/strings.xml	2	"<string name=""app_name"">Saaf Milk</string>"	REVIEW_VISIBLE_RESOURCE
+phase18/app/src/main/res/values/strings.xml	352	"<string name=""login_title"">Sign in to Saaf Milk</string>"	REVIEW_VISIBLE_RESOURCE
+phase18/app/src/main/res/values/strings.xml	430	"<string name=""native_app_name"">Saaf Milk</string>"	REVIEW_VISIBLE_RESOURCE
+phase18/app/src/main/res/values/strings.xml	502	"<string name=""native_brand_mark"">Saaf Milk mark</string>"	REVIEW_VISIBLE_RESOURCE

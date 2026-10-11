@@ -1,0 +1,6 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/BOOTSTRAP_AND_REPAIR.md
+@@
+-No migration, workflow or CLI action in these repairs has been run against DEV/PROD. Bootstrap execution and database concurrency need a local PostgreSQL/Supabase rehearsal before deployment. No local psql/docker runtime was available when prepared.
++No migration, workflow or CLI action in these repairs has been run against DEV/PROD. The fresh bootstrap, reconciliation, sequence behavior and last-owner invariants passed offline execution in PostgreSQL WASM and a disposable native PostgreSQL 18.6 cluster. Native concurrent disable/demote/delete fixtures cover READ COMMITTED and REPEATABLE READ. Auth tables, functions and roles are local stand-ins; deployed Supabase parity and real Auth behavior still require predeployment verification. The native cluster was stopped and removed after testing.
+*** End Patch

@@ -1,0 +1,14 @@
+{
+  "scenario": "surface-light-large",
+  "screen": "ux",
+  "device": "samsung SM-A065F",
+  "packageName": "com.saaf.milkshop.qa.tests",
+  "capturedAt": "2026-10-10T23:34:03.714956Z",
+  "orientation": "portrait",
+  "fontScale": "1.0",
+  "theme": "light",
+  "workflowId": "NativeSurfaceGeometryTest",
+  "evidenceFilename": "surface-light-large.png",
+  "reviewStatus": "UNREVIEWED",
+  "note": "Shared variants, long content and font scaling. Presentation fixture; Owner visual review pending."
+}

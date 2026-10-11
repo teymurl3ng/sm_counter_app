@@ -1,7 +1,7 @@
 package com.saaf.milkshop.nativeui.owner
 
 import android.net.Uri
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +28,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,8 +62,153 @@ import com.saaf.milkshop.application.AppTimeFormats
  * or local encrypted export only when [localExportOnly] (Admin). Passphrase CharArrays
  * are wiped by the ViewModel / facade after submit.
  */
+private data class OwnerBackupScreenSnapshot(
+    val identity: NativeSignedInIdentity,
+    val context: NativeOwnerMoreContext,
+    val snapshot: NativeOwnerBackupSnapshot?,
+    val loading: Boolean,
+    val error: String?,
+    val exportOpen: Boolean,
+    val restoreOpen: Boolean,
+    val connectOpen: Boolean,
+    val inspection: NativeOwnerBackupInspection?,
+    val busy: Boolean,
+    val reauthOpen: Boolean,
+    val reauthBusy: Boolean,
+    val disconnectConfirmOpen: Boolean,
+    val showHeader: Boolean,
+    val backToHubLabel: String,
+    val localExportOnly: Boolean,
+    val cloudOpen: Boolean,
+)
+
 @Composable
 fun OwnerBackupScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    context: NativeOwnerMoreContext,
+    snapshot: NativeOwnerBackupSnapshot?,
+    loading: Boolean,
+    error: String?,
+    exportOpen: Boolean,
+    restoreOpen: Boolean,
+    connectOpen: Boolean,
+    inspection: NativeOwnerBackupInspection?,
+    busy: Boolean,
+    reauthOpen: Boolean,
+    reauthBusy: Boolean,
+    disconnectConfirmOpen: Boolean,
+    onBackToMenu: () -> Unit,
+    onRetry: () -> Unit,
+    onOpenExport: () -> Unit,
+    onBackFromExport: () -> Unit,
+    onExport: (Uri, CharArray) -> Unit,
+    onOpenRestore: () -> Unit,
+    onBackFromRestore: () -> Unit,
+    onInspectRestore: (Uri, CharArray) -> Unit,
+    onConfirmRestore: (Boolean) -> Unit,
+    onOpenConnect: () -> Unit,
+    onBackFromConnect: () -> Unit,
+    onConnectDrive: (CharArray, Boolean) -> Unit,
+    onSetDriveEnabled: (Boolean) -> Unit,
+    onRunDriveNow: () -> Unit,
+    onRequestDisconnect: () -> Unit,
+    onConfirmDisconnect: () -> Unit,
+    onCancelDisconnect: () -> Unit,
+    onSubmitReauth: (CharArray) -> Unit,
+    onCancelReauth: () -> Unit,
+    onOpenCloud: () -> Unit = {},
+    onBackFromCloud: () -> Unit = {},
+    onRefreshCloud: () -> Unit = {},
+    onInspectCloud: (String, CharArray?) -> Unit = { _, _ -> },
+    onConfirmCloudRestore: (Boolean) -> Unit = {},
+    hostedScaffold: HostedScaffold,
+    showHeader: Boolean = true,
+    backToHubLabel: String = "Back to More",
+    localExportOnly: Boolean = false,
+    cloudOpen: Boolean = false,
+    modifier: Modifier = Modifier,
+) {
+    val paneSnapshot = OwnerBackupScreenSnapshot(
+        identity = identity,
+        context = context,
+        snapshot = snapshot,
+        loading = loading,
+        error = error,
+        exportOpen = exportOpen,
+        restoreOpen = restoreOpen,
+        connectOpen = connectOpen,
+        inspection = inspection,
+        busy = busy,
+        reauthOpen = reauthOpen,
+        reauthBusy = reauthBusy,
+        disconnectConfirmOpen = disconnectConfirmOpen,
+        showHeader = showHeader,
+        backToHubLabel = backToHubLabel,
+        localExportOnly = localExportOnly,
+        cloudOpen = cloudOpen,
+    )
+    com.saaf.milkshop.nativeui.common.NativeSectionTransition(
+        targetState = paneSnapshot,
+        contentKey = { pane -> when {
+            pane.exportOpen -> "export"
+            pane.restoreOpen -> "restore"
+            pane.connectOpen -> "connect"
+            else -> "home"
+        } },
+        modifier = modifier,
+    ) { pane ->
+        OwnerBackupScreenPane(
+            snackbarHostState = snackbarHostState,
+            identity = pane.identity,
+            context = pane.context,
+            snapshot = pane.snapshot,
+            loading = pane.loading,
+            error = pane.error,
+            exportOpen = pane.exportOpen,
+            restoreOpen = pane.restoreOpen,
+            connectOpen = pane.connectOpen,
+            inspection = pane.inspection,
+            busy = pane.busy,
+            reauthOpen = pane.reauthOpen,
+            reauthBusy = pane.reauthBusy,
+            disconnectConfirmOpen = pane.disconnectConfirmOpen,
+            onBackToMenu = onBackToMenu,
+            onRetry = onRetry,
+            onOpenExport = onOpenExport,
+            onBackFromExport = onBackFromExport,
+            onExport = onExport,
+            onOpenRestore = onOpenRestore,
+            onBackFromRestore = onBackFromRestore,
+            onInspectRestore = onInspectRestore,
+            onConfirmRestore = onConfirmRestore,
+            onOpenConnect = onOpenConnect,
+            onBackFromConnect = onBackFromConnect,
+            onConnectDrive = onConnectDrive,
+            onSetDriveEnabled = onSetDriveEnabled,
+            onRunDriveNow = onRunDriveNow,
+            onRequestDisconnect = onRequestDisconnect,
+            onConfirmDisconnect = onConfirmDisconnect,
+            onCancelDisconnect = onCancelDisconnect,
+            onSubmitReauth = onSubmitReauth,
+            onCancelReauth = onCancelReauth,
+            onOpenCloud = onOpenCloud,
+            onBackFromCloud = onBackFromCloud,
+            onRefreshCloud = onRefreshCloud,
+            onInspectCloud = onInspectCloud,
+            onConfirmCloudRestore = onConfirmCloudRestore,
+            hostedScaffold = hostedScaffold,
+            showHeader = pane.showHeader,
+            backToHubLabel = pane.backToHubLabel,
+            localExportOnly = pane.localExportOnly,
+            cloudOpen = pane.cloudOpen,
+            modifier = modifier,
+        )
+    }
+}
+
+@Composable
+private fun OwnerBackupScreenPane(
     snackbarHostState: SnackbarHostState,
     identity: NativeSignedInIdentity,
     context: NativeOwnerMoreContext,
@@ -266,7 +412,7 @@ private fun OwnerBackupStatusScreen(
                         )
                         Spacer(Modifier.height(16.dp))
                         Button(
-                            onClick = onRetry,
+                            onClick = hapticAction(onRetry),
                             modifier = Modifier.testTag(NativeUiTags.OwnerBackupRetry),
                         ) { Text("Try again") }
                     }
@@ -303,7 +449,7 @@ private fun OwnerBackupStatusScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                                 Button(
-                                    onClick = onOpenExport,
+                                    onClick = hapticAction(onOpenExport),
                                     enabled = !busy,
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -356,14 +502,14 @@ private fun OwnerBackupStatusScreen(
                                     fontWeight = FontWeight.SemiBold,
                                 )
                                 Button(
-                                    onClick = onOpenExport,
+                                    onClick = hapticAction(onOpenExport),
                                     enabled = !busy,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .testTag(NativeUiTags.OwnerBackupExport),
                                 ) { Text("Export backup") }
                                 Button(
-                                    onClick = onOpenRestore,
+                                    onClick = hapticAction(onOpenRestore),
                                     enabled = !busy,
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -378,7 +524,7 @@ private fun OwnerBackupStatusScreen(
                                 )
                                 if (!snapshot.configured) {
                                     Button(
-                                        onClick = onOpenConnect,
+                                        onClick = hapticAction(onOpenConnect),
                                         enabled = !busy && snapshot.cloudActionsAvailable,
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -394,12 +540,12 @@ private fun OwnerBackupStatusScreen(
                                 } else {
                                     if (snapshot.enabled) {
                                         TextButton(
-                                            onClick = { onSetDriveEnabled(false) },
+                                            onClick = com.saaf.milkshop.nativeui.common.hapticAction { onSetDriveEnabled(false) },
                                             enabled = !busy && snapshot.cloudActionsAvailable,
                                             modifier = Modifier.testTag(NativeUiTags.OwnerBackupPause),
                                         ) { Text("Pause Drive vault") }
                                         Button(
-                                            onClick = onRunDriveNow,
+                                            onClick = hapticAction(onRunDriveNow),
                                             enabled = !busy && snapshot.cloudActionsAvailable,
                                             modifier = Modifier
                                                 .fillMaxWidth()
@@ -407,7 +553,7 @@ private fun OwnerBackupStatusScreen(
                                         ) { Text("Run backup now") }
                                     } else {
                                         Button(
-                                            onClick = { onSetDriveEnabled(true) },
+                                            onClick = com.saaf.milkshop.nativeui.common.hapticAction { onSetDriveEnabled(true) },
                                             enabled = !busy && snapshot.cloudActionsAvailable,
                                             modifier = Modifier
                                                 .fillMaxWidth()
@@ -415,12 +561,12 @@ private fun OwnerBackupStatusScreen(
                                         ) { Text("Enable Drive vault") }
                                     }
                                     TextButton(
-                                        onClick = onRequestDisconnect,
+                                        onClick = hapticAction(onRequestDisconnect),
                                         enabled = !busy && snapshot.cloudActionsAvailable,
                                         modifier = Modifier.testTag(NativeUiTags.OwnerBackupDisconnect),
                                     ) { Text("Disconnect Drive") }
                                     Button(
-                                        onClick = onOpenCloud,
+                                        onClick = hapticAction(onOpenCloud),
                                         enabled = !busy && snapshot.cloudActionsAvailable,
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -445,13 +591,13 @@ private fun OwnerBackupStatusScreen(
             },
             confirmButton = {
                 TextButton(
-                    onClick = onConfirmDisconnect,
+                    onClick = hapticAction(onConfirmDisconnect),
                     modifier = Modifier.testTag(NativeUiTags.OwnerBackupDisconnectConfirm),
                 ) { Text("Disconnect") }
             },
             dismissButton = {
                 TextButton(
-                    onClick = onCancelDisconnect,
+                    onClick = hapticAction(onCancelDisconnect),
                     modifier = Modifier.testTag(NativeUiTags.OwnerBackupDisconnectCancel),
                 ) { Text("Cancel") }
             },
@@ -563,8 +709,8 @@ private fun OwnerBackupExportScreen(
                             .testTag(NativeUiTags.OwnerBackupExportConfirm),
                     )
                     Button(
-                        onClick = {
-                            if (passphrase != confirm) return@Button
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                            if (passphrase != confirm) return@hapticAction
                             createDocument.launch(suggestedFileName)
                         },
                         enabled = !busy &&
@@ -687,7 +833,7 @@ private fun OwnerBackupRestoreScreen(
                                 .testTag(NativeUiTags.OwnerBackupRestorePassphrase),
                         )
                         Button(
-                            onClick = {
+                            onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                                 openDocument.launch(
                                     arrayOf("application/octet-stream", "application/json", "*/*"),
                                 )
@@ -734,7 +880,7 @@ private fun OwnerBackupRestoreScreen(
                             )
                         }
                         Button(
-                            onClick = { onConfirmRestore(confirmed) },
+                            onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction { onConfirmRestore(confirmed) },
                             enabled = !busy && confirmed,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -869,8 +1015,8 @@ private fun OwnerBackupConnectScreen(
                         Text("Allow backup on metered networks")
                     }
                     Button(
-                        onClick = {
-                            if (passphrase != confirm) return@Button
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                            if (passphrase != confirm) return@hapticAction
                             val chars = passphrase.toCharArray()
                             passphrase = ""
                             confirm = ""
@@ -942,7 +1088,7 @@ private fun OwnerBackupReauthScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 TextButton(
-                    onClick = onCancel,
+                    onClick = hapticAction(onCancel),
                     modifier = Modifier.testTag(NativeUiTags.OwnerBackupReauthCancel),
                 ) { Text("Cancel") }
                 error?.let {
@@ -968,7 +1114,7 @@ private fun OwnerBackupReauthScreen(
                         .testTag(NativeUiTags.OwnerBackupReauthPassphrase),
                 )
                 Button(
-                    onClick = {
+                    onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
                         val chars = passphrase.toCharArray()
                         passphrase = ""
                         onConfirm(chars)
@@ -1077,7 +1223,7 @@ private fun OwnerBackupCloudScreen(
                         )
                     }
                     Button(
-                        onClick = onRefresh,
+                        onClick = hapticAction(onRefresh),
                         enabled = !busy,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -1104,7 +1250,7 @@ private fun OwnerBackupCloudScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                                 Button(
-                                    onClick = {
+                                    onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                                         selectedRemoteId = remote.remoteFileId
                                         draftTouched = true
                                         onInspect(remote.remoteFileId, null)
@@ -1137,8 +1283,8 @@ private fun OwnerBackupCloudScreen(
                                 .testTag(NativeUiTags.OwnerBackupCloudRecoveryPassphrase),
                         )
                         Button(
-                            onClick = {
-                                val remoteId = selectedRemoteId ?: return@Button
+                            onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                                val remoteId = selectedRemoteId ?: return@hapticAction
                                 val secret = recoveryPassphrase.toCharArray()
                                 recoveryPassphrase = ""
                                 onInspect(remoteId, secret)
@@ -1174,7 +1320,7 @@ private fun OwnerBackupCloudScreen(
                                 Text("I understand this replaces the current installation")
                             }
                             Button(
-                                onClick = { onConfirmRestore(confirmed) },
+                                onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction { onConfirmRestore(confirmed) },
                                 enabled = !busy && confirmed,
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -1211,13 +1357,13 @@ private fun OwnerBackupDiscardDialog(
         text = { Text(body) },
         confirmButton = {
             TextButton(
-                onClick = leaveGuard::confirmDiscard,
+                onClick = hapticAction(leaveGuard::confirmDiscard),
                 modifier = Modifier.testTag(discardTag),
             ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(
-                onClick = leaveGuard::keepEditing,
+                onClick = hapticAction(leaveGuard::keepEditing),
                 modifier = Modifier.testTag(keepTag),
             ) { Text("Keep editing") }
         },

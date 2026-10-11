@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeShopIdentityRegressionTest" tests="3" failures="0" errors="0" skipped="0" time="41.884" timestamp="2026-10-10T17:31:03" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="changedMerchantNameRefreshesWithoutRestartOrChangingActor" classname="com.saaf.milkshop.NativeShopIdentityRegressionTest" time="2.035" />
+  <testcase name="catalogPickerHandlesZeroOneTwoThreeTwelveAndFiftyProducts" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="13.771" />
+  <testcase name="uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens" classname="com.saaf.milkshop.NativeFoundationUiTest" time="24.81" />
+</testsuite>

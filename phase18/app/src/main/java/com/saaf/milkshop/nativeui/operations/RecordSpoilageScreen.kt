@@ -1,6 +1,10 @@
 package com.saaf.milkshop.nativeui.operations
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.nativeListItem
+
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -243,7 +247,14 @@ internal fun RecordSpoilageReadyContent(
                     )
                 }
 
-                if (state.receipt != null) {
+                NativeSectionTransition(
+            targetState = state,
+            contentKey = { it.receipt != null },
+            modifier = Modifier.fillMaxWidth(),
+        ) { state ->
+            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
+        if (state.receipt != null) {
                     SuccessCard(state.receipt, onRecordAnother)
                 } else {
                     SelectorRow(
@@ -287,7 +298,7 @@ internal fun RecordSpoilageReadyContent(
                     )
                     if (!noteRequired) {
                         TextButton(
-                            onClick = { noteOpen = !noteOpen },
+                            onClick = com.saaf.milkshop.nativeui.common.hapticAction { noteOpen = !noteOpen },
                             enabled = !state.saving,
                             modifier = Modifier.testTag(NativeUiTags.OpsRecordSpoilageNoteToggle),
                         ) {
@@ -351,6 +362,9 @@ internal fun RecordSpoilageReadyContent(
                         )
                     }
                 }
+        
+        }
+}
             }
         }
 
@@ -380,13 +394,13 @@ internal fun RecordSpoilageDiscardDialog(leaveGuard: EntryLeaveGuard) {
         text = { Text("Your product and quantity stay if you keep editing.") },
         confirmButton = {
             TextButton(
-                onClick = leaveGuard::confirmDiscard,
+                onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction(leaveGuard::confirmDiscard),
                 modifier = Modifier.testTag(NativeUiTags.OpsRecordSpoilageDiscardConfirm),
             ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(
-                onClick = leaveGuard::keepEditing,
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction(leaveGuard::keepEditing),
                 modifier = Modifier.testTag(NativeUiTags.OpsRecordSpoilageDiscardCancel),
             ) { Text("Keep editing") }
         },
@@ -409,7 +423,7 @@ private fun SelectorRow(
             .heightIn(min = 56.dp)
             .testTag(tag)
             .semantics { role = Role.Button }
-            .clickable(enabled = enabled, onClick = onClick),
+            .clickable(enabled = enabled, onClick = com.saaf.milkshop.nativeui.common.hapticAction(onClick)),
     ) {
         Row(
             Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
@@ -442,7 +456,7 @@ private fun ReviewDock(
             .fillMaxWidth()
             .testTag(NativeUiTags.OpsRecordSpoilageReview),
     ) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text("Physical review", style = MaterialTheme.typography.titleSmall)
             if (product == null || quantity == null || quantity <= 0.0 || reason == null) {
                 Text(
@@ -477,6 +491,7 @@ private fun SuccessCard(
     receipt: NativeRecordSpoilageReceipt,
     onRecordAnother: () -> Unit,
 ) {
+    com.saaf.milkshop.nativeui.common.NativeReceiptFeedback("spoilage", receipt.eventId)
     Surface(
         tonalElevation = 2.dp,
         modifier = Modifier
@@ -496,7 +511,7 @@ private fun SuccessCard(
             Text(receipt.reasonLabel)
             Text("Left on hand: ${receipt.remainingLabel}")
             Button(
-                onClick = onRecordAnother,
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction(onRecordAnother),
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag(NativeUiTags.OpsRecordSpoilageAnother),
@@ -525,10 +540,9 @@ private fun ProductPickerDialog(
                 products.forEach { product ->
                     Row(
                         Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 56.dp)
-                            .clickable { onSelect(product.productId) }
-                            .padding(vertical = 12.dp)
+                            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Selection)
+                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(product.productId) })
+                            .nativeListItemContent(NativeListStyle.Selection)
                             .testTag(NativeUiTags.opsRecordSpoilageProduct(product.productId)),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -543,7 +557,7 @@ private fun ProductPickerDialog(
         },
         confirmButton = {},
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onDismiss)) { Text("Cancel") }
         },
     )
 }
@@ -559,14 +573,13 @@ private fun ReasonPickerDialog(
         modifier = Modifier.testTag(NativeUiTags.OpsRecordSpoilageReasonPicker),
         title = { Text("Choose reason") },
         text = {
-            Column {
+            Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
                 reasons.forEach { reason ->
                     Row(
                         Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 56.dp)
-                            .clickable { onSelect(reason.code) }
-                            .padding(vertical = 12.dp)
+                            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Selection)
+                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(reason.code) })
+                            .nativeListItemContent(NativeListStyle.Selection)
                             .testTag(NativeUiTags.opsRecordSpoilageReason(reason.code)),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -582,7 +595,7 @@ private fun ReasonPickerDialog(
         },
         confirmButton = {},
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onDismiss)) { Text("Cancel") }
         },
     )
 }

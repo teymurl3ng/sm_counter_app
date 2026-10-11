@@ -1,0 +1,7 @@
+{
+  "tests": 9,
+  "failed": 0,
+  "skipped": 0,
+  "passed": 9,
+  "note": "Final geometry plus actual text clipping assertions"
+}

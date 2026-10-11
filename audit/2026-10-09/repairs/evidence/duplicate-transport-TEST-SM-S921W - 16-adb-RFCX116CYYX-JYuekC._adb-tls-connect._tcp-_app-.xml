@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite tests="0" failures="0" errors="0" skipped="0" time="2.104" timestamp="2026-10-10T01:00:09" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-S921W - 16-adb-RFCX116CYYX-JYuekC._adb-tls-connect._tcp" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <system-err>Test run failed to complete. No test results. onError: commandError=true message=INSTRUMENTATION_FAILED: com.saaf.milkshop.qa.tests.test/com.saaf.milkshop.SaafMilkTestRunner
+</system-err>
+</testsuite>

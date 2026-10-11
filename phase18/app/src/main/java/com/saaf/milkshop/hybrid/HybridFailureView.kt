@@ -41,7 +41,7 @@ internal fun createHybridFailureView(
         }, matchWrap(topMargin = context.dp(14)))
         if (recoveryAction != null) addView(Button(context).apply {
             id = R.id.hybrid_recovery_action
-            text = "Reload Saaf Milk securely"
+            text = "Reload your shop securely"
             isAllCaps = false
             textSize = 16f
             setTextColor(Color.WHITE)

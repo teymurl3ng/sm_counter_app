@@ -1,5 +1,8 @@
 package com.saaf.milkshop
 
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
+
 import android.net.Uri
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
@@ -32,6 +35,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class NativeOwnerBackupScreenContractTest {
+    private var keyboard: SoftwareKeyboardController? = null
     @get:Rule
     val composeRule = createComposeRule()
 
@@ -273,6 +277,21 @@ class NativeOwnerBackupScreenContractTest {
         assertEquals(1, retries)
     }
 
+    @Test
+    fun connectDiscardCanKeepOrConfirmNavigation() {
+        var navigated = 0
+        setScreen(snapshot = sampleSnapshot(cloudActionsAvailable = true), connectOpen = true,
+            onNavigate = { navigated++ })
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupConnectPassphrase).performTextInput("draft phrase")
+        composeRule.runOnIdle { keyboard?.hide() }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupConnectKeep).performClick()
+        assertEquals(0, navigated)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupConnectDiscard).performClick()
+        assertEquals(1, navigated)
+    }
+
     private fun setScreen(
         snapshot: NativeOwnerBackupSnapshot?,
         loading: Boolean = false,
@@ -308,6 +327,7 @@ class NativeOwnerBackupScreenContractTest {
     ) {
         composeRule.setContent {
             SaafTheme(darkTheme = false) {
+                keyboard = LocalSoftwareKeyboardController.current
                 OwnerBackupScreen(
                     snackbarHostState = remember { SnackbarHostState() },
                     identity = NativeSignedInIdentity(
@@ -356,7 +376,7 @@ class NativeOwnerBackupScreenContractTest {
                         OwnerScaffold(
                             snackbarHostState = snackbar,
                             section = OwnerSection.More,
-                            onNavigate = { section -> wrapNav { } },
+                            onNavigate = { section -> wrapNav { onNavigate(section) } },
                             modifier = mod,
                             content = content,
                         )

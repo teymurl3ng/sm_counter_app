@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-10",
+  "purpose": "User approved scoped QA exception and UX implementation on 2026-10-10. Preserve these pre-existing protected edits.",
+  "device": "R8VXA02SNKH",
+  "qaPackage": "com.saaf.milkshop.qa",
+  "ordinaryPackage": "com.saaf.milkshop",
+  "approval": "APPROVED",
+  "protectedFiles": [
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/data/BudgetDataRepository.kt",
+      "sha256": "db36b0142a138539c0d010e3d8a91dc5fc2f80b2a21dcd26cb7cd96945ece27d"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/data/Phase3SecurityDaos.kt",
+      "sha256": "e811a6f60c24f2acd4312e68c915099a05ba3a7078ca04d2e4160ee329f3060a"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/data/SyncEntities.kt",
+      "sha256": "4a48a10f095420df363de94b1c754b1d170a889e43afece0b0eda2666fb52b84"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/BudgetManagement.kt",
+      "sha256": "3cd9e6ff6ad8c6b8d84509b991464439eda6db3e39ecc6af5010ddb0290bd7a6"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/Costing.kt",
+      "sha256": "a8f7fd9871cffea527bf9c23019429b4bf7fec41b241a1a0c6165f45c8455b3a"
+    }
+  ],
+  "observedQaApplicationPackage": "com.saaf.milkshop.qa.tests",
+  "packageObservationNote": "Canonical qaScreen/qaCheckpoint forces instrumentationSandbox. The original qaPackage field records the intended interactive QA build; the test target uses the established .qa.tests suffix."
+}

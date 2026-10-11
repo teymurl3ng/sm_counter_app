@@ -75,9 +75,10 @@ class SyncPullClient(
                 if (text.isEmpty()) return SyncPullOutcome.RetryLater("malformed_response")
                 val json = runCatching { JSONObject(text) }.getOrNull()
                     ?: return SyncPullOutcome.RetryLater("malformed_response")
+                if (json.opt("ok") != true) return SyncPullOutcome.RetryLater("malformed_response")
                 val array = json.optJSONArray("records") ?: return SyncPullOutcome.RetryLater("malformed_response")
-                val records = (0 until array.length()).mapNotNull { index ->
-                    val record = array.optJSONObject(index) ?: return@mapNotNull null
+                val records = runCatching { (0 until array.length()).map { index ->
+                    val record = array.getJSONObject(index)
                     SyncPulledRecord(
                         serverSeq = record.getLong("server_seq"),
                         shopId = record.optString("shop_id").takeIf { it.isNotEmpty() },
@@ -86,6 +87,13 @@ class SyncPullClient(
                         payload = record.getJSONObject("payload"),
                         originDevice = record.optString("origin_device").takeIf { it.isNotEmpty() },
                     )
+                } }.getOrNull() ?: return SyncPullOutcome.RetryLater("malformed_response")
+                var previous = sinceSeq
+                for (record in records) {
+                    if (record.serverSeq <= previous || (shopId != null && record.shopId != shopId)) {
+                        return SyncPullOutcome.RetryLater("malformed_response")
+                    }
+                    previous = record.serverSeq
                 }
                 SyncPullOutcome.Fetched(
                     batch = SyncPullBatch(records, records.maxOfOrNull { it.serverSeq } ?: sinceSeq),

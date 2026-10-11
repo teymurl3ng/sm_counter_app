@@ -3,7 +3,7 @@ package com.saaf.milkshop.nativeui.owner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.saaf.milkshop.application.owner.NativeOwnerWorkContext
-import com.saaf.milkshop.application.owner.NativeOwnerWorkFacade
+import com.saaf.milkshop.application.owner.NativeOwnerWorkOperations
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
 import com.saaf.milkshop.nativeui.DataChangeBus
@@ -46,7 +46,7 @@ sealed interface NativeOwnerWorkState {
 }
 
 class NativeOwnerWorkViewModel(
-    private val facade: NativeOwnerWorkFacade,
+    private val facade: NativeOwnerWorkOperations,
     private val onSessionExpired: () -> Unit,
 ) : ViewModel() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -92,8 +92,6 @@ class NativeOwnerWorkViewModel(
         val session = sessionHandle ?: return
         val request = loadGate.begin(session)
         val previous = _state.value as? NativeOwnerWorkState.Ready
-        val previousDestination =
-            previous?.destination ?: NativeOwnerWorkDestination.Home
         _state.value = previous?.copy(refreshing = true, error = null)
             ?: NativeOwnerWorkState.Loading
         scope.launch {
@@ -102,7 +100,8 @@ class NativeOwnerWorkViewModel(
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 _state.value = NativeOwnerWorkState.Ready(
                     context = context,
-                    destination = previousDestination,
+                    destination = (_state.value as? NativeOwnerWorkState.Ready)?.destination
+                        ?: NativeOwnerWorkDestination.Home,
                     refreshing = false,
                 )
             } catch (error: Throwable) {
@@ -110,7 +109,7 @@ class NativeOwnerWorkViewModel(
                 if (error is SecurityFailure.SessionExpired || previous == null) {
                     handleLoadFailure(error)
                 } else {
-                    _state.value = previous.copy(
+                    _state.value = ((_state.value as? NativeOwnerWorkState.Ready) ?: previous).copy(
                         refreshing = false,
                         error = error.message ?: "Work could not open. Try again.",
                     )
@@ -145,7 +144,7 @@ class NativeOwnerWorkViewModel(
     }
 
     class Factory(
-        private val facade: NativeOwnerWorkFacade,
+        private val facade: NativeOwnerWorkOperations,
         private val onSessionExpired: () -> Unit,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")

@@ -1,0 +1,7 @@
+Starting: Intent { cmp=com.saaf.milkshop.preview/com.saaf.milkshop.Main }
+Status: ok
+LaunchState: COLD
+Activity: com.saaf.milkshop.preview/com.saaf.milkshop.nativeui.NativePreviewActivity
+TotalTime: 4021
+WaitTime: 4025
+Complete

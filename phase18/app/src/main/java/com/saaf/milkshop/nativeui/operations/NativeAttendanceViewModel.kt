@@ -68,13 +68,14 @@ class NativeAttendanceViewModel(
             try {
                 val context = withContext(Dispatchers.IO) { facade.load(session) }
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                _state.value = NativeAttendanceState.Ready(context, refreshing = false)
+                _state.value = (_state.value as? NativeAttendanceState.Ready)?.copy(context = context, refreshing = false, error = null)
+                    ?: NativeAttendanceState.Ready(context, refreshing = false)
             } catch (error: Throwable) {
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 if (error is SecurityFailure.SessionExpired || previous == null) {
                     handleLoadFailure(error)
                 } else {
-                    _state.value = previous.copy(
+                    _state.value = ((_state.value as? NativeAttendanceState.Ready) ?: previous).copy(
                         refreshing = false,
                         error = error.message ?: publicMessage(error),
                     )

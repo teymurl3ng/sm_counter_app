@@ -88,7 +88,7 @@ class NativeOperationsMoreViewModel(
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 // Merge into the previous pane: a warm refresh must never
                 // reset the open destination or in-progress dialogs.
-                _state.value = previous?.copy(
+                _state.value = (_state.value as? NativeOperationsMoreState.Ready)?.copy(
                     context = context,
                     security = security,
                     refreshing = false,
@@ -103,7 +103,7 @@ class NativeOperationsMoreViewModel(
                 if (error is SecurityFailure.SessionExpired || previous == null) {
                     handleLoadFailure(error)
                 } else {
-                    _state.value = previous.copy(
+                    _state.value = ((_state.value as? NativeOperationsMoreState.Ready) ?: previous).copy(
                         refreshing = false,
                         error = error.message ?: publicMessage(error),
                     )
@@ -187,6 +187,7 @@ class NativeOperationsMoreViewModel(
                 val security = withContext(Dispatchers.IO) {
                     facade.removeQuickUnlock(session, passphrase)
                 }
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Quick unlock settings saved")
                 val latest = _state.value as? NativeOperationsMoreState.Ready ?: return@launch
                 _state.value = latest.copy(
                     security = security,
@@ -221,6 +222,7 @@ class NativeOperationsMoreViewModel(
                         pin = pin,
                     )
                 }
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Quick unlock settings saved")
                 val latest = _state.value as? NativeOperationsMoreState.Ready ?: return@launch
                 _state.value = latest.copy(security = security, saving = false, error = null)
             } catch (error: Throwable) {
@@ -259,6 +261,7 @@ class NativeOperationsMoreViewModel(
                         pin = pin,
                     )
                 }
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Quick unlock settings saved")
                 val latest = _state.value as? NativeOperationsMoreState.Ready ?: return@launch
                 _state.value = latest.copy(security = security, saving = false, error = null)
             } catch (error: Throwable) {

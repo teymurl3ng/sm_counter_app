@@ -1,6 +1,9 @@
 package com.saaf.milkshop.nativeui.owner
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.nativeListItem
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +28,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -113,12 +117,13 @@ fun OwnerReportsScreen(
                         )
                         Spacer(Modifier.height(16.dp))
                         Button(
-                            onClick = onRetry,
+                            onClick = hapticAction(onRetry),
                             modifier = Modifier.testTag(NativeUiTags.OwnerReportsRetry),
                         ) { Text("Try again") }
                     }
                 is NativeOwnerReportsState.Ready -> {
                     val snapshot = state.snapshot
+                    Column(Modifier.fillMaxSize()) {
                     Row(
                         Modifier
                             .fillMaxWidth()
@@ -127,7 +132,7 @@ fun OwnerReportsScreen(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         TextButton(
-                            onClick = {
+                            onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                                 customStart = snapshot.startInclusive
                                 customEnd = runCatching {
                                     java.time.LocalDate.parse(snapshot.endExclusive).minusDays(1).toString()
@@ -149,7 +154,8 @@ fun OwnerReportsScreen(
                     }
                     Column(
                         Modifier
-                            .fillMaxSize()
+                            .weight(1f)
+                            .fillMaxWidth()
                             .verticalScroll(rememberScrollState())
                             .nativeRefreshOverlay(state.refreshing)
                             .padding(horizontal = 16.dp, vertical = 12.dp)
@@ -164,20 +170,20 @@ fun OwnerReportsScreen(
                         ) {
                             FilterChip(
                                 selected = snapshot.preset == NativeOwnerReportsPreset.ThisMonth,
-                                onClick = { onSelectPreset(NativeOwnerReportsPreset.ThisMonth) },
+                                onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelectPreset(NativeOwnerReportsPreset.ThisMonth) },
                                 label = { Text("This month") },
                                 modifier = Modifier.testTag(NativeUiTags.OwnerReportsPresetThisMonth),
                             )
                             FilterChip(
                                 selected = snapshot.preset == NativeOwnerReportsPreset.LastMonth,
-                                onClick = { onSelectPreset(NativeOwnerReportsPreset.LastMonth) },
+                                onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelectPreset(NativeOwnerReportsPreset.LastMonth) },
                                 label = { Text("Last month") },
                                 modifier = Modifier.testTag(NativeUiTags.OwnerReportsPresetLastMonth),
                             )
                             if (snapshot.preset == NativeOwnerReportsPreset.Custom) {
                                 FilterChip(
                                     selected = true,
-                                    onClick = {
+                                    onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                                         customStart = snapshot.startInclusive
                                         customEnd = java.time.LocalDate.parse(snapshot.endExclusive)
                                             .minusDays(1)
@@ -237,6 +243,7 @@ fun OwnerReportsScreen(
                             }
                         }
                     }
+                    }
                 }
             }
             }
@@ -267,7 +274,7 @@ fun OwnerReportsScreen(
             },
             confirmButton = {
                 TextButton(
-                    onClick = {
+                    onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction {
                         customRangeOpen = false
                         onSelectCustomRange(customStart, customEnd)
                     },
@@ -275,7 +282,7 @@ fun OwnerReportsScreen(
                 ) { Text("Apply") }
             },
             dismissButton = {
-                TextButton(onClick = { customRangeOpen = false }) { Text("Cancel") }
+                TextButton(onClick = com.saaf.milkshop.nativeui.common.hapticAction { customRangeOpen = false }) { Text("Cancel") }
             },
         )
     }
@@ -316,7 +323,7 @@ private fun CoverageBanner(snapshot: NativeOwnerReportsSnapshot) {
 private fun ProductRow(row: NativeOwnerReportsProductRow) {
     Column(
         Modifier
-            .fillMaxWidth()
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Section).nativeListItemContent(NativeListStyle.Section)
             .testTag(NativeUiTags.ownerReportsProduct(row.productId)),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {

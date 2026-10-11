@@ -207,6 +207,98 @@ class NativeCashCloseFacadeTest {
         assertTrue(failure is SecurityFailure.PermissionDenied)
     }
 
+    private suspend fun cashierSession(): String {
+        val pending = security.beginUserEnrollment(ownerSession, CreateUserInput(
+            loginName = "close.cashier", displayName = "Closing cashier", role = AppRole.CASHIER.wireValue,
+        ))
+        security.completeUserEnrollment(pending.enrollmentToken, OPERATOR_PASSPHRASE.toCharArray())
+        return security.login("close.cashier", OPERATOR_PASSPHRASE.toCharArray()).sessionId
+    }
+
+    @Test
+    fun cashierClosesOwnDayNextDateOpensAndReopenIsDenied() = runBlocking {
+        val session = cashierSession()
+        val count = facade.recordCount(session, NativeCashCloseCountRequest(
+            countedCashPaisa = facade.load(session, DATE).expectedCashPaisa, notes = null,
+        ), DATE).count
+        facade.closeDay(session, NativeCashCloseDayRequest(count.countId, null), DATE)
+        assertTrue(database.dailyCloseDao().isPostingClosed(DATE.toString()))
+        assertTrue(facade.load(session, DATE.plusDays(1)).postingOpen)
+        val failure = runCatching {
+            facade.reopenDay(session, "Accidental close", OPERATOR_PASSPHRASE.toCharArray(), DATE)
+        }.exceptionOrNull()
+        assertTrue(failure is SecurityFailure.PermissionDenied)
+        assertTrue(database.dailyCloseDao().isPostingClosed(DATE.toString()))
+    }
+
+    @Test
+    fun cashMovementAfterCountRefusesCloseWithoutPartialWrite() = runBlocking {
+        val session = cashierSession()
+        val count = facade.recordCount(session, NativeCashCloseCountRequest(0L, null), DATE).count
+        val expense = com.saaf.milkshop.application.expense.NativeExpenseFacade(database, security)
+        val context = expense.load(session, DATE)
+        expense.record(session, com.saaf.milkshop.application.expense.NativeExpenseRequest(
+            expenseCategoryAccountId = context.categories.first().accountId,
+            paymentAccountId = requireNotNull(context.defaultPaymentAccountId),
+            amountPaisa = 100L, notes = "After count",
+        ), DATE)
+        val events = database.eventDao().count()
+        val failure = runCatching {
+            facade.closeDay(session, NativeCashCloseDayRequest(count.countId, null), DATE)
+        }.exceptionOrNull()
+        assertTrue(failure is IllegalArgumentException)
+        assertTrue(failure!!.message!!.contains("count", ignoreCase = true))
+        assertFalse(database.dailyCloseDao().isPostingClosed(DATE.toString()))
+        assertEquals(events, database.eventDao().count())
+    }
+
+    @Test
+    fun pendingDeliveryRefusesCloseUntilResolved() = runBlocking {
+        val session = cashierSession()
+        val customer = com.saaf.milkshop.domain.CustomerManagementService(database).create("Close customer")
+        val milk = database.productDao().all().first { it.name == "Milk" }
+        val delivery = com.saaf.milkshop.domain.DeliveryService(database)
+        val id = delivery.create(com.saaf.milkshop.domain.DeliveryInput(
+            customerAccountId = customer, productId = milk.productId,
+            quantity = 1.0, businessDate = DATE.toString(),
+        ))
+        val count = facade.recordCount(session, NativeCashCloseCountRequest(0L, null), DATE).count
+        val failure = runCatching {
+            facade.closeDay(session, NativeCashCloseDayRequest(count.countId, null), DATE)
+        }.exceptionOrNull()
+        assertTrue(failure is IllegalArgumentException)
+        assertFalse(database.dailyCloseDao().isPostingClosed(DATE.toString()))
+        facade.resolvePendingDelivery(session, id, DATE)
+        facade.closeDay(session, NativeCashCloseDayRequest(count.countId, null), DATE)
+        assertTrue(database.dailyCloseDao().isPostingClosed(DATE.toString()))
+    }
+
+    @Test
+    fun earlierOpenDeliveryRefusesCloseUntilCashierResolvesIt() = runBlocking {
+        val session = cashierSession()
+        val customer = com.saaf.milkshop.domain.CustomerManagementService(database).create("Close customer")
+        val milk = database.productDao().all().first { it.name == "Milk" }
+        val delivery = com.saaf.milkshop.domain.DeliveryService(database)
+        val id = delivery.create(com.saaf.milkshop.domain.DeliveryInput(
+            customerAccountId = customer, productId = milk.productId,
+            quantity = 1.0, businessDate = DATE.minusDays(1).toString(),
+        ))
+        val count = facade.recordCount(session, NativeCashCloseCountRequest(0L, null), DATE).count
+        val eventsBefore = database.eventDao().count()
+        assertTrue(facade.load(session, DATE).pendingDeliveries.single().label.contains(DATE.minusDays(1).toString()))
+        val failure = runCatching {
+            facade.closeDay(session, NativeCashCloseDayRequest(count.countId, null), DATE)
+        }.exceptionOrNull()
+        assertTrue(failure is IllegalArgumentException)
+        assertFalse(database.dailyCloseDao().isPostingClosed(DATE.toString()))
+        assertEquals(eventsBefore, database.eventDao().count())
+        assertFalse(database.dailyCloseDao().isPostingClosed(DATE.minusDays(1).toString()))
+        facade.resolvePendingDelivery(session, id, DATE)
+        facade.closeDay(session, NativeCashCloseDayRequest(count.countId, null), DATE)
+        assertTrue(database.dailyCloseDao().isPostingClosed(DATE.toString()))
+        assertTrue(database.dailyCloseDao().isPostingClosed(DATE.minusDays(1).toString()))
+    }
+
     private companion object {
         val DATE: LocalDate = LocalDate.of(2026, 9, 20)
         const val OWNER_PASSPHRASE = "cash close owner passphrase 2026"

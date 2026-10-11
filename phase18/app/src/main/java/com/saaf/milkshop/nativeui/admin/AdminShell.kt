@@ -1,5 +1,7 @@
 package com.saaf.milkshop.nativeui.admin
 
+import com.saaf.milkshop.nativeui.common.NativeBottomNavigation
+import com.saaf.milkshop.nativeui.common.NativeNavigationLabel
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.heightIn
@@ -87,7 +89,7 @@ private fun AdminRailItem(
             unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
         icon = { Icon(icon, contentDescription = null) },
-        label = { Text(label) },
+        label = { NativeNavigationLabel(label) },
     )
 }
 
@@ -96,10 +98,7 @@ internal fun AdminNavigation(
     selected: AdminSection,
     onNavigate: (AdminSection) -> Unit,
 ) {
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.background,
-        tonalElevation = 0.dp,
-    ) {
+    NativeBottomNavigation {
         AdminNavItem(
             selected = selected == AdminSection.Work,
             tag = NativeUiTags.AdminNavWork,
@@ -148,7 +147,7 @@ private fun RowScope.AdminNavItem(
             .testTag(tag)
             .heightIn(min = 56.dp),
         icon = { Icon(icon, contentDescription = null) },
-        label = { Text(label) },
+        label = { NativeNavigationLabel(label) },
         colors = NavigationBarItemDefaults.colors(
             selectedIconColor = MaterialTheme.colorScheme.onPrimary,
             selectedTextColor = MaterialTheme.colorScheme.primary,

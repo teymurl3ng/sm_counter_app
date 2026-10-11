@@ -39,6 +39,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -113,13 +114,13 @@ internal fun CashCloseDiscardDialog(leaveGuard: EntryLeaveGuard) {
         text = { Text("The counted amount and reopen details you entered will be cleared.") },
         confirmButton = {
             TextButton(
-                onClick = leaveGuard::confirmDiscard,
+                onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction(leaveGuard::confirmDiscard),
                 modifier = Modifier.testTag(NativeUiTags.CashCloseDiscardDraft),
             ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(
-                onClick = leaveGuard::keepEditing,
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction(leaveGuard::keepEditing),
                 modifier = Modifier.testTag(NativeUiTags.CashCloseKeepDraft),
             ) { Text("Keep editing") }
         },
@@ -138,7 +139,7 @@ internal fun CashCloseEntryContent(
     leaveGuard: EntryLeaveGuard,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
-    allowReopen: Boolean = true,
+    allowReopen: Boolean = identity.role == com.saaf.milkshop.domain.AppRole.OWNER || identity.role == com.saaf.milkshop.domain.AppRole.ADMIN,
 ) {
     var countedText by rememberSaveable { mutableStateOf("") }
     var notes by rememberSaveable { mutableStateOf("") }
@@ -177,11 +178,16 @@ internal fun CashCloseEntryContent(
             businessDate = state.context.businessDate,
             postingOpen = state.context.postingOpen,
         )
+        NativeSectionTransition(
+            targetState = state,
+            contentKey = { it.receipt != null },
+            modifier = Modifier.weight(1f),
+        ) { state ->
         if (state.receipt != null) {
             CashCloseSuccess(
                 receipt = state.receipt,
                 onBack = onBack,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxSize(),
             )
         } else {
             CashCloseForm(
@@ -243,8 +249,9 @@ internal fun CashCloseEntryContent(
                     draftTouched = false
                 },
                 allowReopen = allowReopen,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxSize(),
             )
+        }
         }
     }
 }
@@ -273,6 +280,7 @@ private fun CashCloseForm(
     modifier: Modifier = Modifier,
 ) {
     val hapticContext = LocalContext.current
+    var confirmClose by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     val canCount = state.context.postingOpen &&
         countedPaisa != null &&
@@ -282,6 +290,8 @@ private fun CashCloseForm(
     val canClose = state.context.postingOpen &&
         activeCount != null &&
         reasonOk &&
+        activeCount.expectedCashPaisa == state.context.expectedCashPaisa &&
+        state.context.pendingDeliveries.isEmpty() &&
         !state.saving
     val canReopen = allowReopen &&
         !state.context.postingOpen &&
@@ -452,13 +462,10 @@ private fun CashCloseForm(
                     )
                     Spacer(Modifier.height(8.dp))
                 }
-                // H9: pending deliveries freeze at close — list them with a
-                // one-tap resolve. The close proceeds either way; after close
-                // the only remedy is an owner reopen.
+                // Resolve unfinished deliveries before locking the business date.
                 if (state.context.pendingDeliveries.isNotEmpty()) {
                     Text(
-                        "Pending deliveries — they cannot be confirmed after close " +
-                            "(the remedy then is an owner reopen):",
+                        "Finish or archive these deliveries before closing the day:",
                         style = MaterialTheme.typography.titleSmall,
                         modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashClosePendingDeliveries),
                     )
@@ -483,6 +490,7 @@ private fun CashCloseForm(
                 }
             }
         if (activeCount != null) {
+            if (activeCount.expectedCashPaisa != state.context.expectedCashPaisa) Text("Cash changed after this count. Count the drawer again before closing.", color = MaterialTheme.colorScheme.error)
             state.context.coverageNote?.let { coverageNote ->
                 Text(
                     coverageNote,
@@ -507,7 +515,7 @@ private fun CashCloseForm(
             if (state.context.postingOpen) {
                 val press1 = rememberPressSource()
                 Button(
-                    onClick = { hapticContext.hapticCommit(); onCloseDay() },
+                    onClick = { hapticContext.hapticCommit(); confirmClose = true },
                     enabled = canClose,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = SaafYellow,
@@ -545,6 +553,27 @@ private fun CashCloseForm(
         }
         Spacer(Modifier.height(4.dp))
     }
+    if (confirmClose) {
+        AlertDialog(
+            onDismissRequest = { confirmClose = false },
+            title = { Text("Close ${state.context.businessDate}?") },
+            text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Posting for this date and earlier unclosed dates will be locked. Only Owner/Admin can reopen with a reason and full passphrase.")
+                state.context.coverageNote?.let { Text(it) }
+                Text("Counted cash: PKR ${formatMoney(activeCount?.countedCashPaisa ?: 0L)}")
+            } },
+            confirmButton = { TextButton(
+                enabled = canClose,
+                onClick = { confirmClose = false; hapticContext.hapticCommit(); onCloseDay() },
+                modifier = Modifier.testTag(NativeUiTags.CashCloseConfirm),
+            ) { Text("Close day") } },
+            dismissButton = { TextButton(
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction { confirmClose = false },
+                modifier = Modifier.testTag(NativeUiTags.CashCloseCancel),
+            ) { Text("Keep day open") } },
+        )
+    }
+
 }
 
 @Composable
@@ -570,7 +599,7 @@ val hapticContext = LocalContext.current
         ) {
             Text("Reopen this date", style = MaterialTheme.typography.titleMedium)
             Text(
-                "Quick PIN cannot authorize reopen. Enter your full Saaf passphrase.",
+                "Quick PIN cannot authorize reopen. Enter your full passphrase.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -635,7 +664,7 @@ private fun ReopenSuccessPanel(success: NativeCashCloseReopenSubmission) {
             .semantics { liveRegion = LiveRegionMode.Polite }
             .testTag(NativeUiTags.CashCloseReopenSuccess),
     ) {
-        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.Top) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
             Icon(Icons.Outlined.CheckCircle, contentDescription = null)
             Spacer(Modifier.width(10.dp))
             Column {
@@ -676,6 +705,7 @@ private fun CashCloseSuccess(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    com.saaf.milkshop.nativeui.common.NativeReceiptFeedback("close", receipt.actionId)
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -713,14 +743,14 @@ private fun CashCloseSuccess(
                 SummaryRow("Close record", "#${receipt.actionId}")
             }
         }
+        Button(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onBack), modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashCloseDone)) { Text("Done") }
     }
 }
 
 @Composable
 private fun SummaryRow(label: String, value: String) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.width(16.dp))
         Text(value, fontWeight = FontWeight.SemiBold)
     }
 }
@@ -755,7 +785,7 @@ private fun StatusPanel(
             .semantics { liveRegion = LiveRegionMode.Polite }
             .testTag(tag),
     ) {
-        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.Top) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
             Icon(Icons.Outlined.WarningAmber, contentDescription = null)
             Spacer(Modifier.width(10.dp))
             Column {

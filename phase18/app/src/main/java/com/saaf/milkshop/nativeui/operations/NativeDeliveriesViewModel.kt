@@ -110,13 +110,14 @@ class NativeDeliveriesViewModel(
             try {
                 val context = withContext(Dispatchers.IO) { facade.load(session) }
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                _state.value = NativeDeliveriesState.Ready(context, refreshing = false)
+                _state.value = (_state.value as? NativeDeliveriesState.Ready)?.copy(context = context, refreshing = false, error = null)
+                    ?: NativeDeliveriesState.Ready(context, refreshing = false)
             } catch (error: Throwable) {
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 if (error is SecurityFailure.SessionExpired || previous == null) {
                     handleLoadFailure(error)
                 } else {
-                    _state.value = previous.copy(
+                    _state.value = ((_state.value as? NativeDeliveriesState.Ready) ?: previous).copy(
                         refreshing = false,
                         error = error.message ?: publicMessage(error),
                     )
@@ -187,6 +188,13 @@ class NativeDeliveriesViewModel(
     fun selectDraftCustomer(id: Long?) {
         val current = _state.value as? NativeDeliveriesState.Ready ?: return
         _state.value = current.copy(draftCustomerId = id)
+    }
+
+    fun discardDraft() {
+        val current = _state.value as? NativeDeliveriesState.Ready ?: return
+        if (current.creating) return
+        _state.value = current.copy(draftCustomerId = null, draftProductId = null,
+            draftQuantity = "", draftRoute = "", draftNotes = "", error = null)
     }
 
     fun selectDraftProduct(id: Long?) {

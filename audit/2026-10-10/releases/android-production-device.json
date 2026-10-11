@@ -1,0 +1,17 @@
+{
+  "installed_apk_sha256": "588e4f15cc0f06b9b47d9c315e73b233290bf15bd3f372f708d40ea5fba7c44c",
+  "matches_release": true,
+  "resumed_activity": [
+    "topResumedActivity=ActivityRecord{132505628 u0 com.saaf.milkshop/.Main t34547}",
+    "ResumedActivity: ActivityRecord{132505628 u0 com.saaf.milkshop/.Main t34547}"
+  ],
+  "screen_text": [
+    "Saaf Milk",
+    "Your shop, ready for the day.",
+    "Shop ledger ready.",
+    "Daily work works offline",
+    "Private account access",
+    "Continue",
+    "Choose your account on the next screen."
+  ]
+}

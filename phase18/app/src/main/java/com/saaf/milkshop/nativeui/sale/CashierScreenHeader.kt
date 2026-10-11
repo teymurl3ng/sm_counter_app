@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -16,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.nativeui.theme.SaafInk
 import com.saaf.milkshop.nativeui.common.LocalDayStatusAction
@@ -48,55 +50,31 @@ fun CashierScreenHeader(
 ) {
     if (!LocalPaneHeaderEnabled.current) return
     val dayStatusAction = onDayStatusClick ?: LocalDayStatusAction.current
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.onPrimary,
-    ) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .padding(horizontal = 18.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.headlineMedium,
-            )
-            Row(
-                Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
+    com.saaf.milkshop.nativeui.common.NativeChromeBand(
+        title = when (title) {
+            "Cash count and close", "Cash count & close" -> "Count & close"
+            else -> title
+        },
+        modifier = modifier,
+        trailing = if (showDayChip) ({
+            Surface(
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction { dayStatusAction?.invoke() },
+                enabled = dayStatusAction != null,
+                modifier = Modifier.height(48.dp),
+                color = if (postingOpen) SaafYellow else MaterialTheme.colorScheme.error,
+                contentColor = if (postingOpen) SaafInk else MaterialTheme.colorScheme.onError,
+                shape = RoundedCornerShape(999.dp),
             ) {
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        text = displayName,
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                    Text(
-                        text = "$roleLabel · ${formatCashierBusinessDate(businessDate)}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.82f),
-                    )
-                }
-                if (showDayChip) {
-                    Surface(
-                        onClick = { dayStatusAction?.invoke() },
-                        enabled = dayStatusAction != null,
-                        color = if (postingOpen) SaafYellow else MaterialTheme.colorScheme.error,
-                        contentColor = if (postingOpen) SaafInk else MaterialTheme.colorScheme.onError,
-                        shape = RoundedCornerShape(999.dp),
-                    ) {
-                        Text(
-                            text = if (postingOpen) "Open" else "Closed",
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                            style = MaterialTheme.typography.labelLarge,
-                        )
-                    }
-                }
+                Text(if (postingOpen) "Open" else "Closed",
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 12.sp, lineHeight = 16.sp),
+                    maxLines = 1)
             }
-        }
+        }) else null,
+    ) {
+        com.saaf.milkshop.nativeui.common.NativeChromeContext(com.saaf.milkshop.nativeui.common.LocalShopName.current)
+        com.saaf.milkshop.nativeui.common.NativeChromeContext(displayName, prominent = true)
+        com.saaf.milkshop.nativeui.common.NativeChromeContext("$roleLabel · ${formatCashierBusinessDate(businessDate)}")
     }
 }
 

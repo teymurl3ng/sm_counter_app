@@ -1,0 +1,75 @@
+{
+  "status": "READY_FOR_USER_TESTING; formal acceptance pending",
+  "device": "R8VXA02SNKH",
+  "qaPackage": "com.saaf.milkshop.qa",
+  "versionName": "0.4.1-qa",
+  "apk": "audit\\2026-10-11\\capsule-implementation\\Saaf-Milk-QA.apk",
+  "apkSha256": "64306a93bac72ae4f5a09f7fb5dd3311b2a82eb422d371c6d75b86693f9f5643",
+  "install": "adb -s R8VXA02SNKH install -r; Success",
+  "dataReset": false,
+  "qaFirstInstallTimePreserved": "2026-10-10 16:31:46",
+  "qaLastUpdateTime": "2026-10-11 04:37:58",
+  "existingAccountsObserved": [
+    "Acceptance Owner",
+    "Preview Admin",
+    "Preview Cashier",
+    "Preview Manager",
+    "Preview Operator"
+  ],
+  "leftOpen": "Preview Cashier > More > Count cash, blank fields; no cash count written in interactive QA",
+  "qaFast": "PASS; 93 unit passes, one existing skip",
+  "affectedQaScreen": {
+    "screen": "surfaces",
+    "tests": 48,
+    "passed": 48,
+    "failed": 0
+  },
+  "fullCheckpoint": {
+    "tests": 600,
+    "passed": 596,
+    "failed": 4,
+    "status": "FAIL; all four cases passed in focused retry; not relabeled PASS"
+  },
+  "inventory": {
+    "controls": 1001,
+    "untested": 0,
+    "orphans": 0
+  },
+  "fullRunEvidence": {
+    "png": 24,
+    "unreviewed": 24,
+    "mp4": 1
+  },
+  "interactiveAfterImages": 2,
+  "visualAcceptance": "BLOCKED; Owner review pending",
+  "protectedFiles": [
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/data/BudgetDataRepository.kt",
+      "unchanged": true
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/data/Phase3SecurityDaos.kt",
+      "unchanged": true
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/data/SyncEntities.kt",
+      "unchanged": true
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/BudgetManagement.kt",
+      "unchanged": true
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/Costing.kt",
+      "unchanged": true
+    }
+  ],
+  "ordinaryPackageMetadataUnchanged": true,
+  "newProtectedLogicEdits": 0,
+  "finalSourceHashesVerified": true,
+  "limitations": [
+    "Representative screenshots; no exhaustive per-state visual review",
+    "Perceived motion/haptics require physical review",
+    "Fully green single checkpoint remains formal acceptance item"
+  ]
+}

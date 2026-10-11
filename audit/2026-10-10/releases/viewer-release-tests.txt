@@ -1,0 +1,204 @@
+▶ normalize
+  ✔ trims and lowercases username (0.8119ms)
+  ✔ strips non-digits from credential (0.2605ms)
+  ✔ validates username and credential shapes (0.2754ms)
+✔ normalize (2.5493ms)
+▶ decideViewerAccess
+  ✔ allows active owner and admin (0.3197ms)
+  ✔ denies lower roles (0.1665ms)
+  ✔ denies disabled (0.1457ms)
+  ✔ maps invalid credentials and not authorized (0.1368ms)
+  ✔ maps network failure to UNKNOWN (0.1601ms)
+✔ decideViewerAccess (1.2956ms)
+▶ translateAuditEvent (C0.5)
+  ✔ covers every known action (1.1936ms)
+  ✔ uses safe fallback for unknown actions and missing optional detail (0.3166ms)
+  ✔ keeps HTML/script-like values as plain text (no crash) (0.2315ms)
+  ✔ credential reset never embeds credential material in summary (0.1944ms)
+✔ translateAuditEvent (C0.5) (3.174ms)
+▶ extractSafeDetailFields
+  ✔ renders only whitelisted safe fields (1.4265ms)
+  ✔ suppresses credential-like keys and flags them (0.2984ms)
+  ✔ detailHasSensitiveKeys detects nested-looking key names (0.2279ms)
+  ✔ shows safe recovery counts (0.3398ms)
+✔ extractSafeDetailFields (2.6624ms)
+▶ mapActivityList / mapActivityEvent
+  ✔ maps a valid list newest-first preserving order (0.5728ms)
+  ✔ links shop/staff only when UUIDs are valid (0.3495ms)
+  ✔ marks recover_identity as important (0.2815ms)
+  ✔ returns null on malformed list payload (0.1815ms)
+  ✔ maps empty list (0.1169ms)
+✔ mapActivityList / mapActivityEvent (1.846ms)
+▶ filters / query parsing
+  ✔ parses group, target, dates, and paging (2.2071ms)
+  ✔ rejects invalid dates, inverted range, long target, bad group (0.309ms)
+  ✔ maps single-action groups to rpc action; multi-action needs post-filter (0.2033ms)
+  ✔ filters events by group (0.2746ms)
+  ✔ validates date helpers (0.1981ms)
+  ✔ categoryForAction covers groups (0.13ms)
+✔ filters / query parsing (3.6084ms)
+▶ privileged Account Server headers
+  ✔ uses opaque secret keys only as apikey (3.0316ms)
+  ✔ uses legacy service-role JWTs as apikey and bearer (0.4175ms)
+  ✔ rejects publishable and unknown keys (1.2026ms)
+✔ privileged Account Server headers (6.0133ms)
+▶ admin security parsing
+  ✔ validates UUIDs and Auth response IDs (0.4736ms)
+  ✔ maps provider failures without exposing their body (0.2422ms)
+  ✔ maps Postgres codes to stable safe errors (0.4547ms)
+✔ admin security parsing (2.8158ms)
+▶ resolveHostingChannel
+  ✔ maps Vercel channels (0.731ms)
+✔ resolveHostingChannel (1.7563ms)
+▶ resolveAccountServerEnv
+  ✔ requires ACCOUNT_SERVER_ENV (0.362ms)
+  ✔ local/preview/development require DEV (0.2791ms)
+  ✔ Vercel production requires PROD (0.173ms)
+  ✔ rejects env/url project mismatches (0.1807ms)
+  ✔ rejects unknown env labels (0.3227ms)
+✔ resolveAccountServerEnv (3.0855ms)
+▶ Credential generator
+  ✔ generates exactly 15 ASCII digits (1.7424ms)
+  ✔ can generate many credentials without throwing (4.2368ms)
+  ✔ formats credential correctly (0.2779ms)
+✔ Credential generator (7.4883ms)
+✔ retains identities after lost, malformed, proxy and server responses (1.0171ms)
+✔ recognizes valid completion and definitive permission/SQL rejection (0.3794ms)
+▶ mapAdminOverview
+  ✔ maps counts and recent events from admin_overview (1.8713ms)
+  ✔ treats empty recent_activity as valid empty list (0.3042ms)
+  ✔ rejects incomplete payloads instead of inventing zeroes (0.245ms)
+✔ mapAdminOverview (3.6432ms)
+▶ translateAuditEvent
+  ✔ translates known actions (0.4125ms)
+  ✔ falls back safely for unknown actions and missing fields (0.4108ms)
+  ✔ does not invent display names from username alone (0.1739ms)
+✔ translateAuditEvent (1.2843ms)
+▶ formatActivityTime
+  ✔ formats same-day times compactly (36.7099ms)
+✔ formatActivityTime (36.9802ms)
+▶ overview loading contract
+  ✔ loading UI must not receive overview counts (null until ready) (0.1538ms)
+✔ overview loading contract (0.3327ms)
+▶ safeAccountServerMeta
+  ✔ returns live config when load succeeds (0.8376ms)
+  ✔ fails closed to unknown when load throws (0.2728ms)
+✔ safeAccountServerMeta (2.2587ms)
+▶ safeNextPath
+  ✔ allows known Viewer destinations (0.9337ms)
+  ✔ rejects open redirects (0.232ms)
+✔ safeNextPath (2.2247ms)
+▶ deriveShopStatus
+  ✔ maps active/inactive (0.8195ms)
+✔ deriveShopStatus (1.9364ms)
+▶ mapShopList
+  ✔ maps valid shops (0.6514ms)
+  ✔ maps empty list (0.8156ms)
+  ✔ rejects malformed (0.2045ms)
+✔ mapShopList (1.9761ms)
+▶ mapShopDetail
+  ✔ separates owners from assigned staff (0.5607ms)
+  ✔ handles no assigned staff (0.183ms)
+  ✔ maps disabled/terminated staff status (0.2011ms)
+✔ mapShopDetail (1.2186ms)
+▶ mapShopActivity
+  ✔ keeps only structured shop_id matches for shop actions (0.4913ms)
+  ✔ does not match on shop name alone (0.1523ms)
+✔ mapShopActivity (0.8376ms)
+▶ deriveStaffStatus
+  ✔ maps active (0.8384ms)
+  ✔ maps disabled (0.2502ms)
+  ✔ maps terminated (0.1909ms)
+  ✔ terminated wins over active=true inconsistency (0.2214ms)
+✔ deriveStaffStatus (3.0347ms)
+▶ formatStaffRole
+  ✔ capitalizes frozen roles (0.2635ms)
+✔ formatStaffRole (0.4207ms)
+▶ formatShopsLabel
+  ✔ shows All shops for owners (0.4844ms)
+  ✔ formats ordinary assignments (0.2249ms)
+✔ formatShopsLabel (0.9218ms)
+▶ mapStaffList
+  ✔ maps a valid list (0.6283ms)
+  ✔ maps empty list (0.7714ms)
+  ✔ rejects malformed response (0.2197ms)
+  ✔ maps disabled and terminated (0.1919ms)
+✔ mapStaffList (2.0801ms)
+▶ mapStaffDetail
+  ✔ maps owner with All shops (0.324ms)
+  ✔ maps terminated detail (0.12ms)
+✔ mapStaffDetail (0.5739ms)
+▶ isUuid
+  ✔ validates staff ids (0.1939ms)
+✔ isUuid (0.2578ms)
+▶ classifyStaffEmpty
+  ✔ differentiates empty causes (0.129ms)
+✔ classifyStaffEmpty (0.1989ms)
+▶ formatStaffDate
+  ✔ produces a non-ISO readable date (37.7041ms)
+✔ formatStaffDate (37.8463ms)
+▶ System health mapping
+  ✔ maps online with checked_at (0.8903ms)
+  ✔ maps unavailable without stale checked_at (0.2175ms)
+  ✔ online without at still works (0.1698ms)
+✔ System health mapping (2.5489ms)
+▶ System environment / contract
+  ✔ labels Account Server env as DEV (0.3238ms)
+  ✔ labels missing/unknown Account Server env as UNKNOWN (0.1569ms)
+  ✔ distinguishes Viewer deployment from Account Server env (0.2114ms)
+  ✔ static info carries configured contract (0.304ms)
+✔ System environment / contract (1.3546ms)
+▶ System account context
+  ✔ maps display name, username, and role safely (0.3008ms)
+  ✔ rejects incomplete profiles (0.1371ms)
+✔ System account context (0.6334ms)
+▶ System access model
+  ✔ states Owner/Admin Viewer access (0.2494ms)
+  ✔ lists frozen role catalog (0.7442ms)
+✔ System access model (1.1334ms)
+▶ System keep-alive / limitations
+  ✔ keep-alive is informational only (0.383ms)
+  ✔ read-only and limitations are present (0.2417ms)
+✔ System keep-alive / limitations (0.7572ms)
+▶ System shop summary
+  ✔ maps overview shop counts (0.1919ms)
+✔ System shop summary (0.2579ms)
+▶ System security payload checks
+  ✔ detects forbidden keys (0.2479ms)
+  ✔ static system response shape has no secrets (0.1557ms)
+✔ System security payload checks (0.4945ms)
+▶ System viewer meta helpers
+  ✔ shortens commit SHA (0.1195ms)
+✔ System viewer meta helpers (0.188ms)
+▶ System loading contract
+  ✔ loading UI must not treat unchecked health as Offline (0.098ms)
+✔ System loading contract (0.1567ms)
+▶ Validation
+  ✔ validates username (1.0964ms)
+  ✔ validates display name (0.2723ms)
+  ✔ validates role (0.1958ms)
+  ✔ validates shops (0.3788ms)
+✔ Validation (4.5688ms)
+✔ invalidates logical keys by their actual request URLs (34.6904ms)
+✔ a late old-session 401 cannot clear a new session (0.9274ms)
+✔ invalidation during a shared request refetches before publishing (1.0366ms)
+▶ viewer-cache
+  ✔ isolates sessions and clears on identity change (27.7603ms)
+  ✔ single-flights concurrent misses (32.0181ms)
+  ✔ clears cache on 401 and does not store it (0.4521ms)
+✔ viewer-cache (61.6696ms)
+▶ write RPC response contract
+  ✔ accepts empty 204 acknowledgements for each SQL void mutation (12.1663ms)
+  ✔ does not treat absent identity/shop results as valid acknowledgements (0.681ms)
+  ✔ preserves JSON UUID and structured results (2.0533ms)
+  ✔ accepts the JSON null form of a void success (0.2364ms)
+  ✔ keeps malformed JSON and unexplained empty 200 responses ambiguous (1.1331ms)
+✔ write RPC response contract (17.1194ms)
+ℹ tests 114
+ℹ suites 41
+ℹ pass 114
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 494.8642

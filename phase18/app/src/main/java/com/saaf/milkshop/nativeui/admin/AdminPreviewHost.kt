@@ -1,10 +1,11 @@
 package com.saaf.milkshop.nativeui.admin
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.scaleIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -247,7 +248,7 @@ fun AdminPreviewHost(
             }
         }
 
-        val businessDate = LocalDate.now().toString()
+        val businessDate = com.saaf.milkshop.sync.BusinessClock.today().toString()
         val sectionStateHolder = rememberSaveableStateHolder()
         // Static chrome (Cashier pattern): one scaffold + one header at the
         // host, outside the pane transition — nav and header never reload.
@@ -286,17 +287,12 @@ fun AdminPreviewHost(
             modifier = Modifier.weight(1f),
         ) { section ->
         sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}") {
-        AnimatedContent(
+        androidx.compose.runtime.CompositionLocalProvider(com.saaf.milkshop.nativeui.sale.LocalPaneHeaderEnabled provides false) {
+        NativeSectionTransition(
             targetState = workDestination,
             contentKey = { it },
-            transitionSpec = {
-                // No alpha: the incoming pane is fully opaque from frame 1 and
-                // just settles 96%->100%, so there is never a blank/flash frame.
-                // The old pane is covered instantly by the opaque new one.
-                scaleIn(initialScale = 0.96f, animationSpec = tween(200)) togetherWith ExitTransition.None
-            },
-            label = "admin_work_destination",
         ) { destination ->
+        val registerPaneGuard = com.saaf.milkshop.nativeui.common.rememberPaneGuardRegistration({ activeEntryGuard }) { activeEntryGuard = it }
         when {
             section == AdminSection.Work &&
                 destination == NativeAdminWorkDestination.RecordExpense -> {
@@ -308,7 +304,7 @@ fun AdminPreviewHost(
                     onRecordExpense = expenseViewModel::record,
                     onRecordAnother = expenseViewModel::recordAnother,
                     onBackToWork = { returnAdminWorkHome() },
-                    onRegisterGuard = { activeEntryGuard = it },
+                    onRegisterGuard = registerPaneGuard,
                     admScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.AdminShellRoot)) {
                             CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {
@@ -517,6 +513,7 @@ fun AdminPreviewHost(
         }
         }
         }
+        }
     }
 }
         }
@@ -580,7 +577,7 @@ fun AdminShellChromePreview(
                 -> onAdminSectionChange(AdminSection.Work)
             }
         }
-        val businessDate = LocalDate.now().toString()
+        val businessDate = com.saaf.milkshop.sync.BusinessClock.today().toString()
         AdminScaffold(
             snackbarHostState = snackbarHostState,
             section = adminSection,

@@ -1,5 +1,6 @@
 package com.saaf.milkshop.application.operations
 
+import androidx.room3.withWriteTransaction
 import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
@@ -79,26 +80,30 @@ class NativeMakeYogurtFacade(
                 "Not enough milk on hand. Available ${context.milkOnHandLabel}. Change the milk amount.",
             )
         }
-        val result = commands.recordProduction(
-            sessionHandle,
-            YogurtProductionInput(
-                occurredAt = context.businessDate,
-                milkLitersUsed = request.milkLitersUsed,
-                yogurtKgProduced = request.yogurtKgProduced,
-                notes = request.notes?.trim()?.takeIf { it.isNotEmpty() },
-            ),
-        )
-        val refreshed = load(sessionHandle, date)
-        return NativeMakeYogurtSubmission(
-            receipt = NativeMakeYogurtReceipt(
-                eventId = result.eventId,
-                milkLitersUsed = round4(result.milkLitersUsed),
-                yogurtKgProduced = round4(result.yogurtKgProduced),
-                milkOnHandLabel = refreshed.milkOnHandLabel,
-                yogurtOnHandLabel = refreshed.yogurtOnHandLabel,
-            ),
-            refreshedContext = refreshed,
-        )
+        // The mutation, required evidence and receipt reads commit together.
+        // A read/authorization failure cannot report failure after saving.
+        return database.withWriteTransaction {
+            val result = commands.recordProduction(
+                sessionHandle,
+                YogurtProductionInput(
+                    occurredAt = context.businessDate,
+                    milkLitersUsed = request.milkLitersUsed,
+                    yogurtKgProduced = request.yogurtKgProduced,
+                    notes = request.notes?.trim()?.takeIf { it.isNotEmpty() },
+                ),
+            )
+            val refreshed = load(sessionHandle, date)
+            NativeMakeYogurtSubmission(
+                receipt = NativeMakeYogurtReceipt(
+                    eventId = result.eventId,
+                    milkLitersUsed = round4(result.milkLitersUsed),
+                    yogurtKgProduced = round4(result.yogurtKgProduced),
+                    milkOnHandLabel = refreshed.milkOnHandLabel,
+                    yogurtOnHandLabel = refreshed.yogurtOnHandLabel,
+                ),
+                refreshedContext = refreshed,
+            )
+        }
     }
 
     private suspend fun stockOf(productId: Long): Double =

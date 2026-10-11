@@ -1,0 +1,141 @@
+
+> Configure project :
+QA connected filter classCount=221 preferredSerial=R8VXA02SNKH
+QA tip: export ANDROID_SERIAL=R8VXA02SNKH before gradlew if multiple adb devices are connected
+
+> Configure project :app
+WARNING: The option setting 'android.disallowKotlinSourceSets=false' is experimental.
+The current default is 'true'.
+QA app class filter applied (221 entries)
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :checkFrozenBaselines
+OK phase18/milk-shop-core-logic-spec-v2.md
+OK phase18/milk_shop_schema_sql_only_final_v2.sql
+FROZEN_BASELINES: PASS
+
+> Task :checkGoldenLedgerContract
+Golden ledger host contract OK (instrumented execution is enforced by qaScreen/qaCheckpoint).
+GOLDEN_LEDGER_CONTRACT: PASS
+
+> Task :checkNativeInventory
+inventory rows=1001 untested=0 orphans=0
+NATIVE_INVENTORY: PASS
+UNTESTED_COUNT=0
+
+> Task :checkUiOnly
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+LOGIC EXCEPTION ACTIVE
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Protected files changed with allow.logic override:
+  - phase18/app/src/main/java/com/saaf/milkshop/data/BudgetDataRepository.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/data/Phase3SecurityDaos.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/data/SyncEntities.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/domain/BudgetManagement.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/domain/Costing.kt
+CHECK_UI_ONLY: PASS_WITH_LOGIC_EXCEPTION
+
+> Task :verifyBridgeContract
+Bridge contract OK: v5, 92 endpoints, SHA-256 276C3C9B263322EC90091834F659B068E920659D47E71B1F195D7AD4DA46906F
+
+> Task :verifyUiCleanup
+UI cleanup gate OK: 88 active TypeScript/TSX files; 23 prototype paths and 6 dependencies absent; 3 packaged files scanned.
+
+> Task :app:verifyHybridWebAssets
+> Task :app:preBuild
+> Task :app:preDebugBuild
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
+
+> Task :app:kspDebugKotlin UP-TO-DATE
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar UP-TO-DATE
+> Task :app:preDebugAndroidTestBuild SKIPPED
+> Task :app:processDebugAndroidTestManifest UP-TO-DATE
+> Task :app:generateDebugAndroidTestBuildConfig UP-TO-DATE
+> Task :app:generateDebugAndroidTestResources UP-TO-DATE
+> Task :app:packageDebugAndroidTestResources UP-TO-DATE
+> Task :app:processDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :app:parseDebugAndroidTestLocalResources UP-TO-DATE
+> Task :app:generateDebugAndroidTestRFile UP-TO-DATE
+> Task :app:bundleDebugClassesToRuntimeJar UP-TO-DATE
+
+> Task :app:kspDebugUnitTestKotlin UP-TO-DATE
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :app:preDebugUnitTestBuild
+> Task :app:compileDebugUnitTestKotlin UP-TO-DATE
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
+> Task :app:testDebugUnitTest UP-TO-DATE
+
+> Task :app:kspDebugAndroidTestKotlin
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :checkNativeInventoryCheckpoint
+inventory rows=1001 untested=0 orphans=0
+NATIVE_INVENTORY: PASS
+UNTESTED_COUNT=0
+
+> Task :devicePreflight
+Using device serial=R8VXA02SNKH model=SM-A065F
+ANDROID_SERIAL=R8VXA02SNKH
+DEVICE_PREFLIGHT: PASS
+
+> Task :app:javaPreCompileDebugAndroidTest UP-TO-DATE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+
+> Task :app:compileDebugAndroidTestKotlin FAILED
+e: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerCashCloseScreenContractTest.kt:68:23 Unresolved reference 'espresso'.
+e: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerCollectionEntryScreenContractTest.kt:75:23 Unresolved reference 'espresso'.
+e: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerExpenseScreenContractTest.kt:67:23 Unresolved reference 'espresso'.
+e: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerPaySalaryScreenContractTest.kt:67:23 Unresolved reference 'espresso'.
+e: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerPaySupplierScreenContractTest.kt:67:23 Unresolved reference 'espresso'.
+e: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerSaleEntryScreenContractTest.kt:67:23 Unresolved reference 'espresso'.
+
+> Task :app:dexBuilderDebug UP-TO-DATE
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileDebugAndroidTestKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 6s
+51 actionable tasks: 11 executed, 40 up-to-date

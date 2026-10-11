@@ -1,0 +1,16 @@
+Preparing portable PostgreSQL runtime
+Initializing disposable localhost cluster
+postgres (PostgreSQL) 18.6
+Executing bootstrap and concurrent connection fixtures
+PASS fresh bootstrap executes in native PostgreSQL with local Auth stand-ins
+PASS direct staff writes cannot remove the final active owner, regardless of other business owners
+PASS ambiguous create reconciliation retains unlinked Auth identity and resolves linked identity
+PASS fresh sync RPCs assign sequences and return shop-scoped records
+PASS competing disable operations at READ COMMITTED retain an active owner
+PASS competing demote operations at READ COMMITTED retain an active owner
+PASS competing delete operations at READ COMMITTED retain an active owner
+PASS competing disable operations at REPEATABLE READ retain an active owner
+PASS competing demote operations at REPEATABLE READ retain an active owner
+PASS competing delete operations at REPEATABLE READ retain an active owner
+10 SQL checks passed. Concurrent native connections verified. Deployed Supabase parity and real Auth behavior are not validated.
+Disposable cluster stopped

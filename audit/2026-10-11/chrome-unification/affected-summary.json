@@ -1,0 +1,7 @@
+{
+  "tests": 35,
+  "failed": 0,
+  "skipped": 0,
+  "passed": 35,
+  "note": "Initial affected run; followed by Back-slot and font-metric refinements"
+}

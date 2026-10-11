@@ -1,0 +1,18 @@
+[
+  "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\activity\\CashierActivityScreen.kt",
+  "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\admin\\AdminShell.kt",
+  "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\auth\\NativeAuthenticationScreens.kt",
+  "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\manager\\ManagerShell.kt",
+  "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\operations\\OperationsWorkScreen.kt",
+  "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\owner\\OwnerShell.kt",
+  "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\sale\\CashierSaleScreen.kt",
+  "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\sale\\CashierScreenHeader.kt",
+  "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\welcome\\WelcomeScreen.kt",
+  "phase18\\app\\src\\androidTest\\java\\com\\saaf\\milkshop\\NativeAccessEvidenceTest.kt",
+  "phase18\\app\\src\\androidTest\\java\\com\\saaf\\milkshop\\NativeAuthenticationScreenContractTest.kt",
+  "phase18\\app\\src\\androidTest\\java\\com\\saaf\\milkshop\\NativeFoundationUiTest.kt",
+  "phase18\\app\\src\\androidTest\\java\\com\\saaf\\milkshop\\NativeOwnerBootstrapUiTest.kt",
+  "phase18\\build.gradle.kts",
+  "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/NativeChrome.kt",
+  "phase18/app/src/androidTest/java/com/saaf/milkshop/NativeChromeGeometryTest.kt"
+]

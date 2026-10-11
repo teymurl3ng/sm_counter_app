@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-11",
+  "scope": "Stable native header/footer geometry",
+  "device": "R8VXA02SNKH",
+  "package": "com.saaf.milkshop.qa",
+  "label": "Saaf Milk (preview)",
+  "installation": "install -r; success",
+  "version": "0.4.1-qa",
+  "lastUpdateTime": "2026-10-11 05:55:01",
+  "firstInstallTime": "2026-10-10 16:31:46",
+  "apk": "Saaf-Milk-QA.apk",
+  "apkSha256": "c14d0af6d24b8770474ec27aa163a214075b495908f43ef514f9a4da0739c417",
+  "existingAccountsObserved": [
+    "Acceptance Owner",
+    "Preview Admin",
+    "Preview Cashier",
+    "Preview Manager",
+    "Preview Operator"
+  ],
+  "leftAt": "Preview Cashier / More / blank Count cash; no interactive transaction posted",
+  "ordinaryPackage": "com.saaf.milkshop",
+  "ordinaryInstallMetadataUnchanged": true,
+  "protectedFilesIdentical": true,
+  "qaFast": "PASS",
+  "inventory": {
+    "rows": 1001,
+    "untested": 0,
+    "orphans": 0
+  },
+  "initialAffected": {
+    "passed": 35,
+    "total": 35
+  },
+  "finalGeometry": {
+    "passed": 9,
+    "total": 9
+  },
+  "checkpoint": {
+    "status": "FAIL",
+    "passed": 606,
+    "total": 609,
+    "failures": 3,
+    "productionFrozen": true
+  },
+  "exactFailedCasesUnchangedRerun": {
+    "passed": 3,
+    "total": 3
+  },
+  "freshOwnerBootstrap": {
+    "passed": 1,
+    "total": 1,
+    "testSelectorCorrected": true
+  },
+  "visualAcceptance": "BLOCKED",
+  "checkpointPngs": 33,
+  "checkpointUnreviewed": 33,
+  "additionalInstalledAppPngs": 4,
+  "additionalInstalledAppUnreviewed": 4,
+  "motionMp4": 1,
+  "limitations": [
+    "Representative visual evidence, not every state of every mapped screen",
+    "Formal full checkpoint remains FAIL despite passing focused reruns",
+    "Owner visual/motion review pending"
+  ]
+}

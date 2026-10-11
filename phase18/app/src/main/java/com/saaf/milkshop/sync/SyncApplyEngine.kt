@@ -66,24 +66,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                 // clean boundary so a half-applied record (header without its
                 // ledger children) can never commit — idempotent re-apply of
                 // a skipped uid would otherwise never repair it.
-                executeSQL("SAVEPOINT record_apply")
-                val outcome: PerRecord = try {
-                    val result = applyOne(record)
-                    executeSQL("RELEASE record_apply")
-                    result
-                } catch (cancelled: kotlinx.coroutines.CancellationException) {
-                    executeSQL("ROLLBACK TO record_apply")
-                    executeSQL("RELEASE record_apply")
-                    // Review finding (go 7): cancellation is not a record
-                    // failure — never convert it to a skip/audit; rethrow so
-                    // the worker stops and the batch retries whole.
-                    throw cancelled
-                } catch (failure: Throwable) {
-                    executeSQL("ROLLBACK TO record_apply")
-                    executeSQL("RELEASE record_apply")
-                    auditSkip(record, failure.message ?: failure.javaClass.simpleName)
-                    PerRecord.SKIPPED
-                }
+                val outcome = applyAtomically(record) { executeSQL(it) }
                 when (outcome) {
                     PerRecord.APPLIED -> applied += 1
                     PerRecord.UPDATED -> updated += 1
@@ -96,7 +79,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
             // batch — parents that arrived since may have closed the gap. The
             // cursor already advanced past them; this pass is the only thing
             // standing between a parked row and permanent loss.
-            applied += retryParksPass()
+            applied += retryParksPass { executeSQL(it) }
         } finally {
             SyncMigrationSql.captureTriggers.forEach { create -> executeSQL(create) }
         }
@@ -115,6 +98,22 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
 
     private enum class PerRecord { APPLIED, UPDATED, PRESENT, SKIPPED, PARKED, CONFLICT }
 
+    /** Errors must cross the savepoint boundary before being turned into refusals. */
+    private suspend fun applyAtomically(record: SyncPulledRecord, execute: suspend (String) -> Unit): PerRecord {
+        execute("SAVEPOINT record_apply")
+        return try {
+            val result = applyOne(record)
+            execute("RELEASE record_apply")
+            result
+        } catch (failure: Throwable) {
+            execute("ROLLBACK TO record_apply")
+            execute("RELEASE record_apply")
+            if (failure is kotlinx.coroutines.CancellationException || failure is AuditPersistenceFailure) throw failure
+            auditSkip(record, failure.message ?: failure.javaClass.simpleName)
+            PerRecord.SKIPPED
+        }
+    }
+
     private suspend fun applyOne(record: SyncPulledRecord): PerRecord {
         val payload = record.payload
         // C1 pending-edit guard: a pulled row whose uid still has an unpushed
@@ -125,8 +124,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         if (database.syncOutboxDao().countByTableAndUid(record.tableName, record.rowUid) > 0) {
             return park(record, "pending_local_edit")
         }
-        return try {
-            when (record.tableName) {
+        return when (record.tableName) {
                 "products" -> applyProduct(record.rowUid, payload)
                 "accounts" -> applyAccount(record.rowUid, payload)
                 "settings" -> applySetting(payload)
@@ -139,13 +137,6 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                 "daily_close_actions" -> applyCloseAction(record)
                 "store_profile" -> applyStoreProfile(payload)
                 else -> PerRecord.SKIPPED
-            }
-        } catch (cancelled: kotlinx.coroutines.CancellationException) {
-            // Cancellation propagates to the batch loop's savepoint handler.
-            throw cancelled
-        } catch (failure: Throwable) {
-            auditSkip(record, failure.message ?: failure.javaClass.simpleName)
-            PerRecord.SKIPPED
         }
     }
 
@@ -174,8 +165,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                 ),
             )
         }
-        runCatching {
-            database.securityAuditDao().insert(
+        persistAudit(
                 com.saaf.milkshop.data.SecurityAuditEntryEntity(
                     auditId = 0,
                     occurredAt = Instant.now().toString(),
@@ -184,23 +174,21 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                     reasonCode = reason,
                     details = "table=${record.tableName};uid=${record.rowUid};seq=${record.serverSeq}",
                 ),
-            )
-        }
+        )
         return PerRecord.PARKED
     }
 
     /**
      * One recovery attempt per parked row per batch. Any resolved outcome
      * (applied, updated, already-present, sibling conflict) clears the park;
-     * a re-park counts a retry, with a bounded number of attempts before the
-     * park stops consuming effort (the row stays as evidence, audited once).
+     * a re-park counts a retry up to the diagnostic ceiling (audited once).
+     * Later batches still attempt recovery, including after a parent arrives.
      * A park whose uid still has a pending local outbox edit defers without
      * consuming retries — only its push resolves it.
      */
-    private suspend fun retryParksPass(): Int {
+    private suspend fun retryParksPass(execute: suspend (String) -> Unit): Int {
         var recovered = 0
         for (park in database.syncParkedRowDao().all()) {
-            if (park.retryCount >= MAX_PARK_RETRIES) continue
             if (database.syncOutboxDao().countByTableAndUid(park.tableName, park.rowUid) > 0) continue
             val record = SyncPulledRecord(
                 serverSeq = park.serverSeq,
@@ -210,18 +198,19 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                 payload = JSONObject(park.payloadJson),
                 originDevice = null,
             )
-            val outcome = applyOne(record)
+            val outcome = applyAtomically(record, execute)
             when (outcome) {
                 PerRecord.APPLIED, PerRecord.UPDATED, PerRecord.PRESENT, PerRecord.CONFLICT -> {
                     database.syncParkedRowDao().delete(park.tableName, park.rowUid)
                     if (outcome != PerRecord.PRESENT) recovered += 1
                 }
                 PerRecord.PARKED -> {
-                    val attempts = park.retryCount + 1
+                    // Bound each pass to one attempt, not the row's lifetime:
+                    // a dependency can arrive after any number of other batches.
+                    val attempts = (park.retryCount + 1).coerceAtMost(MAX_PARK_RETRIES)
                     database.syncParkedRowDao().upsert(park.copy(retryCount = attempts))
-                    if (attempts == MAX_PARK_RETRIES) {
-                        runCatching {
-                            database.securityAuditDao().insert(
+                    if (park.retryCount < MAX_PARK_RETRIES && attempts == MAX_PARK_RETRIES) {
+                        persistAudit(
                                 com.saaf.milkshop.data.SecurityAuditEntryEntity(
                                     auditId = 0,
                                     occurredAt = Instant.now().toString(),
@@ -230,8 +219,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                                     reasonCode = "retries_exhausted",
                                     details = "table=${park.tableName};uid=${park.rowUid};seq=${park.serverSeq}",
                                 ),
-                            )
-                        }
+                        )
                     }
                 }
                 PerRecord.SKIPPED -> Unit // semantic refusal: keep the park as evidence, stop retrying it
@@ -244,6 +232,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         val existing = database.syncEnvelopeDao().productsByUid(listOf(uid)).firstOrNull()
         val name = payload.getString("name")
         val unit = payload.getString("unit")
+        require(unit == "Liters" || unit == "Kg") { "Product unit must be Liters or Kg" }
         return if (existing == null) {
             database.productDao().insert(ProductEntity(name = name, unit = unit, uid = uid))
             PerRecord.APPLIED
@@ -260,6 +249,13 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         val name = payload.getString("name")
         val type = payload.getString("type")
         val category = payload.getString("category")
+        val expectedType = when (category) {
+            "Cash/Bank", "Customer" -> "Asset"
+            "Vendor" -> "Liability"
+            "Operating Expense", "Salary" -> "Expense"
+            else -> error("Invalid account category")
+        }
+        require(type == expectedType) { "Account type/category combination is invalid" }
         return if (existing == null) {
             val id = database.accountDao().insert(
                 AccountEntity(name = name, type = type, category = category, uid = uid),
@@ -291,7 +287,6 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         val uid = record.rowUid
         val payload = record.payload
         val existing = database.syncEnvelopeDao().eventsByUid(listOf(uid)).firstOrNull()
-        if (existing != null) return PerRecord.PRESENT // events are immutable history
 
         val correctsUid = payload.optNullableString("corrects_event_uid")
         var correctsLocalId: Long? = null
@@ -318,7 +313,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         val spoilageRows = ArrayList<Triple<Long, Double, String>>()
         payload.optJSONArray("inventory_logs")?.let { rows ->
             for (index in 0 until rows.length()) {
-                val row = rows.optJSONObject(index) ?: continue
+                val row = rows.getJSONObject(index)
                 val productUid = row.optString("product_uid")
                 val productId = resolveProduct(productUid)
                     ?: return park(record, "inventory product $productUid not local yet")
@@ -327,7 +322,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         }
         payload.optJSONArray("financial_logs")?.let { rows ->
             for (index in 0 until rows.length()) {
-                val row = rows.optJSONObject(index) ?: continue
+                val row = rows.getJSONObject(index)
                 val accountUid = row.optString("account_uid")
                 val accountId = resolveAccount(accountUid)
                     ?: return park(record, "financial account $accountUid not local yet")
@@ -336,7 +331,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         }
         payload.optJSONArray("spoilage_details")?.let { rows ->
             for (index in 0 until rows.length()) {
-                val row = rows.optJSONObject(index) ?: continue
+                val row = rows.getJSONObject(index)
                 val productUid = row.optString("product_uid")
                 val productId = resolveProduct(productUid)
                     ?: return park(record, "spoilage product $productUid not local yet")
@@ -374,7 +369,17 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
             trustedEstimatedAt = payload.optNullableString("trusted_estimated_at") ?: "",
             timeTrust = payload.optNullableString("time_trust") ?: EventTimeTrust.DEVICE_ONLY,
         )
-        val eventId = database.eventDao().insert(event)
+        // Prior builds could commit a header or a prefix of children after
+        // a child failed. Repair only an identical header and matching child
+        // subset; never replace immutable history with a different server body.
+        if (existing != null) {
+            require(existing.copy(eventId = 0) == event) { "Existing event header differs from server history" }
+            subtractExisting(inventoryRows, database.inventoryLogDao().findByEventId(existing.eventId).map { it.productId to it.quantity })
+            subtractExisting(financialRows, database.financialLogDao().findByEventId(existing.eventId).map { it.accountId to it.amount })
+            subtractExisting(spoilageRows, database.syncEnvelopeDao().spoilageDetailsForEvents(listOf(existing.eventId)).map { Triple(it.productId, it.quantity, it.reason) })
+            if (inventoryRows.isEmpty() && financialRows.isEmpty() && spoilageRows.isEmpty()) return PerRecord.PRESENT
+        }
+        val eventId = existing?.eventId ?: database.eventDao().insert(event)
 
         inventoryRows.forEach { (productId, quantity) ->
             database.inventoryLogDao().insert(
@@ -417,6 +422,12 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         return PerRecord.APPLIED
     }
 
+    private fun <T> subtractExisting(expected: MutableList<T>, existing: List<T>) {
+        existing.forEach { child ->
+            require(expected.remove(child)) { "Existing ledger child differs from server history" }
+        }
+    }
+
     private suspend fun resolveProduct(uid: String): Long? =
         if (uid.isEmpty()) null
         else database.syncEnvelopeDao().productsByUid(listOf(uid)).firstOrNull()?.productId
@@ -444,7 +455,9 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         val productUid = payload.optString("product_uid")
         val customerId = resolveAccount(customerUid) ?: return park(record, "delivery customer $customerUid not local yet")
         val productId = resolveProduct(productUid) ?: return park(record, "delivery product $productUid not local yet")
-        val saleId = payload.optNullableString("sale_event_uid")?.let { resolveEvent(it) }
+        val saleId = payload.optNullableString("sale_event_uid")?.let {
+            resolveEvent(it) ?: return park(record, "delivery sale $it not local yet")
+        }
         val existing = database.syncEnvelopeDao().deliveriesByUid(listOf(uid)).firstOrNull()
         return if (existing == null) {
             database.deliveryDao().insert(
@@ -501,6 +514,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                     notes = payload.optNullableString("notes"),
                     createdAt = payload.getString("created_at"),
                     supersedesId = supersedes,
+                    archived = payload.optBoolean("archived", false),
                     uid = uid,
                 ),
             )
@@ -627,8 +641,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
     }
 
     private suspend fun auditSkip(record: SyncPulledRecord, reason: String) {
-        runCatching {
-            database.securityAuditDao().insert(
+        persistAudit(
                 com.saaf.milkshop.data.SecurityAuditEntryEntity(
                     auditId = 0,
                     occurredAt = Instant.now().toString(),
@@ -637,13 +650,11 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                     reasonCode = "skipped",
                     details = "table=${record.tableName};uid=${record.rowUid};seq=${record.serverSeq};reason=$reason",
                 ),
-            )
-        }
+        )
     }
 
     private suspend fun auditConflict(incomingUid: String, targetUid: String, existingUid: String) {
-        runCatching {
-            database.securityAuditDao().insert(
+        persistAudit(
                 com.saaf.milkshop.data.SecurityAuditEntryEntity(
                     auditId = 0,
                     occurredAt = Instant.now().toString(),
@@ -652,7 +663,19 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                     reasonCode = "sibling_correction",
                     details = "incoming=$incomingUid;target=$targetUid;existing_child=$existingUid",
                 ),
-            )
+        )
+    }
+
+    private class AuditPersistenceFailure(cause: Exception) : IllegalStateException("Sync audit could not be persisted", cause)
+
+    private suspend fun persistAudit(entry: com.saaf.milkshop.data.SecurityAuditEntryEntity) {
+        try {
+            database.securityAuditDao().insert(entry)
+        } catch (failure: Exception) {
+            if (failure is kotlinx.coroutines.CancellationException) throw failure
+            // This is a failed batch, not a semantic refusal that may advance
+            // the cursor and permanently lose the incoming record.
+            throw AuditPersistenceFailure(failure)
         }
     }
 

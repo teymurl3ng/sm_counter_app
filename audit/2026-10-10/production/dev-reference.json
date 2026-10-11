@@ -1,0 +1,580 @@
+{
+  "sync": {
+    "rows": 66,
+    "max_seq": 222,
+    "data_md5": "32db84b3cb0e18bdf942feb4c752f387",
+    "non_objects": 0,
+    "unknown_tables": 0,
+    "mismatched_shops": 0
+  },
+  "counts": {
+    "audit": 566,
+    "shops": 4,
+    "staff": 46,
+    "auth_users": 17,
+    "businesses": 2,
+    "reconciliation": 0
+  },
+  "policies": [
+    {
+      "cmd": "SELECT",
+      "qual": "(shop_id IN ( SELECT sync_staff_shop_ids() AS sync_staff_shop_ids))",
+      "roles": [
+        "public"
+      ],
+      "tablename": "sync_records",
+      "permissive": "PERMISSIVE",
+      "policyname": "sync_records_staff_select",
+      "schemaname": "public",
+      "with_check": null
+    }
+  ],
+  "triggers": [
+    {
+      "name": "staff_last_owner_guard",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER staff_last_owner_guard BEFORE DELETE OR UPDATE ON public.staff FOR EACH ROW EXECUTE FUNCTION protect_last_active_owner()"
+    },
+    {
+      "name": "staff_set_updated_at",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER staff_set_updated_at BEFORE UPDATE ON public.staff FOR EACH ROW EXECUTE FUNCTION set_staff_updated_at()"
+    }
+  ],
+  "functions": [
+    {
+      "args": "",
+      "name": "set_staff_updated_at",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "trigger",
+      "anon_execute": true,
+      "definition_md5": "9ee7ef6b055180c9bc847b534e8b6e0d",
+      "service_execute": true,
+      "security_definer": false,
+      "authenticated_execute": true
+    },
+    {
+      "args": "",
+      "name": "my_profile",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "anon_execute": false,
+      "definition_md5": "357aa9a556183804358752c8f14269d5",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "",
+      "name": "ping",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "timestamp with time zone",
+      "anon_execute": true,
+      "definition_md5": "ab30bba7d6b650b041e3acf39673fd69",
+      "service_execute": true,
+      "security_definer": false,
+      "authenticated_execute": true
+    },
+    {
+      "args": "",
+      "name": "admin_require_caller_business_id",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "uuid",
+      "anon_execute": false,
+      "definition_md5": "638255f6a6538d0590423baa5399b1d6",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "args": "p_staff_id uuid",
+      "name": "admin_staff_shops_json",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "anon_execute": false,
+      "definition_md5": "16cce867c11cd099a61869a3a16f7053",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "args": "",
+      "name": "admin_require_write_caller",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "TABLE(business_id uuid, staff_id uuid, username text, caller_role text)",
+      "anon_execute": false,
+      "definition_md5": "fa42873660fb9604ad16bdfcb18e0ed5",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "args": "",
+      "name": "admin_overview",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "anon_execute": false,
+      "definition_md5": "62dd0b1142b3f69df12992900f19f5c0",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "p_search text, p_role text, p_status text, p_shop_id uuid, p_limit integer, p_offset integer",
+      "name": "admin_list_staff",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "anon_execute": false,
+      "definition_md5": "0a91ab5e3b6777e07915a6d1cbe765f3",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "p_staff_id uuid",
+      "name": "admin_get_staff",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "anon_execute": false,
+      "definition_md5": "aeed47cc9260e00bac12a9951ab16e6e",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "p_limit integer, p_offset integer",
+      "name": "admin_list_shops",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "anon_execute": false,
+      "definition_md5": "44f7d842721f096f980c3be5691e3bcd",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "p_shop_id uuid",
+      "name": "admin_get_shop",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "anon_execute": false,
+      "definition_md5": "da7cd4a1be68b1c6ff8d187095dad263",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "p_action text, p_target_username text, p_from timestamp with time zone, p_to timestamp with time zone, p_limit integer, p_offset integer",
+      "name": "admin_list_activity",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "anon_execute": false,
+      "definition_md5": "576efef481c8ba4eccd6663052189259",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "p_business_id uuid, p_excluding_staff_id uuid",
+      "name": "admin_ensure_not_last_active_owner",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "anon_execute": false,
+      "definition_md5": "4cbe3430bdf7adcf05a82093a441e637",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "args": "p_business_id uuid, p_limit integer",
+      "name": "admin_list_auth_reconciliation",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "TABLE(id uuid, operation text, auth_user_id uuid)",
+      "anon_execute": false,
+      "definition_md5": "e42ec2c258aba11d50d11a90103e37bd",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "args": "p_staff_id uuid, p_shop_id uuid",
+      "name": "admin_assign_shop",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "anon_execute": false,
+      "definition_md5": "32a362c858f99562b517691e7a96ceb8",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "p_val jsonb",
+      "name": "redact_json_secrets",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "anon_execute": false,
+      "definition_md5": "3d51054ff8ae9a52c3bf4c754842612b",
+      "service_execute": true,
+      "security_definer": false,
+      "authenticated_execute": false
+    },
+    {
+      "args": "p_business_id uuid, p_action text, p_target_username text, p_detail jsonb, p_performed_by uuid, p_performed_by_username text",
+      "name": "admin_write_audit",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "anon_execute": false,
+      "definition_md5": "a3a54137d48ededc03d75095f1aa58ae",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "args": "p_operation text, p_auth_user_id uuid, p_target_username text, p_last_error text",
+      "name": "admin_record_auth_reconciliation",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "anon_execute": false,
+      "definition_md5": "80009d050c27f9505b31db2c82a51ddd",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "args": "p_staff_id uuid",
+      "name": "admin_disable_staff",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "anon_execute": false,
+      "definition_md5": "e105ecab58b1378f0a4e01f0118166f7",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "p_staff_id uuid",
+      "name": "admin_enable_staff",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "anon_execute": false,
+      "definition_md5": "613638f34945e11a8602fea3354a0ef7",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "p_staff_id uuid, p_shop_id uuid",
+      "name": "admin_unassign_shop",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "anon_execute": false,
+      "definition_md5": "8d79970bcc0b3637a7caae6390815c15",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "p_staff_id uuid, p_new_role text",
+      "name": "admin_set_role",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "anon_execute": false,
+      "definition_md5": "0c00fa359d217aec33d1b61d3f1a6838",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "p_name text",
+      "name": "admin_add_shop",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "anon_execute": false,
+      "definition_md5": "f544c16ca85b638ee2158d149a20e127",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "p_staff_id uuid, p_confirm_username text",
+      "name": "admin_terminate_staff_db",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "uuid",
+      "anon_execute": false,
+      "definition_md5": "68f23b76eca2b955f03329b182f32abe",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "p_business_id uuid, p_operation text, p_auth_user_id uuid, p_target_username text, p_performed_by uuid, p_performed_by_username text, p_error_code text, p_correlation_id uuid",
+      "name": "admin_record_auth_reconciliation",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "uuid",
+      "anon_execute": false,
+      "definition_md5": "2e60f756d3771d466cba006530015d33",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "args": "p_staff_id uuid",
+      "name": "admin_record_reset_credential_audit",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "anon_execute": false,
+      "definition_md5": "8d1312ea7336142fa53e8d6105772c1e",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "p_reconciliation_id uuid",
+      "name": "admin_reconcile_reset_audit",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "anon_execute": false,
+      "definition_md5": "75572d4cade3cbbfabb82d237a2994e4",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "args": "p_auth_user_id uuid, p_username text, p_display_name text, p_role text, p_shop_ids uuid[]",
+      "name": "admin_create_staff_db",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "uuid",
+      "anon_execute": false,
+      "definition_md5": "f98da94c5173cd78dfcbb140fc20baf1",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "p_reconciliation_id uuid, p_resolved boolean, p_error_code text",
+      "name": "admin_update_auth_reconciliation",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "anon_execute": false,
+      "definition_md5": "e6376d5c469a40ace8582290a4d09283",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "args": "",
+      "name": "sync_staff_shop_ids",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "SETOF uuid",
+      "anon_execute": false,
+      "definition_md5": "f68b5811f5608ad6c414ab3d90e62ce9",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "since_seq bigint, max_rows integer, shop uuid",
+      "name": "sync_pull",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "jsonb",
+      "anon_execute": false,
+      "definition_md5": "64eee07aa5fcd64d6d38ac0c5ef4423c",
+      "service_execute": true,
+      "security_definer": false,
+      "authenticated_execute": true
+    },
+    {
+      "args": "p jsonb",
+      "name": "sync_normalize_payload",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "anon_execute": true,
+      "definition_md5": "65063d31b02a44aa3bba45803a91af90",
+      "service_execute": true,
+      "security_definer": false,
+      "authenticated_execute": true
+    },
+    {
+      "args": "",
+      "name": "sync_records_assign_seq",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "trigger",
+      "anon_execute": true,
+      "definition_md5": "4589077e5dffa23d53ebaa28c0d3cb3b",
+      "service_execute": true,
+      "security_definer": false,
+      "authenticated_execute": true
+    },
+    {
+      "args": "envelopes jsonb, device_id text, shop_id uuid, pull_cursor bigint",
+      "name": "sync_push",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "anon_execute": false,
+      "definition_md5": "cc681db1a8a41e61971876750b908da8",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": true
+    },
+    {
+      "args": "p_reconciliation_id uuid",
+      "name": "admin_verify_created_identity",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "boolean",
+      "anon_execute": false,
+      "definition_md5": "0dbb856379102a4628793fd890c3b60d",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    },
+    {
+      "args": "",
+      "name": "protect_last_active_owner",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "trigger",
+      "anon_execute": false,
+      "definition_md5": "044732975856fc27945b8cf3369c4b3d",
+      "service_execute": true,
+      "security_definer": true,
+      "authenticated_execute": false
+    }
+  ],
+  "integrity": {
+    "active_staff_without_auth": 0,
+    "businesses_without_active_owner": 0
+  },
+  "privileges": [
+    {
+      "role": "anon",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false,
+      "sequence_usage": false,
+      "sequence_select": false,
+      "sequence_update": false
+    },
+    {
+      "role": "authenticated",
+      "delete": false,
+      "insert": false,
+      "select": true,
+      "update": false,
+      "sequence_usage": false,
+      "sequence_select": false,
+      "sequence_update": false
+    },
+    {
+      "role": "service_role",
+      "delete": true,
+      "insert": true,
+      "select": true,
+      "update": true,
+      "sequence_usage": true,
+      "sequence_select": true,
+      "sequence_update": true
+    }
+  ],
+  "constraints": [
+    {
+      "name": "sync_records_business_id_fkey",
+      "validated": true,
+      "definition": "FOREIGN KEY (business_id) REFERENCES businesses(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "sync_records_payload_check",
+      "validated": true,
+      "definition": "CHECK ((jsonb_typeof(payload) = 'object'::text))"
+    },
+    {
+      "name": "sync_records_pkey",
+      "validated": true,
+      "definition": "PRIMARY KEY (server_seq)"
+    },
+    {
+      "name": "sync_records_shop_id_fkey",
+      "validated": true,
+      "definition": "FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "sync_records_shop_table_uid",
+      "validated": true,
+      "definition": "UNIQUE (shop_id, table_name, row_uid)"
+    }
+  ],
+  "shop_data_md5": "3eae3e89f1d2c2e30465f6c5c7820a24",
+  "staff_data_md5": "c56c2da83465bb654684b1ddb46a9dd7",
+  "business_data_md5": "fd3d95b6d90458fb0c8f3cbb705b3b78"
+}

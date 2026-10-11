@@ -1,0 +1,41 @@
+{
+  "events": [
+    {
+      "event_uid": "u1_8f1e6482ce884d0facd2136ebf05efa3",
+      "event_type": "PURCHASE_RECEIPT",
+      "server_seq": 220,
+      "header_matches": true,
+      "inventory_matches": true,
+      "financial_matches": true,
+      "spoilage_matches": true
+    },
+    {
+      "event_uid": "u1_94cc880316a748acbc3d45535256417b",
+      "event_type": "PRODUCTION",
+      "server_seq": 221,
+      "header_matches": true,
+      "inventory_matches": true,
+      "financial_matches": true,
+      "spoilage_matches": true
+    },
+    {
+      "event_uid": "u1_a921a24caeaf47dbbdba359e80534131",
+      "event_type": "VENDOR_PAYMENT",
+      "server_seq": 222,
+      "header_matches": true,
+      "inventory_matches": true,
+      "financial_matches": true,
+      "spoilage_matches": true
+    }
+  ],
+  "cursor": {
+    "state_id": 1,
+    "last_server_seq": 222,
+    "updated_at": "2026-10-10T11:45:44.985079Z"
+  },
+  "outbox": 0,
+  "parked": 0,
+  "holds": 0,
+  "semantic_skip_audits": 0,
+  "integrity_check": "ok"
+}

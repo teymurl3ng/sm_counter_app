@@ -1,0 +1,44 @@
+{
+  "pulledAt": "2026-10-11T01:04:18.1498603+05:00",
+  "serial": "R8VXA02SNKH",
+  "screens": [
+    "auth",
+    "collect",
+    "ux"
+  ],
+  "pngCount": 14,
+  "reviewSidecarCount": 14,
+  "pngs": [
+    "account-picker-dark.png",
+    "account-picker-light.png",
+    "passphrase-error-dark.png",
+    "passphrase-error-light.png",
+    "recovery-code-dark.png",
+    "recovery-code-light.png",
+    "keyboard-risk-amount.png",
+    "portrait-large-text-navigation.png",
+    "ready-default.png",
+    "deliveries-tenth-entry.png",
+    "phone-portrait-lock.png",
+    "products-list.png",
+    "receive-milk-tenth-entry.png",
+    "sale-committed-receipt.png"
+  ],
+  "reviewSidecars": [
+    "account-picker-dark.review.json",
+    "account-picker-light.review.json",
+    "passphrase-error-dark.review.json",
+    "passphrase-error-light.review.json",
+    "recovery-code-dark.review.json",
+    "recovery-code-light.review.json",
+    "keyboard-risk-amount.review.json",
+    "portrait-large-text-navigation.review.json",
+    "ready-default.review.json",
+    "deliveries-tenth-entry.review.json",
+    "phone-portrait-lock.review.json",
+    "products-list.review.json",
+    "receive-milk-tenth-entry.review.json",
+    "sale-committed-receipt.review.json"
+  ],
+  "source": "device:/sdcard/Download/phase14-native-evidence"
+}

@@ -1,5 +1,6 @@
 package com.saaf.milkshop.application.operations
 
+import androidx.room3.withWriteTransaction
 import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
@@ -62,35 +63,39 @@ class NativeRecordSpoilageFacade(
                 "Not enough ${product.name} on hand. Available ${product.onHandLabel}. Change the quantity.",
             )
         }
-        val result = commands.recordSpoilage(
-            sessionHandle,
-            SpoilageInput(
-                productId = product.productId,
-                quantity = request.quantity,
-                occurredAt = context.businessDate,
-                reason = reason.code,
-                notes = when {
-                    note.isNotEmpty() -> note
-                    else -> reason.label
-                },
-            ),
-        )
-        val refreshed = load(sessionHandle, date)
-        val refreshedProduct = refreshed.products.singleOrNull { it.productId == product.productId }
-        return NativeRecordSpoilageSubmission(
-            receipt = NativeRecordSpoilageReceipt(
-                eventId = result.eventId,
-                product = product.copy(
-                    onHand = refreshedProduct?.onHand ?: product.onHand,
-                    onHandLabel = refreshedProduct?.onHandLabel ?: product.onHandLabel,
+        // The mutation, required evidence and receipt reads commit together.
+        // A read/authorization failure cannot report failure after saving.
+        return database.withWriteTransaction {
+            val result = commands.recordSpoilage(
+                sessionHandle,
+                SpoilageInput(
+                    productId = product.productId,
+                    quantity = request.quantity,
+                    occurredAt = context.businessDate,
+                    reason = reason.code,
+                    notes = when {
+                        note.isNotEmpty() -> note
+                        else -> reason.label
+                    },
                 ),
-                quantity = round4(result.quantity),
-                reasonCode = reason.code,
-                reasonLabel = reason.label,
-                remainingLabel = refreshedProduct?.onHandLabel ?: product.onHandLabel,
-            ),
-            refreshedContext = refreshed,
-        )
+            )
+            val refreshed = load(sessionHandle, date)
+            val refreshedProduct = refreshed.products.singleOrNull { it.productId == product.productId }
+            NativeRecordSpoilageSubmission(
+                receipt = NativeRecordSpoilageReceipt(
+                    eventId = result.eventId,
+                    product = product.copy(
+                        onHand = refreshedProduct?.onHand ?: product.onHand,
+                        onHandLabel = refreshedProduct?.onHandLabel ?: product.onHandLabel,
+                    ),
+                    quantity = round4(result.quantity),
+                    reasonCode = reason.code,
+                    reasonLabel = reason.label,
+                    remainingLabel = refreshedProduct?.onHandLabel ?: product.onHandLabel,
+                ),
+                refreshedContext = refreshed,
+            )
+        }
     }
 
     private suspend fun trackedProducts(): List<NativeSpoilageProduct> {

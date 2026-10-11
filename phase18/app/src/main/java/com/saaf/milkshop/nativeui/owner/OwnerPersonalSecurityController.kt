@@ -79,10 +79,13 @@ internal class OwnerPersonalSecurityController(
         val session = token.handle
         runtime.state.value = current.copy(saving = true, error = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 val security = withContext(Dispatchers.IO) {
                     facade.removeQuickUnlock(session, passphrase)
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Quick unlock removed")
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
                 runtime.state.value = latest.copy(
@@ -92,7 +95,7 @@ internal class OwnerPersonalSecurityController(
                     error = null,
                 )
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
             } finally {
                 passphrase.fill('\u0000')
             }
@@ -110,6 +113,7 @@ internal class OwnerPersonalSecurityController(
         val session = token.handle
         runtime.state.value = current.copy(saving = true, error = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 val security = withContext(Dispatchers.IO) {
                     facade.enrollQuickUnlock(
@@ -119,11 +123,13 @@ internal class OwnerPersonalSecurityController(
                         pin = pin,
                     )
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Quick unlock saved")
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
                 runtime.state.value = latest.copy(security = security, saving = false, error = null)
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
             } finally {
                 passphrase.fill('\u0000')
                 pin.fill('\u0000')
@@ -150,6 +156,7 @@ internal class OwnerPersonalSecurityController(
         }
         runtime.state.value = current.copy(saving = true, error = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 val security = withContext(Dispatchers.IO) {
                     facade.enrollQuickUnlock(
@@ -159,11 +166,13 @@ internal class OwnerPersonalSecurityController(
                         pin = pin,
                     )
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Quick unlock saved")
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
                 runtime.state.value = latest.copy(security = security, saving = false, error = null)
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
             } finally {
                 passphrase.fill('\u0000')
                 pin?.fill('\u0000')

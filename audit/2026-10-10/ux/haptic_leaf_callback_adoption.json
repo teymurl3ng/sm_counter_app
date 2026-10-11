@@ -1,0 +1,70 @@
+[
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\admin\\AdminWorkScreen.kt",
+    "leafControls": 2
+  },
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\auth\\NativeAuthenticationScreens.kt",
+    "leafControls": 3
+  },
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\cashclose\\CashCloseEntryScreen.kt",
+    "leafControls": 1
+  },
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\collection\\CashierCollectionScreen.kt",
+    "leafControls": 9
+  },
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\common\\NativeAsyncUi.kt",
+    "leafControls": 1
+  },
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\drawing\\DrawingEntryScreen.kt",
+    "leafControls": 2
+  },
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\expense\\ExpenseEntryScreen.kt",
+    "leafControls": 5
+  },
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\manager\\ManagerWorkScreen.kt",
+    "leafControls": 2
+  },
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\more\\CashierMoreScreen.kt",
+    "leafControls": 3
+  },
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\operations\\DeliveriesScreen.kt",
+    "leafControls": 1
+  },
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\operations\\MakeYogurtScreen.kt",
+    "leafControls": 1
+  },
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\operations\\ReceiveMilkScreen.kt",
+    "leafControls": 3
+  },
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\operations\\RecordSpoilageScreen.kt",
+    "leafControls": 4
+  },
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\owner\\OwnerWorkScreen.kt",
+    "leafControls": 1
+  },
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\salarypayment\\SalaryPaymentEntryScreen.kt",
+    "leafControls": 5
+  },
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\sale\\CashierSaleScreen.kt",
+    "leafControls": 3
+  },
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\vendorpayment\\VendorPaymentEntryScreen.kt",
+    "leafControls": 5
+  }
+]

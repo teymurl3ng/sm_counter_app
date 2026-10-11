@@ -1,0 +1,33 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/app/(app)/system/system-panel.tsx
+@@
+   const [state, setState] = useState<LoadState>(peeked && peeked.ok ? "ready" : "loading");
+   const [data, setData] = useState<SystemApiResponse | null>(peeked);
+ 
+-  const load = useCallback(async () => {
++  const load = useCallback(async (isCurrent: () => boolean = () => true) => {
+     const apply = (status: number, json: SystemApiResponse) => {
++      if (!isCurrent()) return;
+       if (
+         status === 401 ||
+         json.error?.code === "UNAUTHENTICATED" ||
+@@
+       });
+       apply(result.status, result.body as SystemApiResponse);
+     } catch {
++      if (!isCurrent()) return;
+       setData(null);
+       setState("error");
+     }
+   }, [router]);
+ 
+   useEffect(() => {
+-    void load();
++    let disposed = false;
++    // Subscribe after commit; cleanup fences cache and network completions alike.
++    queueMicrotask(() => { if (!disposed) void load(() => !disposed); });
++    return () => { disposed = true; };
+   }, [load]);
+ 
+   const staticInfo = data?.static;
+*** End Patch

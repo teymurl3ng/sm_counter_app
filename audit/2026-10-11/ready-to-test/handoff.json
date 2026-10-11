@@ -1,0 +1,29 @@
+{
+  "device": "R8VXA02SNKH",
+  "package": "com.saaf.milkshop.qa",
+  "version": "0.4.1-qa",
+  "launcherLabel": "Saaf Milk (preview)",
+  "install": "Success, update in place with install -r",
+  "existingQaFirstInstallPreserved": "2026-10-10 16:31:46",
+  "screen": "Who is signing in?",
+  "foregroundComponent": "com.saaf.milkshop.qa/com.saaf.milkshop.Main",
+  "ordinaryInstallationUnchanged": true,
+  "qaDataCleared": false,
+  "apkSha256": "9b2edd91bcb367ced26868514902e5f066143adac7c032da05b559f889a46889",
+  "qaFast": "PASS",
+  "fullCheckpoint": {
+    "passed": 594,
+    "total": 596,
+    "status": "FAIL"
+  },
+  "focusedRerun": {
+    "passed": 8,
+    "total": 8,
+    "status": "PASS"
+  },
+  "inventory": 1001,
+  "untested": 0,
+  "unreviewedScreenshots": 14,
+  "capsuleDesign": "deferred, unchanged in this pass",
+  "sourceUnchangedSinceFocusedRun": true
+}

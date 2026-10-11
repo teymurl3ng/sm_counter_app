@@ -10,6 +10,7 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -64,6 +65,15 @@ class NativeOwnerCashCloseScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.CashCloseAmountInput)
             .performScrollTo()
             .performTextReplacement("250.00")
+        // Compact navigation is intentionally hidden behind the IME; dismiss it before leaving.
+        if (composeRule.onAllNodesWithTag(NativeUiTags.OwnerNavOverview).fetchSemanticsNodes().isEmpty()) {
+            androidx.test.uiautomator.UiDevice.getInstance(
+                androidx.test.platform.app.InstrumentationRegistry.getInstrumentation(),
+            ).pressBack()
+        }
+        composeRule.waitUntil(5_000) {
+            runCatching { composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).fetchSemanticsNode() }.isSuccess
+        }
         composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).performClick()
 
         composeRule.onNodeWithText("Discard this count?").assertIsDisplayed()
@@ -176,8 +186,12 @@ class NativeOwnerCashCloseScreenContractTest {
         onNavigate: (OwnerSection) -> Unit = {},
         onReopenDay: (String, CharArray) -> Unit = { _, _ -> },
     ) {
+        var activeGuard: com.saaf.milkshop.nativeui.common.EntryLeaveGuard? = null
         composeRule.setContent {
             SaafTheme(darkTheme = false) {
+                val registerGuard = com.saaf.milkshop.nativeui.common.rememberPaneGuardRegistration(
+                    active = { activeGuard }, publish = { activeGuard = it },
+                )
                 OwnerCashCloseEntryScreen(
                     snackbarHostState = remember { SnackbarHostState() },
                     identity = ownerIdentity(),
@@ -187,11 +201,16 @@ class NativeOwnerCashCloseScreenContractTest {
                     onCloseDay = {},
                     onReopenDay = onReopenDay,
                     onBackToWork = {},
+                    onRegisterGuard = registerGuard,
                     ownScaffold = { s, m, content ->
                         OwnerScaffold(
                             snackbarHostState = s,
                             section = OwnerSection.Work,
-                            onNavigate = {},
+                            onNavigate = { section ->
+                                if (!((state as? NativeCashCloseState.Ready)?.saving ?: false)) {
+                                    activeGuard?.requestLeave { onNavigate(section) } ?: onNavigate(section)
+                                }
+                            },
                             modifier = m,
                             content = content,
                         )

@@ -1,0 +1,12 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/lib/perf.ts
+@@
+ 
+ /** No-op: keep call sites; prefer Server-Timing over noisy function logs. */
+ export function logPerf(_marks: PerfMarks): void {
+-  // intentionally empty
++  void _marks; // intentionally empty
+ }
+ 
+ /** W3C Server-Timing for browser DevTools / client measurement. */
+*** End Patch

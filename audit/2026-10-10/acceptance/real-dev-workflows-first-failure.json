@@ -1,0 +1,64 @@
+{
+  "started_at": "2026-10-10T11:53:54.424989+00:00",
+  "environment": "dev",
+  "checks": [
+    {
+      "name": "independent_real_auth_session",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "owner_viewer_login_a",
+      "passed": true
+    },
+    {
+      "name": "owner_viewer_login_b",
+      "passed": true
+    },
+    {
+      "name": "viewer_logout_a",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "logged_out_viewer_denied",
+      "passed": true,
+      "http_status": 401
+    },
+    {
+      "name": "other_viewer_session_survives",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "independent_refresh_survives_viewer_logout",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "create_disposable_staff_real_route",
+      "passed": true,
+      "http_status": 200,
+      "staff_id": "fc6eee75-2c1a-4f66-8958-8a5d00cddab4",
+      "error_code": null
+    },
+    {
+      "name": "disposable_staff_real_login",
+      "passed": true
+    },
+    {
+      "name": "active_staff_protected_read",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "owner_disables_disposable_staff",
+      "passed": false,
+      "http_status": 503,
+      "error_code": "SERVER_UNAVAILABLE"
+    }
+  ],
+  "outcome": "incomplete_or_failed",
+  "failure_type": "AssertionError",
+  "finished_at": "2026-10-10T11:53:59.785395+00:00"
+}

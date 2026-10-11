@@ -1,0 +1,329 @@
+
+> Configure project :
+QA connected filter classCount=222 preferredSerial=R8VXA02SNKH
+QA tip: export ANDROID_SERIAL=R8VXA02SNKH before gradlew if multiple adb devices are connected
+
+> Configure project :app
+WARNING: The option setting 'android.disallowKotlinSourceSets=false' is experimental.
+The current default is 'true'.
+QA app class filter applied (222 entries)
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :checkFrozenBaselines
+OK phase18/milk-shop-core-logic-spec-v2.md
+OK phase18/milk_shop_schema_sql_only_final_v2.sql
+FROZEN_BASELINES: PASS
+
+> Task :checkGoldenLedgerContract
+Golden ledger host contract OK (instrumented execution is enforced by qaScreen/qaCheckpoint).
+GOLDEN_LEDGER_CONTRACT: PASS
+
+> Task :checkNativeInventory
+inventory rows=1001 untested=0 orphans=0
+NATIVE_INVENTORY: PASS
+UNTESTED_COUNT=0
+
+> Task :checkUiOnly
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+LOGIC EXCEPTION ACTIVE
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Protected files changed with allow.logic override:
+  - phase18/app/src/main/java/com/saaf/milkshop/data/BudgetDataRepository.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/data/Phase3SecurityDaos.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/data/SyncEntities.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/domain/BudgetManagement.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/domain/Costing.kt
+CHECK_UI_ONLY: PASS_WITH_LOGIC_EXCEPTION
+
+> Task :verifyBridgeContract
+Bridge contract OK: v5, 92 endpoints, SHA-256 276C3C9B263322EC90091834F659B068E920659D47E71B1F195D7AD4DA46906F
+
+> Task :verifyUiCleanup
+UI cleanup gate OK: 88 active TypeScript/TSX files; 23 prototype paths and 6 dependencies absent; 3 packaged files scanned.
+
+> Task :app:verifyHybridWebAssets
+> Task :app:preBuild
+> Task :app:preDebugBuild
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:preDebugAndroidTestBuild SKIPPED
+> Task :app:processDebugAndroidTestManifest UP-TO-DATE
+> Task :app:generateDebugAndroidTestBuildConfig UP-TO-DATE
+> Task :app:generateDebugAndroidTestResources UP-TO-DATE
+> Task :app:packageDebugAndroidTestResources UP-TO-DATE
+> Task :app:processDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :app:parseDebugAndroidTestLocalResources UP-TO-DATE
+> Task :app:generateDebugAndroidTestRFile UP-TO-DATE
+> Task :app:preDebugUnitTestBuild
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+
+> Task :checkNativeInventoryCheckpoint
+inventory rows=1001 untested=0 orphans=0
+NATIVE_INVENTORY: PASS
+UNTESTED_COUNT=0
+
+> Task :app:kspDebugKotlin
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :devicePreflight
+Using device serial=R8VXA02SNKH model=SM-A065F
+ANDROID_SERIAL=R8VXA02SNKH
+DEVICE_PREFLIGHT: PASS
+
+> Task :app:javaPreCompileDebugAndroidTest UP-TO-DATE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:mergeDebugNativeLibs UP-TO-DATE
+> Task :app:stripDebugDebugSymbols UP-TO-DATE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:generateDebugAndroidTestAssets UP-TO-DATE
+> Task :app:mergeDebugAndroidTestAssets UP-TO-DATE
+> Task :app:compressDebugAndroidTestAssets UP-TO-DATE
+> Task :app:desugarDebugAndroidTestFileDependencies UP-TO-DATE
+> Task :app:checkDebugAndroidTestAarMetadata UP-TO-DATE
+> Task :app:compileDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :app:mapDebugAndroidTestSourceSetPaths UP-TO-DATE
+> Task :app:mergeDebugAndroidTestResources UP-TO-DATE
+> Task :app:processDebugAndroidTestResources UP-TO-DATE
+> Task :app:checkDebugAndroidTestDuplicateClasses UP-TO-DATE
+> Task :app:mergeExtDexDebugAndroidTest UP-TO-DATE
+> Task :app:mergeLibDexDebugAndroidTest UP-TO-DATE
+> Task :app:mergeDebugAndroidTestJniLibFolders UP-TO-DATE
+> Task :app:mergeDebugAndroidTestNativeLibs NO-SOURCE
+> Task :app:stripDebugAndroidTestDebugSymbols NO-SOURCE
+> Task :app:validateSigningDebugAndroidTest UP-TO-DATE
+> Task :app:writeDebugAndroidTestSigningConfigVersions UP-TO-DATE
+> Task :app:compileDebugKotlin
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:dexBuilderDebug
+> Task :app:mergeDebugGlobalSynthetics UP-TO-DATE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:bundleDebugClassesToRuntimeJar
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:mergeProjectDexDebug
+
+> Task :app:kspDebugUnitTestKotlin
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :app:kspDebugAndroidTestKotlin
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :app:compileDebugUnitTestKotlin UP-TO-DATE
+> Task :app:compileDebugAndroidTestKotlin UP-TO-DATE
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
+> Task :app:testDebugUnitTest
+
+> Task :qaFast
+QA_FAST: PASS
+
+> Task :app:compileDebugAndroidTestJavaWithJavac UP-TO-DATE
+> Task :app:dexBuilderDebugAndroidTest UP-TO-DATE
+> Task :app:mergeDebugAndroidTestGlobalSynthetics UP-TO-DATE
+> Task :app:processDebugAndroidTestJavaRes UP-TO-DATE
+> Task :app:mergeDebugAndroidTestJavaResource UP-TO-DATE
+> Task :app:mergeProjectDexDebugAndroidTest UP-TO-DATE
+> Task :app:packageDebugAndroidTest UP-TO-DATE
+> Task :app:createDebugAndroidTestApkListingFileRedirect UP-TO-DATE
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect UP-TO-DATE
+Starting 600 tests on SM-A065F - 16
+> Task :app:connectedDebugAndroidTest
+
+SM-A065F - 16 Tests 4/600 completed. (0 skipped) (0 failed)
+SM-A065F - 16 Tests 5/600 completed. (0 skipped) (0 failed)
+SM-A065F - 16 Tests 7/600 completed. (0 skipped) (0 failed)
+SM-A065F - 16 Tests 13/600 completed. (0 skipped) (0 failed)
+SM-A065F - 16 Tests 15/600 completed. (0 skipped) (0 failed)
+SM-A065F - 16 Tests 17/600 completed. (0 skipped) (0 failed)
+SM-A065F - 16 Tests 19/600 completed. (0 skipped) (0 failed)
+SM-A065F - 16 Tests 22/600 completed. (0 skipped) (0 failed)
+SM-A065F - 16 Tests 24/600 completed. (0 skipped) (0 failed)
+SM-A065F - 16 Tests 27/600 completed. (0 skipped) (0 failed)
+SM-A065F - 16 Tests 29/600 completed. (0 skipped) (0 failed)
+SM-A065F - 16 Tests 31/600 completed. (0 skipped) (0 failed)
+SM-A065F - 16 Tests 34/600 completed. (0 skipped) (0 failed)
+SM-A065F - 16 Tests 36/600 completed. (0 skipped) (0 failed)
+SM-A065F - 16 Tests 39/600 completed. (0 skipped) (0 failed)
+SM-A065F - 16 Tests 41/600 completed. (0 skipped) (0 failed)
+
+com.saaf.milkshop.NativeFoundationUiTest > adminExpenseOpensUnderAdminChrome[SM-A065F - 16] [31mFAILED [0m
+	androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 15000 ms
+	at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+SM-A065F - 16 Tests 43/600 completed. (0 skipped) (1 failed)
+SM-A065F - 16 Tests 46/600 completed. (0 skipped) (1 failed)
+SM-A065F - 16 Tests 48/600 completed. (0 skipped) (1 failed)
+SM-A065F - 16 Tests 51/600 completed. (0 skipped) (1 failed)
+SM-A065F - 16 Tests 53/600 completed. (0 skipped) (1 failed)
+SM-A065F - 16 Tests 56/600 completed. (0 skipped) (1 failed)
+SM-A065F - 16 Tests 59/600 completed. (0 skipped) (1 failed)
+SM-A065F - 16 Tests 62/600 completed. (0 skipped) (1 failed)
+SM-A065F - 16 Tests 64/600 completed. (0 skipped) (1 failed)
+SM-A065F - 16 Tests 65/600 completed. (0 skipped) (1 failed)
+
+com.saaf.milkshop.NativeFoundationUiTest > adminExpenseHardwareBackReturnsToWorkHome[SM-A065F - 16] [31mFAILED [0m
+	androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 15000 ms
+	at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+SM-A065F - 16 Tests 66/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 68/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 71/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 73/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 76/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 79/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 81/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 84/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 87/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 89/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 92/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 95/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 98/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 101/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 103/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 106/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 108/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 110/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 113/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 116/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 118/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 121/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 124/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 127/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 130/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 133/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 135/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 137/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 140/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 143/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 144/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 147/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 149/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 151/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 155/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 160/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 161/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 168/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 172/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 174/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 177/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 178/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 180/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 182/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 188/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 197/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 206/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 214/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 221/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 227/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 233/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 240/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 246/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 253/600 completed. (0 skipped) (2 failed)
+SM-A065F - 16 Tests 261/600 completed. (0 skipped) (2 failed)
+
+com.saaf.milkshop.NativeOwnerOverviewScreenContractTest > overviewShowsDecisionSummaryAndKeepsOverviewNavSelected[SM-A065F - 16] [31mFAILED [0m
+	java.lang.AssertionError: Assert failed: The component with TestTag = 'owner_overview_stock' is not displayed!
+	at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+SM-A065F - 16 Tests 270/600 completed. (0 skipped) (3 failed)
+SM-A065F - 16 Tests 277/600 completed. (0 skipped) (3 failed)
+SM-A065F - 16 Tests 285/600 completed. (0 skipped) (3 failed)
+SM-A065F - 16 Tests 293/600 completed. (0 skipped) (3 failed)
+SM-A065F - 16 Tests 302/600 completed. (0 skipped) (3 failed)
+SM-A065F - 16 Tests 309/600 completed. (0 skipped) (3 failed)
+
+com.saaf.milkshop.NativeOwnerExpenseScreenContractTest > dirtyOwnerNavigationRequiresDiscardConfirmation[SM-A065F - 16] [31mFAILED [0m
+	java.lang.AssertionError: Failed to inject touch input.
+	Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'owner_nav_overview')
+SM-A065F - 16 Tests 317/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 325/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 330/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 339/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 343/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 347/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 353/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 361/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 368/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 376/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 385/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 394/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 400/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 407/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 413/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 420/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 427/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 434/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 440/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 447/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 454/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 460/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 467/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 474/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 480/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 486/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 494/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 499/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 504/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 511/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 518/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 525/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 531/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 537/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 545/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 552/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 557/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 565/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 572/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 580/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 589/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 595/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 596/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 597/600 completed. (0 skipped) (4 failed)
+SM-A065F - 16 Tests 600/600 completed. (0 skipped) (4 failed)
+Tests on SM-A065F - 16 failed: There was 4 failure(s).
+Finished 600 tests on SM-A065F - 16
+
+> Task :app:connectedDebugAndroidTest FAILED
+89 actionable tasks: 21 executed, 68 up-to-date
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:connectedDebugAndroidTest'.
+> There were failing tests. See the report at: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/build/reports/androidTests/connected/debug/index.html
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 23m 11s

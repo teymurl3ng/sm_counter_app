@@ -17,6 +17,9 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -76,90 +79,56 @@ import com.saaf.milkshop.nativeui.theme.SaafSurface
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 
 @Composable
-fun WelcomeScreen(
-    onContinue: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        color = MaterialTheme.colorScheme.background,
-        contentColor = MaterialTheme.colorScheme.onBackground,
-        modifier = modifier.fillMaxSize(),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.safeDrawing)
-                .padding(horizontal = 24.dp, vertical = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Spacer(Modifier.weight(0.65f))
-            SaafBrandMark()
-            Spacer(Modifier.height(22.dp))
-            Text(
-                text = stringResource(R.string.native_app_name),
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = stringResource(R.string.native_welcome_tagline),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(Modifier.height(28.dp))
-            WelcomeLedgerProgress()
-            Spacer(Modifier.weight(1f))
-            Surface(
-                color = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.onSurface,
-                shape = RoundedCornerShape(16.dp),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Column {
-                    WelcomeAssurance(
-                        icon = { Icon(Icons.Outlined.CloudOff, contentDescription = null) },
-                        text = stringResource(R.string.native_offline_assurance),
-                    )
-                    Surface(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.16f), modifier = Modifier.fillMaxWidth().height(1.dp)) {}
-                    WelcomeAssurance(
-                        icon = { Icon(Icons.Outlined.Lock, contentDescription = null) },
-                        text = stringResource(R.string.native_private_access_assurance),
-                    )
+fun WelcomeScreen(onContinue: () -> Unit, modifier: Modifier = Modifier) {
+    Surface(color = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground, modifier = modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize().navigationBarsPadding()) {
+            com.saaf.milkshop.nativeui.common.NativeChromeBand(title = "Welcome", reserveNavigationSpace = true, reserveActionSpace = false) {
+                com.saaf.milkshop.nativeui.common.NativeChromeContext(com.saaf.milkshop.nativeui.common.LocalShopName.current)
+                com.saaf.milkshop.nativeui.common.NativeChromeContext("Daily work", prominent = true)
+                com.saaf.milkshop.nativeui.common.NativeChromeContext("Offline and private")
+            }
+            Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                SaafBrandMark()
+                Spacer(Modifier.height(18.dp))
+                Text(com.saaf.milkshop.nativeui.common.LocalShopName.current,
+                    style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.primary, textAlign = TextAlign.Center)
+                Spacer(Modifier.height(8.dp))
+                Text(stringResource(R.string.native_welcome_tagline), style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+                Spacer(Modifier.height(20.dp))
+                WelcomeLedgerProgress()
+                Spacer(Modifier.height(24.dp))
+                Surface(color = MaterialTheme.colorScheme.surface, contentColor = MaterialTheme.colorScheme.onSurface,
+                    shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                    modifier = Modifier.fillMaxWidth()) {
+                    Column {
+                        WelcomeAssurance(icon = { Icon(Icons.Outlined.CloudOff, contentDescription = null) },
+                            text = stringResource(R.string.native_offline_assurance))
+                        Surface(color = MaterialTheme.colorScheme.primary.copy(alpha = .16f),
+                            modifier = Modifier.fillMaxWidth().height(1.dp)) {}
+                        WelcomeAssurance(icon = { Icon(Icons.Outlined.Lock, contentDescription = null) },
+                            text = stringResource(R.string.native_private_access_assurance))
+                    }
                 }
             }
-            Spacer(Modifier.weight(1f))
-            val hapticContext = LocalContext.current
-            val press = rememberPressSource()
-            Button(
-                onClick = { hapticContext.hapticTap(); onContinue() },
-                modifier = Modifier
-                    .pressScale(press)
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .testTag(NativeUiTags.WelcomeContinue),
-                shape = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary,
-                ),
-                interactionSource = press,
-            ) {
-                Text(
-                    text = stringResource(R.string.native_continue),
-                    style = MaterialTheme.typography.titleMedium,
-                )
+            Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                val hapticContext = LocalContext.current
+                val press = rememberPressSource()
+                Button(onClick = { hapticContext.hapticTap(); onContinue() },
+                    modifier = Modifier.pressScale(press).fillMaxWidth().height(56.dp).testTag(NativeUiTags.WelcomeContinue),
+                    shape = RoundedCornerShape(14.dp), interactionSource = press,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary)) {
+                    Text(stringResource(R.string.native_continue), style = MaterialTheme.typography.titleMedium)
+                }
+                Spacer(Modifier.height(8.dp))
+                Text(stringResource(R.string.native_continue_hint), style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
             }
-            Spacer(Modifier.height(10.dp))
-            Text(
-                text = stringResource(R.string.native_continue_hint),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
         }
     }
 }
@@ -172,7 +141,7 @@ fun WelcomeScreen(
  */
 @Composable
 private fun SaafBrandMark() {
-    val description = stringResource(R.string.native_brand_mark)
+    val description = "${com.saaf.milkshop.nativeui.common.LocalShopName.current} mark"
     var appeared by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { appeared = true }
     val scale by animateFloatAsState(
@@ -204,66 +173,11 @@ private fun SaafBrandMark() {
 /** Animated ledger-ready sequence from the Counter Ledger welcome design. */
 @Composable
 private fun WelcomeLedgerProgress() {
-    val stages = listOf(
-        0.45f to R.string.native_splash_stage_1,
-        0.78f to R.string.native_splash_stage_2,
-        1f to R.string.native_splash_stage_3,
+    Text(
+        text = "Sales, stock and daily cash in one place",
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
-    var stage by remember { mutableIntStateOf(0) }
-    LaunchedEffect(Unit) {
-        for (index in stages.indices) {
-            stage = index
-            if (index < stages.lastIndex) kotlinx.coroutines.delay(450)
-        }
-    }
-    val target = stages[stage].first
-    val progress by animateFloatAsState(
-        targetValue = target,
-        animationSpec = tween(durationMillis = 450, easing = LinearEasing),
-        label = "ledger_progress",
-    )
-    val label = stringResource(stages[stage].second)
-    val spin = rememberInfiniteTransition(label = "ledger_sync")
-    val rotation by spin.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(tween(2500, easing = LinearEasing), RepeatMode.Restart),
-        label = "ledger_sync_rotation",
-    )
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(
-            Modifier
-                .width(240.dp)
-                .height(6.dp)
-                .background(MaterialTheme.colorScheme.outline, RoundedCornerShape(3.dp)),
-        ) {
-            Box(
-                Modifier
-                    .fillMaxWidth(progress)
-                    .fillMaxHeight()
-                    .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(3.dp)),
-            )
-        }
-        Spacer(Modifier.height(10.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                Icons.Outlined.Sync,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .size(16.dp)
-                    .rotate(rotation),
-            )
-            Spacer(Modifier.width(6.dp))
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
-    }
 }
 
 @Composable

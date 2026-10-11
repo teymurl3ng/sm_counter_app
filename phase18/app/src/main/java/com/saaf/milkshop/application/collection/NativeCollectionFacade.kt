@@ -1,5 +1,6 @@
 package com.saaf.milkshop.application.collection
 
+import androidx.room3.withWriteTransaction
 import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
 import com.saaf.milkshop.application.readmodels.HybridReadModelService
 import com.saaf.milkshop.data.MilkShopDatabase
@@ -122,32 +123,36 @@ class NativeCollectionFacade(
             ?: throw IllegalArgumentException("Choose an active customer.")
         val paymentAccount = context.paymentAccounts.singleOrNull { it.accountId == request.paymentAccountId }
             ?: throw IllegalArgumentException("Choose a valid Cash/Bank account.")
-        val result = commands.recordCreditCollection(
-            sessionHandle,
-            CreditCollectionInput(
-                customerAccountId = customer.accountId,
-                paymentAccountId = paymentAccount.accountId,
-                amount = BigDecimal(request.amountPaisa).movePointLeft(2).toDouble(),
-                occurredAt = context.businessDate,
-                notes = request.notes?.trim()?.takeIf { it.isNotEmpty() },
-            ),
-        )
-        val refreshedContext = load(sessionHandle, date)
-        val refreshedCustomer = refreshedContext.customers.singleOrNull {
-            it.accountId == customer.accountId
-        } ?: customer
-        val balanceAfter = database.readModelDao().accountBalance(customer.accountId)?.balance
-            ?: throw IllegalStateException("The saved customer balance could not be verified.")
-        return NativeCollectionSubmission(
-            receipt = NativeCollectionReceipt(
-                eventId = result.eventId,
-                customer = refreshedCustomer,
-                paymentAccount = paymentAccount,
-                amountPaisa = request.amountPaisa,
-                customerBalanceAfterPaisa = moneyToPaisa(balanceAfter),
-            ),
-            refreshedContext = refreshedContext,
-        )
+        // The mutation, required evidence and receipt reads commit together.
+        // A read/authorization failure cannot report failure after saving.
+        return database.withWriteTransaction {
+            val result = commands.recordCreditCollection(
+                sessionHandle,
+                CreditCollectionInput(
+                    customerAccountId = customer.accountId,
+                    paymentAccountId = paymentAccount.accountId,
+                    amount = BigDecimal(request.amountPaisa).movePointLeft(2).toDouble(),
+                    occurredAt = context.businessDate,
+                    notes = request.notes?.trim()?.takeIf { it.isNotEmpty() },
+                ),
+            )
+            val refreshedContext = load(sessionHandle, date)
+            val refreshedCustomer = refreshedContext.customers.singleOrNull {
+                it.accountId == customer.accountId
+            } ?: customer
+            val balanceAfter = database.readModelDao().accountBalance(customer.accountId)?.balance
+                ?: throw IllegalStateException("The saved customer balance could not be verified.")
+            NativeCollectionSubmission(
+                receipt = NativeCollectionReceipt(
+                    eventId = result.eventId,
+                    customer = refreshedCustomer,
+                    paymentAccount = paymentAccount,
+                    amountPaisa = request.amountPaisa,
+                    customerBalanceAfterPaisa = moneyToPaisa(balanceAfter),
+                ),
+                refreshedContext = refreshedContext,
+            )
+        }
     }
 
     private fun moneyToPaisa(value: Double): Long = BigDecimal.valueOf(value)

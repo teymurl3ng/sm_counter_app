@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeSurfaceGeometryTest" tests="34" failures="0" errors="0" skipped="0" time="138.054" timestamp="2026-10-10T21:32:17" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="lightDefaultRows" classname="com.saaf.milkshop.NativeSurfaceGeometryTest" time="2.622" />
+  <testcase name="darkLargeTextRows" classname="com.saaf.milkshop.NativeSurfaceGeometryTest" time="1.741" />
+  <testcase name="lightLargeTextRows" classname="com.saaf.milkshop.NativeSurfaceGeometryTest" time="1.619" />
+  <testcase name="darkDefaultRows" classname="com.saaf.milkshop.NativeSurfaceGeometryTest" time="1.537" />
+  <testcase name="menuOpensExpenseEntry" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.671" />
+  <testcase name="countCashRecordsBlindAmountAndShowsSuccessWithoutExpectedVariance" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="3.435" />
+  <testcase name="personalSecurityShowsStatus" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.434" />
+  <testcase name="countReceiptDoneCallsBackOnceAndReturnsToMenu" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.672" />
+  <testcase name="menuOpensCountCashEntry" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.369" />
+  <testcase name="menuShowsCashierActionsAndKeepsMoreNavSelected" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.697" />
+  <testcase name="switchAccountAndSignOutFireFromMenu" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.417" />
+  <testcase name="menuOpensDeliveriesFromMore" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.264" />
+  <testcase name="loadFailureOffersRetry" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.18" />
+  <testcase name="portraitAccessAndRecoveryLightEvidence" classname="com.saaf.milkshop.NativeAccessEvidenceTest" time="9.842" />
+  <testcase name="portraitAccessAndRecoveryDarkEvidence" classname="com.saaf.milkshop.NativeAccessEvidenceTest" time="8.756" />
+  <testcase name="collectInvalidAmountAndPayFullDisabled" classname="com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest" time="5.065" />
+  <testcase name="collectDestinationRetentionOnCollectAnother" classname="com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest" time="5.625" />
+  <testcase name="collectCancelPathsAndCustomerSwitchResetAmount" classname="com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest" time="7.296" />
+  <testcase name="collectLargeTextPortraitSemanticsRemainAvailable" classname="com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest" time="6.139" />
+  <testcase name="collectDirtyBackKeepAndDiscard" classname="com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest" time="4.807" />
+  <testcase name="collectNoMatchSearchAndImeDoneClearFocus" classname="com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest" time="6.333" />
+  <testcase name="managerMoreOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.789" />
+  <testcase name="adminMoreOpensUnderAdminChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.557" />
+  <testcase name="ownerMoreOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="6.644" />
+  <testcase name="uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens" classname="com.saaf.milkshop.NativeFoundationUiTest" time="19.156" />
+  <testcase name="operationsMoreOpensConnectedEntry" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.737" />
+  <testcase name="saleFollowUpCreatesBornLinkedDelivery" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="1.587" />
+  <testcase name="saleFollowUpClearsAfterSent" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="1.082" />
+  <testcase name="saleWholesaleRateAndNoteStayEditable" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="3.064" />
+  <testcase name="saleChequeNextReturnsToForm" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="1.359" />
+  <testcase name="salePaymentPickerCancelsAndChangesDestination" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="1.818" />
+  <testcase name="saleFollowUpOffersDeliveryForCreditSale" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="1.152" />
+  <testcase name="catalogPickerHandlesZeroOneTwoThreeTwelveAndFiftyProducts" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="9.995" />
+  <testcase name="saleLoadFailureRetryChangesToVisibleLoadingState" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="1.138" />
+</testsuite>

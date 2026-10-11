@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.delay
 
 sealed interface NativeExpenseState {
     data object Idle : NativeExpenseState
@@ -39,6 +38,7 @@ class NativeExpenseViewModel(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val _state = MutableStateFlow<NativeExpenseState>(NativeExpenseState.Idle)
     private var sessionHandle: String? = null
+    private val loadGate = com.saaf.milkshop.nativeui.SessionRequestGate()
     val state: StateFlow<NativeExpenseState> = _state.asStateFlow()
 
     init {
@@ -88,20 +88,22 @@ class NativeExpenseViewModel(
 
     fun refresh() {
         val session = sessionHandle ?: return
+        val request = loadGate.begin(session)
         val previous = _state.value as? NativeExpenseState.Ready
         _state.value = previous?.copy(refreshing = true, error = null)
             ?: NativeExpenseState.Loading
         scope.launch {
             try {
-                _state.value = NativeExpenseState.Ready(
-                    withContext(Dispatchers.IO) { facade.load(session) },
-                    refreshing = false,
-                )
+                val context = withContext(Dispatchers.IO) { facade.load(session) }
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
+                _state.value = (_state.value as? NativeExpenseState.Ready)?.copy(context = context, refreshing = false, error = null)
+                    ?: NativeExpenseState.Ready(context, refreshing = false)
             } catch (error: Throwable) {
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 if (error is SecurityFailure.SessionExpired || previous == null) {
                     handleLoadFailure(error)
                 } else {
-                    _state.value = previous.copy(
+                    _state.value = ((_state.value as? NativeExpenseState.Ready) ?: previous).copy(
                         refreshing = false,
                         error = error.message ?: "The expense could not be refreshed. Try again.",
                     )
@@ -122,7 +124,7 @@ class NativeExpenseViewModel(
                     context = submission.refreshedContext,
                     receipt = submission.receipt,
                 )
-                autoClearReceipt(submission.receipt)
+
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
@@ -142,15 +144,7 @@ class NativeExpenseViewModel(
 
 
     /** Auto-clears the success receipt after 4s unless a newer one replaced it. */
-    private fun autoClearReceipt(receipt: Any?) {
-        scope.launch {
-            delay(4_000)
-            val current = _state.value as? NativeExpenseState.Ready ?: return@launch
-            if (current.receipt === receipt) {
-                _state.value = current.copy(receipt = null)
-            }
-        }
-    }
+
 
     fun clearFeedback() {
         val current = _state.value as? NativeExpenseState.Ready ?: return
@@ -158,6 +152,7 @@ class NativeExpenseViewModel(
     }
 
     fun close() {
+        loadGate.invalidate()
         sessionHandle = null
         _state.value = NativeExpenseState.Idle
     }

@@ -133,7 +133,7 @@ class NativeCashCloseFacade(
         }
         val pendingDeliveries = if (postingOpen) {
             database.deliveryDao().activeDeliveries()
-                .filter { it.businessDate == businessDate }
+                .filter { it.businessDate <= businessDate && !database.dailyCloseDao().isPostingClosed(it.businessDate) }
                 .mapNotNull { delivery ->
                     val status = database.deliveryDao().latestStatus(delivery.deliveryId)?.status
                     if (status != "pending") return@mapNotNull null
@@ -143,7 +143,7 @@ class NativeCashCloseFacade(
                         ?: "Product #${delivery.productId}"
                     NativeCashClosePendingDelivery(
                         deliveryId = delivery.deliveryId,
-                        label = "$product for $customer (${delivery.quantity})",
+                        label = "${delivery.businessDate}: $product for $customer (${delivery.quantity})",
                     )
                 }
         } else {
@@ -195,26 +195,30 @@ class NativeCashCloseFacade(
         if (!context.postingOpen) {
             throw IllegalStateException("This business day is closed. Reopen it before counting cash.")
         }
-        val result = reconciliation.recordCount(
-            sessionHandle,
-            PhysicalCashCountInput(
-                accountId = context.cashAccountId,
-                businessDate = context.businessDate,
-                countedAmount = BigDecimal(request.countedCashPaisa).movePointLeft(2).toDouble(),
-                notes = request.notes?.trim()?.takeIf { it.isNotEmpty() },
-            ),
-        )
-        val count = NativeCashCloseCountSnapshot(
-            countId = result.count.countId,
-            countedCashPaisa = money(result.count.countedAmount),
-            expectedCashPaisa = money(result.expectedBalance),
-            variancePaisa = money(result.variance),
-            countedAt = result.count.countedAt,
-        )
-        return NativeCashCloseCountSubmission(
-            count = count,
-            refreshedContext = load(sessionHandle, date),
-        )
+        // The mutation, required evidence and receipt reads commit together.
+        // A read/authorization failure cannot report failure after saving.
+        return database.withWriteTransaction {
+            val result = reconciliation.recordCount(
+                sessionHandle,
+                PhysicalCashCountInput(
+                    accountId = context.cashAccountId,
+                    businessDate = context.businessDate,
+                    countedAmount = BigDecimal(request.countedCashPaisa).movePointLeft(2).toDouble(),
+                    notes = request.notes?.trim()?.takeIf { it.isNotEmpty() },
+                ),
+            )
+            val count = NativeCashCloseCountSnapshot(
+                countId = result.count.countId,
+                countedCashPaisa = money(result.count.countedAmount),
+                expectedCashPaisa = money(result.expectedBalance),
+                variancePaisa = money(result.variance),
+                countedAt = result.count.countedAt,
+            )
+            NativeCashCloseCountSubmission(
+                count = count,
+                refreshedContext = load(sessionHandle, date),
+            )
+        }
     }
 
     suspend fun closeDay(
@@ -222,6 +226,7 @@ class NativeCashCloseFacade(
         request: NativeCashCloseDayRequest,
         date: LocalDate = BusinessClock.today(),
     ): NativeCashCloseDaySubmission {
+        return database.withWriteTransaction {
         val context = load(sessionHandle, date)
         if (!context.postingOpen) {
             throw IllegalStateException("This business date is already closed.")
@@ -236,69 +241,72 @@ class NativeCashCloseFacade(
                 ?: throw IllegalArgumentException("Explain the non-zero cash variance before closing.")
             require(reason.isNotEmpty())
         }
-        val result = reconciliation.closeDate(
-            sessionHandle,
-            VerifiedDailyCloseInput(
-                businessDate = context.businessDate,
-                physicalCashCountId = request.physicalCashCountId,
-                varianceReason = request.varianceReason?.trim()?.takeIf { it.isNotEmpty() },
-            ),
-        )
-        // H8: record HOW each absorbed day was sealed — audit rows that say
-        // "absorbed by this close, with no count of its own", so reports can
-        // tell closed-with-count apart from absorbed. Written immediately
-        // after the close action (its own audit already exists); a crash in
-        // this window loses the seal rows, never the close itself.
-        if (context.absorbedDays.isNotEmpty()) {
-            val actor = security.requirePermission(sessionHandle, AppPermission.CASH_COUNT_AND_CLOSE)
-            database.withWriteTransaction {
-                context.absorbedDays.forEach { day ->
-                    database.securityAuditDao().insert(
-                        com.saaf.milkshop.data.SecurityAuditEntryEntity(
-                            auditId = 0,
-                            occurredAt = java.time.Instant.now().toString(),
-                            action = "daily_close_seal_absorbed",
-                            result = "info",
-                            reasonCode = day.businessDate,
-                            details = "sealed_by=${context.businessDate};events=${day.eventCount};actor=${actor.userId}",
-                        ),
-                    )
+        require(context.pendingDeliveries.isEmpty()) {
+            "Finish or archive pending deliveries before closing the day."
+        }
+        require(latest.expectedCashPaisa == context.expectedCashPaisa) {
+            "Cash changed since this count. Record a fresh drawer count before closing."
+        }
+        // The mutation, required evidence and receipt reads commit together.
+        // A read/authorization failure cannot report failure after saving.
+            val result = reconciliation.closeDate(
+                sessionHandle,
+                VerifiedDailyCloseInput(
+                    businessDate = context.businessDate,
+                    physicalCashCountId = request.physicalCashCountId,
+                    varianceReason = request.varianceReason?.trim()?.takeIf { it.isNotEmpty() },
+                ),
+            )
+            // H8: record HOW each absorbed day was sealed — audit rows that say
+            // "absorbed by this close, with no count of its own", so reports can
+            // tell closed-with-count apart from absorbed. The surrounding
+            // transaction includes the close, these seal rows and its receipt;
+            // a crash or audit failure cannot separate their commits.
+            if (context.absorbedDays.isNotEmpty()) {
+                val actor = security.requirePermission(sessionHandle, AppPermission.CASH_COUNT_AND_CLOSE)
+                database.withWriteTransaction {
+                    context.absorbedDays.forEach { day ->
+                        database.securityAuditDao().insert(
+                            com.saaf.milkshop.data.SecurityAuditEntryEntity(
+                                auditId = 0,
+                                occurredAt = java.time.Instant.now().toString(),
+                                action = "daily_close_seal_absorbed",
+                                result = "info",
+                                reasonCode = day.businessDate,
+                                details = "sealed_by=${context.businessDate};events=${day.eventCount};actor=${actor.userId}",
+                            ),
+                        )
+                    }
                 }
             }
+            val counted = result.countedCash ?: latest.countedCashPaisa / 100.0
+            val expected = result.expectedCash ?: latest.expectedCashPaisa / 100.0
+            val variance = result.variance ?: (counted - expected)
+            NativeCashCloseDaySubmission(
+                receipt = NativeCashCloseReceipt(
+                    businessDate = context.businessDate,
+                    actionId = result.action.actionId,
+                    countedCashPaisa = money(counted),
+                    expectedCashPaisa = money(expected),
+                    variancePaisa = money(variance),
+                ),
+                refreshedContext = load(sessionHandle, date),
+            )
         }
-        val counted = result.countedCash ?: latest.countedCashPaisa / 100.0
-        val expected = result.expectedCash ?: latest.expectedCashPaisa / 100.0
-        val variance = result.variance ?: (counted - expected)
-        return NativeCashCloseDaySubmission(
-            receipt = NativeCashCloseReceipt(
-                businessDate = context.businessDate,
-                actionId = result.action.actionId,
-                countedCashPaisa = money(counted),
-                expectedCashPaisa = money(expected),
-                variancePaisa = money(variance),
-            ),
-            refreshedContext = load(sessionHandle, date),
-        )
     }
 
     /**
-     * H8: "Last synced N min ago" from the newer of the pull-state write and
-     * the newest outbox send (an honest live-contact signal for the pre-close
-     * decision — the reviewer's anti-refusal measure for the offline-tablet
-     * workflow). "Unknown" when the installation has never contacted.
+     * Explicit profile/shop verification is evidence of server contact.
+     * Queue timestamps do not prove delivery; this label does not claim convergence.
      */
     private suspend fun lastSyncedLabel(): String {
-        val pullAt = database.syncPullStateDao().find()?.updatedAt
-        val pushAt = database.syncOutboxDao().all().maxOfOrNull { it.enqueuedAt }
-        val stamps = listOfNotNull(pullAt, pushAt)
-            .mapNotNull { runCatching { java.time.Instant.parse(it).toEpochMilli() }.getOrNull() }
-        val newest = stamps.maxOrNull() ?: return "Unknown"
+        val newest = database.serverAccountDao().findBinding()?.verifiedAtEpochMs ?: return "Server contact unknown"
         val minutes = (System.currentTimeMillis() - newest) / 60_000
         return when {
-            minutes < 1 -> "Last synced moments ago"
-            minutes < 60 -> "Last synced $minutes min ago"
-            minutes < 24 * 60 -> "Last synced ${minutes / 60} h ago"
-            else -> "Last synced ${minutes / (24 * 60)} days ago"
+            minutes < 1 -> "Server verified moments ago"
+            minutes < 60 -> "Server verified $minutes min ago"
+            minutes < 24 * 60 -> "Server verified ${minutes / 60} h ago"
+            else -> "Server verified ${minutes / (24 * 60)} days ago"
         }
     }
 
@@ -313,8 +321,10 @@ class NativeCashCloseFacade(
         date: LocalDate = BusinessClock.today(),
     ): NativeCashCloseContext {
         val deliveries = NativeDeliveriesFacade(database, security)
-        deliveries.markDelivered(sessionHandle, deliveryId, date)
-        return load(sessionHandle, date)
+        return database.withWriteTransaction {
+            deliveries.markDelivered(sessionHandle, deliveryId, date)
+            load(sessionHandle, date)
+        }
     }
 
     /**
@@ -337,20 +347,24 @@ class NativeCashCloseFacade(
                 throw IllegalStateException("This business date is already open.")
             }
             security.reauthenticate(sessionHandle, passphrase)
-            val result = reconciliation.reopenDate(
-                sessionHandle,
-                VerifiedDailyReopenInput(
+            // The mutation, required evidence and receipt reads commit together.
+            // A read/authorization failure cannot report failure after saving.
+            return database.withWriteTransaction {
+                val result = reconciliation.reopenDate(
+                    sessionHandle,
+                    VerifiedDailyReopenInput(
+                        businessDate = context.businessDate,
+                        reason = cleanedReason,
+                    ),
+                )
+                val refreshed = load(sessionHandle, date)
+                require(refreshed.postingOpen) { "Reopen did not restore an open posting day." }
+                NativeCashCloseReopenSubmission(
                     businessDate = context.businessDate,
-                    reason = cleanedReason,
-                ),
-            )
-            val refreshed = load(sessionHandle, date)
-            require(refreshed.postingOpen) { "Reopen did not restore an open posting day." }
-            return NativeCashCloseReopenSubmission(
-                businessDate = context.businessDate,
-                actionId = result.action.actionId,
-                refreshedContext = refreshed,
-            )
+                    actionId = result.action.actionId,
+                    refreshedContext = refreshed,
+                )
+            }
         } finally {
             passphrase.fill('\u0000')
         }

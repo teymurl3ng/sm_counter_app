@@ -1,0 +1,65 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/app/(app)/staff/[staffId]/page.tsx
+@@
+   const [data, setData] = useState<StaffDetailApiResponse | null>(peeked);
+   const [showId, setShowId] = useState(false);
+ 
+-  const load = useCallback(async () => {
++  const load = useCallback(async (isCurrent: () => boolean = () => true) => {
+     const apply = (status: number, json: StaffDetailApiResponse) => {
++      if (!isCurrent()) return;
+       if (
+         status === 401 ||
+         json.error?.code === "UNAUTHENTICATED" ||
+@@
+       });
+       apply(result.status, result.body as StaffDetailApiResponse);
+     } catch {
++      if (!isCurrent()) return;
+       setData({
+         ok: false,
+         env: "unknown",
+@@
+   }, [router, staffId]);
+ 
+   useEffect(() => {
+-    void load();
++    let disposed = false;
++    // Subscribe after commit; cleanup fences cache and network completions alike.
++    queueMicrotask(() => { if (!disposed) void load(() => !disposed); });
++    return () => { disposed = true; };
+   }, [load]);
+ 
+   const staff = state === "ready" ? data?.staff : null;
+@@
+         viewerCacheInvalidate([`/api/staff/${staff.staff_id}`, `/api/staff`]);
+         await load();
+       }
+-    } catch (e) {
++    } catch {
+       alert("Network error.");
+     } finally {
+       setIsUpdatingStatus(false);
+@@
+     if (!staff) return;
+     try {
+       const res = await fetch("/api/shops?limit=100");
+-      const json = await res.json();
++      const json: { ok?: boolean; shops?: { shop_id: string; name: string }[] } = await res.json();
+       if (!json.ok || !json.shops) {
+         alert("Could not load shops.");
+         return;
+       }
+-      const available = json.shops.filter((s: any) => !staff.shops.some((assigned: any) => assigned.id === s.shop_id));
++      const available = json.shops.filter((s) => !staff.shops.some((assigned) => assigned.id === s.shop_id));
+       if (available.length === 0) {
+         alert("All shops are already assigned to this staff.");
+         return;
+       }
+       
+-      const msg = available.map((s: any, i: number) => `${i + 1}. ${s.name}`).join("\n");
++      const msg = available.map((s, i) => `${i + 1}. ${s.name}`).join("\n");
+       const choice = window.prompt(`Enter the number of the shop to assign:\n\n${msg}`);
+       if (!choice) return;
+       
+*** End Patch

@@ -52,7 +52,7 @@ class BudgetManagementService(
                 require(input.periodStart.dayOfMonth == 1) { "Operating-cost budgets must start on the first day of the month" }
                 require(input.periodEndExclusive == input.periodStart.plusMonths(1)) { "Operating-cost budgets must cover exactly one month" }
             }
-            require(input.periodEndExclusive.isAfter(LocalDate.now())) { "Closed budget periods cannot be created or revised" }
+            require(input.periodEndExclusive.isAfter(com.saaf.milkshop.sync.BusinessClock.today())) { "Closed budget periods cannot be created or revised" }
 
             val existing = database.budgetPlanDao().findActive(input.category, input.periodStart.toString())
             if (existing != null) {
@@ -127,7 +127,7 @@ class BudgetManagementService(
             require(amount >= 0.0) { "Collections target cannot be negative" }
             require(weekStart.dayOfWeek == java.time.DayOfWeek.MONDAY) { "Collections targets must start on Monday" }
             val end = weekStart.plusDays(7)
-            require(end.isAfter(LocalDate.now())) { "Closed collection target periods cannot be revised" }
+            require(end.isAfter(com.saaf.milkshop.sync.BusinessClock.today())) { "Closed collection target periods cannot be revised" }
             val existing = database.collectionsTargetDao().findActive(weekStart.toString())
             if (existing != null) database.collectionsTargetDao().archive(existing.targetId)
             val id = database.collectionsTargetDao().insert(
@@ -143,9 +143,9 @@ class BudgetManagementService(
             CollectionsTargetResult(id, amount)
         }
 
-    fun currentWeekStart(today: LocalDate = LocalDate.now()): LocalDate =
+    fun currentWeekStart(today: LocalDate = com.saaf.milkshop.sync.BusinessClock.today()): LocalDate =
         today.with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY))
 
-    fun currentMonthStart(today: LocalDate = LocalDate.now()): LocalDate =
+    fun currentMonthStart(today: LocalDate = com.saaf.milkshop.sync.BusinessClock.today()): LocalDate =
         today.withDayOfMonth(1)
 }

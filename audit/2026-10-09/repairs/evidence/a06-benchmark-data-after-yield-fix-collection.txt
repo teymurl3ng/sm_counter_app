@@ -1,0 +1,4 @@
+Verified isolated profileable APK identities; installing A06 QA benchmark only.
+Running benchmark profilePersistentMixedCostingDataset
+{"build": "benchmark", "device": "SM-A065F", "dataset": "Persistent bundled Room; 100 customers; 10000 collections; 21 purchases; 40 yogurt batches; 20 yogurt sales; one costing policy", "storage": "persistent isolated Room fixture", "warmups_per_operation": 2, "collection_seed_ms": 8182.002154, "yield_context_40_batches": {"samples": 3, "median_ms": 356.708924, "p95_ms": 405.598154, "max_ms": 405.598154}, "collection_command_and_receipt": {"samples": 20, "median_ms": 38.083462, "p95_ms": 66.817538, "max_ms": 69.035}, "sale_command_and_receipt": {"samples": 20, "median_ms": 293.316616, "p95_ms": 307.901539, "max_ms": 329.722461}, "month_reports": {"samples": 20, "median_ms": 406.92023, "p95_ms": 424.535077, "max_ms": 449.461769}}
+A06_BENCHMARK_DATA_COLLECTION: PASS. No ordinary app or live DB changed.

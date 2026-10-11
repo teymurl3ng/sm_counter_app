@@ -1,0 +1,6 @@
+{
+  "previous_apk_sha256": "2138e5ee940614b27f85c859711f0a102af96809d0e168071590d65ad6f3076b",
+  "expected_signer_sha256": "9c9e03d7969d79018e2880b79b8d9ec46c43ab50eaf30512ee3fb989bc6abfa1",
+  "release_signing_config_present": true,
+  "a06_production_package_present_before_install": false
+}

@@ -17,6 +17,11 @@ data class NativeManagerWorkContext(
     val cashCountMissing: Boolean,
 )
 
+interface NativeManagerWorkOperations {
+    suspend fun load(sessionHandle: String, date: LocalDate = BusinessClock.today()): NativeManagerWorkContext
+}
+
+
 /**
  * Manager Work-home boundary: daily command launcher context (not Owner-only).
  * Does not call Owner-gated business-settings reads — shop name comes from store profile.
@@ -24,10 +29,10 @@ data class NativeManagerWorkContext(
 class NativeManagerWorkFacade(
     private val database: MilkShopDatabase,
     private val security: UserSecurityService,
-) {
-    suspend fun load(
+) : NativeManagerWorkOperations {
+    override suspend fun load(
         sessionHandle: String,
-        date: LocalDate = BusinessClock.today(),
+        date: LocalDate,
     ): NativeManagerWorkContext {
         val actor = security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
         val role = AppRole.parse(actor.role)
@@ -49,7 +54,7 @@ class NativeManagerWorkFacade(
             businessDate = businessDate,
             postingOpen = postingOpen,
             shopName = database.storeProfileDao().get()?.storeName?.takeIf { it.isNotBlank() }
-                ?: "Saaf Milk",
+                ?: "Your shop",
             activeDeliveryCount = activeDeliveryCount,
             cashCountMissing = postingOpen && latestCount == null,
         )

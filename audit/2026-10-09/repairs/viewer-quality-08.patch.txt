@@ -1,0 +1,12 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/app/(app)/staff/create/page.tsx
+@@
+         const res = await fetch("/api/shops?limit=100");
+         const json = await res.json();
+         if (json.ok && json.shops) setShops(json.shops);
+-      } catch (e) {
++      } catch {
+         // ignore
+       } finally {
+         setLoadingShops(false);
+*** End Patch

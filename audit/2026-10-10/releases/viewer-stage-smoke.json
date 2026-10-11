@@ -1,0 +1,48 @@
+{
+  "base_url": "https://sm-server-view-772lu6h8n-mkrc.vercel.app",
+  "checks": [
+    {
+      "path": "/login",
+      "status": 200,
+      "final_url": "https://sm-server-view-772lu6h8n-mkrc.vercel.app/login",
+      "has_prod_label": true,
+      "has_login_form": true
+    },
+    {
+      "path": "/api/overview",
+      "status": 401,
+      "final_url": "https://sm-server-view-772lu6h8n-mkrc.vercel.app/api/overview",
+      "body": {
+        "ok": false,
+        "env": "prod",
+        "contract": "v1.1.0-read-admin",
+        "server": {
+          "status": "unavailable",
+          "pingOk": false
+        },
+        "overview": null,
+        "error": {
+          "code": "UNAUTHENTICATED",
+          "message": "Sign in required."
+        }
+      }
+    },
+    {
+      "path": "/api/health",
+      "status": 401,
+      "final_url": "https://sm-server-view-772lu6h8n-mkrc.vercel.app/api/health",
+      "body": {
+        "ok": false,
+        "code": "UNAUTHENTICATED"
+      }
+    },
+    {
+      "path": "/staff",
+      "status": 200,
+      "final_url": "https://sm-server-view-772lu6h8n-mkrc.vercel.app/login?next=%2Fstaff",
+      "has_prod_label": true,
+      "has_login_form": true
+    }
+  ],
+  "scope": "Unauthenticated HTTP and configuration only; no real PROD login or server reachability assertion."
+}

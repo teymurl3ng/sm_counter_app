@@ -55,7 +55,7 @@ class NativeOwnerShopSettingsFacadeTest {
     @Test
     fun loadReturnsShopIdentityAndRates() = runBlocking {
         val snapshot = facade.load(ownerSession)
-        assertEquals("Saaf Milk", snapshot.shopName)
+        assertEquals("Your shop", snapshot.shopName)
         assertEquals("PKR", snapshot.currencyCode)
         assertTrue(snapshot.vendorMilkRateLabel.contains("PKR"))
         assertTrue(snapshot.retailMilkRateLabel.contains("PKR"))

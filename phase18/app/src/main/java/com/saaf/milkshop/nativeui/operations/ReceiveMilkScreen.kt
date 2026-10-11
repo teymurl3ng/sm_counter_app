@@ -1,6 +1,10 @@
 package com.saaf.milkshop.nativeui.operations
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.nativeListItem
+
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -241,7 +245,14 @@ internal fun ReceiveMilkReadyContent(
                     )
                 }
 
-                if (state.receipt != null) {
+                NativeSectionTransition(
+            targetState = state,
+            contentKey = { it.receipt != null },
+            modifier = Modifier.fillMaxWidth(),
+        ) { state ->
+            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
+        if (state.receipt != null) {
                     SuccessCard(state.receipt, onReceiveAnother)
                 } else {
                     SupplierRow(
@@ -271,7 +282,7 @@ internal fun ReceiveMilkReadyContent(
                         onValueChange = { lrText = it.filterDecimalInput() },
                     )
                     TextButton(
-                        onClick = { noteOpen = !noteOpen },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { noteOpen = !noteOpen },
                         enabled = !state.saving,
                         modifier = Modifier.testTag(NativeUiTags.OpsReceiveMilkNoteToggle),
                     ) {
@@ -334,6 +345,9 @@ internal fun ReceiveMilkReadyContent(
                         )
                     }
                 }
+        
+        }
+}
             }
         }
 
@@ -356,13 +370,13 @@ internal fun ReceiveMilkDiscardDialog(leaveGuard: EntryLeaveGuard) {
         text = { Text("Your supplier and measurements stay if you keep editing.") },
         confirmButton = {
             TextButton(
-                onClick = leaveGuard::confirmDiscard,
+                onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction(leaveGuard::confirmDiscard),
                 modifier = Modifier.testTag(NativeUiTags.OpsReceiveMilkDiscardConfirm),
             ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(
-                onClick = leaveGuard::keepEditing,
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction(leaveGuard::keepEditing),
                 modifier = Modifier.testTag(NativeUiTags.OpsReceiveMilkDiscardCancel),
             ) { Text("Keep editing") }
         },
@@ -382,7 +396,7 @@ private fun SupplierRow(
             .heightIn(min = 56.dp)
             .testTag(NativeUiTags.OpsReceiveMilkSupplier)
             .semantics { role = Role.Button }
-            .clickable(enabled = enabled, onClick = onClick),
+            .clickable(enabled = enabled, onClick = com.saaf.milkshop.nativeui.common.hapticAction(onClick)),
     ) {
         Row(
             Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
@@ -433,7 +447,7 @@ private fun ReviewDock(preview: NativeReceiveMilkPreview?, milkOnHand: String) {
             .fillMaxWidth()
             .testTag(NativeUiTags.OpsReceiveMilkReview),
     ) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text("Physical review", style = MaterialTheme.typography.titleSmall)
             Text("Milk on hand now: $milkOnHand", style = MaterialTheme.typography.bodyMedium)
             if (preview == null) {
@@ -461,6 +475,7 @@ private fun SuccessCard(
     receipt: NativeReceiveMilkReceipt,
     onReceiveAnother: () -> Unit,
 ) {
+    com.saaf.milkshop.nativeui.common.NativeReceiptFeedback("receive", receipt.eventId)
     Surface(
         tonalElevation = 2.dp,
         modifier = Modifier
@@ -483,7 +498,7 @@ private fun SuccessCard(
             Text("Adjusted ${formatQty(receipt.adjustedLiters)} L")
             Text("Milk on hand: ${receipt.milkOnHandLabel}")
             Button(
-                onClick = onReceiveAnother,
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction(onReceiveAnother),
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag(NativeUiTags.OpsReceiveMilkAnother),
@@ -515,10 +530,9 @@ private fun VendorPickerDialog(
                 vendors.forEach { vendor ->
                     Row(
                         Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 56.dp)
-                            .clickable { onSelect(vendor.accountId) }
-                            .padding(vertical = 12.dp)
+                            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Selection)
+                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(vendor.accountId) })
+                            .nativeListItemContent(NativeListStyle.Selection)
                             .testTag(NativeUiTags.opsReceiveMilkVendor(vendor.accountId)),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -535,7 +549,7 @@ private fun VendorPickerDialog(
         },
         confirmButton = {},
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onDismiss)) { Text("Cancel") }
         },
     )
 }

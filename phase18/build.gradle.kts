@@ -37,7 +37,130 @@ val qaScreenName = providers.gradleProperty("qa.screen").orNull?.trim().orEmpty(
 val qaDevice = providers.gradleProperty("qa.device").orNull?.trim().orEmpty()
 
 val screenClassMap = mapOf(
+    "chromegeometry" to listOf("com.saaf.milkshop.NativeChromeGeometryTest"),
+    "chrome" to listOf(
+        "com.saaf.milkshop.NativeChromeGeometryTest",
+        "com.saaf.milkshop.NativeAuthenticationScreenContractTest",
+        "com.saaf.milkshop.NativeAccessEvidenceTest",
+        "com.saaf.milkshop.NativeMoreScreenContractTest",
+        "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+        "com.saaf.milkshop.NativeFoundationUiTest#ownerMoreOpensUnderOwnerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerMoreOpensUnderManagerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminMoreOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#operationsMoreOpensConnectedEntry",
+        "com.saaf.milkshop.NativeFoundationUiTest#uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens",
+    ),
+    "surfaces" to listOf(
+        "com.saaf.milkshop.NativeSurfaceGeometryTest",
+        "com.saaf.milkshop.NativeMoreScreenContractTest",
+        "com.saaf.milkshop.NativeAccessEvidenceTest",
+        "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+        "com.saaf.milkshop.NativeFoundationUiTest#ownerMoreOpensUnderOwnerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerMoreOpensUnderManagerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminMoreOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#operationsMoreOpensConnectedEntry",
+        "com.saaf.milkshop.NativeFoundationUiTest#uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens",
+        "com.saaf.milkshop.NativeSaleScreenContractTest",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminExpenseOpensUnderAdminChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminExpenseHardwareBackReturnsToWorkHome",
+        "com.saaf.milkshop.NativeOwnerOverviewScreenContractTest",
+        "com.saaf.milkshop.NativeOwnerExpenseScreenContractTest",
+    ),
+    "uxready" to listOf(
+        "com.saaf.milkshop.NativeFoundationUiTest#cashierCountsClosesDayAndCannotReopen",
+        "com.saaf.milkshop.NativeFoundationUiTest#operationsRecordSpoilageRecordsPhysicalLoss",
+        "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+    ),
+    "uxcorrection" to listOf(
+        "com.saaf.milkshop.NativeFoundationUiTest#operationsRecordSpoilageRecordsPhysicalLoss",
+        "com.saaf.milkshop.NativeSaleHardeningContractTest",
+        "com.saaf.milkshop.NativeCollectionScreenContractTest",
+    ),
+    "uxfinish" to listOf(
+        "com.saaf.milkshop.NativeAccessEvidenceTest",
+        "com.saaf.milkshop.NativeFoundationUiTest#phonePortraitLockSurvivesRotationRequest",
+        "com.saaf.milkshop.NativeFoundationUiTest#submenuClicksReachTheDeviceVibrator",
+        "com.saaf.milkshop.NativeFoundationUiTest#uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens",
+        "com.saaf.milkshop.NativeFoundationUiTest#recordSaleWritesRoomAndShowsRefreshedReceipt",
+        "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest#collectLargeTextPortraitSemanticsRemainAvailable",
+        "com.saaf.milkshop.Phase8SaleOperationsTest#packagedDailyWorkScreenRecordsPaidSaleThroughRoom",
+        "com.saaf.milkshop.NativeOwnerSaleEntryScreenContractTest#dirtyOwnerNavigationRequiresDiscardConfirmation",
+        "com.saaf.milkshop.NativeOwnerCollectionEntryScreenContractTest#dirtyOwnerNavigationRequiresDiscardConfirmation",
+        "com.saaf.milkshop.NativeOwnerExpenseScreenContractTest#dirtyOwnerNavigationRequiresDiscardConfirmation",
+        "com.saaf.milkshop.NativeOwnerPaySupplierScreenContractTest#dirtyOwnerNavigationRequiresDiscardConfirmation",
+        "com.saaf.milkshop.NativeOwnerPaySalaryScreenContractTest#dirtyOwnerNavigationRequiresDiscardConfirmation",
+        "com.saaf.milkshop.NativeOwnerCashCloseScreenContractTest#dirtyOwnerNavigationRequiresDiscardConfirmation",
+        "com.saaf.milkshop.NativeWorkRefreshRegressionTest",
+    ),
+    "uxbounded" to listOf(
+        "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest#collectLargeTextPortraitSemanticsRemainAvailable",
+        "com.saaf.milkshop.NativeCashCloseFacadeTest#cashierClosesOwnDayNextDateOpensAndReopenIsDenied",
+        "com.saaf.milkshop.NativeCashCloseFacadeTest#cashMovementAfterCountRefusesCloseWithoutPartialWrite",
+        "com.saaf.milkshop.NativeCashCloseFacadeTest#pendingDeliveryRefusesCloseUntilResolved",
+        "com.saaf.milkshop.NativeCashCloseFacadeTest#earlierOpenDeliveryRefusesCloseUntilCashierResolvesIt",
+        "com.saaf.milkshop.NativeFoundationUiTest#cashierCountsClosesDayAndCannotReopen",
+        "com.saaf.milkshop.NativeSaleHardeningContractTest#missingProductAndPaymentReferencesExplainWhatTheOwnerMustFix",
+        "com.saaf.milkshop.NativeActivityScreenContractTest#emptyTodayExplainsAndKeepsActivityNavSelected",
+    ),
+    "uxfinalfixes" to listOf(
+        "com.saaf.milkshop.NativeFoundationUiTest#operationsRecordSpoilageRecordsPhysicalLoss",
+        "com.saaf.milkshop.NativeSaleHardeningContractTest#missingProductAndPaymentReferencesExplainWhatTheOwnerMustFix",
+        "com.saaf.milkshop.Phase8SaleOperationsTest",
+        "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest#collectLargeTextPortraitSemanticsRemainAvailable",
+        "com.saaf.milkshop.NativeActivityScreenContractTest",
+        "com.saaf.milkshop.NativeOperationsWorkFacadeTest",
+        "com.saaf.milkshop.NativeOwnerSaleEntryScreenContractTest",
+        "com.saaf.milkshop.NativeOwnerCollectionEntryScreenContractTest",
+        "com.saaf.milkshop.NativeOwnerExpenseScreenContractTest",
+        "com.saaf.milkshop.NativeOwnerPaySupplierScreenContractTest",
+        "com.saaf.milkshop.NativeOwnerPaySalaryScreenContractTest",
+        "com.saaf.milkshop.NativeOwnerCashCloseScreenContractTest",
+        "com.saaf.milkshop.NativeOwnerDeliveriesEntryScreenContractTest",
+        "com.saaf.milkshop.NativeOwnerRecordsFacadeTest#correctRejectsClosedDay",
+        "com.saaf.milkshop.NativeOwnerShopSettingsFacadeTest",
+        "com.saaf.milkshop.NativeCashCloseFacadeTest",
+    ),
+    "uxcash" to listOf("com.saaf.milkshop.NativeFoundationUiTest#cashierCountsClosesDayAndCannotReopen"),
+    "uxassets" to listOf(
+        "com.saaf.milkshop.NativeShopIdentityRegressionTest",
+        "com.saaf.milkshop.NativeSaleScreenContractTest#catalogPickerHandlesZeroOneTwoThreeTwelveAndFiftyProducts",
+        "com.saaf.milkshop.NativeFoundationUiTest#uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens",
+    ),
+    "uxback" to listOf(
+        "com.saaf.milkshop.NativeFoundationUiTest#switchAccountHardwareBackKeepsSessionAndReturnsToMore",
+        "com.saaf.milkshop.NativeFoundationUiTest#ownerPaySupplierOpensUnderOwnerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminBusinessRecordsHardwareBackReturnsToRecordsHub",
+    ),
+    "ux" to listOf(
+        "com.saaf.milkshop.NativeFoundationUiTest#phonePortraitLockSurvivesRotationRequest",
+        "com.saaf.milkshop.NativeFoundationUiTest#submenuClicksReachTheDeviceVibrator",
+        "com.saaf.milkshop.NativeShopIdentityRegressionTest",
+        "com.saaf.milkshop.NativeCashCloseFacadeTest",
+        "com.saaf.milkshop.NativeSaleScreenContractTest#catalogPickerHandlesZeroOneTwoThreeTwelveAndFiftyProducts",
+        "com.saaf.milkshop.NativeFoundationUiTest#uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens",
+        "com.saaf.milkshop.NativeWorkRefreshRegressionTest",
+        "com.saaf.milkshop.NativeCatalogPricingRegressionTest",
+        "com.saaf.milkshop.NativeAuthenticationScreenContractTest",
+        "com.saaf.milkshop.NativeMoreScreenContractTest",
+        "com.saaf.milkshop.NativeCashierExpenseScreenContractTest",
+        "com.saaf.milkshop.NativeCashCloseFacadeTest",
+        "com.saaf.milkshop.NativeFoundationUiTest#cashierCountsClosesDayAndCannotReopen",
+        "com.saaf.milkshop.NativeFoundationUiTest#switchAccountHardwareBackKeepsSessionAndReturnsToMore",
+        "com.saaf.milkshop.NativeFoundationUiTest#switchAccountUiBackKeepsSessionAndReturnsToMore",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerRecordsHardwareBackReturnsToWorkHome",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerRecordsCorrectionHardwareBackReturnsToDetailThenList",
+        "com.saaf.milkshop.NativeFoundationUiTest#managerShellNavSwitchesSectionsUnderManagerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#ownerPaySupplierOpensUnderOwnerChrome",
+        "com.saaf.milkshop.NativeFoundationUiTest#ownerPaySupplierHardwareBackReturnsToWorkHome",
+        "com.saaf.milkshop.NativeFoundationUiTest#adminBusinessRecordsHardwareBackReturnsToRecordsHub",
+        "com.saaf.milkshop.NativeFoundationUiTest#entryModesInputAndSteppersConvertAndRecalculate",
+        "com.saaf.milkshop.NativeFoundationUiTest#recordSaleWritesRoomAndShowsRefreshedReceipt",
+        "com.saaf.milkshop.NativeFoundationUiTest#editedSaleDraftSurvivesActivityRecreation",
+    ),
     "auth" to listOf(
+        "com.saaf.milkshop.NativeChromeGeometryTest",
+        "com.saaf.milkshop.NativeSurfaceGeometryTest",
+        "com.saaf.milkshop.NativeAccessEvidenceTest",
         // NativeOwnerBootstrapUiTest requires saafSkipBootstrap=true + empty DB; runner seed
         // makes first-run unreachable in shared connected suites. Covered separately via
         // scripts/qa/run-connected-qa.ps1 auth-bootstrap when needed.
@@ -68,6 +191,7 @@ val screenClassMap = mapOf(
         "com.saaf.milkshop.NativeFoundationUiTest#collectPaymentWritesRoomShowsReceiptAndOffersTheNextVisibleActions",
     ),
     "more" to listOf(
+        "com.saaf.milkshop.NativeFoundationUiTest#cashierCountsClosesDayAndCannotReopen",
         "com.saaf.milkshop.NativeMoreFacadeTest",
         "com.saaf.milkshop.NativeMoreScreenContractTest",
         "com.saaf.milkshop.NativeCashierExpenseScreenContractTest",
@@ -310,7 +434,8 @@ if (wantsQaScreen || wantsQaCheckpoint) {
             screenClassMap.getValue("spoilage") + screenClassMap.getValue("deliveries") +
             screenClassMap.getValue("attendance") + screenClassMap.getValue("opsmore") +
             screenClassMap.getValue("owner") + screenClassMap.getValue("ownerwork") +
-            screenClassMap.getValue("ownerrecords") + screenClassMap.getValue("ownermore"))
+            screenClassMap.getValue("ownerrecords") + screenClassMap.getValue("ownermore") +
+            screenClassMap.getValue("managershell") + screenClassMap.getValue("adminshell") + screenClassMap.getValue("ux"))
             .distinct()
     } else {
         val screen = qaScreenName.lowercase()

@@ -1,0 +1,5 @@
+{
+  "reason": "Stopped deliberately to complete three confirmed list gutters before checkpoint acceptance",
+  "completed": 22,
+  "reportedFailure": "Instrumentation process was intentionally stopped; not evidence of an independent app defect"
+}

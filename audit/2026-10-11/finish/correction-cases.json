@@ -1,0 +1,80 @@
+[
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "operationsRecordSpoilageRecordsPhysicalLoss",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+    "method": "closedBusinessDayExplainsTheBlockAndDisablesRecord",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+    "method": "surchargeEditedAmountWinsOverDefault",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+    "method": "surchargeTogglePrefillsDefaultAndCarriesIntoRequest",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+    "method": "missingProductAndPaymentReferencesExplainWhatTheOwnerMustFix",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+    "method": "largeTextDarkThemeKeepsCoreActionsAndTalkBackStateAvailable",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+    "method": "longCustomerListScrollsToTheLastAccountAndSelectsIt",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCollectionScreenContractTest",
+    "method": "loadRetryAndSaveFailureHaveVisibleRecoverableWorkflows",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCollectionScreenContractTest",
+    "method": "unavailableAndFailureStatesExplainRecoveryAndPreserveEnteredAmount",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCollectionScreenContractTest",
+    "method": "customerSearchSelectionAmountShortcutsAccountAndNoteControlsChangeVisibleState",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCollectionScreenContractTest",
+    "method": "overpaymentRequiresExplicitAdvanceConfirmationWithExactConsequences",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCollectionScreenContractTest",
+    "method": "successShowsAuthoritativeResultAndBothActionsRespond",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCollectionScreenContractTest",
+    "method": "normalPaymentSubmitsExactRequestAndSavingStateBlocksDuplicateTap",
+    "failure": null,
+    "skipped": false
+  }
+]

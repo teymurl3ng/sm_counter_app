@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" tests="28" failures="1" errors="0" skipped="0" time="12.928" timestamp="2026-10-10T01:21:12" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-S921W - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="collectionReauthorizationFailureCannotLeaveSavedCollection" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.193" />
+  <testcase name="drawingReceiptReadFailureCannotLeaveSavedDrawing" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.182" />
+  <testcase name="successfulAbsorptionReturnsReceiptAndDurableSealEvidence" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.289" />
+  <testcase name="failedAbsorptionAuditRollsBackClose" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.259" />
+  <testcase name="countReceiptReadFailureCannotLeaveSavedCount" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.211" />
+  <testcase name="operatorCannotLoadCashClose" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.567" />
+  <testcase name="closeThenReopenRestoresOpenPosting" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.418" />
+  <testcase name="recordCountThenCloseDayReturnsReceipt" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.212" />
+  <testcase name="loadExposesCashAccountExpectedAndOpenPosting" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.187" />
+  <testcase name="reopenRejectsBlankReasonAndWrongPassphrase" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.42" />
+  <testcase name="varianceRequiresReasonBeforeClose" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.21" />
+  <testcase name="loadKeepsBalancesOutOfTheCustomerListAndResolvesOnlyTheSelection" classname="com.saaf.milkshop.NativeCollectionFacadeTest" time="0.211" />
+  <testcase name="recordAllowsAdvanceAndReturnsVerifiedCustomerAndCashMovements" classname="com.saaf.milkshop.NativeCollectionFacadeTest" time="0.21" />
+  <testcase name="operatorCannotLoadOrRecordCollectionData" classname="com.saaf.milkshop.NativeCollectionFacadeTest" time="0.624" />
+  <testcase name="loadExposesActiveCategoriesAndDefaultsCash" classname="com.saaf.milkshop.NativeExpenseFacadeTest" time="0.236" />
+  <testcase name="recordPostsExpenseAndReturnsReceipt" classname="com.saaf.milkshop.NativeExpenseFacadeTest" time="0.26" />
+  <testcase name="operatorCannotLoadOrRecordExpense" classname="com.saaf.milkshop.NativeExpenseFacadeTest" time="0.625" />
+  <testcase name="recordReturnsPhysicalConversionWithoutFinance" classname="com.saaf.milkshop.NativeMakeYogurtFacadeTest" time="0.601" />
+  <testcase name="loadExposesStockWithoutRatesOrMargins" classname="com.saaf.milkshop.NativeMakeYogurtFacadeTest" time="0.57" />
+  <testcase name="insufficientMilkKeepsDraftFriendlyMessage" classname="com.saaf.milkshop.NativeMakeYogurtFacadeTest" time="0.569" />
+  <testcase name="loadExposesSuppliersWithoutBalancesOrRates" classname="com.saaf.milkshop.NativeReceiveMilkFacadeTest" time="0.547" />
+  <testcase name="cashierCannotLoadReceiveMilk" classname="com.saaf.milkshop.NativeReceiveMilkFacadeTest" time="0.923" />
+  <testcase name="previewAndRecordReturnPhysicalValuesWithoutAmountOwed" classname="com.saaf.milkshop.NativeReceiveMilkFacadeTest" time="0.576" />
+  <testcase name="otherReasonRequiresNote" classname="com.saaf.milkshop.NativeRecordSpoilageFacadeTest" time="0.576" />
+  <testcase name="recordReturnsPhysicalRemovalWithoutFinance" classname="com.saaf.milkshop.NativeRecordSpoilageFacadeTest" time="0.569" />
+  <testcase name="insufficientStockKeepsDraftFriendlyMessage" classname="com.saaf.milkshop.NativeRecordSpoilageFacadeTest" time="0.577" />
+  <testcase name="loadExposesProductsWithoutRatesOrMargins" classname="com.saaf.milkshop.NativeRecordSpoilageFacadeTest" time="0.555" />
+  <testcase name="initializationError" classname="com.saaf.milkshop.NativeDrawingTest" time="0.021">
+    <failure>java.lang.RuntimeException: Failed loading specified test class 'com.saaf.milkshop.NativeDrawingTest'
+at androidx.test.internal.runner.DirectTestLoader.doCreateRunner(DirectTestLoader.java:50)
+at androidx.test.internal.runner.TestLoader.getRunnersFor(TestLoader.java:64)
+at androidx.test.internal.runner.TestRequestBuilder.build(TestRequestBuilder.java:842)
+at androidx.test.runner.AndroidJUnitRunner.buildRequest(AndroidJUnitRunner.java:672)
+at androidx.test.runner.AndroidJUnitRunner.onStart(AndroidJUnitRunner.java:453)
+at com.saaf.milkshop.SaafMilkTestRunner.onStart(SaafMilkTestRunner.kt:123)
+at android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2683)
+Caused by: java.lang.ClassNotFoundException: com.saaf.milkshop.NativeDrawingTest
+at java.lang.Class.classForName(Native Method)
+at java.lang.Class.forName(Class.java:591)
+at androidx.test.internal.runner.DirectTestLoader.doCreateRunner(DirectTestLoader.java:44)
+... 6 more
+Caused by: java.lang.ClassNotFoundException: Didn't find class "com.saaf.milkshop.NativeDrawingTest" on path: DexPathList[[zip file "/data/app/~~yJGp4VX-nSN9QuoUdcJsiQ==/com.saaf.milkshop.qa.tests.test-LELo30wLx7Li0_Vya5f1ZA==/base.apk", zip file "/data/app/~~SyAcU5k6UcGrXuTTxytFKg==/com.saaf.milkshop.qa.tests-8sjgvVNUqT7jgmgklXRO6A==/base.apk"],nativeLibraryDirectories=[/data/app/~~yJGp4VX-nSN9QuoUdcJsiQ==/com.saaf.milkshop.qa.tests.test-LELo30wLx7Li0_Vya5f1ZA==/lib/arm64, /data/app/~~SyAcU5k6UcGrXuTTxytFKg==/com.saaf.milkshop.qa.tests-8sjgvVNUqT7jgmgklXRO6A==/lib/arm64, /data/app/~~yJGp4VX-nSN9QuoUdcJsiQ==/com.saaf.milkshop.qa.tests.test-LELo30wLx7Li0_Vya5f1ZA==/base.apk!/lib/arm64-v8a, /data/app/~~SyAcU5k6UcGrXuTTxytFKg==/com.saaf.milkshop.qa.tests-8sjgvVNUqT7jgmgklXRO6A==/base.apk!/lib/arm64-v8a, /system/lib64, /system_ext/lib64]]
+at dalvik.system.BaseDexClassLoader.findClass(BaseDexClassLoader.java:248)
+at java.lang.ClassLoader.loadClass(ClassLoader.java:644)
+at java.lang.ClassLoader.loadClass(ClassLoader.java:580)
+... 9 more
+</failure>
+  </testcase>
+</testsuite>

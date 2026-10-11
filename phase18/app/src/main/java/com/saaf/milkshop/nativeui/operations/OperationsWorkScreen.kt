@@ -1,6 +1,8 @@
 package com.saaf.milkshop.nativeui.operations
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeBottomNavigation
+import com.saaf.milkshop.nativeui.common.NativeNavigationLabel
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -226,7 +228,9 @@ private fun WorkHomeBody(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Surface(
-            color = MaterialTheme.colorScheme.surfaceVariant,
+            color = MaterialTheme.colorScheme.surface,
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag(NativeUiTags.OpsWorkContext),
@@ -365,7 +369,7 @@ private fun OpsRailItem(
             unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
         icon = { Icon(icon, contentDescription = label) },
-        label = { Text(label) },
+        label = { NativeNavigationLabel(label) },
     )
 }
 
@@ -374,37 +378,34 @@ internal fun OperationsNavigation(
     selected: OperationsSection,
     onNavigate: (OperationsSection) -> Unit,
 ) {
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.background,
-        tonalElevation = 0.dp,
-    ) {
+    NativeBottomNavigation {
         OpsNavItem(
             selected = selected == OperationsSection.Work,
             label = "Work",
             icon = Icons.Outlined.WorkOutline,
             tag = NativeUiTags.OpsNavWork,
-            onClick = { onNavigate(OperationsSection.Work) },
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction { onNavigate(OperationsSection.Work) },
         )
         OpsNavItem(
             selected = selected == OperationsSection.Deliveries,
             label = "Deliveries",
             icon = Icons.Outlined.LocalShipping,
             tag = NativeUiTags.OpsNavDeliveries,
-            onClick = { onNavigate(OperationsSection.Deliveries) },
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction { onNavigate(OperationsSection.Deliveries) },
         )
         OpsNavItem(
             selected = selected == OperationsSection.Attendance,
             label = "Attendance",
             icon = Icons.Outlined.EventAvailable,
             tag = NativeUiTags.OpsNavAttendance,
-            onClick = { onNavigate(OperationsSection.Attendance) },
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction { onNavigate(OperationsSection.Attendance) },
         )
         OpsNavItem(
             selected = selected == OperationsSection.More,
             label = "More",
             icon = Icons.Outlined.MoreHoriz,
             tag = NativeUiTags.OpsNavMore,
-            onClick = { onNavigate(OperationsSection.More) },
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction { onNavigate(OperationsSection.More) },
         )
     }
 }
@@ -423,7 +424,7 @@ private fun androidx.compose.foundation.layout.RowScope.OpsNavItem(
         onClick = { context.hapticTap(); onClick() },
         modifier = Modifier.testTag(tag).heightIn(min = 56.dp),
         icon = { Icon(icon, contentDescription = label) },
-        label = { Text(label) },
+        label = { NativeNavigationLabel(label) },
         colors = NavigationBarItemDefaults.colors(
             selectedIconColor = MaterialTheme.colorScheme.onPrimary,
             selectedTextColor = MaterialTheme.colorScheme.primary,

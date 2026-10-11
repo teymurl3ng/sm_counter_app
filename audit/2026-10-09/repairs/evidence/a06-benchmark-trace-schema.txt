@@ -1,0 +1,38 @@
+
+Loading trace: 0.00 MB
+
+Loading trace: 25.11 MB
+[327.822]     common_flags.cc:525 Trace loaded: 25.11 MB in 1.27s (19.8 MB/s)
+[327.822]            query.cc:191 Query execution time: 0 ms
+"name"
+"thread_track"
+"process_track"
+"expected_frame_timeline_slice"
+"actual_frame_timeline_slice"
+
+"cid","name","type","notnull","dflt_value","pk"
+0,"id","INTEGER",0,"[NULL]",1
+1,"ts","INTEGER",0,"[NULL]",0
+2,"dur","INTEGER",0,"[NULL]",0
+3,"track_id","INTEGER",0,"[NULL]",0
+4,"category","TEXT",0,"[NULL]",0
+5,"name","TEXT",0,"[NULL]",0
+6,"depth","INTEGER",0,"[NULL]",0
+7,"parent_id","INTEGER",0,"[NULL]",0
+8,"arg_set_id","INTEGER",0,"[NULL]",0
+9,"display_frame_token","INTEGER",0,"[NULL]",0
+10,"surface_frame_token","INTEGER",0,"[NULL]",0
+11,"upid","INTEGER",0,"[NULL]",0
+12,"layer_name","TEXT",0,"[NULL]",0
+13,"present_type","TEXT",0,"[NULL]",0
+14,"on_time_finish","INTEGER",0,"[NULL]",0
+15,"gpu_composition","INTEGER",0,"[NULL]",0
+16,"jank_type","TEXT",0,"[NULL]",0
+17,"jank_severity_type","TEXT",0,"[NULL]",0
+18,"prediction_type","TEXT",0,"[NULL]",0
+19,"jank_tag","TEXT",0,"[NULL]",0
+20,"jank_tag_experimental","TEXT",0,"[NULL]",0
+21,"jank_score","DOUBLE",0,"[NULL]",0
+22,"latched_unsignaled_count","INTEGER",0,"[NULL]",0
+23,"addressable_unsignaled_latch_count","INTEGER",0,"[NULL]",0
+24,"latched_fence_state","TEXT",0,"[NULL]",0

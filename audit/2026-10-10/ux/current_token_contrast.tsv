@@ -1,0 +1,8 @@
+foreground	background	ratio	intended_usage
+muted	page	5.46	secondary text
+muted	surface	6.62	row supporting text
+ink	surface	16.4	primary text
+outline	page	3.14	interactive boundary
+outline	surface	3.82	interactive boundary
+surface	green	11.51	header text
+ink	yellow	10.48	commit button text

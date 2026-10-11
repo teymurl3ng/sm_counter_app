@@ -1,0 +1,25 @@
+{
+  "projects": {
+    "dev": {
+      "sync_rows": 39,
+      "non_object_payloads": 0,
+      "unknown_sync_tables": 0,
+      "business_shop_mismatches": 0
+    },
+    "prod": {
+      "sync_rows": 36,
+      "non_object_payloads": 0,
+      "unknown_sync_tables": 0,
+      "business_shop_mismatches": 0
+    }
+  },
+  "native_passes_by_batch": {
+    "supabase-bootstrap-parity-final.txt": 11,
+    "supabase-native-boundary-repair.txt": 11
+  },
+  "unchanged_android_sources": 81,
+  "supabase_evidence_hashes": 47,
+  "deployment_performed": false,
+  "real_auth_session_verified": false
+}
+SUPABASE_EVIDENCE_RECONCILIATION: PASS

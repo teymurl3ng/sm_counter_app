@@ -1,0 +1,47 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/app/(app)/shops/shops-list-panel.tsx
+@@
+   const [state, setState] = useState<LoadState>(peeked && peeked.ok && peeked.shops ? "ready" : "loading");
+   const [data, setData] = useState<ShopListApiResponse | null>(peeked);
+ 
+-  const load = useCallback(async () => {
++  const load = useCallback(async (isCurrent: () => boolean = () => true) => {
+     const qs = new URLSearchParams();
+     qs.set("limit", String(SHOP_PAGE_SIZE_DEFAULT));
+     if (offset > 0) qs.set("offset", String(offset));
+     const qsStr = qs.toString();
+     const apply = (status: number, json: ShopListApiResponse) => {
++      if (!isCurrent()) return;
+       if (
+         status === 401 ||
+         json.error?.code === "UNAUTHENTICATED" ||
+@@
+       });
+       apply(result.status, result.body as ShopListApiResponse);
+     } catch {
++      if (!isCurrent()) return;
+       setData({
+         ok: false,
+         env: "unknown",
+@@
+   }, [offset, router]);
+ 
+   useEffect(() => {
+-    void load();
++    let disposed = false;
++    // Subscribe after commit; cleanup fences cache and network completions alike.
++    queueMicrotask(() => { if (!disposed) void load(() => !disposed); });
++    return () => { disposed = true; };
+   }, [load]);
+ 
+   function setOffset(next: number) {
+@@
+         // Reload to show the new shop
+         await load();
+       }
+-    } catch (e) {
++    } catch {
+       alert("Network error.");
+     } finally {
+       setIsAdding(false);
+*** End Patch

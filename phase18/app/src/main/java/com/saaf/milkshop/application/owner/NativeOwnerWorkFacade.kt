@@ -16,6 +16,11 @@ data class NativeOwnerWorkContext(
     val activeDeliveryCount: Int,
 )
 
+interface NativeOwnerWorkOperations {
+    suspend fun load(sessionHandle: String, date: LocalDate = BusinessClock.today()): NativeOwnerWorkContext
+}
+
+
 /**
  * Owner Work-home boundary: command launcher context only.
  */
@@ -23,10 +28,10 @@ class NativeOwnerWorkFacade(
     private val database: MilkShopDatabase,
     private val security: UserSecurityService,
     private val reads: HybridReadModelService = HybridReadModelService(database, security),
-) {
-    suspend fun load(
+) : NativeOwnerWorkOperations {
+    override suspend fun load(
         sessionHandle: String,
-        date: LocalDate = BusinessClock.today(),
+        date: LocalDate,
     ): NativeOwnerWorkContext {
         val actor = security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
         require(AppRole.parse(actor.role) == AppRole.OWNER) {
@@ -41,7 +46,7 @@ class NativeOwnerWorkFacade(
         return NativeOwnerWorkContext(
             businessDate = businessDate,
             postingOpen = !database.dailyCloseDao().isPostingClosed(businessDate),
-            shopName = settings.store?.storeName?.takeIf { it.isNotBlank() } ?: "Saaf Milk",
+            shopName = settings.store?.storeName?.takeIf { it.isNotBlank() } ?: "Your shop",
             activeDeliveryCount = activeDeliveryCount,
         )
     }

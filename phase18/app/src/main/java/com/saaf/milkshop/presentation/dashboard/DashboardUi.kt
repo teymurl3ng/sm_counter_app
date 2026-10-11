@@ -75,7 +75,7 @@ class DashboardUi(
     }
 
     private suspend fun refreshAnalyticsDashboard(period: AnalyticsPeriod) {
-        val today = LocalDate.now()
+        val today = com.saaf.milkshop.sync.BusinessClock.today()
         val (start, end, _) = when (period) {
             AnalyticsPeriod.TODAY -> Triple(today, today.plusDays(1), activity.getString(R.string.analytics_period_today))
             AnalyticsPeriod.WEEK -> {

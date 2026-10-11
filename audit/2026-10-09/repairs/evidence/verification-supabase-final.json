@@ -1,0 +1,228 @@
+{
+  "date": "2026-10-10",
+  "operation_scope": "Live read-only MCP; local source repairs and disposable SQL execution",
+  "live_mutations": false,
+  "deployment": "Not performed; exact DEV proposal awaits review",
+  "new_finding": {
+    "id": "S01",
+    "severity": "HIGH",
+    "status": "Verified live control gap; locally reproduced/repaired; not deployed"
+  },
+  "projects": {
+    "dev": {
+      "name": "saafmilk-dev",
+      "project_id": "tghzmofkkdsaasvnixps",
+      "aggregate_snapshot": {
+        "sync_rows": 39,
+        "non_object_payloads": 0,
+        "unknown_sync_tables": 0,
+        "business_shop_mismatches": 0
+      },
+      "owner_public_sql_context": {
+        "role": "authenticated",
+        "pull_ok": true,
+        "profile_role": "owner",
+        "pull_records": 1,
+        "eligible_shops": 3,
+        "auth_uid_is_set": true,
+        "profile_nonnull": true,
+        "overview_nonnull": true
+      },
+      "no_identity_sql_context": {
+        "role": "authenticated",
+        "pull_ok": true,
+        "pull_records": 0,
+        "eligible_shops": 0,
+        "auth_uid_is_null": true,
+        "visible_sync_rows": 0
+      },
+      "direct_insert_readonly_plan_accepted": true,
+      "anon_boundary": "Expected private-helper ACL denial: 42501",
+      "initial_owner_read": "Invalid private-helper probe; intended ACL denial, not product defect",
+      "real_auth_session_tested": false
+    },
+    "prod": {
+      "name": "saafmilk-prod",
+      "project_id": "tlsuxbghuhlqntkgtrxt",
+      "aggregate_snapshot": {
+        "sync_rows": 36,
+        "non_object_payloads": 0,
+        "unknown_sync_tables": 0,
+        "business_shop_mismatches": 0
+      },
+      "owner_public_sql_context": {
+        "role": "authenticated",
+        "pull_ok": true,
+        "profile_role": "owner",
+        "pull_records": 1,
+        "eligible_shops": 1,
+        "auth_uid_is_set": true,
+        "profile_nonnull": true,
+        "overview_nonnull": true
+      },
+      "no_identity_sql_context": {
+        "role": "authenticated",
+        "pull_ok": true,
+        "pull_records": 0,
+        "eligible_shops": 0,
+        "auth_uid_is_null": true,
+        "visible_sync_rows": 0
+      },
+      "direct_insert_readonly_plan_accepted": true,
+      "anon_boundary": "Expected private-helper ACL denial: 42501",
+      "initial_owner_read": "Invalid private-helper probe; intended ACL denial, not product defect",
+      "real_auth_session_tested": false
+    }
+  },
+  "comparison": {
+    "dev_prod_function_definitions_lexically_equal_after_documented_normalization": true,
+    "dev_prod_function_count": 34,
+    "dev_prod_schema_policy_privilege_trigger_differences": [],
+    "fresh_columns_and_profile_now_match_live": true,
+    "prepared_c1_6_functions_missing_live": [
+      "admin_verify_created_identity(p_reconciliation_id uuid)",
+      "protect_last_active_owner()"
+    ],
+    "prepared_function_definition_differences": [
+      "admin_record_auth_reconciliation(p_business_id uuid, p_operation text, p_auth_user_id uuid, p_target_username text, p_performed_by uuid, p_performed_by_username text, p_error_code text, p_correlation_id uuid)",
+      "redact_json_secrets(p_val jsonb)",
+      "sync_records_assign_seq()"
+    ],
+    "constraint_differences": {
+      "fresh_payload_object_check": "Prepared fresh schema enforces object payloads; live currently has no such check",
+      "sync_foreign_key_deletion": "Fresh schema uses NO ACTION; live uses ON DELETE CASCADE. Preserve live history/deletion behavior pending an explicit policy decision."
+    },
+    "index_name_difference": "sync_records_shop_seq_idx (fresh) vs sync_records_shop_seq (live); same indexed columns",
+    "method_limit": "Lexical comparison is not a SQL equivalence proof; PostgreSQL 17/18 catalog formatting is normalized only where documented."
+  },
+  "native_batches": {
+    "supabase-bootstrap-parity-final.txt": {
+      "checks": [
+        "fresh bootstrap executes in native PostgreSQL with local Auth stand-ins",
+        "direct staff writes cannot remove the final active owner, regardless of other business owners",
+        "ambiguous create reconciliation retains unlinked Auth identity and resolves linked identity",
+        "fresh sync RPCs assign sequences and return shop-scoped records",
+        "authenticated RLS cannot read another business or call internal identity verification",
+        "competing disable operations at READ COMMITTED retain an active owner",
+        "competing demote operations at READ COMMITTED retain an active owner",
+        "competing delete operations at READ COMMITTED retain an active owner",
+        "competing disable operations at REPEATABLE READ retain an active owner",
+        "competing demote operations at REPEATABLE READ retain an active owner",
+        "competing delete operations at REPEATABLE READ retain an active owner"
+      ],
+      "passed": 11,
+      "scope": "disposable PostgreSQL 18.6; local Auth stand-ins"
+    },
+    "supabase-native-boundary-repair.txt": {
+      "checks": [
+        "live-model RPC refuses cashier history correction",
+        "live-model direct INSERT bypasses correction and business-header checks",
+        "live-model direct INSERT accepts unknown table and JSON null",
+        "incompatible history aborts the entire repair without dropping rows or partially revoking access",
+        "reviewable repair applies atomically and reapplies without data changes",
+        "repaired boundary denies direct authenticated INSERT and sequence use",
+        "repaired boundary preserves correction authorization",
+        "repaired boundary preserves ordinary RPC push, pull and timezone profile",
+        "repaired payload constraint rejects JSON null even for privileged writes",
+        "repaired internal redactor keeps recursive semantics with fixed search_path",
+        "repaired C1.6 trigger prevents direct removal of the fixture final owner"
+      ],
+      "passed": 11,
+      "scope": "disposable PostgreSQL 18.6; local Auth stand-ins"
+    }
+  },
+  "test_counts_are_not_unique_coverage": true,
+  "android_source_hashes_unchanged": 81,
+  "prior_a06_evidence_hashes_still_match": true,
+  "remaining": [
+    "DEV/PROD deployment",
+    "Real Auth/session and deployed reconciliation rehearsal",
+    "Owner visual acceptance",
+    "Release motion tracing",
+    "Persistent/costing profiling",
+    "Owner-approved historical partial-event recovery",
+    "Power-loss durability if required"
+  ],
+  "proposal_sha256": "8856aa3b069eb7a6badd165d97003c373c43963f8f7004950911129e8e5b8308",
+  "older_snapshots_preserved": {
+    "verification-final.json": "764a249bcd49f45276d9c4c62aa29d35d61a5717a7cc7035333986379bdb5687",
+    "verification-a06-final.json": "25d1ad14be21b2cbdcf350e538267c8f99b519d1696a298a94c0710d47f56a9d"
+  },
+  "older_report_hashes": "Dated historical snapshots; current reports intentionally updated for Supabase continuation",
+  "server_source_sha256": {
+    "C:\\Users\\Teymur\\Desktop\\saaf-anchor-tmp\\migration.sql": "452b08484ed2267484de79d3f1d9ad8a6dc822f5b9052162366b9be22c3c7f1b",
+    "C:\\Users\\Teymur\\Desktop\\saaf-anchor-tmp\\migration_c1_3_hardening.sql": "ea41c7eb3014dfc6b8cbecf5f3ad186efd04e950a93c2da03b2fcdd820eb2069",
+    "C:\\Users\\Teymur\\Desktop\\saaf-anchor-tmp\\migration_c1_6_integrity.sql": "0b1138ffc5f3ce6fa589381055f4f71540b11a9f16c65e07a71437952e0dd309",
+    "C:\\Users\\Teymur\\Desktop\\saaf-anchor-tmp\\migration_sync_fresh.sql": "0e900d06f0e6beb108e803fec11f804e9ffb03da458aee3e83b8a4677a28cd56",
+    "C:\\Users\\Teymur\\Desktop\\saaf-anchor-tmp\\bootstrap.sql": "f1fafa175f54e420dd750e9bb5573d4416f3b70367c63acf237603274e00f4db",
+    "C:\\Users\\Teymur\\Desktop\\saaf-anchor-tmp\\CONTRACT.md": "1db26aec7021713008ef94d5d75e117ae94ef47016972b4f2589af46768cbf93"
+  },
+  "support_sha256": {
+    "audit\\2026-10-09\\repairs\\compare_supabase_catalogs.py": "649a1507dce074e9cc5521eeb988ee68f6224dfa1e01c3b2714e0dd87c40c025",
+    "audit\\2026-10-09\\repairs\\verify_supabase_evidence.py": "d82358a65235c5d1b4be1114e10d370da1188fae014b80922e934e42f0ca8fa8",
+    "audit\\2026-10-09\\repairs\\prepare_bootstrap_parity.py": "088b24ebd40b7ea9b8d84801226e45a0699192f536bd0ab3a1553071062f37c0",
+    "audit\\2026-10-09\\repairs\\sql-check\\check.mjs": "3d2567f40083da677f6b9b5759a35143c68b76e9dc973c3d2fb6ad0d8c82e07f",
+    "audit\\2026-10-09\\repairs\\sql-check\\live-boundary.mjs": "955c125e891020decfd9b48a178cb3144a79df1a41deb8f24fefe4ef5a20516a",
+    "audit\\2026-10-09\\repairs\\sql-check\\native-run.py": "e7715f5a1150bc85a47f55ece7146938e42d5277f732c7ff13c020b5bf742092",
+    "audit\\2026-10-09\\repairs\\SUPABASE_LIVE_REPAIR_2026-10-10.sql": "8856aa3b069eb7a6badd165d97003c373c43963f8f7004950911129e8e5b8308"
+  },
+  "report_sha256": {
+    "PROJECT_AUDIT_2026-10-09.md": "d8a6ada3ac927f35f1c921e20a4419b705d7c641682538bbe2d1143cfd49d33d",
+    "REPAIR_PLAN_2026-10-10.md": "2bd60a75e005888f9c61f8f0d73be0c7c61b8643068d36f30ba1592d91cd40e8",
+    "FINDINGS_STATUS.md": "d6ac1356a935144e84ae83c2df872bb415f36429712db4ceda4d4e416df23d68",
+    "audit/2026-10-09/repairs/A06_VERIFICATION_2026-10-10.md": "1fc7f206e0bc0a63970682236c13f2287c63e323b0c6cb1bb6e6198cec6363a4",
+    "audit/2026-10-09/repairs/SUPABASE_VERIFICATION_2026-10-10.md": "ad65ff8b45ca769f71a41c262f8bd7074859e76bd92daae544dbbe82ec19d901",
+    "audit/2026-10-09/repairs/README.md": "fb839b4e3faac90e0fd8a9dc2487ed150dc2b57a4b4d641fc4657ab7282046c7",
+    "audit/2026-10-09/repairs/sql-check/README.md": "7f18cb769049db00046b28d3298cca38a00aa20d9e4e5c37392301ea84e87358"
+  },
+  "supabase_evidence_sha256": {
+    "supabase-bootstrap-parity-final.txt": "ed2ef311de64dcae92072b80bbb05f31de3e5d676a2c133794f35f34844bb478",
+    "supabase-bootstrap-parity-source.patch.txt": "40d974b4dee49bc64571997e2846e5d2b248369905cdf1e75ad217e57b5cac14",
+    "supabase-catalog-readonly.sql": "997f5f2e14e26dfe18efe04fea263c6891eaae7b6126e51bb61739e374acd9fc",
+    "supabase-dev-anon_boundary-2026-10-10.json": "ee6a13ae845af24d2ca63a22362a44e0522067169243a0099ff7bf4dac56b449",
+    "supabase-dev-anon_boundary-readonly.sql": "77ee5bfccef636fe89236bb1569b5fcb5d5656a59c3059cd5f4d41525a70c4a3",
+    "supabase-dev-catalog-2026-10-10.json": "644cd82e9c4ce28435b4cd07cdacf5d5d565061225541d878d0270567f8111c4",
+    "supabase-dev-extensions-2026-10-10.json": "ed79303a57c08d4718704ffdff840537829089482885ed1ab1c2eb5b94718e76",
+    "supabase-dev-insert_plan-2026-10-10.json": "5871aee475379b09cb2732f837356cd804c4a438fb90a133c645d8d13d4c108f",
+    "supabase-dev-insert_plan-readonly.sql": "8ea4425f20ebc64904fe91883be2a0982b9c3498f6c3713ceb48c5c65204923d",
+    "supabase-dev-migrations-2026-10-10.json": "4215135c1570e0bbdf4c719d0a11e47a1585bd887abf3e635f89753055bd1294",
+    "supabase-dev-no_jwt-2026-10-10.json": "bab7a309eda739dbc230a84d2fa8e47ca8aabd844a2cb135ecb23ef4fbdb6090",
+    "supabase-dev-no_jwt-readonly.sql": "cca662ca651ef23a2341f507b2645c7b05e8dd82696d9a7c0bdd92fb887284c3",
+    "supabase-dev-owner_public_read-2026-10-10.json": "67b7cdade204f386819ec28b46c5a48b693ff2416c060576ff6f864317156193",
+    "supabase-dev-owner_public_read-readonly.sql": "680c9c5b17129b94e9308bc683f0b8f23c0625f2e2a4ec66653941328caed9aa",
+    "supabase-dev-owner_read-2026-10-10.json": "f97f1f4c794565fa8a26970e57a309ec575ab8b9a49244494cfd56a2c8e531f1",
+    "supabase-dev-owner_read-readonly.sql": "27d83d036b8c11b2936f8db00a890ce39b6e5ecfa5b3ba0d5b53c1fa86cf9394",
+    "supabase-dev-performance-2026-10-10.json": "e6639a84e4fd021aa82e6b569cf5ae933c5f209d2e8779c7a22b19ead3a5f637",
+    "supabase-dev-security-2026-10-10.json": "35efaa0d1cb19e031cda736a54d085f77152e4e6e41632dd5b92eae16480fc5f",
+    "supabase-dev-sync-integrity-2026-10-10.json": "c54238cf96bcc4bf20eb26f0bba934b513c3469f3d5c3ff775b70334836a89eb",
+    "supabase-dev-tables-2026-10-10.json": "e77dc22307f87f8b1e2bd001b21cbcde76bed08b45bde68480a70dcbc630942c",
+    "supabase-final-diffchecks.json": "2c034f4628bc429169a39abaa714bdc9f0bedf93dc576178ff675fba6d14643e",
+    "supabase-local-bootstrap-catalog-before-parity.json": "b3be29e243c9c55f275a8ac33909d19fb530d84033ba29d7d52e12d26f5ae756",
+    "supabase-local-bootstrap-catalog.json": "f345d834905509c3efed43e687dcd706ffc50546ebb6a04708a4b4efc5aa3857",
+    "supabase-local-parity-baseline.txt": "ed2ef311de64dcae92072b80bbb05f31de3e5d676a2c133794f35f34844bb478",
+    "supabase-native-boundary-first-10.txt": "3c2713d1d5d3768c5b1750a0e3b6444d165a8e1f8ab79cf99ae95acf5b3d3102",
+    "supabase-native-boundary-repair.txt": "1345700ceb206a14fbce0435294d72ae01857d61e12269a30aec0182a1b87017",
+    "supabase-parity-comparison-final.txt": "7b7be8b7faefca1a256066e5452aa853dcf1f430e7cf1a873cbbd7ea50dcf27e",
+    "supabase-parity-comparison.json": "17cc1f18bf1cadf98683765a91ba9d8d7468b49bc0081fb6c7731a43e5dacb3a",
+    "supabase-parity-comparison.txt": "8df90a765c60cef45f91b813854d64662422235077b39264bcc0f73443d85012",
+    "supabase-prod-anon_boundary-2026-10-10.json": "ee6a13ae845af24d2ca63a22362a44e0522067169243a0099ff7bf4dac56b449",
+    "supabase-prod-anon_boundary-readonly.sql": "77ee5bfccef636fe89236bb1569b5fcb5d5656a59c3059cd5f4d41525a70c4a3",
+    "supabase-prod-catalog-2026-10-10.json": "a544b0dbfe40f7cf875bb251a0ab9cac80d4b1fb24262ec05d18613c73395d3b",
+    "supabase-prod-extensions-2026-10-10.json": "31eb13a3d467260f404c7a3dcd5aeedd704f39d081f66268daedf37158016397",
+    "supabase-prod-insert_plan-2026-10-10.json": "a1a52a294a29f5db154d11151f3dce910e8d271cf9a3df5c059d4acdca1755bc",
+    "supabase-prod-insert_plan-readonly.sql": "8ea4425f20ebc64904fe91883be2a0982b9c3498f6c3713ceb48c5c65204923d",
+    "supabase-prod-migrations-2026-10-10.json": "5b0601a50c952bd0b8fa7e0d0ae5a843e6d3bb5fcb2b78eb2ce9a4ee3fba2299",
+    "supabase-prod-no_jwt-2026-10-10.json": "2eb56edb041fe862155f80a4070fe870f87ff8ff32344073e079ab0ab0260436",
+    "supabase-prod-no_jwt-readonly.sql": "cca662ca651ef23a2341f507b2645c7b05e8dd82696d9a7c0bdd92fb887284c3",
+    "supabase-prod-owner_public_read-2026-10-10.json": "9c04b34cc1eee6f4f0159c1dc69dcb5a5e923b93fe40d9ccf524be9044a91f86",
+    "supabase-prod-owner_public_read-readonly.sql": "680c9c5b17129b94e9308bc683f0b8f23c0625f2e2a4ec66653941328caed9aa",
+    "supabase-prod-owner_read-2026-10-10.json": "f97f1f4c794565fa8a26970e57a309ec575ab8b9a49244494cfd56a2c8e531f1",
+    "supabase-prod-owner_read-readonly.sql": "27d83d036b8c11b2936f8db00a890ce39b6e5ecfa5b3ba0d5b53c1fa86cf9394",
+    "supabase-prod-performance-2026-10-10.json": "27c886231daaa99331c70fd8165c9986d228acbccbdc10af1c27e9792487e263",
+    "supabase-prod-security-2026-10-10.json": "430a7bd03358d44e1db7cc4d3ac0c8ad93517a2337801356f22067b4bd8eacb0",
+    "supabase-prod-sync-integrity-2026-10-10.json": "5308535d3dca1ab8481f061420f4f92cd60695c188aa658f79bca6062f5441c4",
+    "supabase-prod-tables-2026-10-10.json": "687369e7e46daa615562c67c35fefae0821e4372d97920cd12cfbd1477feba3b",
+    "supabase-sync-integrity-readonly.sql": "dd0745fd4ccb24ca36cffb8a63c75f03de12a5559be2798039a05b8aa90b95ad"
+  },
+  "verification_log_excluded": "supabase-evidence-verification.txt is generated by this verifier"
+}

@@ -1,0 +1,14 @@
+{
+  "scenario": "cashier-blind-count-form",
+  "screen": "ux",
+  "device": "samsung SM-A065F",
+  "packageName": "com.saaf.milkshop.qa.tests",
+  "capturedAt": "2026-10-10T23:34:08.702919Z",
+  "orientation": "portrait",
+  "fontScale": "1.0",
+  "theme": "light",
+  "workflowId": "countCashRecordsBlindAmountAndShowsSuccessWithoutExpectedVariance",
+  "evidenceFilename": "cashier-blind-count-form.png",
+  "reviewStatus": "UNREVIEWED",
+  "note": "Real form geometry before input; blind count keeps expected total hidden."
+}

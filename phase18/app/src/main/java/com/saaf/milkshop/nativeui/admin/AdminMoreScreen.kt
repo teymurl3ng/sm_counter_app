@@ -1,6 +1,8 @@
 package com.saaf.milkshop.nativeui.admin
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +37,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
+import com.saaf.milkshop.nativeui.common.nativeListItem
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -167,7 +171,7 @@ fun AdminMoreScreen(
                 Text(state.message, style = MaterialTheme.typography.bodyLarge)
                 Spacer(Modifier.height(16.dp))
                 Button(
-                    onClick = onRetry,
+                    onClick = hapticAction(onRetry),
                     modifier = Modifier.testTag(NativeUiTags.AdminMoreRetryLoad),
                 ) {
                     Text("Try again")
@@ -452,6 +456,7 @@ private fun AdminMoreMenuScreen(
                 Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp)
                     .nativeRefreshOverlay(state.refreshing)
                     .testTag(NativeUiTags.AdminMoreMenu),
             ) {
@@ -461,33 +466,29 @@ private fun AdminMoreMenuScreen(
                     title = "Costing & plans",
                     subtitle = "Review and approve conversion costing",
                     tag = NativeUiTags.AdminMoreCosting,
-                    onClick = onOpenCostingPlans,
+                    onClick = hapticAction(onOpenCostingPlans),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 AdminMoreMenuRow(
                     icon = Icons.Outlined.Settings,
                     title = "Shop settings",
                     subtitle = "Identity, rates, and expense categories",
                     tag = NativeUiTags.AdminMoreShopSettings,
-                    onClick = onOpenShopSettings,
+                    onClick = hapticAction(onOpenShopSettings),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 AdminMoreMenuRow(
                     icon = Icons.Outlined.Inventory2,
                     title = "Products",
                     subtitle = "Catalog and measurement units",
                     tag = NativeUiTags.AdminMoreProducts,
-                    onClick = onOpenProducts,
+                    onClick = hapticAction(onOpenProducts),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 AdminMoreMenuRow(
                     icon = Icons.Outlined.Backup,
                     title = "Local export",
                     subtitle = "Encrypted backup file on this phone",
                     tag = NativeUiTags.AdminMoreLocalExport,
-                    onClick = onOpenBackup,
+                    onClick = hapticAction(onOpenBackup),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
                 AdminMoreSectionLabel("Account")
                 AdminMoreMenuRow(
@@ -495,23 +496,21 @@ private fun AdminMoreMenuScreen(
                     title = "Personal security",
                     subtitle = "Quick unlock for this account on this phone",
                     tag = NativeUiTags.AdminMorePersonalSecurity,
-                    onClick = onOpenPersonalSecurity,
+                    onClick = hapticAction(onOpenPersonalSecurity),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 AdminMoreMenuRow(
                     icon = Icons.Outlined.SwapHoriz,
                     title = "Switch account",
                     subtitle = "Choose another person on this phone",
                     tag = NativeUiTags.AdminMoreSwitchAccount,
-                    onClick = onSwitchAccount,
+                    onClick = hapticAction(onSwitchAccount),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 AdminMoreMenuRow(
                     icon = Icons.AutoMirrored.Outlined.Logout,
                     title = "Sign out",
                     subtitle = "Return to Welcome",
                     tag = NativeUiTags.AdminMoreSignOut,
-                    onClick = onSignOut,
+                    onClick = hapticAction(onSignOut),
                 )
             }
         }
@@ -545,7 +544,7 @@ private fun AdminMorePersonalSecurityScreen(
                 Text("This clears Quick PIN and phone security for ${identity.displayName} on this phone.")
             },
             confirmButton = {
-                TextButton(onClick = {
+                TextButton(onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction {
                     val secret = passphrase.toCharArray()
                     passphrase = ""
                     pin = ""
@@ -553,7 +552,7 @@ private fun AdminMorePersonalSecurityScreen(
                 }) { Text("Discard and leave") }
             },
             dismissButton = {
-                TextButton(onClick = onCancelRemove) { Text("Keep editing") }
+                TextButton(onClick = hapticAction(onCancelRemove)) { Text("Keep editing") }
             },
         )
     }
@@ -602,8 +601,8 @@ private fun AdminMorePersonalSecurityScreen(
                         Text(it, color = MaterialTheme.colorScheme.error)
                     }
                     Button(
-                        onClick = {
-                            if (passphrase.isBlank() || pin.length != 4) return@Button
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                            if (passphrase.isBlank() || pin.length != 4) return@hapticAction
                             val secret = passphrase.toCharArray()
                             val quickPin = pin.toCharArray()
                             passphrase = ""
@@ -615,8 +614,8 @@ private fun AdminMorePersonalSecurityScreen(
                     ) { Text(if (state.saving) "Saving…" else "Save Quick PIN") }
                     if (security.phoneSecurityAvailable) {
                         Button(
-                            onClick = {
-                                if (passphrase.isBlank()) return@Button
+                            onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                                if (passphrase.isBlank()) return@hapticAction
                                 val secret = passphrase.toCharArray()
                                 val quickPin = pin.takeIf { it.length == 4 }?.toCharArray()
                                 passphrase = ""
@@ -629,7 +628,7 @@ private fun AdminMorePersonalSecurityScreen(
                     }
                     if (security.quickPinEnabled || security.phoneSecurityEnabled) {
                         TextButton(
-                            onClick = onRequestRemove,
+                            onClick = hapticAction(onRequestRemove),
                             enabled = !state.saving && passphrase.isNotBlank(),
                         ) { Text("Remove Quick unlock") }
                     }
@@ -659,7 +658,7 @@ private fun AdminMoreSectionLabel(label: String) {
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp)
+            .padding(vertical = 10.dp)
             .testTag(NativeUiTags.AdminMoreSectionLabel),
     )
 }
@@ -674,11 +673,10 @@ private fun AdminMoreMenuRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 72.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Navigation)
             .semantics { role = Role.Button }
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .clickable(onClick = hapticAction(onClick))
+            .nativeListItemContent(NativeListStyle.Navigation)
             .testTag(tag),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),

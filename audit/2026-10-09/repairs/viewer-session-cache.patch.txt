@@ -1,0 +1,52 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/lib/account-server.ts
+@@
+-    await fetch(`${cfg.url}/auth/v1/logout`, {
++    await fetch(`${cfg.url}/auth/v1/logout?scope=local`, {
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/lib/viewer-cache.ts
+@@
+ let activeSessionId: string | null = null;
++let generation = 0;
+@@
+   if (activeSessionId && activeSessionId !== id) {
++    generation += 1;
+@@
+ export function clearViewerCache(): void {
++  generation += 1;
+@@
+ export function viewerCacheInvalidate(prefixes: string[]): void {
++  generation += 1;
++  inflight.clear();
+   for (const key of store.keys()) {
+-    if (prefixes.some(p => key.startsWith(p))) {
++    const path = key.slice(key.indexOf("::") + 2);
++    if (prefixes.some(p => path.startsWith(p))) {
+@@
+   if (!sessionId) {
+@@
+-    const fresh = await networkGet(input.url);
+-    if (isAuthFailure(fresh.status)) clearViewerCache();
++    const requestGeneration = generation;
++    const fresh = await networkGet(input.url);
++    if (requestGeneration === generation && !activeSessionId && isAuthFailure(fresh.status)) clearViewerCache();
+@@
+ ): Promise<void> {
++  const requestGeneration = generation;
+   try {
+@@
+-    onRevalidated?.({ status: result.status, body: result.body, fromCache: false });
++    if (requestGeneration === generation && activeSessionId === sessionId) {
++      onRevalidated?.({ status: result.status, body: result.body, fromCache: false });
++    }
+@@
+-  const pending = networkGet(url).finally(() => {
+-    inflight.delete(k);
++  const requestGeneration = generation;
++  const pending = networkGet(url).finally(() => {
++    if (inflight.get(k) === pending) inflight.delete(k);
+@@
+   const fresh = await pending;
++
++  if (activeSessionId !== sessionId) return { status: 401, body: null, fromCache: false };
++  if (requestGeneration !== generation) return fetchAndStore(k, url, sessionId);
+*** End Patch

@@ -8,10 +8,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.ui.Modifier
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.click
+import com.saaf.milkshop.qa.NativeLayoutImeEvidence
+import com.saaf.milkshop.qa.NativeEvidenceCapture
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -35,12 +43,16 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class NativeMoreScreenContractTest {
     @get:Rule
-    val composeRule = createComposeRule()
+    val composeRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
     fun menuShowsCashierActionsAndKeepsMoreNavSelected() {
         setScreen(NativeMoreState.Ready(context = openContext()))
         composeRule.onNodeWithTag(NativeUiTags.MoreMenu).assertIsDisplayed()
+        NativeEvidenceCapture.captureWholeWindow(composeRule.activity, NativeEvidenceCapture.CaptureSpec(
+            screen = "ux", scenario = "cashier-more-surfaces", workflowId = "menuShowsCashierActionsAndKeepsMoreNavSelected",
+            note = "Cashier navigation row surfaces; visual approval pending.",
+        ))
         composeRule.onNodeWithTag(NativeUiTags.MoreExpense).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.MoreCountCash).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.MorePersonalSecurity).assertIsDisplayed()
@@ -74,19 +86,18 @@ class NativeMoreScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.MoreCountAmount).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.MoreCountRecord).assertIsDisplayed()
 
-        // Drive the save path the same way ViewModel would after a valid amount.
-        recorded = null
-        state = (state as NativeMoreState.Ready).let { ready ->
-            val amount = 12_550L
-            recorded = amount to null
-            ready.copy(
-                countReceipt = NativeBlindCashCountReceipt(
-                    countId = 77L,
-                    businessDate = "2026-09-20",
-                    countedCashPaisa = amount,
-                ),
-            )
-        }
+        val amountBounds = composeRule.onNodeWithTag(NativeUiTags.MoreCountAmount).fetchSemanticsNode().boundsInRoot
+        val notesBounds = composeRule.onNodeWithTag(NativeUiTags.MoreCountNotes).fetchSemanticsNode().boundsInRoot
+        val recordBounds = composeRule.onNodeWithTag(NativeUiTags.MoreCountRecord).fetchSemanticsNode().boundsInRoot
+        assertTrue("Count and notes fields must not overlap", amountBounds.bottom <= notesBounds.top)
+        assertTrue("Notes and Record button must not overlap", notesBounds.bottom <= recordBounds.top)
+        NativeEvidenceCapture.captureWholeWindow(composeRule.activity, NativeEvidenceCapture.CaptureSpec(
+            screen = "ux", scenario = "cashier-blind-count-form", workflowId = "countCashRecordsBlindAmountAndShowsSuccessWithoutExpectedVariance",
+            note = "Real form geometry before input; blind count keeps expected total hidden.",
+        ))
+        composeRule.onNodeWithTag(NativeUiTags.MoreCountAmount).performTextReplacement("125.50")
+        NativeLayoutImeEvidence.dismissImeAndWait(composeRule.activity, composeRule)
+        composeRule.onNodeWithTag(NativeUiTags.MoreCountRecord).performScrollTo().performTouchInput { click() }
         composeRule.waitUntil(5_000) {
             runCatching { composeRule.onNodeWithTag(NativeUiTags.MoreCountSuccess).fetchSemanticsNode() }.isSuccess
         }
@@ -173,6 +184,22 @@ class NativeMoreScreenContractTest {
         assertEquals(1, retries)
     }
 
+    @Test
+    fun countReceiptDoneCallsBackOnceAndReturnsToMenu() {
+        var state by mutableStateOf<NativeMoreState>(NativeMoreState.Ready(
+            context = openContext(), destination = NativeMoreDestination.CountCash,
+            countReceipt = NativeBlindCashCountReceipt(77L, "2026-09-20", 12550L),
+        ))
+        var left = 0
+        setScreen(stateProvider = { state }, onBackToMenu = {
+            left++
+            state = NativeMoreState.Ready(context = openContext())
+        })
+        composeRule.onNodeWithTag(NativeUiTags.MoreCountDone).performScrollTo().performClick()
+        composeRule.onNodeWithTag(NativeUiTags.MoreMenu).assertIsDisplayed()
+        assertEquals(1, left)
+    }
+
     private fun setScreen(
         state: NativeMoreState,
         onRetry: () -> Unit = {},
@@ -197,6 +224,7 @@ class NativeMoreScreenContractTest {
 
     private fun setScreen(
         stateProvider: () -> NativeMoreState,
+        onBackToMenu: () -> Unit = {},
         onRetry: () -> Unit = {},
         onOpenCountCash: () -> Unit = {},
         onOpenExpense: () -> Unit = {},
@@ -217,7 +245,7 @@ class NativeMoreScreenContractTest {
                     onOpenExpense = onOpenExpense,
                     onOpenDeliveries = onOpenDeliveries,
                     onOpenPersonalSecurity = {},
-                    onBackToMenu = {},
+                    onBackToMenu = onBackToMenu,
                     onRecordCashCount = onRecordCashCount,
                     onRequestRemoveQuickUnlock = {},
                     onCancelRemoveQuickUnlock = {},
@@ -227,6 +255,7 @@ class NativeMoreScreenContractTest {
                     onSwitchAccount = onSwitchAccount,
                     onSignOut = onSignOut,
                     onNavigate = {},
+                    modifier = Modifier.safeDrawingPadding(),
                 )
             }
         }

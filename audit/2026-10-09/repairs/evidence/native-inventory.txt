@@ -1,0 +1,3 @@
+inventory rows=992 untested=0 orphans=0
+NATIVE_INVENTORY: PASS
+UNTESTED_COUNT=0

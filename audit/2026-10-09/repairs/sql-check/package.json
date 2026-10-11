@@ -1,0 +1,1 @@
+{"name":"saaf-offline-sql-check","private":true,"type":"module","scripts":{"test":"node check.mjs"},"dependencies":{"@electric-sql/pglite":"0.5.8","pg":"8.23.1"}}

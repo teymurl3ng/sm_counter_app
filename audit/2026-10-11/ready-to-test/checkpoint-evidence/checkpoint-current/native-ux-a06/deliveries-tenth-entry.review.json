@@ -1,0 +1,14 @@
+{
+  "scenario": "deliveries-tenth-entry",
+  "screen": "ux",
+  "device": "samsung SM-A065F",
+  "packageName": "com.saaf.milkshop.qa.tests",
+  "capturedAt": "2026-10-10T20:29:30.168308Z",
+  "orientation": "portrait",
+  "fontScale": "1.0",
+  "theme": "light",
+  "workflowId": "uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens",
+  "evidenceFilename": "deliveries-tenth-entry.png",
+  "reviewStatus": "UNREVIEWED",
+  "note": "Isolated A06 QA fixture; settled appearance. This PNG alone does not prove motion quality."
+}

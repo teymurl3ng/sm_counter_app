@@ -1,0 +1,35 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/app/theme-toggle.tsx
+@@
+ "use client";
+ 
+-import { useEffect, useState } from "react";
++import { useEffect, useState, useSyncExternalStore } from "react";
+ 
+ const STORAGE_KEY = "smav-theme";
+ 
+@@
+   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+ }
+ 
++const subscribeMounted = () => () => {};
++const clientMounted = () => true;
++const serverMounted = () => false;
++
+ export function ThemeToggle({ className }: { className?: string }) {
+   const [theme, setTheme] = useState<"light" | "dark">("light");
+-  const [mounted, setMounted] = useState(false);
+-
+-  useEffect(() => {
++  const mounted = useSyncExternalStore(subscribeMounted, clientMounted, serverMounted);
++  const [initialized, setInitialized] = useState(false);
++  if (mounted && !initialized) {
++    setInitialized(true);
+     setTheme(getInitialTheme());
+-    setMounted(true);
+-  }, []);
++  }
+ 
+   useEffect(() => {
+     if (!mounted) return;
+*** End Patch

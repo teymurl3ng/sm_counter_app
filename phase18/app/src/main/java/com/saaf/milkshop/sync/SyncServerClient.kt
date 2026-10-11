@@ -83,10 +83,11 @@ class SyncServerClient(
         // The RPC answers 200 with an ok flag; a refused batch carries a
         // stable error code the engine halts on (e.g. a cashier pushing a
         // correction — correction_privilege_required).
-        anchorFrom(response)
         val text = response.bodyText()?.trim().orEmpty()
         val json = if (text.isNotEmpty()) runCatching { JSONObject(text) }.getOrNull() else null
-        if (json != null && json.optBoolean("ok", true) == false) {
+        if (json == null || json.opt("ok") !is Boolean) return SyncPushResult.Transient("malformed_response")
+        anchorFrom(response)
+        if (json.getBoolean("ok") == false) {
             val error = json.optJSONObject("error")
             return SyncPushResult.Permanent(
                 reasonCode = error?.optString("code")?.takeIf { it.isNotEmpty() } ?: "server_rejected",

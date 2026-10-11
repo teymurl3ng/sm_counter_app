@@ -87,7 +87,7 @@ class NativeOwnerOverviewViewModel(
                 if (error is SecurityFailure.SessionExpired || previous == null) {
                     handleLoadFailure(error)
                 } else {
-                    _state.value = previous.copy(
+                    _state.value = ((_state.value as? NativeOwnerOverviewState.Ready) ?: previous).copy(
                         refreshing = false,
                         error = error.message ?: "Overview could not open. Try again.",
                     )

@@ -7,7 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.saaf.milkshop.application.bridge.BridgeContractSnapshot
 import com.saaf.milkshop.application.bridge.HybridBridgeDispatcher
-import com.saaf.milkshop.application.bridge.OperationsBridgeCommandService
+import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.CreateUserInput
 import com.saaf.milkshop.domain.CustomerManagementService
@@ -90,7 +90,8 @@ class Phase8SaleOperationsTest {
 
         val range = JSONObject().put("startDateInclusive", BUSINESS_DATE).put("endDateExclusive", "2026-08-29")
         val summary = dispatch("query.cashierSummary", range, cashier.sessionId).getJSONObject("data")
-        assertEquals("38000", summary.getString("salesValuePaisa"))
+        // The cashier total includes the posted surcharge, matching the canonical cash movement.
+        assertEquals("43000", summary.getString("salesValuePaisa"))
         val cash = (0 until summary.getJSONArray("paymentAccounts").length())
             .map { summary.getJSONArray("paymentAccounts").getJSONObject(it) }
             .single { it.getString("name") == "Cash" }
@@ -262,7 +263,7 @@ class Phase8SaleOperationsTest {
             if (evaluate(webView, "Boolean($expression)") == "true") return
             SystemClock.sleep(100)
         }
-        throw AssertionError("Web condition did not become true: $expression")
+        throw AssertionError("Web condition did not become true: $expression; visible page: " + evaluate(webView, "document.body.innerText.slice(0, 1500)"))
     }
 
     private fun evaluate(webView: WebView, script: String): String? {

@@ -1,0 +1,7 @@
+{
+  "scenario": "installed-QA-account-picker",
+  "reviewStatus": "UNREVIEWED",
+  "device": "R8VXA02SNKH",
+  "package": "com.saaf.milkshop.qa",
+  "note": "Additional installed-app smoke evidence; excluded from 33 checkpoint PNG count."
+}

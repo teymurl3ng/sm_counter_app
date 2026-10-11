@@ -1,0 +1,596 @@
+{
+  "contextName": "mkrc",
+  "deployments": [
+    {
+      "url": "sm-server-view-kt0lcckp6-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1791642947368,
+      "buildingAt": 1791642949664,
+      "ready": 1791642979137,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "Merge remote-tracking branch 'origin/main'",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "115a63634a2010eda0f3e47d96f678ba6d15495f",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "githubRepoOwnerType": "User",
+        "githubCommitRepoId": "1378280817",
+        "githubRepoId": "1378280817",
+        "githubRepoVisibility": "private",
+        "githubHost": "github.com",
+        "githubCommitAuthorLogin": "teymurl3ng",
+        "githubCommitVerification": "unverified",
+        "repoPushedAt": "1791642945000",
+        "branchAlias": "sm-server-view-git-main-mkrc.vercel.app",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    },
+    {
+      "url": "sm-server-view-772lu6h8n-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1791642545737,
+      "buildingAt": 1791642547522,
+      "ready": 1791642577632,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "auditReleaseGitSha": "115a63634a2010eda0f3e47d96f678ba6d15495f",
+        "actor": "codex",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    },
+    {
+      "url": "sm-server-view-q3mn494c1-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1791476419016,
+      "buildingAt": 1791476420448,
+      "ready": 1791476445549,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "admin create-staff: self-diagnosing failure messages — FORBIDDEN (admin key rejected for project), INVALID_INPUT (credential rejected by password policy), RATE_LIMITED, UNREACHABLE instead of one generic string; INTERNAL_ERROR wording fixed",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "21cf09c6c151e5ae665a4fa3b75532fae3dc9a07",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "githubRepoOwnerType": "User",
+        "githubCommitRepoId": "1378280817",
+        "githubRepoId": "1378280817",
+        "githubRepoVisibility": "private",
+        "githubHost": "github.com",
+        "githubCommitAuthorLogin": "teymurl3ng",
+        "githubCommitVerification": "unverified",
+        "branchAlias": "sm-server-view-git-main-mkrc.vercel.app",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    },
+    {
+      "url": "sm-server-view-dwxe9t602-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1791475296570,
+      "buildingAt": 1791475297748,
+      "ready": 1791475321119,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "Merge fix/c1-hardening: C1 hardening (fresh authorization, safe error mapping, reconciliation)",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "5ebfd52d7b15e0db0d634043a9ae446e83593263",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "gitRootDirectory": "",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack",
+        "originalDeploymentId": "dpl_9t9cYUzE16RyGHa7WiqMpV5zBzPZ"
+      }
+    },
+    {
+      "url": "sm-server-view-8gelkbqgi-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1790353895077,
+      "buildingAt": 1790353896464,
+      "ready": 1790353928843,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "Merge fix/c1-hardening: C1 hardening (fresh authorization, safe error mapping, reconciliation)",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "5ebfd52d7b15e0db0d634043a9ae446e83593263",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "gitRootDirectory": "",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    },
+    {
+      "url": "sm-server-view-7lymnipi6-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1790200492108,
+      "buildingAt": 1790200493116,
+      "ready": 1790200520552,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "fix: resolve build error with SYSTEM_MESSAGE export",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "dd2708e1561deadbf59c10bf5bec8eb494e1edb2",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "gitRootDirectory": "",
+        "actor": "antigravity",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    },
+    {
+      "url": "sm-server-view-mr037gcp2-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1790198548106,
+      "buildingAt": 1790198549038,
+      "ready": 1790198586796,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "P1.5.1: instant paint from memory cache on soft-nav",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "ae209b8435609a9063f43df2e88d7f6118c8665d",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "gitDirty": "1",
+        "gitRootDirectory": "",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack",
+        "action": "redeploy",
+        "originalDeploymentId": "dpl_4NopK64YGfDqUr41uZXvoMMHB86Z"
+      }
+    },
+    {
+      "url": "sm-server-view-91p5k8v1a-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1789997616558,
+      "buildingAt": 1789997618341,
+      "ready": 1789997643339,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "P1.5.1: instant paint from memory cache on soft-nav",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "ae209b8435609a9063f43df2e88d7f6118c8665d",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "gitDirty": "1",
+        "gitRootDirectory": "",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    },
+    {
+      "url": "sm-server-view-91cm3jyoc-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1789996853610,
+      "buildingAt": 1789996855301,
+      "ready": 1789996884096,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "Add dark mode with theme toggle on every screen",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "77927c1fd05bbd5bc6e0edcb62e6ea70fe861a06",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "gitDirty": "1",
+        "gitRootDirectory": "",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    },
+    {
+      "url": "sm-server-view-g8o4zgo9b-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1789995909633,
+      "buildingAt": 1789995912811,
+      "ready": 1789995946045,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "Redesign UI: sky blue + orange theme, unified layout, welcome page",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "246ea60815cec47846a51f472fbfec98ce43d311",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "gitDirty": "1",
+        "gitRootDirectory": "",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    },
+    {
+      "url": "sm-server-view-htbpgzfpn-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1789971371403,
+      "buildingAt": 1789971373024,
+      "ready": 1789971397455,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "Document P1 performance results and quiet console perf logs.",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "c67f3cdf4e6300c663265450ccadb1719308b922",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "gitRootDirectory": "",
+        "actor": "cursor-cli",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    },
+    {
+      "url": "sm-server-view-mc2713omk-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1789970968502,
+      "buildingAt": 1789970972416,
+      "ready": 1789970994267,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "P1.3: add in-memory SWR cache with session isolation and single-flight.",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "874bb21609414eeadb93c07efd39edbe4a4a1d1d",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "gitRootDirectory": "",
+        "actor": "cursor-cli",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    },
+    {
+      "url": "sm-server-view-4gv55w7sh-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1789970705402,
+      "buildingAt": 1789970706362,
+      "ready": 1789970724111,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "P1.2: run Vercel Functions in Tokyo (hnd1) near Account Server.",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "67fabf88625df0d4b85d90a97d0f8a18589303db",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "gitDirty": "1",
+        "gitRootDirectory": "",
+        "actor": "cursor-cli",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    },
+    {
+      "url": "sm-server-view-2pykg95lw-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1789970504968,
+      "buildingAt": 1789970505893,
+      "ready": 1789970526911,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "P1.1: remove blocking ping from data paths; parallelize safe RPCs.",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "aeae99957777efa690c184901f263d207ab49045",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "gitRootDirectory": "",
+        "actor": "cursor-cli",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    },
+    {
+      "url": "sm-server-view-pbjsis62o-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1789969463546,
+      "buildingAt": 1789969467121,
+      "ready": 1789969487688,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "Harden C0.8 environment labeling and freeze Viewer at v1.0.0.",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "35f1bf02ffc02e1136fdd0593e40e3fea47e9fb2",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "gitDirty": "1",
+        "gitRootDirectory": "",
+        "actor": "cursor-cli",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    },
+    {
+      "url": "sm-server-view-bc1fwirgq-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1789918564812,
+      "buildingAt": 1789918566256,
+      "ready": 1789918598423,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "Harden C0.8 environment labeling and freeze Viewer at v1.0.0.",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "35f1bf02ffc02e1136fdd0593e40e3fea47e9fb2",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "gitRootDirectory": "",
+        "actor": "cursor-cli",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    },
+    {
+      "url": "sm-server-view-isdr016fa-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1789917654154,
+      "buildingAt": 1789917655338,
+      "ready": 1789917676841,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "Freeze Saaf Milk Admin Viewer C0 with PROD Account Server separation.",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "d540a491d9f66b1fc071cfc5da92ac56466c1eec",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "gitRootDirectory": "",
+        "actor": "cursor-cli",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    },
+    {
+      "url": "sm-server-view-rjrwmwsp9-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1789917215448,
+      "buildingAt": 1789917219135,
+      "ready": 1789917239675,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "Clarify C0.7 deployment and lint tooling notes in security review.",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "f8bdc9db6c4c44ba487afb3db0593e28c50b9d20",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "gitRootDirectory": "",
+        "actor": "cursor-cli",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    },
+    {
+      "url": "sm-server-view-ax5ww0a3s-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1789917040813,
+      "buildingAt": 1789917041830,
+      "ready": 1789917064385,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "Harden Viewer security and document C0.7 audit findings.",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "efb6966336795785ce802b861848a00e3743cb09",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "gitRootDirectory": "",
+        "actor": "cursor-cli",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    },
+    {
+      "url": "sm-server-view-6jmzm0aoi-mkrc.vercel.app",
+      "name": "sm-server-view",
+      "state": "READY",
+      "target": "production",
+      "createdAt": 1789916314391,
+      "buildingAt": 1789916315896,
+      "ready": 1789916341161,
+      "creator": {
+        "uid": "Dw5yQHkdcBVJkzXi0GXIlIFR",
+        "username": "teimurkasumov"
+      },
+      "meta": {
+        "githubCommitAuthorName": "teymurl3ng",
+        "githubCommitAuthorEmail": "teymur.qasimovfb@gmail.com",
+        "githubCommitMessage": "Add System page with connection status and Viewer boundaries for C0.6.",
+        "githubCommitOrg": "teymurl3ng",
+        "githubCommitRef": "main",
+        "githubCommitRepo": "sm-server-view",
+        "githubCommitSha": "d4e0f8b8a70de747c2c644ef33bf435d5d9b27ee",
+        "githubDeployment": "1",
+        "githubOrg": "teymurl3ng",
+        "githubRepo": "sm-server-view",
+        "gitRootDirectory": "",
+        "actor": "cursor-cli",
+        "lambdaRuntimeStats": "{\"nodejs\":3}",
+        "bundler": "turbopack"
+      }
+    }
+  ],
+  "pagination": {
+    "count": 20,
+    "next": 1789916314391,
+    "prev": 1791642947368
+  }
+}

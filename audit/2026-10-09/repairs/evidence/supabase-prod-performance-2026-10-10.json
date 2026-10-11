@@ -1,0 +1,134 @@
+{
+  "result": {
+    "lints": [
+      {
+        "name": "unindexed_foreign_keys",
+        "title": "Unindexed foreign keys",
+        "level": "INFO",
+        "facing": "EXTERNAL",
+        "categories": [
+          "PERFORMANCE"
+        ],
+        "description": "Identifies foreign key constraints without a covering index, which can impact database performance.",
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys",
+        "count": 7,
+        "findings": [
+          {
+            "detail": "Table \\`public.audit_log\\` has a foreign key \\`audit_log_performed_by_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+            "metadata": {
+              "name": "audit_log",
+              "type": "table",
+              "schema": "public",
+              "fkey_name": "audit_log_performed_by_fkey",
+              "fkey_columns": [
+                7
+              ]
+            },
+            "observed_at": "2026-10-10T09:36:53.035Z"
+          },
+          {
+            "detail": "Table \\`public.auth_reconciliation\\` has a foreign key \\`auth_reconciliation_business_id_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+            "metadata": {
+              "name": "auth_reconciliation",
+              "type": "table",
+              "schema": "public",
+              "fkey_name": "auth_reconciliation_business_id_fkey",
+              "fkey_columns": [
+                2
+              ]
+            },
+            "observed_at": "2026-10-10T09:36:53.035Z"
+          },
+          {
+            "detail": "Table \\`public.auth_reconciliation\\` has a foreign key \\`auth_reconciliation_performed_by_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+            "metadata": {
+              "name": "auth_reconciliation",
+              "type": "table",
+              "schema": "public",
+              "fkey_name": "auth_reconciliation_performed_by_fkey",
+              "fkey_columns": [
+                16
+              ]
+            },
+            "observed_at": "2026-10-10T09:36:53.035Z"
+          },
+          {
+            "detail": "Table \\`public.staff\\` has a foreign key \\`staff_business_id_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+            "metadata": {
+              "name": "staff",
+              "type": "table",
+              "schema": "public",
+              "fkey_name": "staff_business_id_fkey",
+              "fkey_columns": [
+                3
+              ]
+            },
+            "observed_at": "2026-10-10T09:36:53.035Z"
+          },
+          {
+            "detail": "Table \\`public.staff\\` has a foreign key \\`staff_role_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+            "metadata": {
+              "name": "staff",
+              "type": "table",
+              "schema": "public",
+              "fkey_name": "staff_role_fkey",
+              "fkey_columns": [
+                6
+              ]
+            },
+            "observed_at": "2026-10-10T09:36:53.035Z"
+          },
+          {
+            "detail": "Table \\`public.staff_shops\\` has a foreign key \\`staff_shops_shop_id_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+            "metadata": {
+              "name": "staff_shops",
+              "type": "table",
+              "schema": "public",
+              "fkey_name": "staff_shops_shop_id_fkey",
+              "fkey_columns": [
+                2
+              ]
+            },
+            "observed_at": "2026-10-10T09:36:53.035Z"
+          },
+          {
+            "detail": "Table \\`public.sync_records\\` has a foreign key \\`sync_records_business_id_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+            "metadata": {
+              "name": "sync_records",
+              "type": "table",
+              "schema": "public",
+              "fkey_name": "sync_records_business_id_fkey",
+              "fkey_columns": [
+                2
+              ]
+            },
+            "observed_at": "2026-10-10T09:36:53.035Z"
+          }
+        ]
+      },
+      {
+        "name": "unused_index",
+        "title": "Unused Index",
+        "level": "INFO",
+        "facing": "EXTERNAL",
+        "categories": [
+          "PERFORMANCE"
+        ],
+        "description": "Detects if an index has never been used and may be a candidate for removal.",
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index",
+        "count": 1,
+        "findings": [
+          {
+            "detail": "Index \\`audit_log_business_at_idx\\` on table \\`public.audit_log\\` has not been used",
+            "metadata": {
+              "name": "audit_log",
+              "type": "table",
+              "schema": "public"
+            },
+            "observed_at": "2026-10-10T09:36:53.035Z"
+          }
+        ]
+      }
+    ]
+  }
+}

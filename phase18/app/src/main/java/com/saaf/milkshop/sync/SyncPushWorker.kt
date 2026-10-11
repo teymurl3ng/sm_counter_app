@@ -11,6 +11,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.saaf.milkshop.MilkShopApplication
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CancellationException
 
 /**
  * Push activation (sync Phase 6): every committed write kicks this worker
@@ -26,13 +27,19 @@ class SyncPushWorker(
 
     override suspend fun doWork(): Result {
         val app = applicationContext as? MilkShopApplication ?: return Result.success()
-        return when (app.syncRuntime.drainOnce()) {
+        return try { when (app.syncRuntime.drainOnce()) {
             SyncPushEngine.DrainOutcome.NotConfigured,
             is SyncPushEngine.DrainOutcome.Drained,
             is SyncPushEngine.DrainOutcome.Halted,
             -> Result.success()
 
             is SyncPushEngine.DrainOutcome.RetryLater -> Result.retry()
+        } } catch (failure: Exception) {
+            if (failure is CancellationException) throw failure
+            // Database/audit failures must not permanently finish the worker
+            // while a cursor or recovery classification remains uncommitted.
+            android.util.Log.w("SyncPushWorker", "Sync state commit failed: ${failure.javaClass.simpleName}")
+            Result.retry()
         }
     }
 

@@ -1,0 +1,176 @@
+com.saaf.milkshop.NativeFoundationUiTest.operationsRecordSpoilageRecordsPhysicalLoss
+androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 10000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeFoundationUiTest.operationsRecordSpoilageRecordsPhysicalLoss(NativeFoundationUiTest.kt:2244)
+
+
+com.saaf.milkshop.NativeSaleHardeningContractTest.missingProductAndPaymentReferencesExplainWhatTheOwnerMustFix
+java.lang.AssertionError: Assert failed: The component with TestTag = 'cashier_product_unavailable' is not displayed!
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+at com.saaf.milkshop.NativeSaleHardeningContractTest.missingProductAndPaymentReferencesExplainWhatTheOwnerMustFix(NativeSaleHardeningContractTest.kt:76)
+
+
+com.saaf.milkshop.Phase8SaleOperationsTest.cashierRecordsQuantitySaleToCashWithNativeDefaultSurchargeAndSummaries
+org.junit.ComparisonFailure: expected:<[38]000> but was:<[43]000>
+at org.junit.Assert.assertEquals(Assert.java:117)
+at org.junit.Assert.assertEquals(Assert.java:146)
+at com.saaf.milkshop.Phase8SaleOperationsTest$cashierRecordsQuantitySaleToCashWithNativeDefaultSurchargeAndSummaries$1.invokeSuspend(Phase8SaleOperationsTest.kt:93)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at com.saaf.milkshop.Phase8SaleOperationsTest.cashierRecordsQuantitySaleToCashWithNativeDefaultSurchargeAndSummaries(Phase8SaleOperationsTest.kt:56)
+
+
+com.saaf.milkshop.Phase8SaleOperationsTest.packagedDailyWorkScreenRecordsPaidSaleThroughRoom
+java.lang.AssertionError: Web condition did not become true: document.getElementById('login-button') !== null
+at com.saaf.milkshop.Phase8SaleOperationsTest.waitFor(Phase8SaleOperationsTest.kt:265)
+at com.saaf.milkshop.Phase8SaleOperationsTest.waitFor$default(Phase8SaleOperationsTest.kt:259)
+at com.saaf.milkshop.Phase8SaleOperationsTest$packagedDailyWorkScreenRecordsPaidSaleThroughRoom$1.invokeSuspend(Phase8SaleOperationsTest.kt:178)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at com.saaf.milkshop.Phase8SaleOperationsTest.packagedDailyWorkScreenRecordsPaidSaleThroughRoom(Phase8SaleOperationsTest.kt:163)
+
+
+com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest.collectLargeTextLandscapeSemanticsRemainAvailable
+java.lang.AssertionError: Assert failed: The component with TestTag = 'cashier_nav_collect' is not displayed!
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+at com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest.collectLargeTextLandscapeSemanticsRemainAvailable(NativeCollectionAcceptanceGapsTest.kt:270)
+
+
+com.saaf.milkshop.NativeActivityScreenContractTest.emptyTodayExplainsAndKeepsActivityNavSelected
+java.lang.AssertionError: Failed to assert the following: (Selected = 'true')
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'cashier_nav_activity')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:262)
+at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+at androidx.compose.ui.test.AssertionsKt.assertIsSelected(Assertions.kt:88)
+at com.saaf.milkshop.NativeActivityScreenContractTest.emptyTodayExplainsAndKeepsActivityNavSelected(NativeActivityScreenContractTest.kt:41)
+
+
+com.saaf.milkshop.NativeOperationsWorkFacadeTest.loadUsesEffectivePurchaseNotSupersededOriginal
+org.junit.ComparisonFailure: expected:<[6]:10 pm> but was:<[11]:10 pm>
+at org.junit.Assert.assertEquals(Assert.java:117)
+at org.junit.Assert.assertEquals(Assert.java:146)
+at com.saaf.milkshop.NativeOperationsWorkFacadeTest$loadUsesEffectivePurchaseNotSupersededOriginal$1.invokeSuspend(NativeOperationsWorkFacadeTest.kt:112)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at com.saaf.milkshop.NativeOperationsWorkFacadeTest.loadUsesEffectivePurchaseNotSupersededOriginal(NativeOperationsWorkFacadeTest.kt:84)
+
+
+com.saaf.milkshop.NativeOwnerSaleEntryScreenContractTest.dirtyOwnerNavigationRequiresDiscardConfirmation
+java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'Discard this sale draft?' (ignoreCase: false) is not displayed!
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+at com.saaf.milkshop.NativeOwnerSaleEntryScreenContractTest.dirtyOwnerNavigationRequiresDiscardConfirmation(NativeOwnerSaleEntryScreenContractTest.kt:68)
+
+
+com.saaf.milkshop.NativeOwnerCollectionEntryScreenContractTest.dirtyOwnerNavigationRequiresDiscardConfirmation
+java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'Discard this payment?' (ignoreCase: false) is not displayed!
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+at com.saaf.milkshop.NativeOwnerCollectionEntryScreenContractTest.dirtyOwnerNavigationRequiresDiscardConfirmation(NativeOwnerCollectionEntryScreenContractTest.kt:76)
+
+
+com.saaf.milkshop.NativeOwnerExpenseScreenContractTest.dirtyOwnerNavigationRequiresDiscardConfirmation
+java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'Discard this expense?' (ignoreCase: false) is not displayed!
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+at com.saaf.milkshop.NativeOwnerExpenseScreenContractTest.dirtyOwnerNavigationRequiresDiscardConfirmation(NativeOwnerExpenseScreenContractTest.kt:68)
+
+
+com.saaf.milkshop.NativeOwnerPaySupplierScreenContractTest.dirtyOwnerNavigationRequiresDiscardConfirmation
+java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'Discard this payment?' (ignoreCase: false) is not displayed!
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+at com.saaf.milkshop.NativeOwnerPaySupplierScreenContractTest.dirtyOwnerNavigationRequiresDiscardConfirmation(NativeOwnerPaySupplierScreenContractTest.kt:68)
+
+
+com.saaf.milkshop.NativeOwnerPaySalaryScreenContractTest.dirtyOwnerNavigationRequiresDiscardConfirmation
+java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'Discard this payment?' (ignoreCase: false) is not displayed!
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+at com.saaf.milkshop.NativeOwnerPaySalaryScreenContractTest.dirtyOwnerNavigationRequiresDiscardConfirmation(NativeOwnerPaySalaryScreenContractTest.kt:68)
+
+
+com.saaf.milkshop.NativeOwnerCashCloseScreenContractTest.dirtyOwnerNavigationRequiresDiscardConfirmation
+java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'Discard this count?' (ignoreCase: false) is not displayed!
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+at com.saaf.milkshop.NativeOwnerCashCloseScreenContractTest.dirtyOwnerNavigationRequiresDiscardConfirmation(NativeOwnerCashCloseScreenContractTest.kt:69)
+
+
+com.saaf.milkshop.NativeOwnerDeliveriesEntryScreenContractTest.loadFailureRetainsOwnerShellAndRetries
+java.lang.AssertionError: Failed to inject touch input.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'ops_deliveries_retry_load')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.performTouchInput(Actions.kt:402)
+at androidx.compose.ui.test.AndroidActions.performClickImpl(Actions.android.kt:23)
+at androidx.compose.ui.test.ActionsKt.performClick(Actions.kt:60)
+at com.saaf.milkshop.NativeOwnerDeliveriesEntryScreenContractTest.loadFailureRetainsOwnerShellAndRetries(NativeOwnerDeliveriesEntryScreenContractTest.kt:86)
+
+
+com.saaf.milkshop.NativeOwnerRecordsFacadeTest.correctRejectsClosedDay
+android.database.SQLException: Error code: 1811, message: Daily close requires a verified user
+at androidx.sqlite.driver.bundled.BundledSQLiteStatementKt.nativeStep(Native Method)
+at androidx.sqlite.driver.bundled.BundledSQLiteStatementKt.access$nativeStep(BundledSQLiteStatement.jvmAndAndroid.kt:1)
+at androidx.sqlite.driver.bundled.BundledSQLiteStatement.step(BundledSQLiteStatement.jvmAndAndroid.kt:102)
+at androidx.room3.coroutines.BasePreparedStatementCache$CachedStatement.step(Unknown Source:2)
+at androidx.room3.EntityInsertAdapter.insertAndReturnId(EntityInsertAdapter.kt:109)
+at com.saaf.milkshop.data.DailyCloseDao_Impl$insert$2.invokeSuspend(DailyCloseDao_Impl.kt:69)
+at com.saaf.milkshop.data.DailyCloseDao_Impl$insert$2.invoke(Unknown Source:8)
+at com.saaf.milkshop.data.DailyCloseDao_Impl$insert$2.invoke(Unknown Source:4)
+at androidx.room3.util.DBUtil__DBUtilKt$performSuspending$2$1$1.invokeSuspend(DBUtil.kt:50)
+at androidx.room3.util.DBUtil__DBUtilKt$performSuspending$2$1$1.invoke(Unknown Source:8)
+at androidx.room3.util.DBUtil__DBUtilKt$performSuspending$2$1$1.invoke(Unknown Source:4)
+at androidx.room3.coroutines.PooledConnectionImpl.useRawConnection(ConnectionPoolImpl.kt:435)
+at androidx.room3.coroutines.PooledConnectionImpl$TransactionImpl.useRawConnection(ConnectionPoolImpl.kt:538)
+at androidx.room3.util.DBUtil__DBUtilKt$performSuspending$2$invokeSuspend$$inlined$internalPerform$1$1.invokeSuspend(DBUtil.kt:72)
+at androidx.room3.util.DBUtil__DBUtilKt$performSuspending$2$invokeSuspend$$inlined$internalPerform$1$1.invoke(Unknown Source:8)
+at androidx.room3.util.DBUtil__DBUtilKt$performSuspending$2$invokeSuspend$$inlined$internalPerform$1$1.invoke(Unknown Source:4)
+at androidx.room3.coroutines.PooledConnectionImpl.transaction(ConnectionPoolImpl.kt:473)
+at androidx.room3.coroutines.PooledConnectionImpl.withTransaction(ConnectionPoolImpl.kt:448)
+at androidx.room3.util.DBUtil__DBUtilKt$performSuspending$2$invokeSuspend$$inlined$internalPerform$1.invokeSuspend(DBUtil.kt:71)
+at androidx.room3.util.DBUtil__DBUtilKt$performSuspending$2$invokeSuspend$$inlined$internalPerform$1.invoke(Unknown Source:8)
+at androidx.room3.util.DBUtil__DBUtilKt$performSuspending$2$invokeSuspend$$inlined$internalPerform$1.invoke(Unknown Source:4)
+at androidx.room3.coroutines.ConnectionPoolImpl$useConnection$4.invokeSuspend(ConnectionPoolImpl.kt:161)
+at androidx.room3.coroutines.ConnectionPoolImpl$useConnection$4.invoke(Unknown Source:8)
+at androidx.room3.coroutines.ConnectionPoolImpl$useConnection$4.invoke(Unknown Source:4)
+at kotlinx.coroutines.intrinsics.UndispatchedKt.startUndspatched(Undispatched.kt:66)
+at kotlinx.coroutines.intrinsics.UndispatchedKt.startUndispatchedOrReturn(Undispatched.kt:43)
+at kotlinx.coroutines.BuildersKt__Builders_commonKt.withContext(Builders.common.kt:165)
+at kotlinx.coroutines.BuildersKt.withContext(Unknown Source:1)
+at androidx.room3.coroutines.ConnectionPoolImpl.useConnection(ConnectionPoolImpl.kt:161)
+at androidx.room3.coroutines.Connect
+
+com.saaf.milkshop.NativeOwnerShopSettingsFacadeTest.loadReturnsShopIdentityAndRates
+org.junit.ComparisonFailure: expected:<[Saaf Milk]> but was:<[Your shop]>
+at org.junit.Assert.assertEquals(Assert.java:117)
+at org.junit.Assert.assertEquals(Assert.java:146)
+at com.saaf.milkshop.NativeOwnerShopSettingsFacadeTest$loadReturnsShopIdentityAndRates$1.invokeSuspend(NativeOwnerShopSettingsFacadeTest.kt:58)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at com.saaf.milkshop.NativeOwnerShopSettingsFacadeTest.loadReturnsShopIdentityAndRates(NativeOwnerShopSettingsFacadeTest.kt:56)

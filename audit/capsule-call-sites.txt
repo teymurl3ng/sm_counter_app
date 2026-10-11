@@ -1,0 +1,369 @@
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\activity\CashierActivityScreen.kt-312-    onClick: () -> Unit,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\activity\CashierActivityScreen.kt-313-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\activity\CashierActivityScreen.kt-314-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\activity\CashierActivityScreen.kt-315-        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\activity\CashierActivityScreen.kt:316:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\activity\CashierActivityScreen.kt-317-            .heightIn(min = 64.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\activity\CashierActivityScreen.kt-318-            .semantics { role = Role.Button }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\activity\CashierActivityScreen.kt-319-            .clickable(onClick = hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\activity\CashierActivityScreen.kt-320-            .padding(horizontal = 16.dp, vertical = 14.dp)
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\auth\NativeAuthenticationScreens.kt-266-private fun AccountRow(account: NativeAccountSummary, onClick: () -> Unit) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\auth\NativeAuthenticationScreens.kt-267-    val context = LocalContext.current
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\auth\NativeAuthenticationScreens.kt-268-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\auth\NativeAuthenticationScreens.kt-269-        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\auth\NativeAuthenticationScreens.kt:270:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\auth\NativeAuthenticationScreens.kt-271-            .testTag(NativeUiTags.authAccount(account.loginName))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\auth\NativeAuthenticationScreens.kt-272-            .clickable(onClick = { context.hapticSelect(); onClick() })
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\auth\NativeAuthenticationScreens.kt-273-            .padding(vertical = 14.dp),
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\auth\NativeAuthenticationScreens.kt-274-        verticalAlignment = Alignment.CenterVertically,
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt-767-                    }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt-768-                    matches.forEach { customer ->
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt-769-                        Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt-770-                            modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt:771:                                .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt-772-                                .heightIn(min = 56.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt-773-                                .clickable(enabled = !selecting, onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(customer) })
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt-774-                                .testTag(NativeUiTags.collectCustomer(customer.accountId))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt-775-                                .padding(vertical = 10.dp),
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt-812-            Column {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt-813-                accounts.forEach { account ->
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt-814-                    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt-815-                        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt:816:                            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt-817-                            .heightIn(min = 56.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt-818-                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(account) })
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt-819-                            .semantics {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\collection\CashierCollectionScreen.kt-820-                                role = Role.RadioButton
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminPeopleScreen.kt-428-    onClick: () -> Unit,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminPeopleScreen.kt-429-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminPeopleScreen.kt-430-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminPeopleScreen.kt-431-        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminPeopleScreen.kt:432:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminPeopleScreen.kt-433-            .heightIn(min = 72.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminPeopleScreen.kt-434-            .semantics { role = Role.Button }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminPeopleScreen.kt-435-            .clickable(onClick = hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminPeopleScreen.kt-436-            .padding(horizontal = 16.dp, vertical = 14.dp)
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminRecordsScreen.kt-249-    onClick: () -> Unit,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminRecordsScreen.kt-250-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminRecordsScreen.kt-251-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminRecordsScreen.kt-252-        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminRecordsScreen.kt:253:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminRecordsScreen.kt-254-            .heightIn(min = 72.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminRecordsScreen.kt-255-            .semantics { role = Role.Button }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminRecordsScreen.kt-256-            .clickable(onClick = hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminRecordsScreen.kt-257-            .padding(horizontal = 16.dp, vertical = 14.dp)
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\more\CashierMoreScreen.kt-612-    enabled: Boolean = true,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\more\CashierMoreScreen.kt-613-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\more\CashierMoreScreen.kt-614-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\more\CashierMoreScreen.kt-615-        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\more\CashierMoreScreen.kt:616:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\more\CashierMoreScreen.kt-617-            .heightIn(min = 72.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\more\CashierMoreScreen.kt-618-            .semantics { role = Role.Button }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\more\CashierMoreScreen.kt-619-            .clickable(enabled = enabled, onClick = com.saaf.milkshop.nativeui.common.hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\more\CashierMoreScreen.kt-620-            .padding(horizontal = 16.dp, vertical = 14.dp)
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminWorkScreen.kt-353-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminWorkScreen.kt-354-    val clickable = enabled && onClick != null
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminWorkScreen.kt-355-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminWorkScreen.kt-356-        Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminWorkScreen.kt:357:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminWorkScreen.kt-358-            .heightIn(min = 64.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminWorkScreen.kt-359-            .testTag(tag)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminWorkScreen.kt-360-            .then(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminWorkScreen.kt-361-                if (clickable) Modifier.clickable(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onClick!!))
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminMoreScreen.kt-675-    onClick: () -> Unit,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminMoreScreen.kt-676-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminMoreScreen.kt-677-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminMoreScreen.kt-678-        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminMoreScreen.kt:679:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminMoreScreen.kt-680-            .heightIn(min = 72.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminMoreScreen.kt-681-            .semantics { role = Role.Button }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminMoreScreen.kt-682-            .clickable(onClick = hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\admin\AdminMoreScreen.kt-683-            .padding(horizontal = 16.dp, vertical = 14.dp)
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\common\NativeListItem.kt-12-import androidx.compose.ui.unit.dp
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\common\NativeListItem.kt-13-
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\common\NativeListItem.kt-14-/** Distinct, bounded rows on the app's page background, with inset ripple. */
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\common\NativeListItem.kt-15-@Composable
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\common\NativeListItem.kt:16:fun Modifier.nativeListItem(): Modifier {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\common\NativeListItem.kt-17-    val shape = RoundedCornerShape(12.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\common\NativeListItem.kt-18-    return padding(vertical = 4.dp).clip(shape)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\common\NativeListItem.kt-19-        .background(MaterialTheme.colorScheme.surface)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\common\NativeListItem.kt-20-        .border(1.dp, MaterialTheme.colorScheme.outline, shape)
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\sale\CashierSaleScreen.kt-767-            Column {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\sale\CashierSaleScreen.kt-768-                accounts.forEach { account ->
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\sale\CashierSaleScreen.kt-769-                    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\sale\CashierSaleScreen.kt-770-                        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\sale\CashierSaleScreen.kt:771:                            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\sale\CashierSaleScreen.kt-772-                            .heightIn(min = 56.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\sale\CashierSaleScreen.kt-773-                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(account) })
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\sale\CashierSaleScreen.kt-774-                            .semantics {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\sale\CashierSaleScreen.kt-775-                                role = Role.RadioButton
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerWorkScreen.kt-401-    badge: String? = null,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerWorkScreen.kt-402-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerWorkScreen.kt-403-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerWorkScreen.kt-404-        Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerWorkScreen.kt:405:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerWorkScreen.kt-406-            .heightIn(min = 64.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerWorkScreen.kt-407-            .testTag(tag)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerWorkScreen.kt-408-            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerWorkScreen.kt-409-            .padding(vertical = 12.dp),
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt-535-            Column {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt-536-                vendors.forEach { vendor ->
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt-537-                    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt-538-                        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt:539:                            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt-540-                            .heightIn(min = 56.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt-541-                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(vendor) })
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt-542-                            .semantics {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt-543-                                role = Role.RadioButton
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt-581-            Column {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt-582-                accounts.forEach { account ->
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt-583-                    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt-584-                        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt:585:                            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt-586-                            .heightIn(min = 56.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt-587-                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(account) })
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt-588-                            .semantics {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\vendorpayment\VendorPaymentEntryScreen.kt-589-                                role = Role.RadioButton
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt-535-            Column {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt-536-                employees.forEach { employee ->
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt-537-                    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt-538-                        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt:539:                            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt-540-                            .heightIn(min = 56.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt-541-                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(employee) })
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt-542-                            .semantics {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt-543-                                role = Role.RadioButton
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt-581-            Column {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt-582-                accounts.forEach { account ->
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt-583-                    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt-584-                        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt:585:                            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt-586-                            .heightIn(min = 56.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt-587-                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(account) })
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt-588-                            .semantics {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\salarypayment\SalaryPaymentEntryScreen.kt-589-                                role = Role.RadioButton
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\OperationsMoreScreen.kt-481-    enabled: Boolean = true,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\OperationsMoreScreen.kt-482-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\OperationsMoreScreen.kt-483-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\OperationsMoreScreen.kt-484-        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\OperationsMoreScreen.kt:485:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\OperationsMoreScreen.kt-486-            .heightIn(min = 72.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\OperationsMoreScreen.kt-487-            .semantics { role = Role.Button }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\OperationsMoreScreen.kt-488-            .clickable(enabled = enabled, onClick = hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\OperationsMoreScreen.kt-489-            .padding(horizontal = 16.dp, vertical = 14.dp)
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerMoreScreen.kt-608-    onClick: () -> Unit,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerMoreScreen.kt-609-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerMoreScreen.kt-610-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerMoreScreen.kt-611-        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerMoreScreen.kt:612:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerMoreScreen.kt-613-            .heightIn(min = 72.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerMoreScreen.kt-614-            .semantics { role = Role.Button }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerMoreScreen.kt-615-            .clickable(onClick = hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\manager\ManagerMoreScreen.kt-616-            .padding(horizontal = 16.dp, vertical = 14.dp)
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\ReceiveMilkScreen.kt-527-                }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\ReceiveMilkScreen.kt-528-                vendors.forEach { vendor ->
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\ReceiveMilkScreen.kt-529-                    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\ReceiveMilkScreen.kt-530-                        Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\ReceiveMilkScreen.kt:531:                            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\ReceiveMilkScreen.kt-532-                            .heightIn(min = 56.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\ReceiveMilkScreen.kt-533-                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(vendor.accountId) })
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\ReceiveMilkScreen.kt-534-                            .padding(vertical = 12.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\ReceiveMilkScreen.kt-535-                            .testTag(NativeUiTags.opsReceiveMilkVendor(vendor.accountId)),
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt-537-            ) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt-538-                products.forEach { product ->
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt-539-                    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt-540-                        Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt:541:                            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt-542-                            .heightIn(min = 56.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt-543-                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(product.productId) })
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt-544-                            .padding(vertical = 12.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt-545-                            .testTag(NativeUiTags.opsRecordSpoilageProduct(product.productId)),
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt-575-            Column {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt-576-                reasons.forEach { reason ->
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt-577-                    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt-578-                        Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt:579:                            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt-580-                            .heightIn(min = 56.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt-581-                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(reason.code) })
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt-582-                            .padding(vertical = 12.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\operations\RecordSpoilageScreen.kt-583-                            .testTag(NativeUiTags.opsRecordSpoilageReason(reason.code)),
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlanningScreens.kt-966-                        batches.forEach { batch ->
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlanningScreens.kt-967-                            val checked = batch.productionEventId in selectedIds
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlanningScreens.kt-968-                            Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlanningScreens.kt-969-                                Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlanningScreens.kt:970:                                    .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlanningScreens.kt-971-                                    .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlanningScreens.kt-972-                                        selectedIds = if (checked) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlanningScreens.kt-973-                                            selectedIds - batch.productionEventId
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlanningScreens.kt-974-                                        } else {
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlansScreen.kt-1326-    onClick: () -> Unit,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlansScreen.kt-1327-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlansScreen.kt-1328-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlansScreen.kt-1329-        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlansScreen.kt:1330:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlansScreen.kt-1331-            .heightIn(min = 72.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlansScreen.kt-1332-            .semantics { role = Role.Button }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlansScreen.kt-1333-            .clickable(onClick = hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCostingPlansScreen.kt-1334-            .padding(horizontal = 16.dp, vertical = 14.dp)
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt-551-            Column {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt-552-                categories.forEach { category ->
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt-553-                    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt-554-                        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt:555:                            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt-556-                            .heightIn(min = 56.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt-557-                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(category) })
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt-558-                            .semantics {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt-559-                                role = Role.RadioButton
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt-597-            Column {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt-598-                accounts.forEach { account ->
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt-599-                    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt-600-                        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt:601:                            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt-602-                            .heightIn(min = 56.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt-603-                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(account) })
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt-604-                            .semantics {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\expense\ExpenseEntryScreen.kt-605-                                role = Role.RadioButton
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCustomersScreen.kt-810-    onClick: () -> Unit,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCustomersScreen.kt-811-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCustomersScreen.kt-812-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCustomersScreen.kt-813-        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCustomersScreen.kt:814:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCustomersScreen.kt-815-            .heightIn(min = 72.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCustomersScreen.kt-816-            .semantics { role = Role.Button }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCustomersScreen.kt-817-            .clickable(onClick = hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerCustomersScreen.kt-818-            .padding(horizontal = 16.dp, vertical = 14.dp)
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerEmployeesScreen.kt-798-    onClick: () -> Unit,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerEmployeesScreen.kt-799-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerEmployeesScreen.kt-800-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerEmployeesScreen.kt-801-        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerEmployeesScreen.kt:802:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerEmployeesScreen.kt-803-            .heightIn(min = 72.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerEmployeesScreen.kt-804-            .semantics { role = Role.Button }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerEmployeesScreen.kt-805-            .clickable(onClick = hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerEmployeesScreen.kt-806-            .padding(horizontal = 16.dp, vertical = 14.dp)
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerMoreScreen.kt-982-    enabled: Boolean = true,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerMoreScreen.kt-983-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerMoreScreen.kt-984-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerMoreScreen.kt-985-        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerMoreScreen.kt:986:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerMoreScreen.kt-987-            .heightIn(min = 72.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerMoreScreen.kt-988-            .semantics { role = Role.Button }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerMoreScreen.kt-989-            .clickable(enabled = enabled, onClick = hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerMoreScreen.kt-990-            .padding(horizontal = 16.dp, vertical = 14.dp)
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerProductsScreen.kt-897-    onClick: () -> Unit,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerProductsScreen.kt-898-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerProductsScreen.kt-899-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerProductsScreen.kt-900-        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerProductsScreen.kt:901:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerProductsScreen.kt-902-            .heightIn(min = 72.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerProductsScreen.kt-903-            .semantics { role = Role.Button }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerProductsScreen.kt-904-            .clickable(onClick = hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerProductsScreen.kt-905-            .padding(horizontal = 16.dp, vertical = 14.dp)
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt-401-    LazyColumn(Modifier.fillMaxSize()) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt-402-        items(rows, key = { it.accountId }) { row ->
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt-403-            Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt-404-                Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt:405:                    .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt-406-                    .heightIn(min = 64.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt-407-                    .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenLedger(row.accountId) })
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt-408-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt-409-                horizontalArrangement = Arrangement.SpaceBetween,
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt-952-    onClick: () -> Unit,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt-953-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt-954-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt-955-        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt:956:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt-957-            .heightIn(min = 64.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt-958-            .semantics { role = Role.Button }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt-959-            .clickable(onClick = hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerRecordsScreen.kt-960-            .padding(horizontal = 16.dp, vertical = 14.dp)
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSecurityHistoryScreen.kt-240-    onClick: () -> Unit,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSecurityHistoryScreen.kt-241-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSecurityHistoryScreen.kt-242-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSecurityHistoryScreen.kt-243-        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSecurityHistoryScreen.kt:244:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSecurityHistoryScreen.kt-245-            .heightIn(min = 72.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSecurityHistoryScreen.kt-246-            .semantics { role = Role.Button }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSecurityHistoryScreen.kt-247-            .clickable(onClick = hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSecurityHistoryScreen.kt-248-            .padding(horizontal = 16.dp, vertical = 14.dp)
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerShopSettingsScreen.kt-551-                            } else {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerShopSettingsScreen.kt-552-                                snapshot.expenseCategories.forEach { category ->
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerShopSettingsScreen.kt-553-                                    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerShopSettingsScreen.kt-554-                                        Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerShopSettingsScreen.kt:555:                                            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerShopSettingsScreen.kt-556-                                            .semantics { role = Role.Button }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerShopSettingsScreen.kt-557-                                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenCategory(category.accountId) })
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerShopSettingsScreen.kt-558-                                            .testTag(NativeUiTags.ownerShopExpenseCategory(category.accountId))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerShopSettingsScreen.kt-559-                                            .padding(vertical = 8.dp),
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSuppliersScreen.kt-740-    onClick: () -> Unit,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSuppliersScreen.kt-741-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSuppliersScreen.kt-742-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSuppliersScreen.kt-743-        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSuppliersScreen.kt:744:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSuppliersScreen.kt-745-            .heightIn(min = 72.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSuppliersScreen.kt-746-            .semantics { role = Role.Button }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSuppliersScreen.kt-747-            .clickable(onClick = hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSuppliersScreen.kt-748-            .padding(horizontal = 16.dp, vertical = 14.dp)
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSyncScreen.kt-193-                ownerChoices.forEach { owner ->
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSyncScreen.kt-194-                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSyncScreen.kt-195-                    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSyncScreen.kt-196-                        Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSyncScreen.kt:197:                            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSyncScreen.kt-198-                            .padding(vertical = 12.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSyncScreen.kt-199-                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSyncScreen.kt-200-                                pickedOwnerId = owner.userId
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerSyncScreen.kt-201-                                val chars = takeCredential()
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerUsersRolesScreen.kt-1057-    onClick: () -> Unit,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerUsersRolesScreen.kt-1058-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerUsersRolesScreen.kt-1059-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerUsersRolesScreen.kt-1060-        modifier = Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerUsersRolesScreen.kt:1061:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerUsersRolesScreen.kt-1062-            .heightIn(min = 72.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerUsersRolesScreen.kt-1063-            .semantics { role = Role.Button }
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerUsersRolesScreen.kt-1064-            .clickable(onClick = hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerUsersRolesScreen.kt-1065-            .padding(horizontal = 16.dp, vertical = 14.dp)
+--
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerWorkScreen.kt-343-    badge: String? = null,
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerWorkScreen.kt-344-) {
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerWorkScreen.kt-345-    Row(
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerWorkScreen.kt-346-        Modifier
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerWorkScreen.kt:347:            .fillMaxWidth().nativeListItem()
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerWorkScreen.kt-348-            .heightIn(min = 64.dp)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerWorkScreen.kt-349-            .testTag(tag)
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerWorkScreen.kt-350-            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onClick))
+phase18/app/src/main/java/com/saaf/milkshop/nativeui\owner\OwnerWorkScreen.kt-351-            .padding(vertical = 12.dp),

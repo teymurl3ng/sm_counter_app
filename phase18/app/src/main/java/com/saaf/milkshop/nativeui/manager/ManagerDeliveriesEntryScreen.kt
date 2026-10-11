@@ -1,6 +1,6 @@
 package com.saaf.milkshop.nativeui.manager
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard

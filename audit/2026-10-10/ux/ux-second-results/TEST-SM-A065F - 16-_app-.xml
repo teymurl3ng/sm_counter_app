@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeFoundationUiTest" tests="39" failures="3" errors="0" skipped="0" time="181.231" timestamp="2026-10-10T16:50:55" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="managerRecordsHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="8.961" />
+  <testcase name="switchAccountHardwareBackKeepsSessionAndReturnsToMore" classname="com.saaf.milkshop.NativeFoundationUiTest" time="15.048">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 10000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeFoundationUiTest.openSwitchAccountPicker(NativeFoundationUiTest.kt:3639)
+at com.saaf.milkshop.NativeFoundationUiTest.switchAccountHardwareBackKeepsSessionAndReturnsToMore(NativeFoundationUiTest.kt:2340)
+</failure>
+  </testcase>
+  <testcase name="managerShellNavSwitchesSectionsUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="6.641" />
+  <testcase name="managerRecordsCorrectionHardwareBackReturnsToDetailThenList" classname="com.saaf.milkshop.NativeFoundationUiTest" time="5.371" />
+  <testcase name="entryModesInputAndSteppersConvertAndRecalculate" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.855" />
+  <testcase name="ownerPaySupplierOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="20.865">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 15000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeFoundationUiTest.openOwnerPaySupplier(NativeFoundationUiTest.kt:2994)
+at com.saaf.milkshop.NativeFoundationUiTest.ownerPaySupplierOpensUnderOwnerChrome(NativeFoundationUiTest.kt:1405)
+</failure>
+  </testcase>
+  <testcase name="uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens" classname="com.saaf.milkshop.NativeFoundationUiTest" time="17.814" />
+  <testcase name="adminBusinessRecordsHardwareBackReturnsToRecordsHub" classname="com.saaf.milkshop.NativeFoundationUiTest" time="13.426">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 10000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeFoundationUiTest.adminBusinessRecordsHardwareBackReturnsToRecordsHub(NativeFoundationUiTest.kt:1177)
+</failure>
+  </testcase>
+  <testcase name="recordSaleWritesRoomAndShowsRefreshedReceipt" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.519" />
+  <testcase name="editedSaleDraftSurvivesActivityRecreation" classname="com.saaf.milkshop.NativeFoundationUiTest" time="5.676" />
+  <testcase name="ownerPaySupplierHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.256" />
+  <testcase name="switchAccountUiBackKeepsSessionAndReturnsToMore" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.35" />
+  <testcase name="cashierCountsClosesDayAndCannotReopen" classname="com.saaf.milkshop.NativeFoundationUiTest" time="11.326" />
+  <testcase name="operatorBackWinsOverWarmRefresh" classname="com.saaf.milkshop.NativeWorkRefreshRegressionTest" time="8.965" />
+  <testcase name="ownerNavigationWinsOverRefreshingSuccessAndFailure" classname="com.saaf.milkshop.NativeWorkRefreshRegressionTest" time="8.966" />
+  <testcase name="managerNavigationWinsOverWarmRefresh" classname="com.saaf.milkshop.NativeWorkRefreshRegressionTest" time="6.979" />
+  <testcase name="adminNavigationWinsOverWarmRefreshFailure" classname="com.saaf.milkshop.NativeWorkRefreshRegressionTest" time="6.926" />
+  <testcase name="catalogProductsRemainVisibleAndPriceFollowsIdAfterRename" classname="com.saaf.milkshop.NativeCatalogPricingRegressionTest" time="0.74" />
+  <testcase name="methodPickerShowsOnlyEnrolledPhoneSecurityAndSurfacesCancellation" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.111" />
+  <testcase name="darkSystemHostKeepsTheBrandedAccountPickerContrast" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.126" />
+  <testcase name="rateLimitedQuickPinKeepsFullPassphraseRecoveryVisibleAndWorking" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.212" />
+  <testcase name="startupFailureRetryChangesToTheRequestedVisibleState" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.055" />
+  <testcase name="menuOpensExpenseEntry" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.081" />
+  <testcase name="countCashRecordsBlindAmountAndShowsSuccessWithoutExpectedVariance" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.264" />
+  <testcase name="personalSecurityShowsStatus" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.147" />
+  <testcase name="menuOpensCountCashEntry" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.154" />
+  <testcase name="menuShowsCashierActionsAndKeepsMoreNavSelected" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.221" />
+  <testcase name="switchAccountAndSignOutFireFromMenu" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.16" />
+  <testcase name="menuOpensDeliveriesFromMore" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.128" />
+  <testcase name="loadFailureOffersRetry" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.079" />
+  <testcase name="dirtyCashierNavigationRequiresDiscardConfirmation" classname="com.saaf.milkshop.NativeCashierExpenseScreenContractTest" time="2.286" />
+  <testcase name="readyUsesCashierChromeAndExcludesOwnerNavigation" classname="com.saaf.milkshop.NativeCashierExpenseScreenContractTest" time="1.22" />
+  <testcase name="loadFailureRetainsCashierShellAndRetries" classname="com.saaf.milkshop.NativeCashierExpenseScreenContractTest" time="1.071" />
+  <testcase name="operatorCannotLoadCashClose" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="1.365" />
+  <testcase name="closeThenReopenRestoresOpenPosting" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="1.177" />
+  <testcase name="recordCountThenCloseDayReturnsReceipt" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.66" />
+  <testcase name="loadExposesCashAccountExpectedAndOpenPosting" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.589" />
+  <testcase name="reopenRejectsBlankReasonAndWrongPassphrase" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="1.136" />
+  <testcase name="varianceRequiresReasonBeforeClose" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.608" />
+</testsuite>

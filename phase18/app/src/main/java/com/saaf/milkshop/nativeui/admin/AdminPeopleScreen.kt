@@ -1,6 +1,8 @@
 package com.saaf.milkshop.nativeui.admin
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +30,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
+import com.saaf.milkshop.nativeui.common.nativeListItem
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -148,7 +152,7 @@ fun AdminPeopleScreen(
                 Text(state.message, style = MaterialTheme.typography.bodyLarge)
                 Spacer(Modifier.height(16.dp))
                 Button(
-                    onClick = onRetry,
+                    onClick = hapticAction(onRetry),
                     modifier = Modifier.testTag(NativeUiTags.AdminPeopleRetryLoad),
                 ) {
                     Text("Try again")
@@ -362,6 +366,7 @@ private fun AdminPeopleHubScreen(
                 Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp)
                     .testTag(NativeUiTags.AdminPeopleHub),
             ) {
                 AdminPeopleSectionLabel("Staff access")
@@ -370,9 +375,8 @@ private fun AdminPeopleHubScreen(
                     title = "Users & roles",
                     subtitle = "Login accounts, enrollment, and access state",
                     tag = NativeUiTags.AdminPeopleUsersRoles,
-                    onClick = onOpenUsersRoles,
+                    onClick = hapticAction(onOpenUsersRoles),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
                 AdminPeopleSectionLabel("People and businesses")
                 AdminPeopleMenuRow(
@@ -380,23 +384,21 @@ private fun AdminPeopleHubScreen(
                     title = "Employees",
                     subtitle = "Employee profiles and attendance accounts",
                     tag = NativeUiTags.AdminPeopleEmployees,
-                    onClick = onOpenEmployees,
+                    onClick = hapticAction(onOpenEmployees),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 AdminPeopleMenuRow(
                     icon = Icons.Outlined.People,
                     title = "Customers",
                     subtitle = "Customer accounts and balances",
                     tag = NativeUiTags.AdminPeopleCustomers,
-                    onClick = onOpenCustomers,
+                    onClick = hapticAction(onOpenCustomers),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 AdminPeopleMenuRow(
                     icon = Icons.Outlined.Business,
                     title = "Suppliers",
                     subtitle = "Supplier accounts and milk receipts",
                     tag = NativeUiTags.AdminPeopleSuppliers,
-                    onClick = onOpenSuppliers,
+                    onClick = hapticAction(onOpenSuppliers),
                 )
             }
         }
@@ -412,7 +414,7 @@ private fun AdminPeopleSectionLabel(label: String) {
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp)
+            .padding(vertical = 10.dp)
             .testTag(NativeUiTags.AdminPeopleSectionLabel),
     )
 }
@@ -427,11 +429,10 @@ private fun AdminPeopleMenuRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 72.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Navigation)
             .semantics { role = Role.Button }
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .clickable(onClick = hapticAction(onClick))
+            .nativeListItemContent(NativeListStyle.Navigation)
             .testTag(tag),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),

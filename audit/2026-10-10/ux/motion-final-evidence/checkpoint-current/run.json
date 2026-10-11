@@ -1,0 +1,20 @@
+﻿{
+    "pulledAt":  "2026-10-10T22:54:25.8453817+05:00",
+    "serial":  "R8VXA02SNKH",
+    "screens":  [
+                    "motion"
+                ],
+    "pngCount":  3,
+    "reviewSidecarCount":  3,
+    "pngs":  [
+                 "motion-after.png",
+                 "motion-before.png",
+                 "motion-mid.png"
+             ],
+    "reviewSidecars":  [
+                           "motion-after.review.json",
+                           "motion-before.review.json",
+                           "motion-mid.review.json"
+                       ],
+    "source":  "device:/sdcard/Download/phase14-native-evidence"
+}

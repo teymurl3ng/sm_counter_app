@@ -1,6 +1,6 @@
 package com.saaf.milkshop.nativeui.operations
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -173,13 +173,14 @@ private fun AttendanceReady(
 @Composable
 private fun UnlinkedCard() {
     Surface(
-        tonalElevation = 1.dp,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         modifier = Modifier
             .fillMaxWidth()
             .testTag(NativeUiTags.OpsAttendanceUnlinked),
     ) {
         Column(
-            Modifier.padding(20.dp),
+            Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -207,7 +208,8 @@ private fun LinkedBody(
 ) {
 val hapticContext = LocalContext.current
     Surface(
-        tonalElevation = 1.dp,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         modifier = Modifier
             .fillMaxWidth()
             .testTag(NativeUiTags.OpsAttendanceLinked),

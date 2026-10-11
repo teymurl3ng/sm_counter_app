@@ -1,0 +1,1 @@
+10-11 00:48:23.812 I/TestRunner( 6775): started: uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens(com.saaf.milkshop.NativeFoundationUiTest)

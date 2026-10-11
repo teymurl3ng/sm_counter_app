@@ -189,10 +189,13 @@ internal class OwnerBackupController(
         var retryRetained = false
         runtime.state.value = current.copy(backupBusy = true, backupError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.exportEncrypted(session, uri, passphrase)
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Encrypted backup exported")
                 val snapshot = withContext(Dispatchers.IO) { facade.load(session) }
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
@@ -219,7 +222,7 @@ internal class OwnerBackupController(
                         backupError = null,
                     )
                 } else {
-                    handleFailure(token, error)
+                    handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
                 }
             } finally {
                 passphrase.fill('\u0000')
@@ -334,10 +337,13 @@ internal class OwnerBackupController(
         }
         runtime.state.value = current.copy(backupBusy = true, backupError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.confirmRestore(session, ticket, confirm)
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Backup restored on this phone")
                 clearPendingBackupSecrets()
                 runtime.endSession()
             } catch (error: Throwable) {
@@ -352,7 +358,7 @@ internal class OwnerBackupController(
                         backupError = null,
                     )
                 } else {
-                    handleFailure(token, error)
+                    handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
                 }
             }
         }
@@ -407,10 +413,13 @@ internal class OwnerBackupController(
         var retryRetained = false
         runtime.state.value = current.copy(backupBusy = true, backupError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 val snapshot = withContext(Dispatchers.IO) {
                     facade.connectDrive(session, passphrase, allowMetered)
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Drive backup connected")
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
                 if (latest.destination != NativeOwnerMoreDestination.Backup) return@launch
@@ -436,7 +445,7 @@ internal class OwnerBackupController(
                         backupError = null,
                     )
                 } else {
-                    handleFailure(token, error)
+                    handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
                 }
             } finally {
                 passphrase.fill('\u0000')
@@ -453,10 +462,13 @@ internal class OwnerBackupController(
         val allowMetered = current.backup?.allowMetered ?: false
         runtime.state.value = current.copy(backupBusy = true, backupError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 val snapshot = withContext(Dispatchers.IO) {
                     facade.setDrivePolicy(session, enabled, allowMetered)
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Backup settings saved")
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
                 if (latest.destination != NativeOwnerMoreDestination.Backup) return@launch
@@ -479,7 +491,7 @@ internal class OwnerBackupController(
                         backupError = null,
                     )
                 } else {
-                    handleFailure(token, error)
+                    handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
                 }
             }
         }
@@ -492,10 +504,13 @@ internal class OwnerBackupController(
         if (current.destination != NativeOwnerMoreDestination.Backup || current.backupBusy) return
         runtime.state.value = current.copy(backupBusy = true, backupError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 val snapshot = withContext(Dispatchers.IO) {
                     facade.runDriveBackupNow(session)
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Backup requested. Check backup status for completion.")
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
                 if (latest.destination != NativeOwnerMoreDestination.Backup) return@launch
@@ -505,7 +520,7 @@ internal class OwnerBackupController(
                     backupError = null,
                 )
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
             }
         }
     }
@@ -533,10 +548,13 @@ internal class OwnerBackupController(
             backupError = null,
         )
         runtime.scope.launch {
+            var saved = false
             try {
                 val snapshot = withContext(Dispatchers.IO) {
                     facade.disconnectDrive(session, confirmRevoke = true)
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Drive backup disconnected")
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
                 if (latest.destination != NativeOwnerMoreDestination.Backup) return@launch
@@ -559,7 +577,7 @@ internal class OwnerBackupController(
                         backupError = null,
                     )
                 } else {
-                    handleFailure(token, error)
+                    handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
                 }
             }
         }
@@ -678,10 +696,13 @@ internal class OwnerBackupController(
         if (current.destination != NativeOwnerMoreDestination.Backup || current.backupBusy) return
         runtime.state.value = current.copy(backupBusy = true, backupError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.confirmCloudRestore(session, ticket, confirm)
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Cloud backup restored on this phone")
                 runtime.endSession()
             } catch (error: Throwable) {
                 if (error is SecurityFailure.RecentAuthenticationRequired) {
@@ -695,7 +716,7 @@ internal class OwnerBackupController(
                         backupError = null,
                     )
                 } else {
-                    handleFailure(token, error)
+                    handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
                 }
             }
         }

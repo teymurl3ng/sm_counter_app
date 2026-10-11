@@ -1,0 +1,210 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.SyncIntegrityRegressionTest" tests="23" failures="18" errors="0" skipped="0" time="98.145" timestamp="2026-10-10T00:36:58" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-S921W - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="existingPartialLedgerIsFilledOnceWithoutReplacingHistory" classname="com.saaf.milkshop.SyncIntegrityRegressionTest" time="0.17" />
+  <testcase name="failedLedgerChildMustRollBackIncomingEvent" classname="com.saaf.milkshop.SyncIntegrityRegressionTest" time="0.077" />
+  <testcase name="deliveryWaitsForItsSaleInsteadOfDroppingTheLink" classname="com.saaf.milkshop.SyncIntegrityRegressionTest" time="0.188" />
+  <testcase name="lateDependencyMustRecoverAfterFiveUnrelatedBatches" classname="com.saaf.milkshop.SyncIntegrityRegressionTest" time="0.315" />
+  <testcase name="saleDiscardClearsRealFormBeforeLeaving" classname="com.saaf.milkshop.NativeGuardRegressionTest" time="4.797">
+    <failure>java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:157)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.TextActionsKt.getNodeAndFocus(TextActions.kt:124)
+at androidx.compose.ui.test.TextActionsKt.getNodeAndFocus$default(TextActions.kt:119)
+at androidx.compose.ui.test.TextActionsKt.performTextReplacement(TextActions.kt:82)
+at com.saaf.milkshop.NativeGuardRegressionTest.saleDiscardClearsRealFormBeforeLeaving(NativeGuardRegressionTest.kt:62)
+</failure>
+  </testcase>
+  <testcase name="outgoingPaneDisposalCannotClearIncomingGuard" classname="com.saaf.milkshop.NativeGuardRegressionTest" time="10.342" />
+  <testcase name="saleFollowUpCreatesBornLinkedDelivery" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="4.371">
+    <failure>java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:157)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.scrollToMatchingDescendantOrReturnScrollable(Actions.kt:277)
+at androidx.compose.ui.test.ActionsKt.performScrollToNode(Actions.kt:236)
+at com.saaf.milkshop.NativeSaleScreenContractTest.saleFollowUpCreatesBornLinkedDelivery(NativeSaleScreenContractTest.kt:134)
+</failure>
+  </testcase>
+  <testcase name="saleFollowUpClearsAfterSent" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="4.206">
+    <failure>java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:157)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.scrollToMatchingDescendantOrReturnScrollable(Actions.kt:277)
+at androidx.compose.ui.test.ActionsKt.performScrollToNode(Actions.kt:236)
+at com.saaf.milkshop.NativeSaleScreenContractTest.saleFollowUpClearsAfterSent(NativeSaleScreenContractTest.kt:164)
+</failure>
+  </testcase>
+  <testcase name="saleWholesaleRateAndNoteStayEditable" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="4.246">
+    <failure>java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:157)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+at com.saaf.milkshop.NativeSaleScreenContractTest.saleWholesaleRateAndNoteStayEditable(NativeSaleScreenContractTest.kt:193)
+</failure>
+  </testcase>
+  <testcase name="saleChequeNextReturnsToForm" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="4.208">
+    <failure>java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test$default(SemanticsNodeInteraction.kt:59)
+at androidx.compose.ui.test.AndroidAssertions_androidKt.checkIsDisplayed(AndroidAssertions.android.kt:29)
+at androidx.compose.ui.test.AssertionsKt.isDisplayed(Assertions.kt:351)
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:33)
+at com.saaf.milkshop.NativeSaleScreenContractTest.saleChequeNextReturnsToForm(NativeSaleScreenContractTest.kt:211)
+</failure>
+  </testcase>
+  <testcase name="salePaymentPickerCancelsAndChangesDestination" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="4.262">
+    <failure>java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:157)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+at com.saaf.milkshop.NativeSaleScreenContractTest.salePaymentPickerCancelsAndChangesDestination(NativeSaleScreenContractTest.kt:177)
+</failure>
+  </testcase>
+  <testcase name="saleFollowUpOffersDeliveryForCreditSale" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="4.238">
+    <failure>java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:157)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.scrollToMatchingDescendantOrReturnScrollable(Actions.kt:277)
+at androidx.compose.ui.test.ActionsKt.performScrollToNode(Actions.kt:236)
+at com.saaf.milkshop.NativeSaleScreenContractTest.saleFollowUpOffersDeliveryForCreditSale(NativeSaleScreenContractTest.kt:98)
+</failure>
+  </testcase>
+  <testcase name="saleLoadFailureRetryChangesToVisibleLoadingState" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="4.278">
+    <failure>java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test$default(SemanticsNodeInteraction.kt:59)
+at androidx.compose.ui.test.AndroidAssertions_androidKt.checkIsDisplayed(AndroidAssertions.android.kt:29)
+at androidx.compose.ui.test.AssertionsKt.isDisplayed(Assertions.kt:351)
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:33)
+at com.saaf.milkshop.NativeSaleScreenContractTest.saleLoadFailureRetryChangesToVisibleLoadingState(NativeSaleScreenContractTest.kt:69)
+</failure>
+  </testcase>
+  <testcase name="syncNowPullsAndPushes" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="4.294">
+    <failure>java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:157)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+at com.saaf.milkshop.NativeOwnerMoreScreenContractTest.syncNowPullsAndPushes(NativeOwnerMoreScreenContractTest.kt:500)
+</failure>
+  </testcase>
+  <testcase name="backupOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="4.236">
+    <failure>java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:157)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+at com.saaf.milkshop.NativeOwnerMoreScreenContractTest.backupOpensFromMenu(NativeOwnerMoreScreenContractTest.kt:195)
+</failure>
+  </testcase>
+  <testcase name="takeServerDropsEntrySoParkApplies" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="4.27">
+    <failure>java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:157)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+at com.saaf.milkshop.NativeOwnerMoreScreenContractTest.takeServerDropsEntrySoParkApplies(NativeOwnerMoreScreenContractTest.kt:576)
+</failure>
+  </testcase>
+  <testcase name="unenrollOpensConfirm" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="4.235">
+    <failure>java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:157)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+at com.saaf.milkshop.NativeOwnerMoreScreenContractTest.unenrollOpensConfirm(NativeOwnerMoreScreenContractTest.kt:608)
+</failure>
+  </testcase>
+  <testcase name="enrollConnectsPhone" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="4.299">
+    <failure>java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:157)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+at com.saaf.milkshop.NativeOwnerMoreScreenContractTest.enrollConnectsPhone(NativeOwnerMoreScreenContractTest.kt:642)
+</failure>
+  </testcase>
+  <testcase name="personalSecurityOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="4.235">
+    <failure>java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:157)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+at com.saaf.milkshop.NativeOwnerMoreScreenContractTest.personalSecurityOpensFromMenu(NativeOwnerMoreScreenContractTest.kt:208)
+</failure>
+  </testcase>
+  <testcase name="confirmStopsSyncing" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="4.132">
+    <failure>java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:157)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+at com.saaf.milkshop.NativeOwnerMoreScreenContractTest.confirmStopsSyncing(NativeOwnerMoreScreenContractTest.kt:625)
+</failure>
+  </testcase>
+  <testcase name="shopPickCompletesEnrollment" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="4.268">
+    <failure>java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:157)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+at com.saaf.milkshop.NativeOwnerMoreScreenContractTest.shopPickCompletesEnrollment(NativeOwnerMoreScreenContractTest.kt:688)
+</failure>
+  </testcase>
+  <testcase name="loadingShowsWhileStatusLoads" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="4.247">
+    <failure>java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test$default(SemanticsNodeInteraction.kt:59)
+at androidx.compose.ui.test.AndroidAssertions_androidKt.checkIsDisplayed(AndroidAssertions.android.kt:29)
+at androidx.compose.ui.test.AssertionsKt.isDisplayed(Assertions.kt:351)
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:33)
+at com.saaf.milkshop.NativeOwnerMoreScreenContractTest.loadingShowsWhileStatusLoads(NativeOwnerMoreScreenContractTest.kt:485)
+</failure>
+  </testcase>
+  <testcase name="menuShowsJourneyGroupsWithoutCashierChrome" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="2.695">
+    <failure></failure>
+  </testcase>
+  <system-err>Test run failed to complete. Instrumentation run failed due to Process crashed.
+</system-err>
+</testsuite>

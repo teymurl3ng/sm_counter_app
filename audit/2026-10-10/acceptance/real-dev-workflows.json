@@ -1,0 +1,97 @@
+{
+  "started_at": "2026-10-10T12:00:27.228042+00:00",
+  "environment": "dev",
+  "checks": [
+    {
+      "name": "independent_real_auth_session",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "owner_viewer_login_a",
+      "passed": true
+    },
+    {
+      "name": "owner_viewer_login_b",
+      "passed": true
+    },
+    {
+      "name": "viewer_logout_a",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "logged_out_viewer_denied",
+      "passed": true,
+      "http_status": 401
+    },
+    {
+      "name": "other_viewer_session_survives",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "independent_refresh_survives_viewer_logout",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "owner_enables_existing_disposable_fixture",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "disposable_staff_real_login",
+      "passed": true
+    },
+    {
+      "name": "independent_staff_session_for_mutation_check",
+      "passed": true
+    },
+    {
+      "name": "active_staff_protected_read",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "owner_disables_disposable_staff",
+      "passed": true,
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "name": "disabled_existing_session_protected_read_denied",
+      "passed": true,
+      "http_status": 401,
+      "error_code": "UNAUTHORIZED"
+    },
+    {
+      "name": "disabled_session_mutation_denied",
+      "passed": true,
+      "http_status": 401,
+      "error_code": "UNAUTHORIZED"
+    },
+    {
+      "name": "disabled_staff_new_login_denied",
+      "passed": true,
+      "http_status": 403,
+      "error_code": null
+    },
+    {
+      "name": "last_active_owner_disable_refused",
+      "passed": true,
+      "http_status": 409,
+      "error_code": "LAST_OWNER"
+    },
+    {
+      "name": "real_reconciliation_endpoint_quiescent",
+      "passed": true,
+      "http_status": 200,
+      "processed": 0,
+      "resolved": 0
+    }
+  ],
+  "fixture_reused": true,
+  "outcome": "pass",
+  "finished_at": "2026-10-10T12:00:33.794679+00:00"
+}

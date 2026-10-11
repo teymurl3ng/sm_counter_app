@@ -31,6 +31,11 @@ sealed interface NativeOperationsAttendanceStatus {
     data class Marked(val statusLabel: String) : NativeOperationsAttendanceStatus
 }
 
+interface NativeOperationsWorkOperations {
+    suspend fun load(sessionHandle: String, date: LocalDate = BusinessClock.today()): NativeOperationsWorkContext
+}
+
+
 /**
  * Operations Work-home boundary: physical context only for choosing the next job.
  * Never returns rates, payables, margins, or financial loss values.
@@ -38,10 +43,10 @@ sealed interface NativeOperationsAttendanceStatus {
 class NativeOperationsWorkFacade(
     private val database: MilkShopDatabase,
     private val security: UserSecurityService,
-) {
-    suspend fun load(
+) : NativeOperationsWorkOperations {
+    override suspend fun load(
         sessionHandle: String,
-        date: LocalDate = BusinessClock.today(),
+        date: LocalDate,
     ): NativeOperationsWorkContext {
         val actor = security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
         val businessDate = date.toString()

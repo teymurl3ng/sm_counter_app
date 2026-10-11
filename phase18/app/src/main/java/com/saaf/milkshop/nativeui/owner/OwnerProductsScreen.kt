@@ -1,6 +1,8 @@
 package com.saaf.milkshop.nativeui.owner
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,6 +35,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
+import com.saaf.milkshop.nativeui.common.nativeListItem
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,8 +69,119 @@ import java.util.Locale
  * Owner Products — active/archived catalog list + detail + create/edit/archive/unarchive under OwnerScaffold.
  * Nested from Owner More; never mounts foreign role chrome.
  */
+private data class OwnerProductsScreenSnapshot(
+    val identity: NativeSignedInIdentity,
+    val context: NativeOwnerMoreContext,
+    val products: List<NativeOwnerProductRow>,
+    val productsLoading: Boolean,
+    val productsShowArchived: Boolean,
+    val productDetail: NativeOwnerProductDetail?,
+    val productCreateOpen: Boolean,
+    val productCreating: Boolean,
+    val productEditOpen: Boolean,
+    val productUpdating: Boolean,
+    val productArchiving: Boolean,
+    val productUnarchiving: Boolean,
+    val productsError: String?,
+    val showHeader: Boolean,
+)
+
 @Composable
 fun OwnerProductsScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    context: NativeOwnerMoreContext,
+    products: List<NativeOwnerProductRow>,
+    productsLoading: Boolean,
+    productsShowArchived: Boolean,
+    productDetail: NativeOwnerProductDetail?,
+    productCreateOpen: Boolean,
+    productCreating: Boolean,
+    productEditOpen: Boolean,
+    productUpdating: Boolean,
+    productArchiving: Boolean,
+    productUnarchiving: Boolean,
+    productsError: String?,
+    onBackToMenu: () -> Unit,
+    onRetry: () -> Unit,
+    onShowArchivedChange: (Boolean) -> Unit,
+    onOpenProduct: (Long) -> Unit,
+    onBackFromDetail: () -> Unit,
+    onOpenCreate: () -> Unit,
+    onBackFromCreate: () -> Unit,
+    onCreateProduct: (ProductCatalogInput) -> Unit,
+    onOpenEdit: () -> Unit,
+    onBackFromEdit: () -> Unit,
+    onUpdateProduct: (ProductCatalogInput) -> Unit,
+    onArchiveProduct: () -> Unit,
+    onUnarchiveProduct: () -> Unit,
+    hostedScaffold: HostedScaffold,
+    showHeader: Boolean = true,
+    modifier: Modifier = Modifier,
+) {
+    val snapshot = OwnerProductsScreenSnapshot(
+        identity = identity,
+        context = context,
+        products = products,
+        productsLoading = productsLoading,
+        productsShowArchived = productsShowArchived,
+        productDetail = productDetail,
+        productCreateOpen = productCreateOpen,
+        productCreating = productCreating,
+        productEditOpen = productEditOpen,
+        productUpdating = productUpdating,
+        productArchiving = productArchiving,
+        productUnarchiving = productUnarchiving,
+        productsError = productsError,
+        showHeader = showHeader,
+    )
+    com.saaf.milkshop.nativeui.common.NativeSectionTransition(
+        targetState = snapshot,
+        contentKey = { pane -> when {
+            pane.productCreateOpen -> "create"
+            pane.productEditOpen -> "edit"
+            pane.productDetail != null -> "detail:${pane.productDetail.row.productId}"
+            else -> "list"
+        } },
+        modifier = modifier,
+    ) { pane ->
+        OwnerProductsScreenPane(
+            snackbarHostState = snackbarHostState,
+            identity = pane.identity,
+            context = pane.context,
+            products = pane.products,
+            productsLoading = pane.productsLoading,
+            productsShowArchived = pane.productsShowArchived,
+            productDetail = pane.productDetail,
+            productCreateOpen = pane.productCreateOpen,
+            productCreating = pane.productCreating,
+            productEditOpen = pane.productEditOpen,
+            productUpdating = pane.productUpdating,
+            productArchiving = pane.productArchiving,
+            productUnarchiving = pane.productUnarchiving,
+            productsError = pane.productsError,
+            onBackToMenu = onBackToMenu,
+            onRetry = onRetry,
+            onShowArchivedChange = onShowArchivedChange,
+            onOpenProduct = onOpenProduct,
+            onBackFromDetail = onBackFromDetail,
+            onOpenCreate = onOpenCreate,
+            onBackFromCreate = onBackFromCreate,
+            onCreateProduct = onCreateProduct,
+            onOpenEdit = onOpenEdit,
+            onBackFromEdit = onBackFromEdit,
+            onUpdateProduct = onUpdateProduct,
+            onArchiveProduct = onArchiveProduct,
+            onUnarchiveProduct = onUnarchiveProduct,
+            hostedScaffold = hostedScaffold,
+            showHeader = pane.showHeader,
+            modifier = modifier,
+        )
+    }
+}
+
+@Composable
+private fun OwnerProductsScreenPane(
     snackbarHostState: SnackbarHostState,
     identity: NativeSignedInIdentity,
     context: NativeOwnerMoreContext,
@@ -194,7 +309,7 @@ fun OwnerProductsScreen(
                         )
                         Spacer(Modifier.height(16.dp))
                         Button(
-                            onClick = onRetry,
+                            onClick = hapticAction(onRetry),
                             modifier = Modifier.testTag(NativeUiTags.OwnerProductsRetry),
                         ) { Text("Try again") }
                     }
@@ -210,7 +325,7 @@ fun OwnerProductsScreen(
                         ) {
                             if (!productsShowArchived) {
                                 TextButton(
-                                    onClick = onOpenCreate,
+                                    onClick = hapticAction(onOpenCreate),
                                     modifier = Modifier.testTag(NativeUiTags.OwnerProductsCreateOpen),
                                 ) { Text("Add product") }
                             }
@@ -223,14 +338,14 @@ fun OwnerProductsScreen(
                         ) {
                             FilterChip(
                                 selected = !productsShowArchived,
-                                onClick = { onShowArchivedChange(false) },
+                                onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction { onShowArchivedChange(false) },
                                 enabled = !productsLoading,
                                 label = { Text("Active") },
                                 modifier = Modifier.testTag(NativeUiTags.OwnerProductsFilterActive),
                             )
                             FilterChip(
                                 selected = productsShowArchived,
-                                onClick = { onShowArchivedChange(true) },
+                                onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction { onShowArchivedChange(true) },
                                 enabled = !productsLoading,
                                 label = { Text("Archived") },
                                 modifier = Modifier.testTag(NativeUiTags.OwnerProductsFilterArchived),
@@ -267,14 +382,14 @@ fun OwnerProductsScreen(
                             LazyColumn(
                                 Modifier
                                     .fillMaxSize()
+                                    .padding(horizontal = 16.dp)
                                     .testTag(NativeUiTags.OwnerProductsList),
                             ) {
                                 items(products, key = { it.productId }) { product ->
                                     OwnerProductRow(
                                         product = product,
-                                        onClick = { onOpenProduct(product.productId) },
+                                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenProduct(product.productId) },
                                     )
-                                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                                 }
                             }
                         }
@@ -435,7 +550,7 @@ private fun OwnerProductsFormScreen(
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterChip(
                             selected = unit == "Liters",
-                            onClick = {
+                            onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                                 unit = "Liters"
                                 draftTouched = true
                             },
@@ -445,7 +560,7 @@ private fun OwnerProductsFormScreen(
                         )
                         FilterChip(
                             selected = unit == "Kg",
-                            onClick = {
+                            onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                                 unit = "Kg"
                                 draftTouched = true
                             },
@@ -514,8 +629,8 @@ private fun OwnerProductsFormScreen(
                         )
                     }
                     Button(
-                        onClick = {
-                            if (!canSave) return@Button
+                        onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
+                            if (!canSave) return@hapticCommitAction
                             onSave(
                                 ProductCatalogInput(
                                     name = name,
@@ -546,7 +661,7 @@ private fun OwnerProductsFormScreen(
                         }
                     }
                     TextButton(
-                        onClick = { requestLeave(onBack) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { requestLeave(onBack) },
                         enabled = !saving,
                         modifier = Modifier.testTag(tags.cancel),
                     ) { Text("Cancel") }
@@ -592,13 +707,13 @@ private fun OwnerProductsFormDiscardDialog(
         },
         confirmButton = {
             TextButton(
-                onClick = leaveGuard::confirmDiscard,
+                onClick = hapticAction(leaveGuard::confirmDiscard),
                 modifier = Modifier.testTag(discardTag),
             ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(
-                onClick = leaveGuard::keepEditing,
+                onClick = hapticAction(leaveGuard::keepEditing),
                 modifier = Modifier.testTag(keepTag),
             ) { Text("Keep editing") }
         },
@@ -675,7 +790,7 @@ private fun OwnerProductsDetailScreen(
                 }
                 if (row.archived) {
                     Button(
-                        onClick = { unarchiveConfirmOpen = true },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { unarchiveConfirmOpen = true },
                         enabled = !busy,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -692,14 +807,14 @@ private fun OwnerProductsDetailScreen(
                     }
                 } else {
                     Button(
-                        onClick = onOpenEdit,
+                        onClick = hapticAction(onOpenEdit),
                         enabled = !busy,
                         modifier = Modifier
                             .fillMaxWidth()
                             .testTag(NativeUiTags.OwnerProductsDetailEdit),
                     ) { Text("Edit product") }
                     TextButton(
-                        onClick = { archiveConfirmOpen = true },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { archiveConfirmOpen = true },
                         enabled = !busy,
                         modifier = Modifier.testTag(NativeUiTags.OwnerProductsDetailArchive),
                     ) {
@@ -729,7 +844,7 @@ private fun OwnerProductsDetailScreen(
             },
             confirmButton = {
                 TextButton(
-                    onClick = {
+                    onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction {
                         archiveConfirmOpen = false
                         onArchive()
                     },
@@ -739,7 +854,7 @@ private fun OwnerProductsDetailScreen(
             },
             dismissButton = {
                 TextButton(
-                    onClick = { archiveConfirmOpen = false },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { archiveConfirmOpen = false },
                     enabled = !busy,
                     modifier = Modifier.testTag(NativeUiTags.OwnerProductsArchiveCancel),
                 ) { Text("Cancel") }
@@ -759,7 +874,7 @@ private fun OwnerProductsDetailScreen(
             },
             confirmButton = {
                 TextButton(
-                    onClick = {
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                         unarchiveConfirmOpen = false
                         onUnarchive()
                     },
@@ -769,7 +884,7 @@ private fun OwnerProductsDetailScreen(
             },
             dismissButton = {
                 TextButton(
-                    onClick = { unarchiveConfirmOpen = false },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { unarchiveConfirmOpen = false },
                     enabled = !busy,
                     modifier = Modifier.testTag(NativeUiTags.OwnerProductsUnarchiveCancel),
                 ) { Text("Cancel") }
@@ -785,11 +900,10 @@ private fun OwnerProductRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 72.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Entity)
             .semantics { role = Role.Button }
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .clickable(onClick = hapticAction(onClick))
+            .nativeListItemContent(NativeListStyle.Entity)
             .testTag(NativeUiTags.ownerProduct(product.productId)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),

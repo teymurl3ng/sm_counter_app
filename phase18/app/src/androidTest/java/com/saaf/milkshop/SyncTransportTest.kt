@@ -88,6 +88,20 @@ class SyncTransportTest {
     private fun tokenBody() =
         """{"access_token":"jwt-token-1","refresh_token":"refresh-1","expires_in":3600,"server_time_epoch_ms":1800000000000}"""
 
+    @Test
+    fun malformedPushAcknowledgementsKeepQueuedWork() = runBlocking {
+        val db = MilkShopDatabase.createInMemory()
+        try {
+            SyncTokenStore(context).save(SyncTokenStore.Session("test", null, null))
+            val envelope = JSONObject().put("table", "products").put("uid", "test").put("payload", JSONObject())
+            for (body in listOf("", "garbage", "{}", "{\"ok\":\"true\"}")) {
+                val http = FakeSyncHttp().apply { handler = { SyncHttpResponse(200, body.toByteArray()) } }
+                assertEquals(SyncPushResult.Transient("malformed_response"),
+                    SyncServerClient(http, config, db, SyncTokenStore(context)).push(listOf(envelope), emptyList()))
+            }
+        } finally { db.close() }
+    }
+
     private fun profileBody(active: Boolean = true) = """
         {"staff_id":"11111111-1111-4111-8111-111111111111","username":"owner","display_name":"Owner",
          "role":"owner","active":$active,"terminated_at":null,"business_id":"22222222-2222-4222-8222-222222222222",

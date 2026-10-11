@@ -1,0 +1,10 @@
+pair	foreground	background	contrast	purpose
+light ink/background	17201B	F4F1E8	14.770455815416918	text
+light muted/background	68726C	F4F1E8	4.414442042108975	text
+light muted/surface	68726C	FFFDF7	4.901426017589143	text
+light muted/surfaceVariant	68726C	EBE7DC	4.035124187240683	text
+light surface/background	FFFDF7	F4F1E8	1.1103160877036942	surface separation, not a WCAG text test
+light outlineVariant/background	E6E1D7	F4F1E8	1.1537628548003926	divider, not automatically a required 3:1 control boundary
+light outline/background	D6D0C3	F4F1E8	1.360242509822943	boundary signal
+dark onSurfaceVariant/background	C5CEC8	101713	11.296952265838813	text
+dark surface/background	18211C	101713	1.103254419124088	surface separation

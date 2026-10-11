@@ -1,6 +1,8 @@
 package com.saaf.milkshop.nativeui.owner
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +32,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
+import com.saaf.milkshop.nativeui.common.nativeListItem
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,8 +69,142 @@ import java.util.Locale
  * Owner Users & roles — staff login list + detail + enroll / enable / role change
  * under HostedScaffold (Owner More or Admin People). distinct from Employees salary accounts.
  */
+private data class OwnerUsersRolesScreenSnapshot(
+    val identity: NativeSignedInIdentity,
+    val context: NativeOwnerMoreContext,
+    val users: List<NativeOwnerUserRow>,
+    val usersLoading: Boolean,
+    val userDetail: NativeOwnerUserDetail?,
+    val userEnrollOpen: Boolean,
+    val userEnrollPending: NativeOwnerPendingEnrollment?,
+    val userEnrollBusy: Boolean,
+    val userRoleChangeOpen: Boolean,
+    val userRoleChanging: Boolean,
+    val userEnableConfirmOpen: Boolean,
+    val userEnableBusy: Boolean,
+    val userReauthOpen: Boolean,
+    val userReauthBusy: Boolean,
+    val usersError: String?,
+    val enrollableRoles: List<AppRole>,
+    val showHeader: Boolean,
+)
+
 @Composable
 fun OwnerUsersRolesScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    context: NativeOwnerMoreContext,
+    users: List<NativeOwnerUserRow>,
+    usersLoading: Boolean,
+    userDetail: NativeOwnerUserDetail?,
+    userEnrollOpen: Boolean,
+    userEnrollPending: NativeOwnerPendingEnrollment?,
+    userEnrollBusy: Boolean,
+    userRoleChangeOpen: Boolean,
+    userRoleChanging: Boolean,
+    userEnableConfirmOpen: Boolean,
+    userEnableBusy: Boolean,
+    userReauthOpen: Boolean,
+    userReauthBusy: Boolean,
+    usersError: String?,
+    enrollableRoles: List<AppRole>,
+    onBackToMenu: () -> Unit,
+    onRetry: () -> Unit,
+    onOpenUser: (Long) -> Unit,
+    onBackFromDetail: () -> Unit,
+    onOpenEnroll: () -> Unit,
+    onBackFromEnroll: () -> Unit,
+    onBeginEnroll: (loginName: String, displayName: String, roleWire: String) -> Unit,
+    onCompleteEnroll: (passphrase: CharArray, confirmation: CharArray) -> Unit,
+    onOpenRoleChange: () -> Unit,
+    onBackFromRoleChange: () -> Unit,
+    onChangeRole: (String) -> Unit,
+    onRequestSetEnabled: (Boolean) -> Unit,
+    onConfirmSetEnabled: () -> Unit,
+    onCancelSetEnabled: () -> Unit,
+    onBeginCredentialReset: () -> Unit = {},
+    onResumeCredentialSetup: () -> Unit = {},
+    onSubmitReauth: (CharArray) -> Unit,
+    onCancelReauth: () -> Unit,
+    hostedScaffold: HostedScaffold,
+    showHeader: Boolean = true,
+    modifier: Modifier = Modifier,
+) {
+    val paneSnapshot = OwnerUsersRolesScreenSnapshot(
+        identity = identity,
+        context = context,
+        users = users,
+        usersLoading = usersLoading,
+        userDetail = userDetail,
+        userEnrollOpen = userEnrollOpen,
+        userEnrollPending = userEnrollPending,
+        userEnrollBusy = userEnrollBusy,
+        userRoleChangeOpen = userRoleChangeOpen,
+        userRoleChanging = userRoleChanging,
+        userEnableConfirmOpen = userEnableConfirmOpen,
+        userEnableBusy = userEnableBusy,
+        userReauthOpen = userReauthOpen,
+        userReauthBusy = userReauthBusy,
+        usersError = usersError,
+        enrollableRoles = enrollableRoles,
+        showHeader = showHeader,
+    )
+    com.saaf.milkshop.nativeui.common.NativeSectionTransition(
+        targetState = paneSnapshot,
+        contentKey = { pane -> when {
+            pane.userEnrollOpen && pane.userEnrollPending != null -> "credentials"
+            pane.userEnrollOpen -> "enroll"
+            pane.userRoleChangeOpen -> "role"
+            pane.userDetail != null -> "user-detail"
+            else -> "home"
+        } },
+        modifier = modifier,
+    ) { pane ->
+        OwnerUsersRolesScreenPane(
+            snackbarHostState = snackbarHostState,
+            identity = pane.identity,
+            context = pane.context,
+            users = pane.users,
+            usersLoading = pane.usersLoading,
+            userDetail = pane.userDetail,
+            userEnrollOpen = pane.userEnrollOpen,
+            userEnrollPending = pane.userEnrollPending,
+            userEnrollBusy = pane.userEnrollBusy,
+            userRoleChangeOpen = pane.userRoleChangeOpen,
+            userRoleChanging = pane.userRoleChanging,
+            userEnableConfirmOpen = pane.userEnableConfirmOpen,
+            userEnableBusy = pane.userEnableBusy,
+            userReauthOpen = pane.userReauthOpen,
+            userReauthBusy = pane.userReauthBusy,
+            usersError = pane.usersError,
+            enrollableRoles = pane.enrollableRoles,
+            onBackToMenu = onBackToMenu,
+            onRetry = onRetry,
+            onOpenUser = onOpenUser,
+            onBackFromDetail = onBackFromDetail,
+            onOpenEnroll = onOpenEnroll,
+            onBackFromEnroll = onBackFromEnroll,
+            onBeginEnroll = onBeginEnroll,
+            onCompleteEnroll = onCompleteEnroll,
+            onOpenRoleChange = onOpenRoleChange,
+            onBackFromRoleChange = onBackFromRoleChange,
+            onChangeRole = onChangeRole,
+            onRequestSetEnabled = onRequestSetEnabled,
+            onConfirmSetEnabled = onConfirmSetEnabled,
+            onCancelSetEnabled = onCancelSetEnabled,
+            onBeginCredentialReset = onBeginCredentialReset,
+            onResumeCredentialSetup = onResumeCredentialSetup,
+            onSubmitReauth = onSubmitReauth,
+            onCancelReauth = onCancelReauth,
+            hostedScaffold = hostedScaffold,
+            showHeader = pane.showHeader,
+            modifier = modifier,
+        )
+    }
+}
+
+@Composable
+private fun OwnerUsersRolesScreenPane(
     snackbarHostState: SnackbarHostState,
     identity: NativeSignedInIdentity,
     context: NativeOwnerMoreContext,
@@ -226,7 +364,7 @@ fun OwnerUsersRolesScreen(
                         )
                         Spacer(Modifier.height(16.dp))
                         Button(
-                            onClick = onRetry,
+                            onClick = hapticAction(onRetry),
                             modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesRetry),
                         ) { Text("Try again") }
                     }
@@ -241,7 +379,7 @@ fun OwnerUsersRolesScreen(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             TextButton(
-                                onClick = onOpenEnroll,
+                                onClick = hapticAction(onOpenEnroll),
                                 modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesEnroll),
                             ) { Text("Enroll user") }
                         }
@@ -272,14 +410,14 @@ fun OwnerUsersRolesScreen(
                             LazyColumn(
                                 Modifier
                                     .fillMaxSize()
-                                    .testTag(NativeUiTags.OwnerUsersRolesList),
+                                    .padding(horizontal = 16.dp)
+                    .testTag(NativeUiTags.OwnerUsersRolesList),
                             ) {
                                 items(users, key = { it.userId }) { user ->
                                     OwnerUserRow(
                                         user = user,
-                                        onClick = { onOpenUser(user.userId) },
+                                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenUser(user.userId) },
                                     )
-                                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                                 }
                             }
                         }
@@ -356,7 +494,7 @@ private fun OwnerUsersRolesDetailScreen(
                     )
                 }
                 Button(
-                    onClick = onOpenRoleChange,
+                    onClick = hapticAction(onOpenRoleChange),
                     enabled = !enableBusy,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -364,7 +502,7 @@ private fun OwnerUsersRolesDetailScreen(
                 ) { Text("Change role") }
                 if (row.enabled) {
                     Button(
-                        onClick = { onRequestSetEnabled(false) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onRequestSetEnabled(false) },
                         enabled = !enableBusy,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -372,7 +510,7 @@ private fun OwnerUsersRolesDetailScreen(
                     ) { Text(if (enableBusy) "Working…" else "Disable user") }
                 } else {
                     Button(
-                        onClick = { onRequestSetEnabled(true) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onRequestSetEnabled(true) },
                         enabled = !enableBusy,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -380,7 +518,7 @@ private fun OwnerUsersRolesDetailScreen(
                     ) { Text(if (enableBusy) "Working…" else "Enable user") }
                 }
                 Button(
-                    onClick = onBeginCredentialReset,
+                    onClick = hapticAction(onBeginCredentialReset),
                     enabled = !enableBusy,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -388,7 +526,7 @@ private fun OwnerUsersRolesDetailScreen(
                 ) { Text("Reset credentials") }
                 if (row.setupRequired) {
                     Button(
-                        onClick = onResumeCredentialSetup,
+                        onClick = hapticAction(onResumeCredentialSetup),
                         enabled = !enableBusy,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -421,7 +559,7 @@ private fun OwnerUsersRolesDetailScreen(
             },
             confirmButton = {
                 TextButton(
-                    onClick = onConfirmSetEnabled,
+                    onClick = hapticAction(onConfirmSetEnabled),
                     enabled = !enableBusy,
                     modifier = Modifier.testTag(
                         if (enabling) {
@@ -434,7 +572,7 @@ private fun OwnerUsersRolesDetailScreen(
             },
             dismissButton = {
                 TextButton(
-                    onClick = onCancelSetEnabled,
+                    onClick = hapticAction(onCancelSetEnabled),
                     enabled = !enableBusy,
                     modifier = Modifier.testTag(
                         if (enabling) {
@@ -568,7 +706,7 @@ private fun OwnerUsersRolesEnrollIdentityScreen(
                         )
                     }
                     Button(
-                        onClick = { onSave(loginName, displayName, roleWire) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction { onSave(loginName, displayName, roleWire) },
                         enabled = canSave,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -695,10 +833,10 @@ private fun OwnerUsersRolesEnrollPassphraseScreen(
                         )
                     }
                     Button(
-                        onClick = {
+                        onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
                             if (passphrase != confirmation) {
                                 localError = "Passphrases do not match"
-                                return@Button
+                                return@hapticCommitAction
                             }
                             val secret = passphrase.toCharArray()
                             val confirm = confirmation.toCharArray()
@@ -809,7 +947,7 @@ private fun OwnerUsersRolesRoleChangeScreen(
                         )
                     }
                     Button(
-                        onClick = { onSave(roleWire) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction { onSave(roleWire) },
                         enabled = canSave,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -861,8 +999,8 @@ private fun OwnerUsersRolesReauthDialog(
         },
         confirmButton = {
             TextButton(
-                onClick = {
-                    if (passphrase.isBlank()) return@TextButton
+                onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
+                    if (passphrase.isBlank()) return@hapticCommitAction
                     val secret = passphrase.toCharArray()
                     passphrase = ""
                     onConfirm(secret)
@@ -873,7 +1011,7 @@ private fun OwnerUsersRolesReauthDialog(
         },
         dismissButton = {
             TextButton(
-                onClick = onCancel,
+                onClick = hapticAction(onCancel),
                 enabled = !busy,
                 modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesReauthCancel),
             ) { Text("Cancel") }
@@ -898,7 +1036,7 @@ private fun OwnerRoleChipRow(
                 rowRoles.forEach { role ->
                     FilterChip(
                         selected = role.wireValue == selectedWire,
-                        onClick = { onSelect(role.wireValue) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(role.wireValue) },
                         enabled = enabled,
                         label = {
                             Text(
@@ -922,11 +1060,10 @@ private fun OwnerUserRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 72.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Entity)
             .semantics { role = Role.Button }
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .clickable(onClick = hapticAction(onClick))
+            .nativeListItemContent(NativeListStyle.Entity)
             .testTag(NativeUiTags.ownerUser(user.userId)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -981,13 +1118,13 @@ private fun OwnerUsersRolesDiscardDialog(
         text = { Text(body) },
         confirmButton = {
             TextButton(
-                onClick = leaveGuard::confirmDiscard,
+                onClick = hapticAction(leaveGuard::confirmDiscard),
                 modifier = Modifier.testTag(discardTag),
             ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(
-                onClick = leaveGuard::keepEditing,
+                onClick = hapticAction(leaveGuard::keepEditing),
                 modifier = Modifier.testTag(keepTag),
             ) { Text("Keep editing") }
         },

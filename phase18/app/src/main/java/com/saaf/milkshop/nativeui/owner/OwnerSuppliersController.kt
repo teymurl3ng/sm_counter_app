@@ -176,8 +176,13 @@ internal class OwnerSuppliersController(
         if (current.supplierCreating) return
         runtime.state.value = current.copy(supplierCreating = true, suppliersError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) { facade.createSupplier(session, name) }
+                runtime.updateCurrent(token, NativeOwnerMoreDestination.Suppliers) { it.copy(supplierCreateOpen = false, supplierCreating = false) }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Supplier added")
+                com.saaf.milkshop.nativeui.DataChangeBus.notifyDataChanged()
                 val snapshot = withContext(Dispatchers.IO) { facade.loadSuppliers(session) }
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
@@ -193,7 +198,7 @@ internal class OwnerSuppliersController(
                     suppliersLoading = false,
                 )
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, if (saved && error !is com.saaf.milkshop.domain.SecurityFailure) IllegalStateException("Saved on this phone. The latest list could not refresh; try Refresh.", error) else error)
             }
         }
     }
@@ -230,10 +235,15 @@ internal class OwnerSuppliersController(
         if (current.supplierUpdating) return
         runtime.state.value = current.copy(supplierUpdating = true, suppliersError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.updateSupplier(session, accountId, name, profile)
                 }
+                runtime.updateCurrent(token, NativeOwnerMoreDestination.Suppliers) { it.copy(supplierEditOpen = false, supplierUpdating = false) }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Supplier saved")
+                com.saaf.milkshop.nativeui.DataChangeBus.notifyDataChanged()
                 val detail = withContext(Dispatchers.IO) {
                     facade.loadDetail(session, accountId)
                 }
@@ -250,7 +260,7 @@ internal class OwnerSuppliersController(
                     suppliersLoading = false,
                 )
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, if (saved && error !is com.saaf.milkshop.domain.SecurityFailure) IllegalStateException("Saved on this phone. The latest list could not refresh; try Refresh.", error) else error)
             }
         }
     }

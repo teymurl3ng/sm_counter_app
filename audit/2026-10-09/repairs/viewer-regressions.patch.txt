@@ -1,0 +1,96 @@
+*** Begin Patch
+*** Add File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/lib/identity-create.ts
++import { isUuid } from "./admin-security";
++
++/** An HTTP error alone is not proof of rollback; compensate only a known rejection. */
++export function createOutcomeIsAmbiguous(result: {
++  kind: "ok" | "error" | "unauthorized" | "unreachable";
++  status?: number; data?: unknown; body?: unknown;
++}): boolean {
++  if (result.kind === "ok") return !isUuid(result.data);
++  if (result.kind === "unauthorized") return false;
++  if (result.kind === "unreachable") return true;
++  if (!result.status || result.status >= 500) return true;
++  const body = result.body;
++  const code = body && typeof body === "object" ? (body as Record<string, unknown>).code : null;
++  return typeof code !== "string" || !/^[0-9A-Z]{5}$/.test(code);
++}
+*** Add File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/lib/identity-create.test.ts
++import assert from "node:assert/strict";
++import { it } from "node:test";
++import { createOutcomeIsAmbiguous } from "./identity-create";
++it("retains identities after lost, malformed, proxy and server responses", () => {
++  for (const result of [
++    { kind: "unreachable" as const },
++    { kind: "ok" as const, data: null },
++    { kind: "error" as const, status: 502, body: {} },
++    { kind: "error" as const, status: 400, body: "proxy error" },
++    { kind: "error" as const, status: 429, body: {} },
++  ]) assert.equal(createOutcomeIsAmbiguous(result), true);
++});
++it("recognizes valid completion and definitive permission/SQL rejection", () => {
++  assert.equal(createOutcomeIsAmbiguous({kind: "ok", data: "11111111-1111-4111-8111-111111111111"}), false);
++  assert.equal(createOutcomeIsAmbiguous({kind: "unauthorized", status: 403}), false);
++  assert.equal(createOutcomeIsAmbiguous({kind: "error", status: 409, body: {code: "23505"}}), false);
++});
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/app/api/admin/create-staff/route.ts
+@@
+-import { classifyProviderFailure, classifyRpcFailure, isUuid, readAuthUserId, safeCorrelationId } from "@/lib/admin-security";
++import { classifyProviderFailure, classifyRpcFailure, readAuthUserId, safeCorrelationId } from "@/lib/admin-security";
++import { createOutcomeIsAmbiguous } from "@/lib/identity-create";
+@@
+-  if (rpcRes.kind === "unreachable" ||
+-      (rpcRes.kind === "error" && rpcRes.status >= 500) ||
+-      (rpcRes.kind === "ok" && !isUuid(rpcRes.data))) {
++  if (createOutcomeIsAmbiguous(rpcRes)) {
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/lib/viewer-cache.ts
+@@
+     const fresh = await networkGet(input.url);
++    if (activeSessionId || requestGeneration !== generation) return { status: 401, body: null, fromCache: false };
+     if (requestGeneration === generation && !activeSessionId && isAuthFailure(fresh.status)) clearViewerCache();
+*** Add File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/lib/viewer-cache-regression.test.ts
++import assert from "node:assert/strict";
++import { it } from "node:test";
++import { clearViewerCache, setViewerCacheSession, getViewerCacheSession, viewerCacheInvalidate, viewerCachePeek, viewerCachedGet } from "./viewer-cache";
++const input = {key: "staff", url: "/api/staff?limit=20", ttlMs: 30_000};
++it("invalidates logical keys by their actual request URLs", async () => {
++  const original = globalThis.fetch;
++  try {
++    clearViewerCache(); setViewerCacheSession("alice");
++    let calls = 0;
++    globalThis.fetch = async () => Response.json({version: ++calls});
++    await viewerCachedGet(input);
++    viewerCacheInvalidate(["/api/staff"]);
++    assert.equal(viewerCachePeek("staff"), null);
++    assert.deepEqual((await viewerCachedGet(input)).body, {version: 2});
++  } finally { globalThis.fetch = original; clearViewerCache(); }
++});
++it("a late old-session 401 cannot clear a new session", async () => {
++  const original = globalThis.fetch;
++  try {
++    clearViewerCache(); setViewerCacheSession("alice");
++    let finish!: (response: Response) => void;
++    globalThis.fetch = () => new Promise(resolve => { finish = resolve; });
++    const first = viewerCachedGet(input);
++    const joined = viewerCachedGet(input);
++    setViewerCacheSession("bob");
++    finish(Response.json({error: "expired"}, {status: 401}));
++    await Promise.all([first, joined]);
++    assert.equal(getViewerCacheSession(), "bob");
++  } finally { globalThis.fetch = original; clearViewerCache(); }
++});
++it("invalidation during a shared request refetches before publishing", async () => {
++  const original = globalThis.fetch;
++  try {
++    clearViewerCache(); setViewerCacheSession("alice");
++    let finish!: (response: Response) => void;
++    let calls = 0;
++    globalThis.fetch = () => ++calls === 1 ? new Promise(resolve => {finish = resolve;}) : Promise.resolve(Response.json({version: 2}));
++    const first = viewerCachedGet(input); const joined = viewerCachedGet(input);
++    viewerCacheInvalidate(["/api/staff"]);
++    finish(Response.json({version: 1}));
++    for (const result of await Promise.all([first, joined])) assert.deepEqual(result.body, {version: 2});
++    assert.deepEqual(viewerCachePeek("staff"), {version: 2});
++  } finally { globalThis.fetch = original; clearViewerCache(); }
++});
+*** End Patch

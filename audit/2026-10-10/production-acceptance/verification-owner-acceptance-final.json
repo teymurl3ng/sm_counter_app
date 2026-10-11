@@ -1,0 +1,32 @@
+{
+  "recorded_at_utc": "2026-10-10T14:53:57.099345+00:00",
+  "manual_confirmation": {
+    "source": "human reply in this chat",
+    "exact_reply": "all looks good",
+    "requested_check": "Published PROD Viewer login using existing PROD account and expected shop/staff information",
+    "method": "owner_confirmation",
+    "login_and_shop_staff_read_accepted": true,
+    "automated_browser_test": false
+  },
+  "immediate_prod_release_acceptance_complete": true,
+  "real_prod_phone_auth_and_sync_verified": true,
+  "production_admin_mutations_tested": false,
+  "previous_acceptance_artifacts_unchanged_except_appended_root_trackers": true,
+  "previous_manifests_preserved": true,
+  "current_artifact_and_report_sha256": {
+    "REPAIR_PLAN_2026-10-10.md": "341f13b55b753194754a5f070ba3ebd1e016b2b5a9a0daa159affffcd6906be5",
+    "PROJECT_AUDIT_2026-10-09.md": "c3c136fc3f855b1e87e4e8f66385f0257054079f8aa9ffd03af34c2eb8742570",
+    "audit/2026-10-10/production-acceptance/PROD_ACCEPTANCE_COMPLETE_2026-10-10.md": "8137e255e93172392ba47b381f33ca2f3738df1a98f645aa8c2283cc765624da",
+    "audit/2026-10-10/production-acceptance/verification-prod-phone-final.json": "9cff12c4c010e9db947a847c1a8e70769a911880a52f1c1ad24fcf1d785fa5de",
+    "audit/2026-10-10/releases/verification-release-final.json": "b279292d03853b8a69b411d72c440b0188efcd6d93b2389e25af212ef9d2e88b"
+  },
+  "remaining_separate_work": [
+    "Android source Git publication",
+    "Server CLI/DR source publication and live DR restore",
+    "Production admin-key mutation acceptance",
+    "Multi-phone and complete ledger-child convergence",
+    "Physical power-loss durability",
+    "Production motion budgets"
+  ],
+  "intentional_and_stale_decisions_preserved": true
+}

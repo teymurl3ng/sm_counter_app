@@ -1,0 +1,119 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.SyncRuntimeRecoveryRegressionTest" tests="97" failures="1" errors="0" skipped="0" time="93.95" timestamp="2026-10-10T00:29:04" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-S921W - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="offlineDisabledMalformedAndWrongShopNeverRenewGrace" classname="com.saaf.milkshop.SyncRuntimeRecoveryRegressionTest" time="0.199" />
+  <testcase name="unfinishedRestoreIdentityCannotUseOldStoredTokens" classname="com.saaf.milkshop.SyncRuntimeRecoveryRegressionTest" time="0.0" />
+  <testcase name="failedPartialRebaselineNeverPushesAndRestartsFromZero" classname="com.saaf.milkshop.SyncRuntimeRecoveryRegressionTest" time="0.49" />
+  <testcase name="existingPartialLedgerIsFilledOnceWithoutReplacingHistory" classname="com.saaf.milkshop.SyncIntegrityRegressionTest" time="0.133" />
+  <testcase name="failedLedgerChildMustRollBackIncomingEvent" classname="com.saaf.milkshop.SyncIntegrityRegressionTest" time="0.08" />
+  <testcase name="deliveryWaitsForItsSaleInsteadOfDroppingTheLink" classname="com.saaf.milkshop.SyncIntegrityRegressionTest" time="0.121">
+    <failure>java.util.NoSuchElementException: List is empty.
+at kotlin.collections.CollectionsKt___CollectionsKt.single(_Collections.kt:616)
+at com.saaf.milkshop.SyncIntegrityRegressionTest$deliveryWaitsForItsSaleInsteadOfDroppingTheLink$1.invokeSuspend(SyncIntegrityRegressionTest.kt:57)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at com.saaf.milkshop.SyncIntegrityRegressionTest.deliveryWaitsForItsSaleInsteadOfDroppingTheLink(SyncIntegrityRegressionTest.kt:40)
+</failure>
+  </testcase>
+  <testcase name="lateDependencyMustRecoverAfterFiveUnrelatedBatches" classname="com.saaf.milkshop.SyncIntegrityRegressionTest" time="0.187" />
+  <testcase name="drainsInStrictOrder_andEmptiesTheQueue" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.184" />
+  <testcase name="schedulerKick_recordsWorkWaiting" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.006" />
+  <testcase name="editDuringUploadKeepsItsOutboxMarker" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.056" />
+  <testcase name="transientAfterProgressStillRequestsRetry" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.082" />
+  <testcase name="permanentFailure_haltsAtHead_andResumesAfterFix" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.517" />
+  <testcase name="transientFailure_leavesQueueIntactForRetry" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.107" />
+  <testcase name="missingTransport_isANoOp" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.031" />
+  <testcase name="ambiguousShop_withoutChoice_listsShops_andSavesNothing" classname="com.saaf.milkshop.SyncEnrollmentTest" time="0.031" />
+  <testcase name="unenroll_clearsEverything" classname="com.saaf.milkshop.SyncEnrollmentTest" time="0.057" />
+  <testcase name="enrollment_persistsBindingSessionConfig_andSetsZone" classname="com.saaf.milkshop.SyncEnrollmentTest" time="0.164" />
+  <testcase name="failedEnrollment_leavesZeroState" classname="com.saaf.milkshop.SyncEnrollmentTest" time="0.003" />
+  <testcase name="serverClient_classifiesOutcomes_andAnchorsTime" classname="com.saaf.milkshop.SyncTransportTest" time="0.189" />
+  <testcase name="malformedPushAcknowledgementsKeepQueuedWork" classname="com.saaf.milkshop.SyncTransportTest" time="0.083" />
+  <testcase name="signIn_allowed_carriesIdentityAndAnchorsTime" classname="com.saaf.milkshop.SyncTransportTest" time="0.006" />
+  <testcase name="serverConfig_storeRoundTrips" classname="com.saaf.milkshop.SyncTransportTest" time="0.004" />
+  <testcase name="tokenStore_roundTripsUnderKeystoreEncryption" classname="com.saaf.milkshop.SyncTransportTest" time="0.006" />
+  <testcase name="signIn_unknownOutcomes_neverBecomeIdentityDecisions" classname="com.saaf.milkshop.SyncTransportTest" time="0.004" />
+  <testcase name="signIn_invalidCredentials_isTheOnlyCredentialVerdict" classname="com.saaf.milkshop.SyncTransportTest" time="0.013" />
+  <testcase name="signIn_disabledStaff_andNoStaffProfile_classifyDefinitively" classname="com.saaf.milkshop.SyncTransportTest" time="0.008" />
+  <testcase name="envelopeFactory_embedsChildrenAndProfiles" classname="com.saaf.milkshop.SyncTransportTest" time="0.162" />
+  <testcase name="oldSaveCannotPublishIntoReopenedSameSessionHandle" classname="com.saaf.milkshop.NativeSaleStateRegressionTest" time="12.948" />
+  <testcase name="wholesaleFollowUpUsesExactBookedQuantity" classname="com.saaf.milkshop.NativeSaleStateRegressionTest" time="7.138" />
+  <testcase name="finishingRefreshCannotReopenSaveGateOrEraseReceipt" classname="com.saaf.milkshop.NativeSaleStateRegressionTest" time="10.631" />
+  <testcase name="presetChipRequestsLastMonth" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="0.881" />
+  <testcase name="customRangePreviewSurfacesNotice" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="0.673" />
+  <testcase name="warmRefreshKeepsReportVisible" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="0.719" />
+  <testcase name="loadFailureOffersRetry" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="0.644" />
+  <testcase name="emptyProductsShowsHonestCopy" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="0.751" />
+  <testcase name="customRangeAppliesInclusiveDates" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="1.411" />
+  <testcase name="contentShowsReportWithoutCashierChrome" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="0.743" />
+  <testcase name="loadRetryAndSaveFailureHaveVisibleRecoverableWorkflows" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="1.669" />
+  <testcase name="unavailableAndFailureStatesExplainRecoveryAndPreserveEnteredAmount" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="0.724" />
+  <testcase name="customerSearchSelectionAmountShortcutsAccountAndNoteControlsChangeVisibleState" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="2.602" />
+  <testcase name="overpaymentRequiresExplicitAdvanceConfirmationWithExactConsequences" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="1.896" />
+  <testcase name="successShowsAuthoritativeResultAndBothActionsRespond" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="0.722" />
+  <testcase name="normalPaymentSubmitsExactRequestAndSavingStateBlocksDuplicateTap" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="2.108" />
+  <testcase name="syncNowPullsAndPushes" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.182" />
+  <testcase name="backupOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.214" />
+  <testcase name="takeServerDropsEntrySoParkApplies" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.67" />
+  <testcase name="unenrollOpensConfirm" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.747" />
+  <testcase name="enrollConnectsPhone" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.704" />
+  <testcase name="personalSecurityOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.183" />
+  <testcase name="confirmStopsSyncing" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.727" />
+  <testcase name="shopPickCompletesEnrollment" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.644" />
+  <testcase name="loadingShowsWhileStatusLoads" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.623" />
+  <testcase name="menuShowsJourneyGroupsWithoutCashierChrome" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.162" />
+  <testcase name="restoredHoldsListedForReview" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.638" />
+  <testcase name="personalSecurityScreenShowsStatus" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.644" />
+  <testcase name="employeesOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.651" />
+  <testcase name="usersRolesOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.673" />
+  <testcase name="productsOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.646" />
+  <testcase name="refreshReloadsStatus" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.645" />
+  <testcase name="overviewNavFromMoreRequestsNavigation" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.678" />
+  <testcase name="suppliersOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.648" />
+  <testcase name="enrolledShowsServerShopSession" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.67" />
+  <testcase name="keepMineReleasesEntryToPush" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.644" />
+  <testcase name="coldSyncFailureOffersWorkingRetry" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.155" />
+  <testcase name="shopChoicesListedWhenAmbiguous" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.723" />
+  <testcase name="errorShowsFailureReason" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.625" />
+  <testcase name="customersOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.153" />
+  <testcase name="costingPlansOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.647" />
+  <testcase name="syncRowOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.696" />
+  <testcase name="shopSettingsOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.698" />
+  <testcase name="loadFailureOffersRetry" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.131" />
+  <testcase name="noticeShowsResultSummary" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.626" />
+  <testcase name="syncScreenShowsStatusOrEnroll" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.649" />
+  <testcase name="securityHistoryOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.671" />
+  <testcase name="saleFollowUpCreatesBornLinkedDelivery" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="1.309" />
+  <testcase name="saleFollowUpClearsAfterSent" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="0.591" />
+  <testcase name="saleFollowUpOffersDeliveryForCreditSale" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="0.65" />
+  <testcase name="saleLoadFailureRetryChangesToVisibleLoadingState" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="0.621" />
+  <testcase name="closedDrawingCannotSubmit" classname="com.saaf.milkshop.NativeDrawingScreenContractTest" time="0.648" />
+  <testcase name="drawingAmountAndNoteSubmitExactlyOnce" classname="com.saaf.milkshop.NativeDrawingScreenContractTest" time="2.457" />
+  <testcase name="drawingSuccessOffersAnotherAndBack" classname="com.saaf.milkshop.NativeDrawingScreenContractTest" time="0.646" />
+  <testcase name="drawingErrorRemainsRecoverable" classname="com.saaf.milkshop.NativeDrawingScreenContractTest" time="0.619" />
+  <testcase name="deliveriesOpensConnectedDestination" classname="com.saaf.milkshop.NativeOwnerWorkScreenContractTest" time="0.644" />
+  <testcase name="recordSaleOpensConnectedDestination" classname="com.saaf.milkshop.NativeOwnerWorkScreenContractTest" time="0.624" />
+  <testcase name="recordSpoilageOpensConnectedDestination" classname="com.saaf.milkshop.NativeOwnerWorkScreenContractTest" time="0.669" />
+  <testcase name="paySupplierOpensConnectedDestination" classname="com.saaf.milkshop.NativeOwnerWorkScreenContractTest" time="0.671" />
+  <testcase name="recordPaymentOpensConnectedDestination" classname="com.saaf.milkshop.NativeOwnerWorkScreenContractTest" time="0.617" />
+  <testcase name="makeYogurtOpensConnectedDestination" classname="com.saaf.milkshop.NativeOwnerWorkScreenContractTest" time="1.158" />
+  <testcase name="paySalaryOpensConnectedDestination" classname="com.saaf.milkshop.NativeOwnerWorkScreenContractTest" time="0.673" />
+  <testcase name="deliveriesBadgeShowsActiveCount" classname="com.saaf.milkshop.NativeOwnerWorkScreenContractTest" time="0.691" />
+  <testcase name="recordExpenseOpensConnectedDestination" classname="com.saaf.milkshop.NativeOwnerWorkScreenContractTest" time="0.621" />
+  <testcase name="overviewNavFromWorkRequestsNavigation" classname="com.saaf.milkshop.NativeOwnerWorkScreenContractTest" time="0.645" />
+  <testcase name="drawingOpensConnectedDestination" classname="com.saaf.milkshop.NativeOwnerWorkScreenContractTest" time="0.644" />
+  <testcase name="homeShowsCommandGroupsAndKeepsWorkNavSelected" classname="com.saaf.milkshop.NativeOwnerWorkScreenContractTest" time="0.848" />
+  <testcase name="loadFailureOffersRetry" classname="com.saaf.milkshop.NativeOwnerWorkScreenContractTest" time="0.643" />
+  <testcase name="cashCloseOpensConnectedDestination" classname="com.saaf.milkshop.NativeOwnerWorkScreenContractTest" time="0.696" />
+  <testcase name="receiveMilkOpensConnectedDestination" classname="com.saaf.milkshop.NativeOwnerWorkScreenContractTest" time="0.645" />
+</testsuite>

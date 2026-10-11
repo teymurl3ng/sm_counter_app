@@ -1,0 +1,26 @@
+{
+  "status": "ok",
+  "deployment": {
+    "id": "dpl_2jngWS8puUzAQJNTwPQZ8WdtRVth",
+    "url": "https://sm-server-view-772lu6h8n-mkrc.vercel.app",
+    "inspectorUrl": "https://vercel.com/mkrc/sm-server-view/2jngWS8puUzAQJNTwPQZ8WdtRVth",
+    "readyState": "READY",
+    "target": "production",
+    "deploymentApiUrl": "https://api.vercel.com/v13/deployments/dpl_2jngWS8puUzAQJNTwPQZ8WdtRVth"
+  },
+  "message": "Deployment sm-server-view-772lu6h8n-mkrc.vercel.app ready.",
+  "next": [
+    {
+      "command": "vercel curl https://sm-server-view-772lu6h8n-mkrc.vercel.app",
+      "when": "Verify deployment, including when Deployment Protection is enabled"
+    },
+    {
+      "command": "vercel inspect sm-server-view-772lu6h8n-mkrc.vercel.app",
+      "when": "Inspect deployment"
+    },
+    {
+      "command": "vercel deploy --prod",
+      "when": "Promote to production"
+    }
+  ]
+}

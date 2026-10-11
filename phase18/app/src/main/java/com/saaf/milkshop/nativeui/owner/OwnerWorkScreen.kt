@@ -1,6 +1,10 @@
 package com.saaf.milkshop.nativeui.owner
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.nativeListItem
+
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -185,7 +189,7 @@ private fun WorkHomeBody(
                     color = MaterialTheme.colorScheme.error,
                 )
                 Button(
-                    onClick = { onOpenDestination(NativeOwnerWorkDestination.CashCountAndClose) },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeOwnerWorkDestination.CashCountAndClose) },
                     modifier = Modifier.testTag(NativeUiTags.OwnerWorkClosedReopen),
                 ) {
                     Text("Go to Cash count & close")
@@ -203,13 +207,13 @@ private fun WorkHomeBody(
                     label = "Record sale",
                     icon = Icons.Outlined.PointOfSale,
                     tag = NativeUiTags.OwnerWorkRecordSale,
-                    onClick = { onOpenDestination(NativeOwnerWorkDestination.RecordSale) },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeOwnerWorkDestination.RecordSale) },
                 )
                 PrimaryAction(
                     label = "Record payment",
                     icon = Icons.Outlined.Payments,
                     tag = NativeUiTags.OwnerWorkRecordPayment,
-                    onClick = { onOpenDestination(NativeOwnerWorkDestination.RecordPayment) },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeOwnerWorkDestination.RecordPayment) },
                 )
             }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -217,19 +221,19 @@ private fun WorkHomeBody(
                     label = "Receive milk",
                     icon = Icons.Outlined.WaterDrop,
                     tag = NativeUiTags.OwnerWorkReceiveMilk,
-                    onClick = { onOpenDestination(NativeOwnerWorkDestination.ReceiveMilk) },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeOwnerWorkDestination.ReceiveMilk) },
                 )
                 PrimaryAction(
                     label = "Record expense",
                     icon = Icons.Outlined.ReceiptLong,
                     tag = NativeUiTags.OwnerWorkRecordExpense,
-                    onClick = { onOpenDestination(NativeOwnerWorkDestination.RecordExpense) },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeOwnerWorkDestination.RecordExpense) },
                 )
                 PrimaryAction(
                     label = "Owner drawing",
                     icon = Icons.Outlined.AccountBalanceWallet,
                     tag = NativeUiTags.OwnerWorkRecordDrawing,
-                    onClick = { onOpenDestination(NativeOwnerWorkDestination.RecordDrawing) },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeOwnerWorkDestination.RecordDrawing) },
                 )
             }
         }
@@ -244,14 +248,14 @@ private fun WorkHomeBody(
                 detail = "Record Milk used and Yogurt produced",
                 icon = Icons.Outlined.Science,
                 tag = NativeUiTags.OwnerWorkMakeYogurt,
-                onClick = { onOpenDestination(NativeOwnerWorkDestination.MakeYogurt) },
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeOwnerWorkDestination.MakeYogurt) },
             )
             CommandRow(
                 label = "Record spoilage",
                 detail = "Physical loss and reason",
                 icon = Icons.Outlined.Assignment,
                 tag = NativeUiTags.OwnerWorkRecordSpoilage,
-                onClick = { onOpenDestination(NativeOwnerWorkDestination.RecordSpoilage) },
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeOwnerWorkDestination.RecordSpoilage) },
             )
             CommandRow(
                 label = "Deliveries",
@@ -263,7 +267,7 @@ private fun WorkHomeBody(
                 icon = Icons.Outlined.LocalShipping,
                 tag = NativeUiTags.OwnerWorkDeliveries,
                 badge = context.activeDeliveryCount.takeIf { it > 0 }?.toString(),
-                onClick = { onOpenDestination(NativeOwnerWorkDestination.Deliveries) },
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeOwnerWorkDestination.Deliveries) },
             )
         }
 
@@ -277,14 +281,14 @@ private fun WorkHomeBody(
                 detail = "Supplier balance and payment",
                 icon = Icons.Outlined.AccountBalance,
                 tag = NativeUiTags.OwnerWorkPaySupplier,
-                onClick = { onOpenDestination(NativeOwnerWorkDestination.PaySupplier) },
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeOwnerWorkDestination.PaySupplier) },
             )
             CommandRow(
                 label = "Pay salary",
                 detail = "Employee salary settlement",
                 icon = Icons.Outlined.AccountBalanceWallet,
                 tag = NativeUiTags.OwnerWorkPaySalary,
-                onClick = { onOpenDestination(NativeOwnerWorkDestination.PaySalary) },
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeOwnerWorkDestination.PaySalary) },
             )
             CommandRow(
                 label = "Cash count and close",
@@ -292,7 +296,7 @@ private fun WorkHomeBody(
                 icon = Icons.Outlined.Payments,
                 tag = NativeUiTags.OwnerWorkCashClose,
                 badge = if (context.postingOpen) "Open" else "Closed",
-                onClick = { onOpenDestination(NativeOwnerWorkDestination.CashCountAndClose) },
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeOwnerWorkDestination.CashCountAndClose) },
             )
         }
     }
@@ -342,11 +346,10 @@ private fun CommandRow(
 ) {
     Row(
         Modifier
-            .fillMaxWidth()
-            .heightIn(min = 64.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Navigation)
             .testTag(tag)
-            .clickable(onClick = onClick)
-            .padding(vertical = 12.dp),
+            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onClick))
+            .nativeListItemContent(NativeListStyle.Navigation),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

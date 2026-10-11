@@ -1,0 +1,13 @@
+{
+  "app": {
+    "path": "C:\\Users\\Teymur\\Desktop\\hybrid project\\codex\\Saaf_Milk_Codex_Handoff_Pack\\Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED\\phase18\\app\\build\\outputs\\apk\\benchmark\\app-benchmark.apk",
+    "sha256": "c1a2c8f86f531b2f72510b268eb80ab9094b0f310b7e9a4299ed2640cac26545",
+    "verified_package": "com.saaf.milkshop.qa.benchmark"
+  },
+  "tests": {
+    "path": "C:\\Users\\Teymur\\Desktop\\hybrid project\\codex\\Saaf_Milk_Codex_Handoff_Pack\\Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED\\phase18\\app\\build\\outputs\\apk\\androidTest\\benchmark\\app-benchmark-androidTest.apk",
+    "sha256": "47c00f97941e53205b4882a1ae75a2c0256c84e0ca4234c9b72f2483f7520b24",
+    "verified_package": "com.saaf.milkshop.qa.benchmark.test"
+  },
+  "requested_compilation": "speed for both QA packages"
+}

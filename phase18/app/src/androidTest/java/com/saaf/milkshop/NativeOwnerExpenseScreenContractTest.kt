@@ -7,7 +7,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -35,7 +37,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class NativeOwnerExpenseScreenContractTest {
     @get:Rule
-    val composeRule = createComposeRule()
+    val composeRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
     fun readyUsesOwnerChromeAndExcludesCashierNavigation() {
@@ -63,6 +65,11 @@ class NativeOwnerExpenseScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.ExpenseAmountInput)
             .performScrollTo()
             .performTextReplacement("125.50")
+        // Compact navigation is intentionally hidden behind the IME; dismiss it before leaving.
+        com.saaf.milkshop.qa.NativeLayoutImeEvidence.dismissImeAndWait(composeRule.activity, composeRule)
+        composeRule.waitUntil(5_000) {
+            runCatching { composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).fetchSemanticsNode() }.isSuccess
+        }
         composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).performClick()
 
         composeRule.onNodeWithText("Discard this expense?").assertIsDisplayed()
@@ -116,8 +123,12 @@ class NativeOwnerExpenseScreenContractTest {
         state: NativeExpenseState,
         onNavigate: (OwnerSection) -> Unit = {},
     ) {
+        var activeGuard: com.saaf.milkshop.nativeui.common.EntryLeaveGuard? = null
         composeRule.setContent {
             SaafTheme(darkTheme = false) {
+                val registerGuard = com.saaf.milkshop.nativeui.common.rememberPaneGuardRegistration(
+                    active = { activeGuard }, publish = { activeGuard = it },
+                )
                 OwnerExpenseEntryScreen(
                     snackbarHostState = remember { SnackbarHostState() },
                     identity = ownerIdentity(),
@@ -126,11 +137,16 @@ class NativeOwnerExpenseScreenContractTest {
                     onRecordExpense = {},
                     onRecordAnother = {},
                     onBackToWork = {},
+                    onRegisterGuard = registerGuard,
                     ownScaffold = { s, m, content ->
                         OwnerScaffold(
                             snackbarHostState = s,
                             section = OwnerSection.Work,
-                            onNavigate = {},
+                            onNavigate = { section ->
+                                if (!((state as? NativeExpenseState.Ready)?.saving ?: false)) {
+                                    activeGuard?.requestLeave { onNavigate(section) } ?: onNavigate(section)
+                                }
+                            },
                             modifier = m,
                             content = content,
                         )

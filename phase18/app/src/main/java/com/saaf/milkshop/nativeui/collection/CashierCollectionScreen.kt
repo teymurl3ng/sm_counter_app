@@ -1,6 +1,8 @@
 package com.saaf.milkshop.nativeui.collection
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -51,6 +53,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.nativeListItem
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -136,7 +139,11 @@ fun CashierCollectionScreen(
     BackHandler {
         if (canLeave) leaveGuard.requestLeave(onLeaveConfirmed)
     }
-    Column(modifier = modifier.fillMaxSize().padding(contentPadding)) {
+    CollectionScaffold(
+        snackbarHostState = snackbarHostState,
+        onNavigate = { section -> if (canLeave) leaveGuard.requestLeave { onNavigate(section) } },
+        modifier = modifier.fillMaxSize().padding(contentPadding),
+    ) { scaffoldPadding ->
         NativeSectionTransition(
             targetState = state,
             contentKey = { if (it is NativeCollectionState.Idle || it is NativeCollectionState.Loading) NativeCollectionState.Loading::class else it::class },
@@ -158,8 +165,8 @@ fun CashierCollectionScreen(
                 onCollectAnother = onCollectAnother,
                 onViewRecord = onViewRecord,
                 leaveGuard = leaveGuard,
-                contentPadding = PaddingValues(0.dp),
-                showHeader = false,
+                contentPadding = scaffoldPadding,
+                showHeader = true,
             )
         }
         }
@@ -219,13 +226,13 @@ internal fun CollectionDiscardDialog(leaveGuard: EntryLeaveGuard) {
         text = { Text("The customer, amount, and note you entered will be cleared.") },
         confirmButton = {
             TextButton(
-                onClick = leaveGuard::confirmDiscard,
+                onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction(leaveGuard::confirmDiscard),
                 modifier = Modifier.testTag(NativeUiTags.CollectDiscardDraft),
             ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(
-                onClick = leaveGuard::keepEditing,
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction(leaveGuard::keepEditing),
                 modifier = Modifier.testTag(NativeUiTags.CollectKeepDraft),
             ) { Text("Keep editing") }
         },
@@ -253,6 +260,20 @@ internal fun CollectionEntryContent(
     var notes by rememberSaveable { mutableStateOf("") }
     var advanceConfirmationOpen by rememberSaveable { mutableStateOf(false) }
     var draftTouched by rememberSaveable { mutableStateOf(false) }
+    DisposableEffect(leaveGuard) {
+        leaveGuard.onDiscard = {
+            customerPickerOpen = false
+            paymentPickerOpen = false
+            amountText = ""
+            paymentAccountId = null
+            notesExpanded = false
+            notes = ""
+            advanceConfirmationOpen = false
+            draftTouched = false
+            onCollectAnother()
+        }
+        onDispose { leaveGuard.onDiscard = null }
+    }
     val selectedCustomer = state.selectedCustomer
     val amountPaisa = parsePaisa(amountText)
     val selectedPaymentAccount = state.context.paymentAccounts.singleOrNull {
@@ -337,6 +358,11 @@ internal fun CollectionEntryContent(
             businessDate = state.context.businessDate,
             postingOpen = state.context.postingOpen,
         )
+        NativeSectionTransition(
+            targetState = state,
+            contentKey = { it.receipt != null },
+            modifier = Modifier.weight(1f),
+        ) { state ->
         if (state.receipt != null) {
             CollectionSuccess(
                 receipt = state.receipt,
@@ -348,7 +374,7 @@ internal fun CollectionEntryContent(
                     onCollectAnother()
                 },
                 onViewRecord = { onViewRecord(state.receipt.eventId) },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxSize(),
             )
         } else {
             CollectionForm(
@@ -402,8 +428,9 @@ internal fun CollectionEntryContent(
                         )
                     }
                 },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxSize(),
             )
+        }
         }
     }
 }
@@ -490,12 +517,12 @@ private fun CollectionForm(
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(
-                    onClick = onQuick1000,
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction(onQuick1000),
                     enabled = customer != null && !state.saving,
                     modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag(NativeUiTags.CollectQuick1000),
                 ) { Text("PKR 1,000") }
                 OutlinedButton(
-                    onClick = onPayFull,
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction(onPayFull),
                     enabled = customer != null && customer.balancePaisa > 0L && !state.saving,
                     modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag(NativeUiTags.CollectPayFull),
                 ) { Text("Pay full") }
@@ -518,7 +545,7 @@ private fun CollectionForm(
         }
 
         TextButton(
-            onClick = onToggleNotes,
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction(onToggleNotes),
             enabled = !state.saving,
             modifier = Modifier.heightIn(min = 48.dp).testTag(NativeUiTags.CollectNoteToggle),
         ) {
@@ -644,8 +671,8 @@ private fun CollectionSuccess(
     onViewRecord: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    com.saaf.milkshop.nativeui.common.NativeReceiptFeedback("collection", receipt.eventId)
     val context = LocalContext.current
-    LaunchedEffect(receipt.eventId) { context.hapticConfirm() }
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -683,11 +710,11 @@ private fun CollectionSuccess(
             }
         }
         Button(
-            onClick = onCollectAnother,
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction(onCollectAnother),
             modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag(NativeUiTags.CollectAnother),
         ) { Text("Collect another") }
         OutlinedButton(
-            onClick = onViewRecord,
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction(onViewRecord),
             modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag(NativeUiTags.CollectViewRecord),
         ) { Text("View record") }
     }
@@ -743,11 +770,10 @@ private fun CustomerPickerDialog(
                     matches.forEach { customer ->
                         Row(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(min = 56.dp)
-                                .clickable(enabled = !selecting) { onSelect(customer) }
+                                .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Selection, enabled = !selecting)
+                                .clickable(enabled = !selecting, onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(customer) })
                                 .testTag(NativeUiTags.collectCustomer(customer.accountId))
-                                .padding(vertical = 10.dp),
+                                .nativeListItemContent(NativeListStyle.Selection),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Column(Modifier.weight(1f)) {
@@ -765,7 +791,7 @@ private fun CustomerPickerDialog(
         confirmButton = {},
         dismissButton = {
             TextButton(
-                onClick = onDismiss,
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction(onDismiss),
                 modifier = Modifier.testTag(NativeUiTags.CollectCustomerCancel),
             ) { Text("Cancel") }
         },
@@ -784,13 +810,12 @@ private fun PaymentPickerDialog(
         onDismissRequest = onDismiss,
         title = { Text("Received in") },
         text = {
-            Column {
+            Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
                 accounts.forEach { account ->
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 56.dp)
-                            .clickable { onSelect(account) }
+                            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Selection, selected = account.accountId == selectedId)
+                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(account) })
                             .semantics {
                                 role = Role.RadioButton
                                 contentDescription = if (account.accountId == selectedId) {
@@ -798,7 +823,7 @@ private fun PaymentPickerDialog(
                                 } else account.name
                             }
                             .testTag(NativeUiTags.collectPaymentAccount(account.accountId))
-                            .padding(vertical = 12.dp),
+                            .nativeListItemContent(NativeListStyle.Selection),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(account.name, Modifier.weight(1f), fontWeight = FontWeight.SemiBold)
@@ -812,7 +837,7 @@ private fun PaymentPickerDialog(
         confirmButton = {},
         dismissButton = {
             TextButton(
-                onClick = onDismiss,
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction(onDismiss),
                 modifier = Modifier.testTag(NativeUiTags.CollectPaymentCancel),
             ) { Text("Cancel") }
         },
@@ -861,7 +886,7 @@ private fun AdvanceConfirmationDialog(
         },
         dismissButton = {
             TextButton(
-                onClick = onCancel,
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction(onCancel),
                 enabled = !saving,
                 modifier = Modifier.testTag(NativeUiTags.CollectCancelAdvance),
             ) { Text("Go back") }
@@ -893,7 +918,7 @@ private fun SelectorSurface(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 72.dp)
-            .clickable(enabled = enabled, onClick = onClick)
+            .clickable(enabled = enabled, onClick = com.saaf.milkshop.nativeui.common.hapticAction(onClick))
             .semantics { role = Role.Button }
             .testTag(tag),
     ) {
@@ -934,7 +959,7 @@ private fun StatusPanel(
             .semantics { liveRegion = LiveRegionMode.Polite }
             .testTag(tag),
     ) {
-        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.Top) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
             Icon(Icons.Outlined.WarningAmber, contentDescription = null)
             Spacer(Modifier.width(10.dp))
             Column {

@@ -1,0 +1,52 @@
+{
+  "tests": [
+    {
+      "name": "collectLargeTextLandscapeSemanticsRemainAvailable",
+      "classname": "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+      "time": "8.764",
+      "passed": true
+    },
+    {
+      "name": "cashierClosesOwnDayNextDateOpensAndReopenIsDenied",
+      "classname": "com.saaf.milkshop.NativeCashCloseFacadeTest",
+      "time": "1.619",
+      "passed": true
+    },
+    {
+      "name": "earlierOpenDeliveryRefusesCloseUntilCashierResolvesIt",
+      "classname": "com.saaf.milkshop.NativeCashCloseFacadeTest",
+      "time": "1.781",
+      "passed": true
+    },
+    {
+      "name": "pendingDeliveryRefusesCloseUntilResolved",
+      "classname": "com.saaf.milkshop.NativeCashCloseFacadeTest",
+      "time": "1.716",
+      "passed": true
+    },
+    {
+      "name": "cashMovementAfterCountRefusesCloseWithoutPartialWrite",
+      "classname": "com.saaf.milkshop.NativeCashCloseFacadeTest",
+      "time": "1.744",
+      "passed": true
+    },
+    {
+      "name": "cashierCountsClosesDayAndCannotReopen",
+      "classname": "com.saaf.milkshop.NativeFoundationUiTest",
+      "time": "15.618",
+      "passed": true
+    },
+    {
+      "name": "missingProductAndPaymentReferencesExplainWhatTheOwnerMustFix",
+      "classname": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+      "time": "1.289",
+      "passed": true
+    },
+    {
+      "name": "emptyTodayExplainsAndKeepsActivityNavSelected",
+      "classname": "com.saaf.milkshop.NativeActivityScreenContractTest",
+      "time": "1.132",
+      "passed": true
+    }
+  ]
+}

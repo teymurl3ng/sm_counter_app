@@ -1,0 +1,10 @@
+{
+  "login_ok": true,
+  "authenticated_health_ok": true,
+  "overview_ok": true,
+  "env": "dev",
+  "username": "accept.owner",
+  "role": "owner",
+  "local_http_cookie_setting": "COOKIE_SECURE=false",
+  "cookie_values_saved_to_evidence": false
+}

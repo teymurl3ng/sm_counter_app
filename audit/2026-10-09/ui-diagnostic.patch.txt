@@ -1,0 +1,24 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Desktop/hybrid project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerReportsScreenContractTest.kt
+@@
+ import androidx.compose.ui.test.performClick
++import androidx.compose.ui.test.performSemanticsAction
++import androidx.compose.ui.semantics.SemanticsActions
+@@
+         composeRule.onNodeWithTag(NativeUiTags.OwnerReportsCustomPreview).performClick()
++        auditUiEvidence("reports-touch", "preview=$preview; button=${composeRule.onNodeWithTag(NativeUiTags.OwnerReportsCustomPreview).fetchSemanticsNode().boundsInRoot}; content=${composeRule.onNodeWithTag(NativeUiTags.OwnerReportsContent).fetchSemanticsNode().boundsInRoot}")
++        composeRule.onNodeWithTag(NativeUiTags.OwnerReportsCustomPreview).performSemanticsAction(SemanticsActions.OnClick) { it() }
++        composeRule.waitForIdle()
++        auditUiEvidence("reports-semantics", "preview=$preview")
+         assertTrue(preview)
+*** Update File: C:/Users/Teymur/Desktop/hybrid project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/androidTest/java/com/saaf/milkshop/NativeCollectionScreenContractTest.kt
+@@
+ import androidx.compose.ui.test.performClick
++import androidx.compose.ui.test.onRoot
++import androidx.compose.ui.test.printToString
+@@
+         composeRule.onNodeWithTag(NativeUiTags.CollectRecord).performScrollTo().performClick()
+-        waitForAdvanceDialog()
++        auditUiEvidence("collection-reopen", composeRule.onRoot().printToString())
++        waitForAdvanceDialog()
+*** End Patch

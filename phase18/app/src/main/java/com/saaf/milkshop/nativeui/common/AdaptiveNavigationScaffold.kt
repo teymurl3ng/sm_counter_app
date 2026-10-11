@@ -1,6 +1,7 @@
 package com.saaf.milkshop.nativeui.common
 
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -13,10 +14,14 @@ import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+
+private val LocalNavigationHosted = compositionLocalOf { false }
 
 /** Switches primary navigation from a bottom bar to a rail at the Material compact/medium boundary. */
 @Composable
@@ -32,6 +37,12 @@ internal fun AdaptiveNavigationScaffold(
     contentWindowInsets: WindowInsets = WindowInsets(0, 0, 0, 0),
     content: @Composable (PaddingValues) -> Unit,
 ) {
+    // Role hosts own the single navigation bar and snackbar. Child screens
+    // still work independently in previews/tests without duplicating chrome.
+    if (LocalNavigationHosted.current) {
+        Box(modifier) { content(PaddingValues(0.dp)) }
+        return
+    }
     BoxWithConstraints(modifier = modifier) {
         val useNavigationRail = maxWidth >= 600.dp
         // While the keyboard is open the bar would sit behind the IME but its
@@ -49,7 +60,9 @@ internal fun AdaptiveNavigationScaffold(
                 bottomBar = {
                     if (!useNavigationRail && !imeVisible) compactNavigation()
                 },
-                content = content,
+                content = { padding ->
+                    CompositionLocalProvider(LocalNavigationHosted provides true) { content(padding) }
+                },
             )
         }
     }

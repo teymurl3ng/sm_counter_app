@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeShopIdentityRegressionTest" tests="45" failures="2" errors="0" skipped="0" time="161.122" timestamp="2026-10-10T17:16:01" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="changedMerchantNameRefreshesWithoutRestartOrChangingActor" classname="com.saaf.milkshop.NativeShopIdentityRegressionTest" time="2.079" />
+  <testcase name="cashierClosesOwnDayNextDateOpensAndReopenIsDenied" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="1.584" />
+  <testcase name="operatorCannotLoadCashClose" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="1.474" />
+  <testcase name="pendingDeliveryRefusesCloseUntilResolved" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="1.78" />
+  <testcase name="closeThenReopenRestoresOpenPosting" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="1.229" />
+  <testcase name="cashMovementAfterCountRefusesCloseWithoutPartialWrite" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="1.727" />
+  <testcase name="recordCountThenCloseDayReturnsReceipt" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.698" />
+  <testcase name="loadExposesCashAccountExpectedAndOpenPosting" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.571" />
+  <testcase name="reopenRejectsBlankReasonAndWrongPassphrase" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="1.197" />
+  <testcase name="varianceRequiresReasonBeforeClose" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.667" />
+  <testcase name="catalogPickerHandlesZeroOneTwoThreeTwelveAndFiftyProducts" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="10.864">
+    <failure>java.lang.AssertionError: expected:&lt;50&gt; but was:&lt;12&gt;
+at org.junit.Assert.fail(Assert.java:89)
+at org.junit.Assert.failNotEquals(Assert.java:835)
+at org.junit.Assert.assertEquals(Assert.java:647)
+at org.junit.Assert.assertEquals(Assert.java:633)
+at com.saaf.milkshop.NativeSaleScreenContractTest.catalogPickerHandlesZeroOneTwoThreeTwelveAndFiftyProducts(NativeSaleScreenContractTest.kt:246)
+</failure>
+  </testcase>
+  <testcase name="managerRecordsHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="6.208" />
+  <testcase name="switchAccountHardwareBackKeepsSessionAndReturnsToMore" classname="com.saaf.milkshop.NativeFoundationUiTest" time="5.759" />
+  <testcase name="managerShellNavSwitchesSectionsUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="6.338" />
+  <testcase name="managerRecordsCorrectionHardwareBackReturnsToDetailThenList" classname="com.saaf.milkshop.NativeFoundationUiTest" time="5.375" />
+  <testcase name="entryModesInputAndSteppersConvertAndRecalculate" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.71" />
+  <testcase name="ownerPaySupplierOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.67" />
+  <testcase name="uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens" classname="com.saaf.milkshop.NativeFoundationUiTest" time="16.275">
+    <failure>java.lang.IllegalArgumentException: Evidence export requires an isolated QA package
+at com.saaf.milkshop.qa.NativeEvidenceCapture.exportQaEvidence(NativeLayoutImeEvidence.kt:169)
+at com.saaf.milkshop.qa.NativeEvidenceCapture.captureWholeWindow(NativeLayoutImeEvidence.kt:131)
+at com.saaf.milkshop.NativeFoundationUiTest.captureUx(NativeFoundationUiTest.kt:91)
+at com.saaf.milkshop.NativeFoundationUiTest.uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens(NativeFoundationUiTest.kt:69)
+</failure>
+  </testcase>
+  <testcase name="adminBusinessRecordsHardwareBackReturnsToRecordsHub" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.063" />
+  <testcase name="recordSaleWritesRoomAndShowsRefreshedReceipt" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.349" />
+  <testcase name="editedSaleDraftSurvivesActivityRecreation" classname="com.saaf.milkshop.NativeFoundationUiTest" time="5.764" />
+  <testcase name="ownerPaySupplierHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.29" />
+  <testcase name="switchAccountUiBackKeepsSessionAndReturnsToMore" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.406" />
+  <testcase name="cashierCountsClosesDayAndCannotReopen" classname="com.saaf.milkshop.NativeFoundationUiTest" time="11.322" />
+  <testcase name="operatorBackWinsOverWarmRefresh" classname="com.saaf.milkshop.NativeWorkRefreshRegressionTest" time="8.973" />
+  <testcase name="ownerNavigationWinsOverRefreshingSuccessAndFailure" classname="com.saaf.milkshop.NativeWorkRefreshRegressionTest" time="9.022" />
+  <testcase name="managerNavigationWinsOverWarmRefresh" classname="com.saaf.milkshop.NativeWorkRefreshRegressionTest" time="7.029" />
+  <testcase name="adminNavigationWinsOverWarmRefreshFailure" classname="com.saaf.milkshop.NativeWorkRefreshRegressionTest" time="6.963" />
+  <testcase name="catalogProductsRemainVisibleAndPriceFollowsIdAfterRename" classname="com.saaf.milkshop.NativeCatalogPricingRegressionTest" time="0.731" />
+  <testcase name="methodPickerShowsOnlyEnrolledPhoneSecurityAndSurfacesCancellation" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.129" />
+  <testcase name="darkSystemHostKeepsTheBrandedAccountPickerContrast" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.101" />
+  <testcase name="rateLimitedQuickPinKeepsFullPassphraseRecoveryVisibleAndWorking" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.171" />
+  <testcase name="startupFailureRetryChangesToTheRequestedVisibleState" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.092" />
+  <testcase name="menuOpensExpenseEntry" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.136" />
+  <testcase name="countCashRecordsBlindAmountAndShowsSuccessWithoutExpectedVariance" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.26" />
+  <testcase name="personalSecurityShowsStatus" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.137" />
+  <testcase name="countReceiptDoneCallsBackOnceAndReturnsToMenu" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.234" />
+  <testcase name="menuOpensCountCashEntry" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.132" />
+  <testcase name="menuShowsCashierActionsAndKeepsMoreNavSelected" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.165" />
+  <testcase name="switchAccountAndSignOutFireFromMenu" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.164" />
+  <testcase name="menuOpensDeliveriesFromMore" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.134" />
+  <testcase name="loadFailureOffersRetry" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.066" />
+  <testcase name="dirtyCashierNavigationRequiresDiscardConfirmation" classname="com.saaf.milkshop.NativeCashierExpenseScreenContractTest" time="1.899" />
+  <testcase name="readyUsesCashierChromeAndExcludesOwnerNavigation" classname="com.saaf.milkshop.NativeCashierExpenseScreenContractTest" time="1.312" />
+  <testcase name="loadFailureRetainsCashierShellAndRetries" classname="com.saaf.milkshop.NativeCashierExpenseScreenContractTest" time="1.133" />
+</testsuite>

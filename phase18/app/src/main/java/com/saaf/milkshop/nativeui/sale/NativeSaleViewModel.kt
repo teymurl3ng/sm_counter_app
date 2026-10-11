@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.saaf.milkshop.application.sale.NativeSaleContext
 import com.saaf.milkshop.application.sale.NativeSaleFacade
+import com.saaf.milkshop.application.sale.NativeSaleOperations
 import com.saaf.milkshop.application.sale.NativeSaleReceipt
 import com.saaf.milkshop.application.sale.NativeSaleRequest
-import com.saaf.milkshop.application.sale.NativeSaleEntryMode
 import com.saaf.milkshop.application.sale.NativeSalePaymentKind
 import com.saaf.milkshop.application.operations.NativeDeliveriesFacade
 import com.saaf.milkshop.domain.SecurityFailure
@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Locale
+import kotlinx.coroutines.CancellationException
 
 /**
  * Follow-up offer shown after a credit sale: one delivery, born-linked to
@@ -55,13 +55,14 @@ sealed interface NativeSaleState {
 }
 
 class NativeSaleViewModel(
-    private val facade: NativeSaleFacade,
+    private val facade: NativeSaleOperations,
     private val deliveriesFacade: NativeDeliveriesFacade,
     private val onSessionExpired: () -> Unit,
 ) : ViewModel() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val _state = MutableStateFlow<NativeSaleState>(NativeSaleState.Idle)
     private var sessionHandle: String? = null
+    private var sessionGeneration = 0L
     private val loadGate = SessionRequestGate()
     val state: StateFlow<NativeSaleState> = _state.asStateFlow()
 
@@ -80,6 +81,7 @@ class NativeSaleViewModel(
             silentRefresh()
             return
         }
+        sessionGeneration += 1
         sessionHandle = nextSessionHandle
         refresh()
     }
@@ -92,6 +94,7 @@ class NativeSaleViewModel(
     /** Sends the follow-up delivery born-linked to the recorded credit sale. */
     fun sendAsDelivery(route: String) {
         val session = sessionHandle ?: return
+        val generation = sessionGeneration
         val current = _state.value as? NativeSaleState.Ready ?: return
         val followUp = current.deliveryFollowUp ?: return
         if (followUp.sending || followUp.sent) return
@@ -110,19 +113,23 @@ class NativeSaleViewModel(
                         route = route.ifBlank { null },
                     )
                 }
+                DataChangeBus.notifyDataChanged()
+                if (generation != sessionGeneration || sessionHandle != session) return@launch
                 val latest = _state.value as? NativeSaleState.Ready ?: return@launch
+                if (latest.deliveryFollowUp?.saleEventId != followUp.saleEventId) return@launch
                 _state.value = latest.copy(
                     deliveryFollowUp = followUp.copy(sending = false, sent = true),
                 )
-                DataChangeBus.notifyDataChanged()
             } catch (error: Throwable) {
+                if (error is CancellationException) throw error
+                if (generation != sessionGeneration || sessionHandle != session) return@launch
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
                     _state.value = NativeSaleState.Idle
                     onSessionExpired()
                 } else {
                     val latest = _state.value as? NativeSaleState.Ready
-                    if (latest != null) {
+                    if (latest != null && latest.deliveryFollowUp?.saleEventId == followUp.saleEventId) {
                         _state.value = latest.copy(
                             deliveryFollowUp = followUp.copy(sending = false, error = publicMessage(error)),
                         )
@@ -145,14 +152,16 @@ class NativeSaleViewModel(
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 // Merge: a refresh must never wipe the posted receipt or the
                 // delivery follow-up card.
-                _state.value = previous?.copy(context = context, refreshing = false)
+                _state.value = (_state.value as? NativeSaleState.Ready)?.copy(context = context, refreshing = false)
                     ?: NativeSaleState.Ready(context, refreshing = false)
             } catch (error: Throwable) {
+                if (error is CancellationException) throw error
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 if (error is SecurityFailure.SessionExpired || previous == null) {
                     handleLoadFailure(error)
                 } else {
-                    _state.value = previous.copy(
+                    val latest = _state.value as? NativeSaleState.Ready ?: return@launch
+                    _state.value = latest.copy(
                         refreshing = false,
                         error = error.message ?: "The sale could not be refreshed. Check it and try again.",
                     )
@@ -168,19 +177,22 @@ class NativeSaleViewModel(
      */
     private fun silentRefresh() {
         val session = sessionHandle ?: return
-        val current = _state.value as? NativeSaleState.Ready ?: return
+        if (_state.value !is NativeSaleState.Ready) return
+        val request = loadGate.begin(session)
         scope.launch {
             try {
                 val fresh = withContext(Dispatchers.IO) { facade.load(session) }
-                if (sessionHandle != session) return@launch
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 val latest = _state.value as? NativeSaleState.Ready ?: return@launch
                 val merged = latest.copy(context = fresh, refreshing = false)
                 if (merged != _state.value) _state.value = merged
             } catch (error: SecurityFailure.SessionExpired) {
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 sessionHandle = null
                 _state.value = NativeSaleState.Idle
                 onSessionExpired()
             } catch (error: Throwable) {
+                if (error is CancellationException) throw error
                 // Silent: the displayed data stays; it will revalidate on
                 // the next entry or day-state change.
             }
@@ -189,31 +201,35 @@ class NativeSaleViewModel(
 
     fun record(request: NativeSaleRequest) {
         val session = sessionHandle ?: return
+        val generation = sessionGeneration
         val current = _state.value as? NativeSaleState.Ready ?: return
         if (current.saving) return
         _state.value = current.copy(saving = true, receipt = null, error = null)
-        val followUp = deliveryFollowUpFor(current.context, request)
         scope.launch {
             try {
                 val submission = withContext(Dispatchers.IO) { facade.record(session, request) }
+                DataChangeBus.notifyDataChanged()
+                if (generation != sessionGeneration || sessionHandle != session) return@launch
                 _state.value = NativeSaleState.Ready(
                     context = submission.refreshedContext,
                     receipt = submission.receipt,
-                    deliveryFollowUp = followUp?.copy(
+                    deliveryFollowUp = deliveryFollowUpFor(current.context, request, submission.receipt)?.copy(
                         saleEventId = submission.receipt.eventId,
                     ),
                 )
                 // Records/Activity hold the receipt context, not this VM — a
                 // self-refresh here would wipe the posted receipt and the
                 // delivery follow-up card.
-                DataChangeBus.notifyDataChanged()
             } catch (error: Throwable) {
+                if (error is CancellationException) throw error
+                if (generation != sessionGeneration || sessionHandle != session) return@launch
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
                     _state.value = NativeSaleState.Idle
                     onSessionExpired()
                 } else {
-                    _state.value = current.copy(error = publicMessage(error))
+                    val latest = _state.value as? NativeSaleState.Ready ?: return@launch
+                    _state.value = latest.copy(saving = false, error = publicMessage(error))
                 }
             }
         }
@@ -223,19 +239,13 @@ class NativeSaleViewModel(
     private fun deliveryFollowUpFor(
         context: NativeSaleContext,
         request: NativeSaleRequest,
+        receipt: NativeSaleReceipt,
     ): NativeSaleDeliveryFollowUp? {
         if (request.paymentKind != NativeSalePaymentKind.CUSTOMER_ACCOUNT) return null
         val customerId = request.customerAccountId ?: return null
         val product = context.products.firstOrNull { it.productId == request.productId }
             ?: return null
-        val quantityText = when (request.entryMode) {
-            NativeSaleEntryMode.QUANTITY -> request.enteredValue.toString()
-            NativeSaleEntryMode.AMOUNT -> {
-                val rate = product.ratePaisaPerUnit / 100.0
-                if (rate <= 0.0) return null
-                followUpQuantityText(request.enteredValue / rate)
-            }
-        }
+        val quantityText = receipt.quantity.toString()
         val customerName = context.customers.firstOrNull { it.accountId == customerId }?.name ?: ""
         return NativeSaleDeliveryFollowUp(
             customerId = customerId,
@@ -246,14 +256,6 @@ class NativeSaleViewModel(
             saleEventId = 0L,
         )
     }
-
-    /** Amount-entry credit sales derive the delivery quantity from amount ÷ rate. */
-    private fun followUpQuantityText(quantity: Double): String =
-        if (quantity == kotlin.math.floor(quantity)) {
-            "${quantity.toInt()}.0"
-        } else {
-            String.format(Locale.US, "%.2f", quantity)
-        }
 
     fun clearFeedback() {
         val current = _state.value as? NativeSaleState.Ready ?: return
@@ -272,6 +274,7 @@ class NativeSaleViewModel(
     }
 
     fun close() {
+        sessionGeneration += 1
         loadGate.invalidate()
         sessionHandle = null
         _state.value = NativeSaleState.Idle

@@ -1,0 +1,168 @@
+[
+  {
+    "server_seq": 220,
+    "row_uid": "u1_8f1e6482ce884d0facd2136ebf05efa3",
+    "payload": {
+      "notes": "Native preview sample stock",
+      "amount": null,
+      "channel": null,
+      "event_id": 1,
+      "event_uid": "u1_8f1e6482ce884d0facd2136ebf05efa3",
+      "unit_rate": null,
+      "created_at": "2026-10-10T11:38:09.902301Z",
+      "event_type": "PURCHASE_RECEIPT",
+      "lr_reading": 28.5,
+      "raw_liters": 80,
+      "sale_value": null,
+      "time_trust": "device_only",
+      "amount_owed": 14447.569230769233,
+      "occurred_at": "2026-10-10",
+      "raw_device_ts": "2026-10-10T11:38:09.902641Z",
+      "sale_quantity": null,
+      "ts_percentage": 12.969000000000001,
+      "fat_percentage": 4.2,
+      "financial_logs": [
+        {
+          "amount": 14447.569230769233,
+          "log_id": 1,
+          "event_id": 1,
+          "account_id": 16,
+          "account_uid": "u1_424b05db59e5468f92370e6ee1abb130"
+        }
+      ],
+      "inventory_logs": [
+        {
+          "log_id": 1,
+          "event_id": 1,
+          "quantity": 80,
+          "product_id": 1,
+          "product_uid": "u1_seed_products_Milk"
+        }
+      ],
+      "milk_rate_used": 170,
+      "snf_percentage": 8.769,
+      "adjusted_liters": 79.80923076923078,
+      "milk_liters_used": null,
+      "origin_device_id": "ce812ab0d24f4a548aa2da9de3eae4e2",
+      "spoilage_details": [],
+      "ts_standard_used": 13,
+      "corrects_event_id": null,
+      "delivery_fee_used": 11,
+      "surcharge_applied": 0,
+      "yogurt_kg_produced": null,
+      "trusted_estimated_at": ""
+    }
+  },
+  {
+    "server_seq": 221,
+    "row_uid": "u1_94cc880316a748acbc3d45535256417b",
+    "payload": {
+      "notes": "Native preview sample yogurt batch",
+      "amount": null,
+      "channel": null,
+      "event_id": 2,
+      "event_uid": "u1_94cc880316a748acbc3d45535256417b",
+      "unit_rate": null,
+      "created_at": "2026-10-10T11:38:09.918188Z",
+      "event_type": "PRODUCTION",
+      "lr_reading": null,
+      "raw_liters": null,
+      "sale_value": null,
+      "time_trust": "device_only",
+      "amount_owed": null,
+      "occurred_at": "2026-10-10",
+      "raw_device_ts": "2026-10-10T11:38:09.918450Z",
+      "sale_quantity": null,
+      "ts_percentage": null,
+      "fat_percentage": null,
+      "financial_logs": [],
+      "inventory_logs": [
+        {
+          "log_id": 2,
+          "event_id": 2,
+          "quantity": -20,
+          "product_id": 1,
+          "product_uid": "u1_seed_products_Milk"
+        },
+        {
+          "log_id": 3,
+          "event_id": 2,
+          "quantity": 18,
+          "product_id": 2,
+          "product_uid": "u1_seed_products_Yogurt"
+        }
+      ],
+      "milk_rate_used": null,
+      "snf_percentage": null,
+      "adjusted_liters": null,
+      "milk_liters_used": 20,
+      "origin_device_id": "ce812ab0d24f4a548aa2da9de3eae4e2",
+      "spoilage_details": [],
+      "ts_standard_used": null,
+      "corrects_event_id": null,
+      "delivery_fee_used": null,
+      "surcharge_applied": 0,
+      "yogurt_kg_produced": 18,
+      "trusted_estimated_at": ""
+    }
+  },
+  {
+    "server_seq": 222,
+    "row_uid": "u1_a921a24caeaf47dbbdba359e80534131",
+    "payload": {
+      "notes": null,
+      "amount": 170000,
+      "channel": null,
+      "event_id": 3,
+      "event_uid": "u1_a921a24caeaf47dbbdba359e80534131",
+      "unit_rate": null,
+      "actor_link": {
+        "actor_user_id": 1,
+        "attributed_at": "2026-10-10T11:43:52.614692Z",
+        "actor_name_snapshot": "Acceptance Owner",
+        "actor_role_snapshot": "owner"
+      },
+      "created_at": "2026-10-10T11:43:52.607617Z",
+      "event_type": "VENDOR_PAYMENT",
+      "lr_reading": null,
+      "raw_liters": null,
+      "sale_value": null,
+      "time_trust": "device_only",
+      "amount_owed": null,
+      "occurred_at": "2026-10-10",
+      "raw_device_ts": "2026-10-10T11:43:52.608931Z",
+      "sale_quantity": null,
+      "ts_percentage": null,
+      "fat_percentage": null,
+      "financial_logs": [
+        {
+          "amount": -170000,
+          "log_id": 2,
+          "event_id": 3,
+          "account_id": 15,
+          "account_uid": "u1_c01de1e2e4b2414880a7207e0c2bccc1"
+        },
+        {
+          "amount": -170000,
+          "log_id": 3,
+          "event_id": 3,
+          "account_id": 3,
+          "account_uid": "u1_seed_accounts_Bank"
+        }
+      ],
+      "inventory_logs": [],
+      "milk_rate_used": null,
+      "snf_percentage": null,
+      "adjusted_liters": null,
+      "milk_liters_used": null,
+      "origin_device_id": "ce812ab0d24f4a548aa2da9de3eae4e2",
+      "spoilage_details": [],
+      "ts_standard_used": null,
+      "corrects_event_id": null,
+      "delivery_fee_used": null,
+      "surcharge_applied": 0,
+      "yogurt_kg_produced": null,
+      "trusted_estimated_at": ""
+    }
+  }
+]

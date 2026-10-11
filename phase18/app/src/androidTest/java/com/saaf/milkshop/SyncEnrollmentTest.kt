@@ -45,19 +45,21 @@ class SyncEnrollmentTest {
         TrustedTime.resetForTest(context)
         TrustedTime.warmUp(context)
         SyncScheduler.suppressSchedulingForTest()
-        SyncEnrollment(context, fakeAuthHttp()).unenroll()
+        com.saaf.milkshop.sync.SyncRebaselineStore(context).clear()
+        runBlocking { SyncEnrollment(context, fakeAuthHttp()).unenroll() }
     }
 
     @After
     fun tearDown() {
-        SyncEnrollment(context, fakeAuthHttp()).unenroll()
+        runBlocking { SyncEnrollment(context, fakeAuthHttp()).unenroll() }
         TrustedTime.resetForTest(context)
+        com.saaf.milkshop.sync.SyncRebaselineStore(context).clear()
         BusinessClock.setZone(ZoneId.systemDefault().id)
     }
 
     private fun fakeAuthHttp() = SyncHttp { SyncHttpResponse(500, null) }
 
-    private fun allowedHttp(active: Boolean = true) = SyncHttp { request ->
+    private fun allowedHttp(active: Boolean = true, role: String = "owner") = SyncHttp { request ->
         when {
             request.url.contains("/auth/v1/token") -> SyncHttpResponse(
                 200,
@@ -66,7 +68,7 @@ class SyncEnrollmentTest {
             request.url.contains("my_profile") -> SyncHttpResponse(
                 200,
                 """
-                {"staff_id":"11111111-1111-4111-8111-111111111111","role":"admin","active":$active,
+                {"staff_id":"11111111-1111-4111-8111-111111111111","role":"$role","active":$active,
                  "terminated_at":null,"business_id":"22222222-2222-4222-8222-222222222222",
                  "shops":[{"id":"249b9c78-475d-483d-b252-314dc5784ff9","name":"Recovery Shop A","timezone":"Asia/Karachi"}]}
                 """.trimIndent().toByteArray(),
@@ -79,6 +81,10 @@ class SyncEnrollmentTest {
     fun enrollment_persistsBindingSessionConfig_andSetsZone() = runBlocking {
         val database = MilkShopDatabase.createInMemory()
         try {
+            database.appUserDao().insert(com.saaf.milkshop.data.AppUserEntity(
+                loginName = "test.owner", displayName = "Owner", role = "owner",
+                createdAt = "2026-10-10T08:00:00Z", updatedAt = "2026-10-10T08:00:00Z",
+            ))
             val outcome = SyncEnrollment(context, allowedHttp(), database)
                 .enroll(config, "Owner", "123456789012345".toCharArray())
 
@@ -90,7 +96,7 @@ class SyncEnrollmentTest {
             assertNotNull(SyncServerConfigStore.load(context))
             assertEquals("Asia/Karachi", BusinessClock.currentZone().id)
             val binding = SyncShopBindingStore.load(context)!!
-            assertEquals("admin", binding.role)
+            assertEquals("owner", binding.role)
             assertEquals("11111111-1111-4111-8111-111111111111", binding.staffId)
             assertEquals("jwt-1", SyncTokenStore(context).load()?.accessToken)
             // Re-baseline: the full local history is enqueued for the new server.
@@ -112,7 +118,7 @@ class SyncEnrollmentTest {
                 )
                 request.url.contains("my_profile") -> SyncHttpResponse(
                     200,
-                    """{"staff_id":"s1","role":"admin","active":true,"business_id":"b1",
+                    """{"staff_id":"s1","role":"cashier","active":true,"business_id":"b1",
                        "shops":[{"id":"shop-a","name":"A"},{"id":"shop-b","name":"B"}]}""".toByteArray(),
                 )
                 else -> SyncHttpResponse(500, null)
@@ -158,7 +164,7 @@ class SyncEnrollmentTest {
 
     @Test
     fun unenroll_clearsEverything() = runBlocking {
-        SyncEnrollment(context, allowedHttp()).enroll(config, "Owner", "123456789012345".toCharArray())
+        SyncEnrollment(context, allowedHttp(role = "cashier")).enroll(config, "Counter", "123456789012345".toCharArray())
         assertNotNull(SyncShopBindingStore.load(context))
 
         SyncEnrollment(context, fakeAuthHttp()).unenroll()
@@ -166,5 +172,27 @@ class SyncEnrollmentTest {
         assertNull(SyncServerConfigStore.load(context))
         assertNull(SyncShopBindingStore.load(context))
         assertNull(SyncTokenStore(context).load())
+    }
+
+    @Test
+    fun unauthorizedSelectionAndCrossShopReenrollmentLeaveExistingBindingUntouched() = runBlocking {
+        val db = MilkShopDatabase.createInMemory()
+        try {
+            val enrollment = SyncEnrollment(context, allowedHttp(role = "cashier"), db)
+            assertEquals(SyncEnrollment.Outcome.Failed("shop_not_authorized"),
+                enrollment.enroll(config, "Counter", "x".toCharArray(), "unlisted-shop"))
+            assertNull(SyncTokenStore(context).load())
+            assertNull(db.serverAccountDao().findBinding())
+            val binding = com.saaf.milkshop.data.AccountInstallationBindingEntity(
+                environment = config.environment, businessId = "22222222-2222-4222-8222-222222222222",
+                shopId = "different-shop", shopNameSnapshot = "Existing", status = "active",
+                createdAt = "2026-10-10", updatedAt = "2026-10-10")
+            db.serverAccountDao().insertBinding(binding)
+            assertEquals(SyncEnrollment.Outcome.Failed("installation_shop_mismatch"),
+                enrollment.enroll(config, "Counter", "x".toCharArray()))
+            assertEquals("different-shop", db.serverAccountDao().findBinding()!!.shopId)
+            assertNull(SyncTokenStore(context).load())
+            assertNull(SyncServerConfigStore.load(context))
+        } finally { db.close() }
     }
 }

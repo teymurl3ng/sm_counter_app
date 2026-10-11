@@ -19,16 +19,37 @@ internal class BackupRestoreEngine(
         json: JSONObject,
         selection: BackupManager.RestoreSelection,
         includeSecurity: Boolean,
+    ) = com.saaf.milkshop.sync.SyncOperationGate.exclusive {
+        restoreLocked(database, json, selection, includeSecurity)
+    }
+
+    private suspend fun restoreLocked(
+        database: MilkShopDatabase,
+        json: JSONObject,
+        selection: BackupManager.RestoreSelection,
+        includeSecurity: Boolean,
     ) {
         // Safety snapshot is created before touching current state.
         createSafetySnapshot(database)
         val previousPreferences = if (selection.preferences) capturePreferences() else null
-        // go 8: captured before the transaction so the re-baseline state is
-        // written only after a successful restore.
+        // Read recovery metadata before persisting the fail-closed flags and
+        // replacing Room; failed transactions restore the previous flags.
         val formatVersion = json.getJSONObject("metadata").optInt("format_version", 0)
         val prevDeviceId = json.getJSONObject("metadata").optString("device_id").takeIf { it.isNotEmpty() }
         val restoredOutbox = readSyncOutboxRows(json.getJSONObject("data").optJSONArray("sync_outbox"))
+        val oldFreshIdentity = rebaselineStore.needsFreshIdentity
+        val oldPrevDevice = rebaselineStore.prevDeviceId
+        val oldRestoredPending = rebaselineStore.restoredRebaseline
+        val oldLivePending = rebaselineStore.liveRebaselinePending
         try {
+            // Persist the fail-closed gate BEFORE replacing Room. A process
+            // death after commit cannot expose the restored queue to pushes.
+            rebaselineStore.needsFreshIdentity = true
+            rebaselineStore.prevDeviceId = prevDeviceId
+            if (selection.business) {
+                rebaselineStore.restoredRebaseline = formatVersion >= 5
+                rebaselineStore.liveRebaselinePending = false
+            }
             database.withWriteTransaction<Unit> {
                 val data = json.getJSONObject("data")
                 val backupDao = database.backupDataDao()
@@ -169,12 +190,13 @@ internal class BackupRestoreEngine(
                         ),
                     )
                     database.syncParkedRowDao().clear()
+                    database.syncRebaselineHoldDao().clear()
                     if (formatVersion >= 5) {
                         // go 8: format-5 restores carry the outbox so edits that
                         // were unsynced at backup time survive; the next
                         // enrollment classifies them against the server
                         // (own-origin drops, foreign-origin holds for review).
-                        backupDao.insertSyncOutbox(restoredOutbox)
+                        backupDao.insertSyncOutbox(restoredOutbox.map { it.copy(held = true) })
                     }
                     Phase3CostingMigrationSql.immutableTriggers.forEach { executeSQL(it) }
                     SyncMigrationSql.captureTriggers.forEach { executeSQL(it) }
@@ -212,10 +234,11 @@ internal class BackupRestoreEngine(
             // the server's conflict audit). Format-5 restores also carried the
             // outbox + prev id, so the next enrollment runs the classified
             // pull-first flow; formats 3/4 keep the legacy push-first flow.
-            rebaselineStore.needsFreshIdentity = true
-            rebaselineStore.prevDeviceId = prevDeviceId
-            rebaselineStore.restoredRebaseline = formatVersion >= 5
         } catch (error: Throwable) {
+            rebaselineStore.needsFreshIdentity = oldFreshIdentity
+            rebaselineStore.prevDeviceId = oldPrevDevice
+            rebaselineStore.restoredRebaseline = oldRestoredPending
+            rebaselineStore.liveRebaselinePending = oldLivePending
             if (previousPreferences != null) {
                 runCatching { restorePreferences(previousPreferences) }
                     .onFailure(error::addSuppressed)

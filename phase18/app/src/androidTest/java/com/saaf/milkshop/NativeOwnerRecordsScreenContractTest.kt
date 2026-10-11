@@ -169,6 +169,22 @@ class NativeOwnerRecordsScreenContractTest {
         assertEquals(OwnerSection.Overview, navigated)
     }
 
+    @Test
+    fun correctionDiscardCanKeepOrConfirmNavigation() {
+        val record = row(55L)
+        var navigated = 0
+        setScreen(NativeOwnerRecordsState.Ready(snapshot = snapshotWith(record),
+            correction = NativeCorrectionEditorState(prefill = monetaryPrefill(record), draftTouched = true)),
+            onNavigate = { navigated++ })
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionDiscardDialog).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionDiscardKeep).performClick()
+        assertEquals(0, navigated)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionDiscardConfirm).performClick()
+        assertEquals(1, navigated)
+    }
+
     private fun setScreen(
         state: NativeOwnerRecordsState,
         onRetry: () -> Unit = {},

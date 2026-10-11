@@ -1,0 +1,22 @@
+[
+  {
+    "path": "phase18/app/src/main/java/com/saaf/milkshop/data/BudgetDataRepository.kt",
+    "matches": true
+  },
+  {
+    "path": "phase18/app/src/main/java/com/saaf/milkshop/data/Phase3SecurityDaos.kt",
+    "matches": true
+  },
+  {
+    "path": "phase18/app/src/main/java/com/saaf/milkshop/data/SyncEntities.kt",
+    "matches": true
+  },
+  {
+    "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/BudgetManagement.kt",
+    "matches": true
+  },
+  {
+    "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/Costing.kt",
+    "matches": true
+  }
+]

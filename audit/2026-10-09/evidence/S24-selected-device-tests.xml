@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.AuditDeviceIntegrityTest" tests="34" failures="9" errors="0" skipped="0" time="33.725" timestamp="2026-10-09T18:42:31" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-S921W - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="failedLedgerChildMustRollBackIncomingEvent" classname="com.saaf.milkshop.AuditDeviceIntegrityTest" time="0.027">
+    <failure>java.lang.AssertionError: Rejected event header survived its failed financial child
+at org.junit.Assert.fail(Assert.java:89)
+at org.junit.Assert.assertTrue(Assert.java:42)
+at com.saaf.milkshop.AuditDeviceIntegrityTest$failedLedgerChildMustRollBackIncomingEvent$1.invokeSuspend(AuditDeviceIntegrityTest.kt:29)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at com.saaf.milkshop.AuditDeviceIntegrityTest.failedLedgerChildMustRollBackIncomingEvent(AuditDeviceIntegrityTest.kt:17)
+</failure>
+  </testcase>
+  <testcase name="lateDependencyMustRecoverAfterFiveUnrelatedBatches" classname="com.saaf.milkshop.AuditDeviceIntegrityTest" time="0.102">
+    <failure>java.lang.AssertionError: Dependency arrived but the valid event remains permanently parked
+at org.junit.Assert.fail(Assert.java:89)
+at org.junit.Assert.assertTrue(Assert.java:42)
+at com.saaf.milkshop.AuditDeviceIntegrityTest$lateDependencyMustRecoverAfterFiveUnrelatedBatches$1.invokeSuspend(AuditDeviceIntegrityTest.kt:53)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at com.saaf.milkshop.AuditDeviceIntegrityTest.lateDependencyMustRecoverAfterFiveUnrelatedBatches(AuditDeviceIntegrityTest.kt:34)
+</failure>
+  </testcase>
+  <testcase name="dependencyPark_exhaustsBoundedRetriesWithOneAudit" classname="com.saaf.milkshop.SyncApplyEngineTest" time="0.063" />
+  <testcase name="roundTrip_reproducesLedgerOnSecondDevice" classname="com.saaf.milkshop.SyncApplyEngineTest" time="0.182" />
+  <testcase name="pendingEditGuard_parksInsteadOfOverwriting" classname="com.saaf.milkshop.SyncApplyEngineTest" time="0.041" />
+  <testcase name="dependencyPark_resolvesWhenParentArrives" classname="com.saaf.milkshop.SyncApplyEngineTest" time="0.063" />
+  <testcase name="drainsInStrictOrder_andEmptiesTheQueue" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.091" />
+  <testcase name="schedulerKick_recordsWorkWaiting" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.009" />
+  <testcase name="permanentFailure_haltsAtHead_andResumesAfterFix" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.257" />
+  <testcase name="transientFailure_leavesQueueIntactForRetry" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.039" />
+  <testcase name="missingTransport_isANoOp" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.007" />
+  <testcase name="restoreFromDifferentShop_isRefused_withEnrollmentIntact" classname="com.saaf.milkshop.SyncRestoreHardeningTest" time="0.317" />
+  <testcase name="restoreWithNoLocalEnrollment_alwaysSucceeds" classname="com.saaf.milkshop.SyncRestoreHardeningTest" time="0.359">
+    <failure>java.lang.AssertionError: expected:&lt;0&gt; but was:&lt;19&gt;
+at org.junit.Assert.fail(Assert.java:89)
+at org.junit.Assert.failNotEquals(Assert.java:835)
+at org.junit.Assert.assertEquals(Assert.java:647)
+at org.junit.Assert.assertEquals(Assert.java:633)
+at com.saaf.milkshop.SyncRestoreHardeningTest$restoreWithNoLocalEnrollment_alwaysSucceeds$1.invokeSuspend(SyncRestoreHardeningTest.kt:176)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at com.saaf.milkshop.SyncRestoreHardeningTest.restoreWithNoLocalEnrollment_alwaysSucceeds(SyncRestoreHardeningTest.kt:164)
+</failure>
+  </testcase>
+  <testcase name="restoreFromSameShop_succeeds_clearsTokens_keepsBindingAndConfig" classname="com.saaf.milkshop.SyncRestoreHardeningTest" time="0.275">
+    <failure>java.lang.AssertionError: expected:&lt;0&gt; but was:&lt;19&gt;
+at org.junit.Assert.fail(Assert.java:89)
+at org.junit.Assert.failNotEquals(Assert.java:835)
+at org.junit.Assert.assertEquals(Assert.java:647)
+at org.junit.Assert.assertEquals(Assert.java:633)
+at com.saaf.milkshop.SyncRestoreHardeningTest$restoreFromSameShop_succeeds_clearsTokens_keepsBindingAndConfig$1.invokeSuspend(SyncRestoreHardeningTest.kt:156)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(dex-id-b317eec6b0aba5aa322b8ddf2303175962e0be5c:1)
+at com.saaf.milkshop.SyncRestoreHardeningTest.restoreFromSameShop_succeeds_clearsTokens_keepsBindingAndConfig(SyncRestoreHardeningTest.kt:130)
+</failure>
+  </testcase>
+  <testcase name="closedBusinessDayExplainsTheBlockAndDisablesRecord" classname="com.saaf.milkshop.NativeSaleHardeningContractTest" time="1.432" />
+  <testcase name="surchargeEditedAmountWinsOverDefault" classname="com.saaf.milkshop.NativeSaleHardeningContractTest" time="2.039" />
+  <testcase name="surchargeTogglePrefillsDefaultAndCarriesIntoRequest" classname="com.saaf.milkshop.NativeSaleHardeningContractTest" time="1.434" />
+  <testcase name="missingProductAndPaymentReferencesExplainWhatTheOwnerMustFix" classname="com.saaf.milkshop.NativeSaleHardeningContractTest" time="0.736" />
+  <testcase name="largeTextDarkThemeKeepsCoreActionsAndTalkBackStateAvailable" classname="com.saaf.milkshop.NativeSaleHardeningContractTest" time="0.87" />
+  <testcase name="longCustomerListScrollsToTheLastAccountAndSelectsIt" classname="com.saaf.milkshop.NativeSaleHardeningContractTest" time="1.234" />
+  <testcase name="presetChipRequestsLastMonth" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="0.74" />
+  <testcase name="customRangePreviewSurfacesNotice" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="0.742">
+    <failure>java.lang.AssertionError
+at org.junit.Assert.fail(Assert.java:87)
+at org.junit.Assert.assertTrue(Assert.java:42)
+at org.junit.Assert.assertTrue(Assert.java:53)
+at com.saaf.milkshop.NativeOwnerReportsScreenContractTest.customRangePreviewSurfacesNotice(NativeOwnerReportsScreenContractTest.kt:70)
+</failure>
+  </testcase>
+  <testcase name="warmRefreshKeepsReportVisible" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="0.674">
+    <failure>java.lang.AssertionError: Assert failed: The component with TestTag = 'owner_reports_refreshing' is not displayed!
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+at com.saaf.milkshop.NativeOwnerReportsScreenContractTest.warmRefreshKeepsReportVisible(NativeOwnerReportsScreenContractTest.kt:93)
+</failure>
+  </testcase>
+  <testcase name="loadFailureOffersRetry" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="0.703" />
+  <testcase name="emptyProductsShowsHonestCopy" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="0.702" />
+  <testcase name="customRangeAppliesInclusiveDates" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="0.729">
+    <failure>java.lang.AssertionError: Failed to perform text input.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'owner_reports_custom_start')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.TextActionsKt.getNodeAndFocus(TextActions.kt:124)
+at androidx.compose.ui.test.TextActionsKt.getNodeAndFocus$default(TextActions.kt:119)
+at androidx.compose.ui.test.TextActionsKt.performTextReplacement(TextActions.kt:82)
+at com.saaf.milkshop.NativeOwnerReportsScreenContractTest.customRangeAppliesInclusiveDates(NativeOwnerReportsScreenContractTest.kt:82)
+</failure>
+  </testcase>
+  <testcase name="contentShowsReportWithoutCashierChrome" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="0.689" />
+  <testcase name="loadRetryAndSaveFailureHaveVisibleRecoverableWorkflows" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="1.435" />
+  <testcase name="unavailableAndFailureStatesExplainRecoveryAndPreserveEnteredAmount" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="0.779" />
+  <testcase name="customerSearchSelectionAmountShortcutsAccountAndNoteControlsChangeVisibleState" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="2.525">
+    <failure>java.lang.AssertionError: Failed to assert the following: (Selected = 'true')
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'cashier_nav_collect')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:262)
+at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+at androidx.compose.ui.test.AssertionsKt.assertIsSelected(Assertions.kt:88)
+at com.saaf.milkshop.NativeCollectionScreenContractTest.customerSearchSelectionAmountShortcutsAccountAndNoteControlsChangeVisibleState(NativeCollectionScreenContractTest.kt:101)
+</failure>
+  </testcase>
+  <testcase name="overpaymentRequiresExplicitAdvanceConfirmationWithExactConsequences" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="9.879">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 8000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeCollectionScreenContractTest.waitForAdvanceDialog(NativeCollectionScreenContractTest.kt:261)
+at com.saaf.milkshop.NativeCollectionScreenContractTest.overpaymentRequiresExplicitAdvanceConfirmationWithExactConsequences(NativeCollectionScreenContractTest.kt:164)
+</failure>
+  </testcase>
+  <testcase name="successShowsAuthoritativeResultAndBothActionsRespond" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="0.759" />
+  <testcase name="normalPaymentSubmitsExactRequestAndSavingStateBlocksDuplicateTap" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="2.177" />
+  <testcase name="goldenScenario_saleCollectionCorrectionExpense_matchCapturedAuthoritativeTotals" classname="com.saaf.milkshop.qa.NativeGoldenLedgerRegressionTest" time="0.06" />
+</testsuite>

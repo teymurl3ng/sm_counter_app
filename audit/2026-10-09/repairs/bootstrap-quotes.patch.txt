@@ -1,0 +1,9 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/migration_sync_fresh.sql
+@@
+-AS $function$;
++AS $function$
+@@
+-AS $function$;
++AS $function$
+*** End Patch

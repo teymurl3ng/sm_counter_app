@@ -1,6 +1,8 @@
 package com.saaf.milkshop.nativeui.owner
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +34,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
+import com.saaf.milkshop.nativeui.common.nativeListItem
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -84,8 +88,250 @@ import java.util.Locale
  * and costing policy approve/supersede under OwnerScaffold. Nested from Owner More;
  * never mounts foreign chrome.
  */
+private data class OwnerCostingPlansScreenSnapshot(
+    val identity: NativeSignedInIdentity,
+    val context: NativeOwnerMoreContext,
+    val policies: List<NativeOwnerCostingPolicyRow>,
+    val policiesLoading: Boolean,
+    val policyDetail: NativeOwnerCostingPolicyDetail?,
+    val policiesError: String?,
+    val currentMonthSummary: String?,
+    val section: NativeOwnerCostingSection,
+    val budgets: List<NativeOwnerBudgetRow>,
+    val targets: List<NativeOwnerCollectionsTargetRow>,
+    val budgetCategories: List<String>,
+    val defaultMilkWeekStart: String,
+    val defaultOperatingMonthStart: String,
+    val budgetEditorOpen: Boolean,
+    val budgetSaving: Boolean,
+    val collectionsEditorOpen: Boolean,
+    val collectionsSaving: Boolean,
+    val openingCosts: List<NativeOwnerOpeningCostRow>,
+    val openingSummary: String?,
+    val openingBasisKinds: List<String>,
+    val openingEditor: NativeOwnerOpeningCostRow?,
+    val openingSaving: Boolean,
+    val yieldPolicies: List<NativeOwnerYieldPolicyRow>,
+    val yieldBatches: List<NativeOwnerYieldBatchRow>,
+    val yieldActivePolicyId: Long?,
+    val yieldSummary: String?,
+    val yieldApproveOpen: Boolean,
+    val yieldApproving: Boolean,
+    val lossSaving: Boolean,
+    val lossClassifications: List<String>,
+    val lossReasons: List<String>,
+    val approveOpen: Boolean,
+    val approveSeed: NativeOwnerCostingPolicyDetail?,
+    val approving: Boolean,
+    val reauthOpen: Boolean,
+    val reauthBusy: Boolean,
+    val reviewReasons: List<String>,
+    val componentCodes: List<String>,
+    val showHeader: Boolean,
+)
+
 @Composable
 fun OwnerCostingPlansScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    context: NativeOwnerMoreContext,
+    policies: List<NativeOwnerCostingPolicyRow>,
+    policiesLoading: Boolean,
+    policyDetail: NativeOwnerCostingPolicyDetail?,
+    policiesError: String?,
+    currentMonthSummary: String?,
+    section: NativeOwnerCostingSection = NativeOwnerCostingSection.Policies,
+    budgets: List<NativeOwnerBudgetRow> = emptyList(),
+    targets: List<NativeOwnerCollectionsTargetRow> = emptyList(),
+    budgetCategories: List<String> = emptyList(),
+    defaultMilkWeekStart: String = "",
+    defaultOperatingMonthStart: String = "",
+    budgetEditorOpen: Boolean = false,
+    budgetSaving: Boolean = false,
+    collectionsEditorOpen: Boolean = false,
+    collectionsSaving: Boolean = false,
+    openingCosts: List<NativeOwnerOpeningCostRow> = emptyList(),
+    openingSummary: String? = null,
+    openingBasisKinds: List<String> = emptyList(),
+    openingEditor: NativeOwnerOpeningCostRow? = null,
+    openingSaving: Boolean = false,
+    yieldPolicies: List<NativeOwnerYieldPolicyRow> = emptyList(),
+    yieldBatches: List<NativeOwnerYieldBatchRow> = emptyList(),
+    yieldActivePolicyId: Long? = null,
+    yieldSummary: String? = null,
+    yieldApproveOpen: Boolean = false,
+    yieldApproving: Boolean = false,
+    lossSaving: Boolean = false,
+    lossClassifications: List<String> = emptyList(),
+    lossReasons: List<String> = emptyList(),
+    approveOpen: Boolean = false,
+    approveSeed: NativeOwnerCostingPolicyDetail? = null,
+    approving: Boolean = false,
+    reauthOpen: Boolean = false,
+    reauthBusy: Boolean = false,
+    reviewReasons: List<String> = emptyList(),
+    componentCodes: List<String> = emptyList(),
+    onBackToMenu: () -> Unit,
+    onRetry: () -> Unit,
+    onSectionChange: (NativeOwnerCostingSection) -> Unit = {},
+    onOpenPolicy: (Long) -> Unit,
+    onBackFromDetail: () -> Unit,
+    onOpenApprove: () -> Unit,
+    onOpenApproveFromDetail: () -> Unit,
+    onBackFromApprove: () -> Unit,
+    onApprovePolicy: (CostingPolicyInput) -> Unit,
+    onOpenBudgetEditor: () -> Unit = {},
+    onBackFromBudgetEditor: () -> Unit = {},
+    onSaveBudget: (BudgetPlanInput) -> Unit = {},
+    onCopyPreviousBudget: (String, LocalDate, LocalDate) -> Unit = { _, _, _ -> },
+    onOpenCollectionsEditor: () -> Unit = {},
+    onBackFromCollectionsEditor: () -> Unit = {},
+    onSaveCollectionsTarget: (LocalDate, Double) -> Unit = { _, _ -> },
+    onOpenOpeningEditor: (Long) -> Unit = {},
+    onOpenShopSettings: () -> Unit = {},
+    onBackFromOpeningEditor: () -> Unit = {},
+    onSaveOpeningCost: (OpeningCostBasisInput) -> Unit = {},
+    onOpenYieldApprove: () -> Unit = {},
+    onBackFromYieldApprove: () -> Unit = {},
+    onApproveYieldPolicy: (YieldPolicyInput) -> Unit = {},
+    onRecordProductionLoss: (ProductionLossAssessmentInput) -> Unit = {},
+    onSubmitReauth: (CharArray) -> Unit,
+    onCancelReauth: () -> Unit,
+    periodEndExclusive: (String, LocalDate) -> LocalDate = { category, start ->
+        if (category == BUDGET_CATEGORY_MILK_PURCHASES) start.plusDays(7) else start.plusMonths(1)
+    },
+    hostedScaffold: HostedScaffold,
+    showHeader: Boolean = true,
+    modifier: Modifier = Modifier,
+) {
+    val paneSnapshot = OwnerCostingPlansScreenSnapshot(
+        identity = identity,
+        context = context,
+        policies = policies,
+        policiesLoading = policiesLoading,
+        policyDetail = policyDetail,
+        policiesError = policiesError,
+        currentMonthSummary = currentMonthSummary,
+        section = section,
+        budgets = budgets,
+        targets = targets,
+        budgetCategories = budgetCategories,
+        defaultMilkWeekStart = defaultMilkWeekStart,
+        defaultOperatingMonthStart = defaultOperatingMonthStart,
+        budgetEditorOpen = budgetEditorOpen,
+        budgetSaving = budgetSaving,
+        collectionsEditorOpen = collectionsEditorOpen,
+        collectionsSaving = collectionsSaving,
+        openingCosts = openingCosts,
+        openingSummary = openingSummary,
+        openingBasisKinds = openingBasisKinds,
+        openingEditor = openingEditor,
+        openingSaving = openingSaving,
+        yieldPolicies = yieldPolicies,
+        yieldBatches = yieldBatches,
+        yieldActivePolicyId = yieldActivePolicyId,
+        yieldSummary = yieldSummary,
+        yieldApproveOpen = yieldApproveOpen,
+        yieldApproving = yieldApproving,
+        lossSaving = lossSaving,
+        lossClassifications = lossClassifications,
+        lossReasons = lossReasons,
+        approveOpen = approveOpen,
+        approveSeed = approveSeed,
+        approving = approving,
+        reauthOpen = reauthOpen,
+        reauthBusy = reauthBusy,
+        reviewReasons = reviewReasons,
+        componentCodes = componentCodes,
+        showHeader = showHeader,
+    )
+    com.saaf.milkshop.nativeui.common.NativeSectionTransition(
+        targetState = paneSnapshot,
+        contentKey = { pane -> when {
+            pane.openingEditor != null -> "opening"
+            pane.budgetEditorOpen -> "budget"
+            pane.collectionsEditorOpen -> "collections"
+            pane.policyDetail != null -> "policy-detail"
+            else -> "home"
+        } },
+        modifier = modifier,
+    ) { pane ->
+        OwnerCostingPlansScreenPane(
+            snackbarHostState = snackbarHostState,
+            identity = pane.identity,
+            context = pane.context,
+            policies = pane.policies,
+            policiesLoading = pane.policiesLoading,
+            policyDetail = pane.policyDetail,
+            policiesError = pane.policiesError,
+            currentMonthSummary = pane.currentMonthSummary,
+            section = pane.section,
+            budgets = pane.budgets,
+            targets = pane.targets,
+            budgetCategories = pane.budgetCategories,
+            defaultMilkWeekStart = pane.defaultMilkWeekStart,
+            defaultOperatingMonthStart = pane.defaultOperatingMonthStart,
+            budgetEditorOpen = pane.budgetEditorOpen,
+            budgetSaving = pane.budgetSaving,
+            collectionsEditorOpen = pane.collectionsEditorOpen,
+            collectionsSaving = pane.collectionsSaving,
+            openingCosts = pane.openingCosts,
+            openingSummary = pane.openingSummary,
+            openingBasisKinds = pane.openingBasisKinds,
+            openingEditor = pane.openingEditor,
+            openingSaving = pane.openingSaving,
+            yieldPolicies = pane.yieldPolicies,
+            yieldBatches = pane.yieldBatches,
+            yieldActivePolicyId = pane.yieldActivePolicyId,
+            yieldSummary = pane.yieldSummary,
+            yieldApproveOpen = pane.yieldApproveOpen,
+            yieldApproving = pane.yieldApproving,
+            lossSaving = pane.lossSaving,
+            lossClassifications = pane.lossClassifications,
+            lossReasons = pane.lossReasons,
+            approveOpen = pane.approveOpen,
+            approveSeed = pane.approveSeed,
+            approving = pane.approving,
+            reauthOpen = pane.reauthOpen,
+            reauthBusy = pane.reauthBusy,
+            reviewReasons = pane.reviewReasons,
+            componentCodes = pane.componentCodes,
+            onBackToMenu = onBackToMenu,
+            onRetry = onRetry,
+            onSectionChange = onSectionChange,
+            onOpenPolicy = onOpenPolicy,
+            onBackFromDetail = onBackFromDetail,
+            onOpenApprove = onOpenApprove,
+            onOpenApproveFromDetail = onOpenApproveFromDetail,
+            onBackFromApprove = onBackFromApprove,
+            onApprovePolicy = onApprovePolicy,
+            onOpenBudgetEditor = onOpenBudgetEditor,
+            onBackFromBudgetEditor = onBackFromBudgetEditor,
+            onSaveBudget = onSaveBudget,
+            onCopyPreviousBudget = onCopyPreviousBudget,
+            onOpenCollectionsEditor = onOpenCollectionsEditor,
+            onBackFromCollectionsEditor = onBackFromCollectionsEditor,
+            onSaveCollectionsTarget = onSaveCollectionsTarget,
+            onOpenOpeningEditor = onOpenOpeningEditor,
+            onOpenShopSettings = onOpenShopSettings,
+            onBackFromOpeningEditor = onBackFromOpeningEditor,
+            onSaveOpeningCost = onSaveOpeningCost,
+            onOpenYieldApprove = onOpenYieldApprove,
+            onBackFromYieldApprove = onBackFromYieldApprove,
+            onApproveYieldPolicy = onApproveYieldPolicy,
+            onRecordProductionLoss = onRecordProductionLoss,
+            onSubmitReauth = onSubmitReauth,
+            onCancelReauth = onCancelReauth,
+            periodEndExclusive = periodEndExclusive,
+            hostedScaffold = hostedScaffold,
+            showHeader = pane.showHeader,
+            modifier = modifier,
+        )
+    }
+}
+
+@Composable
+private fun OwnerCostingPlansScreenPane(
     snackbarHostState: SnackbarHostState,
     identity: NativeSignedInIdentity,
     context: NativeOwnerMoreContext,
@@ -447,7 +693,7 @@ private fun OwnerCostingPlansListBody(
                         )
                         Spacer(Modifier.height(16.dp))
                         Button(
-                            onClick = onRetry,
+                            onClick = hapticAction(onRetry),
                             modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansRetry),
                         ) { Text("Try again") }
                     }
@@ -518,7 +764,7 @@ private fun OwnerCostingPlansListBody(
                     HubHeader(
                         extraActions = {
                             TextButton(
-                                onClick = onOpenApprove,
+                                onClick = hapticAction(onOpenApprove),
                                 modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansApprove),
                             ) { Text("Approve policy") }
                         },
@@ -560,14 +806,14 @@ private fun OwnerCostingPlansListBody(
                         LazyColumn(
                             Modifier
                                 .fillMaxSize()
-                                .testTag(NativeUiTags.OwnerCostingPlansList),
+                                .padding(horizontal = 16.dp)
+                                    .testTag(NativeUiTags.OwnerCostingPlansList),
                         ) {
                             items(policies, key = { it.policyId }) { policy ->
                                 OwnerCostingPolicyRow(
                                     policy = policy,
-                                    onClick = { onOpenPolicy(policy.policyId) },
+                                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenPolicy(policy.policyId) },
                                 )
-                                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                             }
                         }
                     }
@@ -643,7 +889,7 @@ private fun OwnerCostingPlansDetailScreen(
                 }
                 if (row.statusLabel == "Active") {
                     Button(
-                        onClick = onOpenApproveFromDetail,
+                        onClick = hapticAction(onOpenApproveFromDetail),
                         modifier = Modifier
                             .fillMaxWidth()
                             .testTag(NativeUiTags.OwnerCostingPlansDetailSupersede),
@@ -860,7 +1106,7 @@ private fun OwnerCostingPlansApproveScreen(
                                 rowReasons.forEach { reason ->
                                     FilterChip(
                                         selected = reviewReason == reason,
-                                        onClick = {
+                                        onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                                             reviewReason = reason
                                             draftTouched = true
                                         },
@@ -941,8 +1187,8 @@ private fun OwnerCostingPlansApproveScreen(
                         )
                     }
                     Button(
-                        onClick = {
-                            if (!canSave) return@Button
+                        onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
+                            if (!canSave) return@hapticCommitAction
                             val input = CostingPolicyInput(
                                 calendarMonth = calendarMonth.trim(),
                                 normalCapacityKg = capacity!!,
@@ -1029,7 +1275,7 @@ private fun OwnerCostingPlansReauthDialog(
         },
         confirmButton = {
             TextButton(
-                onClick = {
+                onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
                     val chars = passphrase.toCharArray()
                     passphrase = ""
                     onConfirm(chars)
@@ -1040,7 +1286,7 @@ private fun OwnerCostingPlansReauthDialog(
         },
         dismissButton = {
             TextButton(
-                onClick = onCancel,
+                onClick = hapticAction(onCancel),
                 enabled = !busy,
                 modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansReauthCancel),
             ) { Text("Cancel") }
@@ -1063,13 +1309,13 @@ internal fun OwnerCostingPlansDiscardDialog(
         text = { Text(body) },
         confirmButton = {
             TextButton(
-                onClick = leaveGuard::confirmDiscard,
+                onClick = hapticAction(leaveGuard::confirmDiscard),
                 modifier = Modifier.testTag(discardTag),
             ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(
-                onClick = leaveGuard::keepEditing,
+                onClick = hapticAction(leaveGuard::keepEditing),
                 modifier = Modifier.testTag(keepTag),
             ) { Text("Keep editing") }
         },
@@ -1083,11 +1329,10 @@ private fun OwnerCostingPolicyRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 72.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Record)
             .semantics { role = Role.Button }
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .clickable(onClick = hapticAction(onClick))
+            .nativeListItemContent(NativeListStyle.Record)
             .testTag(NativeUiTags.ownerCostingPolicy(policy.policyId)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),

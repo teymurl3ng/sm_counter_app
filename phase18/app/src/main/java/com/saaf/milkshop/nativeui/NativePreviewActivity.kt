@@ -1,8 +1,11 @@
 package com.saaf.milkshop.nativeui
 
+import kotlinx.coroutines.flow.collectLatest
+import com.saaf.milkshop.nativeui.common.hapticHeavy
+
 import android.app.Activity
 import android.os.Bundle
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -10,6 +13,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticConfirm
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -422,7 +426,7 @@ class NativePreviewActivity : FragmentActivity() {
         val openManager = intent.getBooleanExtra(EXTRA_OPEN_MANAGER, false)
         val openAdmin = intent.getBooleanExtra(EXTRA_OPEN_ADMIN, false)
         setContent {
-            SaafTheme {
+            com.saaf.milkshop.nativeui.common.ShopIdentityProvider(app.database) { SaafTheme {
                 val authenticationState by authenticationViewModel.state.collectAsState()
                 val saleState by saleViewModel.state.collectAsState()
                 val collectionState by collectionViewModel.state.collectAsState()
@@ -507,7 +511,7 @@ class NativePreviewActivity : FragmentActivity() {
                     openAdminOnStart = openAdmin,
                 )
             }
-        }
+        } }
     }
 
     companion object {
@@ -636,6 +640,13 @@ private fun NativeFoundationPreview(
     var managerSwitchInFlight by remember { mutableStateOf(false) }
     var adminSwitchInFlight by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val feedbackContext = androidx.compose.ui.platform.LocalContext.current
+    androidx.compose.runtime.LaunchedEffect(snackbarHostState) {
+        com.saaf.milkshop.nativeui.common.NativeFeedbackBus.outcomes.collectLatest { outcome ->
+            if (outcome.success) feedbackContext.hapticConfirm() else feedbackContext.hapticHeavy()
+            snackbarHostState.showSnackbar(outcome.message, withDismissAction = true)
+        }
+    }
     val coroutineScope = rememberCoroutineScope()
     val sellNotice = stringResource(R.string.native_nav_sell_notice)
 
@@ -927,9 +938,13 @@ private fun NativeFoundationPreview(
         }
     }
 
-    // Welcome and auth both follow the system theme now, so the bar icons
-    // simply invert with it (dark icons vanish on a dark background).
-    SystemBarAppearance(useDarkIcons = !isSystemInDarkTheme())
+    // Access and role panes have a green identity band; Welcome uses the page surface.
+    // Navigation icons independently follow the light/dark bottom surface.
+    SystemBarAppearance(
+        useDarkStatusIcons = if (destination == PreviewDestination.Welcome) !isSystemInDarkTheme()
+            else isSystemInDarkTheme(),
+        useDarkNavigationIcons = !isSystemInDarkTheme(),
+    )
 
     NativeSectionTransition(
         targetState = destination,
@@ -951,8 +966,8 @@ private fun NativeFoundationPreview(
             else -> null
         }
         // Owner/Manager: tapping the day chip anywhere opens the close flow.
-        // Cashier/Operator/Admin: null — their chip is a passive indicator
-        // (they cannot close or reopen the day).
+        // Operator/Admin: null — their chip is a passive indicator
+        // Cashiers open Count and close day from More; reopening requires Owner/Admin.
         CompositionLocalProvider(LocalDayStatusAction provides dayStatusAction) {
             val authPane = when {
                 showingOwner -> AuthShellPane.Owner
@@ -963,9 +978,9 @@ private fun NativeFoundationPreview(
                 else -> AuthShellPane.SignIn
             }
             NativeSectionTransition(
-                targetState = authPane,
-                contentKey = { it },
-            ) { pane ->
+                targetState = authPane to authenticationState,
+                contentKey = { it.first },
+            ) { (pane, authenticationState) ->
             if (pane == AuthShellPane.Owner) {
                 val authenticated = authenticationState as? NativeAuthenticationState.Authenticated
                     ?: return@NativeSectionTransition
@@ -1128,6 +1143,8 @@ private fun NativeFoundationPreview(
                     expenseViewModel = expenseViewModel,
                     deliveriesState = deliveriesState,
                     deliveriesViewModel = deliveriesViewModel,
+                    cashCloseState = cashCloseState,
+                    cashCloseViewModel = cashCloseViewModel,
                     onLeaveToWelcome = { leaveToWelcome() },
                     onLeaveToAccountPicker = { leaveToAccountPicker() },
                     onShowNotice = { showPreviewNotice(it) },
@@ -1190,13 +1207,13 @@ private fun NativeFoundationPreview(
 }
 
 @Composable
-private fun SystemBarAppearance(useDarkIcons: Boolean) {
+private fun SystemBarAppearance(useDarkStatusIcons: Boolean, useDarkNavigationIcons: Boolean) {
     val view = LocalView.current
     SideEffect {
         val activity = view.context as? Activity ?: return@SideEffect
         WindowCompat.getInsetsController(activity.window, view).apply {
-            isAppearanceLightStatusBars = useDarkIcons
-            isAppearanceLightNavigationBars = useDarkIcons
+            isAppearanceLightStatusBars = useDarkStatusIcons
+            isAppearanceLightNavigationBars = useDarkNavigationIcons
         }
     }
 }

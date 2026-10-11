@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-10",
+  "method": "Static source inventory plus targeted implementation review; no animation pass claimed",
+  "git_head": "4bee92b5d6c9145d9f658a0d0eb0c85cb74f3ea3",
+  "native_kotlin_files": 130,
+  "screen_host_shell_files": 71,
+  "transition_calls": 65,
+  "viewmodels": 24,
+  "screen_files_with_direct_haptic_calls": 21,
+  "screen_files_without_direct_haptic_calls": 50,
+  "direct_haptic_calls": 44,
+  "control_inventory_rows": 992,
+  "control_inventory_status_counts": {
+    "COVERED": 992
+  },
+  "caveat": "Controls marked COVERED in the older inventory do not prove animation, haptic, contrast, or feedback acceptance."
+}

@@ -321,11 +321,14 @@ internal class OwnerUsersRolesController(
         confirmation.fill('\u0000')
         runtime.state.value = current.copy(userEnrollBusy = true, usersError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.completeEnroll(pending.enrollmentToken, passphrase)
                     DataChangeBus.notifyDataChanged()
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Staff access saved")
                 val snapshot = withContext(Dispatchers.IO) { facade.loadUsers(session) }
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
@@ -340,7 +343,7 @@ internal class OwnerUsersRolesController(
                     usersError = null,
                 )
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
             } finally {
                 passphrase.fill('\u0000')
             }
@@ -389,11 +392,14 @@ internal class OwnerUsersRolesController(
         }
         runtime.state.value = current.copy(userRoleChanging = true, usersError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.changeRole(session, detail.row.userId, roleWire)
                     DataChangeBus.notifyDataChanged()
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Staff role saved")
                 val refreshed = withContext(Dispatchers.IO) {
                     facade.loadDetail(session, detail.row.userId)
                 }
@@ -425,7 +431,7 @@ internal class OwnerUsersRolesController(
                         usersError = null,
                     )
                 } else {
-                    handleFailure(token, error)
+                    handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
                 }
             }
         }
@@ -467,11 +473,14 @@ internal class OwnerUsersRolesController(
         val enabled = current.userEnableTargetEnabled
         runtime.state.value = current.copy(userEnableBusy = true, usersError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.setEnabled(session, detail.row.userId, enabled)
                     DataChangeBus.notifyDataChanged()
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Staff access updated")
                 val refreshed = withContext(Dispatchers.IO) {
                     facade.loadDetail(session, detail.row.userId)
                 }
@@ -504,7 +513,7 @@ internal class OwnerUsersRolesController(
                         usersError = null,
                     )
                 } else {
-                    handleFailure(token, error)
+                    handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
                 }
             }
         }
@@ -519,10 +528,13 @@ internal class OwnerUsersRolesController(
         if (current.destination != NativeOwnerMoreDestination.UsersRoles || current.userEnrollBusy) return
         runtime.state.value = current.copy(userEnrollBusy = true, usersError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 val pending = withContext(Dispatchers.IO) {
                     facade.beginCredentialReset(session, detail.row.userId)
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Credential reset started")
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
                 if (latest.destination != NativeOwnerMoreDestination.UsersRoles) return@launch
@@ -548,7 +560,7 @@ internal class OwnerUsersRolesController(
                         usersError = null,
                     )
                 } else {
-                    handleFailure(token, error)
+                    handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
                 }
             }
         }
@@ -562,10 +574,13 @@ internal class OwnerUsersRolesController(
         if (current.destination != NativeOwnerMoreDestination.UsersRoles || current.userEnrollBusy) return
         runtime.state.value = current.copy(userEnrollBusy = true, usersError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 val pending = withContext(Dispatchers.IO) {
                     facade.resumeCredentialSetup(session, detail.row.userId)
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Credential setup resumed")
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
                 if (latest.destination != NativeOwnerMoreDestination.UsersRoles) return@launch
@@ -591,7 +606,7 @@ internal class OwnerUsersRolesController(
                         usersError = null,
                     )
                 } else {
-                    handleFailure(token, error)
+                    handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
                 }
             }
         }
@@ -620,6 +635,7 @@ internal class OwnerUsersRolesController(
         }
         runtime.state.value = current.copy(userReauthBusy = true, usersError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.reauthenticate(session, passphrase)
@@ -644,6 +660,8 @@ internal class OwnerUsersRolesController(
                         withContext(Dispatchers.IO) {
                             facade.setEnabled(session, pending.userId, pending.enabled)
                         }
+                        saved = true
+                        com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Staff access updated")
                         val refreshed = withContext(Dispatchers.IO) {
                             facade.loadDetail(session, pending.userId)
                         }
@@ -667,6 +685,8 @@ internal class OwnerUsersRolesController(
                         val resetPending = withContext(Dispatchers.IO) {
                             facade.beginCredentialReset(session, pending.userId)
                         }
+                        saved = true
+                        com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Credential reset started")
                         val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                         if (!runtime.isCurrent(token)) return@launch
                         pendingUsersAction = null
@@ -683,6 +703,8 @@ internal class OwnerUsersRolesController(
                         val resumedPending = withContext(Dispatchers.IO) {
                             facade.resumeCredentialSetup(session, pending.userId)
                         }
+                        saved = true
+                        com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Credential setup resumed")
                         val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                         if (!runtime.isCurrent(token)) return@launch
                         pendingUsersAction = null
@@ -699,6 +721,8 @@ internal class OwnerUsersRolesController(
                         withContext(Dispatchers.IO) {
                             facade.changeRole(session, pending.userId, pending.roleWire)
                         }
+                        saved = true
+                        com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Staff role saved")
                         val refreshed = withContext(Dispatchers.IO) {
                             facade.loadDetail(session, pending.userId)
                         }
@@ -720,7 +744,7 @@ internal class OwnerUsersRolesController(
                     }
                 }
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
             } finally {
                 passphrase.fill('\u0000')
             }

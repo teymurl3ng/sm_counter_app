@@ -1,0 +1,92 @@
+[
+  {
+    "class": "com.saaf.milkshop.NativeAccessEvidenceTest",
+    "name": "portraitAccessAndRecoveryLightEvidence",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAccessEvidenceTest",
+    "name": "portraitAccessAndRecoveryDarkEvidence",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "name": "phonePortraitLockSurvivesRotationRequest",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "name": "uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "name": "submenuClicksReachTheDeviceVibrator",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "name": "recordSaleWritesRoomAndShowsRefreshedReceipt",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+    "name": "collectLargeTextPortraitSemanticsRemainAvailable",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.Phase8SaleOperationsTest",
+    "name": "packagedDailyWorkScreenRecordsPaidSaleThroughRoom",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSaleEntryScreenContractTest",
+    "name": "dirtyOwnerNavigationRequiresDiscardConfirmation",
+    "passed": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCollectionEntryScreenContractTest",
+    "name": "dirtyOwnerNavigationRequiresDiscardConfirmation",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerExpenseScreenContractTest",
+    "name": "dirtyOwnerNavigationRequiresDiscardConfirmation",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerPaySupplierScreenContractTest",
+    "name": "dirtyOwnerNavigationRequiresDiscardConfirmation",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerPaySalaryScreenContractTest",
+    "name": "dirtyOwnerNavigationRequiresDiscardConfirmation",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCashCloseScreenContractTest",
+    "name": "dirtyOwnerNavigationRequiresDiscardConfirmation",
+    "passed": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeWorkRefreshRegressionTest",
+    "name": "operatorBackWinsOverWarmRefresh",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.NativeWorkRefreshRegressionTest",
+    "name": "ownerNavigationWinsOverRefreshingSuccessAndFailure",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.NativeWorkRefreshRegressionTest",
+    "name": "managerNavigationWinsOverWarmRefresh",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.NativeWorkRefreshRegressionTest",
+    "name": "adminNavigationWinsOverWarmRefreshFailure",
+    "passed": true
+  }
+]

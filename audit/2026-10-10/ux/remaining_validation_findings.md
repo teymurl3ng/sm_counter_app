@@ -1,0 +1,22 @@
+# Candidate validation findings
+
+The current 591-test run validates the frozen candidate. Apply any fixes together after it completes, then repeat the final gates.
+
+- CONFIRMED SOURCE DEFECT: NativePreviewActivity currently forces light status icons for every Access destination. Auth AccessFrame has a constant dark green band, but authenticated role headers use MaterialTheme.primary, which is light mint in dark mode. Authenticated dark-mode roles therefore need dark status icons. Welcome should continue to follow the page background; unauthenticated auth should retain light icons. `showingAuthenticated` is already available before SystemBarAppearance. Validate the corrected mode combinations on A06; do not claim pixel proof from source alone.
+- PERFORMANCE OBSERVATION: Native-themed synthetic real-time Sale/Reports body probe passes active-guard ownership across 30 transitions. 780 frame callbacks, median total 18.73 ms, p95 111.29 ms, 30 callbacks over reported platform deadline. These are diagnostic observations, not a production motion budget pass. Window captures exclude external system surfaces and show a deliberate mid-crossfade overlap.
+
+- CONFIRMED CLOSE-SCOPE DEFECT: NativeCashCloseFacade.load currently lists pending deliveries only on the closing date, but the confirmation and day-lock can cover earlier open dates too. Before final acceptance, include pending deliveries dated at/before the target whose dates remain posting-open; ignore already sealed legacy dates, and include the delivery date in the label. Add a real facade regression that creates an earlier open pending delivery, refuses close without writing, resolves it through the Cashier facade (not direct domain bypass), and then verifies closure. The existing same-date test should also resolve through the facade.
+
+- CONFIRMED TEST FIXTURE DEFECT: Six NativeOwner*ScreenContractTest.setScreen helpers accept `onNavigate` but wire their OwnerScaffold with `onNavigate = {}` and omit `onRegisterGuard`. Their discard-navigation failures cannot exercise the production host's guard. Rewire the fixtures through rememberPaneGuardRegistration and a saving-aware guarded navigation callback; preserve actual discard/cancel assertions. Check the same pattern in the other owner entry fixtures.
+- MISSING STABLE EMPTY-CATALOG TAG: The single empty-catalog message in ProductSelector needs the existing CashierProductUnavailable tag. The redundant status message was removed, but the remaining message currently lacks the tag used by the hardening contract. Preserve one visible message and the disabled save behavior.
+- OTHER FAILURES REQUIRE IMPLEMENTATION CHECKS: old Phase8 web-screen contract after native cutover; receipt total expected 38000 vs observed 43000 with default surcharge; fixed UTC display-time expectation on a Karachi device; records closed-day setup now refused by verified-actor SQL protection; missing ops_deliveries_retry_load tag; large-text landscape/nav assertions. Do not blanket change expected values, disable controls, or drop tests.
+
+## Wrap-up reconciliation
+
+User requested stopping to conserve usage. The 591-test candidate finished with 575 pass / 16 fail. A correction batch compiled and qaFast passed; its 56-test affected suite was interrupted after last reported 26 completed / 3 failed. Source hashes at wrap-up are in wrapup_main_source_hashes.json.
+
+The prior assertion that auth uses a constant dark-green band was incorrect: NativeAuthenticationScreens.AccessFrame uses MaterialTheme.colorScheme.primary. Both auth and role headers therefore need dark status icons in dark theme. Final expression corrected accordingly, not rerun after interruption.
+
+Implemented but awaiting final verification: earlier-open pending-delivery coverage with actual Cashier resolve regression; stable empty-product tag; six Owner guard fixtures; standalone Activity navigation; Deliveries retry tag; device-zone clock expectation; authenticated closed-day test setup; new default merchant-name expectation. Cashier-summary expectation now includes surcharge, as the canonical query and cash movement both do.
+
+Unresolved diagnostic evidence: WebView blocked by native/assets contract mismatch; Collect 150% text landscape navigation not displayed. Spoilage failed in candidate one; after explicitly dismissing the isolated account notice its focused test passed before interruption. The updated empty-product wording assertion was corrected after the interrupted run and remains unrerun. No new full checkpoint was started.

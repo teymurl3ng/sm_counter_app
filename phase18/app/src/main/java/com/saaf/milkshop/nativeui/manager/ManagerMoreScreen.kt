@@ -1,6 +1,8 @@
 package com.saaf.milkshop.nativeui.manager
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +37,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
+import com.saaf.milkshop.nativeui.common.nativeListItem
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -171,7 +175,7 @@ fun ManagerMoreScreen(
                 Text(state.message, style = MaterialTheme.typography.bodyLarge)
                 Spacer(Modifier.height(16.dp))
                 Button(
-                    onClick = onRetry,
+                    onClick = hapticAction(onRetry),
                     modifier = Modifier.testTag(NativeUiTags.ManagerMoreRetryLoad),
                 ) {
                     Text("Try again")
@@ -395,6 +399,7 @@ private fun ManagerMoreMenuScreen(
                 Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp)
                     .nativeRefreshOverlay(state.refreshing)
                     .testTag(NativeUiTags.ManagerMoreMenu),
             ) {
@@ -404,9 +409,8 @@ private fun ManagerMoreMenuScreen(
                     title = "Products",
                     subtitle = "What you sell and how it is measured",
                     tag = NativeUiTags.ManagerMoreProducts,
-                    onClick = onOpenProducts,
+                    onClick = hapticAction(onOpenProducts),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
                 ManagerMoreSectionLabel("People and businesses")
                 ManagerMoreMenuRow(
@@ -414,25 +418,22 @@ private fun ManagerMoreMenuScreen(
                     title = "Customers",
                     subtitle = "Customer accounts and balances",
                     tag = NativeUiTags.ManagerMoreCustomers,
-                    onClick = onOpenCustomers,
+                    onClick = hapticAction(onOpenCustomers),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 ManagerMoreMenuRow(
                     icon = Icons.Outlined.Business,
                     title = "Suppliers",
                     subtitle = "Supplier accounts and milk receipts",
                     tag = NativeUiTags.ManagerMoreSuppliers,
-                    onClick = onOpenSuppliers,
+                    onClick = hapticAction(onOpenSuppliers),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 ManagerMoreMenuRow(
                     icon = Icons.Outlined.Person,
                     title = "Employees",
                     subtitle = "Employee profiles and attendance",
                     tag = NativeUiTags.ManagerMoreEmployees,
-                    onClick = onOpenEmployees,
+                    onClick = hapticAction(onOpenEmployees),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
                 ManagerMoreSectionLabel("Account")
                 ManagerMoreMenuRow(
@@ -440,23 +441,21 @@ private fun ManagerMoreMenuScreen(
                     title = "Personal security",
                     subtitle = "Quick unlock for this account on this phone",
                     tag = NativeUiTags.ManagerMorePersonalSecurity,
-                    onClick = onOpenPersonalSecurity,
+                    onClick = hapticAction(onOpenPersonalSecurity),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 ManagerMoreMenuRow(
                     icon = Icons.Outlined.SwapHoriz,
                     title = "Switch account",
                     subtitle = "Choose another person on this phone",
                     tag = NativeUiTags.ManagerMoreSwitchAccount,
-                    onClick = onSwitchAccount,
+                    onClick = hapticAction(onSwitchAccount),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 ManagerMoreMenuRow(
                     icon = Icons.AutoMirrored.Outlined.Logout,
                     title = "Sign out",
                     subtitle = "Return to Welcome",
                     tag = NativeUiTags.ManagerMoreSignOut,
-                    onClick = onSignOut,
+                    onClick = hapticAction(onSignOut),
                 )
             }
         }
@@ -490,7 +489,7 @@ private fun ManagerMorePersonalSecurityScreen(
                 Text("This clears Quick PIN and phone security for ${identity.displayName} on this phone.")
             },
             confirmButton = {
-                TextButton(onClick = {
+                TextButton(onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction {
                     val secret = passphrase.toCharArray()
                     passphrase = ""
                     pin = ""
@@ -498,7 +497,7 @@ private fun ManagerMorePersonalSecurityScreen(
                 }) { Text("Discard and leave") }
             },
             dismissButton = {
-                TextButton(onClick = onCancelRemove) { Text("Keep editing") }
+                TextButton(onClick = hapticAction(onCancelRemove)) { Text("Keep editing") }
             },
         )
     }
@@ -546,8 +545,8 @@ private fun ManagerMorePersonalSecurityScreen(
                         Text(it, color = MaterialTheme.colorScheme.error)
                     }
                     Button(
-                        onClick = {
-                            if (passphrase.isBlank() || pin.length != 4) return@Button
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                            if (passphrase.isBlank() || pin.length != 4) return@hapticAction
                             val secret = passphrase.toCharArray()
                             val quickPin = pin.toCharArray()
                             passphrase = ""
@@ -559,8 +558,8 @@ private fun ManagerMorePersonalSecurityScreen(
                     ) { Text(if (state.saving) "Saving…" else "Save Quick PIN") }
                     if (security.phoneSecurityAvailable) {
                         Button(
-                            onClick = {
-                                if (passphrase.isBlank()) return@Button
+                            onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                                if (passphrase.isBlank()) return@hapticAction
                                 val secret = passphrase.toCharArray()
                                 val quickPin = pin.takeIf { it.length == 4 }?.toCharArray()
                                 passphrase = ""
@@ -573,7 +572,7 @@ private fun ManagerMorePersonalSecurityScreen(
                     }
                     if (security.quickPinEnabled || security.phoneSecurityEnabled) {
                         TextButton(
-                            onClick = onRequestRemove,
+                            onClick = hapticAction(onRequestRemove),
                             enabled = !state.saving && passphrase.isNotBlank(),
                         ) { Text("Remove Quick unlock") }
                     }
@@ -592,7 +591,7 @@ private fun ManagerMoreSectionLabel(label: String) {
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp)
+            .padding(vertical = 10.dp)
             .testTag(NativeUiTags.ManagerMoreSectionLabel),
     )
 }
@@ -607,11 +606,10 @@ private fun ManagerMoreMenuRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 72.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Navigation)
             .semantics { role = Role.Button }
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .clickable(onClick = hapticAction(onClick))
+            .nativeListItemContent(NativeListStyle.Navigation)
             .testTag(tag),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),

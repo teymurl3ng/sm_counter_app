@@ -1,5 +1,9 @@
 package com.saaf.milkshop.nativeui.owner
 
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.nativeListItem
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Box
@@ -27,6 +31,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -191,14 +196,14 @@ fun OwnerSyncScreen(
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     Row(
                         Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 12.dp)
-                            .clickable {
+                            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Selection, selected = pickedOwnerId == owner.userId)
+                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction {
                                 pickedOwnerId = owner.userId
                                 val chars = takeCredential()
                                 lastCredential = chars
                                 onEnrollAs(owner.userId, username, chars, environment)
-                            }
+                            })
+                            .nativeListItemContent(NativeListStyle.Selection)
                             .testTag(NativeUiTags.OwnerSyncOwnerPick),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -217,11 +222,10 @@ fun OwnerSyncScreen(
                     modifier = Modifier.testTag(NativeUiTags.OwnerSyncShopPicker),
                 )
                 shopChoices.forEach { choice ->
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     Row(
                         Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 12.dp),
+                            .padding(vertical = 4.dp).nativeListItem(NativeListStyle.Entity)
+                            .nativeListItemContent(NativeListStyle.Entity),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -234,7 +238,7 @@ fun OwnerSyncScreen(
                             )
                         }
                         Button(
-                            onClick = {
+                            onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                                 val chars = takeCredential()
                                 onEnrollInShop(choice.shopId, username, chars, environment, pickedOwnerId)
                                 chars.fill(' ')
@@ -282,7 +286,7 @@ fun OwnerSyncScreen(
             },
             confirmButton = {
                 TextButton(
-                    onClick = {
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                         unenrollConfirmOpen = false
                         onUnenroll()
                     },
@@ -290,7 +294,7 @@ fun OwnerSyncScreen(
                 ) { Text("Stop syncing") }
             },
             dismissButton = {
-                TextButton(onClick = { unenrollConfirmOpen = false }) { Text("Cancel") }
+                TextButton(onClick = com.saaf.milkshop.nativeui.common.hapticAction { unenrollConfirmOpen = false }) { Text("Cancel") }
             },
         )
     }
@@ -368,12 +372,12 @@ private fun OwnerSyncEnrolledBody(
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Button(
-                        onClick = { onResolveHold(hold.tableName, hold.rowUid, true) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onResolveHold(hold.tableName, hold.rowUid, true) },
                         enabled = !busy,
                         modifier = Modifier.testTag(NativeUiTags.OwnerSyncHoldKeep),
                     ) { Text("Keep mine") }
                     OutlinedButton(
-                        onClick = { onResolveHold(hold.tableName, hold.rowUid, false) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onResolveHold(hold.tableName, hold.rowUid, false) },
                         enabled = !busy,
                         modifier = Modifier.testTag(NativeUiTags.OwnerSyncHoldTake),
                     ) { Text("Take server") }
@@ -384,19 +388,19 @@ private fun OwnerSyncEnrolledBody(
     Spacer(Modifier.height(16.dp))
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Button(
-            onClick = onSyncNow,
+            onClick = hapticAction(onSyncNow),
             enabled = !busy,
             modifier = Modifier.testTag(NativeUiTags.OwnerSyncNow),
         ) { Text(if (busy) "Syncing…" else "Sync now") }
         OutlinedButton(
-            onClick = onRefresh,
+            onClick = hapticAction(onRefresh),
             enabled = !busy,
             modifier = Modifier.testTag(NativeUiTags.OwnerSyncRefresh),
         ) { Text("Refresh") }
     }
     Spacer(Modifier.height(8.dp))
     TextButton(
-        onClick = onUnenroll,
+        onClick = hapticAction(onUnenroll),
         enabled = !busy,
         modifier = Modifier.testTag(NativeUiTags.OwnerSyncUnenroll),
     ) { Text("Stop syncing this phone") }
@@ -471,7 +475,7 @@ private fun OwnerSyncEnrollBody(
             Spacer(Modifier.height(8.dp))
             Box {
                 OutlinedButton(
-                    onClick = onEnvironmentMenuOpen,
+                    onClick = hapticAction(onEnvironmentMenuOpen),
                     enabled = !busy,
                     modifier = Modifier.testTag(NativeUiTags.OwnerSyncEnvironment),
                 ) { Text("Server: ${environment.uppercase()}") }
@@ -481,14 +485,14 @@ private fun OwnerSyncEnrollBody(
                 ) {
                     DropdownMenuItem(
                         text = { Text("PROD (live shop)") },
-                        onClick = {
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                             onEnvironmentChange(SyncServerConfig.ENVIRONMENT_PROD)
                             onEnvironmentMenuDismiss()
                         },
                     )
                     DropdownMenuItem(
                         text = { Text("DEV (testing)") },
-                        onClick = {
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                             onEnvironmentChange(SyncServerConfig.ENVIRONMENT_DEV)
                             onEnvironmentMenuDismiss()
                         },
@@ -498,7 +502,7 @@ private fun OwnerSyncEnrollBody(
         }
         Spacer(Modifier.height(16.dp))
         Button(
-            onClick = onEnroll,
+            onClick = hapticAction(onEnroll),
             enabled = !busy && username.isNotBlank() && credential.isNotBlank(),
             modifier = Modifier
                 .fillMaxWidth()

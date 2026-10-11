@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeFoundationUiTest" tests="32" failures="3" errors="0" skipped="0" time="78.934" timestamp="2026-10-10T18:30:06" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="operationsRecordSpoilageRecordsPhysicalLoss" classname="com.saaf.milkshop.NativeFoundationUiTest" time="16.108" />
+  <testcase name="missingProductAndPaymentReferencesExplainWhatTheOwnerMustFix" classname="com.saaf.milkshop.NativeSaleHardeningContractTest" time="1.344">
+    <failure>java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'No active sale product has a retail rate. Ask an owner or manager to configure one.' (ignoreCase: false) is not displayed!
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+at com.saaf.milkshop.NativeSaleHardeningContractTest.missingProductAndPaymentReferencesExplainWhatTheOwnerMustFix(NativeSaleHardeningContractTest.kt:79)
+</failure>
+  </testcase>
+  <testcase name="saleRejectsInsufficientStockClosedHistoryInvalidChannelAndUnauthorizedOperator" classname="com.saaf.milkshop.Phase8SaleOperationsTest" time="1.572" />
+  <testcase name="cashierRecordsQuantitySaleToCashWithNativeDefaultSurchargeAndSummaries" classname="com.saaf.milkshop.Phase8SaleOperationsTest" time="1.617" />
+  <testcase name="packagedDailyWorkScreenRecordsPaidSaleThroughRoom" classname="com.saaf.milkshop.Phase8SaleOperationsTest" time="11.877">
+    <failure>java.lang.AssertionError: Web condition did not become true: document.getElementById('login-button') !== null; visible page: "Saaf Milk cannot open\n\nApp components do not match. Reinstall a complete Saaf Milk build."
+at com.saaf.milkshop.Phase8SaleOperationsTest.waitFor(Phase8SaleOperationsTest.kt:266)
+at com.saaf.milkshop.Phase8SaleOperationsTest.waitFor$default(Phase8SaleOperationsTest.kt:260)
+at com.saaf.milkshop.Phase8SaleOperationsTest$packagedDailyWorkScreenRecordsPaidSaleThroughRoom$1.invokeSuspend(Phase8SaleOperationsTest.kt:179)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at com.saaf.milkshop.Phase8SaleOperationsTest.packagedDailyWorkScreenRecordsPaidSaleThroughRoom(Phase8SaleOperationsTest.kt:164)
+</failure>
+  </testcase>
+  <testcase name="ownerRecordsValueSaleOnCustomerCreditAndNativeDerivesQuantity" classname="com.saaf.milkshop.Phase8SaleOperationsTest" time="0.543" />
+  <testcase name="collectLargeTextLandscapeSemanticsRemainAvailable" classname="com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest" time="6.739">
+    <failure>java.lang.AssertionError: Assert failed: The component with TestTag = 'cashier_nav_collect' is not displayed!
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+at com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest.collectLargeTextLandscapeSemanticsRemainAvailable(NativeCollectionAcceptanceGapsTest.kt:272)
+</failure>
+  </testcase>
+  <testcase name="emptyTodayExplainsAndKeepsActivityNavSelected" classname="com.saaf.milkshop.NativeActivityScreenContractTest" time="1.258" />
+  <testcase name="readyListOpensDetailAndBackClearsIt" classname="com.saaf.milkshop.NativeActivityScreenContractTest" time="1.486" />
+  <testcase name="loadFailureOffersRetry" classname="com.saaf.milkshop.NativeActivityScreenContractTest" time="1.186" />
+  <testcase name="loadRejectsWhenSessionMissingOperationalPermission" classname="com.saaf.milkshop.NativeOperationsWorkFacadeTest" time="1.413" />
+  <testcase name="loadUsesEffectivePurchaseNotSupersededOriginal" classname="com.saaf.milkshop.NativeOperationsWorkFacadeTest" time="1.51" />
+  <testcase name="loadExposesPhysicalContextWithoutFinanceFields" classname="com.saaf.milkshop.NativeOperationsWorkFacadeTest" time="1.466" />
+  <testcase name="loadFailureRetainsOwnerShellAndRetries" classname="com.saaf.milkshop.NativeOwnerSaleEntryScreenContractTest" time="1.359" />
+  <testcase name="readyUsesOwnerChromeAndExcludesCashierNavigation" classname="com.saaf.milkshop.NativeOwnerSaleEntryScreenContractTest" time="1.436" />
+  <testcase name="dirtyOwnerNavigationRequiresDiscardConfirmation" classname="com.saaf.milkshop.NativeOwnerSaleEntryScreenContractTest" time="2.236" />
+  <testcase name="loadFailureRetainsOwnerShellAndRetries" classname="com.saaf.milkshop.NativeOwnerCollectionEntryScreenContractTest" time="1.308" />
+  <testcase name="readyUsesOwnerChromeAndExcludesCashierNavigation" classname="com.saaf.milkshop.NativeOwnerCollectionEntryScreenContractTest" time="1.409" />
+  <testcase name="dirtyOwnerNavigationRequiresDiscardConfirmation" classname="com.saaf.milkshop.NativeOwnerCollectionEntryScreenContractTest" time="2.201" />
+  <testcase name="loadFailureRetainsOwnerShellAndRetries" classname="com.saaf.milkshop.NativeOwnerExpenseScreenContractTest" time="1.234" />
+  <testcase name="readyUsesOwnerChromeAndExcludesCashierNavigation" classname="com.saaf.milkshop.NativeOwnerExpenseScreenContractTest" time="1.341" />
+  <testcase name="dirtyOwnerNavigationRequiresDiscardConfirmation" classname="com.saaf.milkshop.NativeOwnerExpenseScreenContractTest" time="2.187" />
+  <testcase name="loadFailureRetainsOwnerShellAndRetries" classname="com.saaf.milkshop.NativeOwnerPaySupplierScreenContractTest" time="1.412" />
+  <testcase name="readyUsesOwnerChromeAndExcludesCashierNavigation" classname="com.saaf.milkshop.NativeOwnerPaySupplierScreenContractTest" time="1.337" />
+  <testcase name="dirtyOwnerNavigationRequiresDiscardConfirmation" classname="com.saaf.milkshop.NativeOwnerPaySupplierScreenContractTest" time="2.128" />
+  <testcase name="loadFailureRetainsOwnerShellAndRetries" classname="com.saaf.milkshop.NativeOwnerPaySalaryScreenContractTest" time="1.285" />
+  <testcase name="readyUsesOwnerChromeAndExcludesCashierNavigation" classname="com.saaf.milkshop.NativeOwnerPaySalaryScreenContractTest" time="1.385" />
+  <testcase name="dirtyOwnerNavigationRequiresDiscardConfirmation" classname="com.saaf.milkshop.NativeOwnerPaySalaryScreenContractTest" time="2.081" />
+  <testcase name="reopenSuccessShowsOpenFeedbackUnderOwnerChrome" classname="com.saaf.milkshop.NativeOwnerCashCloseScreenContractTest" time="1.263" />
+  <testcase name="loadFailureRetainsOwnerShellAndRetries" classname="com.saaf.milkshop.NativeOwnerCashCloseScreenContractTest" time="1.227" />
+  <testcase name="readyUsesOwnerChromeAndExcludesCashierNavigation" classname="com.saaf.milkshop.NativeOwnerCashCloseScreenContractTest" time="1.335" />
+  <testcase name="closedDateShowsReopenFormAndSubmits" classname="com.saaf.milkshop.NativeOwnerCashCloseScreenContractTest" time="-1.791657003769E9" />
+</testsuite>

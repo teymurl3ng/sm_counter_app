@@ -1,6 +1,12 @@
 package com.saaf.milkshop.nativeui.sale
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeBottomNavigation
+import com.saaf.milkshop.nativeui.common.NativeNavigationLabel
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.nativeListItem
+
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -130,6 +136,14 @@ private enum class EntryMode { Quantity, Amount }
 private enum class PaymentChoice { PaidNow, CustomerAccount }
 enum class CashierSection { Sell, Collect, Activity, More }
 
+private data class SaleReceiptPresentation(
+    val productName: String,
+    val quantityUnit: String,
+    val paymentSummary: String,
+    val priceLabel: String?,
+    val note: String?,
+)
+
 @Composable
 fun CashierSaleScreen(
     snackbarHostState: SnackbarHostState,
@@ -222,7 +236,7 @@ private fun CashierRailItem(
             unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
         icon = { Icon(icon, contentDescription = null) },
-        label = { Text(label, maxLines = 2) },
+        label = { NativeNavigationLabel(label) },
     )
 }
 
@@ -256,6 +270,26 @@ internal fun SaleEntryContent(
     // prefilled from the shop's default_surcharge setting.
     var surchargeEnabled by rememberSaveable { mutableStateOf(false) }
     var surchargeText by rememberSaveable { mutableStateOf("") }
+    DisposableEffect(leaveGuard) {
+        leaveGuard.onDiscard = {
+            selectedProductId = null
+            entryMode = EntryMode.Quantity
+            payment = PaymentChoice.PaidNow
+            entryValue = ""
+            selectedCustomerId = null
+            showCustomerPicker = false
+            paidNowAccountId = null
+            showPaymentPicker = false
+            secondaryDetailsExpanded = false
+            saleNote = ""
+            wholesale = false
+            wholesaleRateText = ""
+            surchargeEnabled = false
+            surchargeText = ""
+            onClearFeedback()
+        }
+        onDispose { leaveGuard.onDiscard = null }
+    }
     val focusManager = LocalFocusManager.current
     val useStackedLayout = LocalDensity.current.fontScale >= 1.3f
 
@@ -287,19 +321,16 @@ internal fun SaleEntryContent(
         PaymentChoice.CustomerAccount -> selectedCustomer?.name
             ?: stringResource(R.string.native_customer_account)
     }
-    val canRecord = context.postingOpen && product != null && quantity > 0.0 && !state.saving &&
+    val canRecord = context.postingOpen && product != null && quantity > 0.0 && activeRatePaisa > 0L && !state.saving &&
         (!wholesale || wholesaleRatePaisa != null) &&
         when (payment) {
             PaymentChoice.PaidNow -> paidNowAccount != null
             PaymentChoice.CustomerAccount -> selectedCustomer != null
         }
 
-    // The receipt posts on top of the untouched form (Square-style "new sale"
-    // flow): product, quantity, mode, payment, and customer carry into the
-    // next sale until the cashier changes them — a repeat credit sale needs
-    // no re-taps, and nothing flips while the follow-up card is on screen.
-    // Only the leave guard clears so leaving after a sale doesn't warn about
-    // changes that are already saved.
+    // Keep the recorded draft while showing its receipt. Next sale explicitly
+    // clears the draft; the outgoing receipt retains its own presentation
+    // snapshot throughout the fade. Saved values do not trigger a leave warning.
     LaunchedEffect(state.receipt?.eventId) {
         if (state.receipt != null) {
             leaveGuard.clear()
@@ -319,18 +350,29 @@ internal fun SaleEntryContent(
                 businessDate = context.businessDate,
                 postingOpen = context.postingOpen,
             )
-            if (state.receipt != null) {
+            NativeSectionTransition(
+            targetState = state to SaleReceiptPresentation(
+                productName, quantityUnit, paymentSummary,
+                if (wholesale && rate > 0.0) "Wholesale · ${formatAmount(rate)} / $quantityUnit" else null,
+                saleNote.trim().takeIf { it.isNotEmpty() },
+            ),
+            contentKey = { it.first.receipt != null },
+            modifier = Modifier.weight(1f),
+        ) { pane ->
+            val state = pane.first
+            val presentation = pane.second
+        if (state.receipt != null) {
                 // Confirmation cheque: the receipt is its own screen. The form
                 // state stays frozen at the recorded values while the pane is
                 // up, so the cheque can show exactly what was booked.
                 SaleChequePane(
                     receipt = state.receipt,
                     followUp = state.deliveryFollowUp,
-                    productName = productName,
-                    quantityUnit = quantityUnit,
-                    paymentSummary = paymentSummary,
-                    priceLabel = if (wholesale && rate > 0.0) "Wholesale · ${formatAmount(rate)} / $quantityUnit" else null,
-                    note = saleNote.trim().takeIf { it.isNotEmpty() },
+                    productName = presentation.productName,
+                    quantityUnit = presentation.quantityUnit,
+                    paymentSummary = presentation.paymentSummary,
+                    priceLabel = presentation.priceLabel,
+                    note = presentation.note,
                     onStartNextSale = {
                         selectedProductId = null
                         entryMode = EntryMode.Quantity
@@ -348,12 +390,12 @@ internal fun SaleEntryContent(
                         onStartNextSale()
                     },
                     onSendAsDelivery = onSendAsDelivery,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.fillMaxSize(),
                 )
             } else {
             Column(
                 modifier = Modifier
-                    .weight(1f)
+                    .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     .testTag(NativeUiTags.CashierSaleScroll)
                     .padding(horizontal = 16.dp, vertical = 12.dp),
@@ -381,13 +423,7 @@ internal fun SaleEntryContent(
                         onClearFeedback()
                     },
                 )
-                if (context.products.isEmpty()) {
-                    StatusMessage(
-                        message = "No active sale product has a retail rate. Ask an owner or manager to configure one.",
-                        error = true,
-                        tag = NativeUiTags.CashierProductUnavailable,
-                    )
-                }
+
 
                 SectionDivider()
                 SectionHeading(title = stringResource(R.string.native_enter_sale))
@@ -503,14 +539,14 @@ internal fun SaleEntryContent(
                     Spacer(Modifier.height(8.dp))
                     PaymentAccountSelectionRow(
                         accountName = paidNowAccount.name,
-                        onClick = { showPaymentPicker = true },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { showPaymentPicker = true },
                     )
                 }
                 if (payment == PaymentChoice.CustomerAccount) {
                     Spacer(Modifier.height(8.dp))
                     CustomerSelectionRow(
                     selectedCustomer = selectedCustomer?.name,
-                        onClick = { showCustomerPicker = true },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { showCustomerPicker = true },
                     )
                 }
                 Spacer(Modifier.height(8.dp))
@@ -652,6 +688,7 @@ internal fun SaleEntryContent(
             }
             }
         }
+        }
 
     if (showCustomerPicker) {
         CustomerAccountDialog(
@@ -731,13 +768,12 @@ private fun SalePaymentPickerDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.native_paid_now)) },
         text = {
-            Column {
+            Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
                 accounts.forEach { account ->
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 56.dp)
-                            .clickable { onSelect(account) }
+                            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Selection, selected = account.accountId == selectedId)
+                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(account) })
                             .semantics {
                                 role = Role.RadioButton
                                 contentDescription = if (account.accountId == selectedId) {
@@ -745,7 +781,7 @@ private fun SalePaymentPickerDialog(
                                 } else account.name
                             }
                             .testTag(NativeUiTags.cashierPaymentAccount(account.accountId))
-                            .padding(vertical = 12.dp),
+                            .nativeListItemContent(NativeListStyle.Selection),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
@@ -764,7 +800,7 @@ private fun SalePaymentPickerDialog(
         confirmButton = {},
         dismissButton = {
             TextButton(
-                onClick = onDismiss,
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction(onDismiss),
                 modifier = Modifier.testTag(NativeUiTags.CashierPaymentCancel),
             ) { Text(stringResource(R.string.native_cancel)) }
         },
@@ -801,13 +837,13 @@ internal fun SaleDiscardDialog(leaveGuard: EntryLeaveGuard) {
         text = { Text("Your unsaved sale entry will be cleared before leaving.") },
         confirmButton = {
             TextButton(
-                onClick = leaveGuard::confirmDiscard,
+                onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction(leaveGuard::confirmDiscard),
                 modifier = Modifier.testTag(NativeUiTags.CashierDiscardDraft),
             ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(
-                onClick = leaveGuard::keepEditing,
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction(leaveGuard::keepEditing),
                 modifier = Modifier.testTag(NativeUiTags.CashierKeepDraft),
             ) { Text("Keep editing") }
         },
@@ -911,6 +947,10 @@ private fun SectionHeading(title: String, supporting: String? = null, stacked: B
     }
 }
 
+private fun productRateLabel(product: NativeSaleProduct): String =
+    if (product.ratePaisaPerUnit <= 0L) "No retail price. Set a price in Products."
+    else "PKR ${formatAmount(product.ratePaisaPerUnit / 100.0)} / ${product.unit.toDisplayUnit()} · ${product.quantityOnHand} in stock"
+
 @Composable
 private fun ProductSelector(
     products: List<NativeSaleProduct>,
@@ -918,7 +958,57 @@ private fun ProductSelector(
     stacked: Boolean,
     onSelected: (NativeSaleProduct) -> Unit,
 ) {
-    if (stacked) {
+    if (products.isEmpty()) {
+        Text("No active products. Ask an Owner or Admin to add a product in Products.",
+            modifier = Modifier.testTag(NativeUiTags.CashierProductUnavailable),
+            style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        return
+    }
+    if (products.size > 6) {
+        val pickerFocus = LocalFocusManager.current
+        var pickerOpen by rememberSaveable { mutableStateOf(false) }
+        var search by rememberSaveable { mutableStateOf("") }
+        val selected = products.firstOrNull { it.productId == selectedProductId } ?: products.first()
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            ProductCard(selected.name, productRateLabel(selected), selected = true,
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction { search = ""; pickerOpen = true },
+                modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashierProductPickerOpen))
+            Text("Tap to choose from ${products.size} products", style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        if (pickerOpen) {
+            AlertDialog(
+                onDismissRequest = { pickerOpen = false },
+                title = { Text("Choose product") },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedTextField(search, onValueChange = { search = it },
+                            label = { Text("Search products") }, singleLine = true,
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(onDone = { pickerFocus.clearFocus() }),
+                            modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashierProductSearch))
+                        val visible = products.filter { it.name.contains(search.trim(), ignoreCase = true) }
+                        LazyColumn(Modifier.fillMaxWidth().heightIn(max = 320.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            if (visible.isEmpty()) item { Text("No matching products") }
+                            items(visible, key = { it.productId }) { option ->
+                                ProductCard(option.name, productRateLabel(option), option.productId == selectedProductId,
+                                    onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction {
+                                        onSelected(option)
+                                        pickerOpen = false
+                                    }, modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.cashierProductPick(option.productId)))
+                            }
+                        }
+                    }
+                },
+                confirmButton = {},
+                dismissButton = { TextButton(onClick = com.saaf.milkshop.nativeui.common.hapticAction { pickerOpen = false },
+                    modifier = Modifier.testTag(NativeUiTags.CashierProductPickerCancel)) { Text("Cancel") } },
+            )
+        }
+        return
+    }
+    if (stacked || products.size > 2) {
         Column(
             modifier = Modifier.fillMaxWidth().selectableGroup(),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -926,9 +1016,9 @@ private fun ProductSelector(
             products.forEach { option ->
                 ProductCard(
                     title = option.name,
-                    rate = "PKR ${formatAmount(option.ratePaisaPerUnit / 100.0)} / ${option.unit.toDisplayUnit()} · ${option.quantityOnHand} in stock",
+                    rate = productRateLabel(option),
                     selected = selectedProductId == option.productId,
-                    onClick = { onSelected(option) },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelected(option) },
                     modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.cashierProduct(option.name)),
                 )
             }
@@ -941,9 +1031,9 @@ private fun ProductSelector(
             products.forEach { option ->
                 ProductCard(
                     title = option.name,
-                    rate = "PKR ${formatAmount(option.ratePaisaPerUnit / 100.0)} / ${option.unit.toDisplayUnit()} · ${option.quantityOnHand} in stock",
+                    rate = productRateLabel(option),
                     selected = selectedProductId == option.productId,
-                    onClick = { onSelected(option) },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelected(option) },
                     modifier = Modifier.weight(1f).testTag(NativeUiTags.cashierProduct(option.name)),
                 )
             }
@@ -967,21 +1057,22 @@ private fun ProductCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     Surface(
         color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
         contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
-        shape = RoundedCornerShape(13.dp),
-        border = if (selected) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        shape = RoundedCornerShape(12.dp),
+        border = if (selected) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         modifier = modifier
-            .heightIn(min = 68.dp)
+            .heightIn(min = 72.dp)
             .selectable(
                 selected = selected,
-                onClick = onClick,
+                onClick = { context.hapticSelect(); onClick() },
                 role = Role.RadioButton,
             ),
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
+            modifier = Modifier.nativeListItemContent(NativeListStyle.Entity),
             verticalArrangement = Arrangement.Center,
         ) {
             Text(text = title, style = MaterialTheme.typography.titleMedium)
@@ -1009,7 +1100,7 @@ private fun EntryModeSelector(selected: EntryMode, onSelected: (EntryMode) -> Un
         Segment(
             text = stringResource(R.string.native_quantity),
             selected = selected == EntryMode.Quantity,
-            onClick = { onSelected(EntryMode.Quantity) },
+            onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelected(EntryMode.Quantity) },
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
@@ -1019,7 +1110,7 @@ private fun EntryModeSelector(selected: EntryMode, onSelected: (EntryMode) -> Un
         Segment(
             text = stringResource(R.string.native_amount),
             selected = selected == EntryMode.Amount,
-            onClick = { onSelected(EntryMode.Amount) },
+            onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelected(EntryMode.Amount) },
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
@@ -1302,7 +1393,7 @@ private fun PaymentCard(
             .selectable(selected = selected, role = Role.RadioButton) { context.hapticSelect(); onClick() },
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             RadioButton(
@@ -1348,7 +1439,7 @@ private fun CustomerSelectionRow(
             .clickable(role = Role.Button) { context.hapticSelect(); onClick() },
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
@@ -1404,24 +1495,18 @@ private fun CustomerAccountDialog(
                 }
                 items(customers, key = { it.accountId }) { customer ->
                     Surface(
-                        color = if (selectedCustomerId == customer.accountId) {
-                            MaterialTheme.colorScheme.surfaceVariant
-                        } else {
-                            Color.Transparent
-                        },
-                        shape = RoundedCornerShape(10.dp),
+                        color = Color.Transparent,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 52.dp)
+                            .nativeListItem(NativeListStyle.Selection, selected = selectedCustomerId == customer.accountId)
                             .testTag(NativeUiTags.cashierCustomer(customer.accountId))
                             .selectable(
                                 selected = selectedCustomerId == customer.accountId,
-                                onClick = { onSelect(customer) },
+                                onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(customer) },
                                 role = Role.RadioButton,
                             ),
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                            modifier = Modifier.fillMaxWidth().nativeListItemContent(NativeListStyle.Selection),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             RadioButton(
@@ -1429,7 +1514,7 @@ private fun CustomerAccountDialog(
                                 onClick = null,
                             )
                             Spacer(Modifier.width(8.dp))
-                            Text(customer.name, style = MaterialTheme.typography.titleMedium)
+                            Text(customer.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                         }
                     }
                 }
@@ -1437,7 +1522,7 @@ private fun CustomerAccountDialog(
         },
         confirmButton = {
             TextButton(
-                onClick = onDismiss,
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction(onDismiss),
                 modifier = Modifier.testTag(NativeUiTags.CashierCustomerCancel),
             ) {
                 Text(stringResource(R.string.native_cancel))
@@ -1470,7 +1555,7 @@ private fun SecondaryDetails(
                 .heightIn(min = 48.dp)
                 .testTag(NativeUiTags.CashierSecondaryDetails)
                 .semantics { stateDescription = if (expanded) "Expanded" else "Collapsed" }
-                .clickable(role = Role.Button, onClick = onToggle),
+                .clickable(role = Role.Button, onClick = com.saaf.milkshop.nativeui.common.hapticAction(onToggle)),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 12.dp),
@@ -1497,7 +1582,7 @@ private fun SecondaryDetails(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Column(
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -1518,13 +1603,13 @@ private fun SecondaryDetails(
                             Segment(
                                 text = stringResource(R.string.native_standard_price),
                                 selected = !wholesale,
-                                onClick = { onWholesaleSelected(false) },
+                                onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onWholesaleSelected(false) },
                                 modifier = Modifier.weight(1f),
                             )
                             Segment(
                                 text = "Wholesale",
                                 selected = wholesale,
-                                onClick = { onWholesaleSelected(true) },
+                                onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onWholesaleSelected(true) },
                                 modifier = Modifier.weight(1f),
                             )
                         }
@@ -1663,37 +1748,34 @@ internal fun CashierNavigation(
     selected: CashierSection,
     onNavigate: (CashierSection) -> Unit,
 ) {
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.background,
-        tonalElevation = 0.dp,
-    ) {
+    NativeBottomNavigation {
         CashierNavigationItem(
             icon = Icons.Outlined.PointOfSale,
             label = stringResource(R.string.native_sell),
             selected = selected == CashierSection.Sell,
             tag = NativeUiTags.CashierNavSell,
-            onClick = { onNavigate(CashierSection.Sell) },
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction { onNavigate(CashierSection.Sell) },
         )
         CashierNavigationItem(
             icon = Icons.Outlined.Payments,
             label = stringResource(R.string.native_collect),
             selected = selected == CashierSection.Collect,
             tag = NativeUiTags.CashierNavCollect,
-            onClick = { onNavigate(CashierSection.Collect) },
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction { onNavigate(CashierSection.Collect) },
         )
         CashierNavigationItem(
             icon = Icons.Outlined.History,
             label = stringResource(R.string.native_activity),
             selected = selected == CashierSection.Activity,
             tag = NativeUiTags.CashierNavActivity,
-            onClick = { onNavigate(CashierSection.Activity) },
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction { onNavigate(CashierSection.Activity) },
         )
         CashierNavigationItem(
             icon = Icons.Outlined.MoreHoriz,
             label = stringResource(R.string.native_more),
             selected = selected == CashierSection.More,
             tag = NativeUiTags.CashierNavMore,
-            onClick = { onNavigate(CashierSection.More) },
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction { onNavigate(CashierSection.More) },
         )
     }
 }
@@ -1712,7 +1794,7 @@ private fun androidx.compose.foundation.layout.RowScope.CashierNavigationItem(
         onClick = { context.hapticTap(); onClick() },
         modifier = Modifier.testTag(tag),
         icon = { Icon(icon, contentDescription = null) },
-        label = { Text(label, maxLines = 2) },
+        label = { NativeNavigationLabel(label) },
         colors = NavigationBarItemDefaults.colors(
             selectedIconColor = MaterialTheme.colorScheme.onPrimary,
             selectedTextColor = MaterialTheme.colorScheme.primary,
@@ -1741,7 +1823,7 @@ private fun SaleDeliveryFollowUpCard(
             .testTag(NativeUiTags.CashierSaleDeliveryCard),
     ) {
         Column(
-            Modifier.padding(14.dp),
+            Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text("Deliver to $customerName", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
@@ -1800,8 +1882,8 @@ private fun SaleChequePane(
     onSendAsDelivery: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    com.saaf.milkshop.nativeui.common.NativeReceiptFeedback("sale", receipt.eventId)
     val context = LocalContext.current
-    LaunchedEffect(receipt.eventId) { context.hapticConfirm() }
     Column(
         modifier = modifier
             .fillMaxSize()

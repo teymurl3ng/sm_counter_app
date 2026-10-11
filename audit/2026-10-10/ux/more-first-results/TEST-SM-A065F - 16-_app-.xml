@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeFoundationUiTest" tests="24" failures="5" errors="0" skipped="0" time="73.948" timestamp="2026-10-10T16:24:28" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="switchAccountHardwareBackKeepsSessionAndReturnsToMore" classname="com.saaf.milkshop.NativeFoundationUiTest" time="18.484">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 10000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeFoundationUiTest.waitForMoreMenu(NativeFoundationUiTest.kt:3588)
+at com.saaf.milkshop.NativeFoundationUiTest.switchAccountHardwareBackKeepsSessionAndReturnsToMore(NativeFoundationUiTest.kt:2311)
+</failure>
+  </testcase>
+  <testcase name="moreMenuHardwareBackReturnsToSellAndKeepsSession" classname="com.saaf.milkshop.NativeFoundationUiTest" time="5.657" />
+  <testcase name="cashierExpenseHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.992" />
+  <testcase name="everyBottomDestinationProvidesItsDefinedPreviewResponse" classname="com.saaf.milkshop.NativeFoundationUiTest" time="5.959" />
+  <testcase name="switchAccountUiBackKeepsSessionAndReturnsToMore" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.816" />
+  <testcase name="cashierExpenseOpensUnderCashierChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.251" />
+  <testcase name="cashierCountsClosesDayAndCannotReopen" classname="com.saaf.milkshop.NativeFoundationUiTest" time="12.099" />
+  <testcase name="securityStatusIsOffWhenQuickUnlockUnavailable" classname="com.saaf.milkshop.NativeMoreFacadeTest" time="0.544" />
+  <testcase name="blindCashCountReturnsCountedAmountWithoutExpectedOrVarianceFields" classname="com.saaf.milkshop.NativeMoreFacadeTest" time="0.489" />
+  <testcase name="loadExposesCashDrawerWithoutExpectedBalance" classname="com.saaf.milkshop.NativeMoreFacadeTest" time="0.518" />
+  <testcase name="menuOpensExpenseEntry" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.0" />
+  <testcase name="countCashRecordsBlindAmountAndShowsSuccessWithoutExpectedVariance" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.207" />
+  <testcase name="personalSecurityShowsStatus" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.055" />
+  <testcase name="menuOpensCountCashEntry" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.048" />
+  <testcase name="menuShowsCashierActionsAndKeepsMoreNavSelected" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.162">
+    <failure>java.lang.AssertionError: Failed to assert the following: (Selected = 'true')
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'cashier_nav_more')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:262)
+at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+at androidx.compose.ui.test.AssertionsKt.assertIsSelected(Assertions.kt:88)
+at com.saaf.milkshop.NativeMoreScreenContractTest.menuShowsCashierActionsAndKeepsMoreNavSelected(NativeMoreScreenContractTest.kt:49)
+</failure>
+  </testcase>
+  <testcase name="switchAccountAndSignOutFireFromMenu" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.053" />
+  <testcase name="menuOpensDeliveriesFromMore" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.05" />
+  <testcase name="loadFailureOffersRetry" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="0.93" />
+  <testcase name="dirtyCashierNavigationRequiresDiscardConfirmation" classname="com.saaf.milkshop.NativeCashierExpenseScreenContractTest" time="1.547">
+    <failure>java.lang.AssertionError: Failed to inject touch input.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'cashier_nav_sell')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.performTouchInput(Actions.kt:402)
+at androidx.compose.ui.test.AndroidActions.performClickImpl(Actions.android.kt:23)
+at androidx.compose.ui.test.ActionsKt.performClick(Actions.kt:60)
+at com.saaf.milkshop.NativeCashierExpenseScreenContractTest.dirtyCashierNavigationRequiresDiscardConfirmation(NativeCashierExpenseScreenContractTest.kt:66)
+</failure>
+  </testcase>
+  <testcase name="readyUsesCashierChromeAndExcludesOwnerNavigation" classname="com.saaf.milkshop.NativeCashierExpenseScreenContractTest" time="1.158">
+    <failure>java.lang.AssertionError: Failed to assert the following: (Selected = 'true')
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'cashier_nav_more')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:262)
+at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+at androidx.compose.ui.test.AssertionsKt.assertIsSelected(Assertions.kt:88)
+at com.saaf.milkshop.NativeCashierExpenseScreenContractTest.readyUsesCashierChromeAndExcludesOwnerNavigation(NativeCashierExpenseScreenContractTest.kt:47)
+</failure>
+  </testcase>
+  <testcase name="loadFailureRetainsCashierShellAndRetries" classname="com.saaf.milkshop.NativeCashierExpenseScreenContractTest" time="0.984">
+    <failure>java.lang.AssertionError: Failed to assert the following: (Selected = 'true')
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'cashier_nav_more')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:262)
+at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+at androidx.compose.ui.test.AssertionsKt.assertIsSelected(Assertions.kt:88)
+at com.saaf.milkshop.NativeCashierExpenseScreenContractTest.loadFailureRetainsCashierShellAndRetries(NativeCashierExpenseScreenContractTest.kt:99)
+</failure>
+  </testcase>
+  <testcase name="loadExposesActiveCategoriesAndDefaultsCash" classname="com.saaf.milkshop.NativeExpenseFacadeTest" time="0.538" />
+  <testcase name="recordPostsExpenseAndReturnsReceipt" classname="com.saaf.milkshop.NativeExpenseFacadeTest" time="0.543" />
+  <testcase name="operatorCannotLoadOrRecordExpense" classname="com.saaf.milkshop.NativeExpenseFacadeTest" time="1.469" />
+</testsuite>

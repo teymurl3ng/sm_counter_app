@@ -1,0 +1,9 @@
+{
+  "canonicalEvidenceMatchesCheckpoint": true,
+  "pngCount": 14,
+  "sourceStillMatchesTargetedRun": true,
+  "deferredCapsuleAndThemeUnchanged": true,
+  "finalQaFast": "PASS",
+  "visualAcceptance": "BLOCKED",
+  "unreviewed": 14
+}

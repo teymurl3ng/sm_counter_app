@@ -125,7 +125,7 @@ class NativeOwnerMoreViewModel internal constructor(
                 // Merge: preserves the open destination, loaded destination
                 // lists and every in-progress editor (products, customers,
                 // costing, backup) across a warm refresh.
-                _state.value = previous?.copy(
+                _state.value = (_state.value as? NativeOwnerMoreState.Ready)?.copy(
                     context = context,
                     security = security,
                     refreshing = false,
@@ -138,7 +138,7 @@ class NativeOwnerMoreViewModel internal constructor(
             } catch (error: Throwable) {
                 if (previous != null && error !is SecurityFailure.SessionExpired) {
                     if (!runtime.isCurrent(token)) return@launch
-                    _state.value = previous.copy(
+                    _state.value = ((_state.value as? NativeOwnerMoreState.Ready) ?: previous).copy(
                         refreshing = false,
                         error = publicMessage(error),
                     )

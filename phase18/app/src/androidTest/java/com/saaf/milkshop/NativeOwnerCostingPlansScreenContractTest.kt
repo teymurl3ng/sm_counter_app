@@ -1,5 +1,8 @@
 package com.saaf.milkshop
 
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
+
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -50,6 +53,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class NativeOwnerCostingPlansScreenContractTest {
+    private var keyboard: SoftwareKeyboardController? = null
     @get:Rule
     val composeRule = createComposeRule()
 
@@ -471,6 +475,22 @@ class NativeOwnerCostingPlansScreenContractTest {
         assertEquals("1.5", saved!!.abnormalMilkLiters.toPlainString())
     }
 
+    @Test
+    fun openingDiscardCanKeepOrConfirmNavigation() {
+        var navigated = 0
+        setScreen(policies = emptyList(), section = NativeOwnerCostingSection.Opening,
+            openingEditor = sampleOpeningCost(), openingBasisKinds = listOf("documented_historical", "owner_estimate"),
+            onNavigate = { navigated++ })
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningTotal).performTextReplacement("250")
+        composeRule.runOnIdle { keyboard?.hide() }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningKeep).performClick()
+        assertEquals(0, navigated)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCostingOpeningDiscard).performClick()
+        assertEquals(1, navigated)
+    }
+
     private fun setScreen(
         policies: List<NativeOwnerCostingPolicyRow>,
         policiesLoading: Boolean = false,
@@ -532,6 +552,7 @@ class NativeOwnerCostingPlansScreenContractTest {
                 LocalDensity provides Density(currentDensity.density, fontScale),
             ) {
                 SaafTheme(darkTheme = false) {
+                    keyboard = LocalSoftwareKeyboardController.current
                     OwnerCostingPlansScreen(
                         snackbarHostState = remember { SnackbarHostState() },
                         identity = NativeSignedInIdentity(
@@ -601,7 +622,7 @@ class NativeOwnerCostingPlansScreenContractTest {
                             OwnerScaffold(
                                 snackbarHostState = snackbar,
                                 section = OwnerSection.More,
-                                onNavigate = { section -> wrapNav { } },
+                                onNavigate = { section -> wrapNav { onNavigate(section) } },
                                 modifier = mod,
                                 content = content,
                             )

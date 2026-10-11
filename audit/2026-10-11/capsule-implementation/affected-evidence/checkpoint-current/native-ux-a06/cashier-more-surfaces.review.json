@@ -1,0 +1,14 @@
+{
+  "scenario": "cashier-more-surfaces",
+  "screen": "ux",
+  "device": "samsung SM-A065F",
+  "packageName": "com.saaf.milkshop.qa.tests",
+  "capturedAt": "2026-10-10T21:33:50.326018Z",
+  "orientation": "portrait",
+  "fontScale": "1.0",
+  "theme": "light",
+  "workflowId": "menuShowsCashierActionsAndKeepsMoreNavSelected",
+  "evidenceFilename": "cashier-more-surfaces.png",
+  "reviewStatus": "UNREVIEWED",
+  "note": "Cashier navigation row surfaces; visual approval pending."
+}

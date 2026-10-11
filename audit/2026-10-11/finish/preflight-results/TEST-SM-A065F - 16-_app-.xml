@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeAccessEvidenceTest" tests="18" failures="2" errors="0" skipped="0" time="116.828" timestamp="2026-10-10T19:38:37" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="portraitAccessAndRecoveryLightEvidence" classname="com.saaf.milkshop.NativeAccessEvidenceTest" time="12.609" />
+  <testcase name="portraitAccessAndRecoveryDarkEvidence" classname="com.saaf.milkshop.NativeAccessEvidenceTest" time="9.583" />
+  <testcase name="phonePortraitLockSurvivesRotationRequest" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.7" />
+  <testcase name="uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens" classname="com.saaf.milkshop.NativeFoundationUiTest" time="23.965" />
+  <testcase name="submenuClicksReachTheDeviceVibrator" classname="com.saaf.milkshop.NativeFoundationUiTest" time="5.022" />
+  <testcase name="recordSaleWritesRoomAndShowsRefreshedReceipt" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.965" />
+  <testcase name="collectLargeTextPortraitSemanticsRemainAvailable" classname="com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest" time="6.22" />
+  <testcase name="packagedDailyWorkScreenRecordsPaidSaleThroughRoom" classname="com.saaf.milkshop.Phase8SaleOperationsTest" time="4.3" />
+  <testcase name="dirtyOwnerNavigationRequiresDiscardConfirmation" classname="com.saaf.milkshop.NativeOwnerSaleEntryScreenContractTest" time="1.982">
+    <failure>java.lang.AssertionError: Failed to inject touch input.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'owner_nav_overview')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.performTouchInput(Actions.kt:402)
+at androidx.compose.ui.test.AndroidActions.performClickImpl(Actions.android.kt:23)
+at androidx.compose.ui.test.ActionsKt.performClick(Actions.kt:60)
+at com.saaf.milkshop.NativeOwnerSaleEntryScreenContractTest.dirtyOwnerNavigationRequiresDiscardConfirmation(NativeOwnerSaleEntryScreenContractTest.kt:66)
+</failure>
+  </testcase>
+  <testcase name="dirtyOwnerNavigationRequiresDiscardConfirmation" classname="com.saaf.milkshop.NativeOwnerCollectionEntryScreenContractTest" time="2.136" />
+  <testcase name="dirtyOwnerNavigationRequiresDiscardConfirmation" classname="com.saaf.milkshop.NativeOwnerExpenseScreenContractTest" time="2.257" />
+  <testcase name="dirtyOwnerNavigationRequiresDiscardConfirmation" classname="com.saaf.milkshop.NativeOwnerPaySupplierScreenContractTest" time="2.199" />
+  <testcase name="dirtyOwnerNavigationRequiresDiscardConfirmation" classname="com.saaf.milkshop.NativeOwnerPaySalaryScreenContractTest" time="2.237" />
+  <testcase name="dirtyOwnerNavigationRequiresDiscardConfirmation" classname="com.saaf.milkshop.NativeOwnerCashCloseScreenContractTest" time="2.381">
+    <failure>java.lang.AssertionError: Failed to inject touch input.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'owner_nav_overview')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.performTouchInput(Actions.kt:402)
+at androidx.compose.ui.test.AndroidActions.performClickImpl(Actions.android.kt:23)
+at androidx.compose.ui.test.ActionsKt.performClick(Actions.kt:60)
+at com.saaf.milkshop.NativeOwnerCashCloseScreenContractTest.dirtyOwnerNavigationRequiresDiscardConfirmation(NativeOwnerCashCloseScreenContractTest.kt:67)
+</failure>
+  </testcase>
+  <testcase name="operatorBackWinsOverWarmRefresh" classname="com.saaf.milkshop.NativeWorkRefreshRegressionTest" time="9.007" />
+  <testcase name="ownerNavigationWinsOverRefreshingSuccessAndFailure" classname="com.saaf.milkshop.NativeWorkRefreshRegressionTest" time="9.018" />
+  <testcase name="managerNavigationWinsOverWarmRefresh" classname="com.saaf.milkshop.NativeWorkRefreshRegressionTest" time="6.956" />
+  <testcase name="adminNavigationWinsOverWarmRefreshFailure" classname="com.saaf.milkshop.NativeWorkRefreshRegressionTest" time="6.988" />
+</testsuite>

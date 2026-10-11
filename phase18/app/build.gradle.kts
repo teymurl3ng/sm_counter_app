@@ -45,8 +45,8 @@ android {
         applicationId = "com.saaf.milkshop"
         minSdk = 26
         targetSdk = 36
-        versionCode = 4
-        versionName = "0.4.0"
+        versionCode = 5
+        versionName = "0.4.1"
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$escapedGoogleWebClientId\"")
         buildConfigField("String", "GIT_SHA", "\"$buildGitSha\"")
         buildConfigField("boolean", "ENABLE_NATIVE_PREVIEW_FIXTURES", "false")

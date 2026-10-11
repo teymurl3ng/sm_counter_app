@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeFoundationUiTest" tests="8" failures="0" errors="0" skipped="0" time="66.789" timestamp="2026-10-10T20:48:04" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="cashierCountsClosesDayAndCannotReopen" classname="com.saaf.milkshop.NativeFoundationUiTest" time="19.015" />
+  <testcase name="operationsRecordSpoilageRecordsPhysicalLoss" classname="com.saaf.milkshop.NativeFoundationUiTest" time="11.932" />
+  <testcase name="collectInvalidAmountAndPayFullDisabled" classname="com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest" time="5.0" />
+  <testcase name="collectDestinationRetentionOnCollectAnother" classname="com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest" time="5.16" />
+  <testcase name="collectCancelPathsAndCustomerSwitchResetAmount" classname="com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest" time="7.438" />
+  <testcase name="collectLargeTextPortraitSemanticsRemainAvailable" classname="com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest" time="6.202" />
+  <testcase name="collectDirtyBackKeepAndDiscard" classname="com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest" time="4.657" />
+  <testcase name="collectNoMatchSearchAndImeDoneClearFocus" classname="com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest" time="6.342" />
+</testsuite>

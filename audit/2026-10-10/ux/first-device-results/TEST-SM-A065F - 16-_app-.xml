@@ -1,0 +1,375 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeAuthenticationScreenContractTest" tests="161" failures="11" errors="0" skipped="0" time="653.351" timestamp="2026-10-10T16:13:28" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="methodPickerShowsOnlyEnrolledPhoneSecurityAndSurfacesCancellation" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="2.635" />
+  <testcase name="darkSystemHostKeepsTheBrandedAccountPickerContrast" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.192" />
+  <testcase name="rateLimitedQuickPinKeepsFullPassphraseRecoveryVisibleAndWorking" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.827" />
+  <testcase name="startupFailureRetryChangesToTheRequestedVisibleState" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.29" />
+  <testcase name="startupExposesOnlyActiveAccountsWithCompletedCredentialSetup" classname="com.saaf.milkshop.NativeAuthenticationFacadeTest" time="0.525" />
+  <testcase name="ownerBootstrapAndFullPassphraseSignInReturnTypedMemorySessions" classname="com.saaf.milkshop.NativeAuthenticationFacadeTest" time="1.432" />
+  <testcase name="managerReceiveMilkHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="5.986" />
+  <testcase name="managerCollectionOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.797" />
+  <testcase name="managerRecordSpoilageOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.324" />
+  <testcase name="managerRecordsHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="14.194">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 10000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeFoundationUiTest.assertReturnedToManagerWorkHome(NativeFoundationUiTest.kt:3288)
+at com.saaf.milkshop.NativeFoundationUiTest.managerRecordsHardwareBackReturnsToWorkHome(NativeFoundationUiTest.kt:599)
+</failure>
+  </testcase>
+  <testcase name="ownerPaySalaryOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="6.936" />
+  <testcase name="operationsNavPreviewDestinationsShowExplicitNotices" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.987" />
+  <testcase name="managerCashCloseOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.089" />
+  <testcase name="managerCollectionHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.094" />
+  <testcase name="managerShellHardwareBackStaysOnWorkAndKeepsSession" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.224" />
+  <testcase name="ownerWorkRecordSaleDirtyBackRequiresDiscard" classname="com.saaf.milkshop.NativeFoundationUiTest" time="5.366" />
+  <testcase name="adminPeopleOpensUnderAdminChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.643" />
+  <testcase name="managerMoreSignsOutToWelcome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.666" />
+  <testcase name="ownerMoreSignsOutToWelcome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.913" />
+  <testcase name="ownerWorkRecordPaymentHardwareBackReturnsToWork" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.186" />
+  <testcase name="managerDeliveriesOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.561" />
+  <testcase name="switchAccountHardwareBackKeepsSessionAndReturnsToMore" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.294" />
+  <testcase name="productButtonsSwitchProductRateUnitAndCalculatedEffects" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.846" />
+  <testcase name="ownerExpenseHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.111" />
+  <testcase name="ownerWorkDeliveriesOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.992" />
+  <testcase name="managerShellNavSwitchesSectionsUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.08">
+    <failure>java.lang.AssertionError: Failed to assert the following: (Selected = 'true')
+Reason: Expected exactly '1' node but found '2' nodes that satisfy: (TestTag = 'manager_nav_records')
+Nodes found:
+1) Node #11396 at (l=367.0, t=1142.0, r=536.0, b=1248.0)px, Tag: 'manager_nav_records'
+Focused = 'false'
+Role = 'Tab'
+Selected = 'true'
+Text = '[Records]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+MergeDescendants = 'true'
+Has 3 siblings
+2) Node #11042 at (l=367.0, t=1382.0, r=536.0, b=1488.0)px, Tag: 'manager_nav_records'
+Focused = 'false'
+Role = 'Tab'
+Selected = 'true'
+Text = '[Records]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+MergeDescendants = 'true'
+Has 3 siblings
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:262)
+at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+at androidx.compose.ui.test.AssertionsKt.assertIsSelected(Assertions.kt:88)
+at com.saaf.milkshop.NativeFoundationUiTest.managerShellNavSwitchesSectionsUnderManagerChrome(NativeFoundationUiTest.kt:391)
+</failure>
+  </testcase>
+  <testcase name="managerCustomersHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.874" />
+  <testcase name="customerAccountSaleWritesTheSelectedCustomerBalance" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.261" />
+  <testcase name="managerDeliveriesHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.605" />
+  <testcase name="ownerCostingPlansHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.008" />
+  <testcase name="operationsAttendanceMarksPresent" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.199" />
+  <testcase name="managerCashCloseHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.881" />
+  <testcase name="adminLocalExportOpensUnderAdminChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.641" />
+  <testcase name="operationsRecordSpoilageOpensConnectedEntry" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.101" />
+  <testcase name="ownerEmployeesHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.928" />
+  <testcase name="adminRecordsOpensUnderAdminChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.302" />
+  <testcase name="adminExpenseOpensUnderAdminChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.447" />
+  <testcase name="adminMoreSignsOutToWelcome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.271" />
+  <testcase name="operationsReceiveMilkRecordsPhysicalReceipt" classname="com.saaf.milkshop.NativeFoundationUiTest" time="6.155" />
+  <testcase name="ownerSuppliersHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.9" />
+  <testcase name="customerPaymentOpensPickerAndPaidNowRestoresCashEffect" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.034" />
+  <testcase name="ownerMonthReportsOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.239" />
+  <testcase name="editedDraftSurvivesSystemBack" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.386" />
+  <testcase name="foregroundValidationRemovesAnInvalidatedSessionBeforeSaleReturns" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.694" />
+  <testcase name="ownerUsersRolesOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.705" />
+  <testcase name="adminCostingPlansHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.663" />
+  <testcase name="operationsReceiveMilkOpensConnectedEntry" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.122" />
+  <testcase name="nativeSaleRemainsUsableInLandscape" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.556" />
+  <testcase name="managerRecordsCorrectionHardwareBackReturnsToDetailThenList" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.4">
+    <failure>java.lang.AssertionError: Failed to assert the following: (Selected = 'true')
+Reason: Expected exactly '1' node but found '2' nodes that satisfy: (TestTag = 'manager_nav_records')
+Nodes found:
+1) Node #23807 at (l=367.0, t=1142.0, r=536.0, b=1248.0)px, Tag: 'manager_nav_records'
+Focused = 'false'
+Role = 'Tab'
+Selected = 'true'
+Text = '[Records]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+MergeDescendants = 'true'
+Has 3 siblings
+2) Node #23107 at (l=367.0, t=1382.0, r=536.0, b=1488.0)px, Tag: 'manager_nav_records'
+Focused = 'false'
+Role = 'Tab'
+Selected = 'true'
+Text = '[Records]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+MergeDescendants = 'true'
+Has 3 siblings
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:262)
+at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+at androidx.compose.ui.test.AssertionsKt.assertIsSelected(Assertions.kt:88)
+at com.saaf.milkshop.NativeFoundationUiTest$managerRecordsCorrectionHardwareBackReturnsToDetailThenList$1.invokeSuspend(NativeFoundationUiTest.kt:714)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at com.saaf.milkshop.NativeFoundationUiTest.managerRecordsCorrectionHardwareBackReturnsToDetailThenList(NativeFoundationUiTest.kt:664)
+</failure>
+  </testcase>
+  <testcase name="managerProductsHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.619" />
+  <testcase name="entryModesInputAndSteppersConvertAndRecalculate" classname="com.saaf.milkshop.NativeFoundationUiTest" time="2.811">
+    <failure>java.lang.AssertionError: Failed to assert the following: (Text + EditableText = [])
+Semantics of the node:
+Node #24818 at (l=56.0, t=724.0, r=374.0, b=799.0)px, Tag: 'cashier_entry_input'
+ContentDataType = 'AndroidContentDataType(androidAutofillType=1)'
+ContentDescription = '[Sale amount]'
+EditableText = ''
+FillableData = 'androidx.compose.ui.autofill.AndroidFillableData&#64;59473f9'
+Focused = 'false'
+ImeAction = 'Done'
+InputText = ''
+IsEditable = 'true'
+Text = '[0]'
+TextSelectionRange = 'TextRange(0, 0)'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, InsertTextAtCursor, OnClick, OnFillData, OnLongClick, PasteText, PerformImeAction, RequestFocus, SetSelection, SetText, SetTextSubstitution, ShowTextSubstitution]
+MergeDescendants = 'true'
+Has 1 sibling
+Selector used: (TestTag = 'cashier_entry_input')
+
+at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:264)
+at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+at androidx.compose.ui.test.AssertionsKt.assertTextEquals(Assertions.kt:185)
+at androidx.compose.ui.test.AssertionsKt.assertTextEquals$default(Assertions.kt:181)
+at com.saaf.milkshop.NativeFoundationUiTest.entryModesInputAndSteppersConvertAndRecalculate(NativeFoundationUiTest.kt:2332)
+</failure>
+  </testcase>
+  <testcase name="ownerWorkRecordSpoilageOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.754" />
+  <testcase name="ownerWorkRecordPaymentOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.651" />
+  <testcase name="ownerWorkRecordSaleOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.787" />
+  <testcase name="managerReceiveMilkOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.219" />
+  <testcase name="ownerBackupOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.621" />
+  <testcase name="adminBusinessRecordsOpensUnderAdminChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.531" />
+  <testcase name="managerMakeYogurtOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.287" />
+  <testcase name="managerMoreOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.423" />
+  <testcase name="ownerCustomersOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.651" />
+  <testcase name="adminCustomersHardwareBackReturnsToPeopleHub" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.642" />
+  <testcase name="adminMoreOpensUnderAdminChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.405" />
+  <testcase name="ownerSecurityHistoryOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.696" />
+  <testcase name="adminProductsHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.636" />
+  <testcase name="adminExpenseHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.35" />
+  <testcase name="ownerCashCloseOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.918" />
+  <testcase name="managerCustomersOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.446" />
+  <testcase name="ownerPaySupplierOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="18.149">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 15000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeFoundationUiTest.openOwnerPaySupplier(NativeFoundationUiTest.kt:2915)
+at com.saaf.milkshop.NativeFoundationUiTest.ownerPaySupplierOpensUnderOwnerChrome(NativeFoundationUiTest.kt:1330)
+</failure>
+  </testcase>
+  <testcase name="adminRecordsHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.259" />
+  <testcase name="adminSecurityHistoryHardwareBackReturnsToRecordsHub" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.501" />
+  <testcase name="ownerWorkOpensConnectedEntry" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.154" />
+  <testcase name="operationsMakeYogurtRecordsPhysicalBatch" classname="com.saaf.milkshop.NativeFoundationUiTest" time="8.229" />
+  <testcase name="ownerCostingPlansOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.499" />
+  <testcase name="adminCustomersOpensUnderAdminChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.394" />
+  <testcase name="quickPinUnlocksTheSelectedAccount" classname="com.saaf.milkshop.NativeFoundationUiTest" time="2.591" />
+  <testcase name="ownerWorkRecordSpoilageHardwareBackReturnsToWork" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.599" />
+  <testcase name="adminPeopleHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.432" />
+  <testcase name="adminShellHardwareBackStaysOnWorkAndKeepsSession" classname="com.saaf.milkshop.NativeFoundationUiTest" time="2.819" />
+  <testcase name="managerEmployeesOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.492" />
+  <testcase name="quickPinRejectsAnotherAccountsPinAndUnlocksTheSelectedAccount" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.722" />
+  <testcase name="managerSaleOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.356" />
+  <testcase name="managerPaySupplierHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.508" />
+  <testcase name="ownerProductsRemainWarmAcrossPrimaryNavigation" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.16" />
+  <testcase name="ownerWorkReceiveMilkHardwareBackReturnsToWork" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.641" />
+  <testcase name="managerEmployeesHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.505" />
+  <testcase name="managerSuppliersOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.51" />
+  <testcase name="cashierSystemBackKeepsSessionOnSellRoot" classname="com.saaf.milkshop.NativeFoundationUiTest" time="2.662" />
+  <testcase name="managerSuppliersHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.543" />
+  <testcase name="managerRecordsCorrectionOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.941">
+    <failure>java.lang.AssertionError: Failed to assert the following: (Selected = 'true')
+Reason: Expected exactly '1' node but found '2' nodes that satisfy: (TestTag = 'manager_nav_records')
+Nodes found:
+1) Node #45148 at (l=367.0, t=1142.0, r=536.0, b=1248.0)px, Tag: 'manager_nav_records'
+Focused = 'false'
+Role = 'Tab'
+Selected = 'true'
+Text = '[Records]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+MergeDescendants = 'true'
+Has 3 siblings
+2) Node #44610 at (l=367.0, t=1382.0, r=536.0, b=1488.0)px, Tag: 'manager_nav_records'
+Focused = 'false'
+Role = 'Tab'
+Selected = 'true'
+Text = '[Records]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+MergeDescendants = 'true'
+Has 3 siblings
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:262)
+at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+at androidx.compose.ui.test.AssertionsKt.assertIsSelected(Assertions.kt:88)
+at com.saaf.milkshop.NativeFoundationUiTest$managerRecordsCorrectionOpensUnderManagerChrome$1.invokeSuspend(NativeFoundationUiTest.kt:643)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at com.saaf.milkshop.NativeFoundationUiTest.managerRecordsCorrectionOpensUnderManagerChrome(NativeFoundationUiTest.kt:603)
+</failure>
+  </testcase>
+  <testcase name="ownerSecurityHistoryHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.848" />
+  <testcase name="adminSecurityHistoryOpensUnderAdminChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.34" />
+  <testcase name="operationsMakeYogurtOpensConnectedEntry" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.031" />
+  <testcase name="managerSaleHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.402" />
+  <testcase name="managerProductsOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.447" />
+  <testcase name="ownerSuppliersOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.391" />
+  <testcase name="ownerMoreOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.363" />
+  <testcase name="moreMenuHardwareBackReturnsToSellAndKeepsSession" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.268" />
+  <testcase name="managerMakeYogurtHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.41" />
+  <testcase name="operationsMoreSignsOutToWelcome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="2.951" />
+  <testcase name="ownerShopSettingsOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.488" />
+  <testcase name="ownerBackupHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.732" />
+  <testcase name="operationsDeliveriesOpensConnectedEntry" classname="com.saaf.milkshop.NativeFoundationUiTest" time="2.778" />
+  <testcase name="operationsWorkHardwareBackKeepsSessionOnWorkRoot" classname="com.saaf.milkshop.NativeFoundationUiTest" time="2.443" />
+  <testcase name="managerExpenseOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.345" />
+  <testcase name="secondaryDetailsToggleShowsAndHidesItsDefinedContent" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.362" />
+  <testcase name="welcomeAccountPickerAndFullPassphraseOpenCashierSale" classname="com.saaf.milkshop.NativeFoundationUiTest" time="2.742" />
+  <testcase name="operationsMoreOpensConnectedEntry" classname="com.saaf.milkshop.NativeFoundationUiTest" time="2.78" />
+  <testcase name="managerRecordsOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.092">
+    <failure>java.lang.AssertionError: Failed to assert the following: (Selected = 'true')
+Reason: Expected exactly '1' node but found '2' nodes that satisfy: (TestTag = 'manager_nav_records')
+Nodes found:
+1) Node #54748 at (l=367.0, t=1142.0, r=536.0, b=1248.0)px, Tag: 'manager_nav_records'
+Focused = 'false'
+Role = 'Tab'
+Selected = 'true'
+Text = '[Records]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+MergeDescendants = 'true'
+Has 3 siblings
+2) Node #54461 at (l=367.0, t=1382.0, r=536.0, b=1488.0)px, Tag: 'manager_nav_records'
+Focused = 'false'
+Role = 'Tab'
+Selected = 'true'
+Text = '[Records]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+MergeDescendants = 'true'
+Has 3 siblings
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:262)
+at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+at androidx.compose.ui.test.AssertionsKt.assertIsSelected(Assertions.kt:88)
+at com.saaf.milkshop.NativeFoundationUiTest.managerRecordsOpensUnderManagerChrome(NativeFoundationUiTest.kt:589)
+</failure>
+  </testcase>
+  <testcase name="cashierExpenseHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.443" />
+  <testcase name="accessBackAccountChangeAndAuthenticationErrorFollowTheirVisibleContracts" classname="com.saaf.milkshop.NativeFoundationUiTest" time="7.713" />
+  <testcase name="customerPickerCancelPreservesPaidNowAndBothAccountsCanBeSelected" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.818" />
+  <testcase name="adminSuppliersOpensUnderAdminChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.383" />
+  <testcase name="adminBusinessRecordsHardwareBackReturnsToRecordsHub" classname="com.saaf.milkshop.NativeFoundationUiTest" time="13.084">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 10000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeFoundationUiTest.adminBusinessRecordsHardwareBackReturnsToRecordsHub(NativeFoundationUiTest.kt:1102)
+</failure>
+  </testcase>
+  <testcase name="adminSuppliersHardwareBackReturnsToPeopleHub" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.494" />
+  <testcase name="recordSaleWritesRoomAndShowsRefreshedReceipt" classname="com.saaf.milkshop.NativeFoundationUiTest" time="18.573">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 15000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeFoundationUiTest$recordSaleWritesRoomAndShowsRefreshedReceipt$1.invokeSuspend(NativeFoundationUiTest.kt:2581)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at com.saaf.milkshop.NativeFoundationUiTest.recordSaleWritesRoomAndShowsRefreshedReceipt(NativeFoundationUiTest.kt:2570)
+</failure>
+  </testcase>
+  <testcase name="insufficientStockKeepsDraftVisibleAndWritesNoSale" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.971" />
+  <testcase name="everyBottomDestinationProvidesItsDefinedPreviewResponse" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.544" />
+  <testcase name="managerPaySupplierOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.18" />
+  <testcase name="ownerProductsOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.371" />
+  <testcase name="ownerOverviewOpensConnectedEntry" classname="com.saaf.milkshop.NativeFoundationUiTest" time="2.732" />
+  <testcase name="ownerWorkDeliveriesHardwareBackReturnsToWork" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.611" />
+  <testcase name="ownerWorkRecordSaleHardwareBackReturnsToWork" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.598" />
+  <testcase name="ownerPaySalaryHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.656" />
+  <testcase name="adminCostingPlansOpensUnderAdminChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.697" />
+  <testcase name="editedSaleDraftSurvivesActivityRecreation" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.951">
+    <failure>java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'Counter pickup' (ignoreCase: false) is not displayed!
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+at com.saaf.milkshop.NativeFoundationUiTest.editedSaleDraftSurvivesActivityRecreation(NativeFoundationUiTest.kt:2379)
+</failure>
+  </testcase>
+  <testcase name="adminProductsOpensUnderAdminChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.464" />
+  <testcase name="ownerCustomersHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.531" />
+  <testcase name="managerRecordSpoilageHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.344" />
+  <testcase name="ownerOverviewPreviewNavShowsExplicitNotices" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.345" />
+  <testcase name="ownerUsersRolesHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.687" />
+  <testcase name="operationsAttendanceOpensConnectedEntry" classname="com.saaf.milkshop.NativeFoundationUiTest" time="2.74" />
+  <testcase name="adminUsersRolesOpensUnderAdminChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.387" />
+  <testcase name="recordSaleRequiresAPositiveEntry" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.754" />
+  <testcase name="ownerPaySupplierHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="18.084">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 15000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeFoundationUiTest.openOwnerPaySupplier(NativeFoundationUiTest.kt:2915)
+at com.saaf.milkshop.NativeFoundationUiTest.ownerPaySupplierHardwareBackReturnsToWorkHome(NativeFoundationUiTest.kt:1342)
+</failure>
+  </testcase>
+  <testcase name="adminUsersRolesHardwareBackReturnsToPeopleHub" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.506" />
+  <testcase name="adminShellNavSwitchesSectionsUnderAdminChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.205" />
+  <testcase name="ownerShopSettingsHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.749" />
+  <testcase name="operationsWorkHomeShowsPhysicalContext" classname="com.saaf.milkshop.NativeFoundationUiTest" time="2.602" />
+  <testcase name="operationsDeliveriesMarksPhysicalDelivery" classname="com.saaf.milkshop.NativeFoundationUiTest" time="2.977" />
+  <testcase name="ownerCashCloseHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.762" />
+  <testcase name="ownerEmployeesOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.611" />
+  <testcase name="collectPaymentWritesRoomShowsReceiptAndOffersTheNextVisibleActions" classname="com.saaf.milkshop.NativeFoundationUiTest" time="6.686" />
+  <testcase name="ownerWorkMakeYogurtHardwareBackReturnsToWork" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.691" />
+  <testcase name="switchAccountUiBackKeepsSessionAndReturnsToMore" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.638" />
+  <testcase name="ownerWorkMakeYogurtOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.529" />
+  <testcase name="adminShopSettingsHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.529" />
+  <testcase name="saleEntryDoneActionClearsKeyboardFocus" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.097" />
+  <testcase name="ownerProductsHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.694" />
+  <testcase name="managerShellOpensUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="2.812" />
+  <testcase name="adminShellOpensUnderAdminChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="2.827" />
+  <testcase name="cashierExpenseOpensUnderCashierChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.385" />
+  <testcase name="ownerWorkReceiveMilkOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.6" />
+  <testcase name="adminShopSettingsOpensUnderAdminChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.553" />
+  <testcase name="adminEmployeesHardwareBackReturnsToPeopleHub" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.443" />
+  <testcase name="adminEmployeesOpensUnderAdminChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.31" />
+  <testcase name="ownerRecordsOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.29" />
+  <testcase name="operationsRecordSpoilageRecordsPhysicalLoss" classname="com.saaf.milkshop.NativeFoundationUiTest" time="8.34" />
+  <testcase name="ownerMonthReportsHardwareBackReturnsToOverview" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.272" />
+  <testcase name="ownerExpenseOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.554" />
+  <testcase name="managerExpenseHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.462" />
+  <testcase name="adminLocalExportHardwareBackReturnsToMoreMenu" classname="com.saaf.milkshop.NativeFoundationUiTest" time="3.452" />
+</testsuite>

@@ -4,8 +4,7 @@ import android.content.Context
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.data.SyncOutboxEntity
 import com.saaf.milkshop.domain.ServerAccountPolicy
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import androidx.room3.withWriteTransaction
 /**
  * Phase 6 runtime glue: builds the production transport from the stored
  * config/session/binding and drains the outbox. An expired access token is
@@ -22,12 +21,9 @@ class SyncRuntime(
 
     private val tokenStore = SyncTokenStore(context)
 
-    companion object {
-        /** See [drainOnceLocked] — process-wide drain/pull serialization. */
-        private val gate = Mutex()
-    }
 
     fun isEnrolled(): Boolean =
+        !SyncRebaselineStore(context).needsFreshIdentity &&
         SyncServerConfigStore.load(context) != null &&
             SyncShopBindingStore.load(context) != null &&
             tokenStore.load() != null
@@ -65,13 +61,13 @@ class SyncRuntime(
         )
     }
 
-    suspend fun drainOnce(): SyncPushEngine.DrainOutcome = gate.withLock {
+    suspend fun drainOnce(): SyncPushEngine.DrainOutcome = SyncOperationGate.exclusive {
         drainOnceLocked()
     }
 
     /**
      * H2 (audit 2026-10-02): every drain/pull entry point in the process
-     * serializes on [gate] — the start-up kick, the WorkManager worker, the
+     * serializes on [SyncOperationGate] — the start-up kick, the WorkManager worker, the
      * owner's Sync-now, the debug receiver, and the facade's second runtime
      * instance all funnel through this one gate. Without it, two concurrent
      * 401s fire two refresh POSTs and, under token rotation, the losing
@@ -83,17 +79,17 @@ class SyncRuntime(
      * and per-instance locks would leave those two draining concurrently.
      */
     private suspend fun drainOnceLocked(): SyncPushEngine.DrainOutcome {
+        if (SyncRebaselineStore(context).needsFreshIdentity) return SyncPushEngine.DrainOutcome.NotConfigured
         val config = SyncServerConfigStore.load(context) ?: return SyncPushEngine.DrainOutcome.NotConfigured
         val binding = SyncShopBindingStore.load(context) ?: return SyncPushEngine.DrainOutcome.NotConfigured
         if (tokenStore.load() == null) return SyncPushEngine.DrainOutcome.NotConfigured
 
-        runRestoredRebaselineIfPending()
-        runLiveRebaselineIfPending()
+        if (!runRestoredRebaselineIfPending() || !runLiveRebaselineIfPending()) {
+            return SyncPushEngine.DrainOutcome.RetryLater(0)
+        }
 
         val outcome = engineDrainLocked(config, binding)
-        if (outcome != SyncPushEngine.DrainOutcome.NotConfigured) {
-            refreshLinkVerificationIfDue()
-        }
+        refreshLinkVerificationIfDue()
         return outcome
     }
 
@@ -122,27 +118,29 @@ class SyncRuntime(
      * outbox entries against the observed origins (keep/drop/hold), and only
      * then fall through to the normal push. The flag clears only after a
      * completed classification; a failed pull retries pull-first next drain.
-     * If the cursor already advanced (crash mid-re-baseline), the flag is
-     * cleared and the remaining entries push normally — audited server-side,
-     * because the restored device identity is fresh by then.
+     * An advanced cursor after interruption restarts at zero to reconstruct
+     * the complete seen set before releasing any restored work.
      */
-    private suspend fun runRestoredRebaselineIfPending() {
+    private suspend fun runRestoredRebaselineIfPending(): Boolean {
         val rebaseline = SyncRebaselineStore(context)
-        if (!rebaseline.restoredRebaseline) return
+        if (!rebaseline.restoredRebaseline) return true
         val cursor = database.syncPullStateDao().find()?.lastServerSeq ?: 0L
         if (cursor != 0L) {
-            rebaseline.restoredRebaseline = false
-            return
+            database.syncPullStateDao().upsert(com.saaf.milkshop.data.SyncPullStateEntity(
+                lastServerSeq = 0, updatedAt = java.time.Instant.now().toString(),
+            ))
         }
         val collector = HashMap<String, SyncRebaseline.SeenServerRow>()
         val pull = pullOnce(collector)
-        if (pull !is SyncPullSummary.Done) return
-        val report = SyncRebaseline.classifyAndApply(
-            database = database,
-            seen = collector,
-            prevDeviceId = rebaseline.prevDeviceId,
-            currentDeviceId = SyncIdentity.currentOrNull().takeIf { it.isNotEmpty() },
-        )
+        if (pull !is SyncPullSummary.Done) return false
+        val report = database.withWriteTransaction {
+            SyncRebaseline.classifyAndApply(
+                database = database,
+                seen = collector,
+                prevDeviceId = rebaseline.prevDeviceId,
+                currentDeviceId = SyncIdentity.currentOrNull().takeIf { it.isNotEmpty() },
+            )
+        }
         rebaseline.restoredRebaseline = false
         runCatching {
             database.securityAuditDao().insert(
@@ -156,6 +154,7 @@ class SyncRuntime(
                 ),
             )
         }
+        return true
     }
 
     /**
@@ -172,9 +171,9 @@ class SyncRuntime(
      * idempotent: released entries are already unheld, dropped entries are
      * gone, holds re-upsert.
      */
-    private suspend fun runLiveRebaselineIfPending() {
+    private suspend fun runLiveRebaselineIfPending(): Boolean {
         val rebaseline = SyncRebaselineStore(context)
-        if (!rebaseline.liveRebaselinePending) return
+        if (!rebaseline.liveRebaselinePending) return true
         val cursor = database.syncPullStateDao().find()?.lastServerSeq ?: 0L
         if (cursor != 0L) {
             database.syncPullStateDao().upsert(
@@ -186,8 +185,8 @@ class SyncRuntime(
         }
         val collector = HashMap<String, SyncRebaseline.SeenServerRow>()
         val pull = pullOnce(collector)
-        if (pull !is SyncPullSummary.Done) return
-        val report = SyncRebaseline.classifyLiveAndApply(database, collector)
+        if (pull !is SyncPullSummary.Done) return false
+        val report = database.withWriteTransaction { SyncRebaseline.classifyLiveAndApply(database, collector) }
         rebaseline.liveRebaselinePending = false
         runCatching {
             database.securityAuditDao().insert(
@@ -201,6 +200,7 @@ class SyncRuntime(
                 ),
             )
         }
+        return true
     }
 
     /**
@@ -210,7 +210,7 @@ class SyncRuntime(
      * before a pull can overwrite it; the apply engine's pending-edit guard
      * and parked rows cover the remaining windows.
      */
-    suspend fun pullOnce(): SyncPullSummary = gate.withLock {
+    suspend fun pullOnce(): SyncPullSummary = SyncOperationGate.exclusive {
         val summary = pullOnce(originCollector = null)
         if (summary is SyncPullSummary.Done) {
             refreshLinkVerificationIfDue()
@@ -227,7 +227,19 @@ class SyncRuntime(
      * (H1) or permission (H5) logic.
      */
     private suspend fun refreshLinkVerificationIfDue() {
+        val current = database.serverAccountDao().findBinding()
+        val nowMs = System.currentTimeMillis()
+        if (current != null && !ServerAccountPolicy.shouldRefreshBindingVerification(current.status, current.verifiedAtEpochMs, nowMs)) return
+        val config = SyncServerConfigStore.load(context) ?: return
+        val fileBinding = SyncShopBindingStore.load(context) ?: return
+        val session = tokenStore.load() ?: return
+        val proof = AccountAuthClient(http, config).verifySession(session) as? AccountAuthResult.Allowed ?: return
+        if (proof.staffId != fileBinding.staffId || proof.businessId != fileBinding.businessId ||
+            proof.shops.none { it.shopId == fileBinding.shopId }) return
+        if (current != null && (current.environment != fileBinding.environment ||
+            current.businessId != fileBinding.businessId || current.shopId != fileBinding.shopId)) return
         runCatching {
+            database.withWriteTransaction<Unit> {
             val now = System.currentTimeMillis()
             // The BINDING clock is authoritative for the grace (Track 1
             // A2'/A6): bump it first, then mirror the bump onto the link row
@@ -280,8 +292,9 @@ class SyncRuntime(
             }
             val link = database.serverAccountDao().identityLinks()
                 .firstOrNull {
-                    ServerAccountPolicy.shouldRefreshVerification(it.status, it.verifiedAtEpochMs, now)
-                } ?: return
+                    it.serverStaffId == proof.staffId && it.businessId == proof.businessId &&
+                        ServerAccountPolicy.shouldRefreshVerification(it.status, it.verifiedAtEpochMs, now)
+                } ?: return@withWriteTransaction
             val wasBlocked = ServerAccountPolicy.writeBlockedByGrace(link.status, link.verifiedAtEpochMs, now)
             database.serverAccountDao().updateIdentityLinkStatus(
                 link.localUserId, link.status, now, link.lastErrorCode,
@@ -298,6 +311,7 @@ class SyncRuntime(
                     ),
                 )
             }
+            }
         }
     }
 
@@ -309,6 +323,7 @@ class SyncRuntime(
     private suspend fun pullOnce(
         originCollector: MutableMap<String, SyncRebaseline.SeenServerRow>?,
     ): SyncPullSummary {
+        if (SyncRebaselineStore(context).needsFreshIdentity) return SyncPullSummary.NotEnrolled
         val config = SyncServerConfigStore.load(context) ?: return SyncPullSummary.NotEnrolled
         val binding = SyncShopBindingStore.load(context) ?: return SyncPullSummary.NotEnrolled
         if (tokenStore.load() == null) return SyncPullSummary.NotEnrolled
@@ -333,7 +348,10 @@ class SyncRuntime(
             }
             when (outcome) {
                 is SyncPullOutcome.Fetched -> {
-                    if (outcome.batch.records.isEmpty()) return SyncPullSummary.Done(applied, updated, skipped, parked, conflicts)
+                    if (outcome.batch.records.isEmpty()) {
+                        applied += applyEngine.apply(emptyList()).applied
+                        return SyncPullSummary.Done(applied, updated, skipped, parked, conflicts)
+                    }
                     originCollector?.let { collector ->
                         outcome.batch.records.forEach { record ->
                             collector[SyncRebaseline.seenKey(record.tableName, record.rowUid)] =
@@ -360,11 +378,7 @@ class SyncRuntime(
                 }
                 SyncPullOutcome.NotConfigured -> return SyncPullSummary.NotEnrolled
                 is SyncPullOutcome.RetryLater -> {
-                    return if (applied + updated > 0) {
-                        SyncPullSummary.Done(applied, updated, skipped, parked, conflicts)
-                    } else {
-                        SyncPullSummary.RetryLater(outcome.reason)
-                    }
+                    return SyncPullSummary.RetryLater(outcome.reason)
                 }
             }
         }

@@ -1,0 +1,14 @@
+{
+  "scenario": "passphrase-error-dark",
+  "screen": "auth",
+  "device": "samsung SM-A065F",
+  "packageName": "com.saaf.milkshop.qa.tests",
+  "capturedAt": "2026-10-10T19:42:35.418373Z",
+  "orientation": "portrait",
+  "fontScale": "1.0",
+  "theme": "dark",
+  "workflowId": "access-recovery",
+  "evidenceFilename": "passphrase-error-dark.png",
+  "reviewStatus": "UNREVIEWED",
+  "note": "Portrait presentation fixture; demo account\/code only. Owner review pending."
+}

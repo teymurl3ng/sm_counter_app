@@ -79,7 +79,7 @@ class NativeOwnerReportsFacade(
         return mapReport(
             report = report,
             preset = preset,
-            shopName = settings.store?.storeName?.takeIf { it.isNotBlank() } ?: "Saaf Milk",
+            shopName = settings.store?.storeName?.takeIf { it.isNotBlank() } ?: "Your shop",
             businessDate = today.toString(),
             postingOpen = !database.dailyCloseDao().isPostingClosed(today.toString()),
         )

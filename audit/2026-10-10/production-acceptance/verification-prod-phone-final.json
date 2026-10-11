@@ -1,0 +1,32 @@
+{
+  "verified_at_utc": "2026-10-10T14:50:51.487808+00:00",
+  "project": "saafmilk-prod / tlsuxbghuhlqntkgtrxt",
+  "package": "com.saaf.milkshop",
+  "device": "R8VXA02SNKH / SM-A065F",
+  "real_prod_phone_auth_and_sync_verified": true,
+  "authenticated_prod_viewer_verified": false,
+  "prod_admin_key_mutations_verified": false,
+  "private_room_ledger_children_compared": false,
+  "all_older_parks_proven_absent": false,
+  "agent_created_production_accounts": false,
+  "agent_sql_wrote_production_history": false,
+  "subsequently_appended_root_reports": [
+    "REPAIR_PLAN_2026-10-10.md",
+    "PROJECT_AUDIT_2026-10-09.md"
+  ],
+  "artifact_and_report_sha256": {
+    "audit/2026-10-10/production-acceptance/phone-sync-repeat-first.xml": "5c8743ebed6a54e0d6929c7ee5bf50e901ecfaf4a432a7127200910dbf6ac506",
+    "audit/2026-10-10/production-acceptance/phone-sync-repeat.png": "916e9ef82e3e48dc2e1363cfbc900bacf7e594694b448cf84412ac1e472e43f0",
+    "audit/2026-10-10/production-acceptance/phone-sync-result.xml": "1f64d3fd89a32b86cdace2c7a583730904e10756ec31fde95345741e0ea21c9f",
+    "audit/2026-10-10/production-acceptance/phone-sync-verification.json": "125224adba5a627a9140fbb72a176e5296070a520436611ee8b2b0d31ac88286",
+    "audit/2026-10-10/production-acceptance/prod-read-check-raw.json": "776b29debc720d9baafc5eab98d4db47a5811455aabb7645c2ecac2e8fd8c7c4",
+    "audit/2026-10-10/production-acceptance/prod-read-check.json": "75aa1b11e63dd08d9690be5a28214af09dec0fc62497dc94fe6416a09139a409",
+    "audit/2026-10-10/production-acceptance/prod-read-check.sql": "e94b660d0e42e9302c439f74e416b0e51df2c98e7b44b9dac72aa61f5ecd276b",
+    "audit/2026-10-10/production-acceptance/prod-repeat-check.json": "f1ff78c172fd1d3b1e4382d96ee34fed07fb1446a1a9ee02b17abdb4c06fdb78",
+    "audit/2026-10-10/production-acceptance/PROD_PHONE_ACCEPTANCE_2026-10-10.md": "ed7394c44a81e493d5d83f6c4963bc2ab6919529515a86bd402bbcc4011bf4a5",
+    "audit/2026-10-10/production-acceptance/verify_prod_phone_evidence.py": "4814900ff39bd8b741edfea24821652b30c1aa6b2f465e8f780dde38fe428c06",
+    "REPAIR_PLAN_2026-10-10.md": "0a969a1b9a1e16638e53595dfd124c265af6e43b720cd0839f28325c2c992305",
+    "PROJECT_AUDIT_2026-10-09.md": "473d7175c76035d9759f349de886b22116ea8bdcb4a2e920192342ca40b6d012",
+    "audit/2026-10-10/releases/verification-release-final.json": "b279292d03853b8a69b411d72c440b0188efcd6d93b2389e25af212ef9d2e88b"
+  }
+}

@@ -1,6 +1,5 @@
 package com.saaf.milkshop.nativeui.common
 
-import android.provider.Settings
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -11,7 +10,6 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,20 +25,24 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.zIndex
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 
-private const val SECONDARY_TRANSITION_BASE_MILLIS = 180
-private const val SECONDARY_TRANSITION_MAX_MILLIS = 1000
 
 /** Shared native UX baseline: cold loads replace content; warm refreshes do not. */
 @Composable
@@ -74,7 +76,7 @@ fun NativeLoadFailurePane(
         Text(message, style = MaterialTheme.typography.bodyLarge)
         Spacer(Modifier.height(16.dp))
         Button(
-            onClick = onRetry,
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction(onRetry),
             modifier = retryTestTag?.let { Modifier.testTag(it) } ?: Modifier,
         ) { Text("Try again") }
     }
@@ -149,11 +151,9 @@ fun Modifier.nativeRefreshOverlay(refreshing: Boolean): Modifier {
 }
 
 /**
- * The app's one transition language: Material 3 fade-through. Outgoing content
- * fades out fast with no movement; incoming content fades in while settling
- * from 92% to full scale — no directional slide (screen switches are between
- * peers, and M3 reserves slides for hierarchy). Panes never overlap at partial
- * alpha (no brightness dip / flash) and the container never morphs size.
+ * Shared pane crossfade. Keep the outgoing pane while the incoming pane appears;
+ * never shrink full-screen chrome or expose the window with an instant exit.
+ * Disable size interpolation so status bars and IME bounds stay stationary.
  * [contentKey] groups states that should share a pane — e.g. Idle/Loading of
  * the same screen — so only real content changes animate, and each pane keeps
  * rendering the state it was composed with (no mid-fade re-branching). Respects
@@ -163,40 +163,37 @@ fun Modifier.nativeRefreshOverlay(refreshing: Boolean): Modifier {
 fun <T> NativeSectionTransition(
     targetState: T,
     modifier: Modifier = Modifier,
-    contentKey: (T) -> Any,
+    contentKey: (T) -> Any?,
     content: @Composable (T) -> Unit,
 ) {
+    val targetKey = contentKey(targetState)
+    val parentActive = LocalPaneActive.current
+    NativeFailureFeedback(targetState, parentActive)
+    val focus = LocalFocusManager.current
+    val keyboard = LocalSoftwareKeyboardController.current
+    LaunchedEffect(targetKey) {
+        focus.clearFocus()
+        keyboard?.hide()
+    }
     AnimatedContent(
         targetState = targetState,
         transitionSpec = {
-            // Owner-preferred feel (the 17caeff fade+settle): full fade from
-            // transparent + 92%->100% scale over 200ms, instant exit. The old
-            // "doubling" came from nested inner transitions (removed), not
-            // from this spec — do not re-add them.
-            (
-                fadeIn(tween(200)) + scaleIn(
-                    initialScale = 0.92f,
-                    animationSpec = tween(200),
-                )
-            ) togetherWith fadeOut(tween(1))
+            (fadeIn(tween(180)) togetherWith fadeOut(tween(180))).using(null)
         },
         contentKey = contentKey,
         modifier = modifier,
         label = "section_transition",
     ) { state ->
-        content(state)
-    }
-}
-@Composable
-private fun rememberSecondaryTransitionDurationMillis(): Int {
-    val context = LocalContext.current
-    return remember {
-        val scale = runCatching {
-            Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f)
-        }.getOrDefault(1f)
-        when {
-            scale <= 0f -> 1
-            else -> (SECONDARY_TRANSITION_BASE_MILLIS * scale).toInt().coerceIn(1, SECONDARY_TRANSITION_MAX_MILLIS)
+        val active = parentActive && contentKey(state) == targetKey
+        val paneModifier = if (active) Modifier.zIndex(1f) else Modifier.zIndex(0f)
+            .clearAndSetSemantics { }
+            .pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() }
+                }
+            }
+        CompositionLocalProvider(LocalPaneActive provides active) {
+            Box(paneModifier) { content(state) }
         }
     }
 }

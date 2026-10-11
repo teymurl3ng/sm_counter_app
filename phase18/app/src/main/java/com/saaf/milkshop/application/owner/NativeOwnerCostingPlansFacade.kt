@@ -399,8 +399,9 @@ class NativeOwnerCostingPlansFacade(
         val productionEvents = database.inventoryCostProjectionDao().effectiveEvents()
             .filter { it.eventType == YogurtProductionService.EVENT_TYPE_PRODUCTION }
             .sortedByDescending { it.eventId }
+        val assessments = yields.assessAll(productionEvents.map { it.eventId })
         val batches = productionEvents.map { event ->
-            val assessment = yields.assess(event.eventId)
+            val assessment = assessments.getValue(event.eventId)
             val loss = database.productionLossAssessmentDao().activeForEvent(event.eventId)
             NativeOwnerYieldBatchRow(
                 productionEventId = event.eventId,

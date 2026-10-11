@@ -1,0 +1,476 @@
+*** Begin Patch
+*** Add File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/migration_c1_6_integrity.sql
++-- C1.6: preserve ambiguous account creation; protect the final owner in every write path.
++-- Apply after C1.5. No Auth identity deletion is authorized by this migration.
++BEGIN;
++CREATE OR REPLACE FUNCTION public.admin_record_auth_reconciliation(
++  p_business_id uuid,
++  p_operation text,
++  p_auth_user_id uuid,
++  p_target_username text,
++  p_performed_by uuid,
++  p_performed_by_username text,
++  p_error_code text,
++  p_correlation_id uuid
++)
++RETURNS uuid
++LANGUAGE plpgsql
++SECURITY DEFINER
++SET search_path = ''
++AS $$
++DECLARE
++  v_id uuid;
++BEGIN
++  IF auth.role() IS DISTINCT FROM 'service_role' THEN
++    RAISE EXCEPTION 'service role required' USING errcode = '42501';
++  END IF;
++  IF p_operation NOT IN ('create_cleanup', 'create_verify', 'terminate_cleanup', 'reset_audit') THEN
++    RAISE EXCEPTION 'invalid reconciliation operation' USING errcode = 'P0011';
++  END IF;
++  IF p_error_code NOT IN (
++    'ALREADY_EXISTS', 'FORBIDDEN', 'INVALID_INPUT', 'NOT_FOUND',
++    'RATE_LIMITED', 'SERVER_ERROR', 'UNREACHABLE', 'UNKNOWN'
++  ) THEN
++    RAISE EXCEPTION 'invalid reconciliation error code' USING errcode = 'P0012';
++  END IF;
++  IF NOT EXISTS (
++    SELECT 1 FROM public.staff
++    WHERE id = p_performed_by
++      AND business_id = p_business_id
++      AND username = p_performed_by_username
++  ) THEN
++    RAISE EXCEPTION 'invalid reconciliation performer' USING errcode = '42501';
++  END IF;
++
++  INSERT INTO public.auth_reconciliation (
++    business_id, operation, auth_user_id, target_username, state,
++    attempt_count, error_code, correlation_id, performed_by,
++    performed_by_username, created_at, updated_at
++  ) VALUES (
++    p_business_id, p_operation, p_auth_user_id, lower(btrim(p_target_username)),
++    'pending', 1, p_error_code, p_correlation_id, p_performed_by,
++    p_performed_by_username, now(), now()
++  )
++  ON CONFLICT (operation, auth_user_id) WHERE state = 'pending'
++  DO UPDATE SET
++    attempt_count = public.auth_reconciliation.attempt_count + 1,
++    error_code = EXCLUDED.error_code,
++    correlation_id = EXCLUDED.correlation_id,
++    updated_at = now(),
++    last_attempt_at = now()
++  RETURNING id INTO v_id;
++
++  RETURN v_id;
++END;
++$$;
++
++
++CREATE OR REPLACE FUNCTION public.admin_verify_created_identity(p_reconciliation_id uuid)
++RETURNS boolean LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
++DECLARE pending record;
++BEGIN
++  IF auth.role() IS DISTINCT FROM 'service_role' THEN
++    RAISE EXCEPTION 'service role required' USING errcode = '42501';
++  END IF;
++  SELECT * INTO pending FROM public.auth_reconciliation
++  WHERE id = p_reconciliation_id AND operation IN ('create_verify', 'create_cleanup')
++    AND state = 'pending' FOR UPDATE;
++  IF NOT FOUND THEN RAISE EXCEPTION 'reconciliation record not found' USING errcode = 'P0002'; END IF;
++  IF EXISTS (SELECT 1 FROM public.staff
++    WHERE auth_user_id = pending.auth_user_id AND business_id = pending.business_id
++      AND username = pending.target_username) THEN
++    UPDATE public.auth_reconciliation SET state = 'resolved', resolved = true,
++      error_code = NULL, last_attempt_at = now(), resolved_at = now(), updated_at = now(),
++      attempt_count = attempt_count + 1 WHERE id = pending.id;
++    RETURN true;
++  END IF;
++  UPDATE public.auth_reconciliation SET last_attempt_at = now(), updated_at = now(),
++    attempt_count = attempt_count + 1 WHERE id = pending.id;
++  RETURN false;
++END; $$;
++REVOKE ALL ON FUNCTION public.admin_verify_created_identity(uuid) FROM PUBLIC, anon, authenticated;
++GRANT EXECUTE ON FUNCTION public.admin_verify_created_identity(uuid) TO service_role;
++
++CREATE OR REPLACE FUNCTION public.protect_last_active_owner()
++RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
++BEGIN
++  IF OLD.role <> 'owner' OR NOT OLD.active OR OLD.terminated_at IS NOT NULL THEN
++    IF TG_OP = 'DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;
++  END IF;
++  IF TG_OP = 'UPDATE' THEN
++    IF NEW.business_id = OLD.business_id AND NEW.role = 'owner'
++      AND NEW.active AND NEW.terminated_at IS NULL THEN RETURN NEW; END IF;
++  END IF;
++  -- All competing owner removals serialize on the same business row.
++  PERFORM id FROM public.businesses WHERE id = OLD.business_id FOR UPDATE;
++  IF NOT EXISTS (SELECT 1 FROM public.staff WHERE business_id = OLD.business_id
++      AND id <> OLD.id AND role = 'owner' AND active AND terminated_at IS NULL) THEN
++    RAISE EXCEPTION 'cannot remove the last active owner' USING errcode = 'P0004';
++  END IF;
++  IF TG_OP = 'DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;
++END; $$;
++REVOKE ALL ON FUNCTION public.protect_last_active_owner() FROM PUBLIC, anon, authenticated;
++DROP TRIGGER IF EXISTS staff_last_owner_guard ON public.staff;
++CREATE TRIGGER staff_last_owner_guard BEFORE UPDATE OR DELETE ON public.staff
++FOR EACH ROW EXECUTE FUNCTION public.protect_last_active_owner();
++COMMIT;
+*** Add File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/supabase/migrations/20261010120000_c1_6_integrity.sql
++-- C1.6: preserve ambiguous account creation; protect the final owner in every write path.
++-- Apply after C1.5. No Auth identity deletion is authorized by this migration.
++BEGIN;
++CREATE OR REPLACE FUNCTION public.admin_record_auth_reconciliation(
++  p_business_id uuid,
++  p_operation text,
++  p_auth_user_id uuid,
++  p_target_username text,
++  p_performed_by uuid,
++  p_performed_by_username text,
++  p_error_code text,
++  p_correlation_id uuid
++)
++RETURNS uuid
++LANGUAGE plpgsql
++SECURITY DEFINER
++SET search_path = ''
++AS $$
++DECLARE
++  v_id uuid;
++BEGIN
++  IF auth.role() IS DISTINCT FROM 'service_role' THEN
++    RAISE EXCEPTION 'service role required' USING errcode = '42501';
++  END IF;
++  IF p_operation NOT IN ('create_cleanup', 'create_verify', 'terminate_cleanup', 'reset_audit') THEN
++    RAISE EXCEPTION 'invalid reconciliation operation' USING errcode = 'P0011';
++  END IF;
++  IF p_error_code NOT IN (
++    'ALREADY_EXISTS', 'FORBIDDEN', 'INVALID_INPUT', 'NOT_FOUND',
++    'RATE_LIMITED', 'SERVER_ERROR', 'UNREACHABLE', 'UNKNOWN'
++  ) THEN
++    RAISE EXCEPTION 'invalid reconciliation error code' USING errcode = 'P0012';
++  END IF;
++  IF NOT EXISTS (
++    SELECT 1 FROM public.staff
++    WHERE id = p_performed_by
++      AND business_id = p_business_id
++      AND username = p_performed_by_username
++  ) THEN
++    RAISE EXCEPTION 'invalid reconciliation performer' USING errcode = '42501';
++  END IF;
++
++  INSERT INTO public.auth_reconciliation (
++    business_id, operation, auth_user_id, target_username, state,
++    attempt_count, error_code, correlation_id, performed_by,
++    performed_by_username, created_at, updated_at
++  ) VALUES (
++    p_business_id, p_operation, p_auth_user_id, lower(btrim(p_target_username)),
++    'pending', 1, p_error_code, p_correlation_id, p_performed_by,
++    p_performed_by_username, now(), now()
++  )
++  ON CONFLICT (operation, auth_user_id) WHERE state = 'pending'
++  DO UPDATE SET
++    attempt_count = public.auth_reconciliation.attempt_count + 1,
++    error_code = EXCLUDED.error_code,
++    correlation_id = EXCLUDED.correlation_id,
++    updated_at = now(),
++    last_attempt_at = now()
++  RETURNING id INTO v_id;
++
++  RETURN v_id;
++END;
++$$;
++
++
++CREATE OR REPLACE FUNCTION public.admin_verify_created_identity(p_reconciliation_id uuid)
++RETURNS boolean LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
++DECLARE pending record;
++BEGIN
++  IF auth.role() IS DISTINCT FROM 'service_role' THEN
++    RAISE EXCEPTION 'service role required' USING errcode = '42501';
++  END IF;
++  SELECT * INTO pending FROM public.auth_reconciliation
++  WHERE id = p_reconciliation_id AND operation IN ('create_verify', 'create_cleanup')
++    AND state = 'pending' FOR UPDATE;
++  IF NOT FOUND THEN RAISE EXCEPTION 'reconciliation record not found' USING errcode = 'P0002'; END IF;
++  IF EXISTS (SELECT 1 FROM public.staff
++    WHERE auth_user_id = pending.auth_user_id AND business_id = pending.business_id
++      AND username = pending.target_username) THEN
++    UPDATE public.auth_reconciliation SET state = 'resolved', resolved = true,
++      error_code = NULL, last_attempt_at = now(), resolved_at = now(), updated_at = now(),
++      attempt_count = attempt_count + 1 WHERE id = pending.id;
++    RETURN true;
++  END IF;
++  UPDATE public.auth_reconciliation SET last_attempt_at = now(), updated_at = now(),
++    attempt_count = attempt_count + 1 WHERE id = pending.id;
++  RETURN false;
++END; $$;
++REVOKE ALL ON FUNCTION public.admin_verify_created_identity(uuid) FROM PUBLIC, anon, authenticated;
++GRANT EXECUTE ON FUNCTION public.admin_verify_created_identity(uuid) TO service_role;
++
++CREATE OR REPLACE FUNCTION public.protect_last_active_owner()
++RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
++BEGIN
++  IF OLD.role <> 'owner' OR NOT OLD.active OR OLD.terminated_at IS NOT NULL THEN
++    IF TG_OP = 'DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;
++  END IF;
++  IF TG_OP = 'UPDATE' THEN
++    IF NEW.business_id = OLD.business_id AND NEW.role = 'owner'
++      AND NEW.active AND NEW.terminated_at IS NULL THEN RETURN NEW; END IF;
++  END IF;
++  -- All competing owner removals serialize on the same business row.
++  PERFORM id FROM public.businesses WHERE id = OLD.business_id FOR UPDATE;
++  IF NOT EXISTS (SELECT 1 FROM public.staff WHERE business_id = OLD.business_id
++      AND id <> OLD.id AND role = 'owner' AND active AND terminated_at IS NULL) THEN
++    RAISE EXCEPTION 'cannot remove the last active owner' USING errcode = 'P0004';
++  END IF;
++  IF TG_OP = 'DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;
++END; $$;
++REVOKE ALL ON FUNCTION public.protect_last_active_owner() FROM PUBLIC, anon, authenticated;
++DROP TRIGGER IF EXISTS staff_last_owner_guard ON public.staff;
++CREATE TRIGGER staff_last_owner_guard BEFORE UPDATE OR DELETE ON public.staff
++FOR EACH ROW EXECUTE FUNCTION public.protect_last_active_owner();
++COMMIT;
+*** Update File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/admin.py
+@@
+-    def count_active_owners(self) -> int:
+-        rows = self.rest_select(
++    def rest_select_all(self, table: str, query: dict[str, str]) -> list[dict[str, Any]]:
++        # A server row cap may be smaller than our requested page. Only an empty
++        # page proves exhaustion. Stable primary-key ordering prevents tied pages.
++        order = query.get("order", "")
++        tie = "staff_id.asc,shop_id.asc" if table == "staff_shops" else "id.asc"
++        page_query = {**query, "order": f"{order},{tie}" if order else tie, "limit": "500"}
++        result: list[dict[str, Any]] = []
++        while True:
++            rows = self.rest_select(table, {**page_query, "offset": str(len(result))})
++            if not rows:
++                return result
++            result.extend(rows)
++
++    def count_active_owners(self, business_id: str) -> int:
++        rows = self.rest_select_all(
+*** Update File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/admin.py
+@@
+-                "role": "eq.owner",
+-                "active": "eq.true",
++                "role": "eq.owner",
++                "business_id": f"eq.{business_id}",
++                "active": "eq.true",
+*** Update File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/admin.py
+@@
+-        if self.count_active_owners() <= 1:
++        if self.count_active_owners(str(staff["business_id"])) <= 1:
+*** Update File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/admin.py
+@@
+-    businesses = client.rest_select("businesses", {"select": "id,name,created_at", "order": "created_at.asc"})
+-    shops = client.rest_select(
+-        "shops",
+-        {"select": "id,business_id,name,active,created_at", "order": "name.asc"},
+-    )
+-    staff = client.rest_select(
+-        "staff",
+-        {
+-            "select": "id,business_id,username,display_name,role,active,terminated_at,created_at,updated_at",
+-            "order": "username.asc",
+-        },
+-    )
+-    # Explicitly omit auth_user_id and any credential material.
+-    assignments = client.rest_select(
+-        "staff_shops",
+-        {"select": "staff_id,shop_id"},
+-    )
+-    audit = client.rest_select(
+-        "audit_log",
+-        {"select": "at,action,target_username,detail,business_id", "order": "at.asc"},
+-    )
+-
++    businesses = client.rest_select_all("businesses", {"select": "id,name,created_at", "order": "created_at.asc"})
++    shops = client.rest_select_all(
++        "shops",
++        {"select": "id,business_id,name,active,created_at", "order": "name.asc"},
++    )
++    staff = client.rest_select_all(
++        "staff",
++        {
++            "select": "id,business_id,username,display_name,role,active,terminated_at,created_at,updated_at",
++            "order": "username.asc",
++        },
++    )
++    # Explicitly omit auth_user_id and any credential material.
++    assignments = client.rest_select_all(
++        "staff_shops",
++        {"select": "staff_id,shop_id"},
++    )
++    audit = client.rest_select_all(
++        "audit_log",
++        {"select": "at,action,target_username,detail,business_id", "order": "at.asc"},
++    )
++
+*** Add File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/scripts/identity_snapshot.py
++"""Paginated identity backup. No implicit credential file loading.
++This is a sequential export, not a transactionally consistent database snapshot.
++"""
++import json
++import os
++from datetime import datetime, timezone
++from pathlib import Path
++from urllib.parse import urlencode
++from urllib.request import Request, urlopen
++
++TABLES = ("businesses", "shops", "staff", "staff_shops", "audit_log", "auth_reconciliation")
++
++def collect_rest(fetch, table):
++    rows, seen = [], set()
++    order = "staff_id.asc,shop_id.asc" if table == "staff_shops" else "id.asc"
++    while True:
++        page = fetch(f"/rest/v1/{table}?" + urlencode({"select": "*", "order": order,
++            "limit": 500, "offset": len(rows)}))
++        if not isinstance(page, list): raise ValueError("Invalid table response: " + table)
++        if not page: return rows
++        for row in page:
++            identity = (row["staff_id"], row["shop_id"]) if table == "staff_shops" else row["id"]
++            if identity in seen: raise ValueError("Duplicate row during export: " + table)
++            seen.add(identity)
++            rows.append(row)
++
++def collect_auth(fetch):
++    rows, seen, page = [], set(), 1
++    while True:
++        body = fetch(f"/auth/v1/admin/users?per_page=100&page={page}")
++        users = body.get("users") if isinstance(body, dict) else None
++        if not isinstance(users, list): raise ValueError("Invalid Auth response")
++        if not users: return {"users": rows}
++        for user in users:
++            if user["id"] in seen: raise ValueError("Duplicate Auth user during export")
++            seen.add(user["id"])
++            rows.append(user)
++        page += 1
++
++def main():
++    url, key = os.environ["URL"].rstrip("/"), os.environ["KEY"]
++    def fetch(path):
++        request = Request(url + path, headers={"apikey": key, "Authorization": "Bearer " + key})
++        with urlopen(request, timeout=60) as response: return json.load(response)
++    started = datetime.now(timezone.utc)
++    destination = Path(os.environ["SNAPSHOT_DIR"])
++    destination.mkdir(parents=True, exist_ok=False)
++    counts = {}
++    for table in TABLES:
++        data = collect_rest(fetch, table)
++        (destination / (table + ".json")).write_text(json.dumps(data, indent=2), encoding="utf-8")
++        counts[table] = len(data)
++    auth = collect_auth(fetch)
++    (destination / "auth_users.json").write_text(json.dumps(auth, indent=2), encoding="utf-8")
++    counts["auth_users"] = len(auth["users"])
++    (destination / "manifest.json").write_text(json.dumps({"started_at": started.isoformat(),
++        "finished_at": datetime.now(timezone.utc).isoformat(), "counts": counts,
++        "consistency": "sequential_nontransactional"}, indent=2), encoding="utf-8")
++    print("Identity snapshot complete; counts:", counts)
++
++if __name__ == "__main__": main()
+*** Update File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/.github/workflows/identity-dr.yml
+@@
+-name: identity-dr
+-
+-# Track 2: scheduled identity dump. The sync/ledger data is safe by
+-# construction (every device holds full history), but staff / roles /
+-# shop bindings / Auth users exist ONLY in Supabase (free tier = no
+-# automatic backups). This job snapshots the identity layer to the
+-# `identity-backups` branch every Monday and on demand.
+-#
+-# Requires repo secret ACCOUNT_SERVER_ADMIN_KEY (PROD service key) and
+-# ACCOUNT_SERVER_URL. NOTE: GitHub disables scheduled workflows after 60
+-# days of repo inactivity — any commit to this repo resets the window
+-# (see keepalive.yml for the paired liveness ping).
+-
+-on:
+-  schedule:
+-    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+-  workflow_dispatch: {}
+-
+-permissions:
+-  contents: write
+-
+-jobs:
+-  dump:
+-    runs-on: ubuntu-latest
+-    steps:
+-      - uses: actions/checkout@v4
+-      - name: Snapshot identity tables
+-        env:
+-          URL: ${{ secrets.ACCOUNT_SERVER_URL }}
+-          KEY: ${{ secrets.ACCOUNT_SERVER_ADMIN_KEY }}
+-        run: |
+-          set -euo pipefail
+-          STAMP="$(date -u +%Y-%m-%d)"
+-          mkdir -p "$STAMP"
+-          for t in businesses shops staff staff_shops audit_log auth_reconciliation; do
+-            curl -sf "$URL/rest/v1/$t?select=*" \
+-              -H "apikey: $KEY" -H "Authorization: Bearer $KEY" \
+-              -o "$STAMP/$t.json"
+-            echo "$t: $(wc -c < "$STAMP/$t.json") bytes"
+-          done
+-          curl -sf "$URL/auth/v1/admin/users?per_page=100" \
+-            -H "apikey: $KEY" -H "Authorization: Bearer $KEY" \
+-            -o "$STAMP/auth_users.json"
+-          echo "auth_users: $(wc -c < "$STAMP/auth_users.json") bytes"
+-          printf '%s\n' "$STAMP" > .snapshot_dir
+-      - name: Commit snapshot to identity-backups branch
+-        run: |
+-          set -euo pipefail
+-          STAMP="$(cat .snapshot_dir)"
+-          git config user.name "identity-dr bot"
+-          git config user.email "identity-dr@users.noreply.github.com"
+-          git fetch origin identity-backups || echo "no branch yet"
+-          if git rev-parse --verify origin/identity-backups >/dev/null 2>&1; then
+-            git checkout --detach origin/identity-backups
+-          else
+-            git checkout --detach
+-          fi
+-          git add -A
+-          if git diff --cached --quiet; then
+-            echo "nothing changed since last snapshot"
+-          else
+-            git commit -m "identity snapshot $STAMP"
+-            git push origin HEAD:refs/heads/identity-backups
+-          fi
++name: identity-dr
++on:
++  schedule:
++    - cron: "0 6 * * 1"
++  workflow_dispatch: {}
++permissions:
++  contents: write
++concurrency:
++  group: identity-dr-backup-branch
++  cancel-in-progress: false
++jobs:
++  dump:
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - name: Prepare backup branch
++        run: |
++          set -euo pipefail
++          cp scripts/identity_snapshot.py "$RUNNER_TEMP/identity_snapshot.py"
++          git config user.name "identity-dr bot"
++          git config user.email "identity-dr@users.noreply.github.com"
++          if git ls-remote --exit-code --heads origin identity-backups >/dev/null; then
++            git fetch origin identity-backups
++            git checkout --detach FETCH_HEAD
++          else
++            git checkout --orphan identity-backups
++            git rm -rf .
++          fi
++          echo "SNAPSHOT_DIR=$(date -u +%Y%m%dT%H%M%S%N)" >> "$GITHUB_ENV"
++      - name: Snapshot identity tables and Auth users
++        env:
++          URL: ${{ secrets.ACCOUNT_SERVER_URL }}
++          KEY: ${{ secrets.ACCOUNT_SERVER_ADMIN_KEY }}
++        run: python3 "$RUNNER_TEMP/identity_snapshot.py"
++      - name: Commit complete snapshot
++        run: |
++          set -euo pipefail
++          git add -- "$SNAPSHOT_DIR"
++          git commit -m "identity snapshot $SNAPSHOT_DIR"
++          git push origin HEAD:refs/heads/identity-backups
+*** End Patch

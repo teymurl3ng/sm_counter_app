@@ -1,0 +1,3578 @@
+[
+  {
+    "class": "com.saaf.milkshop.NativeAccessEvidenceTest",
+    "method": "portraitAccessAndRecoveryLightEvidence",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAccessEvidenceTest",
+    "method": "portraitAccessAndRecoveryDarkEvidence",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAuthenticationScreenContractTest",
+    "method": "methodPickerShowsOnlyEnrolledPhoneSecurityAndSurfacesCancellation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAuthenticationScreenContractTest",
+    "method": "darkSystemHostKeepsTheBrandedAccountPickerContrast",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAuthenticationScreenContractTest",
+    "method": "rateLimitedQuickPinKeepsFullPassphraseRecoveryVisibleAndWorking",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAuthenticationScreenContractTest",
+    "method": "startupFailureRetryChangesToTheRequestedVisibleState",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAuthenticationFacadeTest",
+    "method": "startupExposesOnlyActiveAccountsWithCompletedCredentialSetup",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAuthenticationFacadeTest",
+    "method": "ownerBootstrapAndFullPassphraseSignInReturnTypedMemorySessions",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerReceiveMilkHardwareBackReturnsToWorkHome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerCollectionOpensUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerRecordSpoilageOpensUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerRecordsHardwareBackReturnsToWorkHome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerPaySalaryOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "operationsNavPreviewDestinationsShowExplicitNotices",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerCashCloseOpensUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "phonePortraitLockSurvivesRotationRequest",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerCollectionHardwareBackReturnsToWorkHome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerShellHardwareBackStaysOnWorkAndKeepsSession",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerWorkRecordSaleDirtyBackRequiresDiscard",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminPeopleOpensUnderAdminChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerMoreSignsOutToWelcome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerMoreSignsOutToWelcome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerWorkRecordPaymentHardwareBackReturnsToWork",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerDeliveriesOpensUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "switchAccountHardwareBackKeepsSessionAndReturnsToMore",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerExpenseHardwareBackReturnsToWorkHome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerWorkDeliveriesOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerShellNavSwitchesSectionsUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerCustomersHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerDeliveriesHardwareBackReturnsToWorkHome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerCostingPlansHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "operationsAttendanceMarksPresent",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerCashCloseHardwareBackReturnsToWorkHome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminLocalExportOpensUnderAdminChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "operationsRecordSpoilageOpensConnectedEntry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerEmployeesHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminRecordsOpensUnderAdminChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminExpenseOpensUnderAdminChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminMoreSignsOutToWelcome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "operationsReceiveMilkRecordsPhysicalReceipt",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerSuppliersHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerMonthReportsOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerUsersRolesOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminCostingPlansHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "operationsReceiveMilkOpensConnectedEntry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerRecordsCorrectionHardwareBackReturnsToDetailThenList",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerProductsHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "entryModesInputAndSteppersConvertAndRecalculate",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerWorkRecordSpoilageOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerWorkRecordPaymentOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerWorkRecordSaleOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerReceiveMilkOpensUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerBackupOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminBusinessRecordsOpensUnderAdminChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerMakeYogurtOpensUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerMoreOpensUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerCustomersOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminCustomersHardwareBackReturnsToPeopleHub",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminMoreOpensUnderAdminChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerSecurityHistoryOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminProductsHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminExpenseHardwareBackReturnsToWorkHome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerCashCloseOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerCustomersOpensUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerPaySupplierOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminRecordsHardwareBackReturnsToWorkHome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminSecurityHistoryHardwareBackReturnsToRecordsHub",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerWorkOpensConnectedEntry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "operationsMakeYogurtRecordsPhysicalBatch",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerCostingPlansOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminCustomersOpensUnderAdminChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerWorkRecordSpoilageHardwareBackReturnsToWork",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminPeopleHardwareBackReturnsToWorkHome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminShellHardwareBackStaysOnWorkAndKeepsSession",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerEmployeesOpensUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerSaleOpensUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerPaySupplierHardwareBackReturnsToWorkHome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerProductsRemainWarmAcrossPrimaryNavigation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerWorkReceiveMilkHardwareBackReturnsToWork",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerEmployeesHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerSuppliersOpensUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerSuppliersHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerRecordsCorrectionOpensUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerSecurityHistoryHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminSecurityHistoryOpensUnderAdminChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "operationsMakeYogurtOpensConnectedEntry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerSaleHardwareBackReturnsToWorkHome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerProductsOpensUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerSuppliersOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerMoreOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "moreMenuHardwareBackReturnsToSellAndKeepsSession",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerMakeYogurtHardwareBackReturnsToWorkHome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "operationsMoreSignsOutToWelcome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerShopSettingsOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerBackupHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "operationsDeliveriesOpensConnectedEntry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerExpenseOpensUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "operationsMoreOpensConnectedEntry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerRecordsOpensUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "cashierExpenseHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "submenuClicksReachTheDeviceVibrator",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminSuppliersOpensUnderAdminChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminBusinessRecordsHardwareBackReturnsToRecordsHub",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminSuppliersHardwareBackReturnsToPeopleHub",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "recordSaleWritesRoomAndShowsRefreshedReceipt",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "everyBottomDestinationProvidesItsDefinedPreviewResponse",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerPaySupplierOpensUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerProductsOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerOverviewOpensConnectedEntry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerWorkDeliveriesHardwareBackReturnsToWork",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerWorkRecordSaleHardwareBackReturnsToWork",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerPaySalaryHardwareBackReturnsToWorkHome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminCostingPlansOpensUnderAdminChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "editedSaleDraftSurvivesActivityRecreation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminProductsOpensUnderAdminChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerCustomersHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerRecordSpoilageHardwareBackReturnsToWorkHome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerOverviewPreviewNavShowsExplicitNotices",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerUsersRolesHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "operationsAttendanceOpensConnectedEntry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminUsersRolesOpensUnderAdminChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerPaySupplierHardwareBackReturnsToWorkHome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminUsersRolesHardwareBackReturnsToPeopleHub",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminShellNavSwitchesSectionsUnderAdminChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerShopSettingsHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "operationsWorkHomeShowsPhysicalContext",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "operationsDeliveriesMarksPhysicalDelivery",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerCashCloseHardwareBackReturnsToWorkHome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerEmployeesOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "collectPaymentWritesRoomShowsReceiptAndOffersTheNextVisibleActions",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerWorkMakeYogurtHardwareBackReturnsToWork",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "switchAccountUiBackKeepsSessionAndReturnsToMore",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerWorkMakeYogurtOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminShopSettingsHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerProductsHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerShellOpensUnderManagerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminShellOpensUnderAdminChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "cashierExpenseOpensUnderCashierChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerWorkReceiveMilkOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "cashierCountsClosesDayAndCannotReopen",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminShopSettingsOpensUnderAdminChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminEmployeesHardwareBackReturnsToPeopleHub",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminEmployeesOpensUnderAdminChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerRecordsOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "operationsRecordSpoilageRecordsPhysicalLoss",
+    "failure": "androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 10000 ms\nat androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)\nat androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)\nat com.saaf.milkshop.NativeFoundationUiTest.operationsRecordSpoilageRecordsPhysicalLoss(NativeFoundationUiTest.kt:2291)\n",
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerMonthReportsHardwareBackReturnsToOverview",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "ownerExpenseOpensUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "managerExpenseHardwareBackReturnsToWorkHome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "method": "adminLocalExportHardwareBackReturnsToMoreMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+    "method": "closedBusinessDayExplainsTheBlockAndDisablesRecord",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+    "method": "surchargeEditedAmountWinsOverDefault",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+    "method": "surchargeTogglePrefillsDefaultAndCarriesIntoRequest",
+    "failure": "java.lang.AssertionError\nat org.junit.Assert.fail(Assert.java:87)\nat org.junit.Assert.assertTrue(Assert.java:42)\nat org.junit.Assert.assertTrue(Assert.java:53)\nat com.saaf.milkshop.NativeSaleHardeningContractTest.surchargeTogglePrefillsDefaultAndCarriesIntoRequest(NativeSaleHardeningContractTest.kt:165)\n",
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+    "method": "missingProductAndPaymentReferencesExplainWhatTheOwnerMustFix",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+    "method": "largeTextDarkThemeKeepsCoreActionsAndTalkBackStateAvailable",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+    "method": "longCustomerListScrollsToTheLastAccountAndSelectsIt",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeSaleScreenContractTest",
+    "method": "catalogPickerHandlesZeroOneTwoThreeTwelveAndFiftyProducts",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.Phase8SaleOperationsTest",
+    "method": "saleRejectsInsufficientStockClosedHistoryInvalidChannelAndUnauthorizedOperator",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.Phase8SaleOperationsTest",
+    "method": "cashierRecordsQuantitySaleToCashWithNativeDefaultSurchargeAndSummaries",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.Phase8SaleOperationsTest",
+    "method": "packagedDailyWorkScreenRecordsPaidSaleThroughRoom",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.Phase8SaleOperationsTest",
+    "method": "ownerRecordsValueSaleOnCustomerCreditAndNativeDerivesQuantity",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.qa.NativeGoldenLedgerRegressionTest",
+    "method": "goldenScenario_saleCollectionCorrectionExpense_matchCapturedAuthoritativeTotals",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCollectionFacadeTest",
+    "method": "loadKeepsBalancesOutOfTheCustomerListAndResolvesOnlyTheSelection",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCollectionFacadeTest",
+    "method": "recordAllowsAdvanceAndReturnsVerifiedCustomerAndCashMovements",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCollectionFacadeTest",
+    "method": "operatorCannotLoadOrRecordCollectionData",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCollectionScreenContractTest",
+    "method": "loadRetryAndSaveFailureHaveVisibleRecoverableWorkflows",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCollectionScreenContractTest",
+    "method": "unavailableAndFailureStatesExplainRecoveryAndPreserveEnteredAmount",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCollectionScreenContractTest",
+    "method": "customerSearchSelectionAmountShortcutsAccountAndNoteControlsChangeVisibleState",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCollectionScreenContractTest",
+    "method": "overpaymentRequiresExplicitAdvanceConfirmationWithExactConsequences",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCollectionScreenContractTest",
+    "method": "successShowsAuthoritativeResultAndBothActionsRespond",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCollectionScreenContractTest",
+    "method": "normalPaymentSubmitsExactRequestAndSavingStateBlocksDuplicateTap",
+    "failure": "java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'Recording\u2026' (ignoreCase: false) is not displayed!\nat androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)\nat com.saaf.milkshop.NativeCollectionScreenContractTest.normalPaymentSubmitsExactRequestAndSavingStateBlocksDuplicateTap(NativeCollectionScreenContractTest.kt:133)\n",
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+    "method": "collectInvalidAmountAndPayFullDisabled",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+    "method": "collectDestinationRetentionOnCollectAnother",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+    "method": "collectCancelPathsAndCustomerSwitchResetAmount",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+    "method": "collectLargeTextPortraitSemanticsRemainAvailable",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+    "method": "collectDirtyBackKeepAndDiscard",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+    "method": "collectNoMatchSearchAndImeDoneClearFocus",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.qa.NativeCollectionDeviceEvidenceTest",
+    "method": "collectCheckpointEvidenceCapturesReadyDefault",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.qa.NativeCollectionDeviceEvidenceTest",
+    "method": "collectAmountImeDoesNotPermanentlyOccludeFocusedFieldOrRecordAction",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeActivityFacadeTest",
+    "method": "todayListIsEmptyUntilTheSignedInActorRecordsWork",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeActivityFacadeTest",
+    "method": "todayListAndDetailIncludeOnlyTheSignedInActorsCollections",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeActivityFacadeTest",
+    "method": "operatorWithoutOperationalViewIsDenied",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeActivityScreenContractTest",
+    "method": "emptyTodayExplainsAndKeepsActivityNavSelected",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeActivityScreenContractTest",
+    "method": "readyListOpensDetailAndBackClearsIt",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeActivityScreenContractTest",
+    "method": "loadFailureOffersRetry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMoreFacadeTest",
+    "method": "securityStatusIsOffWhenQuickUnlockUnavailable",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMoreFacadeTest",
+    "method": "blindCashCountReturnsCountedAmountWithoutExpectedOrVarianceFields",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMoreFacadeTest",
+    "method": "loadExposesCashDrawerWithoutExpectedBalance",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMoreScreenContractTest",
+    "method": "menuOpensExpenseEntry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMoreScreenContractTest",
+    "method": "countCashRecordsBlindAmountAndShowsSuccessWithoutExpectedVariance",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMoreScreenContractTest",
+    "method": "personalSecurityShowsStatus",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMoreScreenContractTest",
+    "method": "countReceiptDoneCallsBackOnceAndReturnsToMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMoreScreenContractTest",
+    "method": "menuOpensCountCashEntry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMoreScreenContractTest",
+    "method": "menuShowsCashierActionsAndKeepsMoreNavSelected",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMoreScreenContractTest",
+    "method": "switchAccountAndSignOutFireFromMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMoreScreenContractTest",
+    "method": "menuOpensDeliveriesFromMore",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMoreScreenContractTest",
+    "method": "loadFailureOffersRetry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCashierExpenseScreenContractTest",
+    "method": "dirtyCashierNavigationRequiresDiscardConfirmation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCashierExpenseScreenContractTest",
+    "method": "readyUsesCashierChromeAndExcludesOwnerNavigation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCashierExpenseScreenContractTest",
+    "method": "loadFailureRetainsCashierShellAndRetries",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeExpenseFacadeTest",
+    "method": "loadExposesActiveCategoriesAndDefaultsCash",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeExpenseFacadeTest",
+    "method": "recordPostsExpenseAndReturnsReceipt",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeExpenseFacadeTest",
+    "method": "operatorCannotLoadOrRecordExpense",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOperationsWorkFacadeTest",
+    "method": "loadRejectsWhenSessionMissingOperationalPermission",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOperationsWorkFacadeTest",
+    "method": "loadUsesEffectivePurchaseNotSupersededOriginal",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOperationsWorkFacadeTest",
+    "method": "loadExposesPhysicalContextWithoutFinanceFields",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOperationsWorkScreenContractTest",
+    "method": "receiveMilkOpensConnectedEntry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOperationsWorkScreenContractTest",
+    "method": "moreNavOpensConnectedEntry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOperationsWorkScreenContractTest",
+    "method": "attendanceNavOpensConnectedEntry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOperationsWorkScreenContractTest",
+    "method": "recordSpoilageOpensConnectedEntry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOperationsWorkScreenContractTest",
+    "method": "loadFailureOffersRetry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOperationsWorkScreenContractTest",
+    "method": "closedBusinessDateShowsClosedBanner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOperationsWorkScreenContractTest",
+    "method": "homeShowsPhysicalContextAndKeepsWorkNavSelected",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOperationsWorkScreenContractTest",
+    "method": "deliveriesNavOpensConnectedEntry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOperationsWorkScreenContractTest",
+    "method": "makeYogurtOpensConnectedEntry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeReceiveMilkFacadeTest",
+    "method": "loadExposesSuppliersWithoutBalancesOrRates",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeReceiveMilkFacadeTest",
+    "method": "cashierCannotLoadReceiveMilk",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeReceiveMilkFacadeTest",
+    "method": "previewAndRecordReturnPhysicalValuesWithoutAmountOwed",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeReceiveMilkScreenContractTest",
+    "method": "successShowsReceiveAnother",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeReceiveMilkScreenContractTest",
+    "method": "readyFormShowsPhysicalReviewWithoutMoney",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeReceiveMilkScreenContractTest",
+    "method": "selectingSupplierAndMeasurementsEnablesRecord",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMakeYogurtFacadeTest",
+    "method": "recordReturnsPhysicalConversionWithoutFinance",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMakeYogurtFacadeTest",
+    "method": "loadExposesStockWithoutRatesOrMargins",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMakeYogurtFacadeTest",
+    "method": "insufficientMilkKeepsDraftFriendlyMessage",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMakeYogurtScreenContractTest",
+    "method": "enteringConversionEnablesRecord",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMakeYogurtScreenContractTest",
+    "method": "successShowsMakeAnother",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeMakeYogurtScreenContractTest",
+    "method": "readyFormShowsPhysicalReviewWithoutMoney",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeRecordSpoilageFacadeTest",
+    "method": "otherReasonRequiresNote",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeRecordSpoilageFacadeTest",
+    "method": "recordReturnsPhysicalRemovalWithoutFinance",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeRecordSpoilageFacadeTest",
+    "method": "insufficientStockKeepsDraftFriendlyMessage",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeRecordSpoilageFacadeTest",
+    "method": "loadExposesProductsWithoutRatesOrMargins",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeRecordSpoilageScreenContractTest",
+    "method": "selectingProductQuantityAndReasonEnablesRecord",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeRecordSpoilageScreenContractTest",
+    "method": "successShowsRecordAnother",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeRecordSpoilageScreenContractTest",
+    "method": "readyFormShowsPhysicalReviewWithoutMoney",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeDeliveriesFacadeTest",
+    "method": "loadExposesPendingPhysicalRowsWithoutMoneyFields",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeDeliveriesFacadeTest",
+    "method": "markDeliveredRemovesFromActiveList",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeDeliveriesScreenContractTest",
+    "method": "linkSaleRejectsInvalidSaleNumber",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeDeliveriesScreenContractTest",
+    "method": "archiveDeliveryRemovesFromActiveList",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeDeliveriesScreenContractTest",
+    "method": "createDeliveryRequiresCustomerProductQuantity",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeDeliveriesScreenContractTest",
+    "method": "linkSaleRecordsPhysicalFulfilmentAgainstRecordedSale",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeDeliveriesScreenContractTest",
+    "method": "readyListMarksDelivered",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeDeliveriesScreenContractTest",
+    "method": "emptyStateKeepsDeliveriesNavSelected",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeDeliveriesScreenContractTest",
+    "method": "successBannerShowsAfterMark",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeDeliveriesScreenContractTest",
+    "method": "createDeliveryRecordsPhysicalLogisticsPlan",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAttendanceFacadeTest",
+    "method": "unlinkedAccountShowsUnlinkedWithoutMark",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAttendanceFacadeTest",
+    "method": "markPresentWritesTodayStatus",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAttendanceFacadeTest",
+    "method": "loadExposesLinkedEmployeeWithoutFinanceFields",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAttendanceScreenContractTest",
+    "method": "unlinkedKeepsAttendanceNavSelected",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAttendanceScreenContractTest",
+    "method": "markedTodayShowsStatusWithoutPrimaryWrite",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAttendanceScreenContractTest",
+    "method": "linkedNotMarkedOffersMarkPresent",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOperationsMoreFacadeTest",
+    "method": "todayWorkListsOwnPhysicalReceiveWithoutMoney",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOperationsMoreFacadeTest",
+    "method": "loadExposesPostingContextWithoutCashFields",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOperationsMoreScreenContractTest",
+    "method": "personalSecurityOpensFromMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOperationsMoreScreenContractTest",
+    "method": "menuShowsOperatorActionsWithoutCashCount",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOperationsMoreScreenContractTest",
+    "method": "todayWorkShowsPhysicalRows",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerOverviewFacadeTest",
+    "method": "loadRejectsNonOwnerSession",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerOverviewFacadeTest",
+    "method": "loadRejectsWhenSessionMissing",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerOverviewFacadeTest",
+    "method": "loadExposesDecisionSummaryAndCashCountAttention",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerOverviewScreenContractTest",
+    "method": "moreNavRequestsMoreDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerOverviewScreenContractTest",
+    "method": "workNavShowsPreviewNoticeDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerOverviewScreenContractTest",
+    "method": "clearStateShowsNoUrgentIssues",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerOverviewScreenContractTest",
+    "method": "moreSectionShowsOpeningPlaceholderWhileHosted",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerOverviewScreenContractTest",
+    "method": "overviewShowsDecisionSummaryAndKeepsOverviewNavSelected",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerOverviewScreenContractTest",
+    "method": "recordsNavRequestsRecordsDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerOverviewScreenContractTest",
+    "method": "recordsSectionShowsOpeningPlaceholderWhileHosted",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerOverviewScreenContractTest",
+    "method": "coverageWarningIsVisibleWhenIncomplete",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerOverviewScreenContractTest",
+    "method": "workSectionShowsOpeningPlaceholderWhileHosted",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerReportsFacadeTest",
+    "method": "loadRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerReportsFacadeTest",
+    "method": "customRangeRejectsReversedAndOversizedRanges",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerReportsFacadeTest",
+    "method": "loadMapsThisMonthRangeAndHonestEmptyCoverage",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerReportsFacadeTest",
+    "method": "customRangeConvertsInclusiveEndToExclusiveBoundary",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerReportsFacadeTest",
+    "method": "rangeForLastMonthIsPreviousCalendarMonth",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerReportsScreenContractTest",
+    "method": "presetChipRequestsLastMonth",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerReportsScreenContractTest",
+    "method": "customRangePreviewSurfacesNotice",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerReportsScreenContractTest",
+    "method": "warmRefreshKeepsReportVisible",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerReportsScreenContractTest",
+    "method": "loadFailureOffersRetry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerReportsScreenContractTest",
+    "method": "emptyProductsShowsHonestCopy",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerReportsScreenContractTest",
+    "method": "customRangeAppliesInclusiveDates",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerReportsScreenContractTest",
+    "method": "contentShowsReportWithoutCashierChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkFacadeTest",
+    "method": "loadRejectsNonOwnerSession",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkFacadeTest",
+    "method": "loadRejectsWhenSessionMissing",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkFacadeTest",
+    "method": "loadExposesCommandLauncherContext",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkScreenContractTest",
+    "method": "deliveriesOpensConnectedDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkScreenContractTest",
+    "method": "recordSaleOpensConnectedDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkScreenContractTest",
+    "method": "recordSpoilageOpensConnectedDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkScreenContractTest",
+    "method": "paySupplierOpensConnectedDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkScreenContractTest",
+    "method": "recordPaymentOpensConnectedDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkScreenContractTest",
+    "method": "makeYogurtOpensConnectedDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkScreenContractTest",
+    "method": "paySalaryOpensConnectedDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkScreenContractTest",
+    "method": "deliveriesBadgeShowsActiveCount",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkScreenContractTest",
+    "method": "recordExpenseOpensConnectedDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkScreenContractTest",
+    "method": "overviewNavFromWorkRequestsNavigation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkScreenContractTest",
+    "method": "drawingOpensConnectedDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkScreenContractTest",
+    "method": "homeShowsCommandGroupsAndKeepsWorkNavSelected",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkScreenContractTest",
+    "method": "loadFailureOffersRetry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkScreenContractTest",
+    "method": "cashCloseOpensConnectedDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerWorkScreenContractTest",
+    "method": "receiveMilkOpensConnectedDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSaleEntryScreenContractTest",
+    "method": "loadFailureRetainsOwnerShellAndRetries",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSaleEntryScreenContractTest",
+    "method": "readyUsesOwnerChromeAndExcludesCashierNavigation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSaleEntryScreenContractTest",
+    "method": "dirtyOwnerNavigationRequiresDiscardConfirmation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCollectionEntryScreenContractTest",
+    "method": "loadFailureRetainsOwnerShellAndRetries",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCollectionEntryScreenContractTest",
+    "method": "readyUsesOwnerChromeAndExcludesCashierNavigation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCollectionEntryScreenContractTest",
+    "method": "dirtyOwnerNavigationRequiresDiscardConfirmation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerExpenseScreenContractTest",
+    "method": "loadFailureRetainsOwnerShellAndRetries",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerExpenseScreenContractTest",
+    "method": "readyUsesOwnerChromeAndExcludesCashierNavigation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerExpenseScreenContractTest",
+    "method": "dirtyOwnerNavigationRequiresDiscardConfirmation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerPaySupplierScreenContractTest",
+    "method": "loadFailureRetainsOwnerShellAndRetries",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerPaySupplierScreenContractTest",
+    "method": "readyUsesOwnerChromeAndExcludesCashierNavigation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerPaySupplierScreenContractTest",
+    "method": "dirtyOwnerNavigationRequiresDiscardConfirmation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeVendorPaymentFacadeTest",
+    "method": "loadExposesActiveVendorsAndDefaultsCash",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeVendorPaymentFacadeTest",
+    "method": "operatorCannotLoadOrRecordVendorPayment",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeVendorPaymentFacadeTest",
+    "method": "recordPostsVendorPaymentAndReturnsReceipt",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerPaySalaryScreenContractTest",
+    "method": "loadFailureRetainsOwnerShellAndRetries",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerPaySalaryScreenContractTest",
+    "method": "readyUsesOwnerChromeAndExcludesCashierNavigation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerPaySalaryScreenContractTest",
+    "method": "dirtyOwnerNavigationRequiresDiscardConfirmation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeSalaryPaymentFacadeTest",
+    "method": "operatorCannotLoadOrRecordSalaryPayment",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeSalaryPaymentFacadeTest",
+    "method": "recordPostsSalaryPaymentAndReturnsReceipt",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeSalaryPaymentFacadeTest",
+    "method": "loadExposesActiveEmployeesAndDefaultsCash",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCashCloseScreenContractTest",
+    "method": "reopenSuccessShowsOpenFeedbackUnderOwnerChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCashCloseScreenContractTest",
+    "method": "loadFailureRetainsOwnerShellAndRetries",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCashCloseScreenContractTest",
+    "method": "readyUsesOwnerChromeAndExcludesCashierNavigation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCashCloseScreenContractTest",
+    "method": "closedDateShowsReopenFormAndSubmits",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCashCloseScreenContractTest",
+    "method": "dirtyOwnerNavigationRequiresDiscardConfirmation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCashCloseFacadeTest",
+    "method": "cashierClosesOwnDayNextDateOpensAndReopenIsDenied",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCashCloseFacadeTest",
+    "method": "operatorCannotLoadCashClose",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCashCloseFacadeTest",
+    "method": "earlierOpenDeliveryRefusesCloseUntilCashierResolvesIt",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCashCloseFacadeTest",
+    "method": "pendingDeliveryRefusesCloseUntilResolved",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCashCloseFacadeTest",
+    "method": "closeThenReopenRestoresOpenPosting",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCashCloseFacadeTest",
+    "method": "cashMovementAfterCountRefusesCloseWithoutPartialWrite",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCashCloseFacadeTest",
+    "method": "recordCountThenCloseDayReturnsReceipt",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCashCloseFacadeTest",
+    "method": "loadExposesCashAccountExpectedAndOpenPosting",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCashCloseFacadeTest",
+    "method": "reopenRejectsBlankReasonAndWrongPassphrase",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCashCloseFacadeTest",
+    "method": "varianceRequiresReasonBeforeClose",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerDeliveriesEntryScreenContractTest",
+    "method": "loadFailureRetainsOwnerShellAndRetries",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerDeliveriesEntryScreenContractTest",
+    "method": "readyUsesOwnerChromeAndExcludesOpsNavigation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsFacadeTest",
+    "method": "loadRejectsNonOwnerSession",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsFacadeTest",
+    "method": "correctPostsMonetaryDeltaAndRefreshesDetail",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsFacadeTest",
+    "method": "loadRejectsWhenSessionMissing",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsFacadeTest",
+    "method": "managerCanCorrect",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsFacadeTest",
+    "method": "correctionsGroupFiltersLineage",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsFacadeTest",
+    "method": "searchFilterMatchesActorAndNotes",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsFacadeTest",
+    "method": "historyIsEmptyUntilWorkIsRecorded",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsFacadeTest",
+    "method": "correctRejectsAlreadyReplaced",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsFacadeTest",
+    "method": "historyIsShopWideAcrossActors",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsFacadeTest",
+    "method": "correctRejectsClosedDay",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsScreenContractTest",
+    "method": "emptyHistoryExplainsAndKeepsRecordsNavSelected",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsScreenContractTest",
+    "method": "correctionDiscardCanKeepOrConfirmNavigation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsScreenContractTest",
+    "method": "searchFilterShowsHonestEmptyWhenNoMatches",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsScreenContractTest",
+    "method": "balancesAndClosingGroupsSelectRealViews",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsScreenContractTest",
+    "method": "readyListOpensDetail",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsScreenContractTest",
+    "method": "overviewNavFromRecordsRequestsNavigation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsScreenContractTest",
+    "method": "correctionsGroupSelectsWithoutDeferredNotice",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsScreenContractTest",
+    "method": "loadFailureOffersRetry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerRecordsScreenContractTest",
+    "method": "correctableDetailOpensEditor",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreFacadeTest",
+    "method": "loadRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreFacadeTest",
+    "method": "loadSecurityReturnsDefaultWhenQuickUnlockUnavailable",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreFacadeTest",
+    "method": "loadExposesOwnerContextWithoutCashCountFields",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "syncNowPullsAndPushes",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "backupOpensFromMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "takeServerDropsEntrySoParkApplies",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "unenrollOpensConfirm",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "enrollConnectsPhone",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "personalSecurityOpensFromMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "confirmStopsSyncing",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "shopPickCompletesEnrollment",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "loadingShowsWhileStatusLoads",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "menuShowsJourneyGroupsWithoutCashierChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "restoredHoldsListedForReview",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "personalSecurityScreenShowsStatus",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "employeesOpensFromMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "usersRolesOpensFromMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "productsOpensFromMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "refreshReloadsStatus",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "overviewNavFromMoreRequestsNavigation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "suppliersOpensFromMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "enrolledShowsServerShopSession",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "keepMineReleasesEntryToPush",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "coldSyncFailureOffersWorkingRetry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "shopChoicesListedWhenAmbiguous",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "errorShowsFailureReason",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "customersOpensFromMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "costingPlansOpensFromMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "syncRowOpensFromMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "shopSettingsOpensFromMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "loadFailureOffersRetry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "noticeShowsResultSummary",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "syncEnvironmentChooserChangesEnrollmentTarget",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "syncScreenShowsStatusOrEnroll",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "securityHistoryOpensFromMenu",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+    "method": "syncOwnerChooserUsesTheSelectedLocalOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsFacadeTest",
+    "method": "loadRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsFacadeTest",
+    "method": "createProductThenListContains",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsFacadeTest",
+    "method": "loadDetailResolvesArchivedProduct",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsFacadeTest",
+    "method": "loadProductsListsActiveCatalogOnly",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsFacadeTest",
+    "method": "unarchiveProductRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsFacadeTest",
+    "method": "loadDetailReturnsActiveProductFacts",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsFacadeTest",
+    "method": "archiveThenUnarchiveReturnsToActiveList",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsFacadeTest",
+    "method": "updateProductRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsFacadeTest",
+    "method": "archiveProductRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsFacadeTest",
+    "method": "archiveProductThenAbsentFromActiveList",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsFacadeTest",
+    "method": "updateProductThenDetailReflectsChanges",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsFacadeTest",
+    "method": "loadProductsArchivedFilterExcludesActive",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsFacadeTest",
+    "method": "createProductRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsScreenContractTest",
+    "method": "archivedDetailShowsUnarchiveOnly",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsScreenContractTest",
+    "method": "archivedEmptyStateIsHonest",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsScreenContractTest",
+    "method": "editFormPrefillsAndSaves",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsScreenContractTest",
+    "method": "addProductOpensCreateForm",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsScreenContractTest",
+    "method": "detailShowsFactsEditArchive",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsScreenContractTest",
+    "method": "productRowOpensDetail",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsScreenContractTest",
+    "method": "archiveConfirmCallsArchive",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsScreenContractTest",
+    "method": "listShowsActiveProductsWithoutCashierChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsScreenContractTest",
+    "method": "filterChipsRequestActiveAndArchived",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsScreenContractTest",
+    "method": "loadFailureOffersRetry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsScreenContractTest",
+    "method": "emptyStateIsHonest",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerProductsScreenContractTest",
+    "method": "createFormShowsFieldsAndSave",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCustomersFacadeTest",
+    "method": "loadRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCustomersFacadeTest",
+    "method": "updateCustomerRenamesAndSavesProfile",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCustomersFacadeTest",
+    "method": "loadCustomersListsAccountsWithBalanceAndStatus",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCustomersFacadeTest",
+    "method": "loadDetailReturnsProfileFacts",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCustomersFacadeTest",
+    "method": "updateCustomerCanDeactivateViaActiveFlag",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCustomersFacadeTest",
+    "method": "createCustomerThenListContains",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCustomersFacadeTest",
+    "method": "updateCustomerRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCustomersFacadeTest",
+    "method": "createCustomerRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest",
+    "method": "detailShowsFactsAndEdit",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest",
+    "method": "editFormPrefillsAndSaves",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest",
+    "method": "addCustomerOpensCreateForm",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest",
+    "method": "customerRowOpensDetail",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest",
+    "method": "loadFailureOffersRetry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest",
+    "method": "listShowsCustomersWithoutCashierChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest",
+    "method": "emptyStateIsHonest",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest",
+    "method": "createFormShowsFieldsAndSave",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSuppliersFacadeTest",
+    "method": "loadRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSuppliersFacadeTest",
+    "method": "updateSupplierRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSuppliersFacadeTest",
+    "method": "loadSuppliersListsAccountsWithBalanceAndStatus",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSuppliersFacadeTest",
+    "method": "createSupplierRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSuppliersFacadeTest",
+    "method": "loadDetailReturnsProfileFacts",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSuppliersFacadeTest",
+    "method": "updateSupplierRenamesAndSavesProfile",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSuppliersFacadeTest",
+    "method": "createSupplierThenListContains",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSuppliersFacadeTest",
+    "method": "updateSupplierCanDeactivateViaActiveFlag",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSuppliersScreenContractTest",
+    "method": "listShowsSuppliersWithoutCashierChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSuppliersScreenContractTest",
+    "method": "detailShowsFactsAndEdit",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSuppliersScreenContractTest",
+    "method": "editFormPrefillsAndSaves",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSuppliersScreenContractTest",
+    "method": "supplierRowOpensDetail",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSuppliersScreenContractTest",
+    "method": "loadFailureOffersRetry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSuppliersScreenContractTest",
+    "method": "emptyStateIsHonest",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSuppliersScreenContractTest",
+    "method": "createFormShowsFieldsAndSave",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSuppliersScreenContractTest",
+    "method": "addSupplierOpensCreateForm",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerEmployeesFacadeTest",
+    "method": "loadRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerEmployeesFacadeTest",
+    "method": "loadDetailReturnsProfileFacts",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerEmployeesFacadeTest",
+    "method": "loadEmployeesListsAccountsWithBalanceAndStatus",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerEmployeesFacadeTest",
+    "method": "updateEmployeeRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerEmployeesFacadeTest",
+    "method": "createEmployeeRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerEmployeesFacadeTest",
+    "method": "updateEmployeeCanDeactivateViaActiveFlag",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerEmployeesFacadeTest",
+    "method": "updateEmployeeRenamesAndSavesProfile",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerEmployeesFacadeTest",
+    "method": "createEmployeeThenListContains",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerEmployeesScreenContractTest",
+    "method": "detailShowsFactsAndEdit",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerEmployeesScreenContractTest",
+    "method": "editFormPrefillsAndSaves",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerEmployeesScreenContractTest",
+    "method": "addEmployeeOpensCreateForm",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerEmployeesScreenContractTest",
+    "method": "employeeRowOpensDetail",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerEmployeesScreenContractTest",
+    "method": "loadFailureOffersRetry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerEmployeesScreenContractTest",
+    "method": "listShowsEmployeesWithoutCashierChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerEmployeesScreenContractTest",
+    "method": "emptyStateIsHonest",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerEmployeesScreenContractTest",
+    "method": "createFormShowsFieldsAndSave",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansFacadeTest",
+    "method": "loadRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansFacadeTest",
+    "method": "loadDetailReturnsComponents",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansFacadeTest",
+    "method": "upsertBudgetCreatesMilkPlan",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansFacadeTest",
+    "method": "approveRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansFacadeTest",
+    "method": "reauthenticateWipesPassphrase",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansFacadeTest",
+    "method": "loadPoliciesListsVersionsWithStatusAndRate",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansFacadeTest",
+    "method": "planningRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansFacadeTest",
+    "method": "openingCostsRejectNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansFacadeTest",
+    "method": "openingCostsReadRecordAndCorrectWithoutErasingHistory",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansFacadeTest",
+    "method": "approveYieldPolicyFromThirtyBatches",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansFacadeTest",
+    "method": "loadPoliciesEmptyStateIsHonest",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansFacadeTest",
+    "method": "createOrReviseCollectionsTargetSavesWeek",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansFacadeTest",
+    "method": "openingCostSaveRequiresRecentFullAuthentication",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansFacadeTest",
+    "method": "approvePolicySupersedesActiveVersion",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansFacadeTest",
+    "method": "approvePolicyCreatesActiveVersionInTestDb",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "collectionsEditorShowsFieldsAndSavesTypedInput",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "supersededDetailShowsDeferredEditNotice",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "yieldApproveFormRequiresThirtyBatches",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "openingEmptyStateOpensShopSettings",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "policyRowOpensDetail",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "detailShowsFactsAndSupersedeForActive",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "yieldSectionShowsApproveForm",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "plansSectionShowsBudgetsAndOpensEditor",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "productionLossAssessmentCapturesAbnormalBatch",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "openingSectionShowsCoverageAndOpensProductEditor",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "listShowsPoliciesWithoutCashierChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "costingSectionsRemainReachableAtLargeFontScale",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "openingEditorRequiresEstimateEvidenceAndSavesCorrection",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "approveOpensFormAndSavesTypedInput",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "loadFailureOffersRetry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "openingDiscardCanKeepOrConfirmNavigation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "reauthDialogIsShownWhenRequired",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "emptyStateIsHonest",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest",
+    "method": "budgetEditorShowsFieldsAndSavesTypedInput",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsFacadeTest",
+    "method": "createExpenseCategoryRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsFacadeTest",
+    "method": "loadRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsFacadeTest",
+    "method": "recordOpeningAndCorrectOpeningRequireRecentAuth",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsFacadeTest",
+    "method": "updateRatesUpdatesSnapshot",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsFacadeTest",
+    "method": "createExpenseCategoryThenListContains",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsFacadeTest",
+    "method": "loadReturnsShopIdentityAndRates",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsFacadeTest",
+    "method": "setExpenseCategoryArchivedUpdatesStatus",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsFacadeTest",
+    "method": "saveIdentityRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsFacadeTest",
+    "method": "saveIdentityUpdatesSnapshot",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsFacadeTest",
+    "method": "createExpenseCategoryDuplicateSurfacesError",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsScreenContractTest",
+    "method": "openingSectionShowsNoticeWhenIdentityMissing",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsScreenContractTest",
+    "method": "openingAndCategoriesSectionsArePresent",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsScreenContractTest",
+    "method": "identityFormShowsFieldsAndSave",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsScreenContractTest",
+    "method": "editRatesOpensForm",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsScreenContractTest",
+    "method": "loadFailureOffersRetry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsScreenContractTest",
+    "method": "categoryCreateFormShowsFieldsAndSave",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsScreenContractTest",
+    "method": "contentShowsSettingsWithoutCashierChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsScreenContractTest",
+    "method": "ratesFormShowsFieldsAndSave",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsScreenContractTest",
+    "method": "openingSectionShowsRecordActionWhenAllowed",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsScreenContractTest",
+    "method": "categoryDetailArchivesWithConfirm",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsScreenContractTest",
+    "method": "addCategoryOpensCreateForm",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsScreenContractTest",
+    "method": "categoryRowOpensDetail",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerShopSettingsScreenContractTest",
+    "method": "editIdentityOpensForm",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesFacadeTest",
+    "method": "loadRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesFacadeTest",
+    "method": "wrongReauthPassphraseIsWipedAndFails",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesFacadeTest",
+    "method": "setEnabledRejectsDisablingSelf",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesFacadeTest",
+    "method": "beginAndCompleteEnrollCreatesCashierLikeUser",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesFacadeTest",
+    "method": "loadDetailReturnsAccountFacts",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesFacadeTest",
+    "method": "loadUsersListsOwnerAndCashier",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesFacadeTest",
+    "method": "beginCredentialResetReturnsPendingEnrollment",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesFacadeTest",
+    "method": "reauthenticateWipesPassphraseAndAllowsSensitiveWrites",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesScreenContractTest",
+    "method": "detailShowsFactsAndActions",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesScreenContractTest",
+    "method": "userRowOpensDetail",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesScreenContractTest",
+    "method": "enrollIdentityFormSubmitsBegin",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesScreenContractTest",
+    "method": "resumeSetupReopensPendingCredentialEnrollment",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesScreenContractTest",
+    "method": "enrollOpensIdentityForm",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesScreenContractTest",
+    "method": "roleChangeFormSavesSelectedRole",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesScreenContractTest",
+    "method": "resumeSetupHiddenWhenSetupComplete",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesScreenContractTest",
+    "method": "loadFailureOffersRetry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesScreenContractTest",
+    "method": "listShowsUsersWithoutCashierChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesScreenContractTest",
+    "method": "enrollPassphraseStepCompletes",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesScreenContractTest",
+    "method": "emptyStateIsHonest",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerUsersRolesScreenContractTest",
+    "method": "disableConfirmInvokesCallback",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSecurityHistoryFacadeTest",
+    "method": "loadRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSecurityHistoryFacadeTest",
+    "method": "loadAuditsReturnsSnapshotForOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSecurityHistoryScreenContractTest",
+    "method": "auditRowOpensDetail",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSecurityHistoryScreenContractTest",
+    "method": "detailShowsFacts",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSecurityHistoryScreenContractTest",
+    "method": "listShowsAuditsWithoutCashierChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSecurityHistoryScreenContractTest",
+    "method": "loadFailureOffersRetry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerSecurityHistoryScreenContractTest",
+    "method": "emptyStateIsHonest",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupFacadeTest",
+    "method": "exportInspectRestoreRoundTrip",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupFacadeTest",
+    "method": "loadRejectsNonOwner",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupFacadeTest",
+    "method": "inspectRejectsWrongPassphrase",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupFacadeTest",
+    "method": "cloudConnectEnableRunNowDisconnectWithFakeGateway",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupFacadeTest",
+    "method": "loadWithNullCloudSettingsReportsNotConfigured",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupFacadeTest",
+    "method": "cloudRefreshInspectRestoreWithFakeGateway",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+    "method": "disconnectConfirmConfirmsDisconnect",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+    "method": "disconnectConfirmOffersConfirmAndCancel",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+    "method": "exportFormShowsPassphraseControls",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+    "method": "restoreOpensRestoreForm",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+    "method": "connectDiscardCanKeepOrConfirmNavigation",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+    "method": "reauthFormShowsPassphraseControls",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+    "method": "restoreFormShowsPickControls",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+    "method": "pausedDriveShowsEnable",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+    "method": "configuredDriveShowsEnablePauseRunNowDisconnect",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+    "method": "restoreInspectionShowsConfirmControls",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+    "method": "loadFailureOffersRetry",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+    "method": "exportOpensExportForm",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+    "method": "connectFormCollectsRecoveryPassphrase",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+    "method": "contentShowsStatusWithoutCashierChrome",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+    "method": "connectOpensConnectFormWhenAvailable",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeManagerShellScreenContractTest",
+    "method": "workStubShowsManagerChromeAndKeepsWorkNavSelected",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeManagerShellScreenContractTest",
+    "method": "bottomNavSwitchesAllFourSections",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeManagerWorkScreenContractTest",
+    "method": "allClearWhenNoAttention",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeManagerWorkScreenContractTest",
+    "method": "saleShortcutOpensDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeManagerWorkScreenContractTest",
+    "method": "makeYogurtShortcutOpensDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeManagerWorkScreenContractTest",
+    "method": "deliveriesShortcutOpensDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeManagerWorkScreenContractTest",
+    "method": "attentionShowsWhenCashCountMissing",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeManagerWorkScreenContractTest",
+    "method": "retryLoadIsReachableOnFailure",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeManagerWorkScreenContractTest",
+    "method": "cashCloseShortcutOpensCloseTab",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeManagerWorkScreenContractTest",
+    "method": "expenseShortcutOpensDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeManagerWorkScreenContractTest",
+    "method": "paySupplierShortcutOpensDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeManagerWorkScreenContractTest",
+    "method": "receiveMilkShortcutOpensDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeManagerWorkScreenContractTest",
+    "method": "homeShowsManagerShortcutsAndExcludesOwnerOnlyRows",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeManagerWorkScreenContractTest",
+    "method": "paymentShortcutOpensDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeManagerWorkScreenContractTest",
+    "method": "spoilageShortcutOpensDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAdminShellScreenContractTest",
+    "method": "workStubShowsAdminChromeAndKeepsWorkNavSelected",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAdminShellScreenContractTest",
+    "method": "bottomNavSwitchesAllFourSections",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAdminWorkScreenContractTest",
+    "method": "retryLoadIsReachableOnFailure",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAdminWorkScreenContractTest",
+    "method": "allClearWhenNoSetupGaps",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAdminWorkScreenContractTest",
+    "method": "expenseShortcutOpensDestination",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAdminWorkScreenContractTest",
+    "method": "attentionShowsWhenSetupGapsExist",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeAdminWorkScreenContractTest",
+    "method": "homeShowsSetupHealthAndExpenseShortcut",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeShopIdentityRegressionTest",
+    "method": "changedMerchantNameRefreshesWithoutRestartOrChangingActor",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeWorkRefreshRegressionTest",
+    "method": "operatorBackWinsOverWarmRefresh",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeWorkRefreshRegressionTest",
+    "method": "ownerNavigationWinsOverRefreshingSuccessAndFailure",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeWorkRefreshRegressionTest",
+    "method": "managerNavigationWinsOverWarmRefresh",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeWorkRefreshRegressionTest",
+    "method": "adminNavigationWinsOverWarmRefreshFailure",
+    "failure": null,
+    "skipped": false
+  },
+  {
+    "class": "com.saaf.milkshop.NativeCatalogPricingRegressionTest",
+    "method": "catalogProductsRemainVisibleAndPriceFollowsIdAfterRename",
+    "failure": null,
+    "skipped": false
+  }
+]

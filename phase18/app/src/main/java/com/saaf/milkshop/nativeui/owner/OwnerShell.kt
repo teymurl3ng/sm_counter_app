@@ -1,5 +1,7 @@
 package com.saaf.milkshop.nativeui.owner
 
+import com.saaf.milkshop.nativeui.common.NativeBottomNavigation
+import com.saaf.milkshop.nativeui.common.NativeNavigationLabel
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.heightIn
@@ -99,7 +101,7 @@ private fun OwnerRailItem(
             unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
         icon = { Icon(icon, contentDescription = null) },
-        label = { Text(label) },
+        label = { NativeNavigationLabel(label) },
     )
 }
 
@@ -108,10 +110,7 @@ internal fun OwnerNavigation(
     selected: OwnerSection,
     onNavigate: (OwnerSection) -> Unit,
 ) {
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.background,
-        tonalElevation = 0.dp,
-    ) {
+    NativeBottomNavigation {
         OwnerNavItem(
             selected = selected == OwnerSection.Overview,
             tag = NativeUiTags.OwnerNavOverview,
@@ -160,7 +159,7 @@ private fun RowScope.OwnerNavItem(
             .testTag(tag)
             .heightIn(min = 56.dp),
         icon = { Icon(icon, contentDescription = null) },
-        label = { Text(label) },
+        label = { NativeNavigationLabel(label) },
         colors = NavigationBarItemDefaults.colors(
             selectedIconColor = MaterialTheme.colorScheme.onPrimary,
             selectedTextColor = MaterialTheme.colorScheme.primary,

@@ -40,6 +40,16 @@ class SyncEnrollment(
         credential: CharArray,
         shopId: String? = null,
         localUserId: Long? = null,
+    ): Outcome = SyncOperationGate.exclusive {
+        enrollLocked(config, username, credential, shopId, localUserId)
+    }
+
+    private suspend fun enrollLocked(
+        config: SyncServerConfig,
+        username: String,
+        credential: CharArray,
+        shopId: String?,
+        localUserId: Long?,
     ): Outcome {
         val auth = when (val result = AccountAuthClient(http, config).signIn(username, credential)) {
             is AccountAuthResult.Allowed -> result
@@ -85,28 +95,41 @@ class SyncEnrollment(
                     activeOwners.map { OwnerChoice(it.userId, it.displayName) },
                 )
             }
+            if (activeOwners.none { it.userId == resolvedLocalUserId }) {
+                return Outcome.Failed("owner_link_unresolved")
+            }
         }
 
-        val target = shopId?.let { wanted -> auth.shops.firstOrNull { it.shopId == wanted } }
-            ?: auth.shops.singleOrNull()
+        val target = (if (shopId != null) auth.shops.firstOrNull { it.shopId == shopId }
+            ?: return Outcome.Failed("shop_not_authorized") else auth.shops.singleOrNull())
             ?: return if (auth.shops.isEmpty()) {
                 Outcome.Failed("no_shops")
             } else {
                 Outcome.ShopsAvailable(auth.shops)
             }
 
+        val previous = database?.serverAccountDao()?.findBinding()
+        val fileBinding = SyncShopBindingStore.load(context)
+        val previousEnvironment = previous?.environment ?: fileBinding?.environment
+        val previousBusiness = previous?.businessId ?: fileBinding?.businessId
+        val previousShop = previous?.shopId ?: fileBinding?.shopId
+        if (previousEnvironment != null && (previousEnvironment != config.environment ||
+                previousBusiness != auth.businessId || previousShop != target.shopId)) {
+            return Outcome.Failed("installation_shop_mismatch")
+        }
+
         // go 8: a restore/reset marks the installation for a fresh identity —
         // consume it here, on the definitive enrollment path, so the restored
         // device never pushes as the id that wrote its backup (same-origin
         // pushes escape the server's conflict audit). The replaced id was
         // already recorded as prev_device_id by the restore for outbox
-        // classification. Ordinary enrollments (environment switch) keep
-        // their identity.
+        // classification. Ordinary same-shop enrollments keep their identity.
         val rebaseline = SyncRebaselineStore(context)
         if (rebaseline.needsFreshIdentity) {
             SyncIdentity.regenerate(context)
-            rebaseline.needsFreshIdentity = false
         }
+        // Also fences a crash during ordinary enrollment's file/Room writes.
+        rebaseline.needsFreshIdentity = true
 
         SyncServerConfigStore.save(context, config)
         SyncTokenStore(context).save(
@@ -164,11 +187,12 @@ class SyncEnrollment(
                 ),
             )
         }
-        SyncScheduler.setSchedulingEnabled(true)
-        SyncScheduler.requestPush()
         if (!isCounterDevice) {
             linkVerifiedOwner(auth, username, resolvedLocalUserId)
         }
+        rebaseline.needsFreshIdentity = false
+        SyncScheduler.setSchedulingEnabled(true)
+        SyncScheduler.requestPush()
         return Outcome.Enrolled(binding, target.timezone ?: auth.shopTimezone)
     }
 
@@ -177,9 +201,8 @@ class SyncEnrollment(
      * the verified owner to the local owner and start the grace clock
      * fresh. [localUserId] comes from the signed-in session when the caller
      * has one; otherwise the bootstrap invariant resolves it (exactly one
-     * active owner per installation). With zero or several owners and no
-     * session there is nothing unambiguous to link: skip (audited) and
-     * leave linking to the bridge verification flow.
+     * active owner per installation). Enrollment validates this choice
+     * before writing transport configuration or identity state.
      */
     private suspend fun linkVerifiedOwner(
         auth: AccountAuthResult.Allowed,
@@ -233,7 +256,9 @@ class SyncEnrollment(
         }
     }
 
-    suspend fun unenroll() {
+    suspend fun unenroll() = SyncOperationGate.exclusive { unenrollLocked() }
+
+    private suspend fun unenrollLocked() {
         // A4': stop-syncing is the honest "server logout" moment — revoke
         // this device's session (scope=local) before the files go. The
         // access token may outlive the call (platform behavior), so this is

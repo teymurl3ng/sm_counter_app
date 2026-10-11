@@ -1,0 +1,16 @@
+{
+  "dev": "Applied and verified",
+  "prod": "Unchanged; automatic approval review rejected exact PROD deployment; explicit approval requested",
+  "dev_db_behavior_checks": {
+    "rpc_table_whitelist_preserved": true,
+    "unlinked_identity_remains_pending": true,
+    "authenticated_rpc_push_pull_round_trip": true,
+    "linked_identity_reconciliation_resolves": true,
+    "final_owner_disable_demote_delete_denied": true
+  },
+  "real_auth_session_verified": false,
+  "preserved_android_sources": 81,
+  "deployment_artifacts": 26,
+  "benchmark_artifacts": 42
+}
+DEPLOYMENT_EVIDENCE_RECONCILIATION: PASS

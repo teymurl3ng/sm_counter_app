@@ -1,0 +1,16 @@
+warning: in the working copy of 'src/app/(app)/activity/activity-list-panel.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/(app)/overview/overview-panel.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/(app)/shops/[shopId]/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/(app)/shops/shops-list-panel.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/(app)/staff/[staffId]/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/(app)/staff/create/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/(app)/staff/staff-list-panel.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/(app)/system/system-panel.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/admin/create-staff/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/admin/reconcile-auth/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/theme-toggle.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/account-server.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/admin-mutation.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/perf.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/reconciliation.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/viewer-cache.ts', LF will be replaced by CRLF the next time Git touches it

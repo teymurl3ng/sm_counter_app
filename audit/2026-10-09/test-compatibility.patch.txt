@@ -1,0 +1,59 @@
+*** Begin Patch
+*** Update File: phase18/app/src/androidTest/java/com/saaf/milkshop/Phase8ExpenseOperationsTest.kt
+@@
+-import com.saaf.milkshop.application.bridge.OperationsBridgeCommandService
++import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
+*** Update File: phase18/app/src/androidTest/java/com/saaf/milkshop/Phase8EmployeeAttendanceTest.kt
+@@
+-import com.saaf.milkshop.application.bridge.EmployeeBridgeCommandService
++import com.saaf.milkshop.application.commands.EmployeeBridgeCommandService
+*** Update File: phase18/app/src/androidTest/java/com/saaf/milkshop/Phase8DeliveryOperationsTest.kt
+@@
+-import com.saaf.milkshop.application.bridge.DeliveryBridgeCommandService
++import com.saaf.milkshop.application.commands.DeliveryBridgeCommandService
+*** Update File: phase18/app/src/androidTest/java/com/saaf/milkshop/Phase8ReconciliationOperationsTest.kt
+@@
+-import com.saaf.milkshop.application.bridge.ReconciliationBridgeCommandService
++import com.saaf.milkshop.application.commands.ReconciliationBridgeCommandService
+*** Update File: phase18/app/src/androidTest/java/com/saaf/milkshop/Phase8SaleOperationsTest.kt
+@@
+-import com.saaf.milkshop.application.bridge.OperationsBridgeCommandService
++import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
+*** Update File: phase18/app/src/androidTest/java/com/saaf/milkshop/Phase8PurchaseOperationsTest.kt
+@@
+-import com.saaf.milkshop.application.bridge.OperationsBridgeCommandService
++import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
+*** Update File: phase18/app/src/androidTest/java/com/saaf/milkshop/Phase8ProductionOperationsTest.kt
+@@
+-import com.saaf.milkshop.application.bridge.OperationsBridgeCommandService
++import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
+*** Update File: phase18/app/src/androidTest/java/com/saaf/milkshop/Phase8HistoryCorrectionTest.kt
+@@
+-import com.saaf.milkshop.application.bridge.HistoryBridgeCommandService
++import com.saaf.milkshop.application.commands.HistoryBridgeCommandService
+*** Update File: phase18/app/src/androidTest/java/com/saaf/milkshop/Phase8PaymentOperationsTest.kt
+@@
+-import com.saaf.milkshop.application.bridge.OperationsBridgeCommandService
++import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
+*** Update File: phase18/app/src/androidTest/java/com/saaf/milkshop/Phase8SpoilageOperationsTest.kt
+@@
+-import com.saaf.milkshop.application.bridge.OperationsBridgeCommandService
++import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
+*** Update File: phase18/app/src/androidTest/java/com/saaf/milkshop/Phase8SalaryPaymentOperationsTest.kt
+@@
+-import com.saaf.milkshop.application.bridge.OperationsBridgeCommandService
++import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
+*** Update File: phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerMoreScreenContractTest.kt
+@@
+-                    onEnrollSync = onEnrollSync,
+-                    onEnrollSyncInShop = onEnrollSyncInShop,
++                    onEnrollSync = { username, credential, environment, _ -> onEnrollSync(username, credential, environment) },
++                    onEnrollSyncInShop = { shop, username, credential, environment, _ -> onEnrollSyncInShop(shop, username, credential, environment) },
+*** Update File: phase18/app/src/androidTest/java/com/saaf/milkshop/SyncEnrollmentTest.kt
+@@
+-        SyncEnrollment(context, fakeAuthHttp()).unenroll()
++        runBlocking { SyncEnrollment(context, fakeAuthHttp()).unenroll() }
+@@
+-        SyncEnrollment(context, fakeAuthHttp()).unenroll()
++        runBlocking { SyncEnrollment(context, fakeAuthHttp()).unenroll() }
+*** End Patch

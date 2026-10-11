@@ -1,0 +1,80 @@
+{
+  "migrations": [
+    {
+      "version": "20260920082151",
+      "name": "phase_a_identity_v1"
+    },
+    {
+      "version": "20260920090710",
+      "name": "phase_a5_ping_search_path"
+    },
+    {
+      "version": "20260920090721",
+      "name": "phase_a5_ping_search_path"
+    },
+    {
+      "version": "20260923194929",
+      "name": "c1_admin_write"
+    },
+    {
+      "version": "20260923195132",
+      "name": "c1_1_admin_write_rpcs"
+    },
+    {
+      "version": "20260923195505",
+      "name": "c1_2_admin_auth_db_helpers"
+    },
+    {
+      "version": "20260923210638",
+      "name": "migration_c1_admin_write"
+    },
+    {
+      "version": "20260923210725",
+      "name": "migration_c1_1_admin_write_rpcs"
+    },
+    {
+      "version": "20260923210744",
+      "name": "migration_c1_2_admin_auth_db_helpers"
+    },
+    {
+      "version": "20260925120001",
+      "name": "c1_1_admin_write_rpcs"
+    },
+    {
+      "version": "20260925120002",
+      "name": "c1_2_admin_auth_db_helpers"
+    },
+    {
+      "version": "20260925120003",
+      "name": "c1_3_hardening"
+    },
+    {
+      "version": "20260925120004",
+      "name": "c1_4_reconciliation"
+    },
+    {
+      "version": "20260925120005",
+      "name": "c1_5_error_semantics"
+    },
+    {
+      "version": "20260928160119",
+      "name": "sync_phase5_records_rpcs_rls"
+    },
+    {
+      "version": "20260928160353",
+      "name": "sync_phase5_hide_helper_rpc"
+    },
+    {
+      "version": "20260929055723",
+      "name": "sync_phase5_fix_push_rpc_params"
+    },
+    {
+      "version": "20260929055829",
+      "name": "sync_phase5_fix_push_conflict_target"
+    },
+    {
+      "version": "20260929063817",
+      "name": "sync_phase7_restore_helper_grant"
+    }
+  ]
+}

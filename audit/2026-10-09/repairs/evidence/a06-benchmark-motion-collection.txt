@@ -1,0 +1,5 @@
+Verified isolated profileable APK identities; installing A06 QA benchmark only.
+Running benchmark profileRealTimeNativeTransitionFramesAndGuardOwnership
+{"build": "benchmark", "device": "SM-A065F", "transitions": 30, "capture_method": "real ActivityScenario Choreographer, Window FrameMetrics and PixelCopy window screenshots", "frame_total": {"samples": 888, "median_ms": 22.49772, "p95_ms": 126.963407, "max_ms": 191.038434}, "frames_over_deadline": 26}
+Waiting for bounded 45-second trace to flush.
+A06_BENCHMARK_COLLECTION: PASS. No ordinary app or live DB changed.

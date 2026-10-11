@@ -1,0 +1,1762 @@
+{
+  "tables": [
+    {
+      "rls": true,
+      "kind": "r",
+      "name": "businesses",
+      "owner": "postgres",
+      "options": null,
+      "force_rls": false
+    },
+    {
+      "rls": true,
+      "kind": "r",
+      "name": "roles",
+      "owner": "postgres",
+      "options": null,
+      "force_rls": false
+    },
+    {
+      "rls": true,
+      "kind": "r",
+      "name": "staff",
+      "owner": "postgres",
+      "options": null,
+      "force_rls": false
+    },
+    {
+      "rls": true,
+      "kind": "r",
+      "name": "staff_shops",
+      "owner": "postgres",
+      "options": null,
+      "force_rls": false
+    },
+    {
+      "rls": true,
+      "kind": "r",
+      "name": "audit_log",
+      "owner": "postgres",
+      "options": null,
+      "force_rls": false
+    },
+    {
+      "rls": true,
+      "kind": "r",
+      "name": "sync_records",
+      "owner": "postgres",
+      "options": null,
+      "force_rls": false
+    },
+    {
+      "rls": true,
+      "kind": "r",
+      "name": "auth_reconciliation",
+      "owner": "postgres",
+      "options": null,
+      "force_rls": false
+    },
+    {
+      "rls": true,
+      "kind": "r",
+      "name": "shops",
+      "owner": "postgres",
+      "options": null,
+      "force_rls": false
+    }
+  ],
+  "columns": [
+    {
+      "name": "id",
+      "type": "uuid",
+      "table": "businesses",
+      "default": "gen_random_uuid()",
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "name",
+      "type": "text",
+      "table": "businesses",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "businesses",
+      "default": "now()",
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "name",
+      "type": "text",
+      "table": "roles",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "id",
+      "type": "uuid",
+      "table": "staff",
+      "default": "gen_random_uuid()",
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "auth_user_id",
+      "type": "uuid",
+      "table": "staff",
+      "default": null,
+      "identity": "",
+      "not_null": false,
+      "generated": ""
+    },
+    {
+      "name": "business_id",
+      "type": "uuid",
+      "table": "staff",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "username",
+      "type": "text",
+      "table": "staff",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "display_name",
+      "type": "text",
+      "table": "staff",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "role",
+      "type": "text",
+      "table": "staff",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "active",
+      "type": "boolean",
+      "table": "staff",
+      "default": "true",
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "terminated_at",
+      "type": "timestamp with time zone",
+      "table": "staff",
+      "default": null,
+      "identity": "",
+      "not_null": false,
+      "generated": ""
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "staff",
+      "default": "now()",
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "staff",
+      "default": "now()",
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "staff_id",
+      "type": "uuid",
+      "table": "staff_shops",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "shop_id",
+      "type": "uuid",
+      "table": "staff_shops",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "id",
+      "type": "bigint",
+      "table": "audit_log",
+      "default": null,
+      "identity": "a",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "at",
+      "type": "timestamp with time zone",
+      "table": "audit_log",
+      "default": "now()",
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "action",
+      "type": "text",
+      "table": "audit_log",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "target_username",
+      "type": "text",
+      "table": "audit_log",
+      "default": null,
+      "identity": "",
+      "not_null": false,
+      "generated": ""
+    },
+    {
+      "name": "detail",
+      "type": "jsonb",
+      "table": "audit_log",
+      "default": null,
+      "identity": "",
+      "not_null": false,
+      "generated": ""
+    },
+    {
+      "name": "business_id",
+      "type": "uuid",
+      "table": "audit_log",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "performed_by",
+      "type": "uuid",
+      "table": "audit_log",
+      "default": null,
+      "identity": "",
+      "not_null": false,
+      "generated": ""
+    },
+    {
+      "name": "performed_by_username",
+      "type": "text",
+      "table": "audit_log",
+      "default": null,
+      "identity": "",
+      "not_null": false,
+      "generated": ""
+    },
+    {
+      "name": "server_seq",
+      "type": "bigint",
+      "table": "sync_records",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "business_id",
+      "type": "uuid",
+      "table": "sync_records",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "shop_id",
+      "type": "uuid",
+      "table": "sync_records",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "table_name",
+      "type": "text",
+      "table": "sync_records",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "row_uid",
+      "type": "text",
+      "table": "sync_records",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "payload",
+      "type": "jsonb",
+      "table": "sync_records",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "origin_device",
+      "type": "text",
+      "table": "sync_records",
+      "default": null,
+      "identity": "",
+      "not_null": false,
+      "generated": ""
+    },
+    {
+      "name": "received_at",
+      "type": "timestamp with time zone",
+      "table": "sync_records",
+      "default": "now()",
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "id",
+      "type": "uuid",
+      "table": "auth_reconciliation",
+      "default": "gen_random_uuid()",
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "business_id",
+      "type": "uuid",
+      "table": "auth_reconciliation",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "operation",
+      "type": "text",
+      "table": "auth_reconciliation",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "auth_user_id",
+      "type": "uuid",
+      "table": "auth_reconciliation",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "target_username",
+      "type": "text",
+      "table": "auth_reconciliation",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "last_error",
+      "type": "text",
+      "table": "auth_reconciliation",
+      "default": null,
+      "identity": "",
+      "not_null": false,
+      "generated": ""
+    },
+    {
+      "name": "resolved",
+      "type": "boolean",
+      "table": "auth_reconciliation",
+      "default": "false",
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "auth_reconciliation",
+      "default": "now()",
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "auth_reconciliation",
+      "default": "now()",
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "correlation_id",
+      "type": "uuid",
+      "table": "auth_reconciliation",
+      "default": null,
+      "identity": "",
+      "not_null": false,
+      "generated": ""
+    },
+    {
+      "name": "state",
+      "type": "text",
+      "table": "auth_reconciliation",
+      "default": "'pending'::text",
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "attempt_count",
+      "type": "integer",
+      "table": "auth_reconciliation",
+      "default": "0",
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "error_code",
+      "type": "text",
+      "table": "auth_reconciliation",
+      "default": null,
+      "identity": "",
+      "not_null": false,
+      "generated": ""
+    },
+    {
+      "name": "last_attempt_at",
+      "type": "timestamp with time zone",
+      "table": "auth_reconciliation",
+      "default": null,
+      "identity": "",
+      "not_null": false,
+      "generated": ""
+    },
+    {
+      "name": "resolved_at",
+      "type": "timestamp with time zone",
+      "table": "auth_reconciliation",
+      "default": null,
+      "identity": "",
+      "not_null": false,
+      "generated": ""
+    },
+    {
+      "name": "performed_by",
+      "type": "uuid",
+      "table": "auth_reconciliation",
+      "default": null,
+      "identity": "",
+      "not_null": false,
+      "generated": ""
+    },
+    {
+      "name": "performed_by_username",
+      "type": "text",
+      "table": "auth_reconciliation",
+      "default": null,
+      "identity": "",
+      "not_null": false,
+      "generated": ""
+    },
+    {
+      "name": "id",
+      "type": "uuid",
+      "table": "shops",
+      "default": "gen_random_uuid()",
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "business_id",
+      "type": "uuid",
+      "table": "shops",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "name",
+      "type": "text",
+      "table": "shops",
+      "default": null,
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "active",
+      "type": "boolean",
+      "table": "shops",
+      "default": "true",
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "shops",
+      "default": "now()",
+      "identity": "",
+      "not_null": true,
+      "generated": ""
+    },
+    {
+      "name": "shop_timezone",
+      "type": "text",
+      "table": "shops",
+      "default": null,
+      "identity": "",
+      "not_null": false,
+      "generated": ""
+    }
+  ],
+  "indexes": [
+    {
+      "indexdef": "CREATE UNIQUE INDEX businesses_pkey ON public.businesses USING btree (id)",
+      "indexname": "businesses_pkey",
+      "tablename": "businesses",
+      "schemaname": "public",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX roles_pkey ON public.roles USING btree (name)",
+      "indexname": "roles_pkey",
+      "tablename": "roles",
+      "schemaname": "public",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX staff_pkey ON public.staff USING btree (id)",
+      "indexname": "staff_pkey",
+      "tablename": "staff",
+      "schemaname": "public",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX staff_auth_user_id_key ON public.staff USING btree (auth_user_id)",
+      "indexname": "staff_auth_user_id_key",
+      "tablename": "staff",
+      "schemaname": "public",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX staff_username_key ON public.staff USING btree (username)",
+      "indexname": "staff_username_key",
+      "tablename": "staff",
+      "schemaname": "public",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX staff_shops_pkey ON public.staff_shops USING btree (staff_id, shop_id)",
+      "indexname": "staff_shops_pkey",
+      "tablename": "staff_shops",
+      "schemaname": "public",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX audit_log_pkey ON public.audit_log USING btree (id)",
+      "indexname": "audit_log_pkey",
+      "tablename": "audit_log",
+      "schemaname": "public",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE INDEX audit_log_business_at_idx ON public.audit_log USING btree (business_id, at DESC)",
+      "indexname": "audit_log_business_at_idx",
+      "tablename": "audit_log",
+      "schemaname": "public",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX sync_records_pkey ON public.sync_records USING btree (server_seq)",
+      "indexname": "sync_records_pkey",
+      "tablename": "sync_records",
+      "schemaname": "public",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX sync_records_shop_table_uid ON public.sync_records USING btree (shop_id, table_name, row_uid)",
+      "indexname": "sync_records_shop_table_uid",
+      "tablename": "sync_records",
+      "schemaname": "public",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE INDEX sync_records_shop_seq ON public.sync_records USING btree (shop_id, server_seq)",
+      "indexname": "sync_records_shop_seq",
+      "tablename": "sync_records",
+      "schemaname": "public",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX auth_reconciliation_pkey ON public.auth_reconciliation USING btree (id)",
+      "indexname": "auth_reconciliation_pkey",
+      "tablename": "auth_reconciliation",
+      "schemaname": "public",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX auth_reconciliation_pending_identity_idx ON public.auth_reconciliation USING btree (operation, auth_user_id) WHERE (state = 'pending'::text)",
+      "indexname": "auth_reconciliation_pending_identity_idx",
+      "tablename": "auth_reconciliation",
+      "schemaname": "public",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX shops_pkey ON public.shops USING btree (id)",
+      "indexname": "shops_pkey",
+      "tablename": "shops",
+      "schemaname": "public",
+      "tablespace": null
+    },
+    {
+      "indexdef": "CREATE UNIQUE INDEX shops_business_id_name_key ON public.shops USING btree (business_id, name)",
+      "indexname": "shops_business_id_name_key",
+      "tablename": "shops",
+      "schemaname": "public",
+      "tablespace": null
+    }
+  ],
+  "policies": [
+    {
+      "cmd": "INSERT",
+      "qual": null,
+      "roles": [
+        "public"
+      ],
+      "tablename": "sync_records",
+      "permissive": "PERMISSIVE",
+      "policyname": "sync_records_staff_insert",
+      "schemaname": "public",
+      "with_check": "(shop_id IN ( SELECT sync_staff_shop_ids() AS sync_staff_shop_ids))"
+    },
+    {
+      "cmd": "SELECT",
+      "qual": "(shop_id IN ( SELECT sync_staff_shop_ids() AS sync_staff_shop_ids))",
+      "roles": [
+        "public"
+      ],
+      "tablename": "sync_records",
+      "permissive": "PERMISSIVE",
+      "policyname": "sync_records_staff_select",
+      "schemaname": "public",
+      "with_check": null
+    }
+  ],
+  "triggers": [
+    {
+      "name": "staff_set_updated_at",
+      "table": "staff",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER staff_set_updated_at BEFORE UPDATE ON staff FOR EACH ROW EXECUTE FUNCTION set_staff_updated_at()"
+    },
+    {
+      "name": "sync_records_assign_seq",
+      "table": "sync_records",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER sync_records_assign_seq BEFORE INSERT OR UPDATE ON sync_records FOR EACH ROW EXECUTE FUNCTION sync_records_assign_seq()"
+    }
+  ],
+  "functions": [
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_get_staff",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_get_staff(p_staff_id uuid)\n RETURNS jsonb\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  bid uuid := public.admin_require_caller_business_id();\n  result jsonb;\nbegin\n  select jsonb_build_object(\n    'staff_id', s.id,\n    'username', s.username,\n    'display_name', s.display_name,\n    'role', s.role,\n    'active', s.active,\n    'terminated_at', s.terminated_at,\n    'created_at', s.created_at,\n    'updated_at', s.updated_at,\n    'business_id', s.business_id,\n    'shops', public.admin_staff_shops_json(s.id)\n  )\n  into result\n  from public.staff s\n  where s.id = p_staff_id\n    and s.business_id = bid;\n\n  if result is null then\n    raise exception 'not found' using errcode = 'P0002';\n  end if;\n\n  return result;\nend;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_staff_id uuid",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_staff_shops_json",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_staff_shops_json(p_staff_id uuid)\n RETURNS jsonb\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\n  select coalesce((\n    select jsonb_agg(\n      jsonb_build_object('id', sh.id, 'name', sh.name)\n      order by sh.name\n    )\n    from public.staff s\n    join public.shops sh on sh.business_id = s.business_id and sh.active\n    where s.id = p_staff_id\n      and (\n        s.role = 'owner'\n        or exists (\n          select 1\n          from public.staff_shops ss\n          where ss.staff_id = s.id\n            and ss.shop_id = sh.id\n        )\n      )\n  ), '[]'::jsonb);\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_staff_id uuid",
+      "authenticated_execute": false
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_list_auth_reconciliation",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "TABLE(id uuid, operation text, auth_user_id uuid)",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_list_auth_reconciliation(p_business_id uuid, p_limit integer DEFAULT 20)\n RETURNS TABLE(id uuid, operation text, auth_user_id uuid)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nBEGIN\n  IF auth.role() IS DISTINCT FROM 'service_role' THEN\n    RAISE EXCEPTION 'service role required' USING errcode = '42501';\n  END IF;\n  RETURN QUERY\n    SELECT r.id, r.operation, r.auth_user_id\n    FROM public.auth_reconciliation r\n    WHERE r.business_id = p_business_id AND r.state = 'pending'\n    ORDER BY r.created_at\n    LIMIT greatest(1, least(coalesce(p_limit, 20), 100));\nEND;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_business_id uuid, p_limit integer",
+      "authenticated_execute": false
+    },
+    {
+      "acl": [
+        "=X/postgres",
+        "postgres=X/postgres",
+        "anon=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "set_staff_updated_at",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "trigger",
+      "definition": "CREATE OR REPLACE FUNCTION public.set_staff_updated_at()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO ''\nAS $function$\nbegin\n  new.updated_at = now();\n  return new;\nend;\n$function$\n",
+      "anon_execute": true,
+      "service_execute": true,
+      "security_definer": false,
+      "identity_arguments": "",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "my_profile",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "definition": "CREATE OR REPLACE FUNCTION public.my_profile()\n RETURNS jsonb\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\n  select jsonb_build_object(\n    'staff_id', s.id,\n    'username', s.username,\n    'display_name', s.display_name,\n    'role', s.role,\n    'active', s.active,\n    'terminated_at', s.terminated_at,\n    'business_id', s.business_id,\n    'shops', coalesce((\n      select jsonb_agg(jsonb_build_object(\n        'id', sh.id,\n        'name', sh.name,\n        'shop_timezone', sh.shop_timezone\n      ) order by sh.name)\n      from public.shops sh\n      where sh.business_id = s.business_id\n        and sh.active\n        and (\n          s.role = 'owner'\n          or exists (\n            select 1\n            from public.staff_shops ss\n            where ss.staff_id = s.id and ss.shop_id = sh.id\n          )\n        )\n    ), '[]'::jsonb)\n  )\n  from public.staff s\n  where s.auth_user_id = auth.uid()\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "anon=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "ping",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "timestamp with time zone",
+      "definition": "CREATE OR REPLACE FUNCTION public.ping()\n RETURNS timestamp with time zone\n LANGUAGE sql\n STABLE\n SET search_path TO ''\nAS $function$\n  select now()\n$function$\n",
+      "anon_execute": true,
+      "service_execute": true,
+      "security_definer": false,
+      "identity_arguments": "",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_require_caller_business_id",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "uuid",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_require_caller_business_id()\n RETURNS uuid\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  bid uuid;\nbegin\n  select s.business_id\n    into bid\n  from public.staff s\n  where s.auth_user_id = auth.uid()\n    and s.active is true\n    and s.terminated_at is null\n    and s.role in ('owner', 'admin')\n  limit 1;\n\n  if bid is null then\n    raise exception 'not authorized'\n      using errcode = '42501';\n  end if;\n\n  return bid;\nend;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "",
+      "authenticated_execute": false
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_overview",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_overview()\n RETURNS jsonb\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  bid uuid := public.admin_require_caller_business_id();\n  result jsonb;\nbegin\n  select jsonb_build_object(\n    'active_staff', (\n      select count(*)::int from public.staff s\n      where s.business_id = bid and s.active and s.terminated_at is null\n    ),\n    'disabled_staff', (\n      select count(*)::int from public.staff s\n      where s.business_id = bid and not s.active and s.terminated_at is null\n    ),\n    'terminated_staff', (\n      select count(*)::int from public.staff s\n      where s.business_id = bid and s.terminated_at is not null\n    ),\n    'active_owners', (\n      select count(*)::int from public.staff s\n      where s.business_id = bid and s.role = 'owner'\n        and s.active and s.terminated_at is null\n    ),\n    'active_admins', (\n      select count(*)::int from public.staff s\n      where s.business_id = bid and s.role = 'admin'\n        and s.active and s.terminated_at is null\n    ),\n    'shops', (\n      select count(*)::int from public.shops sh where sh.business_id = bid\n    ),\n    'active_shops', (\n      select count(*)::int from public.shops sh\n      where sh.business_id = bid and sh.active\n    ),\n    'recent_activity', coalesce((\n      select jsonb_agg(row_to_json(x)::jsonb)\n      from (\n        select a.id, a.at, a.action, a.target_username, a.detail\n        from public.audit_log a\n        where a.business_id = bid\n        order by a.at desc, a.id desc\n        limit 10\n      ) x\n    ), '[]'::jsonb)\n  ) into result;\n\n  return result;\nend;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_list_staff",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_list_staff(p_search text DEFAULT NULL::text, p_role text DEFAULT NULL::text, p_status text DEFAULT NULL::text, p_shop_id uuid DEFAULT NULL::uuid, p_limit integer DEFAULT 50, p_offset integer DEFAULT 0)\n RETURNS jsonb\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  bid uuid := public.admin_require_caller_business_id();\n  lim int := greatest(1, least(coalesce(p_limit, 50), 100));\n  off int := greatest(0, least(coalesce(p_offset, 0), 100000));\n  status_key text := nullif(lower(trim(coalesce(p_status, ''))), '');\n  role_key text := nullif(lower(trim(coalesce(p_role, ''))), '');\n  search_key text := nullif(trim(coalesce(p_search, '')), '');\n  result jsonb;\nbegin\n  if status_key is not null\n     and status_key not in ('active', 'disabled', 'terminated', 'all') then\n    raise exception 'invalid status filter' using errcode = '22023';\n  end if;\n\n  if role_key is not null\n     and role_key not in ('owner', 'admin', 'manager', 'cashier', 'operator') then\n    raise exception 'invalid role filter' using errcode = '22023';\n  end if;\n\n  select coalesce(jsonb_agg(row_to_json(x)::jsonb), '[]'::jsonb)\n  into result\n  from (\n    select\n      s.id as staff_id,\n      s.username,\n      s.display_name,\n      s.role,\n      s.active,\n      s.terminated_at,\n      s.created_at,\n      s.updated_at,\n      public.admin_staff_shops_json(s.id) as shops\n    from public.staff s\n    where s.business_id = bid\n      and (role_key is null or s.role = role_key)\n      and (\n        status_key is null or status_key = 'all'\n        or (status_key = 'active' and s.active and s.terminated_at is null)\n        or (status_key = 'disabled' and not s.active and s.terminated_at is null)\n        or (status_key = 'terminated' and s.terminated_at is not null)\n      )\n      and (\n        search_key is null\n        or position(lower(search_key) in lower(s.username)) > 0\n        or position(lower(search_key) in lower(s.display_name)) > 0\n      )\n      and (\n        p_shop_id is null\n        or (\n          s.role = 'owner'\n          and exists (\n            select 1 from public.shops sh\n            where sh.id = p_shop_id\n              and sh.business_id = bid\n          )\n        )\n        or exists (\n          select 1 from public.staff_shops ss\n          where ss.staff_id = s.id and ss.shop_id = p_shop_id\n        )\n      )\n    order by s.username asc\n    limit lim\n    offset off\n  ) x;\n\n  return result;\nend;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_search text, p_role text, p_status text, p_shop_id uuid, p_limit integer, p_offset integer",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_list_shops",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_list_shops(p_limit integer DEFAULT 50, p_offset integer DEFAULT 0)\n RETURNS jsonb\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  bid uuid := public.admin_require_caller_business_id();\n  lim int := greatest(1, least(coalesce(p_limit, 50), 100));\n  off int := greatest(0, least(coalesce(p_offset, 0), 100000));\n  result jsonb;\nbegin\n  select coalesce(jsonb_agg(row_to_json(x)::jsonb), '[]'::jsonb)\n  into result\n  from (\n    select\n      sh.id as shop_id,\n      sh.name,\n      sh.active,\n      sh.created_at,\n      (\n        select count(*)::int\n        from public.staff_shops ss\n        join public.staff st on st.id = ss.staff_id\n        where ss.shop_id = sh.id\n          and st.business_id = bid\n          and st.terminated_at is null\n      ) as assigned_staff_count\n    from public.shops sh\n    where sh.business_id = bid\n    order by sh.name asc\n    limit lim\n    offset off\n  ) x;\n\n  return result;\nend;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_limit integer, p_offset integer",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_get_shop",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_get_shop(p_shop_id uuid)\n RETURNS jsonb\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  bid uuid := public.admin_require_caller_business_id();\n  result jsonb;\nbegin\n  select jsonb_build_object(\n    'shop_id', sh.id,\n    'name', sh.name,\n    'active', sh.active,\n    'created_at', sh.created_at,\n    'business_id', sh.business_id,\n    'assigned_staff', coalesce((\n      select jsonb_agg(\n        jsonb_build_object(\n          'staff_id', st.id,\n          'username', st.username,\n          'display_name', st.display_name,\n          'role', st.role,\n          'active', st.active,\n          'terminated_at', st.terminated_at\n        )\n        order by st.username\n      )\n      from public.staff_shops ss\n      join public.staff st on st.id = ss.staff_id\n      where ss.shop_id = sh.id\n        and st.business_id = bid\n    ), '[]'::jsonb),\n    'owners', coalesce((\n      select jsonb_agg(\n        jsonb_build_object(\n          'staff_id', ow.id,\n          'username', ow.username,\n          'display_name', ow.display_name,\n          'role', ow.role,\n          'active', ow.active,\n          'terminated_at', ow.terminated_at\n        )\n        order by ow.username\n      )\n      from public.staff ow\n      where ow.business_id = bid\n        and ow.role = 'owner'\n        and ow.terminated_at is null\n    ), '[]'::jsonb)\n  )\n  into result\n  from public.shops sh\n  where sh.id = p_shop_id\n    and sh.business_id = bid;\n\n  if result is null then\n    raise exception 'not found' using errcode = 'P0002';\n  end if;\n\n  return result;\nend;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_shop_id uuid",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "sync_staff_shop_ids",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "SETOF uuid",
+      "definition": "CREATE OR REPLACE FUNCTION public.sync_staff_shop_ids()\n RETURNS SETOF uuid\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  select sh.id\n  from public.staff s\n  join public.shops sh on sh.business_id = s.business_id and sh.active\n  where s.auth_user_id = auth.uid()\n    and s.active\n    and s.terminated_at is null\n    and (\n      s.role = 'owner'\n      or exists (\n        select 1 from public.staff_shops ss\n        where ss.staff_id = s.id and ss.shop_id = sh.id\n      )\n    )\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_require_write_caller",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "TABLE(business_id uuid, staff_id uuid, username text, caller_role text)",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_require_write_caller()\n RETURNS TABLE(business_id uuid, staff_id uuid, username text, caller_role text)\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nBEGIN\n  RETURN QUERY\n    SELECT s.business_id, s.id, s.username, s.role\n    FROM public.staff s\n    WHERE s.auth_user_id = auth.uid()\n      AND s.active IS TRUE\n      AND s.terminated_at IS NULL\n      AND s.role IN ('owner', 'admin')\n    LIMIT 1;\n\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'not authorized'\n      USING errcode = '42501';\n  END IF;\nEND;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "",
+      "authenticated_execute": false
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_list_activity",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_list_activity(p_action text DEFAULT NULL::text, p_target_username text DEFAULT NULL::text, p_from timestamp with time zone DEFAULT NULL::timestamp with time zone, p_to timestamp with time zone DEFAULT NULL::timestamp with time zone, p_limit integer DEFAULT 50, p_offset integer DEFAULT 0)\n RETURNS jsonb\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  bid uuid := public.admin_require_caller_business_id();\n  lim int := greatest(1, least(coalesce(p_limit, 50), 100));\n  off int := greatest(0, least(coalesce(p_offset, 0), 100000));\n  action_key text := nullif(trim(coalesce(p_action, '')), '');\n  user_key text := nullif(lower(trim(coalesce(p_target_username, ''))), '');\n  result jsonb;\nbegin\n  select coalesce(jsonb_agg(row_to_json(x)::jsonb), '[]'::jsonb)\n  into result\n  from (\n    select\n      a.id,\n      a.at,\n      a.action,\n      a.target_username,\n      a.detail\n    from public.audit_log a\n    where a.business_id = bid\n      and (action_key is null or a.action = action_key)\n      and (\n        user_key is null\n        or a.target_username = user_key\n        or (\n          a.target_username is not null\n          and position(user_key in a.target_username) > 0\n        )\n      )\n      and (p_from is null or a.at >= p_from)\n      and (p_to is null or a.at <= p_to)\n    order by a.at desc, a.id desc\n    limit lim\n    offset off\n  ) x;\n\n  return result;\nend;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_action text, p_target_username text, p_from timestamp with time zone, p_to timestamp with time zone, p_limit integer, p_offset integer",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_write_audit",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_write_audit(p_business_id uuid, p_action text, p_target_username text, p_detail jsonb, p_performed_by uuid, p_performed_by_username text)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\r\nDECLARE\r\n  cleaned jsonb;\r\nBEGIN\r\n  cleaned := public.redact_json_secrets(p_detail);\r\n\r\n  INSERT INTO public.audit_log (\r\n    action,\r\n    target_username,\r\n    detail,\r\n    business_id,\r\n    performed_by,\r\n    performed_by_username\r\n  ) VALUES (\r\n    p_action,\r\n    p_target_username,\r\n    cleaned,\r\n    p_business_id,\r\n    p_performed_by,\r\n    p_performed_by_username\r\n  );\r\nEND;\r\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_business_id uuid, p_action text, p_target_username text, p_detail jsonb, p_performed_by uuid, p_performed_by_username text",
+      "authenticated_execute": false
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_create_staff_db",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "uuid",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_create_staff_db(p_auth_user_id uuid, p_username text, p_display_name text, p_role text, p_shop_ids uuid[])\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nDECLARE\n  caller record;\n  v_username text;\n  v_staff_id uuid;\n  v_shop_id uuid;\nBEGIN\n  caller := public.admin_require_write_caller();\n\n  v_username := lower(btrim(p_username));\n  IF v_username = '' THEN\n    RAISE EXCEPTION 'Username is required' USING errcode = 'P0008';\n  END IF;\n\n  IF p_role NOT IN ('owner', 'admin', 'manager', 'cashier', 'operator') THEN\n    RAISE EXCEPTION 'Invalid role' USING errcode = '22023';\n  END IF;\n\n  IF p_role IN ('owner', 'admin') AND caller.caller_role != 'owner' THEN\n    RAISE EXCEPTION 'Only owners can create owners or admins' USING errcode = '42501';\n  END IF;\n\n  IF p_role != 'owner' AND (p_shop_ids IS NULL OR array_length(p_shop_ids, 1) IS NULL) THEN\n    RAISE EXCEPTION 'Non-owners require at least one shop assignment' USING errcode = 'P0009';\n  END IF;\n\n  PERFORM id FROM public.businesses WHERE id = caller.business_id FOR UPDATE;\n\n  INSERT INTO public.staff (\n    business_id,\n    auth_user_id,\n    username,\n    display_name,\n    role,\n    active\n  ) VALUES (\n    caller.business_id,\n    p_auth_user_id,\n    v_username,\n    btrim(p_display_name),\n    p_role,\n    true\n  ) RETURNING id INTO v_staff_id;\n\n  IF p_shop_ids IS NOT NULL THEN\n    FOREACH v_shop_id IN ARRAY p_shop_ids LOOP\n      IF NOT EXISTS (SELECT 1 FROM public.shops WHERE id = v_shop_id AND business_id = caller.business_id) THEN\n        RAISE EXCEPTION 'Shop not found' USING errcode = 'P0005';\n      END IF;\n      \n      INSERT INTO public.staff_shops (staff_id, shop_id)\n      VALUES (v_staff_id, v_shop_id)\n      ON CONFLICT DO NOTHING;\n    END LOOP;\n  END IF;\n\n  PERFORM public.admin_write_audit(\n    caller.business_id,\n    'create',\n    v_username,\n    jsonb_build_object('staff_id', v_staff_id, 'role', p_role, 'shops', p_shop_ids),\n    caller.staff_id,\n    caller.username\n  );\n\n  RETURN v_staff_id;\nEND;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_auth_user_id uuid, p_username text, p_display_name text, p_role text, p_shop_ids uuid[]",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "redact_json_secrets",
+      "owner": "postgres",
+      "config": null,
+      "result": "jsonb",
+      "definition": "CREATE OR REPLACE FUNCTION public.redact_json_secrets(p_val jsonb)\n RETURNS jsonb\n LANGUAGE plpgsql\n IMMUTABLE\nAS $function$\r\nDECLARE\r\n  k text;\r\n  v jsonb;\r\n  res jsonb;\r\nBEGIN\r\n  IF jsonb_typeof(p_val) = 'object' THEN\r\n    res := '{}'::jsonb;\r\n    FOR k, v IN SELECT * FROM jsonb_each(p_val) LOOP\r\n      IF lower(k) IN (\r\n        'password', 'password_hash', 'credential', 'server_credential',\r\n        'secret', 'token', 'apikey', 'api_key', 'refresh_token',\r\n        'access_token', 'authorization', 'cookie', 'set-cookie',\r\n        'verifier', 'recovery_code'\r\n      ) THEN\r\n        res := jsonb_set(res, ARRAY[k], '\"[REDACTED]\"'::jsonb);\r\n      ELSE\r\n        res := jsonb_set(res, ARRAY[k], public.redact_json_secrets(v));\r\n      END IF;\r\n    END LOOP;\r\n    RETURN res;\r\n  ELSIF jsonb_typeof(p_val) = 'array' THEN\r\n    res := '[]'::jsonb;\r\n    FOR v IN SELECT * FROM jsonb_array_elements(p_val) LOOP\r\n      res := res || public.redact_json_secrets(v);\r\n    END LOOP;\r\n    RETURN res;\r\n  ELSE\r\n    RETURN p_val;\r\n  END IF;\r\nEND;\r\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": false,
+      "identity_arguments": "p_val jsonb",
+      "authenticated_execute": false
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_record_auth_reconciliation",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_record_auth_reconciliation(p_operation text, p_auth_user_id uuid, p_target_username text, p_last_error text)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\r\nDECLARE\r\n  caller record;\r\nBEGIN\r\n  -- We assume this is called by Vercel API via service_role key or user key.\r\n  -- Wait, if it's called by service_role key, auth.uid() is null!\r\n  -- We'll allow it if called with service_role bypass. But since it's an RPC, \r\n  -- service_role can call it. If auth.uid() is null, it's service role.\r\n  IF auth.role() != 'service_role' THEN\r\n    RAISE EXCEPTION 'Only service_role can record auth reconciliation' USING errcode = '42501';\r\n  END IF;\r\n\r\n  INSERT INTO public.auth_reconciliation (\r\n    business_id, operation, auth_user_id, target_username, last_error\r\n  ) \r\n  -- We need business_id. Find it from the target username, or fallback.\r\n  SELECT business_id, p_operation, p_auth_user_id, p_target_username, p_last_error\r\n  FROM public.staff \r\n  WHERE username = p_target_username \r\n  LIMIT 1;\r\nEND;\r\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_operation text, p_auth_user_id uuid, p_target_username text, p_last_error text",
+      "authenticated_execute": false
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_ensure_not_last_active_owner",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_ensure_not_last_active_owner(p_business_id uuid, p_excluding_staff_id uuid DEFAULT NULL::uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\r\nDECLARE\r\n  v_owner_count int;\r\nBEGIN\r\n  -- Replaced SELECT count FOR UPDATE with simple count, \r\n  -- as the caller now acquires the businesses lock first.\r\n  SELECT count(id) INTO v_owner_count\r\n  FROM public.staff\r\n  WHERE business_id = p_business_id\r\n    AND active = true\r\n    AND terminated_at IS NULL\r\n    AND role = 'owner'\r\n    AND (p_excluding_staff_id IS NULL OR id != p_excluding_staff_id);\r\n\r\n  IF v_owner_count < 1 THEN\r\n    RAISE EXCEPTION 'Cannot perform this action: must leave at least one active owner'\r\n      USING errcode = 'P0001'; -- LAST_OWNER equivalent\r\n  END IF;\r\nEND;\r\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_business_id uuid, p_excluding_staff_id uuid",
+      "authenticated_execute": false
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_disable_staff",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_disable_staff(p_staff_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nDECLARE\n  caller record;\n  target record;\nBEGIN\n  caller := public.admin_require_write_caller();\n\n  -- 1. Lock Business\n  PERFORM id FROM public.businesses WHERE id = caller.business_id FOR UPDATE;\n\n  -- 2. Get target staff FOR UPDATE to lock it\n  SELECT * INTO target\n  FROM public.staff\n  WHERE id = p_staff_id AND business_id = caller.business_id\n  FOR UPDATE;\n\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'Staff not found' USING errcode = '42P01';\n  END IF;\n\n  IF target.terminated_at IS NOT NULL THEN\n    RAISE EXCEPTION 'Cannot disable a terminated account' USING errcode = 'P0003';\n  END IF;\n\n  IF target.active = false THEN\n    RETURN; -- Idempotent\n  END IF;\n\n  IF target.role = 'owner' THEN\n    PERFORM public.admin_ensure_not_last_active_owner(caller.business_id, target.id);\n  END IF;\n\n  UPDATE public.staff\n  SET active = false\n  WHERE id = p_staff_id;\n\n  PERFORM public.admin_write_audit(\n    caller.business_id,\n    'disable',\n    target.username,\n    jsonb_build_object('staff_id', target.id),\n    caller.staff_id,\n    caller.username\n  );\nEND;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_staff_id uuid",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_enable_staff",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_enable_staff(p_staff_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nDECLARE\n  caller record;\n  target record;\nBEGIN\n  caller := public.admin_require_write_caller();\n\n  PERFORM id FROM public.businesses WHERE id = caller.business_id FOR UPDATE;\n\n  SELECT * INTO target\n  FROM public.staff\n  WHERE id = p_staff_id AND business_id = caller.business_id\n  FOR UPDATE;\n\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'Staff not found' USING errcode = '42P01';\n  END IF;\n\n  IF target.terminated_at IS NOT NULL THEN\n    RAISE EXCEPTION 'Cannot enable a terminated account' USING errcode = 'P0003';\n  END IF;\n\n  IF target.active = true THEN\n    RETURN;\n  END IF;\n\n  UPDATE public.staff\n  SET active = true\n  WHERE id = p_staff_id;\n\n  PERFORM public.admin_write_audit(\n    caller.business_id,\n    'enable',\n    target.username,\n    jsonb_build_object('staff_id', target.id),\n    caller.staff_id,\n    caller.username\n  );\nEND;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_staff_id uuid",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_assign_shop",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_assign_shop(p_staff_id uuid, p_shop_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nDECLARE\n  caller record;\n  target record;\n  shop_record record;\nBEGIN\n  caller := public.admin_require_write_caller();\n\n  -- Verify staff\n  SELECT * INTO target\n  FROM public.staff\n  WHERE id = p_staff_id AND business_id = caller.business_id;\n\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'Staff not found' USING errcode = '42P01';\n  END IF;\n\n  IF target.terminated_at IS NOT NULL THEN\n    RAISE EXCEPTION 'Cannot assign shops to a terminated account' USING errcode = 'P0003';\n  END IF;\n\n  -- Verify shop\n  SELECT * INTO shop_record\n  FROM public.shops\n  WHERE id = p_shop_id AND business_id = caller.business_id;\n\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'Shop not found' USING errcode = 'P0005';\n  END IF;\n\n  -- Insert idempotently\n  INSERT INTO public.staff_shops (staff_id, shop_id)\n  VALUES (p_staff_id, p_shop_id)\n  ON CONFLICT DO NOTHING;\n\n  IF FOUND THEN\n    PERFORM public.admin_write_audit(\n      caller.business_id,\n      'assign_shop',\n      target.username,\n      jsonb_build_object('staff_id', target.id, 'shop_id', shop_record.id, 'shop', shop_record.name),\n      caller.staff_id,\n      caller.username\n    );\n  END IF;\nEND;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_staff_id uuid, p_shop_id uuid",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_unassign_shop",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_unassign_shop(p_staff_id uuid, p_shop_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nDECLARE\n  caller record;\n  target record;\n  shop_record record;\nBEGIN\n  caller := public.admin_require_write_caller();\n\n  SELECT * INTO target\n  FROM public.staff\n  WHERE id = p_staff_id AND business_id = caller.business_id;\n\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'Staff not found' USING errcode = '42P01';\n  END IF;\n\n  SELECT * INTO shop_record\n  FROM public.shops\n  WHERE id = p_shop_id AND business_id = caller.business_id;\n\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'Shop not found' USING errcode = 'P0005';\n  END IF;\n\n  DELETE FROM public.staff_shops\n  WHERE staff_id = p_staff_id AND shop_id = p_shop_id;\n\n  IF FOUND THEN\n    PERFORM public.admin_write_audit(\n      caller.business_id,\n      'unassign_shop',\n      target.username,\n      jsonb_build_object('staff_id', target.id, 'shop_id', shop_record.id, 'shop', shop_record.name),\n      caller.staff_id,\n      caller.username\n    );\n  END IF;\nEND;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_staff_id uuid, p_shop_id uuid",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_add_shop",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_add_shop(p_name text)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nDECLARE\n  caller record;\n  v_name text;\n  v_shop_id uuid;\nBEGIN\n  caller := public.admin_require_write_caller();\n\n  v_name := btrim(p_name);\n  IF v_name = '' THEN\n    RAISE EXCEPTION 'Shop name is required' USING errcode = 'P0006';\n  END IF;\n\n  -- Ensure uniqueness\n  IF EXISTS (\n    SELECT 1 FROM public.shops\n    WHERE business_id = caller.business_id AND name = v_name\n  ) THEN\n    RAISE EXCEPTION 'Shop already exists' USING errcode = 'P0007';\n  END IF;\n\n  INSERT INTO public.shops (business_id, name, active)\n  VALUES (caller.business_id, v_name, true)\n  RETURNING id INTO v_shop_id;\n\n  PERFORM public.admin_write_audit(\n    caller.business_id,\n    'add_shop',\n    NULL,\n    jsonb_build_object('shop_id', v_shop_id, 'name', v_name),\n    caller.staff_id,\n    caller.username\n  );\n\n  RETURN jsonb_build_object('id', v_shop_id);\nEND;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_name text",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_terminate_staff_db",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "uuid",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_terminate_staff_db(p_staff_id uuid, p_confirm_username text)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nDECLARE\n  caller record;\n  target record;\n  v_old_auth_user_id uuid;\n  v_now timestamptz;\nBEGIN\n  caller := public.admin_require_write_caller();\n\n  IF caller.caller_role != 'owner' THEN\n    RAISE EXCEPTION 'Only owners can terminate accounts' USING errcode = '42501';\n  END IF;\n\n  -- 1. Lock Business\n  PERFORM id FROM public.businesses WHERE id = caller.business_id FOR UPDATE;\n\n  -- 2. Lock target row\n  SELECT * INTO target\n  FROM public.staff\n  WHERE id = p_staff_id AND business_id = caller.business_id\n  FOR UPDATE;\n\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'Staff not found' USING errcode = '42P01';\n  END IF;\n\n  IF target.terminated_at IS NOT NULL THEN\n    RETURN target.auth_user_id; -- Idempotent\n  END IF;\n\n  IF target.username != lower(btrim(p_confirm_username)) THEN\n    RAISE EXCEPTION 'Confirmation username does not match' USING errcode = 'P0010';\n  END IF;\n\n  IF target.role = 'owner' AND target.active = true THEN\n    PERFORM public.admin_ensure_not_last_active_owner(caller.business_id, target.id);\n  END IF;\n\n  v_old_auth_user_id := target.auth_user_id;\n  v_now := now();\n\n  UPDATE public.staff\n  SET active = false,\n      terminated_at = v_now,\n      auth_user_id = NULL\n  WHERE id = p_staff_id;\n\n  PERFORM public.admin_write_audit(\n    caller.business_id,\n    'terminate',\n    target.username,\n    jsonb_build_object('staff_id', target.id, 'terminated_at', v_now),\n    caller.staff_id,\n    caller.username\n  );\n\n  RETURN v_old_auth_user_id;\nEND;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_staff_id uuid, p_confirm_username text",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_record_auth_reconciliation",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "uuid",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_record_auth_reconciliation(p_business_id uuid, p_operation text, p_auth_user_id uuid, p_target_username text, p_performed_by uuid, p_performed_by_username text, p_error_code text, p_correlation_id uuid)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nDECLARE\n  v_id uuid;\nBEGIN\n  IF auth.role() IS DISTINCT FROM 'service_role' THEN\n    RAISE EXCEPTION 'service role required' USING errcode = '42501';\n  END IF;\n  IF p_operation NOT IN ('create_cleanup', 'terminate_cleanup', 'reset_audit') THEN\n    RAISE EXCEPTION 'invalid reconciliation operation' USING errcode = 'P0011';\n  END IF;\n  IF p_error_code NOT IN (\n    'ALREADY_EXISTS', 'FORBIDDEN', 'INVALID_INPUT', 'NOT_FOUND',\n    'RATE_LIMITED', 'SERVER_ERROR', 'UNREACHABLE', 'UNKNOWN'\n  ) THEN\n    RAISE EXCEPTION 'invalid reconciliation error code' USING errcode = 'P0012';\n  END IF;\n  IF NOT EXISTS (\n    SELECT 1 FROM public.staff\n    WHERE id = p_performed_by\n      AND business_id = p_business_id\n      AND username = p_performed_by_username\n  ) THEN\n    RAISE EXCEPTION 'invalid reconciliation performer' USING errcode = '42501';\n  END IF;\n\n  INSERT INTO public.auth_reconciliation (\n    business_id, operation, auth_user_id, target_username, state,\n    attempt_count, error_code, correlation_id, performed_by,\n    performed_by_username, created_at, updated_at\n  ) VALUES (\n    p_business_id, p_operation, p_auth_user_id, lower(btrim(p_target_username)),\n    'pending', 1, p_error_code, p_correlation_id, p_performed_by,\n    p_performed_by_username, now(), now()\n  )\n  ON CONFLICT (operation, auth_user_id) WHERE state = 'pending'\n  DO UPDATE SET\n    attempt_count = public.auth_reconciliation.attempt_count + 1,\n    error_code = EXCLUDED.error_code,\n    correlation_id = EXCLUDED.correlation_id,\n    updated_at = now(),\n    last_attempt_at = now()\n  RETURNING id INTO v_id;\n\n  RETURN v_id;\nEND;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_business_id uuid, p_operation text, p_auth_user_id uuid, p_target_username text, p_performed_by uuid, p_performed_by_username text, p_error_code text, p_correlation_id uuid",
+      "authenticated_execute": false
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_set_role",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_set_role(p_staff_id uuid, p_new_role text)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nDECLARE\n  caller record;\n  target record;\nBEGIN\n  caller := public.admin_require_write_caller();\n\n  IF p_new_role IN ('owner', 'admin') AND caller.caller_role != 'owner' THEN\n    RAISE EXCEPTION 'Only owners can promote to owner or admin' USING errcode = '42501';\n  END IF;\n\n  IF p_new_role NOT IN ('owner', 'admin', 'manager', 'cashier', 'operator') THEN\n    RAISE EXCEPTION 'Invalid role' USING errcode = '22023';\n  END IF;\n\n  -- 1. Lock Business\n  PERFORM id FROM public.businesses WHERE id = caller.business_id FOR UPDATE;\n\n  -- 2. Lock Target\n  SELECT * INTO target\n  FROM public.staff\n  WHERE id = p_staff_id AND business_id = caller.business_id\n  FOR UPDATE;\n\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'Staff not found' USING errcode = '42P01';\n  END IF;\n\n  IF target.terminated_at IS NOT NULL THEN\n    RAISE EXCEPTION 'Cannot change role on a terminated account' USING errcode = 'P0003';\n  END IF;\n\n  IF target.role = p_new_role THEN\n    RETURN;\n  END IF;\n\n  IF target.role = 'owner' THEN\n    IF caller.caller_role != 'owner' THEN\n      RAISE EXCEPTION 'Only owners can demote an owner' USING errcode = '42501';\n    END IF;\n    IF target.active = true THEN\n      PERFORM public.admin_ensure_not_last_active_owner(caller.business_id, target.id);\n    END IF;\n  END IF;\n\n  UPDATE public.staff\n  SET role = p_new_role\n  WHERE id = p_staff_id;\n\n  PERFORM public.admin_write_audit(\n    caller.business_id,\n    'set_role',\n    target.username,\n    jsonb_build_object('staff_id', target.id, 'old_role', target.role, 'new_role', p_new_role),\n    caller.staff_id,\n    caller.username\n  );\nEND;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_staff_id uuid, p_new_role text",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_record_reset_credential_audit",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_record_reset_credential_audit(p_staff_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nDECLARE\n  caller record;\n  target record;\nBEGIN\n  caller := public.admin_require_write_caller();\n  SELECT id, username, terminated_at INTO target\n  FROM public.staff\n  WHERE id = p_staff_id AND business_id = caller.business_id;\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'staff not found' USING errcode = '42P01';\n  END IF;\n  IF target.terminated_at IS NOT NULL THEN\n    RAISE EXCEPTION 'terminated account' USING errcode = 'P0003';\n  END IF;\n  PERFORM public.admin_write_audit(\n    caller.business_id,\n    'reset_server_credential',\n    target.username,\n    jsonb_build_object('staff_id', target.id),\n    caller.staff_id,\n    caller.username\n  );\nEND;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_staff_id uuid",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_update_auth_reconciliation",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_update_auth_reconciliation(p_reconciliation_id uuid, p_resolved boolean, p_error_code text DEFAULT NULL::text)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nBEGIN\n  IF auth.role() IS DISTINCT FROM 'service_role' THEN\n    RAISE EXCEPTION 'service role required' USING errcode = '42501';\n  END IF;\n  UPDATE public.auth_reconciliation\n  SET state = CASE WHEN p_resolved THEN 'resolved' ELSE 'pending' END,\n      resolved = p_resolved,\n      error_code = CASE WHEN p_resolved THEN NULL ELSE p_error_code END,\n      attempt_count = attempt_count + 1,\n      last_attempt_at = now(),\n      resolved_at = CASE WHEN p_resolved THEN now() ELSE NULL END,\n      updated_at = now()\n  WHERE id = p_reconciliation_id AND state = 'pending';\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'reconciliation record not found' USING errcode = '42P01';\n  END IF;\nEND;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_reconciliation_id uuid, p_resolved boolean, p_error_code text",
+      "authenticated_execute": false
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "admin_reconcile_reset_audit",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "definition": "CREATE OR REPLACE FUNCTION public.admin_reconcile_reset_audit(p_reconciliation_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nDECLARE\n  pending record;\nBEGIN\n  IF auth.role() IS DISTINCT FROM 'service_role' THEN\n    RAISE EXCEPTION 'service role required' USING errcode = '42501';\n  END IF;\n  SELECT * INTO pending\n  FROM public.auth_reconciliation\n  WHERE id = p_reconciliation_id\n    AND operation = 'reset_audit'\n    AND state = 'pending'\n  FOR UPDATE;\n  IF NOT FOUND THEN\n    RAISE EXCEPTION 'reconciliation record not found' USING errcode = '42P01';\n  END IF;\n  PERFORM public.admin_write_audit(\n    pending.business_id,\n    'reset_server_credential',\n    pending.target_username,\n    jsonb_build_object('reconciled', true),\n    pending.performed_by,\n    pending.performed_by_username\n  );\n  UPDATE public.auth_reconciliation\n  SET state = 'resolved', resolved = true, error_code = NULL,\n      attempt_count = attempt_count + 1, last_attempt_at = now(),\n      resolved_at = now(), updated_at = now()\n  WHERE id = p_reconciliation_id;\nEND;\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "p_reconciliation_id uuid",
+      "authenticated_execute": false
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "sync_pull",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "jsonb",
+      "definition": "CREATE OR REPLACE FUNCTION public.sync_pull(since_seq bigint DEFAULT 0, max_rows integer DEFAULT 200, shop uuid DEFAULT NULL::uuid)\n RETURNS jsonb\n LANGUAGE sql\n STABLE\n SET search_path TO 'public'\nAS $function$\n  select jsonb_build_object(\n    'ok', true,\n    'server_time_epoch_ms', (extract(epoch from now()) * 1000)::bigint,\n    'records', coalesce((\n      select jsonb_agg(jsonb_build_object(\n        'server_seq', r.server_seq,\n        'shop_id', r.shop_id,\n        'table', r.table_name,\n        'uid', r.row_uid,\n        'payload', r.payload,\n        'origin_device', r.origin_device,\n        'received_at', r.received_at\n      ) order by r.server_seq)\n      from (\n        select sr.* from public.sync_records sr\n        where sr.server_seq > since_seq\n          and (shop is null or sr.shop_id = shop)\n          and sr.shop_id in (select public.sync_staff_shop_ids())\n        order by sr.server_seq\n        limit least(greatest(coalesce(max_rows, 200), 1), 500)\n      ) r\n    ), '[]'::jsonb)\n  )\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": false,
+      "identity_arguments": "since_seq bigint, max_rows integer, shop uuid",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "=X/postgres",
+        "postgres=X/postgres",
+        "anon=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "sync_normalize_payload",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "definition": "CREATE OR REPLACE FUNCTION public.sync_normalize_payload(p jsonb)\n RETURNS jsonb\n LANGUAGE sql\n IMMUTABLE\n SET search_path TO ''\nAS $function$\n  select p - 'sync_updated_at' - 'received_at'\n$function$\n",
+      "anon_execute": true,
+      "service_execute": true,
+      "security_definer": false,
+      "identity_arguments": "p jsonb",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "=X/postgres",
+        "postgres=X/postgres",
+        "anon=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "sync_records_assign_seq",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "trigger",
+      "definition": "CREATE OR REPLACE FUNCTION public.sync_records_assign_seq()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO ''\nAS $function$\nbegin\n  if tg_op = 'INSERT' then\n    new.server_seq := nextval('public.sync_records_server_seq_seq');\n    return new;\n  end if;\n  if public.sync_normalize_payload(new.payload)\n     is not distinct from public.sync_normalize_payload(old.payload) then\n    return new;  -- unchanged: leave explicitly-set values alone\n  end if;\n  new.server_seq := nextval('public.sync_records_server_seq_seq');\n  return new;\nend\n$function$\n",
+      "anon_execute": true,
+      "service_execute": true,
+      "security_definer": false,
+      "identity_arguments": "",
+      "authenticated_execute": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "authenticated=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "name": "sync_push",
+      "owner": "postgres",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "definition": "CREATE OR REPLACE FUNCTION public.sync_push(envelopes jsonb, device_id text DEFAULT NULL::text, shop_id uuid DEFAULT NULL::uuid, pull_cursor bigint DEFAULT NULL::bigint)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_staff       record;\n  v_shop        uuid;\n  v_env         jsonb;\n  v_table       text;\n  v_uid         text;\n  v_payload     jsonb;\n  v_parked_seq  bigint;\n  v_existing    public.sync_records%rowtype;\n  v_applied     int := 0;\n  v_conflicts   int := 0;\nbegin\n  select s.id, s.business_id, s.role, s.username into v_staff\n    from public.staff s\n   where s.auth_user_id = auth.uid() and s.active and s.terminated_at is null;\n  if not found then\n    return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n      'code', 'not_authorized', 'message', 'No active staff profile'));\n  end if;\n\n  -- erratum 1: nullif(shop_id,'') casts '' to the uuid param at plan time (22P02)\n  v_shop := shop_id;\n  if v_shop is null or v_shop not in (select public.sync_staff_shop_ids()) then\n    return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n      'code', 'shop_required', 'message',\n      'The request must name a shop this account may write to'));\n  end if;\n\n  if jsonb_typeof(envelopes) <> 'array' or jsonb_array_length(envelopes) > 500 then\n    return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n      'code', 'too_many_envelopes', 'message',\n      'Send between 0 and 500 envelopes per call'));\n  end if;\n\n  -- INVARIANT 1: seq order == commit order per shop\n  perform pg_advisory_xact_lock(hashtextextended(v_shop::text, 0));\n\n  for v_env in select * from jsonb_array_elements(envelopes) loop\n    v_table      := v_env->>'table';\n    v_uid        := v_env->>'uid';\n    v_payload    := v_env->'payload';\n    v_parked_seq := nullif(v_env->>'parked_seq', '')::bigint;\n\n    if v_table is null or v_uid is null\n       or jsonb_typeof(v_payload) <> 'object' then\n      return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n        'code', 'malformed_envelope', 'message',\n        'Every envelope needs table, uid and a payload object'));\n    end if;\n\n    if v_table not in (\n      'events', 'products', 'accounts', 'budget_plans', 'collections_targets',\n      'deliveries', 'attendance_records', 'delivery_status_history',\n      'daily_close_actions', 'physical_cash_counts', 'settings', 'store_profile'\n    ) then\n      return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n        'code', 'unknown_table', 'message', 'Unknown synced table: ' || v_table));\n    end if;\n\n    -- D8 (unchanged): corrections of recorded history from privileged sources only\n    if v_table = 'events'\n       and (v_payload->>'corrects_event_uid') is not null\n       and v_staff.role not in ('owner', 'admin') then\n      return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n        'code', 'correction_privilege_required', 'message',\n        'Correcting recorded history requires an owner or admin account'));\n    end if;\n\n    -- erratum 2: qualify columns (unqualified shop_id collides with the param, 42702)\n    select * into v_existing from public.sync_records\n     where public.sync_records.shop_id    = v_shop\n       and public.sync_records.table_name = v_table\n       and public.sync_records.row_uid    = v_uid;\n\n    if found then\n      -- INVARIANT 4: append-only tables are insert-only\n      if v_table in ('events', 'delivery_status_history',\n                     'daily_close_actions', 'physical_cash_counts') then\n        if public.sync_normalize_payload(v_existing.payload)\n           is distinct from public.sync_normalize_payload(v_payload) then\n          insert into public.audit_log (action, business_id, performed_by,\n                                        performed_by_username, detail)\n          values ('sync_append_only_refused', v_staff.business_id, v_staff.id,\n                  v_staff.username,\n                  jsonb_build_object('table', v_table, 'uid', v_uid,\n                                     'shop', v_shop, 'device', device_id));\n        end if;\n        continue;  -- insert-only: never update; NOT counted in 'applied' (erratum 4)\n      end if;\n\n      -- master-data role gate\n      if v_table in ('products', 'accounts', 'settings', 'store_profile')\n         and v_staff.role not in ('owner', 'admin') then\n        return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n          'code', 'master_data_privilege_required', 'message',\n          'Updating ' || v_table || ' requires an owner or admin account'));\n      end if;\n\n      -- INVARIANT 7: true-conflict audit, losing payload preserved\n      if public.sync_normalize_payload(v_existing.payload)\n         is distinct from public.sync_normalize_payload(v_payload)\n         and v_existing.origin_device is distinct from device_id\n         and (\n              (pull_cursor is not null and v_existing.server_seq > pull_cursor)\n              or (v_parked_seq is not null\n                  and v_existing.server_seq >= v_parked_seq)\n             ) then\n        insert into public.audit_log (action, business_id, performed_by,\n                                      performed_by_username, detail)\n        values ('sync_conflict', v_staff.business_id, v_staff.id,\n                v_staff.username,\n                jsonb_build_object(\n                  'table', v_table, 'uid', v_uid, 'shop', v_shop,\n                  'loser_payload', v_existing.payload,\n                  'loser_device',  v_existing.origin_device,\n                  'loser_seq',     v_existing.server_seq,\n                  'winner_device', device_id,\n                  'detected_by',   case when v_parked_seq is not null\n                                        then 'parked_seq' else 'pull_cursor' end));\n        v_conflicts := v_conflicts + 1;\n      end if;\n    end if;\n\n    -- INVARIANT 8: unchanged re-push is a complete no-op (WHERE fails -> nothing set)\n    -- erratum 3: constraint-name target (inference cols collide with the param)\n    insert into public.sync_records\n      (business_id, shop_id, table_name, row_uid, payload, origin_device)\n    values (\n      (select business_id from public.shops where id = v_shop),\n      v_shop, v_table, v_uid, v_payload, device_id)\n    on conflict on constraint sync_records_shop_table_uid do update\n      set payload       = excluded.payload,\n          origin_device = excluded.origin_device,\n          received_at   = now()\n      where public.sync_normalize_payload(public.sync_records.payload)\n            is distinct from public.sync_normalize_payload(excluded.payload);\n\n    v_applied := v_applied + 1;\n  end loop;\n\n  insert into public.audit_log (action, business_id, performed_by,\n                                performed_by_username, detail)\n  values ('sync_push', v_staff.business_id, v_staff.id, v_staff.username,\n          jsonb_build_object('envelopes', v_applied, 'conflicts', v_conflicts,\n                             'device', device_id, 'shop', v_shop));\n\n  return jsonb_build_object('ok', true, 'applied', v_applied,\n                            'conflicts', v_conflicts,\n                            'server_time_epoch_ms',\n                            (extract(epoch from now()) * 1000)::bigint);\nend\n$function$\n",
+      "anon_execute": false,
+      "service_execute": true,
+      "security_definer": true,
+      "identity_arguments": "envelopes jsonb, device_id text, shop_id uuid, pull_cursor bigint",
+      "authenticated_execute": true
+    }
+  ],
+  "sequences": [
+    {
+      "name": "audit_log_id_seq",
+      "role": "anon",
+      "usage": true,
+      "select": true
+    },
+    {
+      "name": "audit_log_id_seq",
+      "role": "authenticated",
+      "usage": true,
+      "select": true
+    },
+    {
+      "name": "audit_log_id_seq",
+      "role": "service_role",
+      "usage": true,
+      "select": true
+    },
+    {
+      "name": "sync_records_server_seq_seq",
+      "role": "anon",
+      "usage": true,
+      "select": true
+    },
+    {
+      "name": "sync_records_server_seq_seq",
+      "role": "authenticated",
+      "usage": true,
+      "select": true
+    },
+    {
+      "name": "sync_records_server_seq_seq",
+      "role": "service_role",
+      "usage": true,
+      "select": true
+    }
+  ],
+  "captured_at": "2026-10-10T10:14:17.758617+00:00",
+  "constraints": [
+    {
+      "name": "businesses_pkey",
+      "type": "p",
+      "table": "businesses",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "shops_pkey",
+      "type": "p",
+      "table": "shops",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "shops_business_id_name_key",
+      "type": "u",
+      "table": "shops",
+      "definition": "UNIQUE (business_id, name)"
+    },
+    {
+      "name": "shops_business_id_fkey",
+      "type": "f",
+      "table": "shops",
+      "definition": "FOREIGN KEY (business_id) REFERENCES businesses(id)"
+    },
+    {
+      "name": "roles_pkey",
+      "type": "p",
+      "table": "roles",
+      "definition": "PRIMARY KEY (name)"
+    },
+    {
+      "name": "staff_username_check",
+      "type": "c",
+      "table": "staff",
+      "definition": "CHECK (username = lower(username) AND username ~ '^[a-z0-9._-]{3,32}$'::text)"
+    },
+    {
+      "name": "staff_pkey",
+      "type": "p",
+      "table": "staff",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "staff_auth_user_id_key",
+      "type": "u",
+      "table": "staff",
+      "definition": "UNIQUE (auth_user_id)"
+    },
+    {
+      "name": "staff_username_key",
+      "type": "u",
+      "table": "staff",
+      "definition": "UNIQUE (username)"
+    },
+    {
+      "name": "staff_auth_user_id_fkey",
+      "type": "f",
+      "table": "staff",
+      "definition": "FOREIGN KEY (auth_user_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "staff_business_id_fkey",
+      "type": "f",
+      "table": "staff",
+      "definition": "FOREIGN KEY (business_id) REFERENCES businesses(id)"
+    },
+    {
+      "name": "staff_role_fkey",
+      "type": "f",
+      "table": "staff",
+      "definition": "FOREIGN KEY (role) REFERENCES roles(name)"
+    },
+    {
+      "name": "staff_shops_pkey",
+      "type": "p",
+      "table": "staff_shops",
+      "definition": "PRIMARY KEY (staff_id, shop_id)"
+    },
+    {
+      "name": "staff_shops_staff_id_fkey",
+      "type": "f",
+      "table": "staff_shops",
+      "definition": "FOREIGN KEY (staff_id) REFERENCES staff(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "staff_shops_shop_id_fkey",
+      "type": "f",
+      "table": "staff_shops",
+      "definition": "FOREIGN KEY (shop_id) REFERENCES shops(id)"
+    },
+    {
+      "name": "audit_log_pkey",
+      "type": "p",
+      "table": "audit_log",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "audit_log_business_id_fkey",
+      "type": "f",
+      "table": "audit_log",
+      "definition": "FOREIGN KEY (business_id) REFERENCES businesses(id)"
+    },
+    {
+      "name": "audit_log_performed_by_fkey",
+      "type": "f",
+      "table": "audit_log",
+      "definition": "FOREIGN KEY (performed_by) REFERENCES staff(id)"
+    },
+    {
+      "name": "auth_reconciliation_pkey",
+      "type": "p",
+      "table": "auth_reconciliation",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "auth_reconciliation_business_id_fkey",
+      "type": "f",
+      "table": "auth_reconciliation",
+      "definition": "FOREIGN KEY (business_id) REFERENCES businesses(id)"
+    },
+    {
+      "name": "auth_reconciliation_performed_by_fkey",
+      "type": "f",
+      "table": "auth_reconciliation",
+      "definition": "FOREIGN KEY (performed_by) REFERENCES staff(id)"
+    },
+    {
+      "name": "sync_records_pkey",
+      "type": "p",
+      "table": "sync_records",
+      "definition": "PRIMARY KEY (server_seq)"
+    },
+    {
+      "name": "sync_records_shop_table_uid",
+      "type": "u",
+      "table": "sync_records",
+      "definition": "UNIQUE (shop_id, table_name, row_uid)"
+    },
+    {
+      "name": "sync_records_business_id_fkey",
+      "type": "f",
+      "table": "sync_records",
+      "definition": "FOREIGN KEY (business_id) REFERENCES businesses(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "sync_records_shop_id_fkey",
+      "type": "f",
+      "table": "sync_records",
+      "definition": "FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE"
+    }
+  ],
+  "postgres_version": "PostgreSQL 17.6 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 15.2.0, 64-bit",
+  "table_privileges": [
+    {
+      "role": "anon",
+      "table": "businesses",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false
+    },
+    {
+      "role": "anon",
+      "table": "roles",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false
+    },
+    {
+      "role": "anon",
+      "table": "staff",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false
+    },
+    {
+      "role": "anon",
+      "table": "staff_shops",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false
+    },
+    {
+      "role": "anon",
+      "table": "audit_log",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false
+    },
+    {
+      "role": "anon",
+      "table": "sync_records",
+      "delete": true,
+      "insert": true,
+      "select": true,
+      "update": true
+    },
+    {
+      "role": "anon",
+      "table": "auth_reconciliation",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false
+    },
+    {
+      "role": "anon",
+      "table": "shops",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false
+    },
+    {
+      "role": "authenticated",
+      "table": "businesses",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false
+    },
+    {
+      "role": "authenticated",
+      "table": "roles",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false
+    },
+    {
+      "role": "authenticated",
+      "table": "staff",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false
+    },
+    {
+      "role": "authenticated",
+      "table": "staff_shops",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false
+    },
+    {
+      "role": "authenticated",
+      "table": "audit_log",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false
+    },
+    {
+      "role": "authenticated",
+      "table": "sync_records",
+      "delete": true,
+      "insert": true,
+      "select": true,
+      "update": true
+    },
+    {
+      "role": "authenticated",
+      "table": "auth_reconciliation",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false
+    },
+    {
+      "role": "authenticated",
+      "table": "shops",
+      "delete": false,
+      "insert": false,
+      "select": false,
+      "update": false
+    },
+    {
+      "role": "service_role",
+      "table": "businesses",
+      "delete": true,
+      "insert": true,
+      "select": true,
+      "update": true
+    },
+    {
+      "role": "service_role",
+      "table": "roles",
+      "delete": true,
+      "insert": true,
+      "select": true,
+      "update": true
+    },
+    {
+      "role": "service_role",
+      "table": "staff",
+      "delete": true,
+      "insert": true,
+      "select": true,
+      "update": true
+    },
+    {
+      "role": "service_role",
+      "table": "staff_shops",
+      "delete": true,
+      "insert": true,
+      "select": true,
+      "update": true
+    },
+    {
+      "role": "service_role",
+      "table": "audit_log",
+      "delete": true,
+      "insert": true,
+      "select": true,
+      "update": true
+    },
+    {
+      "role": "service_role",
+      "table": "sync_records",
+      "delete": true,
+      "insert": true,
+      "select": true,
+      "update": true
+    },
+    {
+      "role": "service_role",
+      "table": "auth_reconciliation",
+      "delete": true,
+      "insert": true,
+      "select": true,
+      "update": true
+    },
+    {
+      "role": "service_role",
+      "table": "shops",
+      "delete": true,
+      "insert": true,
+      "select": true,
+      "update": true
+    }
+  ],
+  "schema_privileges": [
+    {
+      "role": "anon",
+      "usage": true,
+      "create": false
+    },
+    {
+      "role": "authenticated",
+      "usage": true,
+      "create": false
+    },
+    {
+      "role": "service_role",
+      "usage": true,
+      "create": false
+    }
+  ],
+  "aggregate_integrity": {
+    "staff_without_auth": 0,
+    "pending_reconciliations": 0,
+    "businesses_without_live_owner": 0
+  }
+}

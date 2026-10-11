@@ -1,0 +1,7 @@
+{
+  "tests": 34,
+  "passed": 34,
+  "status": "PASS",
+  "productionSourceUnchangedAfterRun": false,
+  "postRunChange": "Added 16dp list gutters to Owner opening costs, Owner records and Owner users/roles before the full 600-test checkpoint; corrected evidence provenance labels. Full checkpoint source manifest covers these changes."
+}

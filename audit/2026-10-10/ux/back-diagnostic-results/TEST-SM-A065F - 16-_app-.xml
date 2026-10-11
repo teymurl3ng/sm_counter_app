@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeFoundationUiTest" tests="3" failures="2" errors="0" skipped="0" time="46.869" timestamp="2026-10-10T16:55:46" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="switchAccountHardwareBackKeepsSessionAndReturnsToMore" classname="com.saaf.milkshop.NativeFoundationUiTest" time="18.389">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 10000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeFoundationUiTest.openSwitchAccountPicker(NativeFoundationUiTest.kt:3645)
+at com.saaf.milkshop.NativeFoundationUiTest.switchAccountHardwareBackKeepsSessionAndReturnsToMore(NativeFoundationUiTest.kt:2341)
+</failure>
+  </testcase>
+  <testcase name="ownerPaySupplierOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="22.134">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 15000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeFoundationUiTest.openOwnerPaySupplier(NativeFoundationUiTest.kt:2995)
+at com.saaf.milkshop.NativeFoundationUiTest.ownerPaySupplierOpensUnderOwnerChrome(NativeFoundationUiTest.kt:1406)
+</failure>
+  </testcase>
+  <testcase name="adminBusinessRecordsHardwareBackReturnsToRecordsHub" classname="com.saaf.milkshop.NativeFoundationUiTest" time="5.208" />
+</testsuite>

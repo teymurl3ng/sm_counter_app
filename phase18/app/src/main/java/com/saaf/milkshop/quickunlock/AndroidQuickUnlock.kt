@@ -243,7 +243,7 @@ class AndroidQuickUnlockDeviceGate(
                     BiometricPrompt.ERROR_NEGATIVE_BUTTON -> QuickUnlockFailure.Cancelled()
                     BiometricPrompt.ERROR_LOCKOUT,
                     BiometricPrompt.ERROR_LOCKOUT_PERMANENT -> QuickUnlockFailure.RateLimited(
-                        "Phone security is temporarily locked. Use your full Saaf passphrase.",
+                        "Phone security is temporarily locked. Use your full passphrase.",
                     )
                     BiometricPrompt.ERROR_HW_NOT_PRESENT,
                     BiometricPrompt.ERROR_HW_UNAVAILABLE,
@@ -318,7 +318,7 @@ class AndroidQuickUnlockDeviceGate(
                 init(Cipher.DECRYPT_MODE, mainKey(keyId), GCMParameterSpec(TAG_BITS, nonce))
             }
             val authenticated = authenticate(
-                title = "Quick unlock Saaf Milk",
+                title = "Quick unlock your account",
                 subtitle = "Continue as $displayName",
                 cipher = cipher,
             )

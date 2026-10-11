@@ -86,7 +86,7 @@ class BudgetUi(
         val categories = listOf(BUDGET_CATEGORY_MILK_PURCHASES) + OPERATING_BUDGET_CATEGORIES
         budgetCategorySpinner.adapter = readableSpinnerAdapter(categories)
 
-        val today = LocalDate.now()
+        val today = com.saaf.milkshop.sync.BusinessClock.today()
         budgetPeriodStartInput.setText(today.with(phaseBudgetStart(BUDGET_CATEGORY_MILK_PURCHASES)).toString())
         budgetTargetWeekInput.setText(budgetRepository.currentWeekStart(today).toString())
 
@@ -100,7 +100,7 @@ class BudgetUi(
                 id: Long,
             ) {
                 val category = categories[position]
-                val parsed = budgetPeriodStartInput.text.toString().toLocalDateOrNull() ?: LocalDate.now()
+                val parsed = budgetPeriodStartInput.text.toString().toLocalDateOrNull() ?: com.saaf.milkshop.sync.BusinessClock.today()
                 budgetPeriodStartInput.setText(parsed.with(phaseBudgetStart(category)).toString())
                 updateBudgetInputsForCategory(category)
                 refreshBudgetSummary()
@@ -167,7 +167,7 @@ class BudgetUi(
             return
         }
         val end = budgetPeriodEnd(category, periodStart)
-        if (!end.isAfter(LocalDate.now())) {
+        if (!end.isAfter(com.saaf.milkshop.sync.BusinessClock.today())) {
             budgetErrorText.text = activity.getString(R.string.budget_error, "That budget period is already closed")
             budgetErrorText.visibility = View.VISIBLE
             return
@@ -305,7 +305,7 @@ class BudgetUi(
             try {
                 val service = budgetRepository
                 val analytics = budgetRepository
-                val today = LocalDate.now()
+                val today = com.saaf.milkshop.sync.BusinessClock.today()
                 val rows = mutableListOf<String>()
 
                 val weekStart = service.currentWeekStart(today)

@@ -1,0 +1,139 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeFoundationUiTest" tests="39" failures="10" errors="0" skipped="0" time="203.049" timestamp="2026-10-10T16:42:08" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="managerRecordsHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="17.627">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 10000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeFoundationUiTest.assertReturnedToManagerWorkHome(NativeFoundationUiTest.kt:3367)
+at com.saaf.milkshop.NativeFoundationUiTest.managerRecordsHardwareBackReturnsToWorkHome(NativeFoundationUiTest.kt:674)
+</failure>
+  </testcase>
+  <testcase name="switchAccountHardwareBackKeepsSessionAndReturnsToMore" classname="com.saaf.milkshop.NativeFoundationUiTest" time="15.45">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 10000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeFoundationUiTest.waitForMoreMenu(NativeFoundationUiTest.kt:3632)
+at com.saaf.milkshop.NativeFoundationUiTest.switchAccountHardwareBackKeepsSessionAndReturnsToMore(NativeFoundationUiTest.kt:2351)
+</failure>
+  </testcase>
+  <testcase name="managerShellNavSwitchesSectionsUnderManagerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="6.536" />
+  <testcase name="managerRecordsCorrectionHardwareBackReturnsToDetailThenList" classname="com.saaf.milkshop.NativeFoundationUiTest" time="5.386" />
+  <testcase name="entryModesInputAndSteppersConvertAndRecalculate" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.814" />
+  <testcase name="ownerPaySupplierOpensUnderOwnerChrome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="20.753">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 15000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeFoundationUiTest.openOwnerPaySupplier(NativeFoundationUiTest.kt:2994)
+at com.saaf.milkshop.NativeFoundationUiTest.ownerPaySupplierOpensUnderOwnerChrome(NativeFoundationUiTest.kt:1405)
+</failure>
+  </testcase>
+  <testcase name="uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens" classname="com.saaf.milkshop.NativeFoundationUiTest" time="18.137" />
+  <testcase name="adminBusinessRecordsHardwareBackReturnsToRecordsHub" classname="com.saaf.milkshop.NativeFoundationUiTest" time="13.644">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 10000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeFoundationUiTest.adminBusinessRecordsHardwareBackReturnsToRecordsHub(NativeFoundationUiTest.kt:1177)
+</failure>
+  </testcase>
+  <testcase name="recordSaleWritesRoomAndShowsRefreshedReceipt" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.422" />
+  <testcase name="editedSaleDraftSurvivesActivityRecreation" classname="com.saaf.milkshop.NativeFoundationUiTest" time="5.606">
+    <failure>java.lang.AssertionError: Action performScrollTo() failed.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + InputText + EditableText contains 'Counter pickup' (ignoreCase: false))
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+at com.saaf.milkshop.NativeFoundationUiTest.editedSaleDraftSurvivesActivityRecreation(NativeFoundationUiTest.kt:2454)
+</failure>
+  </testcase>
+  <testcase name="ownerPaySupplierHardwareBackReturnsToWorkHome" classname="com.saaf.milkshop.NativeFoundationUiTest" time="18.584">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 15000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeFoundationUiTest.openOwnerPaySupplier(NativeFoundationUiTest.kt:2994)
+at com.saaf.milkshop.NativeFoundationUiTest.ownerPaySupplierHardwareBackReturnsToWorkHome(NativeFoundationUiTest.kt:1417)
+</failure>
+  </testcase>
+  <testcase name="switchAccountUiBackKeepsSessionAndReturnsToMore" classname="com.saaf.milkshop.NativeFoundationUiTest" time="4.164" />
+  <testcase name="cashierCountsClosesDayAndCannotReopen" classname="com.saaf.milkshop.NativeFoundationUiTest" time="11.355" />
+  <testcase name="operatorBackWinsOverWarmRefresh" classname="com.saaf.milkshop.NativeWorkRefreshRegressionTest" time="9.026" />
+  <testcase name="ownerNavigationWinsOverRefreshingSuccessAndFailure" classname="com.saaf.milkshop.NativeWorkRefreshRegressionTest" time="9.019" />
+  <testcase name="managerNavigationWinsOverWarmRefresh" classname="com.saaf.milkshop.NativeWorkRefreshRegressionTest" time="6.995" />
+  <testcase name="adminNavigationWinsOverWarmRefreshFailure" classname="com.saaf.milkshop.NativeWorkRefreshRegressionTest" time="6.939" />
+  <testcase name="catalogProductsRemainVisibleAndPriceFollowsIdAfterRename" classname="com.saaf.milkshop.NativeCatalogPricingRegressionTest" time="0.712" />
+  <testcase name="methodPickerShowsOnlyEnrolledPhoneSecurityAndSurfacesCancellation" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.107" />
+  <testcase name="darkSystemHostKeepsTheBrandedAccountPickerContrast" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.106" />
+  <testcase name="rateLimitedQuickPinKeepsFullPassphraseRecoveryVisibleAndWorking" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.205" />
+  <testcase name="startupFailureRetryChangesToTheRequestedVisibleState" classname="com.saaf.milkshop.NativeAuthenticationScreenContractTest" time="1.115" />
+  <testcase name="menuOpensExpenseEntry" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="0.992" />
+  <testcase name="countCashRecordsBlindAmountAndShowsSuccessWithoutExpectedVariance" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.213" />
+  <testcase name="personalSecurityShowsStatus" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.04" />
+  <testcase name="menuOpensCountCashEntry" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.058" />
+  <testcase name="menuShowsCashierActionsAndKeepsMoreNavSelected" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.087">
+    <failure>java.lang.AssertionError: Failed to assert the following: (Selected = 'true')
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'cashier_nav_more')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:262)
+at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+at androidx.compose.ui.test.AssertionsKt.assertIsSelected(Assertions.kt:88)
+at com.saaf.milkshop.NativeMoreScreenContractTest.menuShowsCashierActionsAndKeepsMoreNavSelected(NativeMoreScreenContractTest.kt:49)
+</failure>
+  </testcase>
+  <testcase name="switchAccountAndSignOutFireFromMenu" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.069" />
+  <testcase name="menuOpensDeliveriesFromMore" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.027" />
+  <testcase name="loadFailureOffersRetry" classname="com.saaf.milkshop.NativeMoreScreenContractTest" time="1.008" />
+  <testcase name="dirtyCashierNavigationRequiresDiscardConfirmation" classname="com.saaf.milkshop.NativeCashierExpenseScreenContractTest" time="1.4">
+    <failure>java.lang.AssertionError: Failed to inject touch input.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'cashier_nav_sell')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.performTouchInput(Actions.kt:402)
+at androidx.compose.ui.test.AndroidActions.performClickImpl(Actions.android.kt:23)
+at androidx.compose.ui.test.ActionsKt.performClick(Actions.kt:60)
+at com.saaf.milkshop.NativeCashierExpenseScreenContractTest.dirtyCashierNavigationRequiresDiscardConfirmation(NativeCashierExpenseScreenContractTest.kt:66)
+</failure>
+  </testcase>
+  <testcase name="readyUsesCashierChromeAndExcludesOwnerNavigation" classname="com.saaf.milkshop.NativeCashierExpenseScreenContractTest" time="1.141">
+    <failure>java.lang.AssertionError: Failed to assert the following: (Selected = 'true')
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'cashier_nav_more')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:262)
+at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+at androidx.compose.ui.test.AssertionsKt.assertIsSelected(Assertions.kt:88)
+at com.saaf.milkshop.NativeCashierExpenseScreenContractTest.readyUsesCashierChromeAndExcludesOwnerNavigation(NativeCashierExpenseScreenContractTest.kt:47)
+</failure>
+  </testcase>
+  <testcase name="loadFailureRetainsCashierShellAndRetries" classname="com.saaf.milkshop.NativeCashierExpenseScreenContractTest" time="0.974">
+    <failure>java.lang.AssertionError: Failed to assert the following: (Selected = 'true')
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'cashier_nav_more')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:262)
+at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+at androidx.compose.ui.test.AssertionsKt.assertIsSelected(Assertions.kt:88)
+at com.saaf.milkshop.NativeCashierExpenseScreenContractTest.loadFailureRetainsCashierShellAndRetries(NativeCashierExpenseScreenContractTest.kt:99)
+</failure>
+  </testcase>
+  <testcase name="operatorCannotLoadCashClose" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="1.386" />
+  <testcase name="closeThenReopenRestoresOpenPosting" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="1.136" />
+  <testcase name="recordCountThenCloseDayReturnsReceipt" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.694" />
+  <testcase name="loadExposesCashAccountExpectedAndOpenPosting" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.598" />
+  <testcase name="reopenRejectsBlankReasonAndWrongPassphrase" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="1.169" />
+  <testcase name="varianceRequiresReasonBeforeClose" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.654" />
+</testsuite>

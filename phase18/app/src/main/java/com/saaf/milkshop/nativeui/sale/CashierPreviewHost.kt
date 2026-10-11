@@ -1,8 +1,9 @@
 package com.saaf.milkshop.nativeui.sale
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -12,6 +13,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.cashclose.NativeCashCloseViewModel
+import com.saaf.milkshop.nativeui.cashclose.NativeCashCloseState
+import com.saaf.milkshop.nativeui.owner.OwnerCashCloseEntryScreen
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -77,6 +83,8 @@ fun CashierPreviewHost(
     expenseViewModel: NativeExpenseViewModel,
     deliveriesState: NativeDeliveriesState,
     deliveriesViewModel: NativeDeliveriesViewModel,
+    cashCloseState: NativeCashCloseState,
+    cashCloseViewModel: NativeCashCloseViewModel,
     onLeaveToWelcome: () -> Unit,
     onLeaveToAccountPicker: () -> Unit,
     onShowNotice: (String) -> Unit,
@@ -96,6 +104,7 @@ fun CashierPreviewHost(
                 moreViewModel.close()
                 expenseViewModel.close()
                 deliveriesViewModel.close()
+                cashCloseViewModel.close()
             }
             lastCashierSession = sessionHandle
             sampleReady = false
@@ -110,6 +119,7 @@ fun CashierPreviewHost(
             if ((sample?.seededStaffAccounts ?: 0) > 0) {
                 snackbarHostState.showSnackbar(
                     message = NativePreviewSampleData.previewAccountsHint(),
+                    withDismissAction = true,
                     duration = SnackbarDuration.Long,
                 )
             } else if (sample?.changed == true) {
@@ -142,6 +152,7 @@ fun CashierPreviewHost(
         ) {
             if (!sampleReady || cashierSection != CashierSection.More) return@LaunchedEffect
             val destination = (moreState as? NativeMoreState.Ready)?.destination
+            if (destination == NativeMoreDestination.CashClose) cashCloseViewModel.open(sessionHandle)
             if (destination == NativeMoreDestination.Expense) {
                 expenseViewModel.open(sessionHandle)
             }
@@ -228,10 +239,13 @@ fun CashierPreviewHost(
         // transition: switching sections animates only the content below the
         // header, exactly like top-level navigation in polished apps.
         var activeGuard by remember { mutableStateOf<com.saaf.milkshop.nativeui.common.EntryLeaveGuard?>(null) }
+        var guardOwner by remember { mutableStateOf<Pair<CashierSection, NativeMoreDestination?>?>(null) }
         var pendingSectionNav by remember { mutableStateOf<CashierSection?>(null) }
         fun guardedSectionNavigate(section: CashierSection) {
             val guard = activeGuard
-            if (guard?.dirty == true) pendingSectionNav = section else navigateCashier(section)
+            if (section == cashierSection && !(section == CashierSection.More && moreDestination != NativeMoreDestination.Menu)) {
+                navigateCashier(section)
+            } else if (guard?.dirty == true) pendingSectionNav = section else navigateCashier(section)
         }
         AdaptiveNavigationScaffold(
             snackbarHostState = snackbarHostState,
@@ -245,6 +259,7 @@ fun CashierPreviewHost(
                     cashierSection == CashierSection.Sell -> "New sale"
                     cashierSection == CashierSection.Collect -> "Collect payment"
                     cashierSection == CashierSection.Activity -> "Today’s activity"
+                    moreDestination == NativeMoreDestination.CashClose -> "Cash count and close"
                     moreDestination == NativeMoreDestination.Expense -> "Record expense"
                     moreDestination == NativeMoreDestination.Deliveries -> "Active deliveries"
                     else -> "More"
@@ -259,6 +274,8 @@ fun CashierPreviewHost(
                     CashierSection.Activity ->
                         (activityState as? NativeActivityState.Ready)?.day?.context?.businessDate
                     CashierSection.More -> when (moreDestination) {
+                        NativeMoreDestination.CashClose ->
+                            (cashCloseState as? NativeCashCloseState.Ready)?.context?.businessDate
                         NativeMoreDestination.Expense ->
                             (expenseState as? NativeExpenseState.Ready)?.context?.businessDate
                         NativeMoreDestination.Deliveries ->
@@ -266,7 +283,7 @@ fun CashierPreviewHost(
                         else ->
                             (moreState as? NativeMoreState.Ready)?.context?.businessDate
                     }
-                } ?: java.time.LocalDate.now().toString(),
+                } ?: com.saaf.milkshop.sync.BusinessClock.today().toString(),
                 postingOpen = when (cashierSection) {
                     CashierSection.Sell ->
                         (saleState as? NativeSaleState.Ready)?.context?.postingOpen
@@ -275,6 +292,8 @@ fun CashierPreviewHost(
                     CashierSection.Activity ->
                         (activityState as? NativeActivityState.Ready)?.day?.context?.postingOpen
                     CashierSection.More -> when (moreDestination) {
+                        NativeMoreDestination.CashClose ->
+                            (cashCloseState as? NativeCashCloseState.Ready)?.context?.postingOpen
                         NativeMoreDestination.Expense ->
                             (expenseState as? NativeExpenseState.Ready)?.context?.postingOpen
                         NativeMoreDestination.Deliveries ->
@@ -291,12 +310,23 @@ fun CashierPreviewHost(
             modifier = Modifier.weight(1f),
         ) { pane ->
             val (section, paneDestination) = pane
+            val registerPaneGuard: (com.saaf.milkshop.nativeui.common.EntryLeaveGuard?) -> Unit = { guard ->
+                if (guard != null && pane == (cashierSection to moreDestination)) {
+                    activeGuard = guard
+                    guardOwner = pane
+                } else if (guard == null && guardOwner == pane) {
+                    activeGuard = null
+                    guardOwner = null
+                }
+            }
         sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}:$paneDestination") {
+        androidx.compose.runtime.CompositionLocalProvider(com.saaf.milkshop.nativeui.sale.LocalPaneHeaderEnabled provides false) {
         when (section) {
             CashierSection.Sell -> CashierSaleScreen(
                 snackbarHostState = snackbarHostState,
                 identity = identity,
                 state = saleState,
+                onRegisterGuard = registerPaneGuard,
                 onRetry = saleViewModel::refresh,
                 onClearFeedback = saleViewModel::clearFeedback,
                 onRecordSale = saleViewModel::record,
@@ -308,6 +338,7 @@ fun CashierPreviewHost(
                 snackbarHostState = snackbarHostState,
                 identity = identity,
                 state = collectionState,
+                onRegisterGuard = registerPaneGuard,
                 onRetry = collectionViewModel::refresh,
                 onSelectCustomer = collectionViewModel::selectCustomer,
                 onRecordCollection = collectionViewModel::record,
@@ -346,12 +377,26 @@ fun CashierPreviewHost(
             )
             CashierSection.More -> {
                 val moreReady = moreState as? NativeMoreState.Ready
-                if (moreReady?.destination == NativeMoreDestination.Expense) {
+                if (paneDestination == NativeMoreDestination.CashClose) {
+                    OwnerCashCloseEntryScreen(
+                        snackbarHostState = snackbarHostState,
+                        identity = identity,
+                        state = cashCloseState,
+                        onRetry = cashCloseViewModel::refresh,
+                        onRecordCount = cashCloseViewModel::recordCount,
+                        onCloseDay = cashCloseViewModel::closeDay,
+                        onResolveDelivery = cashCloseViewModel::resolveDelivery,
+                        onReopenDay = cashCloseViewModel::reopenDay,
+                        onBackToWork = moreViewModel::backToMenu,
+                        onRegisterGuard = registerPaneGuard,
+                        ownScaffold = { _, m, content -> Box(m) { content(PaddingValues(0.dp)) } },
+                    )
+                } else if (paneDestination == NativeMoreDestination.Expense) {
                     CashierExpenseEntryScreen(
                         snackbarHostState = snackbarHostState,
                         identity = identity,
                         state = expenseState,
-                        onRegisterGuard = { activeGuard = it },
+                        onRegisterGuard = registerPaneGuard,
                         onRetry = expenseViewModel::refresh,
                         onRecordExpense = expenseViewModel::record,
                         onRecordAnother = expenseViewModel::recordAnother,
@@ -363,12 +408,12 @@ fun CashierPreviewHost(
                             navigateCashier(section)
                         },
                     )
-                } else if (moreReady?.destination == NativeMoreDestination.Deliveries) {
+                } else if (paneDestination == NativeMoreDestination.Deliveries) {
                     CashierDeliveriesEntryScreen(
                         snackbarHostState = snackbarHostState,
                         identity = identity,
                         state = deliveriesState,
-                        onRegisterGuard = { activeGuard = it },
+                        onRegisterGuard = registerPaneGuard,
                         onRetry = deliveriesViewModel::refresh,
                         onMarkDelivered = deliveriesViewModel::markDelivered,
                         draftActions = NativeDeliveriesDraftActions(
@@ -396,6 +441,7 @@ fun CashierPreviewHost(
                         state = moreState,
                         onRetry = moreViewModel::refresh,
                         onOpenCountCash = moreViewModel::openCountCash,
+                        onOpenCloseDay = moreViewModel::openCashClose,
                         onOpenExpense = {
                             moreViewModel.openExpense()
                             expenseViewModel.open(sessionHandle)
@@ -423,6 +469,7 @@ fun CashierPreviewHost(
         }
         }
         }
+        }
             }
         }
         // Tab switch with a dirty draft: confirm at host level, exactly like
@@ -437,7 +484,11 @@ fun CashierPreviewHost(
                     TextButton(onClick = {
                         val target = pendingSectionNav
                         pendingSectionNav = null
-                        sectionGuard.clear()
+                        sectionGuard.confirmDiscard()
+                        sectionStateHolder.removeState("$sessionHandle:${cashierSection.name}:$moreDestination")
+                        if (cashierSection == CashierSection.More && moreDestination == NativeMoreDestination.Deliveries) {
+                            deliveriesViewModel.discardDraft()
+                        }
                         if (target != null) navigateCashier(target)
                     }) { Text("Discard and leave") }
                 },

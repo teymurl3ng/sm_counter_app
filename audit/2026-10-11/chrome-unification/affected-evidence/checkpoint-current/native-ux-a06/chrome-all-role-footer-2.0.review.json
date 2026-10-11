@@ -1,0 +1,14 @@
+{
+  "scenario": "chrome-all-role-footer-2.0",
+  "screen": "ux",
+  "device": "samsung SM-A065F",
+  "packageName": "com.saaf.milkshop.qa.tests",
+  "capturedAt": "2026-10-11T00:08:03.437914Z",
+  "orientation": "portrait",
+  "fontScale": "1.0",
+  "theme": "light",
+  "workflowId": "NativeChromeGeometryTest",
+  "evidenceFilename": "chrome-all-role-footer-2.0.png",
+  "reviewStatus": "UNREVIEWED",
+  "note": "Shared chrome fixture. Local text scale=2.0; Owner review pending."
+}

@@ -1,0 +1,6 @@
+{
+  "scenario": "known-reentry-route",
+  "reviewStatus": "UNREVIEWED",
+  "device": "R8VXA02SNKH",
+  "note": "Current-run A06 route recording, triggered at exact test start; inspect before motion acceptance."
+}

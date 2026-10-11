@@ -1,0 +1,5 @@
+PASS fresh bootstrap executes in PostgreSQL WASM with local Auth stand-ins
+PASS direct staff writes cannot remove the final active owner, regardless of other business owners
+PASS ambiguous create reconciliation retains unlinked Auth identity and resolves linked identity
+PASS fresh sync RPCs assign sequences and return shop-scoped records
+4 SQL checks passed. This single-session runtime does not validate concurrent transactions, deployed Supabase parity or real Auth behavior.

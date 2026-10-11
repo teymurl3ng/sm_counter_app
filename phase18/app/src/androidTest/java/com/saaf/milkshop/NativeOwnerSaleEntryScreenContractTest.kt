@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -63,6 +64,15 @@ class NativeOwnerSaleEntryScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput)
             .performScrollTo()
             .performTextReplacement("3.0")
+        // Compact navigation is intentionally hidden behind the IME; dismiss it before leaving.
+        if (composeRule.onAllNodesWithTag(NativeUiTags.OwnerNavOverview).fetchSemanticsNodes().isEmpty()) {
+            androidx.test.uiautomator.UiDevice.getInstance(
+                androidx.test.platform.app.InstrumentationRegistry.getInstrumentation(),
+            ).pressBack()
+        }
+        composeRule.waitUntil(5_000) {
+            runCatching { composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).fetchSemanticsNode() }.isSuccess
+        }
         composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).performClick()
 
         composeRule.onNodeWithText("Discard this sale draft?").assertIsDisplayed()
@@ -118,8 +128,12 @@ class NativeOwnerSaleEntryScreenContractTest {
         state: NativeSaleState,
         onNavigate: (OwnerSection) -> Unit = {},
     ) {
+        var activeGuard: com.saaf.milkshop.nativeui.common.EntryLeaveGuard? = null
         composeRule.setContent {
             SaafTheme(darkTheme = false) {
+                val registerGuard = com.saaf.milkshop.nativeui.common.rememberPaneGuardRegistration(
+                    active = { activeGuard }, publish = { activeGuard = it },
+                )
                 OwnerSaleEntryScreen(
                     snackbarHostState = remember { SnackbarHostState() },
                     identity = ownerIdentity(),
@@ -130,11 +144,16 @@ class NativeOwnerSaleEntryScreenContractTest {
             onSendAsDelivery = {},
             onStartNextSale = {},
                     onBackToWork = {},
+                    onRegisterGuard = registerGuard,
                     ownScaffold = { s, m, content ->
                         OwnerScaffold(
                             snackbarHostState = s,
                             section = OwnerSection.Work,
-                            onNavigate = {},
+                            onNavigate = { section ->
+                                if (!((state as? NativeSaleState.Ready)?.saving ?: false)) {
+                                    activeGuard?.requestLeave { onNavigate(section) } ?: onNavigate(section)
+                                }
+                            },
                             modifier = m,
                             content = content,
                         )

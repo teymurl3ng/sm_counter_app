@@ -10,10 +10,12 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -40,7 +42,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class NativeCollectionScreenContractTest {
     @get:Rule
-    val composeRule = createComposeRule()
+    val composeRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
     fun customerSearchSelectionAmountShortcutsAccountAndNoteControlsChangeVisibleState() {
@@ -98,7 +100,8 @@ class NativeCollectionScreenContractTest {
         expandCollectNote()
         composeRule.onNodeWithTag(NativeUiTags.CollectNoteInput).performTextReplacement("Counter receipt 41")
         composeRule.onNodeWithText("Optional · 18/240").assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.CashierNavCollect).assertIsSelected()
+        // Navigation is rendered by CashierPreviewHost, outside this content contract.
+        composeRule.onNodeWithTag(NativeUiTags.CollectRecord).performScrollTo().assertIsEnabled()
     }
 
     @Test
@@ -116,6 +119,7 @@ class NativeCollectionScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.CollectAmountInput).performTextReplacement("1000.25")
         expandCollectNote()
         composeRule.onNodeWithTag(NativeUiTags.CollectNoteInput).performTextReplacement("Paid at counter")
+        com.saaf.milkshop.qa.NativeLayoutImeEvidence.dismissImeAndWait(composeRule.activity, composeRule)
         composeRule.onNodeWithTag(NativeUiTags.CollectRecord).performScrollTo().assertIsEnabled().performClick()
 
         assertEquals(1, requests.size)
@@ -128,6 +132,7 @@ class NativeCollectionScreenContractTest {
             ),
             requests.single(),
         )
+        composeRule.onNodeWithTag(NativeUiTags.CollectRecord).performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText("Recording…").assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.CollectRecord).assertIsNotEnabled().performClick()
         assertEquals(1, requests.size)
@@ -142,6 +147,8 @@ class NativeCollectionScreenContractTest {
         )
 
         composeRule.onNodeWithTag(NativeUiTags.CollectAmountInput).performTextReplacement("650")
+        composeRule.onNodeWithTag(NativeUiTags.CollectAmountInput).performImeAction()
+        composeRule.waitForIdle()
         composeRule.onNodeWithText("Ahmed Store will have PKR 150.00 advance")
             .performScrollTo()
             .assertIsDisplayed()
@@ -243,6 +250,8 @@ class NativeCollectionScreenContractTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.CollectAmountInput).performTextReplacement("725")
+        composeRule.onNodeWithTag(NativeUiTags.CollectAmountInput).performImeAction()
+        composeRule.waitForIdle()
         state = (state as NativeCollectionState.Ready).copy(
             error = "The payment was not recorded. Your entries are still here—check them and try again.",
         )

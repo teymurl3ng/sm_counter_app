@@ -1,0 +1,81 @@
+{
+  "verified_at": "2026-10-10T14:20:37.386156+00:00",
+  "project": "saafmilk-prod / tlsuxbghuhlqntkgtrxt",
+  "migration": {
+    "version": "20261010141548",
+    "name": "saaf_c1_6_sync_boundary"
+  },
+  "migration_sha256": "8856aa3b069eb7a6badd165d97003c373c43963f8f7004950911129e8e5b8308",
+  "s01": {
+    "severity": "HIGH",
+    "status": "repaired_and_verified_dev_and_prod"
+  },
+  "production_data_digests_and_counts_preserved": true,
+  "prod_counts": {
+    "audit": 32,
+    "shops": 1,
+    "staff": 3,
+    "auth_users": 3,
+    "businesses": 1,
+    "reconciliation": 0
+  },
+  "sync_records": 36,
+  "migration_function_definitions_match_dev": true,
+  "sql_role_read_and_permission_checks": {
+    "pulled_records": 36,
+    "owner_profile_read": true,
+    "owner_overview_read": true,
+    "owner_sync_pull_read": true,
+    "anonymous_ping_available": true,
+    "service_recursive_redactor": true,
+    "anonymous_sync_table_read_planning_denied": true,
+    "authenticated_direct_insert_planning_denied": true
+  },
+  "production_auth_login_or_client_session_tested": false,
+  "production_test_history_inserted": false,
+  "android_or_viewer_published_by_this_step": false,
+  "remaining_advisors": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "count": 7
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN",
+      "count": 18
+    },
+    {
+      "name": "auth_leaked_password_protection",
+      "level": "WARN",
+      "count": 1
+    }
+  ],
+  "artifact_sha256": {
+    "catalog-verification.sql": "037cf61e99238f7c9afc8f6107f0d960c3c77b639210530c4670801588091022",
+    "dev-migration-functions.json": "5c950d33eb4ea70fa29baea147220919d519a6310757e22abad6737de48fc141",
+    "dev-migrations-reference.json": "0807fab57f180c18135e65db99ee4224fb3486b08f8c44adc8dacb049ca1df87",
+    "dev-reference.json": "12728a49ab8614eea2077d79a225fc76efc8fa7841d837e19fa6a9e85a6f0299",
+    "prod-migration-functions.json": "5c950d33eb4ea70fa29baea147220919d519a6310757e22abad6737de48fc141",
+    "prod-migration-result.json": "2009f43f81ed0e9275edcb44eea7c32e106a522483a98035b84c39e47b6aa694",
+    "prod-migrations-after.json": "358e25bc2ba5f72d935390cf050abc04c1978bd45814a496f9d977a423831fd5",
+    "prod-migrations-before.json": "fc3cc3c5f17146a130c82d744813f727baa7b9ad63ff00beca95910fef7c4d78",
+    "prod-postflight-raw.json": "7f23dc4aab7711dbecd5e4f94b7a2d7ae1f4391f413de81b9947555a7af4e912",
+    "prod-postflight.json": "1f13fe7b36faf30b2f3fa79f78d72fc4be00c2d0d1174f1ce761c8d655ce5545",
+    "prod-preflight.json": "457ad66ed1698094eb971e838489432f2336cc888658a4e349dd23e8b67fe809",
+    "prod-read-verification-result.json": "9acc48d98211b0701fb38d2564a95730ef84dddd3c878f669d3d39b71d9e775c",
+    "prod-read-verification.sql": "586f68fb3a3fd3c89076d0c143b25edc0ca4eb00df55bb2751ac99cbee458b5f",
+    "prod-security-after.json": "86d02b5bd5e8c7ab56a4d7f73b2a11275894f81387e47f7e8c6555257e7da3ea",
+    "prod-security-before.json": "741f6ebd0650a47fb15ee06b435b201e230538a3483c3876869c9928a97f67e4",
+    "PRODUCTION_SERVER_DEPLOYMENT_2026-10-10.md": "505b0c9dc04c3c590ee942459dc91278b1e4735cccfe653a23219a027c94559e",
+    "project-identities.json": "98032c22776c14eea1f6c007b750772a4a47ba456e638da0739c943910b9c06c",
+    "timestamp-helper-dev.json": "f63d72850151b5f5cee7e4b6af2ee9fffd57524a67fcdb3858901bae931ac879",
+    "timestamp-helper-prod.json": "f786c373f89708005ed4048ff829be5f35e1155b73fe10c2b1f799ebee9e332d",
+    "verify_production_evidence.py": "9ac7de505779c2e6b990475460ae3d16820dc5419473910502f8cc2618054368"
+  },
+  "report_sha256": {
+    "REPAIR_PLAN_2026-10-10.md": "b440d0aa0e25f71a10e470aaced1a64be64ab429be17c401940bbe6bee93415d",
+    "PROJECT_AUDIT_2026-10-09.md": "66f5f3faba80fcf5aa11c51799d32a8e8f17e58b76918a6de03788711bea353a",
+    "audit\\2026-10-09\\repairs\\DEPLOYMENT_AND_MANUAL_CHECKS_2026-10-10.md": "06db3d25af3b2fd70f549bf08805d8c33ce490f2dd6a80cc3679952678292161"
+  }
+}

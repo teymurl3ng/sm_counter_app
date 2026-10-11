@@ -24,6 +24,11 @@ data class NativeAdminWorkContext(
     val unlinkedStaffCount: Int,
 )
 
+interface NativeAdminWorkOperations {
+    suspend fun load(sessionHandle: String, date: LocalDate = BusinessClock.today()): NativeAdminWorkContext
+}
+
+
 /**
  * Admin Work-home boundary: setup / administration health + secondary daily launcher context.
  * Uses permissions Admin actually holds (VIEW_OPERATIONAL, MANAGE_STAFF_USERS, MANAGE_MASTER_DATA).
@@ -33,10 +38,10 @@ class NativeAdminWorkFacade(
     private val database: MilkShopDatabase,
     private val security: UserSecurityService,
     private val catalog: ProductCatalogService = ProductCatalogService(database),
-) {
-    suspend fun load(
+) : NativeAdminWorkOperations {
+    override suspend fun load(
         sessionHandle: String,
-        date: LocalDate = BusinessClock.today(),
+        date: LocalDate,
     ): NativeAdminWorkContext {
         val actor = security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
         val role = AppRole.parse(actor.role)
@@ -64,7 +69,7 @@ class NativeAdminWorkFacade(
             businessDate = businessDate,
             postingOpen = !database.dailyCloseDao().isPostingClosed(businessDate),
             shopName = database.storeProfileDao().get()?.storeName?.takeIf { it.isNotBlank() }
-                ?: "Saaf Milk",
+                ?: "Your shop",
             setupRequiredCount = setupRequiredCount,
             firstSetupRequiredUserId = firstSetupRequiredUserId,
             productsMissingRateCount = productsMissingRateCount,

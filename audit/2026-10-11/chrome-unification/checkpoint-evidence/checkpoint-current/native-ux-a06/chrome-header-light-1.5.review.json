@@ -1,0 +1,14 @@
+{
+  "scenario": "chrome-header-light-1.5",
+  "screen": "ux",
+  "device": "samsung SM-A065F",
+  "packageName": "com.saaf.milkshop.qa.tests",
+  "capturedAt": "2026-10-11T00:22:38.368155Z",
+  "orientation": "portrait",
+  "fontScale": "1.0",
+  "theme": "light",
+  "workflowId": "NativeChromeGeometryTest",
+  "evidenceFilename": "chrome-header-light-1.5.png",
+  "reviewStatus": "UNREVIEWED",
+  "note": "Shared chrome fixture. Local text scale=1.5; Owner review pending."
+}

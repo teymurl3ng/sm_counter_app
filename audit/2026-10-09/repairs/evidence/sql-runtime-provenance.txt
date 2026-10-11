@@ -1,0 +1,4 @@
+Portable PostgreSQL 18.6
+Official source: https://get.enterprisedb.com/postgresql/postgresql-18.6-5-windows-x64-binaries.zip
+Downloaded SHA-256 (local identity, not publisher signature): e2246ba91d22345bc3d017586c09ede52d9df180b1eeb480f050445f1cad84e2
+Single-use clusters were bound to 127.0.0.1 and removed after shutdown.

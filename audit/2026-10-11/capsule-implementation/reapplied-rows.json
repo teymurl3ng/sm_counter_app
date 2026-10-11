@@ -1,0 +1,182 @@
+[
+  {
+    "file": "activity\\CashierActivityScreen.kt",
+    "component": "ActivityRow",
+    "variant": "Record"
+  },
+  {
+    "file": "admin\\AdminMoreScreen.kt",
+    "component": "AdminMoreMenuRow",
+    "variant": "Navigation"
+  },
+  {
+    "file": "admin\\AdminPeopleScreen.kt",
+    "component": "AdminPeopleMenuRow",
+    "variant": "Navigation"
+  },
+  {
+    "file": "admin\\AdminRecordsScreen.kt",
+    "component": "AdminRecordsMenuRow",
+    "variant": "Navigation"
+  },
+  {
+    "file": "admin\\AdminWorkScreen.kt",
+    "component": "HealthRow",
+    "variant": "Navigation"
+  },
+  {
+    "file": "auth\\NativeAuthenticationScreens.kt",
+    "component": "AccountRow",
+    "variant": "Entity"
+  },
+  {
+    "file": "collection\\CashierCollectionScreen.kt",
+    "component": "PaymentPickerDialog",
+    "variant": "Selection"
+  },
+  {
+    "file": "collection\\CashierCollectionScreen.kt",
+    "component": "CustomerPickerDialog",
+    "variant": "Selection"
+  },
+  {
+    "file": "expense\\ExpenseEntryScreen.kt",
+    "component": "PaymentPickerDialog",
+    "variant": "Selection"
+  },
+  {
+    "file": "expense\\ExpenseEntryScreen.kt",
+    "component": "CategoryPickerDialog",
+    "variant": "Selection"
+  },
+  {
+    "file": "manager\\ManagerMoreScreen.kt",
+    "component": "ManagerMoreMenuRow",
+    "variant": "Navigation"
+  },
+  {
+    "file": "manager\\ManagerWorkScreen.kt",
+    "component": "CommandRow",
+    "variant": "Navigation"
+  },
+  {
+    "file": "more\\CashierMoreScreen.kt",
+    "component": "MoreMenuRow",
+    "variant": "Navigation"
+  },
+  {
+    "file": "operations\\OperationsMoreScreen.kt",
+    "component": "OpsMoreMenuRow",
+    "variant": "Navigation"
+  },
+  {
+    "file": "operations\\ReceiveMilkScreen.kt",
+    "component": "VendorPickerDialog",
+    "variant": "Selection"
+  },
+  {
+    "file": "operations\\RecordSpoilageScreen.kt",
+    "component": "ReasonPickerDialog",
+    "variant": "Selection"
+  },
+  {
+    "file": "operations\\RecordSpoilageScreen.kt",
+    "component": "ProductPickerDialog",
+    "variant": "Selection"
+  },
+  {
+    "file": "owner\\OwnerCostingPlanningScreens.kt",
+    "component": "requestLeave",
+    "variant": "Record"
+  },
+  {
+    "file": "owner\\OwnerCostingPlansScreen.kt",
+    "component": "OwnerCostingPolicyRow",
+    "variant": "Record"
+  },
+  {
+    "file": "owner\\OwnerCustomersScreen.kt",
+    "component": "OwnerCustomerRow",
+    "variant": "Entity"
+  },
+  {
+    "file": "owner\\OwnerEmployeesScreen.kt",
+    "component": "OwnerEmployeeRow",
+    "variant": "Entity"
+  },
+  {
+    "file": "owner\\OwnerMoreScreen.kt",
+    "component": "OwnerMoreMenuRow",
+    "variant": "Navigation"
+  },
+  {
+    "file": "owner\\OwnerProductsScreen.kt",
+    "component": "OwnerProductRow",
+    "variant": "Entity"
+  },
+  {
+    "file": "owner\\OwnerRecordsScreen.kt",
+    "component": "RecordsRow",
+    "variant": "Record"
+  },
+  {
+    "file": "owner\\OwnerRecordsScreen.kt",
+    "component": "RecordsBalancesBody",
+    "variant": "Record"
+  },
+  {
+    "file": "owner\\OwnerSecurityHistoryScreen.kt",
+    "component": "OwnerSecurityAuditRow",
+    "variant": "Record"
+  },
+  {
+    "file": "owner\\OwnerShopSettingsScreen.kt",
+    "component": "OwnerShopSettingsScreenPane",
+    "variant": "Record"
+  },
+  {
+    "file": "owner\\OwnerSuppliersScreen.kt",
+    "component": "OwnerSupplierRow",
+    "variant": "Entity"
+  },
+  {
+    "file": "owner\\OwnerSyncScreen.kt",
+    "component": "takeCredential",
+    "variant": "Record"
+  },
+  {
+    "file": "owner\\OwnerUsersRolesScreen.kt",
+    "component": "OwnerUserRow",
+    "variant": "Entity"
+  },
+  {
+    "file": "owner\\OwnerWorkScreen.kt",
+    "component": "CommandRow",
+    "variant": "Navigation"
+  },
+  {
+    "file": "salarypayment\\SalaryPaymentEntryScreen.kt",
+    "component": "PaymentPickerDialog",
+    "variant": "Selection"
+  },
+  {
+    "file": "salarypayment\\SalaryPaymentEntryScreen.kt",
+    "component": "EmployeePickerDialog",
+    "variant": "Selection"
+  },
+  {
+    "file": "sale\\CashierSaleScreen.kt",
+    "component": "SalePaymentPickerDialog",
+    "variant": "Selection"
+  },
+  {
+    "file": "vendorpayment\\VendorPaymentEntryScreen.kt",
+    "component": "PaymentPickerDialog",
+    "variant": "Selection"
+  },
+  {
+    "file": "vendorpayment\\VendorPaymentEntryScreen.kt",
+    "component": "VendorPickerDialog",
+    "variant": "Selection"
+  }
+]

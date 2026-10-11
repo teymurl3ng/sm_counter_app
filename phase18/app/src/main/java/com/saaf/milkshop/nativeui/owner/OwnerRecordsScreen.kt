@@ -1,6 +1,8 @@
 package com.saaf.milkshop.nativeui.owner
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +34,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
+import com.saaf.milkshop.nativeui.common.nativeListItem
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -114,24 +118,23 @@ fun OwnerRecordsScreen(
             ) {
                 Text(state.message, style = MaterialTheme.typography.bodyLarge)
                 Button(
-                    onClick = onRetry,
+                    onClick = hapticAction(onRetry),
                     modifier = Modifier.testTag(NativeUiTags.OwnerRecordsRetryLoad),
                 ) { Text("Try again") }
             }
         }
 
         is NativeOwnerRecordsState.Ready -> {
-            val recordsPane = when {
-                state.correction != null -> RecordsPane.Correction
-                state.detail != null -> RecordsPane.Detail
-                state.ledger != null -> RecordsPane.Ledger
-                else -> RecordsPane.List
-            }
             NativeSectionTransition(
-                targetState = recordsPane,
-                contentKey = { it },
-            ) { pane -> when (pane) {
-                RecordsPane.Correction -> {
+                targetState = state,
+                contentKey = { pane -> when {
+                    pane.correction != null -> RecordsPane.Correction
+                    pane.detail != null -> RecordsPane.Detail
+                    pane.ledger != null -> RecordsPane.Ledger
+                    else -> RecordsPane.List
+                } },
+            ) { state -> when {
+                state.correction != null -> {
                     val editor = state.correction ?: return@NativeSectionTransition
                     RecordsCorrectionBody(
                         snackbarHostState = snackbarHostState,
@@ -146,7 +149,7 @@ fun OwnerRecordsScreen(
                         modifier = modifier,
                     )
                 }
-                RecordsPane.Detail -> {
+                state.detail != null -> {
                     val detail = state.detail ?: return@NativeSectionTransition
                     RecordsDetailBody(
                         snackbarHostState = snackbarHostState,
@@ -160,7 +163,7 @@ fun OwnerRecordsScreen(
                         modifier = modifier,
                     )
                 }
-                RecordsPane.Ledger -> {
+                state.ledger != null -> {
                     val ledger = state.ledger ?: return@NativeSectionTransition
                     RecordsLedgerBody(
                         snackbarHostState = snackbarHostState,
@@ -173,7 +176,7 @@ fun OwnerRecordsScreen(
                         modifier = modifier,
                     )
                 }
-                RecordsPane.List -> RecordsListBody(
+                else -> RecordsListBody(
                     snackbarHostState = snackbarHostState,
                     state = state,
                     onSearchQueryChange = onSearchQueryChange,
@@ -209,8 +212,7 @@ private fun RecordsListBody(
     onSelectGroup: (NativeRecordsGroup) -> Unit,
     modifier: Modifier,
 ) {
-    // T17: back at a section root is swallowed — the session stays.
-    BackHandler { }
+    // The role host owns Back at the records section root.
     hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
             Modifier
@@ -257,25 +259,25 @@ private fun RecordsListBody(
                 ) {
                     FilterChip(
                         selected = state.activeGroup == NativeRecordsGroup.Recent,
-                        onClick = { onSelectGroup(NativeRecordsGroup.Recent) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelectGroup(NativeRecordsGroup.Recent) },
                         label = { Text("Recent") },
                         modifier = Modifier.testTag(NativeUiTags.OwnerRecordsGroupRecent),
                     )
                     FilterChip(
                         selected = state.activeGroup == NativeRecordsGroup.Balances,
-                        onClick = { onSelectGroup(NativeRecordsGroup.Balances) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelectGroup(NativeRecordsGroup.Balances) },
                         label = { Text("Balances") },
                         modifier = Modifier.testTag(NativeUiTags.OwnerRecordsGroupBalances),
                     )
                     FilterChip(
                         selected = state.activeGroup == NativeRecordsGroup.Closing,
-                        onClick = { onSelectGroup(NativeRecordsGroup.Closing) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelectGroup(NativeRecordsGroup.Closing) },
                         label = { Text("Closing") },
                         modifier = Modifier.testTag(NativeUiTags.OwnerRecordsGroupClosing),
                     )
                     FilterChip(
                         selected = state.activeGroup == NativeRecordsGroup.Corrections,
-                        onClick = { onSelectGroup(NativeRecordsGroup.Corrections) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelectGroup(NativeRecordsGroup.Corrections) },
                         label = { Text("Corrections") },
                         modifier = Modifier.testTag(NativeUiTags.OwnerRecordsGroupCorrections),
                     )
@@ -352,11 +354,11 @@ private fun RecordsListBody(
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .testTag(NativeUiTags.OwnerRecordsList),
+                                .padding(horizontal = 16.dp)
+                    .testTag(NativeUiTags.OwnerRecordsList),
                         ) {
                             items(state.visibleRecords, key = { it.eventId }) { record ->
-                                RecordsRow(record = record, onClick = { onOpenRecord(record.eventId) })
-                                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                                RecordsRow(record = record, onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenRecord(record.eventId) })
                             }
                         }
                     }
@@ -398,22 +400,21 @@ private fun RecordsBalancesBody(
         }
         return
     }
-    LazyColumn(Modifier.fillMaxSize()) {
+    LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
         items(rows, key = { it.accountId }) { row ->
             Row(
                 Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 64.dp)
-                    .clickable(onClick = { onOpenLedger(row.accountId) })
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Record)
+                    .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenLedger(row.accountId) })
+                    .nativeListItemContent(NativeListStyle.Record),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(Modifier.weight(1f)) {
                     Text(row.displayName, style = MaterialTheme.typography.titleMedium)
                     Text(row.categoryLabel, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(row.balanceLabel, fontWeight = FontWeight.SemiBold)
                 }
-                Text(row.balanceLabel, fontWeight = FontWeight.SemiBold)
                 Icon(Icons.Outlined.ChevronRight, contentDescription = null)
             }
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -439,13 +440,13 @@ private fun RecordsClosingBody(state: NativeOwnerRecordsState.Ready) {
         }
         return
     }
-    LazyColumn(Modifier.fillMaxSize()) {
+    LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
         items(rows, key = { it.actionId }) { row ->
             Column(
-                Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+                Modifier.padding(vertical = 4.dp).nativeListItem(NativeListStyle.Record).nativeListItemContent(NativeListStyle.Record),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text("${row.actionLabel} · ${row.businessDate}", fontWeight = FontWeight.SemiBold)
                     Text("#${row.actionId}", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
@@ -498,13 +499,13 @@ private fun RecordsLedgerBody(
                     Text("No ledger movements yet")
                 }
             } else {
-                LazyColumn(Modifier.fillMaxSize()) {
+                LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
                     items(ledger.entries, key = { it.logId }) { entry ->
                         Column(
-                            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+                            Modifier.padding(vertical = 4.dp).nativeListItem(NativeListStyle.Record).nativeListItemContent(NativeListStyle.Record),
                             verticalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
-                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text(entry.taskLabel, fontWeight = FontWeight.SemiBold)
                                 Text(entry.movementLabel, fontWeight = FontWeight.SemiBold)
                             }
@@ -600,7 +601,7 @@ private fun RecordsDetailBody(
                 val correctionPrefill = detail.correctionPrefill
                 if (detail.canCorrect && correctionPrefill != null) {
                     Button(
-                        onClick = { onOpenCorrection(correctionPrefill) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenCorrection(correctionPrefill) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .testTag(NativeUiTags.OwnerRecordsDetailCorrect),
@@ -750,7 +751,7 @@ private fun RecordsCorrectionBody(
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 FilterChip(
                                     selected = editor.saleQuantityMode,
-                                    onClick = {
+                                    onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                                         if (canLeave) {
                                             onUpdate { it.copy(saleQuantityMode = true) }
                                         }
@@ -762,7 +763,7 @@ private fun RecordsCorrectionBody(
                                 )
                                 FilterChip(
                                     selected = !editor.saleQuantityMode,
-                                    onClick = {
+                                    onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                                         if (canLeave) {
                                             onUpdate { it.copy(saleQuantityMode = false) }
                                         }
@@ -827,7 +828,7 @@ private fun RecordsCorrectionBody(
                                 SALE_CHANNELS.forEach { channel ->
                                     FilterChip(
                                         selected = editor.saleChannel == channel,
-                                        onClick = {
+                                        onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                                             if (canLeave) {
                                                 onUpdate { it.copy(saleChannel = channel) }
                                             }
@@ -887,7 +888,7 @@ private fun RecordsCorrectionBody(
                         )
                     }
                     Button(
-                        onClick = onSave,
+                        onClick = hapticAction(onSave),
                         enabled = canLeave,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -933,13 +934,13 @@ private fun RecordsCorrectionDiscardDialog(leaveGuard: EntryLeaveGuard) {
         text = { Text("Your unsaved correction draft will be lost.") },
         confirmButton = {
             TextButton(
-                onClick = leaveGuard::confirmDiscard,
+                onClick = hapticAction(leaveGuard::confirmDiscard),
                 modifier = Modifier.testTag(NativeUiTags.OwnerRecordsCorrectionDiscardConfirm),
             ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(
-                onClick = leaveGuard::keepEditing,
+                onClick = hapticAction(leaveGuard::keepEditing),
                 modifier = Modifier.testTag(NativeUiTags.OwnerRecordsCorrectionDiscardKeep),
             ) { Text("Keep editing") }
         },
@@ -953,11 +954,10 @@ private fun RecordsRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 64.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Record)
             .semantics { role = Role.Button }
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .clickable(onClick = hapticAction(onClick))
+            .nativeListItemContent(NativeListStyle.Record)
             .testTag(NativeUiTags.ownerRecordsRecord(record.eventId)),
         verticalAlignment = Alignment.CenterVertically,
     ) {

@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.SyncIntegrityRegressionTest" tests="27" failures="0" errors="0" skipped="0" time="5.287" timestamp="2026-10-10T00:11:22" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-S921W - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="failedLedgerChildMustRollBackIncomingEvent" classname="com.saaf.milkshop.SyncIntegrityRegressionTest" time="0.042" />
+  <testcase name="lateDependencyMustRecoverAfterFiveUnrelatedBatches" classname="com.saaf.milkshop.SyncIntegrityRegressionTest" time="0.206" />
+  <testcase name="dependencyPark_exhaustsBoundedRetriesWithOneAudit" classname="com.saaf.milkshop.SyncApplyEngineTest" time="0.236" />
+  <testcase name="roundTrip_reproducesLedgerOnSecondDevice" classname="com.saaf.milkshop.SyncApplyEngineTest" time="0.389" />
+  <testcase name="pendingEditGuard_parksInsteadOfOverwriting" classname="com.saaf.milkshop.SyncApplyEngineTest" time="0.06" />
+  <testcase name="dependencyPark_resolvesWhenParentArrives" classname="com.saaf.milkshop.SyncApplyEngineTest" time="0.086" />
+  <testcase name="drainsInStrictOrder_andEmptiesTheQueue" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.209" />
+  <testcase name="schedulerKick_recordsWorkWaiting" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.005" />
+  <testcase name="permanentFailure_haltsAtHead_andResumesAfterFix" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.443" />
+  <testcase name="transientFailure_leavesQueueIntactForRetry" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.057" />
+  <testcase name="missingTransport_isANoOp" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.056" />
+  <testcase name="serverClient_classifiesOutcomes_andAnchorsTime" classname="com.saaf.milkshop.SyncTransportTest" time="0.183" />
+  <testcase name="malformedPushAcknowledgementsKeepQueuedWork" classname="com.saaf.milkshop.SyncTransportTest" time="0.107" />
+  <testcase name="signIn_allowed_carriesIdentityAndAnchorsTime" classname="com.saaf.milkshop.SyncTransportTest" time="0.031" />
+  <testcase name="serverConfig_storeRoundTrips" classname="com.saaf.milkshop.SyncTransportTest" time="0.005" />
+  <testcase name="tokenStore_roundTripsUnderKeystoreEncryption" classname="com.saaf.milkshop.SyncTransportTest" time="0.006" />
+  <testcase name="signIn_unknownOutcomes_neverBecomeIdentityDecisions" classname="com.saaf.milkshop.SyncTransportTest" time="0.003" />
+  <testcase name="signIn_invalidCredentials_isTheOnlyCredentialVerdict" classname="com.saaf.milkshop.SyncTransportTest" time="0.005" />
+  <testcase name="signIn_disabledStaff_andNoStaffProfile_classifyDefinitively" classname="com.saaf.milkshop.SyncTransportTest" time="0.004" />
+  <testcase name="envelopeFactory_embedsChildrenAndProfiles" classname="com.saaf.milkshop.SyncTransportTest" time="0.133" />
+  <testcase name="restoreFromDifferentShop_isRefused_withEnrollmentIntact" classname="com.saaf.milkshop.SyncRestoreHardeningTest" time="0.391" />
+  <testcase name="restoreWithNoLocalEnrollment_alwaysSucceeds" classname="com.saaf.milkshop.SyncRestoreHardeningTest" time="0.362" />
+  <testcase name="restoreFromSameShop_succeeds_clearsTokens_keepsBindingAndConfig" classname="com.saaf.milkshop.SyncRestoreHardeningTest" time="0.391" />
+  <testcase name="ambiguousShop_withoutChoice_listsShops_andSavesNothing" classname="com.saaf.milkshop.SyncEnrollmentTest" time="0.029" />
+  <testcase name="unenroll_clearsEverything" classname="com.saaf.milkshop.SyncEnrollmentTest" time="0.004" />
+  <testcase name="enrollment_persistsBindingSessionConfig_andSetsZone" classname="com.saaf.milkshop.SyncEnrollmentTest" time="0.144" />
+  <testcase name="failedEnrollment_leavesZeroState" classname="com.saaf.milkshop.SyncEnrollmentTest" time="0.007" />
+</testsuite>

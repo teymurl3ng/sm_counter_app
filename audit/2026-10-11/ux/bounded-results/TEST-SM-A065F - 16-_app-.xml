@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest" tests="8" failures="0" errors="0" skipped="0" time="35.021" timestamp="2026-10-10T19:25:00" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="collectLargeTextLandscapeSemanticsRemainAvailable" classname="com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest" time="8.764" />
+  <testcase name="cashierClosesOwnDayNextDateOpensAndReopenIsDenied" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="1.619" />
+  <testcase name="earlierOpenDeliveryRefusesCloseUntilCashierResolvesIt" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="1.781" />
+  <testcase name="pendingDeliveryRefusesCloseUntilResolved" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="1.716" />
+  <testcase name="cashMovementAfterCountRefusesCloseWithoutPartialWrite" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="1.744" />
+  <testcase name="cashierCountsClosesDayAndCannotReopen" classname="com.saaf.milkshop.NativeFoundationUiTest" time="15.618" />
+  <testcase name="missingProductAndPaymentReferencesExplainWhatTheOwnerMustFix" classname="com.saaf.milkshop.NativeSaleHardeningContractTest" time="1.289" />
+  <testcase name="emptyTodayExplainsAndKeepsActivityNavSelected" classname="com.saaf.milkshop.NativeActivityScreenContractTest" time="1.132" />
+</testsuite>

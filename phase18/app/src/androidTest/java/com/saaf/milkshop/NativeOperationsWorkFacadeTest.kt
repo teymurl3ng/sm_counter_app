@@ -106,7 +106,7 @@ class NativeOperationsWorkFacadeTest {
         }
         val context = facade.load(operatorSession, DATE)
         val expected = runCatching {
-            OffsetDateTime.parse(correction.createdAt).toLocalTime()
+            OffsetDateTime.parse(correction.createdAt).atZoneSameInstant(java.time.ZoneId.systemDefault()).toLocalTime()
                 .format(DateTimeFormatter.ofPattern("h:mm a", Locale.getDefault()))
         }.getOrElse { correction.createdAt }
         assertEquals(expected, context.latestReceiptLabel)

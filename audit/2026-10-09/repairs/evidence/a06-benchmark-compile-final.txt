@@ -1,0 +1,172 @@
+Starting a Gradle Daemon (subsequent builds will be faster)
+
+> Configure project :app
+WARNING: The option setting 'android.disallowKotlinSourceSets=false' is experimental.
+The current default is 'true'.
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :verifyBridgeContract
+Bridge contract OK: v5, 92 endpoints, SHA-256 276C3C9B263322EC90091834F659B068E920659D47E71B1F195D7AD4DA46906F
+
+> Task :verifyUiCleanup
+UI cleanup gate OK: 88 active TypeScript/TSX files; 23 prototype paths and 6 dependencies absent; 3 packaged files scanned.
+
+> Task :app:verifyHybridWebAssets
+> Task :app:preBuild
+> Task :app:preBenchmarkBuild
+> Task :app:mergeBenchmarkJniLibFolders
+> Task :app:mergeBenchmarkNativeLibs
+> Task :app:mergeBenchmarkArtProfile
+> Task :app:desugarBenchmarkFileDependencies
+> Task :app:generateBenchmarkBuildConfig
+> Task :app:generateBenchmarkResources
+
+> Task :app:stripBenchmarkDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libandroidx.graphics.path.so, libsqliteJni.so. Run with --info option to learn more.
+
+> Task :app:packageBenchmarkResources
+> Task :app:extractBenchmarkNativeSymbolTables
+> Task :app:processBenchmarkNavigationResources
+> Task :app:mergeBenchmarkNativeDebugMetadata NO-SOURCE
+> Task :app:javaPreCompileBenchmark
+> Task :app:compileBenchmarkNavigationResources
+> Task :app:checkBenchmarkAarMetadata
+> Task :app:mapBenchmarkSourceSetPaths
+> Task :app:parseBenchmarkLocalResources
+> Task :app:createBenchmarkCompatibleScreenManifests
+> Task :app:extractDeepLinksBenchmark
+> Task :app:generateBenchmarkRFile
+> Task :app:processBenchmarkMainManifest
+> Task :app:processBenchmarkManifest
+> Task :app:checkBenchmarkDuplicateClasses
+
+> Task :app:kspBenchmarkKotlin
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :app:mergeBenchmarkResources
+> Task :app:mergeBenchmarkStartupProfile
+> Task :app:processBenchmarkManifestForPackage
+> Task :app:mergeExtDexBenchmark
+> Task :app:generateBenchmarkAssets UP-TO-DATE
+> Task :app:mergeBenchmarkAssets
+> Task :app:compressBenchmarkAssets
+> Task :app:extractBenchmarkVersionControlInfo
+> Task :app:collectBenchmarkDependencies
+> Task :app:sdkBenchmarkDependencyData
+> Task :app:validateSigningBenchmark
+> Task :app:writeBenchmarkAppMetadata
+> Task :app:writeBenchmarkSigningConfigVersions
+> Task :app:preBenchmarkAndroidTestBuild SKIPPED
+> Task :app:processBenchmarkAndroidTestManifest
+> Task :app:generateBenchmarkAndroidTestBuildConfig
+> Task :app:generateBenchmarkAndroidTestResources
+> Task :app:packageBenchmarkAndroidTestResources
+> Task :app:processBenchmarkAndroidTestNavigationResources
+> Task :app:generateBenchmarkAndroidTestAssets UP-TO-DATE
+> Task :app:javaPreCompileBenchmarkAndroidTest
+> Task :app:parseBenchmarkAndroidTestLocalResources
+> Task :app:mergeBenchmarkAndroidTestAssets
+> Task :app:generateBenchmarkAndroidTestRFile
+> Task :app:desugarBenchmarkAndroidTestFileDependencies
+> Task :app:checkBenchmarkAndroidTestAarMetadata
+> Task :app:compileBenchmarkAndroidTestNavigationResources
+> Task :app:mapBenchmarkAndroidTestSourceSetPaths
+> Task :app:compressBenchmarkAndroidTestAssets
+> Task :app:mergeBenchmarkAndroidTestJniLibFolders
+> Task :app:checkBenchmarkAndroidTestDuplicateClasses
+> Task :app:mergeBenchmarkAndroidTestNativeLibs NO-SOURCE
+> Task :app:mergeBenchmarkAndroidTestResources
+> Task :app:stripBenchmarkAndroidTestDebugSymbols NO-SOURCE
+> Task :app:validateSigningBenchmarkAndroidTest
+> Task :app:writeBenchmarkAndroidTestSigningConfigVersions
+> Task :app:mergeExtDexBenchmarkAndroidTest
+> Task :app:processBenchmarkAndroidTestResources
+> Task :app:processBenchmarkResources
+> Task :app:optimizeBenchmarkResources
+> Task :app:compileBenchmarkKotlin
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/MainActivity.kt:296:17 'fun startActivityForResult(intent: Intent, requestCode: Int): Unit' is deprecated. This method has been deprecated in favor of using the Activity Result API
+      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt
+      contracts for common intents available in
+      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for
+      testing, and allow receiving results in separate, testable classes independent from your
+      activity. Use
+      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}
+      passing in a {@link StartActivityForResult} object for the {@link ActivityResultContract}.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/MainActivity.kt:585:25 'fun startActivityForResult(intent: Intent, requestCode: Int): Unit' is deprecated. This method has been deprecated in favor of using the Activity Result API
+      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt
+      contracts for common intents available in
+      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for
+      testing, and allow receiving results in separate, testable classes independent from your
+      activity. Use
+      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}
+      passing in a {@link StartActivityForResult} object for the {@link ActivityResultContract}.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/MainActivity.kt:679:25 'fun startActivityForResult(intent: Intent, requestCode: Int): Unit' is deprecated. This method has been deprecated in favor of using the Activity Result API
+      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt
+      contracts for common intents available in
+      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for
+      testing, and allow receiving results in separate, testable classes independent from your
+      activity. Use
+      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}
+      passing in a {@link StartActivityForResult} object for the {@link ActivityResultContract}.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/MainActivity.kt:818:15 'fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Unit' is deprecated. This method has been deprecated in favor of using the Activity Result API
+      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt
+      contracts for common intents available in
+      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for
+      testing, and allow receiving results in separate, testable classes independent from your
+      activity. Use
+      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}
+      with the appropriate {@link ActivityResultContract} and handling the result in the
+      {@link ActivityResultCallback#onActivityResult(Object) callback}.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/hybrid/HybridActivity.kt:177:60 'static field SOFT_INPUT_ADJUST_RESIZE: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/admin/AdminWorkScreen.kt:272:41 'val Icons.Outlined.ReceiptLong: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.ReceiptLong.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/collection/CashierCollectionScreen.kt:539:78 'val Icons.Outlined.Notes: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Notes.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/drawing/DrawingEntryScreen.kt:279:86 'val Icons.Outlined.Notes: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Notes.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/expense/ExpenseEntryScreen.kt:387:78 'val Icons.Outlined.Notes: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Notes.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/manager/ManagerWorkScreen.kt:224:43 'val Icons.Outlined.ReceiptLong: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.ReceiptLong.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/manager/ManagerWorkScreen.kt:249:39 'val Icons.Outlined.Assignment: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Assignment.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/more/CashierMoreScreen.kt:311:43 'val Icons.Outlined.ReceiptLong: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.ReceiptLong.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/more/CashierMoreScreen.kt:361:43 'val Icons.Outlined.Logout: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Logout.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/OperationsMoreScreen.kt:253:43 'val Icons.Outlined.Logout: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Logout.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/OperationsWorkScreen.kt:276:35 'val Icons.Outlined.Assignment: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Assignment.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerWorkScreen.kt:224:43 'val Icons.Outlined.ReceiptLong: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.ReceiptLong.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerWorkScreen.kt:252:39 'val Icons.Outlined.Assignment: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Assignment.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/salarypayment/SalaryPaymentEntryScreen.kt:371:78 'val Icons.Outlined.Notes: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Notes.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/vendorpayment/VendorPaymentEntryScreen.kt:371:78 'val Icons.Outlined.Notes: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Notes.
+
+> Task :app:compileBenchmarkJavaWithJavac
+> Task :app:dexBuilderBenchmark
+> Task :app:mergeBenchmarkGlobalSynthetics
+> Task :app:processBenchmarkJavaRes
+> Task :app:bundleBenchmarkClassesToCompileJar
+
+> Task :app:kspBenchmarkAndroidTestKotlin
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :app:mergeBenchmarkJavaResource
+> Task :app:mergeDexBenchmark
+> Task :app:compileBenchmarkArtProfile
+> Task :app:packageBenchmark
+> Task :app:createBenchmarkApkListingFileRedirect
+> Task :app:assembleBenchmark
+
+> Task :app:compileBenchmarkAndroidTestKotlin FAILED
+e: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/androidTest/java/com/saaf/milkshop/NativeReleaseProfileProbe.kt:96:123 Cannot access 'val DATABASE_NAME: String': it is private in 'com/saaf/milkshop/data/MilkShopDatabase.Companion'.
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileBenchmarkAndroidTestKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 6m 8s
+73 actionable tasks: 73 executed

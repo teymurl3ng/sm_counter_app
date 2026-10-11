@@ -1,0 +1,14 @@
+{
+  "scenario": "portrait-large-text-navigation",
+  "screen": "collect",
+  "device": "samsung SM-A065F",
+  "packageName": "com.saaf.milkshop.qa.tests",
+  "capturedAt": "2026-10-10T21:34:37.576897Z",
+  "orientation": "portrait",
+  "fontScale": "1.5",
+  "theme": "light",
+  "workflowId": "collect",
+  "evidenceFilename": "portrait-large-text-navigation.png",
+  "reviewStatus": "UNREVIEWED",
+  "note": "150% text; amount and record remain scroll-reachable; four navigation actions visible"
+}

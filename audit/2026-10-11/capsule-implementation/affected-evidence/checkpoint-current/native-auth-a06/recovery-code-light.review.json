@@ -1,0 +1,14 @@
+{
+  "scenario": "recovery-code-light",
+  "screen": "auth",
+  "device": "samsung SM-A065F",
+  "packageName": "com.saaf.milkshop.qa.tests",
+  "capturedAt": "2026-10-10T21:34:03.619703Z",
+  "orientation": "portrait",
+  "fontScale": "1.0",
+  "theme": "light",
+  "workflowId": "access-recovery",
+  "evidenceFilename": "recovery-code-light.png",
+  "reviewStatus": "UNREVIEWED",
+  "note": "Portrait presentation fixture; demo account\/code only. Owner review pending."
+}

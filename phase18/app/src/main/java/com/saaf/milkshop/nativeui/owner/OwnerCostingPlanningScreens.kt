@@ -2,7 +2,11 @@
 
 package com.saaf.milkshop.nativeui.owner
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.nativeListItem
+
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -35,6 +39,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -82,25 +87,25 @@ internal fun OwnerCostingPlansSectionTabs(
     ) {
         FilterChip(
             selected = section == NativeOwnerCostingSection.Policies,
-            onClick = { onSectionChange(NativeOwnerCostingSection.Policies) },
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction { onSectionChange(NativeOwnerCostingSection.Policies) },
             label = { Text("Policies") },
             modifier = Modifier.testTag(NativeUiTags.OwnerCostingSectionPolicies),
         )
         FilterChip(
             selected = section == NativeOwnerCostingSection.Plans,
-            onClick = { onSectionChange(NativeOwnerCostingSection.Plans) },
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction { onSectionChange(NativeOwnerCostingSection.Plans) },
             label = { Text("Plans") },
             modifier = Modifier.testTag(NativeUiTags.OwnerCostingSectionPlans),
         )
         FilterChip(
             selected = section == NativeOwnerCostingSection.Opening,
-            onClick = { onSectionChange(NativeOwnerCostingSection.Opening) },
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction { onSectionChange(NativeOwnerCostingSection.Opening) },
             label = { Text("Opening") },
             modifier = Modifier.testTag(NativeUiTags.OwnerCostingSectionOpening),
         )
         FilterChip(
             selected = section == NativeOwnerCostingSection.Yield,
-            onClick = { onSectionChange(NativeOwnerCostingSection.Yield) },
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction { onSectionChange(NativeOwnerCostingSection.Yield) },
             label = { Text("Yield") },
             modifier = Modifier.testTag(NativeUiTags.OwnerCostingSectionYield),
         )
@@ -157,7 +162,7 @@ internal fun OwnerCostingPlansBody(
                             fontWeight = FontWeight.SemiBold,
                         )
                         TextButton(
-                            onClick = onOpenBudgetEditor,
+                            onClick = hapticAction(onOpenBudgetEditor),
                             modifier = Modifier.testTag(NativeUiTags.OwnerCostingBudgetOpen),
                         ) { Text("New plan") }
                     }
@@ -218,7 +223,7 @@ internal fun OwnerCostingPlansBody(
                             fontWeight = FontWeight.SemiBold,
                         )
                         TextButton(
-                            onClick = onOpenCollectionsEditor,
+                            onClick = hapticAction(onOpenCollectionsEditor),
                             modifier = Modifier.testTag(NativeUiTags.OwnerCostingTargetOpen),
                         ) { Text("Set target") }
                     }
@@ -356,7 +361,7 @@ internal fun OwnerCostingBudgetEditorScreen(
                 cats.forEach { option ->
                     FilterChip(
                         selected = category == option,
-                        onClick = {
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                             category = option
                             periodStartText = if (option == BUDGET_CATEGORY_MILK_PURCHASES) {
                                 defaultMilkWeekStart
@@ -431,9 +436,9 @@ internal fun OwnerCostingBudgetEditorScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 TextButton(
-                    onClick = {
-                        val start = periodStart ?: return@TextButton
-                        val end = periodEnd ?: return@TextButton
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                        val start = periodStart ?: return@hapticAction
+                        val end = periodEnd ?: return@hapticAction
                         onCopyPrevious(category, start, end)
                     },
                     enabled = !saving && periodStart != null && periodEnd != null,
@@ -445,10 +450,10 @@ internal fun OwnerCostingBudgetEditorScreen(
             val canSaveBudget = !saving && periodStart != null && periodEnd != null &&
                 plannedValue.toDoubleOrNull() != null
             Button(
-                onClick = {
-                    val start = periodStart ?: return@Button
-                    val end = periodEnd ?: return@Button
-                    val value = plannedValue.toDoubleOrNull() ?: return@Button
+                onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
+                    val start = periodStart ?: return@hapticCommitAction
+                    val end = periodEnd ?: return@hapticCommitAction
+                    val value = plannedValue.toDoubleOrNull() ?: return@hapticCommitAction
                     val input = if (category == BUDGET_CATEGORY_MILK_PURCHASES) {
                         BudgetPlanInput(category, start, end, plannedLiters = value)
                     } else {
@@ -571,9 +576,9 @@ internal fun OwnerCostingCollectionsEditorScreen(
                 )
             }
             Button(
-                onClick = {
-                    val start = weekStart ?: return@Button
-                    val amount = amountText.toDoubleOrNull() ?: return@Button
+                onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
+                    val start = weekStart ?: return@hapticCommitAction
+                    val amount = amountText.toDoubleOrNull() ?: return@hapticCommitAction
                     onSave(start, amount)
                 },
                 enabled = !saving && weekStart != null && amountText.toDoubleOrNull() != null,
@@ -647,7 +652,7 @@ internal fun OwnerCostingYieldBody(
                             fontWeight = FontWeight.SemiBold,
                         )
                         TextButton(
-                            onClick = onOpenApprove,
+                            onClick = hapticAction(onOpenApprove),
                             modifier = Modifier.testTag(NativeUiTags.OwnerCostingYieldApprove),
                         ) { Text("Approve baseline") }
                     }
@@ -737,7 +742,7 @@ internal fun OwnerCostingYieldBody(
                                 )
                             }
                             TextButton(
-                                onClick = { assessmentBatch = batch },
+                                onClick = com.saaf.milkshop.nativeui.common.hapticAction { assessmentBatch = batch },
                                 enabled = !savingAssessment,
                                 modifier = Modifier.testTag(
                                     NativeUiTags.ownerCostingLossAssess(batch.productionEventId),
@@ -782,7 +787,7 @@ internal fun OwnerCostingYieldBody(
                         classifications.forEach { code ->
                             FilterChip(
                                 selected = classification == code,
-                                onClick = {
+                                onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                                     classification = code
                                     if (code == "ordinary") abnormalLiters = "0"
                                 },
@@ -808,7 +813,7 @@ internal fun OwnerCostingYieldBody(
                         reasons.forEach { code ->
                             FilterChip(
                                 selected = reason == code,
-                                onClick = { reason = code },
+                                onClick = com.saaf.milkshop.nativeui.common.hapticAction { reason = code },
                                 label = { Text(code.replace('_', ' ').replaceFirstChar { it.uppercase() }) },
                             )
                         }
@@ -823,7 +828,7 @@ internal fun OwnerCostingYieldBody(
             },
             confirmButton = {
                 TextButton(
-                    onClick = {
+                    onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
                         onSaveAssessment(
                             ProductionLossAssessmentInput(
                                 productionEventId = batch.productionEventId,
@@ -846,7 +851,7 @@ internal fun OwnerCostingYieldBody(
             },
             dismissButton = {
                 TextButton(
-                    onClick = { assessmentBatch = null },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { assessmentBatch = null },
                     enabled = !savingAssessment,
                 ) { Text("Cancel") }
             },
@@ -939,7 +944,7 @@ internal fun OwnerCostingYieldApproveScreen(
                         style = MaterialTheme.typography.labelLarge,
                     )
                     TextButton(
-                        onClick = {
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                             selectedIds = batches.map { it.productionEventId }.toSet()
                             draftTouched = true
                         },
@@ -964,16 +969,16 @@ internal fun OwnerCostingYieldApproveScreen(
                             val checked = batch.productionEventId in selectedIds
                             Row(
                                 Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
+                                    .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Selection, selected = checked)
+                                    .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction {
                                         selectedIds = if (checked) {
                                             selectedIds - batch.productionEventId
                                         } else {
                                             selectedIds + batch.productionEventId
                                         }
                                         draftTouched = true
-                                    }
-                                    .padding(vertical = 6.dp)
+                                    })
+                                    .nativeListItemContent(NativeListStyle.Selection)
                                     .testTag(NativeUiTags.ownerCostingYieldBatch(batch.productionEventId)),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
@@ -1028,7 +1033,7 @@ internal fun OwnerCostingYieldApproveScreen(
                     )
                 }
                 Button(
-                    onClick = {
+                    onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
                         onSave(
                             YieldPolicyInput(
                                 acceptedProductionEventIds = selectedIds.sorted(),

@@ -1,0 +1,44 @@
+{
+  "tables": [
+    {
+      "name": "public.businesses",
+      "rls_enabled": true,
+      "rows": 1
+    },
+    {
+      "name": "public.shops",
+      "rls_enabled": true,
+      "rows": 1
+    },
+    {
+      "name": "public.roles",
+      "rls_enabled": true,
+      "rows": 5
+    },
+    {
+      "name": "public.staff",
+      "rls_enabled": true,
+      "rows": 3
+    },
+    {
+      "name": "public.staff_shops",
+      "rls_enabled": true,
+      "rows": 2
+    },
+    {
+      "name": "public.audit_log",
+      "rls_enabled": true,
+      "rows": 32
+    },
+    {
+      "name": "public.auth_reconciliation",
+      "rls_enabled": true,
+      "rows": 0
+    },
+    {
+      "name": "public.sync_records",
+      "rls_enabled": true,
+      "rows": 36
+    }
+  ]
+}

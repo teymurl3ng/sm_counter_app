@@ -1,0 +1,16 @@
+{
+  "scenario": "landscape-large-text-navigation",
+  "screen": "collect",
+  "device": "samsung SM-A065F",
+  "packageName": "com.saaf.milkshop.qa.tests",
+  "capturedAt": "2026-10-10T19:24:33.052101Z",
+  "orientation": "landscape",
+  "fontScale": "1.0",
+  "theme": "light",
+  "workflowId": "collect",
+  "evidenceFilename": "landscape-large-text-navigation.png",
+  "reviewStatus": "UNREVIEWED",
+  "note": "150% text; amount and record remain scroll-reachable; four navigation actions visible",
+  "testCompositionFontScale": 1.5,
+  "observation": "Four navigation labels are visible. Record is disabled because fixture amount is blank. Right-side system navigation overlays the Open badge/body edge; deferred for a future inset pass. Original fontScale field reflects system setting, not LocalDensity test override. Owner review remains pending."
+}

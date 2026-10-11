@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeFoundationUiTest" tests="13" failures="0" errors="0" skipped="0" time="51.484" timestamp="2026-10-10T20:07:21" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="operationsRecordSpoilageRecordsPhysicalLoss" classname="com.saaf.milkshop.NativeFoundationUiTest" time="16.539" />
+  <testcase name="closedBusinessDayExplainsTheBlockAndDisablesRecord" classname="com.saaf.milkshop.NativeSaleHardeningContractTest" time="1.408" />
+  <testcase name="surchargeEditedAmountWinsOverDefault" classname="com.saaf.milkshop.NativeSaleHardeningContractTest" time="3.482" />
+  <testcase name="surchargeTogglePrefillsDefaultAndCarriesIntoRequest" classname="com.saaf.milkshop.NativeSaleHardeningContractTest" time="2.054" />
+  <testcase name="missingProductAndPaymentReferencesExplainWhatTheOwnerMustFix" classname="com.saaf.milkshop.NativeSaleHardeningContractTest" time="1.182" />
+  <testcase name="largeTextDarkThemeKeepsCoreActionsAndTalkBackStateAvailable" classname="com.saaf.milkshop.NativeSaleHardeningContractTest" time="1.538" />
+  <testcase name="longCustomerListScrollsToTheLastAccountAndSelectsIt" classname="com.saaf.milkshop.NativeSaleHardeningContractTest" time="2.585" />
+  <testcase name="loadRetryAndSaveFailureHaveVisibleRecoverableWorkflows" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="3.042" />
+  <testcase name="unavailableAndFailureStatesExplainRecoveryAndPreserveEnteredAmount" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="1.36" />
+  <testcase name="customerSearchSelectionAmountShortcutsAccountAndNoteControlsChangeVisibleState" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="5.093" />
+  <testcase name="overpaymentRequiresExplicitAdvanceConfirmationWithExactConsequences" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="3.55" />
+  <testcase name="successShowsAuthoritativeResultAndBothActionsRespond" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="1.391" />
+  <testcase name="normalPaymentSubmitsExactRequestAndSavingStateBlocksDuplicateTap" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="6.997" />
+</testsuite>

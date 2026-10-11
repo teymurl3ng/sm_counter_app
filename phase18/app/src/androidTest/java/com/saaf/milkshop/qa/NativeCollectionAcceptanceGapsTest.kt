@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertContentDescriptionEquals
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
@@ -19,6 +20,8 @@ import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.printToString
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -130,6 +133,7 @@ class NativeCollectionAcceptanceGapsTest {
 
     @Test
     fun collectDestinationRetentionOnCollectAnother() {
+        var submitted: NativeCollectionRequest? = null
         var state by mutableStateOf<NativeCollectionState>(
             NativeCollectionState.Ready(
                 context(),
@@ -138,7 +142,8 @@ class NativeCollectionAcceptanceGapsTest {
         )
         setScreen(
             stateProvider = { state },
-            onRecord = {
+            onRecord = { request ->
+                submitted = request
                 state = NativeCollectionState.Ready(
                     context = context(),
                     selectedCustomer = NativeCollectionCustomerBalance(customers.first(), 150_000L),
@@ -161,7 +166,13 @@ class NativeCollectionAcceptanceGapsTest {
         composeRule.onNodeWithTag(NativeUiTags.CollectPaymentSelector)
             .assert(hasText("Bank", substring = true))
         composeRule.onNodeWithTag(NativeUiTags.CollectAmountInput).performTextReplacement("1000")
-        composeRule.onNodeWithTag(NativeUiTags.CollectRecord).performScrollTo().assertIsEnabled().performClick()
+        NativeLayoutImeEvidence.dismissImeAndWait(composeRule.activity, composeRule)
+        composeRule.onNodeWithTag(NativeUiTags.CollectRecord)
+            .performScrollTo().assertIsDisplayed().assertIsEnabled().performClick()
+        composeRule.runOnIdle {
+            assertEquals(11L, submitted?.paymentAccountId)
+            assertEquals(100_000L, submitted?.amountPaisa)
+        }
         composeRule.waitUntil(5_000) {
             runCatching {
                 composeRule.onNodeWithTag(NativeUiTags.CollectSuccess).fetchSemanticsNode()
@@ -234,9 +245,9 @@ class NativeCollectionAcceptanceGapsTest {
     }
 
     @Test
-    fun collectLargeTextLandscapeSemanticsRemainAvailable() {
+    fun collectLargeTextPortraitSemanticsRemainAvailable() {
         try {
-            composeRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            composeRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             composeRule.waitForIdle()
             composeRule.setContent {
                 val density = LocalDensity.current
@@ -267,7 +278,20 @@ class NativeCollectionAcceptanceGapsTest {
                 .assertIsDisplayed()
                 .assertContentDescriptionEquals("Collection amount")
             composeRule.onNodeWithTag(NativeUiTags.CollectRecord).performScrollTo().assertIsDisplayed()
-            composeRule.onNodeWithTag(NativeUiTags.CashierNavCollect).assertIsDisplayed()
+            for (tag in listOf(NativeUiTags.CashierNavSell, NativeUiTags.CashierNavCollect,
+                NativeUiTags.CashierNavActivity, NativeUiTags.CashierNavMore)) {
+                composeRule.onNodeWithTag(tag).assertIsDisplayed().assertHasClickAction()
+            }
+            NativeEvidenceCapture.captureWholeWindow(composeRule.activity, NativeEvidenceCapture.CaptureSpec(
+                screen = "collect", scenario = "portrait-large-text-navigation", workflowId = "collect", orientation = "portrait", fontScale = "1.5",
+                note = "150% text; amount and record remain scroll-reachable; four navigation actions visible",
+            ))
+        } catch (failure: Throwable) {
+            println("Portrait failure: " + composeRule.onRoot(useUnmergedTree = true).printToString())
+            NativeEvidenceCapture.captureWholeWindow(composeRule.activity, NativeEvidenceCapture.CaptureSpec(
+                screen = "collect", scenario = "portrait-large-text-diagnostic", workflowId = "collect", orientation = "portrait",
+            ))
+            throw failure
         } finally {
             composeRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             composeRule.waitForIdle()

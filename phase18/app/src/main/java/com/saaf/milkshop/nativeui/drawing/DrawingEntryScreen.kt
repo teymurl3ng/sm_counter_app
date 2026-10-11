@@ -1,6 +1,6 @@
 package com.saaf.milkshop.nativeui.drawing
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -185,6 +185,11 @@ private fun DrawingEntryContent(
             businessDate = state.context.businessDate,
             postingOpen = state.context.postingOpen,
         )
+        NativeSectionTransition(
+            targetState = state,
+            contentKey = { it.receipt != null },
+            modifier = Modifier.weight(1f),
+        ) { state ->
         if (state.receipt != null) {
             DrawingSuccess(
                 receipt = state.receipt,
@@ -196,12 +201,12 @@ private fun DrawingEntryContent(
                     onRecordAnother()
                 },
                 onBack = onBack,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxSize(),
             )
         } else {
             Column(
                 modifier = Modifier
-                    .weight(1f)
+                    .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp, vertical = 18.dp)
                     .testTag(NativeUiTags.DrawingForm),
@@ -226,7 +231,7 @@ private fun DrawingEntryContent(
                         ),
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Column(Modifier.padding(14.dp)) {
+                        Column(Modifier.padding(16.dp)) {
                             Text(
                                 state.context.paymentAccount.name,
                                 style = MaterialTheme.typography.titleMedium,
@@ -269,7 +274,7 @@ private fun DrawingEntryContent(
                 }
 
                 TextButton(
-                    onClick = {
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                         notesExpanded = !notesExpanded
                         draftTouched = true
                     },
@@ -336,6 +341,7 @@ private fun DrawingEntryContent(
                 Spacer(Modifier.height(4.dp))
             }
         }
+        }
     }
 }
 
@@ -370,6 +376,7 @@ private fun DrawingSuccess(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    com.saaf.milkshop.nativeui.common.NativeReceiptFeedback("drawing", receipt.eventId)
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -397,7 +404,7 @@ private fun DrawingSuccess(
         )
         Spacer(Modifier.height(8.dp))
         Button(
-            onClick = onRecordAnother,
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction(onRecordAnother),
             modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag(NativeUiTags.DrawingAnother),
             colors = ButtonDefaults.buttonColors(
                 containerColor = SaafYellow,
@@ -406,7 +413,7 @@ private fun DrawingSuccess(
         ) {
             Text("Record another", style = MaterialTheme.typography.titleMedium)
         }
-        TextButton(onClick = onBack, modifier = Modifier.testTag(NativeUiTags.DrawingBackToWork)) {
+        TextButton(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onBack), modifier = Modifier.testTag(NativeUiTags.DrawingBackToWork)) {
             Text("Back to Work")
         }
     }
@@ -442,7 +449,7 @@ private fun StatusPanel(
             .semantics { liveRegion = LiveRegionMode.Polite }
             .testTag(tag),
     ) {
-        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.Top) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
             Icon(Icons.Outlined.WarningAmber, contentDescription = null)
             Spacer(Modifier.width(10.dp))
             Column {

@@ -1,0 +1,19 @@
+
+Loading trace: 0.00 MB
+
+Loading trace: 24.12 MB
+[777.538]     common_flags.cc:525 Trace loaded: 24.12 MB in 0.96s (25.0 MB/s)
+[777.539]            query.cc:191 Query execution time: 0 ms
+"pid","name","cmdline"
+22611,"perfetto","perfetto --background-wait --txt -c /data/misc/perfetto-configs/saaf-audit-benchmark.pbtxt -o /data/misc/perfetto-traces/saaf-audit-benchmark.perfetto-trace"
+22613,"perfetto","perfetto --background-wait --txt -c /data/misc/perfetto-configs/saaf-audit-benchmark.pbtxt -o /data/misc/perfetto-traces/saaf-audit-benchmark.perfetto-trace"
+22616,"/system/bin/sh","/system/bin/sh -c am instrument -w -r -e saafSkipBootstrap true -e class com.saaf.milkshop.NativeReleaseProfileProbe#profileRealTimeNativeTransitionFramesAndGuardOwnership com.saaf.milkshop.qa.benchmark.test/com.saaf.milkshop.SaafMilkTestRunner"
+22618,"app_process","app_process /system/bin com.android.commands.am.Am instrument -w -r -e saafSkipBootstrap true -e class com.saaf.milkshop.NativeReleaseProfileProbe#profileRealTimeNativeTransitionFramesAndGuardOwnership com.saaf.milkshop.qa.benchmark.test/com.saaf.milkshop.SaafMilkTestRunner"
+
+"pid","name","upid","layer_name","frames"
+1433,"system_server",630,"TX - Surface(name=7d78382 com.saaf.milkshop.qa.benchmark/androidx.activity.ComponentActivity)/@0xe781ae7 - animation-leash of starting_reveal#391866",3
+1433,"system_server",630,"TX - Surface(name=e8568d4 com.saaf.milkshop.qa.benchmark.test/androidx.test.core.app.InstrumentationActivityInvoker$EmptyActivity)/@0xa791a0f - animation-leash of starting_reveal#391885",3
+1913,"com.android.systemui",634,"TX - Splash Screen com.saaf.milkshop.qa.benchmark$_1913#391857",4
+1913,"com.android.systemui",634,"TX - Splash Screen com.saaf.milkshop.qa.benchmark.test$_1913#391871",4
+22647,"zygote64",783,"TX - com.saaf.milkshop.qa.benchmark/androidx.activity.ComponentActivity$_22647#391861",515
+22737,"<pre-initialized>",787,"TX - com.saaf.milkshop.qa.benchmark.test/androidx.test.core.app.InstrumentationActivityInvoker$EmptyActivity$_22737#391878",1

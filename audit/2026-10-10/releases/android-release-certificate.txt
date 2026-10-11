@@ -1,0 +1,4 @@
+Signer #1 certificate DN: CN=Saaf Milk, OU=Saaf, O=Saaf Milk, L=Baku, C=AZ
+Signer #1 certificate SHA-256 digest: 9c9e03d7969d79018e2880b79b8d9ec46c43ab50eaf30512ee3fb989bc6abfa1
+Signer #1 certificate SHA-1 digest: 4ef628333d8bdf29e8d406f5f6726c1290f31413
+Signer #1 certificate MD5 digest: bd3b18ee5f244308c1388dff009cbdbf

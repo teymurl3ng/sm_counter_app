@@ -1,0 +1,40 @@
+{
+  "audit\\2026-10-11\\finish\\known-reentry-route.mp4": {
+    "bytes": 17195940,
+    "parsedBytes": 17195940,
+    "atoms": [
+      {
+        "kind": "ftyp",
+        "size": 24
+      },
+      {
+        "kind": "mdat",
+        "size": 17167819
+      },
+      {
+        "kind": "moov",
+        "size": 28097
+      }
+    ],
+    "hasMoov": true
+  },
+  "audit\\2026-10-11\\finish\\preflight-evidence\\checkpoint-current\\native-ux-a06\\preflight-motion.mp4": {
+    "bytes": 15968677,
+    "parsedBytes": 15968677,
+    "atoms": [
+      {
+        "kind": "ftyp",
+        "size": 24
+      },
+      {
+        "kind": "mdat",
+        "size": 15941588
+      },
+      {
+        "kind": "moov",
+        "size": 27065
+      }
+    ],
+    "hasMoov": true
+  }
+}

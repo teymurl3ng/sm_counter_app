@@ -1,6 +1,10 @@
 package com.saaf.milkshop.nativeui.owner
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.nativeListItem
+
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,6 +33,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -70,8 +75,153 @@ import java.util.Locale
  * Owner Shop settings — read panel + identity/rates/category/opening write depth under OwnerScaffold.
  * Nested from Owner More; never mounts foreign role chrome.
  */
+private data class OwnerShopSettingsScreenSnapshot(
+    val identity: NativeSignedInIdentity,
+    val context: NativeOwnerMoreContext,
+    val snapshot: NativeOwnerShopSettingsSnapshot?,
+    val loading: Boolean,
+    val error: String?,
+    val identityEditOpen: Boolean,
+    val identitySaving: Boolean,
+    val ratesEditOpen: Boolean,
+    val ratesSaving: Boolean,
+    val categoryCreateOpen: Boolean,
+    val categoryCreating: Boolean,
+    val categoryDetail: NativeOwnerExpenseCategoryRow?,
+    val categoryArchiving: Boolean,
+    val openingEditOpen: Boolean,
+    val openingCorrection: Boolean,
+    val openingSaving: Boolean,
+    val openingReauthOpen: Boolean,
+    val openingReauthBusy: Boolean,
+    val showHeader: Boolean,
+)
+
 @Composable
 fun OwnerShopSettingsScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    context: NativeOwnerMoreContext,
+    snapshot: NativeOwnerShopSettingsSnapshot?,
+    loading: Boolean,
+    error: String?,
+    identityEditOpen: Boolean,
+    identitySaving: Boolean,
+    ratesEditOpen: Boolean,
+    ratesSaving: Boolean,
+    categoryCreateOpen: Boolean,
+    categoryCreating: Boolean,
+    categoryDetail: NativeOwnerExpenseCategoryRow?,
+    categoryArchiving: Boolean,
+    openingEditOpen: Boolean = false,
+    openingCorrection: Boolean = false,
+    openingSaving: Boolean = false,
+    openingReauthOpen: Boolean = false,
+    openingReauthBusy: Boolean = false,
+    onBackToMenu: () -> Unit,
+    onRetry: () -> Unit,
+    onOpenIdentityEdit: () -> Unit,
+    onBackFromIdentityEdit: () -> Unit,
+    onSaveIdentity: (StoreIdentityInput) -> Unit,
+    onOpenRatesEdit: () -> Unit,
+    onBackFromRatesEdit: () -> Unit,
+    onUpdateRates: (BusinessSettings) -> Unit,
+    onOpenCategoryCreate: () -> Unit,
+    onBackFromCategoryCreate: () -> Unit,
+    onCreateCategory: (String) -> Unit,
+    onOpenCategory: (Long) -> Unit,
+    onBackFromCategoryDetail: () -> Unit,
+    onSetCategoryArchived: (Boolean) -> Unit,
+    onOpenOpeningEdit: (correction: Boolean) -> Unit = {},
+    onBackFromOpeningEdit: () -> Unit = {},
+    onSaveOpening: (OpeningStateInput) -> Unit = {},
+    onSubmitOpeningReauth: (CharArray) -> Unit = {},
+    onCancelOpeningReauth: () -> Unit = {},
+    hostedScaffold: HostedScaffold,
+    showHeader: Boolean = true,
+    modifier: Modifier = Modifier,
+) {
+    val paneSnapshot = OwnerShopSettingsScreenSnapshot(
+        identity = identity,
+        context = context,
+        snapshot = snapshot,
+        loading = loading,
+        error = error,
+        identityEditOpen = identityEditOpen,
+        identitySaving = identitySaving,
+        ratesEditOpen = ratesEditOpen,
+        ratesSaving = ratesSaving,
+        categoryCreateOpen = categoryCreateOpen,
+        categoryCreating = categoryCreating,
+        categoryDetail = categoryDetail,
+        categoryArchiving = categoryArchiving,
+        openingEditOpen = openingEditOpen,
+        openingCorrection = openingCorrection,
+        openingSaving = openingSaving,
+        openingReauthOpen = openingReauthOpen,
+        openingReauthBusy = openingReauthBusy,
+        showHeader = showHeader,
+    )
+    com.saaf.milkshop.nativeui.common.NativeSectionTransition(
+        targetState = paneSnapshot,
+        contentKey = { pane -> when {
+            pane.openingEditOpen -> "opening"
+            pane.identityEditOpen -> "identity"
+            pane.ratesEditOpen -> "rates"
+            pane.categoryCreateOpen -> "create-category"
+            pane.categoryDetail != null -> "category-detail"
+            else -> "home"
+        } },
+        modifier = modifier,
+    ) { pane ->
+        OwnerShopSettingsScreenPane(
+            snackbarHostState = snackbarHostState,
+            identity = pane.identity,
+            context = pane.context,
+            snapshot = pane.snapshot,
+            loading = pane.loading,
+            error = pane.error,
+            identityEditOpen = pane.identityEditOpen,
+            identitySaving = pane.identitySaving,
+            ratesEditOpen = pane.ratesEditOpen,
+            ratesSaving = pane.ratesSaving,
+            categoryCreateOpen = pane.categoryCreateOpen,
+            categoryCreating = pane.categoryCreating,
+            categoryDetail = pane.categoryDetail,
+            categoryArchiving = pane.categoryArchiving,
+            openingEditOpen = pane.openingEditOpen,
+            openingCorrection = pane.openingCorrection,
+            openingSaving = pane.openingSaving,
+            openingReauthOpen = pane.openingReauthOpen,
+            openingReauthBusy = pane.openingReauthBusy,
+            onBackToMenu = onBackToMenu,
+            onRetry = onRetry,
+            onOpenIdentityEdit = onOpenIdentityEdit,
+            onBackFromIdentityEdit = onBackFromIdentityEdit,
+            onSaveIdentity = onSaveIdentity,
+            onOpenRatesEdit = onOpenRatesEdit,
+            onBackFromRatesEdit = onBackFromRatesEdit,
+            onUpdateRates = onUpdateRates,
+            onOpenCategoryCreate = onOpenCategoryCreate,
+            onBackFromCategoryCreate = onBackFromCategoryCreate,
+            onCreateCategory = onCreateCategory,
+            onOpenCategory = onOpenCategory,
+            onBackFromCategoryDetail = onBackFromCategoryDetail,
+            onSetCategoryArchived = onSetCategoryArchived,
+            onOpenOpeningEdit = onOpenOpeningEdit,
+            onBackFromOpeningEdit = onBackFromOpeningEdit,
+            onSaveOpening = onSaveOpening,
+            onSubmitOpeningReauth = onSubmitOpeningReauth,
+            onCancelOpeningReauth = onCancelOpeningReauth,
+            hostedScaffold = hostedScaffold,
+            showHeader = pane.showHeader,
+            modifier = modifier,
+        )
+    }
+}
+
+@Composable
+private fun OwnerShopSettingsScreenPane(
     snackbarHostState: SnackbarHostState,
     identity: NativeSignedInIdentity,
     context: NativeOwnerMoreContext,
@@ -248,7 +398,7 @@ fun OwnerShopSettingsScreen(
                         )
                         Spacer(Modifier.height(16.dp))
                         Button(
-                            onClick = onRetry,
+                            onClick = hapticAction(onRetry),
                             modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsRetry),
                         ) { Text("Try again") }
                     }
@@ -284,7 +434,7 @@ fun OwnerShopSettingsScreen(
                                     modifier = Modifier.weight(1f),
                                 )
                                 TextButton(
-                                    onClick = onOpenIdentityEdit,
+                                    onClick = hapticAction(onOpenIdentityEdit),
                                     modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsEditIdentity),
                                 ) { Text("Edit identity") }
                             }
@@ -304,7 +454,7 @@ fun OwnerShopSettingsScreen(
                                     modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsRatesSection),
                                 )
                                 TextButton(
-                                    onClick = onOpenRatesEdit,
+                                    onClick = hapticAction(onOpenRatesEdit),
                                     modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsEditRates),
                                 ) { Text("Edit rates") }
                             }
@@ -349,7 +499,7 @@ fun OwnerShopSettingsScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                     Button(
-                                        onClick = { onOpenOpeningEdit(true) },
+                                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenOpeningEdit(true) },
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .testTag(NativeUiTags.OwnerShopSettingsOpeningCorrect),
@@ -362,7 +512,7 @@ fun OwnerShopSettingsScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                     Button(
-                                        onClick = { onOpenOpeningEdit(false) },
+                                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenOpeningEdit(false) },
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .testTag(NativeUiTags.OwnerShopSettingsOpeningRecord),
@@ -390,7 +540,7 @@ fun OwnerShopSettingsScreen(
                                     modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsCategoriesSection),
                                 )
                                 TextButton(
-                                    onClick = onOpenCategoryCreate,
+                                    onClick = hapticAction(onOpenCategoryCreate),
                                     modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsAddCategory),
                                 ) { Text("Add category") }
                             }
@@ -404,11 +554,11 @@ fun OwnerShopSettingsScreen(
                                 snapshot.expenseCategories.forEach { category ->
                                     Row(
                                         Modifier
-                                            .fillMaxWidth()
+                                            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Record)
                                             .semantics { role = Role.Button }
-                                            .clickable { onOpenCategory(category.accountId) }
+                                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenCategory(category.accountId) })
                                             .testTag(NativeUiTags.ownerShopExpenseCategory(category.accountId))
-                                            .padding(vertical = 8.dp),
+                                            .nativeListItemContent(NativeListStyle.Record),
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
@@ -556,8 +706,8 @@ private fun OwnerShopSettingsIdentityEditScreen(
                         )
                     }
                     Button(
-                        onClick = {
-                            if (!canSave) return@Button
+                        onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
+                            if (!canSave) return@hapticCommitAction
                             onSave(
                                 StoreIdentityInput(
                                     storeName = storeName,
@@ -578,7 +728,7 @@ private fun OwnerShopSettingsIdentityEditScreen(
                         }
                     }
                     TextButton(
-                        onClick = { requestLeave(onBack) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { requestLeave(onBack) },
                         enabled = !saving,
                         modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsIdentityCancel),
                     ) { Text("Cancel") }
@@ -738,8 +888,8 @@ private fun OwnerShopSettingsRatesEditScreen(
                         )
                     }
                     Button(
-                        onClick = {
-                            if (!canSave) return@Button
+                        onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
+                            if (!canSave) return@hapticCommitAction
                             onSave(
                                 BusinessSettings(
                                     milkRateVendor = milk!!,
@@ -763,7 +913,7 @@ private fun OwnerShopSettingsRatesEditScreen(
                         }
                     }
                     TextButton(
-                        onClick = { requestLeave(onBack) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { requestLeave(onBack) },
                         enabled = !saving,
                         modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsRatesCancel),
                     ) { Text("Cancel") }
@@ -864,8 +1014,8 @@ private fun OwnerShopSettingsCategoryCreateScreen(
                         )
                     }
                     Button(
-                        onClick = {
-                            if (!canSave) return@Button
+                        onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
+                            if (!canSave) return@hapticCommitAction
                             onSave(name)
                         },
                         enabled = canSave,
@@ -880,7 +1030,7 @@ private fun OwnerShopSettingsCategoryCreateScreen(
                         }
                     }
                     TextButton(
-                        onClick = { requestLeave(onBack) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { requestLeave(onBack) },
                         enabled = !saving,
                         modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsCategoryCreateCancel),
                     ) { Text("Cancel") }
@@ -960,7 +1110,7 @@ private fun OwnerShopSettingsCategoryDetailScreen(
                 }
                 if (category.active) {
                     Button(
-                        onClick = { archiveConfirmOpen = true },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { archiveConfirmOpen = true },
                         enabled = !busy,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -974,7 +1124,7 @@ private fun OwnerShopSettingsCategoryDetailScreen(
                     }
                 } else {
                     Button(
-                        onClick = { unarchiveConfirmOpen = true },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { unarchiveConfirmOpen = true },
                         enabled = !busy,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -1000,7 +1150,7 @@ private fun OwnerShopSettingsCategoryDetailScreen(
             text = { Text("${category.name} will be marked inactive.") },
             confirmButton = {
                 TextButton(
-                    onClick = {
+                    onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction {
                         archiveConfirmOpen = false
                         onSetArchived(true)
                     },
@@ -1010,7 +1160,7 @@ private fun OwnerShopSettingsCategoryDetailScreen(
             },
             dismissButton = {
                 TextButton(
-                    onClick = { archiveConfirmOpen = false },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { archiveConfirmOpen = false },
                     enabled = !busy,
                     modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsCategoryArchiveCancel),
                 ) { Text("Cancel") }
@@ -1026,7 +1176,7 @@ private fun OwnerShopSettingsCategoryDetailScreen(
             text = { Text("${category.name} will be marked active again.") },
             confirmButton = {
                 TextButton(
-                    onClick = {
+                    onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction {
                         unarchiveConfirmOpen = false
                         onSetArchived(false)
                     },
@@ -1036,7 +1186,7 @@ private fun OwnerShopSettingsCategoryDetailScreen(
             },
             dismissButton = {
                 TextButton(
-                    onClick = { unarchiveConfirmOpen = false },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { unarchiveConfirmOpen = false },
                     enabled = !busy,
                     modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsCategoryUnarchiveCancel),
                 ) { Text("Cancel") }
@@ -1093,13 +1243,13 @@ private fun OwnerShopSettingsDiscardDialog(
         text = { Text(body) },
         confirmButton = {
             TextButton(
-                onClick = leaveGuard::confirmDiscard,
+                onClick = hapticAction(leaveGuard::confirmDiscard),
                 modifier = Modifier.testTag(discardTag),
             ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(
-                onClick = leaveGuard::keepEditing,
+                onClick = hapticAction(leaveGuard::keepEditing),
                 modifier = Modifier.testTag(keepTag),
             ) { Text("Keep editing") }
         },
@@ -1126,7 +1276,7 @@ private fun OpeningFormScreen(
     val products = snapshot.openingProducts
     val accounts = snapshot.openingAccounts
     var openingDate by rememberSaveable {
-        mutableStateOf(snapshot.openingDate ?: LocalDate.now().toString())
+        mutableStateOf(snapshot.openingDate ?: com.saaf.milkshop.sync.BusinessClock.today().toString())
     }
     var notes by rememberSaveable { mutableStateOf(snapshot.openingNotes.orEmpty()) }
     var confirmed by rememberSaveable { mutableStateOf(false) }
@@ -1373,8 +1523,8 @@ private fun OpeningFormScreen(
                         )
                     }
                     Button(
-                        onClick = {
-                            val input = buildInputOrNull() ?: return@Button
+                        onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
+                            val input = buildInputOrNull() ?: return@hapticCommitAction
                             onSave(input)
                         },
                         enabled = !saving,
@@ -1389,7 +1539,7 @@ private fun OpeningFormScreen(
                         }
                     }
                     TextButton(
-                        onClick = { requestLeave(onBack) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { requestLeave(onBack) },
                         enabled = !saving,
                         modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsOpeningCancel),
                     ) { Text("Cancel") }
@@ -1442,7 +1592,7 @@ private fun OpeningReauthScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 TextButton(
-                    onClick = onCancel,
+                    onClick = hapticAction(onCancel),
                     modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsOpeningReauthCancel),
                 ) { Text("Cancel") }
                 error?.let {
@@ -1468,7 +1618,7 @@ private fun OpeningReauthScreen(
                         .testTag(NativeUiTags.OwnerShopSettingsOpeningReauthPassphrase),
                 )
                 Button(
-                    onClick = {
+                    onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
                         val chars = passphrase.toCharArray()
                         passphrase = ""
                         onConfirm(chars)

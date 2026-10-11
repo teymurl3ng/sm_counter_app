@@ -1,0 +1,160 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeSaleScreenContractTest" tests="104" failures="3" errors="0" skipped="0" time="192.884" timestamp="2026-10-10T07:05:51" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="saleFollowUpCreatesBornLinkedDelivery" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="4.339" />
+  <testcase name="saleFollowUpClearsAfterSent" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="1.102" />
+  <testcase name="saleWholesaleRateAndNoteStayEditable" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="4.67" />
+  <testcase name="saleChequeNextReturnsToForm" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="1.358" />
+  <testcase name="salePaymentPickerCancelsAndChangesDestination" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="1.972" />
+  <testcase name="saleFollowUpOffersDeliveryForCreditSale" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="1.13" />
+  <testcase name="saleLoadFailureRetryChangesToVisibleLoadingState" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="1.063" />
+  <testcase name="saleDiscardClearsRealFormBeforeLeaving" classname="com.saaf.milkshop.NativeGuardRegressionTest" time="2.855" />
+  <testcase name="outgoingPaneDisposalCannotClearIncomingGuard" classname="com.saaf.milkshop.NativeGuardRegressionTest" time="0.928" />
+  <testcase name="syncNowPullsAndPushes" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.336" />
+  <testcase name="backupOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.441" />
+  <testcase name="takeServerDropsEntrySoParkApplies" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.261" />
+  <testcase name="unenrollOpensConfirm" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.439" />
+  <testcase name="enrollConnectsPhone" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="2.748" />
+  <testcase name="personalSecurityOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.542" />
+  <testcase name="confirmStopsSyncing" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.357" />
+  <testcase name="shopPickCompletesEnrollment" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.185" />
+  <testcase name="loadingShowsWhileStatusLoads" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.079" />
+  <testcase name="menuShowsJourneyGroupsWithoutCashierChrome" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="2.231" />
+  <testcase name="restoredHoldsListedForReview" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.132" />
+  <testcase name="personalSecurityScreenShowsStatus" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.16" />
+  <testcase name="employeesOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.236" />
+  <testcase name="usersRolesOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.261" />
+  <testcase name="productsOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.177" />
+  <testcase name="refreshReloadsStatus" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.131" />
+  <testcase name="overviewNavFromMoreRequestsNavigation" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.231" />
+  <testcase name="suppliersOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.13" />
+  <testcase name="enrolledShowsServerShopSession" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.158" />
+  <testcase name="keepMineReleasesEntryToPush" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.102" />
+  <testcase name="coldSyncFailureOffersWorkingRetry" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.13" />
+  <testcase name="shopChoicesListedWhenAmbiguous" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.208" />
+  <testcase name="errorShowsFailureReason" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.053" />
+  <testcase name="customersOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.184" />
+  <testcase name="costingPlansOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.213" />
+  <testcase name="syncRowOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.254" />
+  <testcase name="shopSettingsOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.15" />
+  <testcase name="loadFailureOffersRetry" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.029" />
+  <testcase name="noticeShowsResultSummary" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.105" />
+  <testcase name="syncEnvironmentChooserChangesEnrollmentTarget" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.435" />
+  <testcase name="syncScreenShowsStatusOrEnroll" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.108" />
+  <testcase name="securityHistoryOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.204" />
+  <testcase name="syncOwnerChooserUsesTheSelectedLocalOwner" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.129" />
+  <testcase name="presetChipRequestsLastMonth" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="1.077" />
+  <testcase name="customRangePreviewSurfacesNotice" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="1.079" />
+  <testcase name="warmRefreshKeepsReportVisible" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="1.055" />
+  <testcase name="loadFailureOffersRetry" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="1.028" />
+  <testcase name="emptyProductsShowsHonestCopy" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="1.13" />
+  <testcase name="customRangeAppliesInclusiveDates" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="2.208" />
+  <testcase name="contentShowsReportWithoutCashierChrome" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="1.178" />
+  <testcase name="emptyHistoryExplainsAndKeepsRecordsNavSelected" classname="com.saaf.milkshop.NativeOwnerRecordsScreenContractTest" time="1.175" />
+  <testcase name="correctionDiscardCanKeepOrConfirmNavigation" classname="com.saaf.milkshop.NativeOwnerRecordsScreenContractTest" time="1.649" />
+  <testcase name="searchFilterShowsHonestEmptyWhenNoMatches" classname="com.saaf.milkshop.NativeOwnerRecordsScreenContractTest" time="1.054" />
+  <testcase name="balancesAndClosingGroupsSelectRealViews" classname="com.saaf.milkshop.NativeOwnerRecordsScreenContractTest" time="1.179" />
+  <testcase name="readyListOpensDetail" classname="com.saaf.milkshop.NativeOwnerRecordsScreenContractTest" time="1.511" />
+  <testcase name="overviewNavFromRecordsRequestsNavigation" classname="com.saaf.milkshop.NativeOwnerRecordsScreenContractTest" time="1.053" />
+  <testcase name="correctionsGroupSelectsWithoutDeferredNotice" classname="com.saaf.milkshop.NativeOwnerRecordsScreenContractTest" time="1.104" />
+  <testcase name="loadFailureOffersRetry" classname="com.saaf.milkshop.NativeOwnerRecordsScreenContractTest" time="0.974" />
+  <testcase name="correctableDetailOpensEditor" classname="com.saaf.milkshop.NativeOwnerRecordsScreenContractTest" time="1.413" />
+  <testcase name="disconnectConfirmConfirmsDisconnect" classname="com.saaf.milkshop.NativeOwnerBackupScreenContractTest" time="1.231" />
+  <testcase name="disconnectConfirmOffersConfirmAndCancel" classname="com.saaf.milkshop.NativeOwnerBackupScreenContractTest" time="1.079" />
+  <testcase name="exportFormShowsPassphraseControls" classname="com.saaf.milkshop.NativeOwnerBackupScreenContractTest" time="1.104" />
+  <testcase name="restoreOpensRestoreForm" classname="com.saaf.milkshop.NativeOwnerBackupScreenContractTest" time="1.103" />
+  <testcase name="connectDiscardCanKeepOrConfirmNavigation" classname="com.saaf.milkshop.NativeOwnerBackupScreenContractTest" time="2.646">
+    <failure>java.lang.AssertionError: expected:&lt;1&gt; but was:&lt;0&gt;
+at org.junit.Assert.fail(Assert.java:89)
+at org.junit.Assert.failNotEquals(Assert.java:835)
+at org.junit.Assert.assertEquals(Assert.java:120)
+at org.junit.Assert.assertEquals(Assert.java:146)
+at com.saaf.milkshop.NativeOwnerBackupScreenContractTest.connectDiscardCanKeepOrConfirmNavigation(NativeOwnerBackupScreenContractTest.kt:292)
+</failure>
+  </testcase>
+  <testcase name="reauthFormShowsPassphraseControls" classname="com.saaf.milkshop.NativeOwnerBackupScreenContractTest" time="1.135" />
+  <testcase name="restoreFormShowsPickControls" classname="com.saaf.milkshop.NativeOwnerBackupScreenContractTest" time="1.104" />
+  <testcase name="pausedDriveShowsEnable" classname="com.saaf.milkshop.NativeOwnerBackupScreenContractTest" time="1.106" />
+  <testcase name="configuredDriveShowsEnablePauseRunNowDisconnect" classname="com.saaf.milkshop.NativeOwnerBackupScreenContractTest" time="1.562" />
+  <testcase name="restoreInspectionShowsConfirmControls" classname="com.saaf.milkshop.NativeOwnerBackupScreenContractTest" time="1.177" />
+  <testcase name="loadFailureOffersRetry" classname="com.saaf.milkshop.NativeOwnerBackupScreenContractTest" time="1.027" />
+  <testcase name="exportOpensExportForm" classname="com.saaf.milkshop.NativeOwnerBackupScreenContractTest" time="1.129" />
+  <testcase name="connectFormCollectsRecoveryPassphrase" classname="com.saaf.milkshop.NativeOwnerBackupScreenContractTest" time="2.327" />
+  <testcase name="contentShowsStatusWithoutCashierChrome" classname="com.saaf.milkshop.NativeOwnerBackupScreenContractTest" time="1.157" />
+  <testcase name="connectOpensConnectFormWhenAvailable" classname="com.saaf.milkshop.NativeOwnerBackupScreenContractTest" time="1.18" />
+  <testcase name="collectionsEditorShowsFieldsAndSavesTypedInput" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="2.329" />
+  <testcase name="supersededDetailShowsDeferredEditNotice" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="1.054" />
+  <testcase name="yieldApproveFormRequiresThirtyBatches" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="2.178" />
+  <testcase name="openingEmptyStateOpensShopSettings" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="1.075" />
+  <testcase name="policyRowOpensDetail" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="1.024" />
+  <testcase name="detailShowsFactsAndSupersedeForActive" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="1.075" />
+  <testcase name="yieldSectionShowsApproveForm" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="1.051" />
+  <testcase name="plansSectionShowsBudgetsAndOpensEditor" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="1.124" />
+  <testcase name="productionLossAssessmentCapturesAbnormalBatch" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="2.405" />
+  <testcase name="openingSectionShowsCoverageAndOpensProductEditor" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="1.205" />
+  <testcase name="listShowsPoliciesWithoutCashierChrome" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="1.124" />
+  <testcase name="costingSectionsRemainReachableAtLargeFontScale" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="1.206" />
+  <testcase name="openingEditorRequiresEstimateEvidenceAndSavesCorrection" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="2.913" />
+  <testcase name="approveOpensFormAndSavesTypedInput" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="2.561" />
+  <testcase name="loadFailureOffersRetry" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="1.076" />
+  <testcase name="openingDiscardCanKeepOrConfirmNavigation" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="1.55">
+    <failure>java.lang.AssertionError: Failed to perform IME action.
+Failed to assert the following: (NOT (ImeAction = 'Default'))
+Semantics of the node:
+Node #10410 at (l=30.0, t=603.0, r=690.0, b=762.0)px, Tag: 'owner_costing_opening_total'
+ContentDataType = 'AndroidContentDataType(androidAutofillType=1)'
+EditableText = '250'
+FillableData = 'androidx.compose.ui.autofill.AndroidFillableData&#64;c0491d5'
+Focused = 'true'
+ImeAction = 'Default'
+InputText = '250'
+IsEditable = 'true'
+Text = '[Total opening cost (PKR), Enter the total cost for this opening quantity.]'
+TextSelectionRange = 'TextRange(3, 3)'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, InsertTextAtCursor, MagnifierPositionInRoot, OnClick, OnFillData, OnLongClick, PasteText, PerformImeAction, RequestFocus, SetSelection, SetText, SetTextSubstitution, ShowTextSubstitution]
+MergeDescendants = 'true'
+Has 8 siblings
+Selector used: (TestTag = 'owner_costing_opening_total')
+
+at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:264)
+at androidx.compose.ui.test.TextActionsKt.performImeAction(TextActions.kt:100)
+at com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest.openingDiscardCanKeepOrConfirmNavigation(NativeOwnerCostingPlansScreenContractTest.kt:483)
+</failure>
+  </testcase>
+  <testcase name="reauthDialogIsShownWhenRequired" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="1.717" />
+  <testcase name="emptyStateIsHonest" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="1.025" />
+  <testcase name="budgetEditorShowsFieldsAndSavesTypedInput" classname="com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest" time="2.667" />
+  <testcase name="loadRetryAndSaveFailureHaveVisibleRecoverableWorkflows" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="2.361" />
+  <testcase name="unavailableAndFailureStatesExplainRecoveryAndPreserveEnteredAmount" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="1.231" />
+  <testcase name="customerSearchSelectionAmountShortcutsAccountAndNoteControlsChangeVisibleState" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="3.471" />
+  <testcase name="overpaymentRequiresExplicitAdvanceConfirmationWithExactConsequences" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="2.2" />
+  <testcase name="successShowsAuthoritativeResultAndBothActionsRespond" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="1.183" />
+  <testcase name="normalPaymentSubmitsExactRequestAndSavingStateBlocksDuplicateTap" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="2.87" />
+  <testcase name="closedDrawingCannotSubmit" classname="com.saaf.milkshop.NativeDrawingScreenContractTest" time="1.028" />
+  <testcase name="drawingAmountAndNoteSubmitExactlyOnce" classname="com.saaf.milkshop.NativeDrawingScreenContractTest" time="3.527" />
+  <testcase name="drawingSuccessOffersAnotherAndBack" classname="com.saaf.milkshop.NativeDrawingScreenContractTest" time="1.0" />
+  <testcase name="drawingErrorRemainsRecoverable" classname="com.saaf.milkshop.NativeDrawingScreenContractTest" time="0.922" />
+  <testcase name="profileReceiptAndReportReadsWithTenThousandCollectionEvents" classname="com.saaf.milkshop.NativeDeviceProfileProbe" time="23.873">
+    <failure>java.lang.AssertionError: expected: java.lang.Long&lt;10001&gt; but was: java.lang.Integer&lt;10001&gt;
+at org.junit.Assert.fail(Assert.java:89)
+at org.junit.Assert.failNotEquals(Assert.java:835)
+at org.junit.Assert.assertEquals(Assert.java:120)
+at org.junit.Assert.assertEquals(Assert.java:146)
+at com.saaf.milkshop.NativeDeviceProfileProbe$profileReceiptAndReportReadsWithTenThousandCollectionEvents$1.invokeSuspend(NativeDeviceProfileProbe.kt:75)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at com.saaf.milkshop.NativeDeviceProfileProbe.profileReceiptAndReportReadsWithTenThousandCollectionEvents(NativeDeviceProfileProbe.kt:57)
+</failure>
+  </testcase>
+  <testcase name="profileRealTimeNativeTransitionFramesAndGuardOwnership" classname="com.saaf.milkshop.NativeDeviceProfileProbe" time="15.302" />
+</testsuite>

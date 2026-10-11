@@ -19,7 +19,7 @@ class BudgetDataRepository(
     private val budgetService = BudgetManagementService(database)
     private val analyticsService = AnalyticsService(database)
 
-    fun currentWeekStart(today: LocalDate = LocalDate.now()): LocalDate =
+    fun currentWeekStart(today: LocalDate = com.saaf.milkshop.sync.BusinessClock.today()): LocalDate =
         budgetService.currentWeekStart(today)
 
     suspend fun createOrRevise(input: BudgetPlanInput): BudgetPlanResult =

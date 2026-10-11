@@ -1,0 +1,25 @@
+
+com.saaf.milkshop.NativeOwnerBootstrapUiTest:
+Error in firstRunCreatesOwnerShowsRecoveryCodeAndEntersCashier(com.saaf.milkshop.NativeOwnerBootstrapUiTest):
+java.lang.AssertionError: Failed to perform checkIsDisplayed check: Expected at most 1 node but found 2 nodes that satisfy (Text + InputText + EditableText contains 'Create Owner' (ignoreCase: false))
+	at androidx.compose.ui.test.AndroidAssertions_androidKt.checkIsDisplayed(AndroidAssertions.android.kt:35)
+	at androidx.compose.ui.test.AssertionsKt.isDisplayed(Assertions.kt:351)
+	at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:33)
+	at com.saaf.milkshop.NativeOwnerBootstrapUiTest.waitForText(NativeOwnerBootstrapUiTest.kt:90)
+	at com.saaf.milkshop.NativeOwnerBootstrapUiTest.firstRunCreatesOwnerShowsRecoveryCodeAndEntersCashier(NativeOwnerBootstrapUiTest.kt:28)
+
+
+Time: 4.404
+There was 1 failure:
+1) firstRunCreatesOwnerShowsRecoveryCodeAndEntersCashier(com.saaf.milkshop.NativeOwnerBootstrapUiTest)
+java.lang.AssertionError: Failed to perform checkIsDisplayed check: Expected at most 1 node but found 2 nodes that satisfy (Text + InputText + EditableText contains 'Create Owner' (ignoreCase: false))
+	at androidx.compose.ui.test.AndroidAssertions_androidKt.checkIsDisplayed(AndroidAssertions.android.kt:35)
+	at androidx.compose.ui.test.AssertionsKt.isDisplayed(Assertions.kt:351)
+	at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:33)
+	at com.saaf.milkshop.NativeOwnerBootstrapUiTest.waitForText(NativeOwnerBootstrapUiTest.kt:90)
+	at com.saaf.milkshop.NativeOwnerBootstrapUiTest.firstRunCreatesOwnerShowsRecoveryCodeAndEntersCashier(NativeOwnerBootstrapUiTest.kt:28)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+

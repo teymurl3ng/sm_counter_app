@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" tests="47" failures="7" errors="0" skipped="0" time="41.831" timestamp="2026-10-10T00:16:37" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-S921W - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="presetChipRequestsLastMonth" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="1.148" />
+  <testcase name="customRangePreviewSurfacesNotice" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="1.232" />
+  <testcase name="warmRefreshKeepsReportVisible" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="0.693" />
+  <testcase name="loadFailureOffersRetry" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="0.696" />
+  <testcase name="emptyProductsShowsHonestCopy" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="0.752" />
+  <testcase name="customRangeAppliesInclusiveDates" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="1.465" />
+  <testcase name="contentShowsReportWithoutCashierChrome" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="0.781" />
+  <testcase name="loadRetryAndSaveFailureHaveVisibleRecoverableWorkflows" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="1.348">
+    <failure>java.lang.AssertionError: Assert failed: The component with TestTag = 'collect_error' is not displayed!
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+at com.saaf.milkshop.NativeCollectionScreenContractTest.loadRetryAndSaveFailureHaveVisibleRecoverableWorkflows(NativeCollectionScreenContractTest.kt:255)
+</failure>
+  </testcase>
+  <testcase name="unavailableAndFailureStatesExplainRecoveryAndPreserveEnteredAmount" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="0.746" />
+  <testcase name="customerSearchSelectionAmountShortcutsAccountAndNoteControlsChangeVisibleState" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="2.655" />
+  <testcase name="overpaymentRequiresExplicitAdvanceConfirmationWithExactConsequences" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="1.141">
+    <failure>java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'Ahmed Store will have PKR 150.00 advance' (ignoreCase: false) is not displayed!
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+at com.saaf.milkshop.NativeCollectionScreenContractTest.overpaymentRequiresExplicitAdvanceConfirmationWithExactConsequences(NativeCollectionScreenContractTest.kt:148)
+</failure>
+  </testcase>
+  <testcase name="successShowsAuthoritativeResultAndBothActionsRespond" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="0.809" />
+  <testcase name="normalPaymentSubmitsExactRequestAndSavingStateBlocksDuplicateTap" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="2.153" />
+  <testcase name="syncNowPullsAndPushes" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.674" />
+  <testcase name="backupOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.72" />
+  <testcase name="takeServerDropsEntrySoParkApplies" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.645" />
+  <testcase name="unenrollOpensConfirm" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.801" />
+  <testcase name="enrollConnectsPhone" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.692" />
+  <testcase name="personalSecurityOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.719" />
+  <testcase name="confirmStopsSyncing" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.744" />
+  <testcase name="shopPickCompletesEnrollment" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.679" />
+  <testcase name="loadingShowsWhileStatusLoads" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.621" />
+  <testcase name="menuShowsJourneyGroupsWithoutCashierChrome" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.133" />
+  <testcase name="restoredHoldsListedForReview" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.621" />
+  <testcase name="personalSecurityScreenShowsStatus" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="1.184" />
+  <testcase name="employeesOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.669" />
+  <testcase name="usersRolesOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.675" />
+  <testcase name="productsOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.672" />
+  <testcase name="refreshReloadsStatus" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.644" />
+  <testcase name="overviewNavFromMoreRequestsNavigation" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.645" />
+  <testcase name="suppliersOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.669" />
+  <testcase name="enrolledShowsServerShopSession" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.643" />
+  <testcase name="keepMineReleasesEntryToPush" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.676" />
+  <testcase name="shopChoicesListedWhenAmbiguous" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.681">
+    <failure>java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'Shop B' (ignoreCase: false) is not displayed!
+at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+at com.saaf.milkshop.NativeOwnerMoreScreenContractTest.shopChoicesListedWhenAmbiguous(NativeOwnerMoreScreenContractTest.kt:669)
+</failure>
+  </testcase>
+  <testcase name="errorShowsFailureReason" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.655">
+    <failure>java.lang.AssertionError: Action performScrollTo() failed.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'owner_sync_error')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+at com.saaf.milkshop.NativeOwnerMoreScreenContractTest.errorShowsFailureReason(NativeOwnerMoreScreenContractTest.kt:703)
+</failure>
+  </testcase>
+  <testcase name="customersOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.679" />
+  <testcase name="costingPlansOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.65" />
+  <testcase name="syncRowOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.7" />
+  <testcase name="shopSettingsOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.716" />
+  <testcase name="loadFailureOffersRetry" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.62" />
+  <testcase name="noticeShowsResultSummary" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.617" />
+  <testcase name="syncScreenShowsStatusOrEnroll" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.651" />
+  <testcase name="securityHistoryOpensFromMenu" classname="com.saaf.milkshop.NativeOwnerMoreScreenContractTest" time="0.7" />
+  <testcase name="saleFollowUpCreatesBornLinkedDelivery" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="0.652">
+    <failure>java.lang.AssertionError: Failed: performScrollToNode(TestTag = 'cashier_sale_delivery_route')
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'cashier_sale_scroll')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.scrollToMatchingDescendantOrReturnScrollable(Actions.kt:277)
+at androidx.compose.ui.test.ActionsKt.performScrollToNode(Actions.kt:236)
+at com.saaf.milkshop.NativeSaleScreenContractTest.saleFollowUpCreatesBornLinkedDelivery(NativeSaleScreenContractTest.kt:131)
+</failure>
+  </testcase>
+  <testcase name="saleFollowUpClearsAfterSent" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="0.608">
+    <failure>java.lang.AssertionError: Failed: performScrollToNode(TestTag = 'cashier_sale_delivery_linked')
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'cashier_sale_scroll')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.scrollToMatchingDescendantOrReturnScrollable(Actions.kt:277)
+at androidx.compose.ui.test.ActionsKt.performScrollToNode(Actions.kt:236)
+at com.saaf.milkshop.NativeSaleScreenContractTest.saleFollowUpClearsAfterSent(NativeSaleScreenContractTest.kt:161)
+</failure>
+  </testcase>
+  <testcase name="saleFollowUpOffersDeliveryForCreditSale" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="0.659">
+    <failure>java.lang.AssertionError: Failed: performScrollToNode(TestTag = 'cashier_sale_delivery_card')
+Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'cashier_sale_scroll')
+
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+at androidx.compose.ui.test.ActionsKt.scrollToMatchingDescendantOrReturnScrollable(Actions.kt:277)
+at androidx.compose.ui.test.ActionsKt.performScrollToNode(Actions.kt:236)
+at com.saaf.milkshop.NativeSaleScreenContractTest.saleFollowUpOffersDeliveryForCreditSale(NativeSaleScreenContractTest.kt:95)
+</failure>
+  </testcase>
+  <testcase name="saleLoadFailureRetryChangesToVisibleLoadingState" classname="com.saaf.milkshop.NativeSaleScreenContractTest" time="0.646" />
+</testsuite>

@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" tests="2" failures="1" errors="0" skipped="0" time="13.46" timestamp="2026-10-09T18:47:17" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-S921W - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="customRangePreviewSurfacesNotice" classname="com.saaf.milkshop.NativeOwnerReportsScreenContractTest" time="1.98" />
+  <testcase name="overpaymentRequiresExplicitAdvanceConfirmationWithExactConsequences" classname="com.saaf.milkshop.NativeCollectionScreenContractTest" time="10.204">
+    <failure>androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 8000 ms
+at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:809)
+at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:378)
+at com.saaf.milkshop.NativeCollectionScreenContractTest.waitForAdvanceDialog(NativeCollectionScreenContractTest.kt:264)
+at com.saaf.milkshop.NativeCollectionScreenContractTest.overpaymentRequiresExplicitAdvanceConfirmationWithExactConsequences(NativeCollectionScreenContractTest.kt:167)
+</failure>
+  </testcase>
+</testsuite>

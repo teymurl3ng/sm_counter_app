@@ -7,12 +7,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
@@ -91,11 +101,11 @@ class NativeSaleScreenContractTest {
                 )
             }
         }
-        composeRule.onNodeWithTag(NativeUiTags.CashierSaleScroll)
+        composeRule.onNodeWithTag(NativeUiTags.CashierSaleCheque)
             .performScrollToNode(hasTestTag(NativeUiTags.CashierSaleDeliveryCard)).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.CashierSaleScroll)
+        composeRule.onNodeWithTag(NativeUiTags.CashierSaleCheque)
             .performScrollToNode(hasTestTag(NativeUiTags.CashierSaleDeliverySend))
-        composeRule.onNodeWithTag(NativeUiTags.CashierSaleScroll).performTouchInput {
+        composeRule.onNodeWithTag(NativeUiTags.CashierSaleCheque).performTouchInput {
                 down(center)
                 moveBy(androidx.compose.ui.geometry.Offset(0f, -200f))
                 up()
@@ -127,10 +137,10 @@ class NativeSaleScreenContractTest {
                 )
             }
         }
-        composeRule.onNodeWithTag(NativeUiTags.CashierSaleScroll)
+        composeRule.onNodeWithTag(NativeUiTags.CashierSaleCheque)
             .performScrollToNode(hasTestTag(NativeUiTags.CashierSaleDeliveryRoute))
         composeRule.onNodeWithTag(NativeUiTags.CashierSaleDeliveryRoute).performTextInput("Morning route")
-        composeRule.onNodeWithTag(NativeUiTags.CashierSaleScroll)
+        composeRule.onNodeWithTag(NativeUiTags.CashierSaleCheque)
             .performScrollToNode(hasTestTag(NativeUiTags.CashierSaleDeliverySend))
         composeRule.onNodeWithTag(NativeUiTags.CashierSaleDeliverySend).performClick()
         assertEquals("Morning route", sentRoute)
@@ -157,9 +167,99 @@ class NativeSaleScreenContractTest {
                 )
             }
         }
-        composeRule.onNodeWithTag(NativeUiTags.CashierSaleScroll)
+        composeRule.onNodeWithTag(NativeUiTags.CashierSaleCheque)
             .performScrollToNode(hasTestTag(NativeUiTags.CashierSaleDeliveryLinked)).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.CashierSaleDeliveryCard).assertDoesNotExist()
+    }
+
+    @Test
+    fun salePaymentPickerCancelsAndChangesDestination() {
+        composeRule.setContent {
+            SaafTheme {
+                CashierSaleScreen(remember { SnackbarHostState() }, testIdentity(),
+                    NativeSaleState.Ready(creditContext().copy(paymentAccounts = listOf(NativeSaleAccount(10, "Cash"), NativeSaleAccount(11, "Bank")), defaultPaymentAccountId = 10)),
+                    {}, {}, {}, {}, {}, {})
+            }
+        }
+        composeRule.onNodeWithTag(NativeUiTags.CashierPaymentAccountSelector).performScrollTo().performClick()
+        composeRule.onNodeWithTag(NativeUiTags.CashierPaymentCancel).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.cashierPaymentAccount(11)).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.CashierPaymentAccountSelector).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.cashierPaymentAccount(11)).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.CashierPaymentAccountSelector).assertTextContains("Bank")
+    }
+
+    @Test
+    fun saleWholesaleRateAndNoteStayEditable() {
+        composeRule.setContent {
+            SaafTheme {
+                CashierSaleScreen(remember { SnackbarHostState() }, testIdentity(), NativeSaleState.Ready(creditContext()),
+                    {}, {}, {}, {}, {}, {})
+            }
+        }
+        composeRule.onNodeWithTag(NativeUiTags.CashierSecondaryDetails).performScrollTo().performClick()
+        composeRule.onNodeWithText("Wholesale").performScrollTo().performClick()
+        composeRule.onNodeWithTag(NativeUiTags.CashierWholesaleRate).performScrollTo().performTextReplacement("100.25")
+        composeRule.onNodeWithTag(NativeUiTags.CashierWholesaleRate)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.EditableText, AnnotatedString("100.25")))
+        composeRule.onNodeWithTag(NativeUiTags.CashierSaleNote).performScrollTo().performTextReplacement("Delivery note")
+        composeRule.onNodeWithTag(NativeUiTags.CashierSaleNote)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.EditableText, AnnotatedString("Delivery note")))
+    }
+
+    @Test
+    fun saleChequeNextReturnsToForm() {
+        var next = 0
+        composeRule.setContent {
+            SaafTheme {
+                var state by remember { mutableStateOf<NativeSaleState>(NativeSaleState.Ready(creditContext(), receipt = NativeSaleReceipt(42, 1.0, 12000))) }
+                CashierSaleScreen(remember { SnackbarHostState() }, testIdentity(), state,
+                    {}, {}, {}, {}, { next++; state = NativeSaleState.Ready(creditContext()) }, {})
+            }
+        }
+        composeRule.onNodeWithTag(NativeUiTags.CashierSaleCheque).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.CashierSaleNext).performScrollTo().performClick()
+        assertEquals(1, next)
+        composeRule.onNodeWithTag(NativeUiTags.CashierSaleScroll).assertIsDisplayed()
+    }
+
+    @Test
+    fun catalogPickerHandlesZeroOneTwoThreeTwelveAndFiftyProducts() {
+        var state by mutableStateOf<NativeSaleState>(NativeSaleState.Ready(creditContext().copy(products = emptyList())))
+        var submitted: com.saaf.milkshop.application.sale.NativeSaleRequest? = null
+        composeRule.setContent {
+            SaafTheme {
+                CashierSaleScreen(remember { SnackbarHostState() }, testIdentity(), state,
+                    {}, {}, { submitted = it }, {}, {}, {})
+            }
+        }
+        composeRule.onNodeWithText("No active products", substring = true).assertIsDisplayed()
+        for (count in listOf(1, 2, 3, 12, 50)) {
+            val products = (1..count).map { index -> NativeSaleProduct(
+                index.toLong(), "Product $index", "Kg", index * 10_000L, "12 kg",
+            ) }
+            state = NativeSaleState.Ready(creditContext().copy(products = products,
+                paymentAccounts = listOf(NativeSaleAccount(10L, "Cash", 100_000L)),
+                defaultPaymentAccountId = 10L, defaultPaymentAccountBalancePaisa = 100_000L))
+            if (count > 6) {
+                val previous = submitted!!.productId
+                composeRule.onNodeWithTag(NativeUiTags.CashierProductPickerOpen).performScrollTo().performClick()
+                composeRule.onNodeWithTag(NativeUiTags.CashierProductPickerCancel).performClick()
+                composeRule.onNodeWithTag(NativeUiTags.CashierProductPickerOpen).assertTextContains("Product $previous")
+                composeRule.onNodeWithTag(NativeUiTags.CashierProductPickerOpen).performClick()
+                composeRule.onNodeWithTag(NativeUiTags.CashierProductSearch).performTextReplacement("Product $count")
+                composeRule.onNodeWithTag(NativeUiTags.CashierProductSearch).performImeAction()
+                composeRule.onNodeWithTag(NativeUiTags.cashierProductPick(count.toLong())).performClick()
+                composeRule.onNodeWithTag(NativeUiTags.CashierProductPickerOpen).assertTextContains("Product $count")
+            } else {
+                composeRule.onNodeWithTag(NativeUiTags.cashierProduct("Product $count"))
+                    .performScrollTo().performClick().assertIsSelected()
+            }
+            composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).performScrollTo().performTextReplacement("1")
+            composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).performImeAction()
+            composeRule.onNodeWithTag(NativeUiTags.CashierRecordSale).performScrollTo().performClick()
+            assertEquals(count.toLong(), submitted!!.productId)
+        }
     }
 
     private fun testIdentity() = NativeSignedInIdentity(

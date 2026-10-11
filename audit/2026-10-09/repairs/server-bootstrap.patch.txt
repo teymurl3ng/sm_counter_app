@@ -1,0 +1,301 @@
+*** Begin Patch
+*** Add File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/migration_sync_fresh.sql
++-- Fresh-environment sync schema. Existing deployments require schema parity review.
++-- Derived from anchored C1 RPCs and SYNC_GLOBAL_SEQ_C1_MIGRATION.md; not a live schema dump.
++BEGIN;
++CREATE TABLE public.sync_records (
++  server_seq bigint PRIMARY KEY,
++  business_id uuid NOT NULL REFERENCES public.businesses(id),
++  shop_id uuid NOT NULL REFERENCES public.shops(id),
++  table_name text NOT NULL,
++  row_uid text NOT NULL,
++  payload jsonb NOT NULL CHECK (jsonb_typeof(payload) = 'object'),
++  origin_device text,
++  received_at timestamptz NOT NULL DEFAULT now(),
++  CONSTRAINT sync_records_shop_table_uid UNIQUE (shop_id, table_name, row_uid)
++);
++CREATE INDEX sync_records_shop_seq_idx ON public.sync_records(shop_id, server_seq);
++CREATE SEQUENCE public.sync_records_server_seq_seq AS bigint OWNED BY public.sync_records.server_seq;
++-- SYNC RPC ANCHOR (continued) — helpers.
++
++CREATE OR REPLACE FUNCTION public.sync_staff_shop_ids()
++ RETURNS SETOF uuid
++ LANGUAGE sql
++ STABLE SECURITY DEFINER
++ SET search_path TO 'public'
++AS $function$;
++  select sh.id
++  from public.staff s
++  join public.shops sh on sh.business_id = s.business_id and sh.active
++  where s.auth_user_id = auth.uid()
++    and s.active
++    and s.terminated_at is null
++    and (
++      s.role = 'owner'
++      or exists (
++        select 1 from public.staff_shops ss
++        where ss.staff_id = s.id and ss.shop_id = sh.id
++      )
++    )
++$function$;
++
++CREATE OR REPLACE FUNCTION public.sync_normalize_payload(p jsonb)
++ RETURNS jsonb
++ LANGUAGE sql
++ IMMUTABLE
++ SET search_path TO ''
++AS $function$;
++  select p - 'sync_updated_at' - 'received_at'
++$function$;
++
++CREATE FUNCTION public.sync_records_assign_seq()
++RETURNS trigger LANGUAGE plpgsql SET search_path = '' AS $$
++BEGIN
++  IF TG_OP = 'INSERT' OR public.sync_normalize_payload(NEW.payload)
++       IS DISTINCT FROM public.sync_normalize_payload(OLD.payload) THEN
++    NEW.server_seq := nextval('public.sync_records_server_seq_seq');
++  END IF;
++  RETURN NEW;
++END; $$;
++CREATE TRIGGER sync_records_assign_seq BEFORE INSERT OR UPDATE ON public.sync_records
++FOR EACH ROW EXECUTE FUNCTION public.sync_records_assign_seq();
++ALTER TABLE public.sync_records ENABLE ROW LEVEL SECURITY;
++REVOKE ALL ON public.sync_records FROM PUBLIC, anon, authenticated;
++GRANT SELECT ON public.sync_records TO authenticated;
++GRANT ALL ON public.sync_records TO service_role;
++GRANT USAGE, SELECT ON public.sync_records_server_seq_seq TO service_role;
++CREATE POLICY sync_records_authorized_read ON public.sync_records FOR SELECT TO authenticated
++USING (shop_id IN (SELECT public.sync_staff_shop_ids()));
++-- SYNC RPC ANCHOR — extracted from PROD (saafmilk-prod, tlsuxbghuhlqntkgtrxt) 2026-10-08
++-- via pg_get_functiondef. This file documents the DEPLOYED truth: the sync RPC
++-- layer was previously undocked (existed in no repo). Any change must be applied
++-- to BOTH projects (DEV + PROD) and re-anchored here.
++-- Verified 2026-10-08: sync_push checks staff.active + terminated_at on EVERY call;
++-- sync_pull scopes shops through sync_staff_shop_ids() which applies the same
++-- active/non-terminated filter.
++
++CREATE OR REPLACE FUNCTION public.sync_push(envelopes jsonb, device_id text DEFAULT NULL::text, shop_id uuid DEFAULT NULL::uuid, pull_cursor bigint DEFAULT NULL::bigint)
++ RETURNS jsonb
++ LANGUAGE plpgsql
++ SECURITY DEFINER
++ SET search_path TO ''
++AS $function$
++declare
++  v_staff       record;
++  v_shop        uuid;
++  v_env         jsonb;
++  v_table       text;
++  v_uid         text;
++  v_payload     jsonb;
++  v_parked_seq  bigint;
++  v_existing    public.sync_records%rowtype;
++  v_applied     int := 0;
++  v_conflicts   int := 0;
++begin
++  select s.id, s.business_id, s.role, s.username into v_staff
++    from public.staff s
++   where s.auth_user_id = auth.uid() and s.active and s.terminated_at is null;
++  if not found then
++    return jsonb_build_object('ok', false, 'error', jsonb_build_object(
++      'code', 'not_authorized', 'message', 'No active staff profile'));
++  end if;
++
++  v_shop := shop_id;
++  if v_shop is null or v_shop not in (select public.sync_staff_shop_ids()) then
++    return jsonb_build_object('ok', false, 'error', jsonb_build_object(
++      'code', 'shop_required', 'message',
++      'The request must name a shop this account may write to'));
++  end if;
++
++  if jsonb_typeof(envelopes) <> 'array' or jsonb_array_length(envelopes) > 500 then
++    return jsonb_build_object('ok', false, 'error', jsonb_build_object(
++      'code', 'too_many_envelopes', 'message',
++      'Send between 0 and 500 envelopes per call'));
++  end if;
++
++  -- INVARIANT 1: seq order == commit order per shop
++  perform pg_advisory_xact_lock(hashtextextended(v_shop::text, 0));
++
++  for v_env in select * from jsonb_array_elements(envelopes) loop
++    v_table      := v_env->>'table';
++    v_uid        := v_env->>'uid';
++    v_payload    := v_env->'payload';
++    v_parked_seq := nullif(v_env->>'parked_seq', '')::bigint;
++
++    if v_table is null or v_uid is null
++       or jsonb_typeof(v_payload) <> 'object' then
++      return jsonb_build_object('ok', false, 'error', jsonb_build_object(
++        'code', 'malformed_envelope', 'message',
++        'Every envelope needs table, uid and a payload object'));
++    end if;
++
++    if v_table not in (
++      'events', 'products', 'accounts', 'budget_plans', 'collections_targets',
++      'deliveries', 'attendance_records', 'delivery_status_history',
++      'daily_close_actions', 'physical_cash_counts', 'settings', 'store_profile'
++    ) then
++      return jsonb_build_object('ok', false, 'error', jsonb_build_object(
++        'code', 'unknown_table', 'message', 'Unknown synced table: ' || v_table));
++    end if;
++
++    -- D8 (unchanged): corrections of recorded history from privileged sources only
++    if v_table = 'events'
++       and (v_payload->>'corrects_event_uid') is not null
++       and v_staff.role not in ('owner', 'admin') then
++      return jsonb_build_object('ok', false, 'error', jsonb_build_object(
++        'code', 'correction_privilege_required', 'message',
++        'Correcting recorded history requires an owner or admin account'));
++    end if;
++
++    select * into v_existing from public.sync_records
++     where public.sync_records.shop_id    = v_shop
++       and public.sync_records.table_name = v_table
++       and public.sync_records.row_uid    = v_uid;
++
++    if found then
++      -- INVARIANT 4: append-only tables are insert-only
++      if v_table in ('events', 'delivery_status_history',
++                     'daily_close_actions', 'physical_cash_counts') then
++        if public.sync_normalize_payload(v_existing.payload)
++           is distinct from public.sync_normalize_payload(v_payload) then
++          insert into public.audit_log (action, business_id, performed_by,
++                                        performed_by_username, detail)
++          values ('sync_append_only_refused', v_staff.business_id, v_staff.id,
++                  v_staff.username,
++                  jsonb_build_object('table', v_table, 'uid', v_uid,
++                                     'shop', v_shop, 'device', device_id));
++        end if;
++        continue;  -- insert-only: never update; NOT counted in 'applied' (erratum 4)
++      end if;
++
++      -- master-data role gate
++      if v_table in ('products', 'accounts', 'settings', 'store_profile')
++         and v_staff.role not in ('owner', 'admin') then
++        return jsonb_build_object('ok', false, 'error', jsonb_build_object(
++          'code', 'master_data_privilege_required', 'message',
++          'Updating ' || v_table || ' requires an owner or admin account'));
++      end if;
++
++      -- INVARIANT 7: true-conflict audit, losing payload preserved
++      if public.sync_normalize_payload(v_existing.payload)
++         is distinct from public.sync_normalize_payload(v_payload)
++         and v_existing.origin_device is distinct from device_id
++         and (
++              (pull_cursor is not null and v_existing.server_seq > pull_cursor)
++              or (v_parked_seq is not null
++                  and v_existing.server_seq >= v_parked_seq)
++             ) then
++        insert into public.audit_log (action, business_id, performed_by,
++                                      performed_by_username, detail)
++        values ('sync_conflict', v_staff.business_id, v_staff.id,
++                v_staff.username,
++                jsonb_build_object(
++                  'table', v_table, 'uid', v_uid, 'shop', v_shop,
++                  'loser_payload', v_existing.payload,
++                  'loser_device',  v_existing.origin_device,
++                  'loser_seq',     v_existing.server_seq,
++                  'winner_device', device_id,
++                  'detected_by',   case when v_parked_seq is not null
++                                        then 'parked_seq' else 'pull_cursor' end));
++        v_conflicts := v_conflicts + 1;
++      end if;
++    end if;
++
++    -- INVARIANT 8: unchanged re-push is a complete no-op (WHERE fails -> nothing set)
++    insert into public.sync_records
++      (business_id, shop_id, table_name, row_uid, payload, origin_device)
++    values (
++      (select business_id from public.shops where id = v_shop),
++      v_shop, v_table, v_uid, v_payload, device_id)
++    on conflict on constraint sync_records_shop_table_uid do update
++      set payload       = excluded.payload,
++          origin_device = excluded.origin_device,
++          received_at   = now()
++      where public.sync_normalize_payload(public.sync_records.payload)
++            is distinct from public.sync_normalize_payload(excluded.payload);
++
++    v_applied := v_applied + 1;
++  end loop;
++
++  insert into public.audit_log (action, business_id, performed_by,
++                                performed_by_username, detail)
++  values ('sync_push', v_staff.business_id, v_staff.id, v_staff.username,
++          jsonb_build_object('envelopes', v_applied, 'conflicts', v_conflicts,
++                             'device', device_id, 'shop', v_shop));
++
++  return jsonb_build_object('ok', true, 'applied', v_applied,
++                            'conflicts', v_conflicts,
++                            'server_time_epoch_ms',
++                            (extract(epoch from now()) * 1000)::bigint);
++end
++$function$;
++-- SYNC RPC ANCHOR (continued) — see sync_push.sql header.
++-- Verified: sync_pull scopes shops through sync_staff_shop_ids(), which filters
++-- staff.active + terminated_at is null — a disabled staff row stops pulling too.
++
++CREATE OR REPLACE FUNCTION public.sync_pull(since_seq bigint DEFAULT 0, max_rows integer DEFAULT 200, shop uuid DEFAULT NULL::uuid)
++ RETURNS jsonb
++ LANGUAGE sql
++ STABLE
++ SET search_path TO 'public'
++AS $function$
++  select jsonb_build_object(
++    'ok', true,
++    'server_time_epoch_ms', (extract(epoch from now()) * 1000)::bigint,
++    'records', coalesce((
++      select jsonb_agg(jsonb_build_object(
++        'server_seq', r.server_seq,
++        'shop_id', r.shop_id,
++        'table', r.table_name,
++        'uid', r.row_uid,
++        'payload', r.payload,
++        'origin_device', r.origin_device,
++        'received_at', r.received_at
++      ) order by r.server_seq)
++      from (
++        select sr.* from public.sync_records sr
++        where sr.server_seq > since_seq
++          and (shop is null or sr.shop_id = shop)
++          and sr.shop_id in (select public.sync_staff_shop_ids())
++        order by sr.server_seq
++        limit least(greatest(coalesce(max_rows, 200), 1), 500)
++      ) r
++    ), '[]'::jsonb)
++  )
++$function$;
++REVOKE ALL ON FUNCTION public.sync_staff_shop_ids() FROM PUBLIC, anon;
++REVOKE ALL ON FUNCTION public.sync_push(jsonb,text,uuid,bigint) FROM PUBLIC, anon;
++REVOKE ALL ON FUNCTION public.sync_pull(bigint,integer,uuid) FROM PUBLIC, anon;
++GRANT EXECUTE ON FUNCTION public.sync_staff_shop_ids() TO authenticated, service_role;
++GRANT EXECUTE ON FUNCTION public.sync_push(jsonb,text,uuid,bigint) TO authenticated;
++GRANT EXECUTE ON FUNCTION public.sync_pull(bigint,integer,uuid) TO authenticated;
++COMMIT;
+*** Add File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/bootstrap.sql
++-- psql -v ON_ERROR_STOP=1 -f bootstrap.sql (fresh Supabase environment only)
++-- Supabase supplies auth schema, roles and auth.uid()/auth.role().
++\set ON_ERROR_STOP on
++\ir migration.sql
++\ir migration_c0_admin_read.sql
++\ir migration_c1_admin_write.sql
++\ir migration_c1_1_admin_write_rpcs.sql
++\ir migration_c1_2_admin_auth_db_helpers.sql
++\ir migration_c1_3_hardening.sql
++\ir migration_c1_4_reconciliation.sql
++\ir migration_c1_5_error_semantics.sql
++\ir migration_c1_6_integrity.sql
++\ir migration_sync_fresh.sql
+*** Add File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/BOOTSTRAP_AND_REPAIR.md
++# Local repair and bootstrap status
++
++`bootstrap.sql` orders identity, admin, reconciliation and sync definitions for a **fresh Supabase database**. It fails if sync tables already exist rather than guessing how to migrate live data. The sync DDL is derived from anchored RPC source and the client C1 specification, not a production schema dump.
++
++Existing DEV/PROD: review and apply only `migration_c1_6_integrity.sql` after C1.5. Viewer create verification requires this migration first. Never run fresh bootstrap over an existing deployment. The timestamped C1.6 migration has identical content for Supabase migration users.
++
++The database owner trigger covers CLI/service-role writes as well as Viewer RPCs. Concurrent competing removals serialize by business; mixed lock order with older RPCs can abort one transaction as a deadlock, preserving the owner. Retry a failed transaction after reloading staff state.
++
++Create verification never deletes Auth users. A linked identity resolves automatically; an unlinked ambiguous identity stays pending for owner inspection. Reset its credential after recovering a committed account, because the original response did not disclose the credential.
++
++DR exports paginate REST and Auth independently, record counts and detect duplicate row IDs. Their manifest explicitly identifies sequential, nontransactional consistency. Identity mutations during export still require a maintenance window or transaction-level backup for exact point-in-time recovery.
++
++No migration, workflow or CLI action in these repairs has been run against DEV/PROD. Bootstrap execution and database concurrency need a local PostgreSQL/Supabase rehearsal before deployment. No local psql/docker runtime was available when prepared.
+*** End Patch

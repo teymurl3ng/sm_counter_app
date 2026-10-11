@@ -1,0 +1,79 @@
+{
+  "sync": {
+    "rows": 36,
+    "max_seq": 107,
+    "non_objects": 0,
+    "unknown_tables": 0,
+    "mismatched_shops": 0
+  },
+  "counts": {
+    "shops": 1,
+    "staff": 3,
+    "auth_users": 3,
+    "businesses": 1,
+    "reconciliation": 0
+  },
+  "checked_at": "2026-10-10T14:46:56.825774+00:00",
+  "by_shop_table": [
+    {
+      "rows": 16,
+      "max_seq": 95,
+      "min_seq": 9,
+      "shop_id": "2a2977af-05c4-474c-bd36-e4c5042143e3",
+      "table_name": "accounts",
+      "changed_after_deployment_baseline": 8
+    },
+    {
+      "rows": 1,
+      "max_seq": 33,
+      "min_seq": 33,
+      "shop_id": "2a2977af-05c4-474c-bd36-e4c5042143e3",
+      "table_name": "deliveries",
+      "changed_after_deployment_baseline": 0
+    },
+    {
+      "rows": 2,
+      "max_seq": 36,
+      "min_seq": 34,
+      "shop_id": "2a2977af-05c4-474c-bd36-e4c5042143e3",
+      "table_name": "delivery_status_history",
+      "changed_after_deployment_baseline": 0
+    },
+    {
+      "rows": 9,
+      "max_seq": 35,
+      "min_seq": 1,
+      "shop_id": "2a2977af-05c4-474c-bd36-e4c5042143e3",
+      "table_name": "events",
+      "changed_after_deployment_baseline": 0
+    },
+    {
+      "rows": 2,
+      "max_seq": 76,
+      "min_seq": 74,
+      "shop_id": "2a2977af-05c4-474c-bd36-e4c5042143e3",
+      "table_name": "products",
+      "changed_after_deployment_baseline": 2
+    },
+    {
+      "rows": 6,
+      "max_seq": 107,
+      "min_seq": 97,
+      "shop_id": "2a2977af-05c4-474c-bd36-e4c5042143e3",
+      "table_name": "settings",
+      "changed_after_deployment_baseline": 6
+    }
+  ],
+  "owner_identity": [
+    {
+      "role": "owner",
+      "active": true,
+      "staff_id": "4709aa37-d1cb-4015-877f-0f7e6b5c6b59",
+      "username": "teimur",
+      "terminated": false,
+      "business_id": "4b981b57-0f3f-40b0-8e82-1656af4544ab",
+      "last_auth_sign_in_at": "2026-10-10T14:44:59.210713+00:00"
+    }
+  ],
+  "authenticated_direct_sync_insert_allowed": false
+}

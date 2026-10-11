@@ -1,6 +1,6 @@
 package com.saaf.milkshop.nativeui.operations
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -213,7 +213,14 @@ internal fun MakeYogurtReadyContent(
                 )
             }
 
-            if (state.receipt != null) {
+            NativeSectionTransition(
+            targetState = state,
+            contentKey = { it.receipt != null },
+            modifier = Modifier.fillMaxWidth(),
+        ) { state ->
+            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
+        if (state.receipt != null) {
                 SuccessCard(state.receipt, onMakeAnother)
             } else {
                 Surface(
@@ -223,7 +230,7 @@ internal fun MakeYogurtReadyContent(
                         .testTag(NativeUiTags.OpsMakeYogurtStock),
                 ) {
                     Column(
-                        Modifier.padding(14.dp),
+                        Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
                         Text("On hand now", style = MaterialTheme.typography.titleSmall)
@@ -246,7 +253,7 @@ internal fun MakeYogurtReadyContent(
                     onValueChange = { yogurtText = it.filterDecimalInput() },
                 )
                 TextButton(
-                    onClick = { noteOpen = !noteOpen },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { noteOpen = !noteOpen },
                     enabled = !state.saving,
                     modifier = Modifier.testTag(NativeUiTags.OpsMakeYogurtNoteToggle),
                 ) {
@@ -314,6 +321,9 @@ internal fun MakeYogurtReadyContent(
                     Text(actionLabel, fontWeight = FontWeight.SemiBold)
                 }
             }
+        
+        }
+}
         }
     }
 }
@@ -327,13 +337,13 @@ internal fun MakeYogurtDiscardDialog(leaveGuard: EntryLeaveGuard) {
         text = { Text("Your measurements stay if you keep editing.") },
         confirmButton = {
             TextButton(
-                onClick = leaveGuard::confirmDiscard,
+                onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction(leaveGuard::confirmDiscard),
                 modifier = Modifier.testTag(NativeUiTags.OpsMakeYogurtDiscardConfirm),
             ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(
-                onClick = leaveGuard::keepEditing,
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction(leaveGuard::keepEditing),
                 modifier = Modifier.testTag(NativeUiTags.OpsMakeYogurtDiscardCancel),
             ) { Text("Keep editing") }
         },
@@ -375,7 +385,7 @@ private fun ReviewDock(
             .fillMaxWidth()
             .testTag(NativeUiTags.OpsMakeYogurtReview),
     ) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text("Physical review", style = MaterialTheme.typography.titleSmall)
             Text("Milk on hand now: $milkOnHandLabel", style = MaterialTheme.typography.bodyMedium)
             if (milk == null || yogurt == null || milk <= 0.0 || yogurt <= 0.0) {
@@ -410,6 +420,7 @@ private fun SuccessCard(
     receipt: NativeMakeYogurtReceipt,
     onMakeAnother: () -> Unit,
 ) {
+    com.saaf.milkshop.nativeui.common.NativeReceiptFeedback("production", receipt.eventId)
     Surface(
         tonalElevation = 2.dp,
         modifier = Modifier
@@ -430,7 +441,7 @@ private fun SuccessCard(
             Text("Milk on hand: ${receipt.milkOnHandLabel}")
             Text("Yogurt on hand: ${receipt.yogurtOnHandLabel}")
             Button(
-                onClick = onMakeAnother,
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction(onMakeAnother),
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag(NativeUiTags.OpsMakeYogurtAnother),

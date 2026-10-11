@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeChromeGeometryTest" tests="9" failures="1" errors="0" skipped="0" time="39.992" timestamp="2026-10-11T00:15:10" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="allRoleFootersExtraLarge" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="10.396" />
+  <testcase name="allRoleFootersLarge" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="7.886" />
+  <testcase name="accessStepsDefault" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="3.317" />
+  <testcase name="allRoleFootersDefault" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="7.143" />
+  <testcase name="workHeaderExtraLarge" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="1.295">
+    <failure>java.lang.AssertionError: Administrator · 11 Oct 2026 must not be vertically clipped
+at org.junit.Assert.fail(Assert.java:89)
+at org.junit.Assert.assertTrue(Assert.java:42)
+at com.saaf.milkshop.NativeChromeGeometryTest.assertTextHeight(NativeChromeGeometryTest.kt:177)
+at com.saaf.milkshop.NativeChromeGeometryTest.headers(NativeChromeGeometryTest.kt:79)
+at com.saaf.milkshop.NativeChromeGeometryTest.workHeaderExtraLarge(NativeChromeGeometryTest.kt:40)
+</failure>
+  </testcase>
+  <testcase name="workHeaderLarge" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="2.011" />
+  <testcase name="workHeaderDefault" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="2.001" />
+  <testcase name="accessStepsLarge" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="2.792" />
+  <testcase name="workHeaderDarkLarge" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="1.95" />
+</testsuite>

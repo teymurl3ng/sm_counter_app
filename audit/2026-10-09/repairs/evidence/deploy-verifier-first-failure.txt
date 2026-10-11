@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "C:\Users\Teymur\Desktop\hybrid project\codex\Saaf_Milk_Codex_Handoff_Pack\Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED\audit\2026-10-09\repairs\verify_deployment_evidence.py", line 46, in <module>
+    assert pre['columns']==post['columns']
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

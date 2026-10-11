@@ -1,0 +1,12 @@
+{
+  "scope": "read-only isolated instrumentation database",
+  "dailyCloseActions": [
+    {
+      "action_id": 1,
+      "business_date": "2026-10-11",
+      "action": "close",
+      "actor_role": "cashier",
+      "supersedes_action_id": null
+    }
+  ]
+}

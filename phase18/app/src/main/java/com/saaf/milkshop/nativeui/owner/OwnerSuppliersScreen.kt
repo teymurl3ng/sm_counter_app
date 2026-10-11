@@ -1,6 +1,8 @@
 package com.saaf.milkshop.nativeui.owner
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +33,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
+import com.saaf.milkshop.nativeui.common.nativeListItem
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,8 +65,101 @@ import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
  * Owner Suppliers — vendor list + detail + create/edit under OwnerScaffold.
  * Nested from Owner More; never mounts foreign role chrome.
  */
+private data class OwnerSuppliersScreenSnapshot(
+    val identity: NativeSignedInIdentity,
+    val context: NativeOwnerMoreContext,
+    val suppliers: List<NativeOwnerSupplierRow>,
+    val suppliersLoading: Boolean,
+    val supplierDetail: NativeOwnerSupplierDetail?,
+    val supplierCreateOpen: Boolean,
+    val supplierCreating: Boolean,
+    val supplierEditOpen: Boolean,
+    val supplierUpdating: Boolean,
+    val suppliersError: String?,
+    val showHeader: Boolean,
+)
+
 @Composable
 fun OwnerSuppliersScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    context: NativeOwnerMoreContext,
+    suppliers: List<NativeOwnerSupplierRow>,
+    suppliersLoading: Boolean,
+    supplierDetail: NativeOwnerSupplierDetail?,
+    supplierCreateOpen: Boolean,
+    supplierCreating: Boolean,
+    supplierEditOpen: Boolean,
+    supplierUpdating: Boolean,
+    suppliersError: String?,
+    onBackToMenu: () -> Unit,
+    onRetry: () -> Unit,
+    onOpenSupplier: (Long) -> Unit,
+    onBackFromDetail: () -> Unit,
+    onOpenCreate: () -> Unit,
+    onBackFromCreate: () -> Unit,
+    onCreateSupplier: (String) -> Unit,
+    onOpenEdit: () -> Unit,
+    onBackFromEdit: () -> Unit,
+    onUpdateSupplier: (String, VendorProfileInput) -> Unit,
+    hostedScaffold: HostedScaffold,
+    showHeader: Boolean = true,
+    modifier: Modifier = Modifier,
+) {
+    val snapshot = OwnerSuppliersScreenSnapshot(
+        identity = identity,
+        context = context,
+        suppliers = suppliers,
+        suppliersLoading = suppliersLoading,
+        supplierDetail = supplierDetail,
+        supplierCreateOpen = supplierCreateOpen,
+        supplierCreating = supplierCreating,
+        supplierEditOpen = supplierEditOpen,
+        supplierUpdating = supplierUpdating,
+        suppliersError = suppliersError,
+        showHeader = showHeader,
+    )
+    com.saaf.milkshop.nativeui.common.NativeSectionTransition(
+        targetState = snapshot,
+        contentKey = { pane -> when {
+            pane.supplierCreateOpen -> "create"
+            pane.supplierEditOpen -> "edit"
+            pane.supplierDetail != null -> "detail:${pane.supplierDetail.row.accountId}"
+            else -> "list"
+        } },
+        modifier = modifier,
+    ) { pane ->
+        OwnerSuppliersScreenPane(
+            snackbarHostState = snackbarHostState,
+            identity = pane.identity,
+            context = pane.context,
+            suppliers = pane.suppliers,
+            suppliersLoading = pane.suppliersLoading,
+            supplierDetail = pane.supplierDetail,
+            supplierCreateOpen = pane.supplierCreateOpen,
+            supplierCreating = pane.supplierCreating,
+            supplierEditOpen = pane.supplierEditOpen,
+            supplierUpdating = pane.supplierUpdating,
+            suppliersError = pane.suppliersError,
+            onBackToMenu = onBackToMenu,
+            onRetry = onRetry,
+            onOpenSupplier = onOpenSupplier,
+            onBackFromDetail = onBackFromDetail,
+            onOpenCreate = onOpenCreate,
+            onBackFromCreate = onBackFromCreate,
+            onCreateSupplier = onCreateSupplier,
+            onOpenEdit = onOpenEdit,
+            onBackFromEdit = onBackFromEdit,
+            onUpdateSupplier = onUpdateSupplier,
+            hostedScaffold = hostedScaffold,
+            showHeader = pane.showHeader,
+            modifier = modifier,
+        )
+    }
+}
+
+@Composable
+private fun OwnerSuppliersScreenPane(
     snackbarHostState: SnackbarHostState,
     identity: NativeSignedInIdentity,
     context: NativeOwnerMoreContext,
@@ -175,7 +272,7 @@ fun OwnerSuppliersScreen(
                         )
                         Spacer(Modifier.height(16.dp))
                         Button(
-                            onClick = onRetry,
+                            onClick = hapticAction(onRetry),
                             modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersRetry),
                         ) { Text("Try again") }
                     }
@@ -190,7 +287,7 @@ fun OwnerSuppliersScreen(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             TextButton(
-                                onClick = onOpenCreate,
+                                onClick = hapticAction(onOpenCreate),
                                 modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersCreateOpen),
                             ) { Text("Add supplier") }
                         }
@@ -221,14 +318,14 @@ fun OwnerSuppliersScreen(
                             LazyColumn(
                                 Modifier
                                     .fillMaxSize()
+                                    .padding(horizontal = 16.dp)
                                     .testTag(NativeUiTags.OwnerSuppliersList),
                             ) {
                                 items(suppliers, key = { it.accountId }) { supplier ->
                                     OwnerSupplierRow(
                                         supplier = supplier,
-                                        onClick = { onOpenSupplier(supplier.accountId) },
+                                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenSupplier(supplier.accountId) },
                                     )
-                                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                                 }
                             }
                         }
@@ -323,8 +420,8 @@ private fun OwnerSuppliersCreateScreen(
                         )
                     }
                     Button(
-                        onClick = {
-                            if (!canSave) return@Button
+                        onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
+                            if (!canSave) return@hapticCommitAction
                             onSave(name)
                         },
                         enabled = canSave,
@@ -342,7 +439,7 @@ private fun OwnerSuppliersCreateScreen(
                         }
                     }
                     TextButton(
-                        onClick = { requestLeave(onBack) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { requestLeave(onBack) },
                         enabled = !saving,
                         modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersCreateCancel),
                     ) { Text("Cancel") }
@@ -503,8 +600,8 @@ private fun OwnerSuppliersEditScreen(
                         )
                     }
                     Button(
-                        onClick = {
-                            if (!canSave) return@Button
+                        onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
+                            if (!canSave) return@hapticCommitAction
                             onSave(
                                 name,
                                 VendorProfileInput(
@@ -530,7 +627,7 @@ private fun OwnerSuppliersEditScreen(
                         }
                     }
                     TextButton(
-                        onClick = { requestLeave(onBack) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { requestLeave(onBack) },
                         enabled = !saving,
                         modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersEditCancel),
                     ) { Text("Cancel") }
@@ -562,13 +659,13 @@ private fun OwnerSuppliersDiscardDialog(
         text = { Text(body) },
         confirmButton = {
             TextButton(
-                onClick = leaveGuard::confirmDiscard,
+                onClick = hapticAction(leaveGuard::confirmDiscard),
                 modifier = Modifier.testTag(discardTag),
             ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(
-                onClick = leaveGuard::keepEditing,
+                onClick = hapticAction(leaveGuard::keepEditing),
                 modifier = Modifier.testTag(keepTag),
             ) { Text("Keep editing") }
         },
@@ -629,7 +726,7 @@ private fun OwnerSuppliersDetailScreen(
                     )
                 }
                 Button(
-                    onClick = onOpenEdit,
+                    onClick = hapticAction(onOpenEdit),
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag(NativeUiTags.OwnerSuppliersDetailEdit),
@@ -646,11 +743,10 @@ private fun OwnerSupplierRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 72.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Entity)
             .semantics { role = Role.Button }
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .clickable(onClick = hapticAction(onClick))
+            .nativeListItemContent(NativeListStyle.Entity)
             .testTag(NativeUiTags.ownerSupplier(supplier.accountId)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),

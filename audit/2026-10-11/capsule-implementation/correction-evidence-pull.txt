@@ -1,0 +1,8 @@
+/sdcard/Download/phase14-native-evidence/native-auth-a06/: 13 files pulled, 0 skipped. 5.5 MB/s (408861 bytes in 0.071s)
+No device evidence yet for sale (/sdcard/Download/phase14-native-evidence/native-sale-a06)
+/sdcard/Download/phase14-native-evidence/native-collect-a06/: 7 files pulled, 0 skipped. 7.4 MB/s (322940 bytes in 0.042s)
+/sdcard/Download/phase14-native-evidence/native-ux-a06/: 31 files pulled, 0 skipped. 7.5 MB/s (1323086 bytes in 0.169s)
+/sdcard/Download/phase14-native-evidence/native-motion-a06/: 1 file pulled, 0 skipped. 24.5 MB/s (17277854 bytes in 0.674s)
+Pulled PNG count (current run): 24
+Pulled review sidecar count (current run): 24
+EVIDENCE_PULL: PASS

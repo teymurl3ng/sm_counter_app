@@ -1,5 +1,7 @@
 package com.saaf.milkshop.nativeui.auth
 
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,6 +43,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.nativeListItem
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,6 +56,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalContext
+import com.saaf.milkshop.nativeui.common.hapticTap
+import com.saaf.milkshop.nativeui.common.hapticSelect
+import com.saaf.milkshop.nativeui.common.hapticCommit
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -66,6 +77,34 @@ import com.saaf.milkshop.nativeui.theme.SaafIvory
 import com.saaf.milkshop.nativeui.theme.SaafYellow
 import com.saaf.milkshop.nativeui.common.NativeSectionTransition
 import com.saaf.milkshop.nativeui.theme.SaafTheme
+
+private val LocalAccessContentOnly = compositionLocalOf { false }
+private data class AccessHeader(
+    val title: String, val subtitle: String, val back: (() -> Unit)? = null,
+    val backTag: String = NativeUiTags.AuthBackToWelcome,
+)
+
+private fun accessHeader(
+    state: NativeAuthenticationState,
+    welcome: () -> Unit, picker: () -> Unit, passphraseBack: () -> Unit, pinBack: () -> Unit,
+): AccessHeader = when (state) {
+    NativeAuthenticationState.Loading -> AccessHeader("Loading accounts", "Checking this phone’s accounts…")
+    is NativeAuthenticationState.StartupFailure -> AccessHeader("Accounts could not open", state.message)
+    is NativeAuthenticationState.OwnerSetup -> AccessHeader("Create the Owner account", "This is the first private account for this shop’s data vault.", welcome)
+    is NativeAuthenticationState.AccountPicker -> AccessHeader(
+        if (state.cancelReturnsToSession) "Switch account" else "Who is signing in?",
+        if (state.cancelReturnsToSession) "Pick another account to sign in. Back keeps you signed in on this account."
+        else "Choose your own account. Your access stays separate from everyone else on this phone.", welcome)
+    is NativeAuthenticationState.Passphrase -> AccessHeader("Welcome back, ${state.account.displayName}",
+        "Sign in with the full passphrase for this account.", passphraseBack, NativeUiTags.AuthPassphraseBack)
+    is NativeAuthenticationState.MethodPicker -> AccessHeader("Unlock ${state.account.displayName}",
+        "Choose a sign-in method already set up for this account on this phone.", picker, NativeUiTags.AuthMethodBack)
+    is NativeAuthenticationState.QuickPin -> AccessHeader("Enter Quick PIN",
+        "This PIN belongs only to ${state.account.displayName} on this phone.", pinBack, NativeUiTags.AuthQuickPinBack)
+    is NativeAuthenticationState.RecoveryCode -> AccessHeader("Save your recovery code",
+        "${state.identity.displayName}, store this code somewhere private. It is shown only once.")
+    is NativeAuthenticationState.Authenticated -> AccessHeader("", "")
+}
 
 @Composable
 fun NativeAuthenticationHost(
@@ -85,17 +124,22 @@ fun NativeAuthenticationHost(
     onAcknowledgeRecoveryCode: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // Inherits the ambient theme (the activity follows the system theme).
-    // Auth steps (picker -> passphrase -> loading -> authenticated) fade-and-
-    // settle with the same language as in-app screen switches.
+    // The identity band stays mounted; only the step's body transitions.
+    if (state is NativeAuthenticationState.Authenticated) return
+    val frame = accessHeader(state, onBackToWelcome, onChooseAnotherAccount,
+        onBackFromPassphrase, onBackFromQuickPin)
+    val focus = LocalFocusManager.current
+    LaunchedEffect(state::class) { focus.clearFocus() }
+    AccessFrame(frame.title, frame.subtitle, frame.back, frame.backTag, modifier) {
+    CompositionLocalProvider(LocalAccessContentOnly provides true) {
     NativeSectionTransition(
         targetState = state,
         contentKey = { it::class },
-        modifier = modifier,
+        modifier = Modifier.fillMaxWidth(),
     ) { state -> when (state) {
             NativeAuthenticationState.Loading -> AccessMessageScreen(
                 title = "Loading accounts",
-                message = "Checking this phone’s Saaf access…",
+                message = "Checking this phone’s accounts…",
                 loading = true,
                 modifier = modifier,
             )
@@ -160,6 +204,8 @@ fun NativeAuthenticationHost(
             is NativeAuthenticationState.Authenticated -> Unit
         }
     }
+    }
+    }
 }
 
 @Composable
@@ -172,7 +218,7 @@ private fun AccountPickerScreen(
     modifier: Modifier = Modifier,
 ) {
     AccessFrame(
-        title = if (cancelReturnsToSession) "Switch account" else "Who is using Saaf?",
+        title = if (cancelReturnsToSession) "Switch account" else "Who is signing in?",
         subtitle = if (cancelReturnsToSession) {
             "Pick another account to sign in. Back keeps you signed in on this account."
         } else {
@@ -192,7 +238,7 @@ private fun AccountPickerScreen(
             AccessError("No active account is ready to sign in.")
         } else {
             accounts.forEachIndexed { index, account ->
-                AccountRow(account = account, onClick = { onSelectAccount(account) })
+                AccountRow(account = account, onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelectAccount(account) })
                 if (index != accounts.lastIndex) {
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 }
@@ -220,12 +266,13 @@ private fun AccountPickerScreen(
 
 @Composable
 private fun AccountRow(account: NativeAccountSummary, onClick: () -> Unit) {
+    val context = LocalContext.current
     Row(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Entity)
             .testTag(NativeUiTags.authAccount(account.loginName))
-            .clickable(onClick = onClick)
-            .padding(vertical = 14.dp),
+            .clickable(onClick = { context.hapticSelect(); onClick() })
+            .nativeListItemContent(NativeListStyle.Entity),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Surface(
@@ -279,7 +326,7 @@ private fun PassphraseSignInScreen(
 
     AccessFrame(
         title = "Welcome back, ${account.displayName}",
-        subtitle = "Sign in with the full Saaf passphrase for this account.",
+        subtitle = "Sign in with the full passphrase for this account.",
         onBack = onBack,
         backTag = NativeUiTags.AuthPassphraseBack,
         modifier = modifier,
@@ -313,7 +360,7 @@ private fun PassphraseSignInScreen(
             onClick = ::submit,
         )
         TextButton(
-            onClick = onChooseAnotherAccount,
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction(onChooseAnotherAccount),
             enabled = !busy,
             modifier = Modifier
                 .fillMaxWidth()
@@ -376,7 +423,7 @@ private fun MethodPickerScreen(
         }
         AccessMethodButton(
             label = "Full passphrase",
-            supporting = "Always available for this Saaf account",
+            supporting = "Always available for this account",
             tag = NativeUiTags.AuthFullPassphraseMethod,
             enabled = !busy,
             icon = { Icon(Icons.Outlined.Lock, contentDescription = null) },
@@ -388,7 +435,7 @@ private fun MethodPickerScreen(
         }
         Spacer(Modifier.height(8.dp))
         TextButton(
-            onClick = onChooseAnotherAccount,
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction(onChooseAnotherAccount),
             enabled = !busy,
             modifier = Modifier
                 .fillMaxWidth()
@@ -463,7 +510,7 @@ private fun QuickPinSignInScreen(
             onClick = submit,
         )
         TextButton(
-            onClick = onUseFullPassphrase,
+            onClick = com.saaf.milkshop.nativeui.common.hapticAction(onUseFullPassphrase),
             enabled = !busy,
             modifier = Modifier
                 .fillMaxWidth()
@@ -500,7 +547,7 @@ private fun OwnerSetupScreen(
 
     AccessFrame(
         title = "Create the Owner account",
-        subtitle = "This is the first private account for this Saaf data vault.",
+        subtitle = "This is the first private account for this shop’s data vault.",
         onBack = onBack,
         modifier = modifier,
     ) {
@@ -576,7 +623,7 @@ private fun RecoveryCodeScreen(
 ) {
     AccessFrame(
         title = "Save your recovery code",
-        subtitle = "$displayName, store this code somewhere private. Saaf shows it only now.",
+        subtitle = "$displayName, store this code somewhere private. It is shown only once.",
         onBack = null,
         modifier = modifier,
     ) {
@@ -646,47 +693,60 @@ private fun AccessFrame(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    if (LocalAccessContentOnly.current) {
+        Column(Modifier.fillMaxWidth(), content = content)
+        return
+    }
+    val context = LocalContext.current
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .safeDrawingPadding()
+                .navigationBarsPadding()
                 .imePadding(),
         ) {
-            Surface(
-                color = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-            ) {
-                Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 16.dp)) {
-                    if (onBack != null) {
-                        TextButton(
-                            onClick = onBack,
-                            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onPrimary),
-                            modifier = Modifier.testTag(backTag),
-                        ) {
-                            Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null)
-                            Spacer(Modifier.size(6.dp))
-                            Text("Back")
-                        }
+            com.saaf.milkshop.nativeui.common.NativeChromeBand(
+                title = compactAccessTitle(title),
+                reserveNavigationSpace = true,
+                reserveActionSpace = false,
+                navigation = if (onBack != null) ({
+                    androidx.compose.material3.IconButton(
+                        onClick = { context.hapticTap(); onBack() },
+                        modifier = Modifier.size(48.dp).testTag(backTag),
+                    ) {
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onPrimary)
                     }
-                    Text(title, style = MaterialTheme.typography.headlineMedium)
-                    Spacer(Modifier.height(6.dp))
-                    Text(
-                        subtitle,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.82f),
-                    )
-                }
+                }) else null,
+            ) {
+                com.saaf.milkshop.nativeui.common.NativeChromeContext(com.saaf.milkshop.nativeui.common.LocalShopName.current)
+                com.saaf.milkshop.nativeui.common.NativeChromeContext("Private account access", prominent = true)
+                com.saaf.milkshop.nativeui.common.NativeChromeContext("On this phone")
             }
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 18.dp, vertical = 20.dp),
-                content = content,
-            )
+                    .padding(horizontal = 16.dp, vertical = 20.dp),
+            ) {
+                Text(subtitle, style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(Modifier.height(16.dp))
+                content()
+            }
         }
     }
+}
+
+private fun compactAccessTitle(title: String): String = when {
+    title.startsWith("Welcome back,") -> "Sign in"
+    title.startsWith("Unlock ") -> "Sign-in method"
+    title == "Who is signing in?" -> "Choose account"
+    title == "Create the Owner account" -> "Create Owner"
+    title == "Save your recovery code" -> "Recovery code"
+    title == "Enter Quick PIN" -> "Quick PIN"
+    title == "Accounts could not open" -> "Accounts unavailable"
+    else -> title
 }
 
 @Composable
@@ -698,7 +758,7 @@ private fun IdentityCard(account: NativeAccountSummary) {
         modifier = Modifier.fillMaxWidth(),
     ) {
         Row(
-            modifier = Modifier.padding(14.dp),
+            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(Icons.Outlined.Person, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
@@ -738,10 +798,11 @@ private fun AccessPrimaryButton(
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
+    val context = LocalContext.current
     val press = rememberPressSource()
     Button(
         interactionSource = press,
-        onClick = onClick,
+        onClick = { context.hapticCommit(); onClick() },
         enabled = enabled,
         shape = RoundedCornerShape(13.dp),
         colors = ButtonDefaults.buttonColors(
@@ -763,9 +824,10 @@ private fun AccessMethodButton(
     icon: @Composable () -> Unit,
     onClick: () -> Unit,
 ) {
+    val context = LocalContext.current
     val press = rememberPressSource()
     OutlinedButton(
-        onClick = onClick,
+        onClick = { context.hapticSelect(); onClick() },
         enabled = enabled,
         shape = RoundedCornerShape(13.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),

@@ -93,7 +93,7 @@ class PurchaseTransactionAction(
                 val result = transactionOperations.recordPurchase(
                     VendorPurchaseInput(
                         vendorAccountId = vendorAccountId,
-                        occurredAt = LocalDate.now().toString(),
+                        occurredAt = com.saaf.milkshop.sync.BusinessClock.today().toString(),
                         rawLiters = rawLiters,
                         fatPercentage = fat,
                         lrReading = lr,

@@ -1,6 +1,8 @@
 package com.saaf.milkshop.nativeui.admin
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +24,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
+import com.saaf.milkshop.nativeui.common.nativeListItem
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -106,6 +110,8 @@ fun AdminRecordsScreen(
                 .fillMaxSize()
                 .testTag(NativeUiTags.AdminBusinessRecordsRoot),
         ) {
+            val ready = ownerRecordsState as? NativeOwnerRecordsState.Ready
+            BackHandler(enabled = ready?.detail == null && ready?.ledger == null && ready?.correction == null, onBack = onBackToHub)
             OwnerRecordsScreen(
             showHeader = false,
                 snackbarHostState = snackbarHostState,
@@ -192,13 +198,14 @@ private fun AdminRecordsHubScreen(
                 title = "Records",
                 displayName = identity.displayName,
                 roleLabel = "Admin",
-                businessDate = LocalDate.now().toString(),
+                businessDate = com.saaf.milkshop.sync.BusinessClock.today().toString(),
                 postingOpen = postingOpen,
             )
             Column(
                 Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp)
                     .testTag(NativeUiTags.AdminRecordsHub),
             ) {
                 AdminRecordsSectionLabel("Business and security")
@@ -207,15 +214,14 @@ private fun AdminRecordsHubScreen(
                     title = "Business records",
                     subtitle = "Inspect shop events and movements",
                     tag = NativeUiTags.AdminRecordsBusiness,
-                    onClick = onOpenBusiness,
+                    onClick = hapticAction(onOpenBusiness),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 AdminRecordsMenuRow(
                     icon = Icons.Outlined.History,
                     title = "Security history",
                     subtitle = "Audit trail for access and privileged actions",
                     tag = NativeUiTags.AdminRecordsSecurityHistory,
-                    onClick = onOpenSecurityHistory,
+                    onClick = hapticAction(onOpenSecurityHistory),
                 )
             }
         }
@@ -231,7 +237,7 @@ private fun AdminRecordsSectionLabel(label: String) {
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp)
+            .padding(vertical = 10.dp)
             .testTag(NativeUiTags.AdminRecordsSectionLabel),
     )
 }
@@ -246,11 +252,10 @@ private fun AdminRecordsMenuRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 72.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Navigation)
             .semantics { role = Role.Button }
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .clickable(onClick = hapticAction(onClick))
+            .nativeListItemContent(NativeListStyle.Navigation)
             .testTag(tag),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),

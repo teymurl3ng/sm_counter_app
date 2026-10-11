@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeSaleStateRegressionTest" tests="44" failures="0" errors="0" skipped="2" time="46.803" timestamp="2026-10-10T07:22:13" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="oldSaveCannotPublishIntoReopenedSameSessionHandle" classname="com.saaf.milkshop.NativeSaleStateRegressionTest" time="13.537" />
+  <testcase name="wholesaleFollowUpUsesExactBookedQuantity" classname="com.saaf.milkshop.NativeSaleStateRegressionTest" time="6.904" />
+  <testcase name="finishingRefreshCannotReopenSaveGateOrEraseReceipt" classname="com.saaf.milkshop.NativeSaleStateRegressionTest" time="10.962" />
+  <testcase name="ambiguousShop_withoutChoice_listsShops_andSavesNothing" classname="com.saaf.milkshop.SyncEnrollmentTest" time="0.03" />
+  <testcase name="unenroll_clearsEverything" classname="com.saaf.milkshop.SyncEnrollmentTest" time="0.056" />
+  <testcase name="enrollment_persistsBindingSessionConfig_andSetsZone" classname="com.saaf.milkshop.SyncEnrollmentTest" time="0.185" />
+  <testcase name="failedEnrollment_leavesZeroState" classname="com.saaf.milkshop.SyncEnrollmentTest" time="0.004" />
+  <testcase name="unauthorizedSelectionAndCrossShopReenrollmentLeaveExistingBindingUntouched" classname="com.saaf.milkshop.SyncEnrollmentTest" time="0.084" />
+  <testcase name="existingPartialLedgerIsFilledOnceWithoutReplacingHistory" classname="com.saaf.milkshop.SyncIntegrityRegressionTest" time="0.235" />
+  <testcase name="failedLedgerChildMustRollBackIncomingEvent" classname="com.saaf.milkshop.SyncIntegrityRegressionTest" time="0.108" />
+  <testcase name="deliveryWaitsForItsSaleInsteadOfDroppingTheLink" classname="com.saaf.milkshop.SyncIntegrityRegressionTest" time="0.158" />
+  <testcase name="lateDependencyMustRecoverAfterFiveUnrelatedBatches" classname="com.saaf.milkshop.SyncIntegrityRegressionTest" time="0.289" />
+  <testcase name="drainsInStrictOrder_andEmptiesTheQueue" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.338" />
+  <testcase name="schedulerKick_recordsWorkWaiting" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.006" />
+  <testcase name="editDuringUploadKeepsItsOutboxMarker" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.133" />
+  <testcase name="transientAfterProgressStillRequestsRetry" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.132" />
+  <testcase name="permanentFailure_haltsAtHead_andResumesAfterFix" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.955" />
+  <testcase name="haltAuditThrottleSurvivesNewEngineInstances" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.363" />
+  <testcase name="transientFailure_leavesQueueIntactForRetry" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.162" />
+  <testcase name="missingTransport_isANoOp" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.081" />
+  <testcase name="failedTakeServerKeepsReviewAndLocalEditThenSuccessfulApplyResolvesBoth" classname="com.saaf.milkshop.SyncRepairBoundaryTest" time="0.26" />
+  <testcase name="incomingUpdatesCannotBypassInsertShapeRules" classname="com.saaf.milkshop.SyncRepairBoundaryTest" time="0.131" />
+  <testcase name="firstAttendancePullPreservesArchiveFlag" classname="com.saaf.milkshop.SyncRepairBoundaryTest" time="0.187" />
+  <testcase name="malformedUnorderedOrForeignShopPullsRemainRetryable" classname="com.saaf.milkshop.SyncRepairBoundaryTest" time="0.108" />
+  <testcase name="missingRefusalAuditRollsBackTheBatchInsteadOfReturningSuccess" classname="com.saaf.milkshop.SyncRepairBoundaryTest" time="0.16" />
+  <testcase name="businessDayUsesShopZoneAcrossMonthBoundary" classname="com.saaf.milkshop.SyncRepairBoundaryTest" time="0.034" />
+  <testcase name="queuedWorkIsNotServerContactAndBothCloseRefusalDirectionsAreCounted" classname="com.saaf.milkshop.SyncRepairBoundaryTest" time="0.541" />
+  <testcase name="enrollmentTeardownWaitsForInFlightSyncGate" classname="com.saaf.milkshop.SyncRepairBoundaryTest" time="0.03" />
+  <testcase name="restoreFromDifferentShop_isRefused_withEnrollmentIntact" classname="com.saaf.milkshop.SyncRestoreHardeningTest" time="0.744" />
+  <testcase name="restoreWithNoLocalEnrollment_alwaysSucceeds" classname="com.saaf.milkshop.SyncRestoreHardeningTest" time="0.828" />
+  <testcase name="restoreFromSameShop_succeeds_clearsTokens_keepsBindingAndConfig" classname="com.saaf.milkshop.SyncRestoreHardeningTest" time="0.846" />
+  <testcase name="profileProofCannotRenewAnotherIdentityAndAuditFailureCannotPartiallyRenewBinding" classname="com.saaf.milkshop.SyncRuntimeRecoveryRegressionTest" time="0.259" />
+  <testcase name="offlineDisabledMalformedAndWrongShopNeverRenewGrace" classname="com.saaf.milkshop.SyncRuntimeRecoveryRegressionTest" time="0.368" />
+  <testcase name="unfinishedRestoreIdentityCannotUseOldStoredTokens" classname="com.saaf.milkshop.SyncRuntimeRecoveryRegressionTest" time="0.03" />
+  <testcase name="failedPartialRebaselineNeverPushesAndRestartsFromZero" classname="com.saaf.milkshop.SyncRuntimeRecoveryRegressionTest" time="0.673" />
+  <testcase name="collectionReauthorizationFailureCannotLeaveSavedCollection" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.727" />
+  <testcase name="drawingReceiptReadFailureCannotLeaveSavedDrawing" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.618" />
+  <testcase name="saleReceiptReadFailureRollsBackLedgerAndStock" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.797" />
+  <testcase name="successfulAbsorptionReturnsReceiptAndDurableSealEvidence" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.902" />
+  <testcase name="failedAbsorptionAuditRollsBackClose" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.909" />
+  <testcase name="successfulSaleReturnsReceiptForCommittedLedgerAndFreshTotals" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.749" />
+  <testcase name="countReceiptReadFailureCannotLeaveSavedCount" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.691" />
+  <testcase name="prepareCrashWindow" classname="com.saaf.milkshop.RestoreProcessDeathProbe" time="0.037">
+    <skipped />
+  </testcase>
+  <testcase name="verifyRecoveryAfterProcessDeath" classname="com.saaf.milkshop.RestoreProcessDeathProbe" time="0.006">
+    <skipped />
+  </testcase>
+</testsuite>

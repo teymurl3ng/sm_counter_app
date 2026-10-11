@@ -1,6 +1,8 @@
 package com.saaf.milkshop.nativeui.activity
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,6 +31,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
+import com.saaf.milkshop.nativeui.common.nativeListItem
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -119,8 +123,14 @@ private fun ActivityScaffold(
     rootTag: String,
     content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit,
 ) {
-    // Chrome (nav + green header) lives in CashierPreviewHost; this is a body.
-    Box(modifier.fillMaxSize().testTag(rootTag)) { content(androidx.compose.foundation.layout.PaddingValues(0.dp)) }
+    // The role host owns chrome; standalone previews retain primary navigation.
+    com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold(
+        snackbarHostState = snackbarHostState,
+        compactNavigation = { CashierNavigation(CashierSection.Activity, onNavigate) },
+        expandedNavigation = { CashierNavigationRail(CashierSection.Activity, onNavigate) },
+        modifier = modifier.fillMaxSize().testTag(rootTag),
+        content = content,
+    )
 }
 
 @Composable
@@ -207,11 +217,11 @@ private fun ActivityListScreen(
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .testTag(NativeUiTags.ActivityList),
+                                .padding(horizontal = 16.dp)
+                                    .testTag(NativeUiTags.ActivityList),
                         ) {
                             items(state.day.records, key = { it.eventId }) { record ->
-                                ActivityRow(record = record, onClick = { onOpenRecord(record.eventId) })
-                                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                                ActivityRow(record = record, onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenRecord(record.eventId) })
                             }
                         }
                     }
@@ -246,12 +256,9 @@ private fun ActivityDetailScreen(
     ActivityScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.ActivityDetail) { padding ->
         Column(
             Modifier
-                .fillMaxSize()
+                .fillMaxSize().nativeRefreshOverlay(refreshing)
                 .padding(padding),
         ) {
-            if (refreshing) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
             Column(
                 Modifier
                     .fillMaxSize()
@@ -305,11 +312,10 @@ private fun ActivityRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 64.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Record)
             .semantics { role = Role.Button }
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .clickable(onClick = hapticAction(onClick))
+            .nativeListItemContent(NativeListStyle.Record)
             .testTag(NativeUiTags.activityRecord(record.eventId)),
         verticalAlignment = Alignment.CenterVertically,
     ) {

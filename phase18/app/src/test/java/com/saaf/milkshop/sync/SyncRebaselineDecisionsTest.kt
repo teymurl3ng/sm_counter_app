@@ -2,6 +2,7 @@ package com.saaf.milkshop.sync
 
 import com.saaf.milkshop.data.SyncOutboxEntity
 import org.json.JSONObject
+import org.json.JSONArray
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -18,6 +19,19 @@ import org.junit.Test
  * what the server lacks, drop proven-equal rows, hold differing rows.
  */
 class SyncRebaselineDecisionsTest {
+
+    @Test
+    fun remappedIdsAndReorderedChildrenAreEqualButChangedAmountsAreNot() {
+        val original = JSONObject().put("event_id", 7).put("event_uid", "same-event")
+            .put("financial_logs", JSONArray().put(JSONObject().put("account_id", 1).put("account_uid", "cash").put("amount", -10))
+                .put(JSONObject().put("account_id", 2).put("account_uid", "expense").put("amount", 10)))
+        val remapped = JSONObject(original.toString()).put("event_id", 41)
+        remapped.put("financial_logs", JSONArray().put(JSONObject().put("account_id", 8).put("account_uid", "expense").put("amount", 10))
+            .put(JSONObject().put("account_id", 9).put("account_uid", "cash").put("amount", -10)))
+        assertTrue(SyncRebaseline.livePayloadsEqual(original, remapped))
+        remapped.getJSONArray("financial_logs").getJSONObject(0).put("amount", 11)
+        org.junit.Assert.assertFalse(SyncRebaseline.livePayloadsEqual(original, remapped))
+    }
 
     private fun entry(table: String, uid: String) =
         SyncOutboxEntity(tableName = table, rowUid = uid, enqueuedAt = "2026-10-03T10:00:00.000Z")

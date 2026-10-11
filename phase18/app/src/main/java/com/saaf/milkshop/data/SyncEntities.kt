@@ -49,7 +49,8 @@ data class SyncOutboxEntity(
  *    unpushed edit that a pulled update must not overwrite.
  * Lifecycle: applying ANY version for the uid clears the park; a successful
  * push of the uid clears it (after the parked_seq conflict hint reached the
- * server); only dependency parks are retry-applied, with bounded retries.
+ * server); dependency parks are attempted once per batch, including after
+ * their diagnostic retry counter reaches its ceiling.
  * Parks are transient retry state, not data — restore clears them and
  * resets the pull cursor so everything re-pulls.
  */
@@ -112,6 +113,9 @@ interface SyncRebaselineHoldDao {
 
     @Query("SELECT COUNT(*) FROM sync_rebaseline_holds")
     suspend fun count(): Int
+
+    @Query("DELETE FROM sync_rebaseline_holds")
+    suspend fun clear()
 }
 
 /**

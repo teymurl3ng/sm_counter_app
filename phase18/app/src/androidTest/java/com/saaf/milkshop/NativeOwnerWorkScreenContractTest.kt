@@ -34,12 +34,12 @@ class NativeOwnerWorkScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.OwnerWorkHome).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerWorkPrimaryActions).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerWorkStockSection).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkMoneySection).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkRecordSale).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkReceiveMilk).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkDeliveries).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkMoneySection).performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkRecordSale).performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkReceiveMilk).performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkDeliveries).performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
-        composeRule.onNodeWithText("All daily commands remain reachable.").assertIsDisplayed()
+        composeRule.onNodeWithText("All daily commands remain reachable.").performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -49,7 +49,7 @@ class NativeOwnerWorkScreenContractTest {
                 context = openContext().copy(activeDeliveryCount = 3),
             ),
         )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkDeliveries).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkDeliveries).performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithTag(
             "${NativeUiTags.OwnerWorkDeliveries}_badge",
             useUnmergedTree = true,
@@ -141,7 +141,7 @@ class NativeOwnerWorkScreenContractTest {
             NativeOwnerWorkState.Ready(context = openContext()),
             onOpenDestination = { opened = it },
         )
-        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkPaySupplier).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkPaySupplier).performScrollTo().performClick()
         assertEquals(NativeOwnerWorkDestination.PaySupplier, opened)
     }
 
@@ -193,6 +193,14 @@ class NativeOwnerWorkScreenContractTest {
         )
         composeRule.onNodeWithTag(NativeUiTags.OwnerNavOverview).performClick()
         assertEquals(OwnerSection.Overview, navigated)
+    }
+
+    @Test
+    fun drawingOpensConnectedDestination() {
+        var destination: NativeOwnerWorkDestination? = null
+        setScreen(NativeOwnerWorkState.Ready(context = openContext()), onOpenDestination = { destination = it })
+        composeRule.onNodeWithTag(NativeUiTags.OwnerWorkRecordDrawing).performScrollTo().performClick()
+        assertEquals(NativeOwnerWorkDestination.RecordDrawing, destination)
     }
 
     private fun setScreen(

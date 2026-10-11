@@ -1,0 +1,12 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"error\":{\"name\":\"HttpException\",\"message\":\"Failed to run sql query: ERROR:  42702: column reference \\\"resolved\\\" is ambiguous\\nDETAIL:  It could refer to either a PL/pgSQL variable or a table column.\\nQUERY:  SELECT state='resolved' AND resolved AND error_code IS NULL               FROM public.auth_reconciliation WHERE id=reconciliation\\nCONTEXT:  PL/pgSQL function inline_code_block line 59 at SQL statement\\n\"}}"
+    }
+  ],
+  "structuredContent": {
+    "error_code": "INVALID_ARGUMENT"
+  },
+  "isError": true
+}

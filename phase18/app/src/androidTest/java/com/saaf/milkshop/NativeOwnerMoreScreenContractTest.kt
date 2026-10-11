@@ -269,6 +269,7 @@ class NativeOwnerMoreScreenContractTest {
         onOpenSync: () -> Unit = {},
         onRefreshSync: () -> Unit = {},
         onEnrollSync: (String, CharArray, String) -> Unit = { _, _, _ -> },
+        onPickedSyncOwner: (Long?) -> Unit = {},
         onEnrollSyncInShop: (String, String, CharArray, String) -> Unit = { _, _, _, _ -> },
         onSyncNow: () -> Unit = {},
         onResolveHoldSync: (String, String, Boolean) -> Unit = { _, _, _ -> },
@@ -303,8 +304,9 @@ class NativeOwnerMoreScreenContractTest {
                     onOpenBackup = onOpenBackup,
                     onOpenSync = onOpenSync,
                     onRefreshSync = onRefreshSync,
-                    onEnrollSync = onEnrollSync,
-                    onEnrollSyncInShop = onEnrollSyncInShop,
+                    onEnrollSync = { username, credential, environment, ownerId -> onPickedSyncOwner(ownerId); onEnrollSync(username, credential, environment) },
+                    onEnrollAs = { ownerId, username, credential, environment -> onPickedSyncOwner(ownerId); onEnrollSync(username, credential, environment) },
+                    onEnrollSyncInShop = { shop, username, credential, environment, _ -> onEnrollSyncInShop(shop, username, credential, environment) },
                     onSyncNow = onSyncNow,
                     onResolveHoldSync = onResolveHoldSync,
                     onUnenrollSync = onUnenrollSync,
@@ -666,7 +668,7 @@ class NativeOwnerMoreScreenContractTest {
             .performScrollTo()
             .assertIsDisplayed()
         composeRule.onNodeWithText("Shop A").assertIsDisplayed()
-        composeRule.onNodeWithText("Shop B").assertIsDisplayed()
+        composeRule.onNodeWithText("Shop B").performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -695,6 +697,7 @@ class NativeOwnerMoreScreenContractTest {
                 context = openContext(),
                 destination = NativeOwnerMoreDestination.Sync,
                 syncState = OwnerSyncState(
+                    status = syncStatus(),
                     error = "The server login or credential is not correct.",
                 ),
             ),
@@ -720,6 +723,36 @@ class NativeOwnerMoreScreenContractTest {
             .assertIsDisplayed()
     }
 
+    @Test
+    fun coldSyncFailureOffersWorkingRetry() {
+        var retried = false
+        setScreen(NativeOwnerMoreState.Ready(context = openContext(), destination = NativeOwnerMoreDestination.Sync,
+            syncState = OwnerSyncState(error = "Server unavailable")), onRefreshSync = { retried = true })
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncRetryLoad).performScrollTo().performClick()
+        assertTrue(retried)
+    }
+
+    @Test
+    fun syncEnvironmentChooserChangesEnrollmentTarget() {
+        setScreen(NativeOwnerMoreState.Ready(context = openContext(), destination = NativeOwnerMoreDestination.Sync))
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncEnvironment).performScrollTo().performClick()
+        composeRule.onNodeWithText("DEV (testing)").performClick()
+        composeRule.onNodeWithText("Server: DEV").assertIsDisplayed()
+    }
+
+    @Test
+    fun syncOwnerChooserUsesTheSelectedLocalOwner() {
+        var picked: Long? = null
+        setScreen(NativeOwnerMoreState.Ready(context = openContext(), destination = NativeOwnerMoreDestination.Sync,
+            syncState = OwnerSyncState(ownerChoices = listOf(
+                com.saaf.milkshop.sync.NativeSyncOwnerChoice(1, "Owner One"),
+                com.saaf.milkshop.sync.NativeSyncOwnerChoice(2, "Owner Two")))),
+            onPickedSyncOwner = { picked = it })
+        composeRule.onNodeWithTag(NativeUiTags.OwnerSyncOwnerPicker).performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("Owner Two").performScrollTo().performClick()
+        assertEquals(2L, picked)
+    }
+
     private fun syncStatus() = NativeSyncStatus(
         environment = "prod",
         shopName = "Shop 1",
@@ -730,4 +763,3 @@ class NativeOwnerMoreScreenContractTest {
         pullCursor = 12,
     )
 }
-

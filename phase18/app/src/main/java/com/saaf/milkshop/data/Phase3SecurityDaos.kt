@@ -75,11 +75,14 @@ interface SecurityAuditDao {
     @Query(
         """
         SELECT COUNT(*) FROM security_audit_entries
-        WHERE action = 'sync_push_halted'
+        WHERE (action = 'sync_push_halted' OR
+            (action = 'sync_apply_skipped' AND details LIKE '%closed%'))
           AND occurred_at >= :sinceIso
         """
     )
     suspend fun refusalsSince(sinceIso: String): Int
+    @Query("SELECT occurred_at FROM security_audit_entries WHERE action = 'sync_push_halted' ORDER BY audit_id DESC LIMIT 1")
+    suspend fun lastSyncHaltAt(): String?
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(entry: SecurityAuditEntryEntity): Long
 

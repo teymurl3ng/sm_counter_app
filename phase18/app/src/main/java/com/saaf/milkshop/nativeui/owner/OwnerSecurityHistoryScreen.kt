@@ -1,6 +1,8 @@
 package com.saaf.milkshop.nativeui.owner
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +28,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
+import com.saaf.milkshop.nativeui.common.nativeListItem
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -118,7 +122,7 @@ fun OwnerSecurityHistoryScreen(
                         )
                         Spacer(Modifier.height(16.dp))
                         Button(
-                            onClick = onRetry,
+                            onClick = hapticAction(onRetry),
                             modifier = Modifier.testTag(NativeUiTags.OwnerSecurityHistoryRetry),
                         ) { Text("Try again") }
                     }
@@ -152,14 +156,14 @@ fun OwnerSecurityHistoryScreen(
                             LazyColumn(
                                 Modifier
                                     .fillMaxSize()
+                                    .padding(horizontal = 16.dp)
                                     .testTag(NativeUiTags.OwnerSecurityHistoryList),
                             ) {
                                 items(audits, key = { it.auditId }) { audit ->
                                     OwnerSecurityAuditRow(
                                         audit = audit,
-                                        onClick = { onOpenAudit(audit.auditId) },
+                                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenAudit(audit.auditId) },
                                     )
-                                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                                 }
                             }
                         }
@@ -239,11 +243,10 @@ private fun OwnerSecurityAuditRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 72.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Record)
             .semantics { role = Role.Button }
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .clickable(onClick = hapticAction(onClick))
+            .nativeListItemContent(NativeListStyle.Record)
             .testTag(NativeUiTags.ownerSecurityAudit(audit.auditId)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),

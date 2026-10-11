@@ -17,9 +17,17 @@ $adb = if ($env:ANDROID_HOME) { Join-Path $env:ANDROID_HOME "platform-tools\adb.
 if ($env:ANDROID_SERIAL) { $Serial = $env:ANDROID_SERIAL }
 
 $deviceRoot = "/sdcard/Download/phase14-native-evidence"
-$screens = if ($Screen -eq "all") { @("auth", "sale", "collect") } else { @($Screen.ToLowerInvariant()) }
+$screens = if ($Screen -eq "all") { @("auth", "sale", "collect", "ux", "motion") } else { @($Screen.ToLowerInvariant()) }
 
 $currentRoot = Join-Path $HostRoot "checkpoint-current"
+$resolvedHostRoot = [System.IO.Path]::GetFullPath($HostRoot)
+$resolvedCurrentRoot = [System.IO.Path]::GetFullPath($currentRoot)
+$expectedCurrentRoot = [System.IO.Path]::GetFullPath((Join-Path $resolvedHostRoot "checkpoint-current"))
+if ($resolvedCurrentRoot -ne $expectedCurrentRoot -or
+    -not $resolvedCurrentRoot.StartsWith($resolvedHostRoot.TrimEnd('\') + '\', [System.StringComparison]::OrdinalIgnoreCase) -or
+    -not $resolvedHostRoot.StartsWith($repoRoot.TrimEnd('\') + '\', [System.StringComparison]::OrdinalIgnoreCase)) {
+    throw "Evidence output must remain beneath this workspace and its named HostRoot."
+}
 if (Test-Path -LiteralPath $currentRoot) {
     Remove-Item -LiteralPath $currentRoot -Recurse -Force
 }
@@ -39,7 +47,9 @@ foreach ($name in $screens) {
 
     $hostScreenDir = Join-Path $currentRoot "native-$name-a06"
     New-Item -ItemType Directory -Force -Path $hostScreenDir | Out-Null
-    & $adb -s $Serial pull $deviceDir $currentRoot
+    # adb's Windows file APIs need an extended absolute path for long evidence names.
+    $pullDestination = if ([System.IO.Path]::DirectorySeparatorChar -eq '\') { "\\?\" + $resolvedCurrentRoot } else { $resolvedCurrentRoot }
+    & $adb -s $Serial pull $deviceDir $pullDestination
     if ($LASTEXITCODE -ne 0) { throw "adb pull failed for $deviceDir" }
 
     $pngFiles = @(Get-ChildItem -Path $hostScreenDir -Filter *.png -File -ErrorAction SilentlyContinue)

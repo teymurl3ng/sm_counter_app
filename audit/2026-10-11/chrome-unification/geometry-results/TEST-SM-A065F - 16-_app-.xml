@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeChromeGeometryTest" tests="9" failures="0" errors="0" skipped="0" time="41.194" timestamp="2026-10-11T00:19:01" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-A065F - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="allRoleFootersExtraLarge" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="10.608" />
+  <testcase name="allRoleFootersLarge" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="7.922" />
+  <testcase name="accessStepsDefault" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="3.191" />
+  <testcase name="allRoleFootersDefault" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="7.283" />
+  <testcase name="workHeaderExtraLarge" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="2.073" />
+  <testcase name="workHeaderLarge" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="2.025" />
+  <testcase name="workHeaderDefault" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="2.026" />
+  <testcase name="accessStepsLarge" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="2.823" />
+  <testcase name="workHeaderDarkLarge" classname="com.saaf.milkshop.NativeChromeGeometryTest" time="2.105" />
+</testsuite>

@@ -1,0 +1,45 @@
+
+> Configure project :app
+WARNING: The option setting 'android.disallowKotlinSourceSets=false' is experimental.
+The current default is 'true'.
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :checkFrozenBaselines
+OK phase18/milk-shop-core-logic-spec-v2.md
+OK phase18/milk_shop_schema_sql_only_final_v2.sql
+FROZEN_BASELINES: PASS
+
+> Task :checkGoldenLedgerContract
+Golden ledger host contract OK (instrumented execution is enforced by qaScreen/qaCheckpoint).
+GOLDEN_LEDGER_CONTRACT: PASS
+
+> Task :checkNativeInventory
+inventory rows=992 untested=0 orphans=0
+NATIVE_INVENTORY: PASS
+UNTESTED_COUNT=0
+
+> Task :checkUiOnly FAILED
+Protected business/domain/SQL files were modified during UI work:
+  - phase18/app/src/main/java/com/saaf/milkshop/data/BudgetDataRepository.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/data/Phase3SecurityDaos.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/data/SyncEntities.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/domain/BudgetManagement.kt
+Re-run with -AllowLogic / -Pallow.logic=true only with owner approval.
+CHECK_UI_ONLY: FAIL
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':checkUiOnly'.
+> Process 'command 'powershell'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 5s
+4 actionable tasks: 4 executed

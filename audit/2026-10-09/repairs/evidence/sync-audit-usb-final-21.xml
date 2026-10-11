@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.SyncRepairBoundaryTest" tests="21" failures="0" errors="0" skipped="0" time="12.937" timestamp="2026-10-10T01:02:43" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-S921W - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="failedTakeServerKeepsReviewAndLocalEditThenSuccessfulApplyResolvesBoth" classname="com.saaf.milkshop.SyncRepairBoundaryTest" time="0.016" />
+  <testcase name="incomingUpdatesCannotBypassInsertShapeRules" classname="com.saaf.milkshop.SyncRepairBoundaryTest" time="0.0" />
+  <testcase name="firstAttendancePullPreservesArchiveFlag" classname="com.saaf.milkshop.SyncRepairBoundaryTest" time="0.01" />
+  <testcase name="malformedUnorderedOrForeignShopPullsRemainRetryable" classname="com.saaf.milkshop.SyncRepairBoundaryTest" time="0.007" />
+  <testcase name="missingRefusalAuditRollsBackTheBatchInsteadOfReturningSuccess" classname="com.saaf.milkshop.SyncRepairBoundaryTest" time="0.064" />
+  <testcase name="businessDayUsesShopZoneAcrossMonthBoundary" classname="com.saaf.milkshop.SyncRepairBoundaryTest" time="0.008" />
+  <testcase name="queuedWorkIsNotServerContactAndBothCloseRefusalDirectionsAreCounted" classname="com.saaf.milkshop.SyncRepairBoundaryTest" time="0.188" />
+  <testcase name="enrollmentTeardownWaitsForInFlightSyncGate" classname="com.saaf.milkshop.SyncRepairBoundaryTest" time="0.006" />
+  <testcase name="profileProofCannotRenewAnotherIdentityAndAuditFailureCannotPartiallyRenewBinding" classname="com.saaf.milkshop.SyncRuntimeRecoveryRegressionTest" time="0.087" />
+  <testcase name="offlineDisabledMalformedAndWrongShopNeverRenewGrace" classname="com.saaf.milkshop.SyncRuntimeRecoveryRegressionTest" time="0.102" />
+  <testcase name="unfinishedRestoreIdentityCannotUseOldStoredTokens" classname="com.saaf.milkshop.SyncRuntimeRecoveryRegressionTest" time="0.029" />
+  <testcase name="failedPartialRebaselineNeverPushesAndRestartsFromZero" classname="com.saaf.milkshop.SyncRuntimeRecoveryRegressionTest" time="0.168" />
+  <testcase name="drainsInStrictOrder_andEmptiesTheQueue" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.041" />
+  <testcase name="schedulerKick_recordsWorkWaiting" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.009" />
+  <testcase name="editDuringUploadKeepsItsOutboxMarker" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.006" />
+  <testcase name="transientAfterProgressStillRequestsRetry" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.005" />
+  <testcase name="permanentFailure_haltsAtHead_andResumesAfterFix" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.113" />
+  <testcase name="haltAuditThrottleSurvivesNewEngineInstances" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.035" />
+  <testcase name="transientFailure_leavesQueueIntactForRetry" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.01" />
+  <testcase name="missingTransport_isANoOp" classname="com.saaf.milkshop.SyncPushEngineTest" time="0.007" />
+  <testcase name="outgoingPaneDisposalCannotClearIncomingGuard" classname="com.saaf.milkshop.NativeGuardRegressionTest" time="10.624" />
+</testsuite>

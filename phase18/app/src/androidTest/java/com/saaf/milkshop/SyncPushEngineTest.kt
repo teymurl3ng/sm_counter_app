@@ -133,6 +133,41 @@ class SyncPushEngineTest {
     }
 
     @Test
+    fun transientAfterProgressStillRequestsRetry() = runBlocking {
+        val database = openDatabase()
+        try {
+            enqueueEvents(database, 2)
+            var calls = 0
+            val outcome = SyncPushEngine(database, SyncPushTransport { _, rows ->
+                if (++calls == 1) SyncPushResult.Success(rows.size) else SyncPushResult.Transient("network")
+            }, batchSize = 1).drainOnce()
+            assertTrue(outcome is SyncPushEngine.DrainOutcome.RetryLater)
+            assertEquals(1, (outcome as SyncPushEngine.DrainOutcome.RetryLater).pushed)
+            assertTrue(database.syncOutboxDao().count() > 0)
+        } finally { database.close() }
+    }
+
+    @Test
+    fun editDuringUploadKeepsItsOutboxMarker() = runBlocking {
+        val database = openDatabase()
+        try {
+            database.syncOutboxDao().deleteAll()
+            val product = database.productDao().findByName("Milk")!!
+            database.syncOutboxDao().insertAll(listOf(com.saaf.milkshop.data.SyncOutboxEntity(
+                tableName = "products", rowUid = product.uid, enqueuedAt = "2026-10-10")))
+            var calls = 0
+            val outcome = SyncPushEngine(database, SyncPushTransport { _, rows ->
+                if (++calls == 1) {
+                    database.syncApplyDao().updateProductByUid(product.uid, "Changed milk", product.unit, "2026-10-10")
+                    SyncPushResult.Success(rows.size)
+                } else SyncPushResult.Transient("network")
+            }).drainOnce()
+            assertTrue(outcome is SyncPushEngine.DrainOutcome.RetryLater)
+            assertEquals(1, database.syncOutboxDao().countByTableAndUid("products", product.uid))
+        } finally { database.close() }
+    }
+
+    @Test
     fun missingTransport_isANoOp() = runBlocking {
         val database = openDatabase()
         try {
@@ -145,6 +180,22 @@ class SyncPushEngineTest {
         } finally {
             database.close()
         }
+    }
+
+    @Test
+    fun haltAuditThrottleSurvivesNewEngineInstances() = runBlocking {
+        val database = openDatabase()
+        try {
+            enqueueEvents(database, 1)
+            repeat(3) {
+                val outcome = SyncPushEngine(database, SyncPushTransport { _, _ ->
+                    SyncPushResult.Permanent("closed", "Closed business day")
+                }).drainOnce()
+                assertTrue(outcome is SyncPushEngine.DrainOutcome.Halted)
+            }
+            assertEquals(1, database.securityAuditDao().all()
+                .count { it.action == SyncPushEngine.ACTION_SYNC_PUSH_HALTED })
+        } finally { database.close() }
     }
 
     @Test

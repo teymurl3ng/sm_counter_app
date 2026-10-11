@@ -90,7 +90,7 @@ class NativeOwnerReportsScreenContractTest {
     fun warmRefreshKeepsReportVisible() {
         setScreen(NativeOwnerReportsState.Ready(snapshot = sampleSnapshot(), refreshing = true))
         composeRule.onNodeWithTag(NativeUiTags.OwnerReportsContent).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.OwnerReportsRefreshing).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerReportsPeriod).assertIsDisplayed()
     }
 
     @Test

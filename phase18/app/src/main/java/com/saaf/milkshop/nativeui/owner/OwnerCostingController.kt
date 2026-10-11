@@ -306,10 +306,13 @@ internal class OwnerCostingController(
         }
         runtime.state.value = current.copy(costingApproving = true, costingPoliciesError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.approvePolicy(session, input)
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Costing policy approved")
                 val snapshot = withContext(Dispatchers.IO) {
                     facade.loadPolicies(session, current.context.businessDate)
                 }
@@ -341,7 +344,7 @@ internal class OwnerCostingController(
                         costingPoliciesError = null,
                     )
                 } else {
-                    handleFailure(token, error)
+                    handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
                 }
             }
         }
@@ -373,6 +376,7 @@ internal class OwnerCostingController(
         }
         runtime.state.value = current.copy(costingReauthBusy = true, costingPoliciesError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.reauthenticate(session, passphrase)
@@ -381,6 +385,8 @@ internal class OwnerCostingController(
                     withContext(Dispatchers.IO) {
                         facade.approvePolicy(session, pendingPolicy)
                     }
+                    saved = true
+                    com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Costing policy approved")
                     val snapshot = withContext(Dispatchers.IO) {
                         facade.loadPolicies(session, current.context.businessDate)
                     }
@@ -407,6 +413,8 @@ internal class OwnerCostingController(
                     withContext(Dispatchers.IO) {
                         facade.approveYieldPolicy(session, pendingYield)
                     }
+                    saved = true
+                    com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Yield policy approved")
                     val yieldContext = withContext(Dispatchers.IO) {
                         facade.loadYieldContext(session)
                     }
@@ -432,6 +440,8 @@ internal class OwnerCostingController(
                     val opening = withContext(Dispatchers.IO) {
                         facade.recordOpeningCostBasis(session, pendingOpening)
                     }
+                    saved = true
+                    com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Opening cost saved")
                     val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                     if (!runtime.isCurrent(token)) return@launch
                     if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
@@ -453,6 +463,8 @@ internal class OwnerCostingController(
                     val yieldContext = withContext(Dispatchers.IO) {
                         facade.recordProductionLossAssessment(session, pendingLoss)
                     }
+                    saved = true
+                    com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Production loss saved")
                     val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                     if (!runtime.isCurrent(token)) return@launch
                     if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
@@ -474,7 +486,7 @@ internal class OwnerCostingController(
                     )
                 }
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
             } finally {
                 passphrase.fill('\u0000')
             }
@@ -529,10 +541,13 @@ internal class OwnerCostingController(
         }
         runtime.state.value = current.copy(costingBudgetSaving = true, costingPoliciesError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.upsertBudget(session, input)
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Budget saved")
                 val planning = withContext(Dispatchers.IO) {
                     facade.loadPlanning(session)
                 }
@@ -550,7 +565,7 @@ internal class OwnerCostingController(
                     costingPoliciesError = null,
                 )
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
             }
         }
     }
@@ -567,10 +582,13 @@ internal class OwnerCostingController(
         }
         runtime.state.value = current.copy(costingBudgetSaving = true, costingPoliciesError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.copyPreviousBudget(session, category, periodStart, periodEndExclusive)
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Previous budget copied")
                 val planning = withContext(Dispatchers.IO) {
                     facade.loadPlanning(session)
                 }
@@ -588,7 +606,7 @@ internal class OwnerCostingController(
                     costingPoliciesError = null,
                 )
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
             }
         }
     }
@@ -625,10 +643,13 @@ internal class OwnerCostingController(
         }
         runtime.state.value = current.copy(costingCollectionsSaving = true, costingPoliciesError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.createOrReviseCollectionsTarget(session, weekStart, amount)
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Collections target saved")
                 val planning = withContext(Dispatchers.IO) {
                     facade.loadPlanning(session)
                 }
@@ -646,7 +667,7 @@ internal class OwnerCostingController(
                     costingPoliciesError = null,
                 )
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
             }
         }
     }
@@ -692,10 +713,13 @@ internal class OwnerCostingController(
         }
         runtime.state.value = current.copy(costingOpeningSaving = true, costingPoliciesError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 val opening = withContext(Dispatchers.IO) {
                     facade.recordOpeningCostBasis(session, input)
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Opening cost saved")
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token)) return@launch
                 if (latest.destination != NativeOwnerMoreDestination.CostingPlans) return@launch
@@ -722,7 +746,7 @@ internal class OwnerCostingController(
                         costingPoliciesError = null,
                     )
                 } else {
-                    handleFailure(token, error)
+                    handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
                 }
             }
         }
@@ -766,10 +790,13 @@ internal class OwnerCostingController(
         }
         runtime.state.value = current.copy(costingYieldApproving = true, costingPoliciesError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.approveYieldPolicy(session, input)
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Yield policy approved")
                 val yieldContext = withContext(Dispatchers.IO) {
                     facade.loadYieldContext(session)
                 }
@@ -800,7 +827,7 @@ internal class OwnerCostingController(
                         costingPoliciesError = null,
                     )
                 } else {
-                    handleFailure(token, error)
+                    handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
                 }
             }
         }
@@ -812,10 +839,13 @@ internal class OwnerCostingController(
         if (current.destination != NativeOwnerMoreDestination.CostingPlans || current.costingLossSaving) return
         runtime.state.value = current.copy(costingLossSaving = true, costingPoliciesError = null)
         runtime.scope.launch {
+            var saved = false
             try {
                 val yieldContext = withContext(Dispatchers.IO) {
                     facade.recordProductionLossAssessment(token.handle, input)
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Production loss saved")
                 val latest = runtime.state.value as? NativeOwnerMoreState.Ready ?: return@launch
                 if (!runtime.isCurrent(token) || latest.destination != NativeOwnerMoreDestination.CostingPlans) {
                     return@launch
@@ -845,7 +875,7 @@ internal class OwnerCostingController(
                         costingPoliciesError = null,
                     )
                 } else {
-                    handleFailure(token, error)
+                    handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
                 }
             }
         }

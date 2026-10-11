@@ -1,6 +1,8 @@
 package com.saaf.milkshop.nativeui.owner
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +43,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
+import com.saaf.milkshop.nativeui.common.nativeListItem
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -249,7 +253,7 @@ fun OwnerMoreScreen(
                 Text(state.message, style = MaterialTheme.typography.bodyLarge)
                 Spacer(Modifier.height(16.dp))
                 Button(
-                    onClick = onRetry,
+                    onClick = hapticAction(onRetry),
                     modifier = Modifier.testTag(NativeUiTags.OwnerMoreRetryLoad),
                 ) {
                     Text("Try again")
@@ -679,6 +683,7 @@ private fun OwnerMoreMenuScreen(
                 Modifier
                     .fillMaxSize().nativeRefreshOverlay(state.refreshing)
                     .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp)
                     .testTag(NativeUiTags.OwnerMoreMenu),
             ) {
                 state.error?.let {
@@ -694,9 +699,8 @@ private fun OwnerMoreMenuScreen(
                     title = "Products",
                     subtitle = "What you sell and how it is measured",
                     tag = NativeUiTags.OwnerMoreProducts,
-                    onClick = onOpenProducts,
+                    onClick = hapticAction(onOpenProducts),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
                 OwnerMoreSectionLabel("People and businesses")
                 OwnerMoreMenuRow(
@@ -704,25 +708,22 @@ private fun OwnerMoreMenuScreen(
                     title = "Customers",
                     subtitle = "Customer accounts and balances",
                     tag = NativeUiTags.OwnerMoreCustomers,
-                    onClick = onOpenCustomers,
+                    onClick = hapticAction(onOpenCustomers),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 OwnerMoreMenuRow(
                     icon = Icons.Outlined.Business,
                     title = "Suppliers",
                     subtitle = "Supplier accounts and milk receipts",
                     tag = NativeUiTags.OwnerMoreSuppliers,
-                    onClick = onOpenSuppliers,
+                    onClick = hapticAction(onOpenSuppliers),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 OwnerMoreMenuRow(
                     icon = Icons.Outlined.Person,
                     title = "Employees",
                     subtitle = "Employee profiles and attendance",
                     tag = NativeUiTags.OwnerMoreEmployees,
-                    onClick = onOpenEmployees,
+                    onClick = hapticAction(onOpenEmployees),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
                 OwnerMoreSectionLabel("Planning and setup")
                 OwnerMoreMenuRow(
@@ -730,17 +731,15 @@ private fun OwnerMoreMenuScreen(
                     title = "Costing & plans",
                     subtitle = "Cost coverage and planning",
                     tag = NativeUiTags.OwnerMoreCosting,
-                    onClick = onOpenCostingPlans,
+                    onClick = hapticAction(onOpenCostingPlans),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 OwnerMoreMenuRow(
                     icon = Icons.Outlined.Settings,
                     title = "Shop settings",
                     subtitle = "Store name, opening state, categories",
                     tag = NativeUiTags.OwnerMoreShopSettings,
-                    onClick = onOpenShopSettings,
+                    onClick = hapticAction(onOpenShopSettings),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
                 OwnerMoreSectionLabel("Your account and staff access")
                 OwnerMoreMenuRow(
@@ -748,25 +747,22 @@ private fun OwnerMoreMenuScreen(
                     title = "Personal security",
                     subtitle = "Quick unlock for this account on this phone",
                     tag = NativeUiTags.OwnerMorePersonalSecurity,
-                    onClick = onOpenPersonalSecurity,
+                    onClick = hapticAction(onOpenPersonalSecurity),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 OwnerMoreMenuRow(
                     icon = Icons.Outlined.People,
                     title = "Users & roles",
                     subtitle = "Staff access and role assignment",
                     tag = NativeUiTags.OwnerMoreUsersRoles,
-                    onClick = onOpenUsersRoles,
+                    onClick = hapticAction(onOpenUsersRoles),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 OwnerMoreMenuRow(
                     icon = Icons.Outlined.History,
                     title = "Security history",
                     subtitle = "Audit of sensitive account actions",
                     tag = NativeUiTags.OwnerMoreSecurityHistory,
-                    onClick = onOpenSecurityHistory,
+                    onClick = hapticAction(onOpenSecurityHistory),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
                 OwnerMoreSectionLabel("Safety and recovery")
                 OwnerMoreMenuRow(
@@ -774,17 +770,15 @@ private fun OwnerMoreMenuScreen(
                     title = "Backup & restore",
                     subtitle = "Local export, Drive backup, restore",
                     tag = NativeUiTags.OwnerMoreBackup,
-                    onClick = onOpenBackup,
+                    onClick = hapticAction(onOpenBackup),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 OwnerMoreMenuRow(
                     icon = Icons.Outlined.CloudSync,
                     title = "Sync",
                     subtitle = "Upload entries to your shop's online record",
                     tag = NativeUiTags.OwnerMoreSync,
-                    onClick = onOpenSync,
+                    onClick = hapticAction(onOpenSync),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
                 OwnerMoreSectionLabel("Account")
                 OwnerMoreMenuRow(
@@ -792,15 +786,14 @@ private fun OwnerMoreMenuScreen(
                     title = "Switch account",
                     subtitle = "Choose another person on this phone",
                     tag = NativeUiTags.OwnerMoreSwitchAccount,
-                    onClick = onSwitchAccount,
+                    onClick = hapticAction(onSwitchAccount),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 OwnerMoreMenuRow(
                     icon = Icons.AutoMirrored.Outlined.Logout,
                     title = "Lock / switch user",
                     subtitle = "Locks this phone's session - sync enrollment is separate",
                     tag = NativeUiTags.OwnerMoreSignOut,
-                    onClick = onSignOut,
+                    onClick = hapticAction(onSignOut),
                 )
                 Spacer(Modifier.height(24.dp))
             }
@@ -836,7 +829,7 @@ private fun OwnerMorePersonalSecurityScreen(
             },
             confirmButton = {
                 TextButton(
-                    onClick = {
+                    onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction {
                         val secret = passphrase.toCharArray()
                         passphrase = ""
                         pin = ""
@@ -846,7 +839,7 @@ private fun OwnerMorePersonalSecurityScreen(
                 ) { Text("Discard and leave") }
             },
             dismissButton = {
-                TextButton(onClick = onCancelRemove) { Text("Keep editing") }
+                TextButton(onClick = hapticAction(onCancelRemove)) { Text("Keep editing") }
             },
         )
     }
@@ -903,8 +896,8 @@ private fun OwnerMorePersonalSecurityScreen(
                         )
                     }
                     Button(
-                        onClick = {
-                            if (passphrase.isBlank() || pin.length != 4) return@Button
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                            if (passphrase.isBlank() || pin.length != 4) return@hapticAction
                             val secret = passphrase.toCharArray()
                             val quickPin = pin.toCharArray()
                             passphrase = ""
@@ -918,8 +911,8 @@ private fun OwnerMorePersonalSecurityScreen(
                     ) { Text(if (state.saving) "Saving…" else "Save Quick PIN") }
                     if (security.phoneSecurityAvailable) {
                         Button(
-                            onClick = {
-                                if (passphrase.isBlank()) return@Button
+                            onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                                if (passphrase.isBlank()) return@hapticAction
                                 val secret = passphrase.toCharArray()
                                 val quickPin = pin.takeIf { it.length == 4 }?.toCharArray()
                                 passphrase = ""
@@ -934,7 +927,7 @@ private fun OwnerMorePersonalSecurityScreen(
                     }
                     if (security.quickPinEnabled || security.phoneSecurityEnabled) {
                         TextButton(
-                            onClick = onRequestRemove,
+                            onClick = hapticAction(onRequestRemove),
                             enabled = !state.saving && passphrase.isNotBlank(),
                             modifier = Modifier.testTag(NativeUiTags.OwnerMoreSecurityRemove),
                         ) { Text("Remove Quick unlock") }
@@ -965,7 +958,7 @@ private fun OwnerMoreSectionLabel(label: String) {
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp)
+            .padding(vertical = 10.dp)
             .testTag(NativeUiTags.OwnerMoreSectionLabel),
     )
 }
@@ -981,11 +974,10 @@ private fun OwnerMoreMenuRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 72.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Navigation)
             .semantics { role = Role.Button }
-            .clickable(enabled = enabled, onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .clickable(enabled = enabled, onClick = hapticAction(onClick))
+            .nativeListItemContent(NativeListStyle.Navigation)
             .testTag(tag),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),

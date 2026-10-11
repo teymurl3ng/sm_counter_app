@@ -1,5 +1,6 @@
 package com.saaf.milkshop.application.vendorpayment
 
+import androidx.room3.withWriteTransaction
 import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
 import com.saaf.milkshop.application.readmodels.HybridReadModelService
 import com.saaf.milkshop.data.MilkShopDatabase
@@ -95,31 +96,35 @@ class NativeVendorPaymentFacade(
             ?: throw IllegalArgumentException("Choose an active supplier.")
         val paymentAccount = context.paymentAccounts.singleOrNull { it.accountId == request.paymentAccountId }
             ?: throw IllegalArgumentException("Choose a valid Cash/Bank account.")
-        val result = commands.recordVendorPayment(
-            sessionHandle = sessionHandle,
-            input = VendorPaymentInput(
-                vendorAccountId = vendor.accountId,
-                paymentAccountId = paymentAccount.accountId,
-                amount = BigDecimal(request.amountPaisa).movePointLeft(2).toDouble(),
-                occurredAt = context.businessDate,
-                notes = request.notes?.trim()?.takeIf { it.isNotEmpty() },
-            ),
-        )
-        val refreshedContext = load(sessionHandle, date)
-        val refreshedVendor = refreshedContext.vendors.singleOrNull {
-            it.accountId == vendor.accountId
-        } ?: vendor
-        val refreshedPayment = refreshedContext.paymentAccounts.singleOrNull {
-            it.accountId == paymentAccount.accountId
-        } ?: paymentAccount
-        return NativeVendorPaymentSubmission(
-            receipt = NativeVendorPaymentReceipt(
-                eventId = result.eventId,
-                vendor = refreshedVendor,
-                paymentAccount = refreshedPayment,
-                amountPaisa = request.amountPaisa,
-            ),
-            refreshedContext = refreshedContext,
-        )
+        // The mutation, required evidence and receipt reads commit together.
+        // A read/authorization failure cannot report failure after saving.
+        return database.withWriteTransaction {
+            val result = commands.recordVendorPayment(
+                sessionHandle = sessionHandle,
+                input = VendorPaymentInput(
+                    vendorAccountId = vendor.accountId,
+                    paymentAccountId = paymentAccount.accountId,
+                    amount = BigDecimal(request.amountPaisa).movePointLeft(2).toDouble(),
+                    occurredAt = context.businessDate,
+                    notes = request.notes?.trim()?.takeIf { it.isNotEmpty() },
+                ),
+            )
+            val refreshedContext = load(sessionHandle, date)
+            val refreshedVendor = refreshedContext.vendors.singleOrNull {
+                it.accountId == vendor.accountId
+            } ?: vendor
+            val refreshedPayment = refreshedContext.paymentAccounts.singleOrNull {
+                it.accountId == paymentAccount.accountId
+            } ?: paymentAccount
+            NativeVendorPaymentSubmission(
+                receipt = NativeVendorPaymentReceipt(
+                    eventId = result.eventId,
+                    vendor = refreshedVendor,
+                    paymentAccount = refreshedPayment,
+                    amountPaisa = request.amountPaisa,
+                ),
+                refreshedContext = refreshedContext,
+            )
+        }
     }
 }

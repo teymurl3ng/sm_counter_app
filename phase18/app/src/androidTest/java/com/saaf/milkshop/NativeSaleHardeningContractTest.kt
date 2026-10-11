@@ -11,7 +11,9 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -43,7 +45,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class NativeSaleHardeningContractTest {
     @get:Rule
-    val composeRule = createComposeRule()
+    val composeRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
     fun closedBusinessDayExplainsTheBlockAndDisablesRecord() {
@@ -75,7 +77,7 @@ class NativeSaleHardeningContractTest {
 
         composeRule.onNodeWithTag(NativeUiTags.CashierProductUnavailable).assertIsDisplayed()
         composeRule.onNodeWithText(
-            "No active sale product has a retail rate. Ask an owner or manager to configure one.",
+            "No active products. Ask an Owner or Admin to add a product in Products.",
         ).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.CashierPaymentUnavailable)
             .performScrollTo()
@@ -157,8 +159,11 @@ class NativeSaleHardeningContractTest {
             .performClick()
         composeRule.onNodeWithTag(NativeUiTags.CashierSurchargeAmount).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).performTextInput("2")
+        com.saaf.milkshop.qa.NativeLayoutImeEvidence.dismissImeAndWait(composeRule.activity, composeRule)
         composeRule.onNodeWithTag(NativeUiTags.CashierRecordSale)
             .performScrollTo()
+            .assertIsDisplayed()
+            .assertIsEnabled()
             .performClick()
 
         val sent = recorded

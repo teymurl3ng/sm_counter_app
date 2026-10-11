@@ -195,6 +195,10 @@ class AccountAuthClient(
         false
     }
 
+    suspend fun verifySession(session: SyncTokenStore.Session): AccountAuthResult = verifyProfile(
+        TokenSet(session.accessToken, session.refreshToken, session.accessTokenExpiresAtEpochMs),
+    )
+
     private suspend fun onSignedIn(tokenResponse: SyncHttpResponse): AccountAuthResult {
         val tokens = parseTokenResponse(tokenResponse) ?: return AccountAuthResult.Unknown("malformed_token_response")
         return verifyProfile(tokens)
@@ -230,7 +234,8 @@ class AccountAuthClient(
             ?: return AccountAuthResult.Unknown("malformed_profile")
         val staffId = profile.optString("staff_id").takeIf { it.isNotEmpty() }
             ?: return AccountAuthResult.Unknown("malformed_profile")
-        val active = profile.optBoolean("active", true)
+        val active = profile.opt("active") as? Boolean
+            ?: return AccountAuthResult.Unknown("malformed_profile")
         val terminated = !profile.isNull("terminated_at") && profile.optString("terminated_at").isNotEmpty()
         if (!active || terminated) return AccountAuthResult.Disabled
 

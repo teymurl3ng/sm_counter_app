@@ -29,6 +29,7 @@ import com.saaf.milkshop.domain.VendorPurchaseInput
 import com.saaf.milkshop.domain.VendorPurchaseService
 import com.saaf.milkshop.domain.YogurtProductionInput
 import com.saaf.milkshop.domain.YogurtProductionService
+import com.saaf.milkshop.domain.YieldAlertAssessment
 import com.saaf.milkshop.domain.YieldPolicyInput
 import com.saaf.milkshop.domain.YieldPolicyService
 import java.math.BigDecimal
@@ -220,6 +221,13 @@ class Phase3CostingTest {
         assertEquals("0.88", policy.upperAlertLimit)
         val unusual = YogurtProductionService(database).record(YogurtProductionInput("2026-07-31", 1.0, 0.70))
         assertEquals("review_required", yields.assess(unusual.eventId).status)
+        val normal = YogurtProductionService(database).record(YogurtProductionInput("2026-07-31", 1.0, 0.85))
+        val batch = yields.assessAll(listOf(productions.first(), unusual.eventId, normal.eventId))
+        assertEquals(yields.assess(productions.first()), batch.getValue(productions.first()))
+        assertEquals(yields.assess(unusual.eventId), batch.getValue(unusual.eventId))
+        assertEquals("within_expected_range", batch.getValue(normal.eventId).status)
+        assertEquals(emptyMap<Long, YieldAlertAssessment>(), yields.assessAll(emptyList()))
+        assertTrue(runCatching { yields.assessAll(listOf(unusual.eventId, Long.MIN_VALUE)) }.isFailure)
         assertNull(database.productionLossAssessmentDao().activeForEvent(unusual.eventId))
     }
 

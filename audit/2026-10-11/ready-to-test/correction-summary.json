@@ -1,0 +1,28 @@
+{
+  "tests": 8,
+  "passed": 8,
+  "changedDuringFocusedRun": [],
+  "protectedFiles": [
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/data/BudgetDataRepository.kt",
+      "unchanged": true
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/data/Phase3SecurityDaos.kt",
+      "unchanged": true
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/data/SyncEntities.kt",
+      "unchanged": true
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/BudgetManagement.kt",
+      "unchanged": true
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/Costing.kt",
+      "unchanged": true
+    }
+  ],
+  "deferredStyleUnchanged": true
+}

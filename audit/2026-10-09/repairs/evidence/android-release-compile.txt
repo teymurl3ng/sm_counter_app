@@ -1,0 +1,82 @@
+
+> Configure project :app
+WARNING: The option setting 'android.disallowKotlinSourceSets=false' is experimental.
+The current default is 'true'.
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :verifyBridgeContract
+Bridge contract OK: v5, 92 endpoints, SHA-256 276C3C9B263322EC90091834F659B068E920659D47E71B1F195D7AD4DA46906F
+
+> Task :verifyUiCleanup
+UI cleanup gate OK: 88 active TypeScript/TSX files; 23 prototype paths and 6 dependencies absent; 3 packaged files scanned.
+
+> Task :app:verifyHybridWebAssets
+> Task :app:preBuild
+> Task :app:preReleaseBuild
+> Task :app:generateReleaseBuildConfig
+> Task :app:generateReleaseResources
+> Task :app:packageReleaseResources
+> Task :app:processReleaseNavigationResources
+> Task :app:parseReleaseLocalResources
+> Task :app:generateReleaseRFile
+
+> Task :app:kspReleaseKotlin
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :app:compileReleaseKotlin
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/MainActivity.kt:296:17 'fun startActivityForResult(intent: Intent, requestCode: Int): Unit' is deprecated. This method has been deprecated in favor of using the Activity Result API
+      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt
+      contracts for common intents available in
+      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for
+      testing, and allow receiving results in separate, testable classes independent from your
+      activity. Use
+      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}
+      passing in a {@link StartActivityForResult} object for the {@link ActivityResultContract}.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/MainActivity.kt:585:25 'fun startActivityForResult(intent: Intent, requestCode: Int): Unit' is deprecated. This method has been deprecated in favor of using the Activity Result API
+      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt
+      contracts for common intents available in
+      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for
+      testing, and allow receiving results in separate, testable classes independent from your
+      activity. Use
+      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}
+      passing in a {@link StartActivityForResult} object for the {@link ActivityResultContract}.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/MainActivity.kt:679:25 'fun startActivityForResult(intent: Intent, requestCode: Int): Unit' is deprecated. This method has been deprecated in favor of using the Activity Result API
+      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt
+      contracts for common intents available in
+      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for
+      testing, and allow receiving results in separate, testable classes independent from your
+      activity. Use
+      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}
+      passing in a {@link StartActivityForResult} object for the {@link ActivityResultContract}.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/MainActivity.kt:818:15 'fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Unit' is deprecated. This method has been deprecated in favor of using the Activity Result API
+      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt
+      contracts for common intents available in
+      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for
+      testing, and allow receiving results in separate, testable classes independent from your
+      activity. Use
+      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}
+      with the appropriate {@link ActivityResultContract} and handling the result in the
+      {@link ActivityResultCallback#onActivityResult(Object) callback}.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/hybrid/HybridActivity.kt:177:60 'static field SOFT_INPUT_ADJUST_RESIZE: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/admin/AdminWorkScreen.kt:272:41 'val Icons.Outlined.ReceiptLong: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.ReceiptLong.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/collection/CashierCollectionScreen.kt:539:78 'val Icons.Outlined.Notes: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Notes.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/drawing/DrawingEntryScreen.kt:279:86 'val Icons.Outlined.Notes: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Notes.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/expense/ExpenseEntryScreen.kt:387:78 'val Icons.Outlined.Notes: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Notes.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/manager/ManagerWorkScreen.kt:224:43 'val Icons.Outlined.ReceiptLong: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.ReceiptLong.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/manager/ManagerWorkScreen.kt:249:39 'val Icons.Outlined.Assignment: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Assignment.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/more/CashierMoreScreen.kt:311:43 'val Icons.Outlined.ReceiptLong: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.ReceiptLong.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/more/CashierMoreScreen.kt:361:43 'val Icons.Outlined.Logout: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Logout.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/OperationsMoreScreen.kt:253:43 'val Icons.Outlined.Logout: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Logout.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/OperationsWorkScreen.kt:276:35 'val Icons.Outlined.Assignment: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Assignment.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerSyncController.kt:95:24 Duplicate branch condition in 'when'.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerSyncController.kt:106:24 Duplicate branch condition in 'when'.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerSyncController.kt:117:24 Duplicate branch condition in 'when'.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerWorkScreen.kt:224:43 'val Icons.Outlined.ReceiptLong: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.ReceiptLong.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerWorkScreen.kt:252:39 'val Icons.Outlined.Assignment: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Assignment.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/salarypayment/SalaryPaymentEntryScreen.kt:371:78 'val Icons.Outlined.Notes: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Notes.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/vendorpayment/VendorPaymentEntryScreen.kt:371:78 'val Icons.Outlined.Notes: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Notes.
+
+BUILD SUCCESSFUL in 2m 40s
+11 actionable tasks: 11 executed
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.3.0/userguide/configuration_cache_enabling.html

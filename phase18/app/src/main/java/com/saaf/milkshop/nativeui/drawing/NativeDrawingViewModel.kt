@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.delay
 
 sealed interface NativeDrawingState {
     data object Idle : NativeDrawingState
@@ -39,6 +38,7 @@ class NativeDrawingViewModel(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val _state = MutableStateFlow<NativeDrawingState>(NativeDrawingState.Idle)
     private var sessionHandle: String? = null
+    private val loadGate = com.saaf.milkshop.nativeui.SessionRequestGate()
     val state: StateFlow<NativeDrawingState> = _state.asStateFlow()
 
     init {
@@ -83,20 +83,22 @@ class NativeDrawingViewModel(
 
     fun refresh() {
         val session = sessionHandle ?: return
+        val request = loadGate.begin(session)
         val previous = _state.value as? NativeDrawingState.Ready
         _state.value = previous?.copy(refreshing = true, error = null)
             ?: NativeDrawingState.Loading
         scope.launch {
             try {
-                _state.value = NativeDrawingState.Ready(
-                    withContext(Dispatchers.IO) { facade.load(session) },
-                    refreshing = false,
-                )
+                val context = withContext(Dispatchers.IO) { facade.load(session) }
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
+                _state.value = (_state.value as? NativeDrawingState.Ready)?.copy(context = context, refreshing = false, error = null)
+                    ?: NativeDrawingState.Ready(context, refreshing = false)
             } catch (error: Throwable) {
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 if (error is SecurityFailure.SessionExpired || previous == null) {
                     handleLoadFailure(error)
                 } else {
-                    _state.value = previous.copy(
+                    _state.value = ((_state.value as? NativeDrawingState.Ready) ?: previous).copy(
                         refreshing = false,
                         error = error.message ?: "The drawing could not be refreshed. Try again.",
                     )
@@ -117,7 +119,7 @@ class NativeDrawingViewModel(
                     context = submission.refreshedContext,
                     receipt = submission.receipt,
                 )
-                autoClearReceipt(submission.receipt)
+
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
@@ -136,15 +138,7 @@ class NativeDrawingViewModel(
     }
 
     /** Auto-clears the success receipt after 4s unless a newer one replaced it. */
-    private fun autoClearReceipt(receipt: Any?) {
-        scope.launch {
-            delay(4_000)
-            val current = _state.value as? NativeDrawingState.Ready ?: return@launch
-            if (current.receipt === receipt) {
-                _state.value = current.copy(receipt = null)
-            }
-        }
-    }
+
 
     fun clearFeedback() {
         val current = _state.value as? NativeDrawingState.Ready ?: return
@@ -152,6 +146,7 @@ class NativeDrawingViewModel(
     }
 
     fun close() {
+        loadGate.invalidate()
         sessionHandle = null
         _state.value = NativeDrawingState.Idle
     }

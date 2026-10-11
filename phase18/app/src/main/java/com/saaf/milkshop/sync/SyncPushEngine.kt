@@ -3,6 +3,7 @@ package com.saaf.milkshop.sync
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.data.SecurityAuditEntryEntity
 import com.saaf.milkshop.data.SyncOutboxEntity
+import androidx.room3.withWriteTransaction
 import org.json.JSONObject
 import java.time.Instant
 
@@ -52,8 +53,6 @@ class SyncPushEngine(
         data object NotConfigured : DrainOutcome
     }
 
-    private var lastHaltAuditEpochMs = 0L
-
     suspend fun drainOnce(): DrainOutcome {
         val activeTransport = transport ?: return DrainOutcome.NotConfigured
         var pushedTotal = 0
@@ -64,17 +63,11 @@ class SyncPushEngine(
             attachParkHints(envelopes)
             when (val result = activeTransport.push(envelopes, effectiveRows)) {
                 is SyncPushResult.Success -> {
-                    val acked = ackedEntries(effectiveRows, envelopes)
-                    delete(acked)
+                    val acked = acknowledge(effectiveRows, envelopes)
                     pushedTotal += acked.size
-                    acked.forEach { row ->
-                        // The local edit won and is now on the server; the held
-                        // remote version is preserved in the sync_conflict audit.
-                        database.syncParkedRowDao().delete(row.tableName, row.rowUid)
-                    }
                 }
                 is SyncPushResult.Transient ->
-                    return if (pushedTotal > 0) DrainOutcome.Drained(pushedTotal) else DrainOutcome.RetryLater(0)
+                    return DrainOutcome.RetryLater(pushedTotal)
                 is SyncPushResult.Permanent -> {
                     // The batch contains at least one row the server refuses.
                     // Retry one by one, in order, so everything ahead of the
@@ -88,19 +81,11 @@ class SyncPushEngine(
                         attachParkHints(singleEnvelopes)
                         when (val single = activeTransport.push(singleEnvelopes, singleRows)) {
                             is SyncPushResult.Success -> {
-                                val acked = ackedEntries(singleRows, singleEnvelopes)
-                                delete(acked)
+                                val acked = acknowledge(singleRows, singleEnvelopes)
                                 pushedTotal += acked.size
-                                acked.forEach { r ->
-                                    database.syncParkedRowDao().delete(r.tableName, r.rowUid)
-                                }
                             }
                             is SyncPushResult.Transient ->
-                                return if (pushedTotal > 0) {
-                                    DrainOutcome.Drained(pushedTotal)
-                                } else {
-                                    DrainOutcome.RetryLater(0)
-                                }
+                                return DrainOutcome.RetryLater(pushedTotal)
                             is SyncPushResult.Permanent -> {
                                 onHalted(single, database.syncOutboxDao().count().toInt())
                                 return DrainOutcome.Halted(single.reasonCode, pushedTotal)
@@ -134,6 +119,14 @@ class SyncPushEngine(
         database.syncOutboxDao().deleteByIds(rows.map { it.outboxId })
     }
 
+    private suspend fun acknowledge(rows: List<SyncOutboxEntity>, pushed: List<JSONObject>): List<SyncOutboxEntity> =
+        database.withWriteTransaction {
+            val acked = ackedEntries(rows, pushed)
+            delete(acked)
+            acked.forEach { database.syncParkedRowDao().delete(it.tableName, it.rowUid) }
+            acked
+        }
+
     /**
      * C1 conflict evidence: an envelope for a uid holding a park (a remote
      * version we saw but refused to apply over an unpushed local edit)
@@ -163,11 +156,11 @@ class SyncPushEngine(
      */
     private suspend fun ackedEntries(rows: List<SyncOutboxEntity>, pushed: List<JSONObject>): List<SyncOutboxEntity> {
         val rebuilt = buildFor(rows)
-        val rebuiltByUid = rebuilt.first.associateBy { it.getString("uid") }
-        val pushedByUid = pushed.associateBy { it.getString("uid") }
+        val rebuiltByUid = rebuilt.first.associateBy { it.getString("table") to it.getString("uid") }
+        val pushedByUid = pushed.associateBy { it.getString("table") to it.getString("uid") }
         return rows.filter { row ->
-            val original = pushedByUid[row.rowUid] ?: return@filter false
-            val current = rebuiltByUid[row.rowUid] ?: return@filter false
+            val original = pushedByUid[row.tableName to row.rowUid] ?: return@filter false
+            val current = rebuiltByUid[row.tableName to row.rowUid] ?: return@filter false
             // parked_seq is transport-only conflict-evidence metadata (the
             // server strips it before storage); it must never break ack
             // equality, or hint-carrying rows would re-push forever.
@@ -181,13 +174,14 @@ class SyncPushEngine(
     }
     private suspend fun onHalted(failure: SyncPushResult.Permanent, queueDepth: Int) {
         val now = System.currentTimeMillis()
-        if (now - lastHaltAuditEpochMs >= HALT_AUDIT_INTERVAL_MS) {
-            lastHaltAuditEpochMs = now
-            runCatching {
+        database.withWriteTransaction {
+            val previous = database.securityAuditDao().lastSyncHaltAt()
+                ?.let { runCatching { Instant.parse(it).toEpochMilli() }.getOrNull() }
+            if (previous == null || now - previous >= HALT_AUDIT_INTERVAL_MS) {
                 database.securityAuditDao().insert(
                     SecurityAuditEntryEntity(
                         auditId = 0,
-                        occurredAt = Instant.now().toString(),
+                        occurredAt = Instant.ofEpochMilli(now).toString(),
                         action = ACTION_SYNC_PUSH_HALTED,
                         result = "failure",
                         reasonCode = failure.reasonCode,

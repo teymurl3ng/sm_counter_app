@@ -92,39 +92,6 @@ internal class OwnerSyncController(
                                 ),
                             )
                         }
-                    is SyncEnrollment.Outcome.OwnersAvailable ->
-                        runtime.updateReady {
-                            it.copy(
-                                syncState = it.syncState.copy(
-                                    busy = false,
-                                    ownerChoices = outcome.owners.map { owner ->
-                                        NativeSyncOwnerChoice(owner.userId, owner.displayName)
-                                    },
-                                ),
-                            )
-                        }
-                    is SyncEnrollment.Outcome.OwnersAvailable ->
-                        runtime.updateReady {
-                            it.copy(
-                                syncState = it.syncState.copy(
-                                    busy = false,
-                                    ownerChoices = outcome.owners.map { owner ->
-                                        NativeSyncOwnerChoice(owner.userId, owner.displayName)
-                                    },
-                                ),
-                            )
-                        }
-                    is SyncEnrollment.Outcome.OwnersAvailable ->
-                        runtime.updateReady {
-                            it.copy(
-                                syncState = it.syncState.copy(
-                                    busy = false,
-                                    ownerChoices = outcome.owners.map { owner ->
-                                        NativeSyncOwnerChoice(owner.userId, owner.displayName)
-                                    },
-                                ),
-                            )
-                        }
                     is SyncEnrollment.Outcome.Failed ->
                         runtime.updateReady {
                             it.copy(syncState = it.syncState.copy(busy = false, error = describeFailure(outcome)))

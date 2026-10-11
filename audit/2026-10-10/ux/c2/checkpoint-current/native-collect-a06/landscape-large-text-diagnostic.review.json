@@ -1,0 +1,14 @@
+{
+  "scenario": "landscape-large-text-diagnostic",
+  "screen": "collect",
+  "device": "samsung SM-A065F",
+  "packageName": "com.saaf.milkshop.qa.tests",
+  "capturedAt": "2026-10-10T18:29:25.959773Z",
+  "orientation": "landscape",
+  "fontScale": "1.0",
+  "theme": "light",
+  "workflowId": "collect",
+  "evidenceFilename": "landscape-large-text-diagnostic.png",
+  "reviewStatus": "UNREVIEWED",
+  "note": ""
+}

@@ -1,0 +1,34 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/app/(app)/shops/[shopId]/page.tsx
+@@
+   const [data, setData] = useState<ShopDetailApiResponse | null>(peeked);
+   const [showId, setShowId] = useState(false);
+ 
+-  const load = useCallback(async () => {
++  const load = useCallback(async (isCurrent: () => boolean = () => true) => {
+     const apply = (status: number, json: ShopDetailApiResponse) => {
++      if (!isCurrent()) return;
+       if (
+         status === 401 ||
+         json.error?.code === "UNAUTHENTICATED" ||
+@@
+       });
+       apply(result.status, result.body as ShopDetailApiResponse);
+     } catch {
++      if (!isCurrent()) return;
+       setData({
+         ok: false,
+         env: "unknown",
+@@
+   }, [router, shopId]);
+ 
+   useEffect(() => {
+-    void load();
++    let disposed = false;
++    // Subscribe after commit; cleanup fences cache and network completions alike.
++    queueMicrotask(() => { if (!disposed) void load(() => !disposed); });
++    return () => { disposed = true; };
+   }, [load]);
+ 
+   const shop = state === "ready" ? data?.shop : null;
+*** End Patch

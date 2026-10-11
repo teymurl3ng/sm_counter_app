@@ -227,7 +227,7 @@ class NativeOwnerRecordsFacade(
                 businessDate = businessDate,
                 postingOpen = !database.dailyCloseDao().isPostingClosed(businessDate),
                 shopName = database.storeProfileDao().get()?.storeName?.takeIf { it.isNotBlank() }
-                    ?: "Saaf Milk",
+                    ?: "Your shop",
             ),
             records = records,
             balances = balances,

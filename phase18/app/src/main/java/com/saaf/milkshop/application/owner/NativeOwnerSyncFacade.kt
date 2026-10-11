@@ -10,6 +10,11 @@ import com.saaf.milkshop.sync.SyncHoldLabels
 import com.saaf.milkshop.sync.SyncPushEngine
 import com.saaf.milkshop.sync.SyncRuntime
 import com.saaf.milkshop.sync.SyncServerConfig
+import com.saaf.milkshop.sync.SyncOperationGate
+import com.saaf.milkshop.sync.SyncApplyEngine
+import com.saaf.milkshop.sync.SyncPulledRecord
+import androidx.room3.withWriteTransaction
+import org.json.JSONObject
 
 /**
  * Owner-facing sync enrollment and status (sync Phase 8.6 cutover). Wraps
@@ -66,12 +71,23 @@ class NativeOwnerSyncFacade(
      * take-server deletes the entry, unblocking its park so the next pull
      * applies the server version over the local row.
      */
-    suspend fun resolveHold(tableName: String, rowUid: String, keepMine: Boolean) {
-        if (keepMine) {
-            database.syncOutboxDao().setHeld(tableName, rowUid, false)
-        } else {
-            database.syncOutboxDao().deleteEntry(tableName, rowUid)
+    suspend fun resolveHold(tableName: String, rowUid: String, keepMine: Boolean) = SyncOperationGate.exclusive {
+        database.withWriteTransaction {
+            if (keepMine) {
+                database.syncOutboxDao().setHeld(tableName, rowUid, false)
+            } else {
+                val park = requireNotNull(database.syncParkedRowDao().find(tableName, rowUid)) {
+                    "The server version is unavailable. Sync again before resolving this item."
+                }
+                database.syncOutboxDao().deleteEntry(tableName, rowUid)
+                SyncApplyEngine(database).apply(listOf(SyncPulledRecord(
+                    park.serverSeq, null, tableName, rowUid, JSONObject(park.payloadJson), null,
+                )))
+                require(database.syncParkedRowDao().find(tableName, rowUid) == null) {
+                    "The server version cannot be applied yet. The review item has been retained."
+                }
+            }
+            database.syncRebaselineHoldDao().delete(tableName, rowUid)
         }
-        database.syncRebaselineHoldDao().delete(tableName, rowUid)
     }
 }

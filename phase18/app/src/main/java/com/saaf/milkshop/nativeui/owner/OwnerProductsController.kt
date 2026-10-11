@@ -198,8 +198,12 @@ internal class OwnerProductsController(
         runtime.updateReady { it.copy(productCreating = true, productsError = null) }
         readJob?.cancel()
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) { facade.createProduct(token.handle, input) }
+                runtime.updateCurrent(token, NativeOwnerMoreDestination.Products) { it.copy(productCreateOpen = false, productCreating = false) }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Product added")
                     DataChangeBus.notifyDataChanged()
                 val snapshot = withContext(Dispatchers.IO) {
                     facade.loadProducts(token.handle, includeArchived = false)
@@ -220,7 +224,7 @@ internal class OwnerProductsController(
                     )
                 }
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, if (saved && error !is com.saaf.milkshop.domain.SecurityFailure) IllegalStateException("Saved on this phone. The latest list could not refresh; try Refresh.", error) else error)
             }
         }
     }
@@ -264,11 +268,16 @@ internal class OwnerProductsController(
         runtime.updateReady { it.copy(productUpdating = true, productsError = null) }
         readJob?.cancel()
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     facade.updateProduct(token.handle, productId, input)
                     DataChangeBus.notifyDataChanged()
                 }
+                runtime.updateCurrent(token, NativeOwnerMoreDestination.Products) { it.copy(productEditOpen = false, productUpdating = false) }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Product saved")
+                com.saaf.milkshop.nativeui.DataChangeBus.notifyDataChanged()
                 val detail = withContext(Dispatchers.IO) {
                     facade.loadDetail(token.handle, productId)
                 }
@@ -286,7 +295,7 @@ internal class OwnerProductsController(
                     )
                 }
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, if (saved && error !is com.saaf.milkshop.domain.SecurityFailure) IllegalStateException("Saved on this phone. The latest list could not refresh; try Refresh.", error) else error)
             }
         }
     }
@@ -334,6 +343,7 @@ internal class OwnerProductsController(
         }
         readJob?.cancel()
         runtime.scope.launch {
+            var saved = false
             try {
                 withContext(Dispatchers.IO) {
                     if (archived) {
@@ -344,6 +354,8 @@ internal class OwnerProductsController(
                     DataChangeBus.notifyDataChanged()
                     }
                 }
+                saved = true
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Product visibility saved")
                 val snapshot = withContext(Dispatchers.IO) {
                     facade.loadProducts(token.handle, includeArchived = showArchived)
                 }
@@ -360,7 +372,7 @@ internal class OwnerProductsController(
                     )
                 }
             } catch (error: Throwable) {
-                handleFailure(token, error)
+                handleFailure(token, com.saaf.milkshop.nativeui.common.savedReadbackFailure(saved, error))
             }
         }
     }

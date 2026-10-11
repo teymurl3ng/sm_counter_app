@@ -1,6 +1,9 @@
 package com.saaf.milkshop.nativeui.owner
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.nativeListItem
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +20,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -143,7 +147,7 @@ private fun OverviewBody(
         verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         Button(
-            onClick = onOpenMonthReports,
+            onClick = hapticAction(onOpenMonthReports),
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag(NativeUiTags.OwnerOverviewMonthReports),
@@ -181,7 +185,7 @@ private fun OverviewBody(
                             }
                             if (item.actionLabel != null) {
                                 TextButton(
-                                    onClick = onAttentionReview,
+                                    onClick = hapticAction(onAttentionReview),
                                     modifier = Modifier.testTag(NativeUiTags.OwnerOverviewAttentionReview),
                                 ) { Text(item.actionLabel) }
                             }
@@ -202,9 +206,7 @@ private fun OverviewBody(
         }
 
         Column(
-            Modifier
-                .fillMaxWidth()
-                .testTag(NativeUiTags.OwnerOverviewSales),
+            Modifier.nativeListItem(NativeListStyle.Section).nativeListItemContent(NativeListStyle.Section).testTag(NativeUiTags.OwnerOverviewSales),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text("Today’s sales", style = MaterialTheme.typography.labelLarge)
@@ -244,7 +246,7 @@ private fun OverviewBody(
             }
         }
 
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(Modifier.nativeListItem(NativeListStyle.Section).nativeListItemContent(NativeListStyle.Section), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text("Balances & outstanding", style = MaterialTheme.typography.labelLarge)
             BalanceRow("Expected cash", snapshot.expectedCashPaisa, NativeUiTags.OwnerOverviewExpectedCash)
             BalanceRow("Customers owe", snapshot.customersDuePaisa, NativeUiTags.OwnerOverviewCustomersDue)
@@ -269,7 +271,7 @@ private fun OverviewBody(
                             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
                             shape = MaterialTheme.shapes.medium,
                         ) {
-                            Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text(line.productName, style = MaterialTheme.typography.bodyMedium)
                                 Text(line.quantityLabel, style = MaterialTheme.typography.titleLarge)
                             }
@@ -280,7 +282,7 @@ private fun OverviewBody(
         }
 
         Column(
-            Modifier.testTag(NativeUiTags.OwnerOverviewLatestActivity),
+            Modifier.nativeListItem(NativeListStyle.Section).nativeListItemContent(NativeListStyle.Section).testTag(NativeUiTags.OwnerOverviewLatestActivity),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text("Latest activity", style = MaterialTheme.typography.labelLarge)

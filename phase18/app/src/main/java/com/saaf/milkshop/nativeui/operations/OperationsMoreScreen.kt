@@ -1,6 +1,8 @@
 package com.saaf.milkshop.nativeui.operations
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +39,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
+import com.saaf.milkshop.nativeui.common.nativeListItem
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -223,6 +227,7 @@ private fun OpsMoreMenuScreen(
                 Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp)
                     .testTag(NativeUiTags.OpsMoreMenu),
             ) {
                 OpsMoreMenuRow(
@@ -230,31 +235,28 @@ private fun OpsMoreMenuScreen(
                     title = "Today's work",
                     subtitle = "Your physical receive, yogurt, and spoilage records",
                     tag = NativeUiTags.OpsMoreTodayWork,
-                    onClick = onOpenTodayWork,
+                    onClick = hapticAction(onOpenTodayWork),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 OpsMoreMenuRow(
                     icon = Icons.Outlined.Lock,
                     title = "Personal security",
                     subtitle = "Quick unlock for this account on this phone",
                     tag = NativeUiTags.OpsMorePersonalSecurity,
-                    onClick = onOpenPersonalSecurity,
+                    onClick = hapticAction(onOpenPersonalSecurity),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 OpsMoreMenuRow(
                     icon = Icons.Outlined.SwapHoriz,
                     title = "Switch account",
                     subtitle = "Choose another person on this phone",
                     tag = NativeUiTags.OpsMoreSwitchAccount,
-                    onClick = onSwitchAccount,
+                    onClick = hapticAction(onSwitchAccount),
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 OpsMoreMenuRow(
                     icon = Icons.Outlined.Logout,
                     title = "Sign out",
                     subtitle = "Return to Welcome",
                     tag = NativeUiTags.OpsMoreSignOut,
-                    onClick = onSignOut,
+                    onClick = hapticAction(onSignOut),
                 )
             }
         }
@@ -303,7 +305,6 @@ private fun OpsMoreTodayWorkScreen(
                 } else {
                     state.todayRecords.forEach { record ->
                         OpsMoreWorkRow(record)
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     }
                 }
             }
@@ -315,8 +316,8 @@ private fun OpsMoreTodayWorkScreen(
 private fun OpsMoreWorkRow(record: NativeOperationsWorkRecord) {
     Column(
         Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Record)
+            .nativeListItemContent(NativeListStyle.Record)
             .testTag(NativeUiTags.opsMoreWorkRecord(record.eventId)),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
@@ -374,7 +375,7 @@ private fun OpsMorePersonalSecurityScreen(
             text = { Text("This clears Quick PIN and phone security for ${identity.displayName} on this phone.") },
             confirmButton = {
                 TextButton(
-                    onClick = {
+                    onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction {
                         val secret = passphrase.toCharArray()
                         passphrase = ""
                         pin = ""
@@ -384,7 +385,7 @@ private fun OpsMorePersonalSecurityScreen(
                 ) { Text("Discard and leave") }
             },
             dismissButton = {
-                TextButton(onClick = onCancelRemove) { Text("Keep editing") }
+                TextButton(onClick = hapticAction(onCancelRemove)) { Text("Keep editing") }
             },
         )
     }
@@ -431,8 +432,8 @@ private fun OpsMorePersonalSecurityScreen(
                         Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag(NativeUiTags.OpsMoreError))
                     }
                     Button(
-                        onClick = {
-                            if (passphrase.isBlank() || pin.length != 4) return@Button
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                            if (passphrase.isBlank() || pin.length != 4) return@hapticAction
                             val secret = passphrase.toCharArray()
                             val quickPin = pin.toCharArray()
                             passphrase = ""
@@ -444,8 +445,8 @@ private fun OpsMorePersonalSecurityScreen(
                     ) { Text(if (state.saving) "Saving…" else "Save Quick PIN") }
                     if (security.phoneSecurityAvailable) {
                         Button(
-                            onClick = {
-                                if (passphrase.isBlank()) return@Button
+                            onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                                if (passphrase.isBlank()) return@hapticAction
                                 val secret = passphrase.toCharArray()
                                 val quickPin = pin.takeIf { it.length == 4 }?.toCharArray()
                                 passphrase = ""
@@ -458,7 +459,7 @@ private fun OpsMorePersonalSecurityScreen(
                     }
                     if (security.quickPinEnabled || security.phoneSecurityEnabled) {
                         TextButton(
-                            onClick = onRequestRemove,
+                            onClick = hapticAction(onRequestRemove),
                             enabled = !state.saving && passphrase.isNotBlank(),
                             modifier = Modifier.testTag(NativeUiTags.OpsMoreSecurityRemove),
                         ) { Text("Remove Quick unlock") }
@@ -480,11 +481,10 @@ private fun OpsMoreMenuRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 72.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Navigation, enabled = enabled)
             .semantics { role = Role.Button }
-            .clickable(enabled = enabled, onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .clickable(enabled = enabled, onClick = hapticAction(onClick))
+            .nativeListItemContent(NativeListStyle.Navigation)
             .testTag(tag),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),

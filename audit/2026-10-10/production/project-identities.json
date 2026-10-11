@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"projects\":[{\"id\":\"tghzmofkkdsaasvnixps\",\"ref\":\"tghzmofkkdsaasvnixps\",\"organization_id\":\"hlewlyngnpziytterocd\",\"organization_slug\":\"hlewlyngnpziytterocd\",\"name\":\"saafmilk-dev\",\"region\":\"ap-northeast-1\",\"status\":\"ACTIVE_HEALTHY\",\"database\":{\"host\":\"db.tghzmofkkdsaasvnixps.supabase.co\",\"version\":\"17.6.1.166\",\"postgres_engine\":\"17\",\"release_channel\":\"ga\"},\"created_at\":\"2026-09-19T18:09:13.372731Z\"},{\"id\":\"tlsuxbghuhlqntkgtrxt\",\"ref\":\"tlsuxbghuhlqntkgtrxt\",\"organization_id\":\"hlewlyngnpziytterocd\",\"organization_slug\":\"hlewlyngnpziytterocd\",\"name\":\"saafmilk-prod\",\"region\":\"ap-northeast-1\",\"status\":\"ACTIVE_HEALTHY\",\"database\":{\"host\":\"db.tlsuxbghuhlqntkgtrxt.supabase.co\",\"version\":\"17.6.1.166\",\"postgres_engine\":\"17\",\"release_channel\":\"ga\"},\"created_at\":\"2026-09-20T07:18:18.852628Z\"}]}"
+    }
+  ],
+  "isError": false
+}

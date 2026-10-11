@@ -1,6 +1,9 @@
 package com.saaf.milkshop.nativeui.owner
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.nativeListItem
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +26,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -88,6 +92,7 @@ internal fun OwnerOpeningCostBasisBody(
             LazyColumn(
                 Modifier
                     .fillMaxSize()
+                    .padding(horizontal = 16.dp)
                     .testTag(NativeUiTags.OwnerCostingOpeningList),
             ) {
                 if (rows.isEmpty()) {
@@ -106,7 +111,7 @@ internal fun OwnerOpeningCostBasisBody(
                                 modifier = Modifier.testTag(NativeUiTags.OwnerCostingOpeningSummary),
                             )
                             Button(
-                                onClick = onOpenShopSettings,
+                                onClick = hapticAction(onOpenShopSettings),
                                 modifier = Modifier
                                     .padding(top = 16.dp)
                                     .testTag(NativeUiTags.OwnerCostingOpeningOpenShopSettings),
@@ -136,8 +141,8 @@ private fun OwnerOpeningCostRow(
 ) {
     Column(
         Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Record)
+            .nativeListItemContent(NativeListStyle.Record)
             .testTag(NativeUiTags.ownerCostingOpeningRow(row.productId)),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
@@ -159,7 +164,7 @@ private fun OwnerOpeningCostRow(
                 )
             }
             TextButton(
-                onClick = onOpenEditor,
+                onClick = hapticAction(onOpenEditor),
                 modifier = Modifier.testTag(NativeUiTags.ownerCostingOpeningEdit(row.productId)),
             ) {
                 Text(if (row.basisId == null) "Add cost" else "Correct")
@@ -298,7 +303,7 @@ internal fun OwnerOpeningCostBasisEditorScreen(
                     availableKinds.forEach { kind ->
                         FilterChip(
                             selected = basisKind == kind,
-                            onClick = {
+                            onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                                 basisKind = kind
                                 leaveGuard.markDirty()
                             },
@@ -352,8 +357,8 @@ internal fun OwnerOpeningCostBasisEditorScreen(
                     )
                 }
                 Button(
-                    onClick = {
-                        if (!canSave) return@Button
+                    onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
+                        if (!canSave) return@hapticCommitAction
                         onSave(
                             OpeningCostBasisInput(
                                 openingEventId = row.openingEventId,

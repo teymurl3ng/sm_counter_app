@@ -1,0 +1,32 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/app/(app)/overview/overview-panel.tsx
+@@
+   const [data, setData] = useState<OverviewApiResponse | null>(peeked);
+   const [tick, setTick] = useState(0);
+ 
+-  const load = useCallback(async () => {
++  const load = useCallback(async (isCurrent: () => boolean = () => true) => {
+     try {
+       const result = await viewerCachedGet({
+         key: "overview",
+@@
+         setState,
+       );
+     } catch {
++      if (!isCurrent()) return;
+       setData({
+         ok: false,
+         env: "unknown",
+@@
+   }, [router]);
+ 
+   useEffect(() => {
+-    void load();
++    let disposed = false;
++    // Subscribe after commit; cleanup fences cache and network completions alike.
++    queueMicrotask(() => { if (!disposed) void load(() => !disposed); });
++    return () => { disposed = true; };
+   }, [load, tick]);
+ 
+   const envLabel = (data?.env || "unknown").toUpperCase();
+*** End Patch

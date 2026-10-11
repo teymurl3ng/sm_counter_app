@@ -3,7 +3,7 @@ package com.saaf.milkshop.nativeui.operations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.saaf.milkshop.application.operations.NativeOperationsWorkContext
-import com.saaf.milkshop.application.operations.NativeOperationsWorkFacade
+import com.saaf.milkshop.application.operations.NativeOperationsWorkOperations
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
 import com.saaf.milkshop.nativeui.DataChangeBus
@@ -40,7 +40,7 @@ sealed interface NativeOperationsWorkState {
 }
 
 class NativeOperationsWorkViewModel(
-    private val facade: NativeOperationsWorkFacade,
+    private val facade: NativeOperationsWorkOperations,
     private val onSessionExpired: () -> Unit,
 ) : ViewModel() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -86,8 +86,6 @@ class NativeOperationsWorkViewModel(
         val session = sessionHandle ?: return
         val request = loadGate.begin(session)
         val previous = _state.value as? NativeOperationsWorkState.Ready
-        val previousDestination =
-            previous?.destination ?: NativeOperationsWorkDestination.Home
         _state.value = previous?.copy(refreshing = true, error = null)
             ?: NativeOperationsWorkState.Loading
         scope.launch {
@@ -96,7 +94,8 @@ class NativeOperationsWorkViewModel(
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 _state.value = NativeOperationsWorkState.Ready(
                     context = context,
-                    destination = previousDestination,
+                    destination = (_state.value as? NativeOperationsWorkState.Ready)?.destination
+                        ?: NativeOperationsWorkDestination.Home,
                     refreshing = false,
                 )
             } catch (error: Throwable) {
@@ -104,7 +103,7 @@ class NativeOperationsWorkViewModel(
                 if (error is SecurityFailure.SessionExpired || previous == null) {
                     handleLoadFailure(error)
                 } else {
-                    _state.value = previous.copy(
+                    _state.value = ((_state.value as? NativeOperationsWorkState.Ready) ?: previous).copy(
                         refreshing = false,
                         error = error.message ?: "Work could not open. Try again.",
                     )
@@ -143,7 +142,7 @@ class NativeOperationsWorkViewModel(
     }
 
     class Factory(
-        private val facade: NativeOperationsWorkFacade,
+        private val facade: NativeOperationsWorkOperations,
         private val onSessionExpired: () -> Unit,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")

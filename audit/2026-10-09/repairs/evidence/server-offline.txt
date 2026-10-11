@@ -1,0 +1,12 @@
+test_auth_collects_more_than_first_hundred (__main__.ServerOfflineTest.test_auth_collects_more_than_first_hundred) ... ok
+test_bootstrap_order_and_migration_copies (__main__.ServerOfflineTest.test_bootstrap_order_and_migration_copies) ... ok
+test_cli_count_is_paginated_and_business_scoped (__main__.ServerOfflineTest.test_cli_count_is_paginated_and_business_scoped) ... ok
+test_duplicate_or_invalid_page_is_rejected (__main__.ServerOfflineTest.test_duplicate_or_invalid_page_is_rejected) ... ok
+test_repeated_backup_branch_runs_preserve_old_snapshots (__main__.ServerOfflineTest.test_repeated_backup_branch_runs_preserve_old_snapshots) ... ok
+test_rest_respects_server_cap_and_collects_every_row (__main__.ServerOfflineTest.test_rest_respects_server_cap_and_collects_every_row) ... ok
+test_workflow_switches_branch_before_snapshot_and_stages_only_snapshot (__main__.ServerOfflineTest.test_workflow_switches_branch_before_snapshot_and_stages_only_snapshot) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 2.333s
+
+OK

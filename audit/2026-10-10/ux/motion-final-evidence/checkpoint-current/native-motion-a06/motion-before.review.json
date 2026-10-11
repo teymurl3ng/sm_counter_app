@@ -1,0 +1,8 @@
+{
+  "scenario": "motion-before",
+  "workflowId": "profileRealTimeNativeTransitionFramesAndGuardOwnership",
+  "reviewStatus": "UNREVIEWED",
+  "packageName": "com.saaf.milkshop.qa.benchmark",
+  "capturedAt": "2026-10-10T17:53:22.898394Z",
+  "note": "Synthetic Sale\/Reports body transition under persistent Owner chrome; not an exhaustive app motion audit."
+}

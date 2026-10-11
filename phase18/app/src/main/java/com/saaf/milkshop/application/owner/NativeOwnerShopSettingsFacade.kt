@@ -156,7 +156,7 @@ class NativeOwnerShopSettingsFacade(
         }
 
         return NativeOwnerShopSettingsSnapshot(
-            shopName = store?.storeName?.takeIf { it.isNotBlank() } ?: "Saaf Milk",
+            shopName = store?.storeName?.takeIf { it.isNotBlank() } ?: "Your shop",
             phone = store?.phone,
             address = store?.address,
             currencyCode = store?.currencyCode?.takeIf { it.isNotBlank() } ?: "PKR",

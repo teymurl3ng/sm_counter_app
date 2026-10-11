@@ -1,5 +1,6 @@
 package com.saaf.milkshop.application.salarypayment
 
+import androidx.room3.withWriteTransaction
 import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
 import com.saaf.milkshop.application.readmodels.HybridReadModelService
 import com.saaf.milkshop.data.MilkShopDatabase
@@ -95,31 +96,35 @@ class NativeSalaryPaymentFacade(
             ?: throw IllegalArgumentException("Choose an active employee.")
         val paymentAccount = context.paymentAccounts.singleOrNull { it.accountId == request.paymentAccountId }
             ?: throw IllegalArgumentException("Choose a valid Cash/Bank account.")
-        val result = commands.recordSalaryPayment(
-            sessionHandle = sessionHandle,
-            input = SalaryPaymentInput(
-                employeeAccountId = employee.accountId,
-                paymentAccountId = paymentAccount.accountId,
-                amount = BigDecimal(request.amountPaisa).movePointLeft(2).toDouble(),
-                occurredAt = context.businessDate,
-                notes = request.notes?.trim()?.takeIf { it.isNotEmpty() },
-            ),
-        )
-        val refreshedContext = load(sessionHandle, date)
-        val refreshedEmployee = refreshedContext.employees.singleOrNull {
-            it.accountId == employee.accountId
-        } ?: employee
-        val refreshedPayment = refreshedContext.paymentAccounts.singleOrNull {
-            it.accountId == paymentAccount.accountId
-        } ?: paymentAccount
-        return NativeSalaryPaymentSubmission(
-            receipt = NativeSalaryPaymentReceipt(
-                eventId = result.eventId,
-                employee = refreshedEmployee,
-                paymentAccount = refreshedPayment,
-                amountPaisa = request.amountPaisa,
-            ),
-            refreshedContext = refreshedContext,
-        )
+        // The mutation, required evidence and receipt reads commit together.
+        // A read/authorization failure cannot report failure after saving.
+        return database.withWriteTransaction {
+            val result = commands.recordSalaryPayment(
+                sessionHandle = sessionHandle,
+                input = SalaryPaymentInput(
+                    employeeAccountId = employee.accountId,
+                    paymentAccountId = paymentAccount.accountId,
+                    amount = BigDecimal(request.amountPaisa).movePointLeft(2).toDouble(),
+                    occurredAt = context.businessDate,
+                    notes = request.notes?.trim()?.takeIf { it.isNotEmpty() },
+                ),
+            )
+            val refreshedContext = load(sessionHandle, date)
+            val refreshedEmployee = refreshedContext.employees.singleOrNull {
+                it.accountId == employee.accountId
+            } ?: employee
+            val refreshedPayment = refreshedContext.paymentAccounts.singleOrNull {
+                it.accountId == paymentAccount.accountId
+            } ?: paymentAccount
+            NativeSalaryPaymentSubmission(
+                receipt = NativeSalaryPaymentReceipt(
+                    eventId = result.eventId,
+                    employee = refreshedEmployee,
+                    paymentAccount = refreshedPayment,
+                    amountPaisa = request.amountPaisa,
+                ),
+                refreshedContext = refreshedContext,
+            )
+        }
     }
 }

@@ -1,0 +1,3 @@
+scenario	png	workflow_id	device	orientation	font_scale	theme	review_status
+ready-default	ready-default.png	collect_customer_selector	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+keyboard-risk-amount	keyboard-risk-amount.png	collect_amount	SM-A065F/16	portrait	1.0	light	UNREVIEWED

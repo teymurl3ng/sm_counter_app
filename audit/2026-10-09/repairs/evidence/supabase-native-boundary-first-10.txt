@@ -1,0 +1,16 @@
+Preparing portable PostgreSQL runtime
+Initializing disposable localhost cluster
+postgres (PostgreSQL) 18.6
+Executing bootstrap and concurrent connection fixtures
+PASS live-model RPC refuses cashier history correction
+PASS live-model direct INSERT bypasses correction and business-header checks
+PASS live-model direct INSERT accepts unknown table and JSON null
+PASS reviewable repair applies atomically and reapplies without data changes
+PASS repaired boundary denies direct authenticated INSERT and sequence use
+PASS repaired boundary preserves correction authorization
+PASS repaired boundary preserves ordinary RPC push, pull and timezone profile
+PASS repaired payload constraint rejects JSON null even for privileged writes
+PASS repaired internal redactor keeps recursive semantics with fixed search_path
+PASS repaired C1.6 trigger prevents direct removal of the fixture final owner
+10 native live-model/repair boundary checks passed. No live writes or real Auth-session verification.
+Disposable cluster stopped

@@ -7,7 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.saaf.milkshop.application.bridge.BridgeContractSnapshot
 import com.saaf.milkshop.application.bridge.HybridBridgeDispatcher
-import com.saaf.milkshop.application.bridge.OperationsBridgeCommandService
+import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.CreateUserInput
 import com.saaf.milkshop.domain.DailyCloseService

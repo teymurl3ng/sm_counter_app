@@ -235,15 +235,12 @@ class NativeOwnerRecordsFacadeTest {
             NativeCollectionRequest(customerId, cashId, 13_000L, null),
             DATE,
         ).receipt.eventId
-        database.dailyCloseDao().insert(
-            DailyCloseActionEntity(
-                businessDate = DATE.toString(),
-                action = "close",
-                actorName = "Records Owner",
-                actorRole = AppRole.OWNER.wireValue,
-                createdAt = Instant.now().toString(),
-            ),
-        )
+        val close = com.saaf.milkshop.application.cashclose.NativeCashCloseFacade(database, security)
+        val expected = close.load(ownerSession, DATE).expectedCashPaisa
+        val count = close.recordCount(ownerSession,
+            com.saaf.milkshop.application.cashclose.NativeCashCloseCountRequest(expected, null), DATE).count
+        close.closeDay(ownerSession,
+            com.saaf.milkshop.application.cashclose.NativeCashCloseDayRequest(count.countId, null), DATE)
         val failure = runCatching {
             facade.correct(
                 ownerSession,

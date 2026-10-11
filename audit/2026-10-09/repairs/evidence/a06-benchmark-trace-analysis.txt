@@ -1,0 +1,49 @@
+
+Loading trace: 0.00 MB
+
+Loading trace: 25.11 MB
+[378.716]     common_flags.cc:525 Trace loaded: 25.11 MB in 1.02s (24.7 MB/s)
+[378.750]            query.cc:191 Query execution time: 30 ms
+"process","jank_type","jank_tag","present_type","on_time_finish","frames","average_ms","max_ms"
+"com.saaf.milkshop.qa.benchmark","Buffer Stuffing","Buffer Stuffing","Late Present",1,469,21.951000,120.720000
+"com.saaf.milkshop.qa.benchmark","App Deadline Missed","Self Jank","Late Present",0,37,144.168000,303.057000
+"com.saaf.milkshop.qa.benchmark","App Deadline Missed, Buffer Stuffing","Self Jank","Late Present",0,9,44.069000,78.426000
+"com.saaf.milkshop.qa.benchmark","None","No Jank","On-time Present",1,1,4.177000,4.177000
+
+"thread","scheduled_cpu_ms"
+"op.qa.benchmark",10288.793000
+"RenderThread",4461.118000
+"Jit thread pool",2871.248000
+"mali-cmar-backe",772.004000
+"fMilkTestRunner",687.389000
+"HeapTaskDaemon",408.381000
+"binder:21237_1",347.349000
+"binder:21237_4",231.820000
+"pool-6-thread-1",129.413000
+"mali-compiler",124.801000
+"GPU completion",119.992000
+"audit-frame-met",114.531000
+
+"thread","name","slices","average_ms","max_ms"
+"op.qa.benchmark","Choreographer#doFrame 66448564",1,295.245000,295.245000
+"op.qa.benchmark","measure",180,13.250000,196.641000
+"op.qa.benchmark","Choreographer#doFrame 66448681",1,196.637000,196.637000
+"op.qa.benchmark","AndroidOwner:onMeasure",177,13.149000,196.404000
+"op.qa.benchmark","Choreographer#doFrame 66449776",1,174.428000,174.428000
+"op.qa.benchmark","Choreographer#doFrame 66448830",1,174.241000,174.241000
+"op.qa.benchmark","Choreographer#doFrame 66450187",1,163.607000,163.607000
+"op.qa.benchmark","Choreographer#doFrame 66449910",1,151.803000,151.803000
+"op.qa.benchmark","Choreographer#doFrame 66449620",1,148.761000,148.761000
+"op.qa.benchmark","Choreographer#doFrame 66449083",1,148.270000,148.270000
+"op.qa.benchmark","Choreographer#doFrame 66449217",1,146.099000,146.099000
+"op.qa.benchmark","Choreographer#doFrame 66449359",1,141.986000,141.986000
+"op.qa.benchmark","Choreographer#doFrame 66449493",1,141.706000,141.706000
+"op.qa.benchmark","Choreographer#doFrame 66448956",1,141.020000,141.020000
+"op.qa.benchmark","Choreographer#doFrame 66450052",1,134.801000,134.801000
+"op.qa.benchmark","Choreographer#doFrame 66448437",1,134.356000,134.356000
+"op.qa.benchmark","Choreographer#doFrame - resynced to 66448487 in 32.0ms",1,133.785000,133.785000
+"op.qa.benchmark","Choreographer#doFrame 66450750",1,126.282000,126.282000
+"op.qa.benchmark","Choreographer#doFrame 66451295",1,122.229000,122.229000
+"RenderThread","DrawFrames 66448437",1,120.920000,120.920000
+
+"name","severity","value"

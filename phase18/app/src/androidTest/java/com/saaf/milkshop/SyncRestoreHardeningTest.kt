@@ -47,6 +47,7 @@ class SyncRestoreHardeningTest {
         SyncShopBindingStore.clear(context)
         SyncServerConfigStore.clear(context)
         SyncTokenStore(context).clear()
+        com.saaf.milkshop.sync.SyncRebaselineStore(context).clear()
         SyncScheduler.warmUp(context)
     }
 
@@ -105,6 +106,8 @@ class SyncRestoreHardeningTest {
         val snapshot = exportLocalSnapshot(source)
         val restored = MilkShopDatabase.createInMemory()
         try {
+            restored.syncRebaselineHoldDao().upsert(com.saaf.milkshop.data.SyncRebaselineHoldEntity(
+                "products", "old-review-item", "{}", "old-device", 42, "2026-10-10"))
             val restore = BackupManager(context).restoreLocalSnapshot(
                 restored,
                 android.net.Uri.fromFile(snapshot),
@@ -118,6 +121,7 @@ class SyncRestoreHardeningTest {
             )
             // Nothing was restored onto the target and the enrollment is untouched.
             assertEquals(0L, restored.appUserDao().count())
+            assertEquals(1, restored.syncRebaselineHoldDao().count())
             assertEquals(shopA, SyncShopBindingStore.load(context)?.shopId)
             assertNotNull(SyncTokenStore(context).load())
         } finally {
@@ -133,6 +137,8 @@ class SyncRestoreHardeningTest {
         val snapshot = exportLocalSnapshot(source)
         val restored = MilkShopDatabase.createInMemory()
         try {
+            restored.syncRebaselineHoldDao().upsert(com.saaf.milkshop.data.SyncRebaselineHoldEntity(
+                "products", "old-review-item", "{}", "old-device", 42, "2026-10-10"))
             val restore = BackupManager(context).restoreLocalSnapshot(
                 restored,
                 android.net.Uri.fromFile(snapshot),
@@ -153,7 +159,9 @@ class SyncRestoreHardeningTest {
             val binding = restored.serverAccountDao().findBinding()!!
             assertEquals(shopA, binding.shopId)
             assertEquals("restored_unverified", binding.status)
-            assertEquals(0L, restored.syncOutboxDao().count())
+            assertEquals(0, restored.syncRebaselineHoldDao().count())
+            assertEquals(source.syncOutboxDao().count(), restored.syncOutboxDao().count())
+            assertTrue(restored.syncOutboxDao().all().all { it.held })
         } finally {
             source.close()
             restored.close()
@@ -173,7 +181,8 @@ class SyncRestoreHardeningTest {
                 NativeSessionManager(),
             )
             assertTrue(restore.exceptionOrNull()?.message, restore.isSuccess)
-            assertEquals(0L, restored.syncOutboxDao().count())
+            assertEquals(source.syncOutboxDao().count(), restored.syncOutboxDao().count())
+            assertTrue(restored.syncOutboxDao().all().all { it.held })
         } finally {
             source.close()
             restored.close()

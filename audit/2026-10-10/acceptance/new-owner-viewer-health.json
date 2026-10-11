@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "env": "dev",
+  "contract": "v1.2.0-write-admin",
+  "ping": {
+    "ok": true,
+    "at": "2026-10-10T11:34:23.57303+00:00"
+  },
+  "my_profile": {
+    "username": "accept.owner",
+    "display_name": "Acceptance Owner",
+    "role": "owner",
+    "active": true
+  }
+}

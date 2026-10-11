@@ -1,0 +1,35 @@
+[
+  {
+    "repository": "android",
+    "status": "fulfilled",
+    "value": {
+      "chunk_id": "160491",
+      "wall_time_seconds": 1.0287325,
+      "exit_code": 0,
+      "original_token_count": 2661,
+      "output": "Warning: truncated output (original token count: 2661)\nTotal output lines: 62\n\nwarning: in the working copy of 'FINDINGS_STATUS.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/androidTest/java/com/saaf/milkshop/NativeCollectionScreenContractTest.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerBackupScreenContractTest.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerCostingPlansScreenContractTest.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerMoreScreenContractTest.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerRecordsScreenContractTest.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerReportsScreenContractTest.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerWorkScreenContractTest.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/androidTest/java/com/saaf/milkshop/NativeSaleScreenContractTest.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/androidTest/java/com/saaf/milkshop/Phase8DeliveryOperationsTest.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/androidTest/java/com/saaf/milkshop/Phase8EmployeeAttendanceTest.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/androidTest/java/com/saaf/milkshop/Pha…1661 tokens truncated…e Git touches it\nwarning: in the working copy of 'phase18/app/src/main/java/com/saaf/milkshop/presentation/transactions/SaleTransactionAction.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/main/java/com/saaf/milkshop/presentation/transactions/SimpleTransactionActions.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/main/java/com/saaf/milkshop/sync/AccountAuthClient.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/main/java/com/saaf/milkshop/sync/SyncApplyEngine.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/main/java/com/saaf/milkshop/sync/SyncEnrollment.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/main/java/com/saaf/milkshop/sync/SyncPullClient.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/main/java/com/saaf/milkshop/sync/SyncPushEngine.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/main/java/com/saaf/milkshop/sync/SyncPushWorker.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/main/java/com/saaf/milkshop/sync/SyncRebaseline.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/main/java/com/saaf/milkshop/sync/SyncRuntime.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/main/java/com/saaf/milkshop/sync/SyncServerClient.kt', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'phase18/app/src/test/java/com/saaf/milkshop/sync/SyncRebaselineDecisionsTest.kt', LF will be replaced by CRLF the next time Git touches it\n"
+    }
+  },
+  {
+    "repository": "server",
+    "status": "fulfilled",
+    "value": {
+      "chunk_id": "6f5142",
+      "wall_time_seconds": 0.3778962,
+      "exit_code": 0,
+      "original_token_count": 57,
+      "output": "warning: in the working copy of '.github/workflows/identity-dr.yml', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'admin.py', LF will be replaced by CRLF the next time Git touches it\n"
+    }
+  },
+  {
+    "repository": "viewer",
+    "status": "fulfilled",
+    "value": {
+      "chunk_id": "67089f",
+      "wall_time_seconds": 0.3905702,
+      "exit_code": 0,
+      "original_token_count": 505,
+      "output": "warning: in the working copy of 'src/app/(app)/activity/activity-list-panel.tsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/app/(app)/overview/overview-panel.tsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/app/(app)/shops/[shopId]/page.tsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/app/(app)/shops/shops-list-panel.tsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/app/(app)/staff/[staffId]/page.tsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/app/(app)/staff/create/page.tsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/app/(app)/staff/staff-list-panel.tsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/app/(app)/system/system-panel.tsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/app/api/admin/create-staff/route.ts', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/app/api/admin/reconcile-auth/route.ts', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/app/theme-toggle.tsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/lib/account-server.ts', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/lib/admin-mutation.ts', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/lib/perf.ts', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/lib/reconciliation.ts', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/lib/viewer-cache.ts', LF will be replaced by CRLF the next time Git touches it\n"
+    }
+  }
+]

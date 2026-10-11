@@ -1,6 +1,8 @@
 package com.saaf.milkshop.nativeui.owner
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +33,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.hapticAction
+import com.saaf.milkshop.nativeui.common.nativeListItem
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,8 +66,101 @@ import java.util.Locale
  * Owner Customers — customer list + detail + create/edit under OwnerScaffold.
  * Nested from Owner More; never mounts foreign role chrome.
  */
+private data class OwnerCustomersScreenSnapshot(
+    val identity: NativeSignedInIdentity,
+    val context: NativeOwnerMoreContext,
+    val customers: List<NativeOwnerCustomerRow>,
+    val customersLoading: Boolean,
+    val customerDetail: NativeOwnerCustomerDetail?,
+    val customerCreateOpen: Boolean,
+    val customerCreating: Boolean,
+    val customerEditOpen: Boolean,
+    val customerUpdating: Boolean,
+    val customersError: String?,
+    val showHeader: Boolean,
+)
+
 @Composable
 fun OwnerCustomersScreen(
+    snackbarHostState: SnackbarHostState,
+    identity: NativeSignedInIdentity,
+    context: NativeOwnerMoreContext,
+    customers: List<NativeOwnerCustomerRow>,
+    customersLoading: Boolean,
+    customerDetail: NativeOwnerCustomerDetail?,
+    customerCreateOpen: Boolean,
+    customerCreating: Boolean,
+    customerEditOpen: Boolean,
+    customerUpdating: Boolean,
+    customersError: String?,
+    onBackToMenu: () -> Unit,
+    onRetry: () -> Unit,
+    onOpenCustomer: (Long) -> Unit,
+    onBackFromDetail: () -> Unit,
+    onOpenCreate: () -> Unit,
+    onBackFromCreate: () -> Unit,
+    onCreateCustomer: (String) -> Unit,
+    onOpenEdit: () -> Unit,
+    onBackFromEdit: () -> Unit,
+    onUpdateCustomer: (String, CustomerProfileInput) -> Unit,
+    hostedScaffold: HostedScaffold,
+    showHeader: Boolean = true,
+    modifier: Modifier = Modifier,
+) {
+    val snapshot = OwnerCustomersScreenSnapshot(
+        identity = identity,
+        context = context,
+        customers = customers,
+        customersLoading = customersLoading,
+        customerDetail = customerDetail,
+        customerCreateOpen = customerCreateOpen,
+        customerCreating = customerCreating,
+        customerEditOpen = customerEditOpen,
+        customerUpdating = customerUpdating,
+        customersError = customersError,
+        showHeader = showHeader,
+    )
+    com.saaf.milkshop.nativeui.common.NativeSectionTransition(
+        targetState = snapshot,
+        contentKey = { pane -> when {
+            pane.customerCreateOpen -> "create"
+            pane.customerEditOpen -> "edit"
+            pane.customerDetail != null -> "detail:${pane.customerDetail.row.accountId}"
+            else -> "list"
+        } },
+        modifier = modifier,
+    ) { pane ->
+        OwnerCustomersScreenPane(
+            snackbarHostState = snackbarHostState,
+            identity = pane.identity,
+            context = pane.context,
+            customers = pane.customers,
+            customersLoading = pane.customersLoading,
+            customerDetail = pane.customerDetail,
+            customerCreateOpen = pane.customerCreateOpen,
+            customerCreating = pane.customerCreating,
+            customerEditOpen = pane.customerEditOpen,
+            customerUpdating = pane.customerUpdating,
+            customersError = pane.customersError,
+            onBackToMenu = onBackToMenu,
+            onRetry = onRetry,
+            onOpenCustomer = onOpenCustomer,
+            onBackFromDetail = onBackFromDetail,
+            onOpenCreate = onOpenCreate,
+            onBackFromCreate = onBackFromCreate,
+            onCreateCustomer = onCreateCustomer,
+            onOpenEdit = onOpenEdit,
+            onBackFromEdit = onBackFromEdit,
+            onUpdateCustomer = onUpdateCustomer,
+            hostedScaffold = hostedScaffold,
+            showHeader = pane.showHeader,
+            modifier = modifier,
+        )
+    }
+}
+
+@Composable
+private fun OwnerCustomersScreenPane(
     snackbarHostState: SnackbarHostState,
     identity: NativeSignedInIdentity,
     context: NativeOwnerMoreContext,
@@ -176,7 +273,7 @@ fun OwnerCustomersScreen(
                         )
                         Spacer(Modifier.height(16.dp))
                         Button(
-                            onClick = onRetry,
+                            onClick = hapticAction(onRetry),
                             modifier = Modifier.testTag(NativeUiTags.OwnerCustomersRetry),
                         ) { Text("Try again") }
                     }
@@ -191,7 +288,7 @@ fun OwnerCustomersScreen(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             TextButton(
-                                onClick = onOpenCreate,
+                                onClick = hapticAction(onOpenCreate),
                                 modifier = Modifier.testTag(NativeUiTags.OwnerCustomersCreateOpen),
                             ) { Text("Add customer") }
                         }
@@ -222,14 +319,14 @@ fun OwnerCustomersScreen(
                             LazyColumn(
                                 Modifier
                                     .fillMaxSize()
+                                    .padding(horizontal = 16.dp)
                                     .testTag(NativeUiTags.OwnerCustomersList),
                             ) {
                                 items(customers, key = { it.accountId }) { customer ->
                                     OwnerCustomerRow(
                                         customer = customer,
-                                        onClick = { onOpenCustomer(customer.accountId) },
+                                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenCustomer(customer.accountId) },
                                     )
-                                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                                 }
                             }
                         }
@@ -324,8 +421,8 @@ private fun OwnerCustomersCreateScreen(
                         )
                     }
                     Button(
-                        onClick = {
-                            if (!canSave) return@Button
+                        onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
+                            if (!canSave) return@hapticCommitAction
                             onSave(name)
                         },
                         enabled = canSave,
@@ -343,7 +440,7 @@ private fun OwnerCustomersCreateScreen(
                         }
                     }
                     TextButton(
-                        onClick = { requestLeave(onBack) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { requestLeave(onBack) },
                         enabled = !saving,
                         modifier = Modifier.testTag(NativeUiTags.OwnerCustomersCreateCancel),
                     ) { Text("Cancel") }
@@ -567,8 +664,8 @@ private fun OwnerCustomersEditScreen(
                         )
                     }
                     Button(
-                        onClick = {
-                            if (!canSave) return@Button
+                        onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction {
+                            if (!canSave) return@hapticCommitAction
                             onSave(
                                 name,
                                 CustomerProfileInput(
@@ -597,7 +694,7 @@ private fun OwnerCustomersEditScreen(
                         }
                     }
                     TextButton(
-                        onClick = { requestLeave(onBack) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { requestLeave(onBack) },
                         enabled = !saving,
                         modifier = Modifier.testTag(NativeUiTags.OwnerCustomersEditCancel),
                     ) { Text("Cancel") }
@@ -629,13 +726,13 @@ private fun OwnerCustomersDiscardDialog(
         text = { Text(body) },
         confirmButton = {
             TextButton(
-                onClick = leaveGuard::confirmDiscard,
+                onClick = hapticAction(leaveGuard::confirmDiscard),
                 modifier = Modifier.testTag(discardTag),
             ) { Text("Discard and leave") }
         },
         dismissButton = {
             TextButton(
-                onClick = leaveGuard::keepEditing,
+                onClick = hapticAction(leaveGuard::keepEditing),
                 modifier = Modifier.testTag(keepTag),
             ) { Text("Keep editing") }
         },
@@ -699,7 +796,7 @@ private fun OwnerCustomersDetailScreen(
                     )
                 }
                 Button(
-                    onClick = onOpenEdit,
+                    onClick = hapticAction(onOpenEdit),
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag(NativeUiTags.OwnerCustomersDetailEdit),
@@ -716,11 +813,10 @@ private fun OwnerCustomerRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 72.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Entity)
             .semantics { role = Role.Button }
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .clickable(onClick = hapticAction(onClick))
+            .nativeListItemContent(NativeListStyle.Entity)
             .testTag(NativeUiTags.ownerCustomer(customer.accountId)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),

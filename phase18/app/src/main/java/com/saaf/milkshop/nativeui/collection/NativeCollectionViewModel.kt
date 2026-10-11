@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.delay
 
 sealed interface NativeCollectionState {
     data object Idle : NativeCollectionState
@@ -78,13 +77,14 @@ class NativeCollectionViewModel(
             try {
                 val context = withContext(Dispatchers.IO) { facade.load(session) }
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
-                _state.value = NativeCollectionState.Ready(context, refreshing = false)
+                _state.value = (_state.value as? NativeCollectionState.Ready)?.copy(context = context, refreshing = false, error = null)
+                    ?: NativeCollectionState.Ready(context, refreshing = false)
             } catch (error: Throwable) {
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 if (error is SecurityFailure.SessionExpired || previous == null) {
                     handleLoadFailure(error)
                 } else {
-                    _state.value = previous.copy(
+                    _state.value = ((_state.value as? NativeCollectionState.Ready) ?: previous).copy(
                         refreshing = false,
                         error = error.message ?: "Collection could not be refreshed. Try again.",
                     )
@@ -162,7 +162,7 @@ class NativeCollectionViewModel(
                     ),
                     receipt = submission.receipt,
                 )
-                autoClearReceipt(submission.receipt)
+
                 DataChangeBus.notifyDataChanged()
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
@@ -189,15 +189,7 @@ class NativeCollectionViewModel(
 
 
     /** Auto-clears the success receipt after 4s unless a newer one replaced it. */
-    private fun autoClearReceipt(receipt: Any?) {
-        scope.launch {
-            delay(4_000)
-            val current = _state.value as? NativeCollectionState.Ready ?: return@launch
-            if (current.receipt === receipt) {
-                _state.value = current.copy(receipt = null)
-            }
-        }
-    }
+
 
     fun clearFeedback() {
         val current = _state.value as? NativeCollectionState.Ready ?: return

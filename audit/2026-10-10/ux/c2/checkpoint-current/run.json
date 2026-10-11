@@ -1,0 +1,34 @@
+{
+  "pulledAt": "2026-10-10T23:30:27.5043737+05:00",
+  "serial": "R8VXA02SNKH",
+  "screens": [
+    "collect",
+    "ux",
+    "motion"
+  ],
+  "pngCount": 9,
+  "reviewSidecarCount": 9,
+  "pngs": [
+    "keyboard-risk-amount.png",
+    "landscape-large-text-diagnostic.png",
+    "ready-default.png",
+    "deliveries-tenth-entry.png",
+    "products-list.png",
+    "receive-milk-tenth-entry.png",
+    "motion-after.png",
+    "motion-before.png",
+    "motion-mid.png"
+  ],
+  "reviewSidecars": [
+    "keyboard-risk-amount.review.json",
+    "landscape-large-text-diagnostic.review.json",
+    "ready-default.review.json",
+    "deliveries-tenth-entry.review.json",
+    "products-list.review.json",
+    "receive-milk-tenth-entry.review.json",
+    "motion-after.review.json",
+    "motion-before.review.json",
+    "motion-mid.review.json"
+  ],
+  "source": "device:/sdcard/Download/phase14-native-evidence"
+}

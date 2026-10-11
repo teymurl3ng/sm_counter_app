@@ -1,0 +1,54 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/app/(app)/staff/staff-list-panel.tsx
+@@
+   const [state, setState] = useState<LoadState>(peeked && peeked.ok && peeked.staff ? "ready" : "loading");
+   const [data, setData] = useState<StaffListApiResponse | null>(peeked);
+ 
+-  useEffect(() => {
++  const [previousSearch, setPreviousSearch] = useState(urlSearch);
++  if (previousSearch !== urlSearch) {
++    setPreviousSearch(urlSearch);
+     setSearchInput(urlSearch);
+-  }, [urlSearch]);
++  }
+ 
+   const syncUrl = useCallback(
+     (next: {
+@@
+     [pathname, router, urlRole, urlSearch, urlShop, urlStatus],
+   );
+ 
+-  const load = useCallback(async () => {
++  const load = useCallback(async (isCurrent: () => boolean = () => true) => {
+     const qs = buildQueryString({
+       search: urlSearch,
+       role: urlRole,
+@@
+       limit: STAFF_PAGE_SIZE_DEFAULT,
+     });
+     const apply = (status: number, json: StaffListApiResponse) => {
++      if (!isCurrent()) return;
+       if (
+         status === 401 ||
+         json.error?.code === "UNAUTHENTICATED" ||
+@@
+       });
+       apply(result.status, result.body as StaffListApiResponse);
+     } catch {
++      if (!isCurrent()) return;
+       setData({
+         ok: false,
+         env: "unknown",
+@@
+   }, [router, urlOffset, urlRole, urlSearch, urlShop, urlStatus]);
+ 
+   useEffect(() => {
+-    void load();
++    let disposed = false;
++    // Subscribe after commit; cleanup fences cache and network completions alike.
++    queueMicrotask(() => { if (!disposed) void load(() => !disposed); });
++    return () => { disposed = true; };
+   }, [load]);
+ 
+   useEffect(() => {
+*** End Patch

@@ -1,10 +1,11 @@
 package com.saaf.milkshop.nativeui.manager
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.scaleIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -285,7 +286,7 @@ fun ManagerPreviewHost(
             title = headerTitle,
             displayName = identity.displayName,
             roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-            businessDate = workReady?.context?.businessDate ?: java.time.LocalDate.now().toString(),
+            businessDate = workReady?.context?.businessDate ?: com.saaf.milkshop.sync.BusinessClock.today().toString(),
             postingOpen = workReady?.context?.postingOpen ?: true,
         )
         NativeSectionTransition(
@@ -294,17 +295,12 @@ fun ManagerPreviewHost(
             modifier = Modifier.weight(1f),
         ) { section ->
         sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}") {
-        AnimatedContent(
+        androidx.compose.runtime.CompositionLocalProvider(com.saaf.milkshop.nativeui.sale.LocalPaneHeaderEnabled provides false) {
+        NativeSectionTransition(
             targetState = workDestination,
             contentKey = { it },
-            transitionSpec = {
-                // No alpha: the incoming pane is fully opaque from frame 1 and
-                // just settles 96%->100%, so there is never a blank/flash frame.
-                // The old pane is covered instantly by the opaque new one.
-                scaleIn(initialScale = 0.96f, animationSpec = tween(200)) togetherWith ExitTransition.None
-            },
-            label = "manager_work_destination",
         ) { destination ->
+        val registerPaneGuard = com.saaf.milkshop.nativeui.common.rememberPaneGuardRegistration({ activeEntryGuard }) { activeEntryGuard = it }
         when {
             section == ManagerSection.Work &&
                 destination == NativeManagerWorkDestination.RecordSale -> {
@@ -318,7 +314,7 @@ fun ManagerPreviewHost(
                     onSendAsDelivery = saleViewModel::sendAsDelivery,
                     onStartNextSale = saleViewModel::startNextSale,
                     onBackToWork = { returnManagerWorkHome() },
-                    onRegisterGuard = { activeEntryGuard = it },
+                    onRegisterGuard = registerPaneGuard,
                     mgrScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.ManagerShellRoot)) {
                             content(PaddingValues(0.dp))
@@ -327,7 +323,7 @@ fun ManagerPreviewHost(
                 )
             }
             section == ManagerSection.Work &&
-                workDestination == NativeManagerWorkDestination.RecordPayment -> {
+                destination == NativeManagerWorkDestination.RecordPayment -> {
                 ManagerCollectionEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -342,7 +338,7 @@ fun ManagerPreviewHost(
                         )
                     },
                     onBackToWork = { returnManagerWorkHome() },
-                    onRegisterGuard = { activeEntryGuard = it },
+                    onRegisterGuard = registerPaneGuard,
                     mgrScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.ManagerShellRoot)) {
                             content(PaddingValues(0.dp))
@@ -351,7 +347,7 @@ fun ManagerPreviewHost(
                 )
             }
             section == ManagerSection.Work &&
-                workDestination == NativeManagerWorkDestination.RecordExpense -> {
+                destination == NativeManagerWorkDestination.RecordExpense -> {
                 ManagerExpenseEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -360,7 +356,7 @@ fun ManagerPreviewHost(
                     onRecordExpense = expenseViewModel::record,
                     onRecordAnother = expenseViewModel::recordAnother,
                     onBackToWork = { returnManagerWorkHome() },
-                    onRegisterGuard = { activeEntryGuard = it },
+                    onRegisterGuard = registerPaneGuard,
                     mgrScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.ManagerShellRoot)) {
                             content(PaddingValues(0.dp))
@@ -369,7 +365,7 @@ fun ManagerPreviewHost(
                 )
             }
             section == ManagerSection.Work &&
-                workDestination == NativeManagerWorkDestination.PaySupplier -> {
+                destination == NativeManagerWorkDestination.PaySupplier -> {
                 ManagerPaySupplierEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -378,7 +374,7 @@ fun ManagerPreviewHost(
                     onRecordPayment = vendorPaymentViewModel::record,
                     onRecordAnother = vendorPaymentViewModel::recordAnother,
                     onBackToWork = { returnManagerWorkHome() },
-                    onRegisterGuard = { activeEntryGuard = it },
+                    onRegisterGuard = registerPaneGuard,
                     mgrScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.ManagerShellRoot)) {
                             content(PaddingValues(0.dp))
@@ -387,7 +383,7 @@ fun ManagerPreviewHost(
                 )
             }
             section == ManagerSection.Work &&
-                workDestination == NativeManagerWorkDestination.ReceiveMilk -> {
+                destination == NativeManagerWorkDestination.ReceiveMilk -> {
                 ManagerReceiveMilkEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -400,7 +396,7 @@ fun ManagerPreviewHost(
                     onRecord = receiveMilkViewModel::record,
                     onReceiveAnother = receiveMilkViewModel::receiveAnother,
                     onBackToWork = { returnManagerWorkHome() },
-                    onRegisterGuard = { activeEntryGuard = it },
+                    onRegisterGuard = registerPaneGuard,
                     mgrScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.ManagerShellRoot)) {
                             content(PaddingValues(0.dp))
@@ -409,7 +405,7 @@ fun ManagerPreviewHost(
                 )
             }
             section == ManagerSection.Work &&
-                workDestination == NativeManagerWorkDestination.MakeYogurt -> {
+                destination == NativeManagerWorkDestination.MakeYogurt -> {
                 ManagerMakeYogurtEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -418,7 +414,7 @@ fun ManagerPreviewHost(
                     onRecord = makeYogurtViewModel::record,
                     onMakeAnother = makeYogurtViewModel::makeAnother,
                     onBackToWork = { returnManagerWorkHome() },
-                    onRegisterGuard = { activeEntryGuard = it },
+                    onRegisterGuard = registerPaneGuard,
                     mgrScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.ManagerShellRoot)) {
                             content(PaddingValues(0.dp))
@@ -427,7 +423,7 @@ fun ManagerPreviewHost(
                 )
             }
             section == ManagerSection.Work &&
-                workDestination == NativeManagerWorkDestination.RecordSpoilage -> {
+                destination == NativeManagerWorkDestination.RecordSpoilage -> {
                 ManagerRecordSpoilageEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -442,7 +438,7 @@ fun ManagerPreviewHost(
                     onRecord = recordSpoilageViewModel::record,
                     onRecordAnother = recordSpoilageViewModel::recordAnother,
                     onBackToWork = { returnManagerWorkHome() },
-                    onRegisterGuard = { activeEntryGuard = it },
+                    onRegisterGuard = registerPaneGuard,
                     mgrScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.ManagerShellRoot)) {
                             content(PaddingValues(0.dp))
@@ -451,7 +447,7 @@ fun ManagerPreviewHost(
                 )
             }
             section == ManagerSection.Work &&
-                workDestination == NativeManagerWorkDestination.Deliveries -> {
+                destination == NativeManagerWorkDestination.Deliveries -> {
                 ManagerDeliveriesEntryScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -469,7 +465,7 @@ fun ManagerPreviewHost(
                     onArchive = deliveriesViewModel::archiveDelivery,
                         onLinkSale = deliveriesViewModel::linkSale,
                     onBackToWork = { returnManagerWorkHome() },
-                    onRegisterGuard = { activeEntryGuard = it },
+                    onRegisterGuard = registerPaneGuard,
                     mgrScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.ManagerShellRoot)) {
                             content(PaddingValues(0.dp))
@@ -489,7 +485,7 @@ fun ManagerPreviewHost(
                     onBackToWork = {
                         onManagerSectionChange(ManagerSection.Work)
                     },
-                    onRegisterGuard = { activeEntryGuard = it },
+                    onRegisterGuard = registerPaneGuard,
                     mgrScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.ManagerShellRoot)) {
                             content(PaddingValues(0.dp))
@@ -613,6 +609,7 @@ fun ManagerPreviewHost(
         }
         }
         }
+        }
     }
         }
     }
@@ -678,7 +675,7 @@ fun ManagerShellChromePreview(
                 -> onManagerSectionChange(ManagerSection.Work)
             }
         }
-        val businessDate = LocalDate.now().toString()
+        val businessDate = com.saaf.milkshop.sync.BusinessClock.today().toString()
         ManagerScaffold(
             snackbarHostState = snackbarHostState,
             section = managerSection,

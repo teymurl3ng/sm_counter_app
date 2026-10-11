@@ -1,0 +1,62 @@
+--- a/migration.sql
++++ b/migration.sql
+@@ -17,6 +17,7 @@
+   id uuid primary key default gen_random_uuid(),
+   business_id uuid not null references public.businesses(id),
+   name text not null,
++  shop_timezone text, -- Nullable additive field already present in DEV/PROD.
+   active boolean not null default true,
+   created_at timestamptz not null default now(),
+   unique (business_id, name)
+@@ -126,13 +127,12 @@
+ -- RPCs: my_profile (authenticated), ping (anon + authenticated)
+ -- ---------------------------------------------------------------------------
+ 
+-create or replace function public.my_profile()
+-returns jsonb
+-language sql
+-stable
+-security definer
+-set search_path = ''
+-as $$
++CREATE OR REPLACE FUNCTION public.my_profile()
++ RETURNS jsonb
++ LANGUAGE sql
++ STABLE SECURITY DEFINER
++ SET search_path TO ''
++AS $function$
+   select jsonb_build_object(
+     'staff_id', s.id,
+     'username', s.username,
+@@ -142,7 +142,11 @@
+     'terminated_at', s.terminated_at,
+     'business_id', s.business_id,
+     'shops', coalesce((
+-      select jsonb_agg(jsonb_build_object('id', sh.id, 'name', sh.name) order by sh.name)
++      select jsonb_agg(jsonb_build_object(
++        'id', sh.id,
++        'name', sh.name,
++        'shop_timezone', sh.shop_timezone
++      ) order by sh.name)
+       from public.shops sh
+       where sh.business_id = s.business_id
+         and sh.active
+@@ -158,7 +162,7 @@
+   )
+   from public.staff s
+   where s.auth_user_id = auth.uid()
+-$$;
++$function$;
+ 
+ revoke all on function public.my_profile() from public;
+ revoke all on function public.my_profile() from anon;
+--- a/migration_c1_3_hardening.sql
++++ b/migration_c1_3_hardening.sql
+@@ -35,6 +35,7 @@
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ IMMUTABLE
++SET search_path = ''
+ AS $$
+ DECLARE
+   k text;

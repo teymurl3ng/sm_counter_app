@@ -1,6 +1,10 @@
 package com.saaf.milkshop.nativeui.admin
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.nativeListItem
+
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -319,7 +323,7 @@ private fun AttentionStrip(
         modifier = Modifier
             .fillMaxWidth()
             .testTag(NativeUiTags.AdminWorkAttention)
-            .clickable(onClick = onOpenPeople),
+            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onOpenPeople)),
     ) {
         Column(
             Modifier.padding(16.dp),
@@ -352,14 +356,13 @@ private fun HealthRow(
     val clickable = enabled && onClick != null
     Row(
         Modifier
-            .fillMaxWidth()
-            .heightIn(min = 64.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Navigation)
             .testTag(tag)
             .then(
-                if (clickable) Modifier.clickable(onClick = onClick!!)
+                if (clickable) Modifier.clickable(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onClick!!))
                 else Modifier,
             )
-            .padding(vertical = 12.dp),
+            .nativeListItemContent(NativeListStyle.Navigation),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

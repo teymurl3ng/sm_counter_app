@@ -1,0 +1,1 @@
+Initial readiness probe asserted HTTP 200 for unauthenticated /api/health and failed. Source inspection confirms this endpoint requires a session and correctly returns 401. This was a validation expectation error, not evidence of a product defect or failed Supabase connectivity. Corrected checks follow in viewer-readiness.json.

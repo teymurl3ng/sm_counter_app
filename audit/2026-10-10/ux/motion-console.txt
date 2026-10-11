@@ -1,0 +1,150 @@
+
+> Configure project :app
+WARNING: The option setting 'android.disallowKotlinSourceSets=false' is experimental.
+The current default is 'true'.
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :checkUiOnly
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+LOGIC EXCEPTION ACTIVE
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Protected files changed with allow.logic override:
+  - phase18/app/src/main/java/com/saaf/milkshop/data/BudgetDataRepository.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/data/Phase3SecurityDaos.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/data/SyncEntities.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/domain/BudgetManagement.kt
+  - phase18/app/src/main/java/com/saaf/milkshop/domain/Costing.kt
+CHECK_UI_ONLY: PASS_WITH_LOGIC_EXCEPTION
+
+> Task :checkNativeInventory
+inventory rows=1001 untested=0 orphans=0
+NATIVE_INVENTORY: PASS
+UNTESTED_COUNT=0
+
+> Task :verifyBridgeContract
+Bridge contract OK: v5, 92 endpoints, SHA-256 276C3C9B263322EC90091834F659B068E920659D47E71B1F195D7AD4DA46906F
+
+> Task :verifyUiCleanup
+UI cleanup gate OK: 88 active TypeScript/TSX files; 23 prototype paths and 6 dependencies absent; 3 packaged files scanned.
+
+> Task :app:verifyHybridWebAssets
+> Task :app:preBuild
+> Task :app:preBenchmarkBuild
+> Task :app:generateBenchmarkBuildConfig
+> Task :app:generateBenchmarkResources
+> Task :app:packageBenchmarkResources
+> Task :app:processBenchmarkNavigationResources
+> Task :app:javaPreCompileBenchmark UP-TO-DATE
+> Task :app:checkBenchmarkAarMetadata UP-TO-DATE
+> Task :app:compileBenchmarkNavigationResources UP-TO-DATE
+> Task :app:mapBenchmarkSourceSetPaths
+> Task :app:parseBenchmarkLocalResources
+> Task :app:generateBenchmarkRFile UP-TO-DATE
+> Task :app:mergeBenchmarkResources
+> Task :app:createBenchmarkCompatibleScreenManifests
+> Task :app:extractDeepLinksBenchmark UP-TO-DATE
+> Task :app:processBenchmarkMainManifest
+> Task :app:processBenchmarkManifest
+> Task :app:preBenchmarkAndroidTestBuild SKIPPED
+> Task :app:processBenchmarkAndroidTestManifest UP-TO-DATE
+> Task :app:generateBenchmarkAndroidTestBuildConfig UP-TO-DATE
+> Task :app:generateBenchmarkAndroidTestResources UP-TO-DATE
+> Task :app:packageBenchmarkAndroidTestResources UP-TO-DATE
+> Task :app:processBenchmarkAndroidTestNavigationResources UP-TO-DATE
+> Task :app:parseBenchmarkAndroidTestLocalResources UP-TO-DATE
+> Task :app:generateBenchmarkAndroidTestRFile UP-TO-DATE
+> Task :app:javaPreCompileBenchmarkAndroidTest UP-TO-DATE
+> Task :app:mergeBenchmarkArtProfile UP-TO-DATE
+> Task :app:desugarBenchmarkFileDependencies UP-TO-DATE
+> Task :app:checkBenchmarkDuplicateClasses UP-TO-DATE
+> Task :app:mergeBenchmarkStartupProfile UP-TO-DATE
+> Task :app:mergeExtDexBenchmark UP-TO-DATE
+> Task :app:generateBenchmarkAssets UP-TO-DATE
+> Task :app:mergeBenchmarkAssets UP-TO-DATE
+> Task :app:compressBenchmarkAssets UP-TO-DATE
+> Task :app:extractBenchmarkVersionControlInfo UP-TO-DATE
+> Task :app:collectBenchmarkDependencies UP-TO-DATE
+> Task :app:sdkBenchmarkDependencyData UP-TO-DATE
+> Task :app:mergeBenchmarkJniLibFolders UP-TO-DATE
+> Task :app:mergeBenchmarkNativeLibs UP-TO-DATE
+> Task :app:stripBenchmarkDebugSymbols UP-TO-DATE
+> Task :app:validateSigningBenchmark UP-TO-DATE
+> Task :app:writeBenchmarkAppMetadata UP-TO-DATE
+> Task :app:writeBenchmarkSigningConfigVersions UP-TO-DATE
+> Task :app:generateBenchmarkAndroidTestAssets UP-TO-DATE
+> Task :app:mergeBenchmarkAndroidTestAssets UP-TO-DATE
+> Task :app:compressBenchmarkAndroidTestAssets UP-TO-DATE
+> Task :app:desugarBenchmarkAndroidTestFileDependencies UP-TO-DATE
+> Task :app:checkBenchmarkAndroidTestAarMetadata UP-TO-DATE
+> Task :app:compileBenchmarkAndroidTestNavigationResources UP-TO-DATE
+> Task :app:mapBenchmarkAndroidTestSourceSetPaths UP-TO-DATE
+> Task :app:mergeBenchmarkAndroidTestResources UP-TO-DATE
+> Task :app:processBenchmarkAndroidTestResources UP-TO-DATE
+> Task :app:checkBenchmarkAndroidTestDuplicateClasses UP-TO-DATE
+> Task :app:mergeExtDexBenchmarkAndroidTest UP-TO-DATE
+> Task :app:mergeBenchmarkAndroidTestJniLibFolders UP-TO-DATE
+> Task :app:mergeBenchmarkAndroidTestNativeLibs NO-SOURCE
+> Task :app:stripBenchmarkAndroidTestDebugSymbols NO-SOURCE
+> Task :app:validateSigningBenchmarkAndroidTest UP-TO-DATE
+> Task :app:writeBenchmarkAndroidTestSigningConfigVersions UP-TO-DATE
+> Task :app:processBenchmarkManifestForPackage
+
+> Task :app:kspBenchmarkKotlin
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :app:processBenchmarkResources
+> Task :app:optimizeBenchmarkResources
+> Task :app:compileBenchmarkKotlin
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/hybrid/HybridActivity.kt:177:60 'static field SOFT_INPUT_ADJUST_RESIZE: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/admin/AdminWorkScreen.kt:274:41 'val Icons.Outlined.ReceiptLong: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.ReceiptLong.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/collection/CashierCollectionScreen.kt:546:78 'val Icons.Outlined.Notes: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Notes.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/Haptics.kt:33:65 'static field HAPTIC_FEEDBACK_ENABLED: String' is deprecated. Deprecated in Java.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/drawing/DrawingEntryScreen.kt:284:86 'val Icons.Outlined.Notes: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Notes.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/expense/ExpenseEntryScreen.kt:396:78 'val Icons.Outlined.Notes: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Notes.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/manager/ManagerWorkScreen.kt:226:43 'val Icons.Outlined.ReceiptLong: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.ReceiptLong.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/manager/ManagerWorkScreen.kt:251:39 'val Icons.Outlined.Assignment: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Assignment.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/more/CashierMoreScreen.kt:321:43 'val Icons.Outlined.ReceiptLong: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.ReceiptLong.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/more/CashierMoreScreen.kt:379:43 'val Icons.Outlined.Logout: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Logout.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/OperationsMoreScreen.kt:255:43 'val Icons.Outlined.Logout: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Logout.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/OperationsWorkScreen.kt:276:35 'val Icons.Outlined.Assignment: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Assignment.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerWorkScreen.kt:226:43 'val Icons.Outlined.ReceiptLong: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.ReceiptLong.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerWorkScreen.kt:254:39 'val Icons.Outlined.Assignment: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Assignment.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/salarypayment/SalaryPaymentEntryScreen.kt:380:78 'val Icons.Outlined.Notes: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Notes.
+w: file:///C:/Users/Teymur/Desktop/hybrid%20project/codex/Saaf_Milk_Codex_Handoff_Pack/Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED/phase18/app/src/main/java/com/saaf/milkshop/nativeui/vendorpayment/VendorPaymentEntryScreen.kt:380:78 'val Icons.Outlined.Notes: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Outlined.Notes.
+
+> Task :app:compileBenchmarkJavaWithJavac
+> Task :app:bundleBenchmarkClassesToCompileJar
+> Task :app:dexBuilderBenchmark
+> Task :app:mergeBenchmarkGlobalSynthetics UP-TO-DATE
+
+> Task :app:kspBenchmarkAndroidTestKotlin
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+Kotlin does not yet support 25 JDK target, falling back to Kotlin JVM_24 JVM target
+
+> Task :app:processBenchmarkJavaRes
+> Task :app:mergeBenchmarkJavaResource
+> Task :app:mergeDexBenchmark
+> Task :app:compileBenchmarkArtProfile
+> Task :app:packageBenchmark
+> Task :app:createBenchmarkApkListingFileRedirect
+> Task :app:compileBenchmarkAndroidTestKotlin
+> Task :app:compileBenchmarkAndroidTestJavaWithJavac UP-TO-DATE
+> Task :app:dexBuilderBenchmarkAndroidTest
+> Task :app:mergeBenchmarkAndroidTestGlobalSynthetics UP-TO-DATE
+> Task :app:processBenchmarkAndroidTestJavaRes UP-TO-DATE
+> Task :app:mergeBenchmarkAndroidTestJavaResource UP-TO-DATE
+> Task :app:mergeDexBenchmarkAndroidTest
+> Task :app:packageBenchmarkAndroidTest
+> Task :app:createBenchmarkAndroidTestApkListingFileRedirect UP-TO-DATE
+Starting 1 tests on SM-A065F - 16
+> Task :app:connectedBenchmarkAndroidTest
+
+SM-A065F - 16 Tests 0/1 completed. (0 skipped) (0 failed)
+Finished 1 tests on SM-A065F - 16
+
+BUILD SUCCESSFUL in 3m 21s
+83 actionable tasks: 35 executed, 48 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.3.0/userguide/configuration_cache_enabling.html

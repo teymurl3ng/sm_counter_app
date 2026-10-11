@@ -1,0 +1,8 @@
+
+com.saaf.milkshop.NativeOwnerBootstrapUiTest:.
+
+Time: 14.878
+
+OK (1 test)
+
+

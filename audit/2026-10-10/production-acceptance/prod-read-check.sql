@@ -1,0 +1,8 @@
+select jsonb_build_object(
+'checked_at',now(),
+'counts',jsonb_build_object('businesses',(select count(*) from public.businesses),'shops',(select count(*) from public.shops),'staff',(select count(*) from public.staff),'auth_users',(select count(*) from auth.users),'reconciliation',(select count(*) from public.auth_reconciliation)),
+'sync',(select jsonb_build_object('rows',count(*),'max_seq',max(server_seq),'non_objects',count(*) filter(where jsonb_typeof(payload)<>'object'),'mismatched_shops',count(*) filter(where not exists(select 1 from public.shops s where s.id=r.shop_id and s.business_id=r.business_id)),'unknown_tables',count(*) filter(where table_name not in ('products','accounts','settings','events','deliveries','attendance_records','budget_plans','collections_targets','delivery_status_history','physical_cash_counts','daily_close_actions','store_profile'))) from public.sync_records r),
+'by_shop_table',(select jsonb_agg(to_jsonb(g)) from (select shop_id,table_name,count(*) as rows,min(server_seq) as min_seq,max(server_seq) as max_seq,count(*) filter(where server_seq>72) as changed_after_deployment_baseline from public.sync_records group by shop_id,table_name order by shop_id,table_name) g),
+'owner_identity',(select jsonb_agg(jsonb_build_object('staff_id',s.id,'business_id',s.business_id,'username',s.username,'role',s.role,'active',s.active,'terminated',s.terminated_at is not null,'last_auth_sign_in_at',u.last_sign_in_at)) from public.staff s join auth.users u on u.id=s.auth_user_id where s.username='teimur'),
+'authenticated_direct_sync_insert_allowed',has_table_privilege('authenticated','public.sync_records','INSERT')
+) as verification;

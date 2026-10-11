@@ -1,0 +1,16 @@
+
+Exception occurred while executing 'disable':
+java.lang.SecurityException: Shell cannot change component state for ComponentInfo{com.saaf.milkshop.qa.benchmark/com.saaf.milkshop.Main} to 2
+	at com.android.server.pm.PackageManagerService.-$$Nest$msetEnabledSettings(qb/108284714 d46ec1d4e366b6f39bdb208819e9fe51145068d770b2fd3406f01078e7fb71a1:876)
+	at com.android.server.pm.PackageManagerService$IPackageManagerImpl.setComponentEnabledSetting(qb/108284714 d46ec1d4e366b6f39bdb208819e9fe51145068d770b2fd3406f01078e7fb71a1:35)
+	at com.android.server.pm.PackageManagerShellCommand.runSetEnabledSetting(qb/108284714 d46ec1d4e366b6f39bdb208819e9fe51145068d770b2fd3406f01078e7fb71a1:151)
+	at com.android.server.pm.PackageManagerShellCommand.onCommand(qb/108284714 d46ec1d4e366b6f39bdb208819e9fe51145068d770b2fd3406f01078e7fb71a1:1802)
+	at com.android.modules.utils.BasicShellCommandHandler.exec(BasicShellCommandHandler.java:97)
+	at android.os.ShellCommand.exec(ShellCommand.java:38)
+	at com.android.server.pm.PackageManagerService$IPackageManagerImpl.onShellCommand(qb/108284714 d46ec1d4e366b6f39bdb208819e9fe51145068d770b2fd3406f01078e7fb71a1:23)
+	at android.os.Binder.shellCommand(Binder.java:1187)
+	at android.os.Binder.onTransact(Binder.java:979)
+	at android.content.pm.IPackageManager$Stub.onTransact(IPackageManager.java:5306)
+	at com.android.server.pm.PackageManagerService$IPackageManagerImpl.onTransact(qb/108284714 d46ec1d4e366b6f39bdb208819e9fe51145068d770b2fd3406f01078e7fb71a1:1)
+	at android.os.Binder.execTransactInternal(Binder.java:1462)
+	at android.os.Binder.execTransact(Binder.java:1401)

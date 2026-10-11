@@ -24,6 +24,7 @@ import kotlinx.coroutines.withContext
 enum class NativeMoreDestination {
     Menu,
     CountCash,
+    CashClose,
     Expense,
     Deliveries,
     PersonalSecurity,
@@ -81,7 +82,7 @@ class NativeMoreViewModel(
         val session = sessionHandle ?: return
         val request = loadGate.begin(session)
         val previous = _state.value as? NativeMoreState.Ready
-        _state.value = previous?.copy(refreshing = true, error = null)
+        _state.value = (_state.value as? NativeMoreState.Ready)?.copy(refreshing = true, error = null)
             ?: NativeMoreState.Loading
         scope.launch {
             try {
@@ -93,7 +94,7 @@ class NativeMoreViewModel(
                 if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 // Merge into the previous pane: a warm refresh must never
                 // reset the open destination or in-progress dialogs.
-                _state.value = previous?.copy(
+                _state.value = (_state.value as? NativeMoreState.Ready)?.copy(
                     context = context,
                     security = security,
                     refreshing = false,
@@ -108,13 +109,18 @@ class NativeMoreViewModel(
                 if (error is SecurityFailure.SessionExpired || previous == null) {
                     handleLoadFailure(error)
                 } else {
-                    _state.value = previous.copy(
+                    _state.value = ((_state.value as? NativeMoreState.Ready) ?: previous).copy(
                         refreshing = false,
                         error = error.message ?: "More could not be refreshed. Try again.",
                     )
                 }
             }
         }
+    }
+
+    fun openCashClose() {
+        val current = _state.value as? NativeMoreState.Ready ?: return
+        _state.value = current.copy(destination = NativeMoreDestination.CashClose, error = null)
     }
 
     fun openCountCash() {
@@ -225,6 +231,7 @@ class NativeMoreViewModel(
                 val security = withContext(Dispatchers.IO) {
                     facade.removeQuickUnlock(session, passphrase)
                 }
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Quick unlock settings saved")
                 val latest = _state.value as? NativeMoreState.Ready ?: return@launch
                 _state.value = latest.copy(
                     security = security,
@@ -259,6 +266,7 @@ class NativeMoreViewModel(
                         pin = pin,
                     )
                 }
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Quick unlock settings saved")
                 val latest = _state.value as? NativeMoreState.Ready ?: return@launch
                 _state.value = latest.copy(security = security, saving = false, error = null)
             } catch (error: Throwable) {
@@ -297,6 +305,7 @@ class NativeMoreViewModel(
                         pin = pin,
                     )
                 }
+                com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved("Quick unlock settings saved")
                 val latest = _state.value as? NativeMoreState.Ready ?: return@launch
                 _state.value = latest.copy(security = security, saving = false, error = null)
             } catch (error: Throwable) {

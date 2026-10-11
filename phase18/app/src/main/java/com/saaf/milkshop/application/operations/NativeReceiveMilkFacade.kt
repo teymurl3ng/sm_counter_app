@@ -1,5 +1,6 @@
 package com.saaf.milkshop.application.operations
 
+import androidx.room3.withWriteTransaction
 import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
@@ -91,32 +92,36 @@ class NativeReceiveMilkFacade(
         if (!context.milkProductPresent) {
             throw IllegalStateException("Ask Owner to set up the Milk product before receiving milk.")
         }
-        val result = commands.recordPurchase(
-            sessionHandle,
-            VendorPurchaseInput(
-                vendorAccountId = vendor.accountId,
-                occurredAt = context.businessDate,
-                rawLiters = request.rawLiters,
-                fatPercentage = request.fatPercentage,
-                lrReading = request.lrReading,
-                notes = request.notes?.trim()?.takeIf { it.isNotEmpty() },
-            ),
-        )
-        val refreshed = load(sessionHandle, date)
-        return NativeReceiveMilkSubmission(
-            receipt = NativeReceiveMilkReceipt(
-                eventId = result.eventId,
-                vendor = vendor,
-                rawLiters = round4(request.rawLiters),
-                fatPercentage = round4(request.fatPercentage),
-                lrReading = round4(request.lrReading),
-                snfPercentage = round4(result.snfPercentage),
-                tsPercentage = round4(result.tsPercentage),
-                adjustedLiters = round4(result.adjustedLiters),
-                milkOnHandLabel = refreshed.milkOnHandLabel,
-            ),
-            refreshedContext = refreshed,
-        )
+        // The mutation, required evidence and receipt reads commit together.
+        // A read/authorization failure cannot report failure after saving.
+        return database.withWriteTransaction {
+            val result = commands.recordPurchase(
+                sessionHandle,
+                VendorPurchaseInput(
+                    vendorAccountId = vendor.accountId,
+                    occurredAt = context.businessDate,
+                    rawLiters = request.rawLiters,
+                    fatPercentage = request.fatPercentage,
+                    lrReading = request.lrReading,
+                    notes = request.notes?.trim()?.takeIf { it.isNotEmpty() },
+                ),
+            )
+            val refreshed = load(sessionHandle, date)
+            NativeReceiveMilkSubmission(
+                receipt = NativeReceiveMilkReceipt(
+                    eventId = result.eventId,
+                    vendor = vendor,
+                    rawLiters = round4(request.rawLiters),
+                    fatPercentage = round4(request.fatPercentage),
+                    lrReading = round4(request.lrReading),
+                    snfPercentage = round4(result.snfPercentage),
+                    tsPercentage = round4(result.tsPercentage),
+                    adjustedLiters = round4(result.adjustedLiters),
+                    milkOnHandLabel = refreshed.milkOnHandLabel,
+                ),
+                refreshedContext = refreshed,
+            )
+        }
     }
 
     private suspend fun activeVendors(): List<NativeReceiveMilkVendor> {

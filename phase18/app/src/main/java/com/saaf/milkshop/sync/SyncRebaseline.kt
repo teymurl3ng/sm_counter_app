@@ -4,6 +4,7 @@ import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.data.SyncOutboxEntity
 import com.saaf.milkshop.data.SyncRebaselineHoldEntity
 import org.json.JSONObject
+import org.json.JSONArray
 import java.time.Instant
 
 /**
@@ -114,6 +115,7 @@ object SyncRebaseline {
             val entry = decision.entry
             when (decision.action) {
                 Action.KEEP -> {
+                    database.syncOutboxDao().setHeld(entry.tableName, entry.rowUid, false)
                     database.syncRebaselineHoldDao().delete(entry.tableName, entry.rowUid)
                     kept += 1
                 }
@@ -213,10 +215,31 @@ object SyncRebaseline {
      * difference.
      */
     fun livePayloadsEqual(device: JSONObject, server: JSONObject): Boolean =
-        jsonStructurallyEqual(
-            JSONObject(device.toString()).apply { remove("sync_updated_at") },
-            JSONObject(server.toString()).apply { remove("sync_updated_at") },
-        )
+        jsonStructurallyEqual(canonicalPayload(device), canonicalPayload(server))
+
+    private val localIdentifiers = setOf(
+        "product_id", "account_id", "event_id", "log_id", "budget_id", "target_id",
+        "attendance_id", "employee_account_id", "supersedes_id", "delivery_id",
+        "customer_account_id", "sale_event_id", "status_id", "count_id", "store_profile_id",
+        "action_id", "actor_user_id", "corrects_event_id", "physical_cash_count_id",
+    )
+
+    /** UIDs and business values survive remapping; integer row IDs do not. */
+    private fun canonicalPayload(value: JSONObject): JSONObject = JSONObject().apply {
+        value.keys().asSequence().sorted().forEach { key ->
+            if (key !in localIdentifiers && key != "sync_updated_at") {
+                val item = value.get(key)
+                put(key, when (item) {
+                    is JSONObject -> canonicalPayload(item)
+                    is JSONArray -> JSONArray((0 until item.length()).map { index ->
+                        val child = item.get(index)
+                        if (child is JSONObject) canonicalPayload(child) else child
+                    }.sortedBy { it.toString() })
+                    else -> item
+                })
+            }
+        }
+    }
 
     /**
      * Applies the live decisions. MUST run after the pull-0 pass completed —

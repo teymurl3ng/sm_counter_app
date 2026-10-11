@@ -1,0 +1,16 @@
+scenario	png	workflow_id	device	orientation	font_scale	theme	review_status
+surface-light-default	surface-light-default.png	NativeSurfaceGeometryTest	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+surface-dark-large	surface-dark-large.png	NativeSurfaceGeometryTest	SM-A065F/16	portrait	1.0	dark	UNREVIEWED
+surface-light-large	surface-light-large.png	NativeSurfaceGeometryTest	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+surface-dark-default	surface-dark-default.png	NativeSurfaceGeometryTest	SM-A065F/16	portrait	1.0	dark	UNREVIEWED
+phone-portrait-lock	phone-portrait-lock.png	uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+manager-more-surfaces	manager-more-surfaces.png	managerMoreOpensUnderManagerChrome	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+admin-more-surfaces	admin-more-surfaces.png	adminMoreOpensUnderAdminChrome	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+owner-more-surfaces	owner-more-surfaces.png	ownerMoreOpensUnderOwnerChrome	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+receive-milk-tenth-entry	receive-milk-tenth-entry.png	uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+deliveries-tenth-entry	deliveries-tenth-entry.png	uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+products-list	products-list.png	uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+operations-more-surfaces	operations-more-surfaces.png	operationsMoreOpensConnectedEntry	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+sale-committed-receipt	sale-committed-receipt.png	uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+cashier-blind-count-form	cashier-blind-count-form.png	countCashRecordsBlindAmountAndShowsSuccessWithoutExpectedVariance	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+cashier-more-surfaces	cashier-more-surfaces.png	menuShowsCashierActionsAndKeepsMoreNavSelected	SM-A065F/16	portrait	1.0	light	UNREVIEWED

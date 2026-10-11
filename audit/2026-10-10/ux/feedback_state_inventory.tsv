@@ -1,0 +1,25 @@
+source	receipt_success_fields	reset_or_timer	warm_refresh
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/activity/NativeActivityViewModel.kt	32		83,90
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/admin/NativeAdminWorkViewModel.kt	35		87
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/auth/NativeAuthenticationViewModel.kt	25		
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/cashclose/NativeCashCloseViewModel.kt	33,34,38	117,164,172,193,220,222,225,233,235	92
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/collection/NativeCollectionViewModel.kt	33,37	131,153,165,185,192,194,197,204	75
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/drawing/NativeDrawingViewModel.kt	28,32	112,120,135,139,141,144,151	87
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/expense/NativeExpenseViewModel.kt	28,32	117,125,140,145,147,150,157	92
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/manager/NativeManagerWorkViewModel.kt	42		94
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/more/NativeMoreViewModel.kt	39,45,190		84,96
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/NativeAttendanceViewModel.kt	29		65
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/NativeDeliveriesViewModel.kt	29,31,39,43	289	107
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/NativeMakeYogurtViewModel.kt	28,32	117,125,140,142,145,152	92
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/NativeOperationsMoreViewModel.kt	43		79,91
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/NativeOperationsWorkViewModel.kt	39		91
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/NativeReceiveMilkViewModel.kt	32,36	132,161,170,185,190,192,195	71
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/NativeRecordSpoilageViewModel.kt	34,38	145,168,177,189,204,209,211,214	106
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/NativeOwnerMoreViewModel.kt			112,128
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/NativeOwnerOverviewViewModel.kt	30		75
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/NativeOwnerRecordsViewModel.kt	65		128,137
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/NativeOwnerReportsViewModel.kt	32		120
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/NativeOwnerWorkViewModel.kt	45		97
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/salarypayment/NativeSalaryPaymentViewModel.kt	28,32	117,125,140,145,147,150,157	92
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/sale/NativeSaleViewModel.kt	49,54,248	207,262,273	147
+phase18/app/src/main/java/com/saaf/milkshop/nativeui/vendorpayment/NativeVendorPaymentViewModel.kt	28,32	117,125,140,145,147,150,157	92

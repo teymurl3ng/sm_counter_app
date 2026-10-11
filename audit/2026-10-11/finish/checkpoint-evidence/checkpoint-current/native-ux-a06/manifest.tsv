@@ -1,0 +1,6 @@
+scenario	png	workflow_id	device	orientation	font_scale	theme	review_status
+phone-portrait-lock	phone-portrait-lock.png	uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+receive-milk-tenth-entry	receive-milk-tenth-entry.png	uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+deliveries-tenth-entry	deliveries-tenth-entry.png	uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+products-list	products-list.png	uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+sale-committed-receipt	sale-committed-receipt.png	uxRepeatedOwnerEntriesKeepChromeAndCaptureScreens	SM-A065F/16	portrait	1.0	light	UNREVIEWED

@@ -1,0 +1,42 @@
+[
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "name": "cashierCountsClosesDayAndCannotReopen",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.NativeFoundationUiTest",
+    "name": "operationsRecordSpoilageRecordsPhysicalLoss",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+    "name": "collectInvalidAmountAndPayFullDisabled",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+    "name": "collectDestinationRetentionOnCollectAnother",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+    "name": "collectCancelPathsAndCustomerSwitchResetAmount",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+    "name": "collectLargeTextPortraitSemanticsRemainAvailable",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+    "name": "collectDirtyBackKeepAndDiscard",
+    "passed": true
+  },
+  {
+    "class": "com.saaf.milkshop.qa.NativeCollectionAcceptanceGapsTest",
+    "name": "collectNoMatchSearchAndImeDoneClearFocus",
+    "passed": true
+  }
+]

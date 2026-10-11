@@ -1,0 +1,63 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/lib/viewer-cache.ts
+@@
+   const existing = inflight.get(k);
++  const requestGeneration = generation;
+   if (existing) {
+     const shared = await existing;
++    if (activeSessionId !== sessionId) return { status: 401, body: null, fromCache: false };
++    if (requestGeneration !== generation) return fetchAndStore(k, url, sessionId);
+     return { ...shared, fromCache: false };
+   }
+ 
+-  const requestGeneration = generation;
+   const pending = networkGet(url).finally(() => {
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/lib/reconciliation.ts
+@@
+-export type ReconciliationOperation = "create_cleanup" | "terminate_cleanup" | "reset_audit";
++export type ReconciliationOperation = "create_cleanup" | "create_verify" | "terminate_cleanup" | "reset_audit";
+@@
+-      !["create_cleanup", "terminate_cleanup", "reset_audit"].includes(String(row.operation))
++      !["create_cleanup", "create_verify", "terminate_cleanup", "reset_audit"].includes(String(row.operation))
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/app/api/admin/create-staff/route.ts
+@@
+-import { classifyProviderFailure, classifyRpcFailure, readAuthUserId, safeCorrelationId } from "@/lib/admin-security";
++import { classifyProviderFailure, classifyRpcFailure, isUuid, readAuthUserId, safeCorrelationId } from "@/lib/admin-security";
+@@
+-  // 3. Compensating cleanup on DB failure
++  // A missing/malformed response or server error does not prove that the write rolled back.
++  if (rpcRes.kind === "unreachable" ||
++      (rpcRes.kind === "error" && rpcRes.status >= 500) ||
++      (rpcRes.kind === "ok" && !isUuid(rpcRes.data))) {
++    const recorded = await recordReconciliation({
++      adminKey: adminKeyCfg.adminKey, businessId: ctx.profile.business_id,
++      operation: "create_verify", authUserId, targetUsername: uVal.normalized,
++      performedBy: ctx.profile.staff_id, performedByUsername: ctx.profile.username,
++      errorCode: "UNREACHABLE", correlationId,
++    });
++    logOperationalFailure("create_staff_verify", correlationId, recorded ? "PENDING" : "RECORD_FAILED");
++    return mutationError(ctx.meta, "RECONCILIATION_REQUIRED",
++      "Account creation has an unknown outcome. Reconcile it before retrying; its identity has been preserved.",
++      503, { label: "admin.createStaff", sessionMs: ctx.sessionMs, totalMs: elapsedMs(ctx.tTotal) });
++  }
++  // Compensate only a definitive rejected database request.
+   if (rpcRes.kind !== "ok") {
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/app/api/admin/reconcile-auth/route.ts
+@@
+-    const cleanup = await deleteAuthWithRetry(adminKeyConfig.adminKey, config.url, row.auth_user_id);
++    if (row.operation === "create_verify" || row.operation === "create_cleanup") {
++      const verification = await callInternalRpc(adminKeyConfig.adminKey, "admin_verify_created_identity", {
++        p_reconciliation_id: row.id,
++      });
++      // This read/reconcile RPC never authorizes automatic identity deletion.
++      // Linked identities are recovered; unlinked/unknown identities require owner inspection.
++      if (verification.kind === "ok" && verification.data === true) resolved += 1;
++      else pending += 1;
++      continue;
++    }
++    const cleanup = await deleteAuthWithRetry(adminKeyConfig.adminKey, config.url, row.auth_user_id);
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/lib/account-server.ts
+@@
+   "admin_reconcile_reset_audit",
++  "admin_verify_created_identity",
+*** End Patch

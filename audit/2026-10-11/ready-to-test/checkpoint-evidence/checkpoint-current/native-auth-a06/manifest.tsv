@@ -1,0 +1,7 @@
+scenario	png	workflow_id	device	orientation	font_scale	theme	review_status
+account-picker-light	account-picker-light.png	access-recovery	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+passphrase-error-light	passphrase-error-light.png	access-recovery	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+recovery-code-light	recovery-code-light.png	access-recovery	SM-A065F/16	portrait	1.0	light	UNREVIEWED
+account-picker-dark	account-picker-dark.png	access-recovery	SM-A065F/16	portrait	1.0	dark	UNREVIEWED
+passphrase-error-dark	passphrase-error-dark.png	access-recovery	SM-A065F/16	portrait	1.0	dark	UNREVIEWED
+recovery-code-dark	recovery-code-dark.png	access-recovery	SM-A065F/16	portrait	1.0	dark	UNREVIEWED

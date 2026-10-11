@@ -1,7 +1,9 @@
 package com.saaf.milkshop.nativeui.more
 
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,6 +42,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.saaf.milkshop.nativeui.common.nativeListItem
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -92,6 +96,7 @@ fun CashierMoreScreen(
     onRetry: () -> Unit,
     onOpenCountCash: () -> Unit,
     onOpenExpense: () -> Unit,
+    onOpenCloseDay: () -> Unit = {},
     onOpenDeliveries: () -> Unit = {},
     onOpenPersonalSecurity: () -> Unit,
     onBackToMenu: () -> Unit,
@@ -130,6 +135,7 @@ fun CashierMoreScreen(
                     identity = identity,
                     state = state,
                     onOpenCountCash = onOpenCountCash,
+                    onOpenCloseDay = onOpenCloseDay,
                     onOpenExpense = onOpenExpense,
                     onOpenDeliveries = onOpenDeliveries,
                     onOpenPersonalSecurity = onOpenPersonalSecurity,
@@ -147,6 +153,7 @@ fun CashierMoreScreen(
                     onNavigate = onNavigate,
                     modifier = modifier,
                 )
+                NativeMoreDestination.CashClose,
                 NativeMoreDestination.Expense -> {
                     // Hosted by CashierPreviewHost via CashierExpenseEntryScreen.
                     MoreLoadingScreen(snackbarHostState, onNavigate, modifier)
@@ -189,7 +196,23 @@ fun CashierDeliveriesEntryScreen(
     modifier: Modifier = Modifier,
     onRegisterGuard: (com.saaf.milkshop.nativeui.common.EntryLeaveGuard?) -> Unit = {},
 ) {
-    BackHandler(onBack = onBackToMore)
+    val leaveGuard = com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard()
+    val ready = state as? NativeDeliveriesState.Ready
+    val draftDirty = ready != null && (ready.draftCustomerId != null || ready.draftProductId != null ||
+        ready.draftQuantity.isNotBlank() || ready.draftRoute.isNotBlank() || ready.draftNotes.isNotBlank())
+    LaunchedEffect(draftDirty) { if (draftDirty) leaveGuard.markDirty() else leaveGuard.clear() }
+    DisposableEffect(leaveGuard, draftActions) {
+        leaveGuard.onDiscard = {
+            draftActions.selectCustomer(null)
+            draftActions.selectProduct(null)
+            draftActions.setQuantity("")
+            draftActions.setRoute("")
+            draftActions.setNotes("")
+        }
+        onRegisterGuard(leaveGuard)
+        onDispose { leaveGuard.onDiscard = null; onRegisterGuard(null) }
+    }
+    BackHandler { if (ready?.creating != true) leaveGuard.requestLeave(onBackToMore) }
     MoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.MoreRoot) { padding ->
         NativeSectionTransition(
             targetState = state,
@@ -216,6 +239,7 @@ fun CashierDeliveriesEntryScreen(
         }
         }
     }
+    com.saaf.milkshop.nativeui.expense.ExpenseDiscardDialog(leaveGuard)
 }
 
 @Composable
@@ -226,8 +250,13 @@ private fun MoreScaffold(
     rootTag: String,
     content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit,
 ) {
-    // Chrome (nav + green header) lives in CashierPreviewHost; this is a body.
-    Box(modifier.fillMaxSize().testTag(rootTag)) { content(androidx.compose.foundation.layout.PaddingValues(0.dp)) }
+    AdaptiveNavigationScaffold(
+        snackbarHostState = snackbarHostState,
+        compactNavigation = { CashierNavigation(CashierSection.More, onNavigate) },
+        expandedNavigation = { CashierNavigationRail(CashierSection.More, onNavigate) },
+        modifier = modifier.fillMaxSize().testTag(rootTag),
+        content = content,
+    )
 }
 
 @Composable
@@ -270,6 +299,7 @@ private fun MoreMenuScreen(
     identity: NativeSignedInIdentity,
     state: NativeMoreState.Ready,
     onOpenCountCash: () -> Unit,
+    onOpenCloseDay: () -> Unit,
     onOpenExpense: () -> Unit,
     onOpenDeliveries: () -> Unit,
     onOpenPersonalSecurity: () -> Unit,
@@ -287,6 +317,7 @@ private fun MoreMenuScreen(
                 Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp)
                     .testTag(NativeUiTags.MoreMenu),
             ) {
                 MoreMenuRow(
@@ -301,12 +332,11 @@ private fun MoreMenuScreen(
                     tag = NativeUiTags.MoreExpense,
                     onClick = onOpenExpense,
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 MoreMenuRow(
                     icon = Icons.Outlined.Payments,
                     title = "Count cash",
                     subtitle = if (state.context.postingOpen) {
-                        "Blind drawer count for ${state.context.cashAccountName}"
+                        "Opening or handover count for ${state.context.cashAccountName}. New dates open automatically."
                     } else {
                         "Day is closed — counting disabled"
                     },
@@ -314,7 +344,13 @@ private fun MoreMenuScreen(
                     tag = NativeUiTags.MoreCountCash,
                     onClick = onOpenCountCash,
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                MoreMenuRow(
+                    icon = Icons.Outlined.Payments,
+                    title = "Count and close day",
+                    subtitle = if (state.context.postingOpen) "Finish today after checking cash and deliveries" else "Review the closed day; ask Owner/Admin to reopen",
+                    tag = NativeUiTags.MoreCloseDay,
+                    onClick = onOpenCloseDay,
+                )
                 MoreMenuRow(
                     icon = Icons.Outlined.LocalShipping,
                     title = "Deliveries",
@@ -322,7 +358,6 @@ private fun MoreMenuScreen(
                     tag = NativeUiTags.MoreDeliveries,
                     onClick = onOpenDeliveries,
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 MoreMenuRow(
                     icon = Icons.Outlined.Lock,
                     title = "Personal security",
@@ -330,7 +365,6 @@ private fun MoreMenuScreen(
                     tag = NativeUiTags.MorePersonalSecurity,
                     onClick = onOpenPersonalSecurity,
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 MoreMenuRow(
                     icon = Icons.Outlined.SwapHoriz,
                     title = "Switch account",
@@ -338,7 +372,6 @@ private fun MoreMenuScreen(
                     tag = NativeUiTags.MoreSwitchAccount,
                     onClick = onSwitchAccount,
                 )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 MoreMenuRow(
                     icon = Icons.Outlined.Logout,
                     title = "Sign out",
@@ -391,11 +424,19 @@ private fun MoreCountCashScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                if (state.countReceipt != null) {
-                    val confirmContext = LocalContext.current
-                    LaunchedEffect(state.countReceipt) { confirmContext.hapticConfirm() }
-                    CountSuccess(state.countReceipt)
+                NativeSectionTransition(targetState = state, contentKey = { it.countReceipt != null }) { pane ->
+                if (pane.countReceipt != null) {
+                    com.saaf.milkshop.nativeui.common.NativeReceiptFeedback("blind-count", pane.countReceipt.countId)
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        CountSuccess(pane.countReceipt)
+                        Button(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onBack),
+                            modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.MoreCountDone)) { Text("Done") }
+                    }
                 } else {
+                    Column(
+                        Modifier.nativeListItem(NativeListStyle.Section).nativeListItemContent(NativeListStyle.Section),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
                     OutlinedTextField(
                         value = amountText,
                         onValueChange = { amountText = sanitizeAmount(it) },
@@ -403,22 +444,22 @@ private fun MoreCountCashScreen(
                         label = { Text("Counted amount (PKR)") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         singleLine = true,
-                        enabled = !state.saving && state.context.postingOpen,
+                        enabled = !pane.saving && pane.context.postingOpen,
                     )
                     OutlinedTextField(
                         value = notes,
                         onValueChange = { notes = it.take(240) },
                         modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.MoreCountNotes),
                         label = { Text("Note (optional)") },
-                        enabled = !state.saving && state.context.postingOpen,
+                        enabled = !pane.saving && pane.context.postingOpen,
                     )
-                    if (!state.context.postingOpen) {
+                    if (!pane.context.postingOpen) {
                         Text(
                             "This business day is closed. Reopen it before counting cash.",
                             color = MaterialTheme.colorScheme.error,
                         )
                     }
-                    state.error?.let {
+                    pane.error?.let {
                         Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag(NativeUiTags.MoreError))
                     }
                     val hapticContext = LocalContext.current
@@ -431,8 +472,10 @@ private fun MoreCountCashScreen(
                         enabled = canRecord,
                         modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.MoreCountRecord),
                     ) {
-                        Text(if (state.saving) "Recording…" else "Record count")
+                        Text(if (pane.saving) "Recording…" else "Record count")
                     }
+                    }
+                }
                 }
             }
         }
@@ -465,7 +508,7 @@ private fun MorePersonalSecurityScreen(
             text = { Text("This clears Quick PIN and phone security for ${identity.displayName} on this phone.") },
             confirmButton = {
                 TextButton(
-                    onClick = {
+                    onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction {
                         val secret = passphrase.toCharArray()
                         passphrase = ""
                         pin = ""
@@ -475,7 +518,7 @@ private fun MorePersonalSecurityScreen(
                 ) { Text("Discard and leave") }
             },
             dismissButton = {
-                TextButton(onClick = onCancelRemove) { Text("Keep editing") }
+                TextButton(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onCancelRemove)) { Text("Keep editing") }
             },
         )
     }
@@ -522,8 +565,8 @@ private fun MorePersonalSecurityScreen(
                         Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag(NativeUiTags.MoreError))
                     }
                     Button(
-                        onClick = {
-                            if (passphrase.isBlank() || pin.length != 4) return@Button
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                            if (passphrase.isBlank() || pin.length != 4) return@hapticAction
                             val secret = passphrase.toCharArray()
                             val quickPin = pin.toCharArray()
                             passphrase = ""
@@ -535,8 +578,8 @@ private fun MorePersonalSecurityScreen(
                     ) { Text(if (state.saving) "Saving…" else "Save Quick PIN") }
                     if (security.phoneSecurityAvailable) {
                         Button(
-                            onClick = {
-                                if (passphrase.isBlank()) return@Button
+                            onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                                if (passphrase.isBlank()) return@hapticAction
                                 val secret = passphrase.toCharArray()
                                 val quickPin = pin.takeIf { it.length == 4 }?.toCharArray()
                                 passphrase = ""
@@ -549,7 +592,7 @@ private fun MorePersonalSecurityScreen(
                     }
                     if (security.quickPinEnabled || security.phoneSecurityEnabled) {
                         TextButton(
-                            onClick = onRequestRemove,
+                            onClick = com.saaf.milkshop.nativeui.common.hapticAction(onRequestRemove),
                             enabled = !state.saving && passphrase.isNotBlank(),
                             modifier = Modifier.testTag(NativeUiTags.MoreSecurityRemove),
                         ) { Text("Remove Quick unlock") }
@@ -572,11 +615,10 @@ private fun MoreMenuRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 72.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Navigation, enabled = enabled)
             .semantics { role = Role.Button }
-            .clickable(enabled = enabled, onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .clickable(enabled = enabled, onClick = com.saaf.milkshop.nativeui.common.hapticAction(onClick))
+            .nativeListItemContent(NativeListStyle.Navigation)
             .testTag(tag),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),

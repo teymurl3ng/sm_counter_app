@@ -1,0 +1,201 @@
+
+> saaf-milk-admin-viewer@1.0.0 test
+> tsx --test src/lib/*.test.ts
+
+▶ normalize
+  ✔ trims and lowercases username (2.4632ms)
+  ✔ strips non-digits from credential (0.3987ms)
+  ✔ validates username and credential shapes (0.4563ms)
+✔ normalize (5.2806ms)
+▶ decideViewerAccess
+  ✔ allows active owner and admin (0.5228ms)
+  ✔ denies lower roles (0.243ms)
+  ✔ denies disabled (0.1993ms)
+  ✔ maps invalid credentials and not authorized (0.2914ms)
+  ✔ maps network failure to UNKNOWN (0.2427ms)
+✔ decideViewerAccess (2.0477ms)
+▶ translateAuditEvent (C0.5)
+  ✔ covers every known action (2.0059ms)
+  ✔ uses safe fallback for unknown actions and missing optional detail (0.6594ms)
+  ✔ keeps HTML/script-like values as plain text (no crash) (0.4401ms)
+  ✔ credential reset never embeds credential material in summary (0.3457ms)
+✔ translateAuditEvent (C0.5) (5.6825ms)
+▶ extractSafeDetailFields
+  ✔ renders only whitelisted safe fields (2.6765ms)
+  ✔ suppresses credential-like keys and flags them (0.4404ms)
+  ✔ detailHasSensitiveKeys detects nested-looking key names (0.3811ms)
+  ✔ shows safe recovery counts (0.5086ms)
+✔ extractSafeDetailFields (4.7345ms)
+▶ mapActivityList / mapActivityEvent
+  ✔ maps a valid list newest-first preserving order (0.8377ms)
+  ✔ links shop/staff only when UUIDs are valid (0.4746ms)
+  ✔ marks recover_identity as important (0.3098ms)
+  ✔ returns null on malformed list payload (0.1969ms)
+  ✔ maps empty list (0.1229ms)
+✔ mapActivityList / mapActivityEvent (2.4585ms)
+▶ filters / query parsing
+  ✔ parses group, target, dates, and paging (3.2597ms)
+  ✔ rejects invalid dates, inverted range, long target, bad group (1.0317ms)
+  ✔ maps single-action groups to rpc action; multi-action needs post-filter (0.3935ms)
+  ✔ filters events by group (0.4129ms)
+  ✔ validates date helpers (0.5917ms)
+  ✔ categoryForAction covers groups (0.2155ms)
+✔ filters / query parsing (6.3694ms)
+▶ privileged Account Server headers
+  ✔ uses opaque secret keys only as apikey (4.0106ms)
+  ✔ uses legacy service-role JWTs as apikey and bearer (0.488ms)
+  ✔ rejects publishable and unknown keys (1.5153ms)
+✔ privileged Account Server headers (8.8618ms)
+▶ admin security parsing
+  ✔ validates UUIDs and Auth response IDs (4.2514ms)
+  ✔ maps provider failures without exposing their body (0.4187ms)
+  ✔ maps Postgres codes to stable safe errors (2.5895ms)
+✔ admin security parsing (7.8552ms)
+▶ resolveHostingChannel
+  ✔ maps Vercel channels (1.5279ms)
+✔ resolveHostingChannel (3.3011ms)
+▶ resolveAccountServerEnv
+  ✔ requires ACCOUNT_SERVER_ENV (0.6113ms)
+  ✔ local/preview/development require DEV (0.3898ms)
+  ✔ Vercel production requires PROD (0.2548ms)
+  ✔ rejects env/url project mismatches (1.6504ms)
+  ✔ rejects unknown env labels (0.2808ms)
+✔ resolveAccountServerEnv (3.8037ms)
+▶ Credential generator
+  ✔ generates exactly 15 ASCII digits (2.1954ms)
+  ✔ can generate many credentials without throwing (5.0877ms)
+  ✔ formats credential correctly (0.4211ms)
+✔ Credential generator (9.9491ms)
+✔ retains identities after lost, malformed, proxy and server responses (0.8486ms)
+✔ recognizes valid completion and definitive permission/SQL rejection (0.228ms)
+▶ mapAdminOverview
+  ✔ maps counts and recent events from admin_overview (2.3231ms)
+  ✔ treats empty recent_activity as valid empty list (4.0847ms)
+  ✔ rejects incomplete payloads instead of inventing zeroes (0.6828ms)
+✔ mapAdminOverview (36.8788ms)
+▶ translateAuditEvent
+  ✔ translates known actions (0.9884ms)
+  ✔ falls back safely for unknown actions and missing fields (1.3357ms)
+  ✔ does not invent display names from username alone (0.3874ms)
+✔ translateAuditEvent (3.6662ms)
+▶ formatActivityTime
+  ✔ formats same-day times compactly (114.8529ms)
+✔ formatActivityTime (115.7217ms)
+▶ overview loading contract
+  ✔ loading UI must not receive overview counts (null until ready) (0.2467ms)
+✔ overview loading contract (0.5479ms)
+▶ safeAccountServerMeta
+  ✔ returns live config when load succeeds (1.6203ms)
+  ✔ fails closed to unknown when load throws (0.3682ms)
+✔ safeAccountServerMeta (5.2758ms)
+▶ safeNextPath
+  ✔ allows known Viewer destinations (1.7244ms)
+  ✔ rejects open redirects (1.3456ms)
+✔ safeNextPath (12.232ms)
+▶ deriveShopStatus
+  ✔ maps active/inactive (1.9093ms)
+✔ deriveShopStatus (3.6036ms)
+▶ mapShopList
+  ✔ maps valid shops (0.923ms)
+  ✔ maps empty list (1.2783ms)
+  ✔ rejects malformed (0.2964ms)
+✔ mapShopList (2.9461ms)
+▶ mapShopDetail
+  ✔ separates owners from assigned staff (0.9462ms)
+  ✔ handles no assigned staff (0.3485ms)
+  ✔ maps disabled/terminated staff status (0.3671ms)
+✔ mapShopDetail (2.1302ms)
+▶ mapShopActivity
+  ✔ keeps only structured shop_id matches for shop actions (0.8497ms)
+  ✔ does not match on shop name alone (0.307ms)
+✔ mapShopActivity (1.4721ms)
+▶ deriveStaffStatus
+  ✔ maps active (1.4251ms)
+  ✔ maps disabled (0.3294ms)
+  ✔ maps terminated (0.262ms)
+  ✔ terminated wins over active=true inconsistency (0.2466ms)
+✔ deriveStaffStatus (4.4542ms)
+▶ formatStaffRole
+  ✔ capitalizes frozen roles (0.3185ms)
+✔ formatStaffRole (0.5759ms)
+▶ formatShopsLabel
+  ✔ shows All shops for owners (0.3796ms)
+  ✔ formats ordinary assignments (0.568ms)
+✔ formatShopsLabel (1.5833ms)
+▶ mapStaffList
+  ✔ maps a valid list (1.6198ms)
+  ✔ maps empty list (1.1664ms)
+  ✔ rejects malformed response (0.4411ms)
+  ✔ maps disabled and terminated (0.4731ms)
+✔ mapStaffList (16.9804ms)
+▶ mapStaffDetail
+  ✔ maps owner with All shops (0.9462ms)
+  ✔ maps terminated detail (0.266ms)
+✔ mapStaffDetail (1.4837ms)
+▶ isUuid
+  ✔ validates staff ids (0.3715ms)
+✔ isUuid (0.496ms)
+▶ classifyStaffEmpty
+  ✔ differentiates empty causes (0.2742ms)
+✔ classifyStaffEmpty (0.3847ms)
+▶ formatStaffDate
+  ✔ produces a non-ISO readable date (48.0597ms)
+✔ formatStaffDate (48.2242ms)
+▶ System health mapping
+  ✔ maps online with checked_at (1.5198ms)
+  ✔ maps unavailable without stale checked_at (0.3149ms)
+  ✔ online without at still works (0.2392ms)
+✔ System health mapping (4.2578ms)
+▶ System environment / contract
+  ✔ labels Account Server env as DEV (0.3701ms)
+  ✔ labels missing/unknown Account Server env as UNKNOWN (0.1948ms)
+  ✔ distinguishes Viewer deployment from Account Server env (0.3398ms)
+  ✔ static info carries configured contract (0.4998ms)
+✔ System environment / contract (1.9371ms)
+▶ System account context
+  ✔ maps display name, username, and role safely (0.5562ms)
+  ✔ rejects incomplete profiles (0.2622ms)
+✔ System account context (1.1911ms)
+▶ System access model
+  ✔ states Owner/Admin Viewer access (1.2982ms)
+  ✔ lists frozen role catalog (1.9065ms)
+✔ System access model (3.5081ms)
+▶ System keep-alive / limitations
+  ✔ keep-alive is informational only (0.6215ms)
+  ✔ read-only and limitations are present (7.6701ms)
+✔ System keep-alive / limitations (8.5666ms)
+▶ System shop summary
+  ✔ maps overview shop counts (0.6822ms)
+✔ System shop summary (0.8669ms)
+▶ System security payload checks
+  ✔ detects forbidden keys (0.4105ms)
+  ✔ static system response shape has no secrets (4.9477ms)
+✔ System security payload checks (5.5835ms)
+▶ System viewer meta helpers
+  ✔ shortens commit SHA (0.4448ms)
+✔ System viewer meta helpers (0.591ms)
+▶ System loading contract
+  ✔ loading UI must not treat unchecked health as Offline (0.2109ms)
+✔ System loading contract (0.3424ms)
+▶ Validation
+  ✔ validates username (1.5816ms)
+  ✔ validates display name (1.5459ms)
+  ✔ validates role (0.4475ms)
+  ✔ validates shops (0.7405ms)
+✔ Validation (6.7269ms)
+✔ invalidates logical keys by their actual request URLs (49.4375ms)
+✔ a late old-session 401 cannot clear a new session (1.0242ms)
+✔ invalidation during a shared request refetches before publishing (1.4168ms)
+▶ viewer-cache
+  ✔ isolates sessions and clears on identity change (55.6088ms)
+  ✔ single-flights concurrent misses (34.5114ms)
+  ✔ clears cache on 401 and does not store it (0.7592ms)
+✔ viewer-cache (93.4351ms)
+ℹ tests 109
+ℹ suites 40
+ℹ pass 109
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 904.4958

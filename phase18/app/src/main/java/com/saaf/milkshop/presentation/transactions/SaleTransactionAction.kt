@@ -95,7 +95,7 @@ class SaleTransactionAction(
                 val result = transactionOperations.recordSale(
                     SaleInput(
                         productId = productId!!,
-                        occurredAt = LocalDate.now().toString(),
+                        occurredAt = com.saaf.milkshop.sync.BusinessClock.today().toString(),
                         channel = channel,
                         unitRate = rate!!,
                         quantity = if (quantityMode) quantity else null,

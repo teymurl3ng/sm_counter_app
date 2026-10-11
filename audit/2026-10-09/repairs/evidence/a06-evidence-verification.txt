@@ -1,0 +1,33 @@
+{
+  "xml_counts": {
+    "a06-ui-first-102.xml": {
+      "tests": 102,
+      "failures": 5,
+      "errors": 0,
+      "skipped": 0
+    },
+    "a06-ui-profile-second-104.xml": {
+      "tests": 104,
+      "failures": 3,
+      "errors": 0,
+      "skipped": 0
+    },
+    "a06-ui-profile-final-104.xml": {
+      "tests": 104,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "a06-data-final.xml": {
+      "tests": 44,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2
+    }
+  },
+  "android_source_hashes": 81,
+  "evidence_hashes": 37,
+  "production_source_changed_since_prior_snapshot": false,
+  "verified_finding_ids": 33
+}
+A06_EVIDENCE_RECONCILIATION: PASS

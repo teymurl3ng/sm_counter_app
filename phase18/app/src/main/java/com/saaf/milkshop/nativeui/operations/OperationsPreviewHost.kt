@@ -1,6 +1,6 @@
 package com.saaf.milkshop.nativeui.operations
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,7 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.scaleIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -207,7 +208,7 @@ fun OperationsPreviewHost(
             title = headerTitle,
             displayName = identity.displayName,
             roleLabel = formatCashierRoleLabel(identity.role.wireValue),
-            businessDate = workReady?.context?.businessDate ?: java.time.LocalDate.now().toString(),
+            businessDate = workReady?.context?.businessDate ?: com.saaf.milkshop.sync.BusinessClock.today().toString(),
             postingOpen = workReady?.context?.postingOpen ?: true,
         )
         NativeSectionTransition(
@@ -216,17 +217,12 @@ fun OperationsPreviewHost(
             modifier = Modifier.weight(1f),
         ) { section ->
         sectionStateHolder.SaveableStateProvider("$sessionHandle:${section.name}") {
-        AnimatedContent(
+        androidx.compose.runtime.CompositionLocalProvider(com.saaf.milkshop.nativeui.sale.LocalPaneHeaderEnabled provides false) {
+        NativeSectionTransition(
             targetState = workReady?.destination,
             contentKey = { it },
-            transitionSpec = {
-                // No alpha: the incoming pane is fully opaque from frame 1 and
-                // just settles 96%->100%, so there is never a blank/flash frame.
-                // The old pane is covered instantly by the opaque new one.
-                scaleIn(initialScale = 0.96f, animationSpec = tween(200)) togetherWith ExitTransition.None
-            },
-            label = "work_destination",
         ) { destination ->
+        val registerPaneGuard = com.saaf.milkshop.nativeui.common.rememberPaneGuardRegistration({ activeEntryGuard }) { activeEntryGuard = it }
         when {
             section == OperationsSection.Deliveries -> {
                 DeliveriesScreen(
@@ -305,7 +301,7 @@ fun OperationsPreviewHost(
                     onBackToHome = {
                         operationsWorkViewModel.backToHome()
                     },
-                    onRegisterGuard = { activeEntryGuard = it },
+                    onRegisterGuard = registerPaneGuard,
                     workScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.OpsWorkRoot)) {
                             content(PaddingValues(0.dp))
@@ -314,7 +310,7 @@ fun OperationsPreviewHost(
                 )
             }
             section == OperationsSection.Work &&
-                workReady?.destination == NativeOperationsWorkDestination.MakeYogurt -> {
+                destination == NativeOperationsWorkDestination.MakeYogurt -> {
                 MakeYogurtScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -325,7 +321,7 @@ fun OperationsPreviewHost(
                     onBackToHome = {
                         operationsWorkViewModel.backToHome()
                     },
-                    onRegisterGuard = { activeEntryGuard = it },
+                    onRegisterGuard = registerPaneGuard,
                     workScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.OpsWorkRoot)) {
                             content(PaddingValues(0.dp))
@@ -334,7 +330,7 @@ fun OperationsPreviewHost(
                 )
             }
             section == OperationsSection.Work &&
-                workReady?.destination == NativeOperationsWorkDestination.RecordSpoilage -> {
+                destination == NativeOperationsWorkDestination.RecordSpoilage -> {
                 RecordSpoilageScreen(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
@@ -351,7 +347,7 @@ fun OperationsPreviewHost(
                     onBackToHome = {
                         operationsWorkViewModel.backToHome()
                     },
-                    onRegisterGuard = { activeEntryGuard = it },
+                    onRegisterGuard = registerPaneGuard,
                     workScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.OpsWorkRoot)) {
                             content(PaddingValues(0.dp))
@@ -386,6 +382,7 @@ fun OperationsPreviewHost(
                     },
                 )
             }
+        }
         }
         }
         }

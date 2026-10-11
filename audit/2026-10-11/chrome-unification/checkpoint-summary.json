@@ -1,0 +1,26 @@
+{
+  "tests": 609,
+  "failures": 3,
+  "skipped": 0,
+  "failed_cases": [
+    {
+      "class": "com.saaf.milkshop.NativeOwnerCollectionEntryScreenContractTest",
+      "name": "dirtyOwnerNavigationRequiresDiscardConfirmation",
+      "message": null,
+      "trace": "java.lang.AssertionError: Failed to inject touch input.\nReason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'owner_nav_overview')\n\nat androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)\nat androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)\nat androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)\nat androidx.compose.ui.test.ActionsKt.performTouchInput(Actions.kt:402)\nat androidx.compose.ui.test.AndroidActions.performClickImpl(Actions.android.kt:23)\nat androidx.compose.ui.test.ActionsKt.performClick(Actions.kt:60)\nat com.saaf.milkshop.NativeOwnerCollectionEntryScreenContractTest.dirtyOwnerNavigationRequiresDiscardConfirmation(NativeOwnerCollectionEntryScreenContractTest.kt:84)\n"
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerPaySupplierScreenContractTest",
+      "name": "dirtyOwnerNavigationRequiresDiscardConfirmation",
+      "message": null,
+      "trace": "java.lang.AssertionError: Failed to inject touch input.\nReason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'owner_nav_overview')\n\nat androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)\nat androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)\nat androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)\nat androidx.compose.ui.test.ActionsKt.performTouchInput(Actions.kt:402)\nat androidx.compose.ui.test.AndroidActions.performClickImpl(Actions.android.kt:23)\nat androidx.compose.ui.test.ActionsKt.performClick(Actions.kt:60)\nat com.saaf.milkshop.NativeOwnerPaySupplierScreenContractTest.dirtyOwnerNavigationRequiresDiscardConfirmation(NativeOwnerPaySupplierScreenContractTest.kt:76)\n"
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerPaySalaryScreenContractTest",
+      "name": "dirtyOwnerNavigationRequiresDiscardConfirmation",
+      "message": null,
+      "trace": "java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'Discard this payment?' (ignoreCase: false) is not displayed!\nat androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)\nat com.saaf.milkshop.NativeOwnerPaySalaryScreenContractTest.dirtyOwnerNavigationRequiresDiscardConfirmation(NativeOwnerPaySalaryScreenContractTest.kt:78)\n"
+    }
+  ],
+  "passed": 606
+}

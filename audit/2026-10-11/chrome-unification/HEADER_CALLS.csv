@@ -1,0 +1,70 @@
+file,line,component,title_expression,issue,priority
+admin\AdminMoreScreen.kt,643,AdminMoreHeader,"""More"",",Unbounded shared header text; site inherits shared fix,P1
+admin\AdminPeopleScreen.kt,358,AdminPeopleHubScreen,"""People"",",Unbounded shared header text; site inherits shared fix,P1
+admin\AdminPreviewHost.kt,277,resetRecordsHub,"headerTitle,",Unbounded shared header text; site inherits shared fix,P0
+admin\AdminPreviewHost.kt,534,AdminStubSection,"title,",Unbounded shared header text; site inherits shared fix,P0
+admin\AdminRecordsScreen.kt,197,AdminRecordsHubScreen,"""Records"",",Unbounded shared header text; site inherits shared fix,P1
+admin\AdminWorkScreen.kt,142,ReadyWork,"""Work desk"",",Unbounded shared header text; site inherits shared fix,P1
+cashclose\CashCloseEntryScreen.kt,174,CashCloseEntryContent,"""Cash count and close"",",Unbounded shared header text; site inherits shared fix,P1
+collection\CashierCollectionScreen.kt,354,CollectionEntryContent,"""Collect payment"",",Unbounded shared header text; site inherits shared fix,P1
+drawing\DrawingEntryScreen.kt,181,DrawingEntryContent,"""Owner drawing"",",Unbounded shared header text; site inherits shared fix,P1
+expense\ExpenseEntryScreen.kt,232,ExpenseEntryContent,"""Record expense"",",Unbounded shared header text; site inherits shared fix,P1
+manager\ManagerPreviewHost.kt,285,returnManagerWorkHome,"headerTitle,",Unbounded shared header text; site inherits shared fix,P0
+manager\ManagerPreviewHost.kt,632,ManagerStubSection,"title,",Unbounded shared header text; site inherits shared fix,P0
+operations\OperationsPreviewHost.kt,207,OperationsPreviewHost,"headerTitle,",Unbounded shared header text; site inherits shared fix,P0
+owner\OwnerBackupScreen.kt,384,OwnerBackupStatusScreen,"if (localExportOnly) ""Local export"" else ""Backup & restore"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerBackupScreen.kt,656,requestLeave,"""Export backup"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerBackupScreen.kt,793,requestLeave,"""Restore backup"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerBackupScreen.kt,951,requestLeave,"""Connect Drive"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerBackupScreen.kt,1076,OwnerBackupReauthScreen,"""Confirm it is you"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerBackupScreen.kt,1203,requestLeave,"""Cloud recovery"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerCostingPlanningScreens.kt,335,requestLeave,"""Costing & plans"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerCostingPlanningScreens.kt,525,requestLeave,"""Costing & plans"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerCostingPlanningScreens.kt,905,requestLeave,"""Costing & plans"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerCostingPlansScreen.kt,628,HubHeader,"""Costing & plans"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerCostingPlansScreen.kt,846,OwnerCostingPlansDetailScreen,"""Costing & plans"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerCostingPlansScreen.kt,1039,requestLeave,"""Costing & plans"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerCustomersScreen.kt,244,OwnerCustomersScreenPane,"""Customers"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerCustomersScreen.kt,383,requestLeave,"""Customers"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerCustomersScreen.kt,522,requestLeave,"""Customers"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerCustomersScreen.kt,763,OwnerCustomersDetailScreen,"""Customers"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerEmployeesScreen.kt,245,OwnerEmployeesScreenPane,"""Employees"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerEmployeesScreen.kt,384,requestLeave,"""Employees"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerEmployeesScreen.kt,519,requestLeave,"""Employees"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerEmployeesScreen.kt,748,OwnerEmployeesDetailScreen,"""Employees"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerMoreScreen.kt,943,OwnerMoreHeader,"""More"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerOpeningCostBasisScreen.kt,243,OwnerOpeningCostBasisEditorScreen,"""Opening cost basis"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerOverviewScreen.kt,88,OwnerOverviewScreen,"""Overview"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerPreviewHost.kt,524,returnOwnerWorkHome,"headerTitle,",Unbounded shared header text; site inherits shared fix,P0
+owner\OwnerProductsScreen.kt,278,OwnerProductsScreenPane,"""Products"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerProductsScreen.kt,509,requestLeave,"""Products"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerProductsScreen.kt,757,OwnerProductsDetailScreen,"""Products"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerRecordsScreen.kt,225,RecordsListBody,"""Records"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerRecordsScreen.kt,477,RecordsLedgerBody,"ledger.displayName,",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerRecordsScreen.kt,548,RecordsDetailBody,"""Records"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerRecordsScreen.kt,669,requestLeave,"""Records"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerReportsScreen.kt,85,OwnerReportsScreen,"""Month reports"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerSecurityHistoryScreen.kt,94,OwnerSecurityHistoryScreen,"""Security history"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerSecurityHistoryScreen.kt,196,OwnerSecurityHistoryDetailScreen,"""Security history"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerShopSettingsScreen.kt,370,OwnerShopSettingsScreenPane,"""Shop settings"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerShopSettingsScreen.kt,643,requestLeave,"""Shop settings"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerShopSettingsScreen.kt,821,touch,"""Shop settings"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerShopSettingsScreen.kt,976,requestLeave,"""Shop settings"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerShopSettingsScreen.kt,1082,OwnerShopSettingsCategoryDetailScreen,"""Shop settings"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerShopSettingsScreen.kt,1377,buildInputOrNull,"""Shop settings"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerShopSettingsScreen.kt,1580,OpeningReauthScreen,"""Confirm it is you"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerSuppliersScreen.kt,243,OwnerSuppliersScreenPane,"""Suppliers"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerSuppliersScreen.kt,382,requestLeave,"""Suppliers"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerSuppliersScreen.kt,508,requestLeave,"""Suppliers"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerSuppliersScreen.kt,696,OwnerSuppliersDetailScreen,"""Suppliers"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerSyncScreen.kt,116,takeCredential,"""Sync"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerUsersRolesScreen.kt,336,OwnerUsersRolesScreenPane,"""Users & roles"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerUsersRolesScreen.kt,459,OwnerUsersRolesDetailScreen,"""Users & roles"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerUsersRolesScreen.kt,635,requestLeave,"""Users & roles"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerUsersRolesScreen.kt,773,requestLeave,"""Users & roles"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerUsersRolesScreen.kt,909,requestLeave,"""Users & roles"",",Unbounded shared header text; site inherits shared fix,P1
+owner\OwnerWorkScreen.kt,122,ReadyWork,"""Work"",",Unbounded shared header text; site inherits shared fix,P1
+salarypayment\SalaryPaymentEntryScreen.kt,216,SalaryPaymentEntryContent,"""Pay salary"",",Unbounded shared header text; site inherits shared fix,P1
+sale\CashierPreviewHost.kt,257,guardedSectionNavigate,when {,Unbounded shared header text; site inherits shared fix,P0
+sale\CashierSaleScreen.kt,344,SaleEntryContent,"stringResource(R.string.native_new_sale),",Unbounded shared header text; site inherits shared fix,P1
+vendorpayment\VendorPaymentEntryScreen.kt,216,VendorPaymentEntryContent,"""Pay supplier"",",Unbounded shared header text; site inherits shared fix,P1

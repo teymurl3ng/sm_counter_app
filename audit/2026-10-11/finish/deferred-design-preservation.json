@@ -1,0 +1,10 @@
+[
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\common\\NativeListItem.kt",
+    "unchangedSincePriorPass": true
+  },
+  {
+    "path": "phase18\\app\\src\\main\\java\\com\\saaf\\milkshop\\nativeui\\theme\\SaafTheme.kt",
+    "unchangedSincePriorPass": true
+  }
+]

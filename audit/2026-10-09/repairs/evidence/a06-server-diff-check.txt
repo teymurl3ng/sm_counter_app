@@ -1,0 +1,2 @@
+warning: in the working copy of '.github/workflows/identity-dr.yml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'admin.py', LF will be replaced by CRLF the next time Git touches it

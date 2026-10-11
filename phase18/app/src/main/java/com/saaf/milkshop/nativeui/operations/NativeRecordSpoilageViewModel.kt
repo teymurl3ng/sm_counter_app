@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.delay
 
 sealed interface NativeRecordSpoilageState {
     data object Idle : NativeRecordSpoilageState
@@ -45,6 +44,7 @@ class NativeRecordSpoilageViewModel(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val _state = MutableStateFlow<NativeRecordSpoilageState>(NativeRecordSpoilageState.Idle)
     private var sessionHandle: String? = null
+    private val loadGate = com.saaf.milkshop.nativeui.SessionRequestGate()
     val state: StateFlow<NativeRecordSpoilageState> = _state.asStateFlow()
 
     init {
@@ -102,20 +102,22 @@ class NativeRecordSpoilageViewModel(
 
     fun refresh() {
         val session = sessionHandle ?: return
+        val request = loadGate.begin(session)
         val previous = _state.value as? NativeRecordSpoilageState.Ready
         _state.value = previous?.copy(refreshing = true, error = null)
             ?: NativeRecordSpoilageState.Loading
         scope.launch {
             try {
-                _state.value = NativeRecordSpoilageState.Ready(
-                    withContext(Dispatchers.IO) { facade.load(session) },
-                    refreshing = false,
-                )
+                val context = withContext(Dispatchers.IO) { facade.load(session) }
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
+                _state.value = (_state.value as? NativeRecordSpoilageState.Ready)?.copy(context = context, refreshing = false, error = null)
+                    ?: NativeRecordSpoilageState.Ready(context, refreshing = false)
             } catch (error: Throwable) {
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 if (error is SecurityFailure.SessionExpired || previous == null) {
                     handleLoadFailure(error)
                 } else {
-                    _state.value = previous.copy(
+                    _state.value = ((_state.value as? NativeRecordSpoilageState.Ready) ?: previous).copy(
                         refreshing = false,
                         error = error.message ?: publicMessage(error),
                     )
@@ -186,7 +188,7 @@ class NativeRecordSpoilageViewModel(
                     },
                     receipt = submission.receipt,
                 )
-                autoClearReceipt(submission.receipt)
+
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
@@ -206,17 +208,10 @@ class NativeRecordSpoilageViewModel(
 
 
     /** Auto-clears the success receipt after 4s unless a newer one replaced it. */
-    private fun autoClearReceipt(receipt: Any?) {
-        scope.launch {
-            delay(4_000)
-            val current = _state.value as? NativeRecordSpoilageState.Ready ?: return@launch
-            if (current.receipt === receipt) {
-                _state.value = current.copy(receipt = null)
-            }
-        }
-    }
+
 
     fun close() {
+        loadGate.invalidate()
         sessionHandle = null
         _state.value = NativeRecordSpoilageState.Idle
     }

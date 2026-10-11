@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.delay
 
 sealed interface NativeVendorPaymentState {
     data object Idle : NativeVendorPaymentState
@@ -39,6 +38,7 @@ class NativeVendorPaymentViewModel(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val _state = MutableStateFlow<NativeVendorPaymentState>(NativeVendorPaymentState.Idle)
     private var sessionHandle: String? = null
+    private val loadGate = com.saaf.milkshop.nativeui.SessionRequestGate()
     val state: StateFlow<NativeVendorPaymentState> = _state.asStateFlow()
 
     init {
@@ -88,20 +88,22 @@ class NativeVendorPaymentViewModel(
 
     fun refresh() {
         val session = sessionHandle ?: return
+        val request = loadGate.begin(session)
         val previous = _state.value as? NativeVendorPaymentState.Ready
         _state.value = previous?.copy(refreshing = true, error = null)
             ?: NativeVendorPaymentState.Loading
         scope.launch {
             try {
-                _state.value = NativeVendorPaymentState.Ready(
-                    withContext(Dispatchers.IO) { facade.load(session) },
-                    refreshing = false,
-                )
+                val context = withContext(Dispatchers.IO) { facade.load(session) }
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
+                _state.value = (_state.value as? NativeVendorPaymentState.Ready)?.copy(context = context, refreshing = false, error = null)
+                    ?: NativeVendorPaymentState.Ready(context, refreshing = false)
             } catch (error: Throwable) {
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 if (error is SecurityFailure.SessionExpired || previous == null) {
                     handleLoadFailure(error)
                 } else {
-                    _state.value = previous.copy(
+                    _state.value = ((_state.value as? NativeVendorPaymentState.Ready) ?: previous).copy(
                         refreshing = false,
                         error = error.message ?: "The supplier payment could not be refreshed. Try again.",
                     )
@@ -122,7 +124,7 @@ class NativeVendorPaymentViewModel(
                     context = submission.refreshedContext,
                     receipt = submission.receipt,
                 )
-                autoClearReceipt(submission.receipt)
+
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
@@ -142,15 +144,7 @@ class NativeVendorPaymentViewModel(
 
 
     /** Auto-clears the success receipt after 4s unless a newer one replaced it. */
-    private fun autoClearReceipt(receipt: Any?) {
-        scope.launch {
-            delay(4_000)
-            val current = _state.value as? NativeVendorPaymentState.Ready ?: return@launch
-            if (current.receipt === receipt) {
-                _state.value = current.copy(receipt = null)
-            }
-        }
-    }
+
 
     fun clearFeedback() {
         val current = _state.value as? NativeVendorPaymentState.Ready ?: return
@@ -158,6 +152,7 @@ class NativeVendorPaymentViewModel(
     }
 
     fun close() {
+        loadGate.invalidate()
         sessionHandle = null
         _state.value = NativeVendorPaymentState.Idle
     }

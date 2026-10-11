@@ -47,3 +47,21 @@ before_state.png
 phase18/edit_h8e.py
 counter_access.txt
 counter_token.json
+
+# Local audit runtimes, external checkouts, and private preview recovery data
+audit/**/checkout/
+audit/**/runtime/
+audit/**/node_modules/
+audit/**/.next/
+audit/**/preview-owner-account/
+audit/**/*.db*
+audit/**/*.sqlite*
+audit/**/.env*
+
+# Large generated QA artifacts stay local; review manifests are retained
+audit/**/*.mp4
+phase14-evidence/**/*.mp4
+audit/**/*.perfetto-trace
+audit/**/logcat-*.txt
+audit/**/*.pb
+audit/**/*.textproto

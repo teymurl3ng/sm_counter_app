@@ -1,0 +1,7 @@
+{
+  "scenario": "interactive-cashier-more",
+  "reviewStatus": "UNREVIEWED",
+  "device": "R8VXA02SNKH",
+  "packageName": "com.saaf.milkshop.qa",
+  "note": "After QA install -r; actual interactive app and existing Preview Cashier account. Owner visual review pending."
+}

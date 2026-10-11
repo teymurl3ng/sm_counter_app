@@ -550,7 +550,7 @@ class NativeAuthenticationViewModel(
         is SecurityFailure,
         is QuickUnlockFailure -> error.message ?: "Sign-in could not be completed."
         is IllegalArgumentException -> error.message ?: "Check the information and try again."
-        else -> "Saaf could not load account access. Try again."
+        else -> "Account access could not load. Try again."
     }
 
     class Factory(

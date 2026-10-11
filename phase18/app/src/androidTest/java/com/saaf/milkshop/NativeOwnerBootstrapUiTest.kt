@@ -25,20 +25,20 @@ class NativeOwnerBootstrapUiTest {
     @Test
     fun firstRunCreatesOwnerShowsRecoveryCodeAndEntersCashier() {
         composeRule.onNodeWithTag(NativeUiTags.WelcomeContinue).performClick()
-        waitForText("Create the Owner account")
+        waitForText("Create Owner")
         composeRule.onNodeWithTag(NativeUiTags.AuthCreateOwner).assertIsNotEnabled()
 
         composeRule.onNodeWithTag(NativeUiTags.AuthBackToWelcome).performClick()
-        composeRule.onNodeWithText("Saaf Milk").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.WelcomeContinue).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.WelcomeContinue).performClick()
-        waitForText("Create the Owner account")
+        waitForText("Create Owner")
 
         composeRule.activityRule.scenario.onActivity { activity ->
             activity.onBackPressedDispatcher.onBackPressed()
         }
-        composeRule.onNodeWithText("Saaf Milk").assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.WelcomeContinue).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.WelcomeContinue).performClick()
-        waitForText("Create the Owner account")
+        waitForText("Create Owner")
 
         composeRule.onNodeWithTag(NativeUiTags.AuthOwnerDisplayInput)
             .performTextReplacement("Instrumentation Owner")
@@ -62,11 +62,11 @@ class NativeOwnerBootstrapUiTest {
             .performScrollTo()
             .performClick()
 
-        waitForText("Save your recovery code")
+        waitForText("Recovery code")
         composeRule.activityRule.scenario.onActivity { activity ->
             activity.onBackPressedDispatcher.onBackPressed()
         }
-        composeRule.onNodeWithText("Save your recovery code").assertIsDisplayed()
+        composeRule.onNodeWithText("Recovery code").assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.AuthRecoveryAcknowledge).performClick()
         waitForText("Overview")
     }
@@ -87,6 +87,7 @@ class NativeOwnerBootstrapUiTest {
         check(errors.isEmpty()) {
             "Authentication showed an error while waiting for '$text'."
         }
-        composeRule.onNodeWithText(text).assertIsDisplayed()
+        // A compact title can share its wording with the form's primary action.
+        composeRule.onAllNodesWithText(text)[0].assertIsDisplayed()
     }
 }

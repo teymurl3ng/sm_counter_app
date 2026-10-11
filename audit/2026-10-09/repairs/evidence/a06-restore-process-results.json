@@ -1,0 +1,18 @@
+[
+  {
+    "stage": "before_commit",
+    "readiness_marker_observed": true,
+    "preparation_intentionally_force_stopped": true,
+    "preparation_adb_exit": 0,
+    "verification_adb_exit": 0,
+    "fresh_process_pass": true
+  },
+  {
+    "stage": "after_commit",
+    "readiness_marker_observed": true,
+    "preparation_intentionally_force_stopped": true,
+    "preparation_adb_exit": 0,
+    "verification_adb_exit": 0,
+    "fresh_process_pass": true
+  }
+]

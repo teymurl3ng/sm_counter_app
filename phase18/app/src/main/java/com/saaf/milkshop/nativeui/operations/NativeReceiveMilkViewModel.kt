@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.delay
 
 sealed interface NativeReceiveMilkState {
     data object Idle : NativeReceiveMilkState
@@ -43,6 +42,7 @@ class NativeReceiveMilkViewModel(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val _state = MutableStateFlow<NativeReceiveMilkState>(NativeReceiveMilkState.Idle)
     private var sessionHandle: String? = null
+    private val loadGate = com.saaf.milkshop.nativeui.SessionRequestGate()
     val state: StateFlow<NativeReceiveMilkState> = _state.asStateFlow()
 
     init {
@@ -67,20 +67,22 @@ class NativeReceiveMilkViewModel(
 
     fun refresh() {
         val session = sessionHandle ?: return
+        val request = loadGate.begin(session)
         val previous = _state.value as? NativeReceiveMilkState.Ready
         _state.value = previous?.copy(refreshing = true, error = null)
             ?: NativeReceiveMilkState.Loading
         scope.launch {
             try {
-                _state.value = NativeReceiveMilkState.Ready(
-                    withContext(Dispatchers.IO) { facade.load(session) },
-                    refreshing = false,
-                )
+                val context = withContext(Dispatchers.IO) { facade.load(session) }
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
+                _state.value = (_state.value as? NativeReceiveMilkState.Ready)?.copy(context = context, refreshing = false, error = null)
+                    ?: NativeReceiveMilkState.Ready(context, refreshing = false)
             } catch (error: Throwable) {
+                if (!loadGate.isCurrent(request, sessionHandle)) return@launch
                 if (error is SecurityFailure.SessionExpired || previous == null) {
                     handleLoadFailure(error)
                 } else {
-                    _state.value = previous.copy(
+                    _state.value = ((_state.value as? NativeReceiveMilkState.Ready) ?: previous).copy(
                         refreshing = false,
                         error = error.message ?: publicMessage(error),
                     )
@@ -167,7 +169,7 @@ class NativeReceiveMilkViewModel(
                     selectedVendor = submission.receipt.vendor,
                     receipt = submission.receipt,
                 )
-                autoClearReceipt(submission.receipt)
+
             } catch (error: Throwable) {
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
@@ -187,17 +189,10 @@ class NativeReceiveMilkViewModel(
 
 
     /** Auto-clears the success receipt after 4s unless a newer one replaced it. */
-    private fun autoClearReceipt(receipt: Any?) {
-        scope.launch {
-            delay(4_000)
-            val current = _state.value as? NativeReceiveMilkState.Ready ?: return@launch
-            if (current.receipt === receipt) {
-                _state.value = current.copy(receipt = null)
-            }
-        }
-    }
+
 
     fun close() {
+        loadGate.invalidate()
         sessionHandle = null
         _state.value = NativeReceiveMilkState.Idle
     }

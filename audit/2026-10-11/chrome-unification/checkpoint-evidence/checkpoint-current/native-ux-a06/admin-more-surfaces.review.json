@@ -1,0 +1,14 @@
+{
+  "scenario": "admin-more-surfaces",
+  "screen": "ux",
+  "device": "samsung SM-A065F",
+  "packageName": "com.saaf.milkshop.qa.tests",
+  "capturedAt": "2026-10-11T00:26:35.650128Z",
+  "orientation": "portrait",
+  "fontScale": "1.0",
+  "theme": "light",
+  "workflowId": "adminMoreOpensUnderAdminChrome",
+  "evidenceFilename": "admin-more-surfaces.png",
+  "reviewStatus": "UNREVIEWED",
+  "note": "Isolated A06 QA fixture; settled appearance. This PNG alone does not prove motion quality."
+}

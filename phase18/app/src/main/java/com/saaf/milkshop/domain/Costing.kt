@@ -245,6 +245,21 @@ class YieldPolicyService(
         val event = database.inventoryCostProjectionDao().effectiveEvents()
             .singleOrNull { it.eventId == productionEventId }
             ?: error("Yield assessment must reference an effective production event")
+        return assessEffectiveEvent(event)
+    }
+
+    /** One effective-history read for a context containing multiple batches. */
+    suspend fun assessAll(productionEventIds: List<Long>): Map<Long, YieldAlertAssessment> {
+        if (productionEventIds.isEmpty()) return emptyMap()
+        val effectiveById = database.inventoryCostProjectionDao().effectiveEvents().groupBy { it.eventId }
+        return productionEventIds.associateWith { id ->
+            val event = effectiveById[id]?.singleOrNull()
+                ?: error("Yield assessment must reference an effective production event")
+            assessEffectiveEvent(event)
+        }
+    }
+
+    private suspend fun assessEffectiveEvent(event: EventEntity): YieldAlertAssessment {
         require(event.eventType == YogurtProductionService.EVENT_TYPE_PRODUCTION) { "Yield assessment must reference production" }
         val milk = BigDecimal.valueOf(requireNotNull(event.milkLitersUsed))
         val yogurt = BigDecimal.valueOf(requireNotNull(event.yogurtKgProduced))

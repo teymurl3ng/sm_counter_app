@@ -1,6 +1,9 @@
 package com.saaf.milkshop.nativeui.operations
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.nativeListItem
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -135,7 +138,7 @@ internal fun DeliveriesLoadFailureBody(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    NativeLoadFailurePane(message = message, onRetry = onRetry, modifier = modifier)
+    NativeLoadFailurePane(message = message, onRetry = onRetry, modifier = modifier, retryTestTag = NativeUiTags.OpsDeliveriesRetryLoad)
 }
 
 @Composable
@@ -158,11 +161,9 @@ internal fun DeliveriesReadyContent(
             .testTag(NativeUiTags.OpsDeliveriesRoot),
     ) {
         val hapticContext = LocalContext.current
-        LaunchedEffect(state.lastDeliveredId, state.lastLinkedId, state.lastCreatedId) {
-            if (state.lastDeliveredId != null || state.lastLinkedId != null || state.lastCreatedId != null) {
-                hapticContext.hapticConfirm()
-            }
-        }
+        com.saaf.milkshop.nativeui.common.NativeReceiptFeedback("delivery-done", state.lastDeliveredId)
+        com.saaf.milkshop.nativeui.common.NativeReceiptFeedback("delivery-linked", state.lastLinkedId)
+        com.saaf.milkshop.nativeui.common.NativeReceiptFeedback("delivery-created", state.lastCreatedId)
         Column(
             Modifier
                 .weight(1f)
@@ -186,7 +187,7 @@ internal fun DeliveriesReadyContent(
                         .testTag(NativeUiTags.OpsDeliveriesSuccess),
                 ) {
                     Row(
-                        Modifier.padding(14.dp),
+                        Modifier.padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(Icons.Outlined.CheckCircle, contentDescription = null)
@@ -206,7 +207,7 @@ internal fun DeliveriesReadyContent(
                         .testTag(NativeUiTags.OpsDeliveriesSuccess),
                 ) {
                     Row(
-                        Modifier.padding(14.dp),
+                        Modifier.padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(Icons.Outlined.CheckCircle, contentDescription = null)
@@ -226,7 +227,7 @@ internal fun DeliveriesReadyContent(
                         .testTag(NativeUiTags.OpsDeliveriesSuccess),
                 ) {
                     Row(
-                        Modifier.padding(14.dp),
+                        Modifier.padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(Icons.Outlined.CheckCircle, contentDescription = null)
@@ -330,19 +331,20 @@ private fun NewDeliveryCard(
     val canCreate = selectedCustomer != null && selectedProduct != null && quantityValid && !state.creating
 
     Surface(
-        tonalElevation = 1.dp,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         modifier = Modifier
             .fillMaxWidth()
             .testTag(NativeUiTags.OpsDeliveriesNewSection),
     ) {
         Column(
-            Modifier.padding(14.dp),
+            Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             if (!expanded) {
                 val press2 = rememberPressSource()
                 Button(
-                    onClick = { expanded = true },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { expanded = true },
                     modifier = Modifier
                         .pressScale(press2)
                         .fillMaxWidth()
@@ -364,7 +366,7 @@ private fun NewDeliveryCard(
                 enabled = !state.creating,
                 trailingIcon = {
                     TextButton(
-                        onClick = { pickingCustomer = true },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { pickingCustomer = true },
                         enabled = !state.creating,
                         modifier = Modifier.testTag(NativeUiTags.OpsDeliveryCustomerPick),
                     ) { Text("Pick") }
@@ -381,7 +383,7 @@ private fun NewDeliveryCard(
                 enabled = !state.creating,
                 trailingIcon = {
                     TextButton(
-                        onClick = { pickingProduct = true },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { pickingProduct = true },
                         enabled = !state.creating,
                         modifier = Modifier.testTag(NativeUiTags.OpsDeliveryProductPick),
                     ) { Text("Pick") }
@@ -488,9 +490,10 @@ private fun NativeDeliveryPickerDialog(
                 }
                 items(options, key = { it.id }) { option ->
                     TextButton(
-                        onClick = { onSelect(option.id) },
+                        onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelect(option.id) },
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .padding(vertical = 4.dp).nativeListItem(NativeListStyle.Selection, selected = option.id == selectedId)
                             .testTag(NativeUiTags.opsDeliveryPickerOption(option.id)),
                     ) {
                         Text(
@@ -503,7 +506,7 @@ private fun NativeDeliveryPickerDialog(
         },
         confirmButton = {},
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onDismiss)) { Text("Cancel") }
         },
     )
 }
@@ -520,13 +523,14 @@ private fun LinkSaleCard(
     val hapticContext = LocalContext.current
     var saleNumber by rememberSaveable(item.deliveryId) { mutableStateOf("") }
     Surface(
-        tonalElevation = 1.dp,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         modifier = Modifier
             .fillMaxWidth()
             .testTag(NativeUiTags.opsDeliveryLinkSection(item.deliveryId)),
     ) {
         Column(
-            Modifier.padding(14.dp),
+            Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(item.customerName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
@@ -570,7 +574,7 @@ private fun LinkSaleCard(
             // An escape hatch for any unlinked delivery — pending or already
             // delivered — so nothing is stuck with only "Link" as an option.
             OutlinedButton(
-                onClick = { onArchive(item.deliveryId) },
+                onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction { onArchive(item.deliveryId) },
                 enabled = !busy,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -602,13 +606,14 @@ private fun DeliveryCard(
 ) {
     val hapticContext = LocalContext.current
     Surface(
-        tonalElevation = 1.dp,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         modifier = Modifier
             .fillMaxWidth()
             .testTag(NativeUiTags.opsDelivery(item.deliveryId)),
     ) {
         Column(
-            Modifier.padding(14.dp),
+            Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(item.customerName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)

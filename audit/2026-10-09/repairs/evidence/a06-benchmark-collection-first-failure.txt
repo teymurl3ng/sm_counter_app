@@ -1,0 +1,12 @@
+Verified isolated profileable APK identities; installing A06 QA benchmark only.
+Running benchmark profilePersistentMixedCostingDataset
+{"build": "benchmark", "device": "SM-A065F", "dataset": "Persistent bundled Room; 100 customers; 10000 collections; 21 purchases; 40 yogurt batches; 20 yogurt sales; one costing policy", "storage": "persistent isolated Room fixture", "warmups_per_operation": 2, "collection_seed_ms": 7942.411154, "yield_context_40_batches": {"samples": 3, "median_ms": 4932.622077, "p95_ms": 4960.641846, "max_ms": 4960.641846}, "collection_command_and_receipt": {"samples": 20, "median_ms": 37.350692, "p95_ms": 62.689847, "max_ms": 64.479076}, "sale_command_and_receipt": {"samples": 20, "median_ms": 271.776231, "p95_ms": 321.878462, "max_ms": 323.612}, "month_reports": {"samples": 20, "median_ms": 397.243308, "p95_ms": 426.995693, "max_ms": 446.334231}}
+Traceback (most recent call last):
+  File "C:\Users\Teymur\Desktop\hybrid project\codex\Saaf_Milk_Codex_Handoff_Pack\Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED\audit\2026-10-09\repairs\run_a06_benchmark.py", line 73, in <module>
+    start=adb('shell','perfetto','--background-wait','--txt','-c',remote_config,'-o',remote_trace)
+  File "C:\Users\Teymur\Desktop\hybrid project\codex\Saaf_Milk_Codex_Handoff_Pack\Saaf_Milk_Real_Hybrid_Phase3_Native_Expansion_In_Progress_FIXED\audit\2026-10-09\repairs\run_a06_benchmark.py", line 23, in adb
+    assert r.returncode==0,r.stderr.decode(errors='replace')+r.stdout.decode(errors='replace')
+           ^^^^^^^^^^^^^^^
+AssertionError: [754.718]     perfetto_cmd.cc:328 Could not open /data/local/tmp/saaf-audit-benchmark.pbtxt. If this is a permission denied error, try placing the config in /data/misc/perfetto-configs: Perfetto should always be able to access this directory. (errno: 13, Permission denied)
+
+

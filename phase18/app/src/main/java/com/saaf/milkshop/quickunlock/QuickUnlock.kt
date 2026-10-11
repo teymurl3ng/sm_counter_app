@@ -284,7 +284,7 @@ class QuickUnlockService internal constructor(
     }
 
     private suspend fun authenticateDevice(record: QuickUnlockRecord, identity: Identity): Boolean {
-        val keyId = record.deviceKeyId ?: throw QuickUnlockFailure.Unavailable("Phone security is not enabled for this Saaf account")
+        val keyId = record.deviceKeyId ?: throw QuickUnlockFailure.Unavailable("Phone security is not enabled for this account")
         val nonce = record.deviceNonceBase64 ?: throw QuickUnlockFailure.Invalidated()
         val ciphertext = record.deviceCiphertextBase64 ?: throw QuickUnlockFailure.Invalidated()
         val expectedHash = record.deviceTokenHashBase64?.let(::decode) ?: throw QuickUnlockFailure.Invalidated()
@@ -319,7 +319,7 @@ class QuickUnlockService internal constructor(
         val entered = pin ?: throw SecurityFailure.Validation("Enter your Quick PIN")
         pinHasher.validate(entered)
         if (record.pinVerifierBase64 == null || record.pinSaltBase64 == null) {
-            throw QuickUnlockFailure.Unavailable("A Quick PIN is not enabled for this Saaf account")
+            throw QuickUnlockFailure.Unavailable("A Quick PIN is not enabled for this account")
         }
         val now = nowEpochMs()
         if (record.pinRequiresFullPassphrase || record.pinLockedUntilEpochMs?.let { it > now } == true) {

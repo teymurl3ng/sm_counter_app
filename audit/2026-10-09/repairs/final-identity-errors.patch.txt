@@ -1,0 +1,21 @@
+*** Begin Patch
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/lib/identity-create.ts
+@@
+-  const body = result.body;
++  let body = result.body;
++  if (typeof body === "string") {
++    try { body = JSON.parse(body); } catch { return true; }
++  }
+*** Update File: C:/Users/Teymur/Documents/Projects/saaf-milk-admin-viewer/src/lib/identity-create.test.ts
+@@
+   assert.equal(createOutcomeIsAmbiguous({kind: "error", status: 409, body: {code: "23505"}}), false);
++  assert.equal(createOutcomeIsAmbiguous({kind: "error", status: 409, body: '{"code":"23505"}'}), false);
+*** Update File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/migration_c1_6_integrity.sql
+@@
+-    RAISE EXCEPTION 'cannot remove the last active owner' USING errcode = 'P0004';
++    RAISE EXCEPTION 'cannot remove the last active owner' USING errcode = 'P0001';
+*** Update File: C:/Users/Teymur/Desktop/saaf-anchor-tmp/supabase/migrations/20261010120000_c1_6_integrity.sql
+@@
+-    RAISE EXCEPTION 'cannot remove the last active owner' USING errcode = 'P0004';
++    RAISE EXCEPTION 'cannot remove the last active owner' USING errcode = 'P0001';
+*** End Patch

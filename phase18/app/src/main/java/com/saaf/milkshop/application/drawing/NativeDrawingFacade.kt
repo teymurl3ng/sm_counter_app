@@ -1,5 +1,6 @@
 package com.saaf.milkshop.application.drawing
 
+import androidx.room3.withWriteTransaction
 import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
@@ -72,21 +73,25 @@ class NativeDrawingFacade(
     ): NativeDrawingSubmission {
         require(request.amountPaisa > 0L) { "Enter an amount greater than zero." }
         val context = load(sessionHandle, date)
-        val result = commands.recordOwnerDrawing(
-            sessionHandle = sessionHandle,
-            amount = BigDecimal(request.amountPaisa).movePointLeft(2).toDouble(),
-            paymentAccountId = null,
-            occurredAt = context.businessDate,
-            notes = request.notes?.trim()?.takeIf { it.isNotEmpty() },
-        )
-        val refreshedContext = load(sessionHandle, date)
-        return NativeDrawingSubmission(
-            receipt = NativeDrawingReceipt(
-                eventId = result.eventId,
-                amountPaisa = request.amountPaisa,
-                paymentAccount = context.paymentAccount,
-            ),
-            refreshedContext = refreshedContext,
-        )
+        // The mutation, required evidence and receipt reads commit together.
+        // A read/authorization failure cannot report failure after saving.
+        return database.withWriteTransaction {
+            val result = commands.recordOwnerDrawing(
+                sessionHandle = sessionHandle,
+                amount = BigDecimal(request.amountPaisa).movePointLeft(2).toDouble(),
+                paymentAccountId = null,
+                occurredAt = context.businessDate,
+                notes = request.notes?.trim()?.takeIf { it.isNotEmpty() },
+            )
+            val refreshedContext = load(sessionHandle, date)
+            NativeDrawingSubmission(
+                receipt = NativeDrawingReceipt(
+                    eventId = result.eventId,
+                    amountPaisa = request.amountPaisa,
+                    paymentAccount = context.paymentAccount,
+                ),
+                refreshedContext = refreshedContext,
+            )
+        }
     }
 }

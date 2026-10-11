@@ -1,0 +1,37 @@
+file,line,component,padding_after_surface,horizontal_inset_status,height_constraints
+activity\CashierActivityScreen.kt,316,ActivityRow,"horizontal = 16.dp, vertical = 14.dp",explicit,heightIn; min = 64.dp
+admin\AdminMoreScreen.kt,679,AdminMoreMenuRow,"horizontal = 16.dp, vertical = 14.dp",explicit,heightIn; min = 72.dp
+admin\AdminPeopleScreen.kt,432,AdminPeopleMenuRow,"horizontal = 16.dp, vertical = 14.dp",explicit,heightIn; min = 72.dp
+admin\AdminRecordsScreen.kt,253,AdminRecordsMenuRow,"horizontal = 16.dp, vertical = 14.dp",explicit,heightIn; min = 72.dp
+admin\AdminWorkScreen.kt,357,HealthRow,vertical = 12.dp,not explicit; inspect content,heightIn; min = 64.dp
+auth\NativeAuthenticationScreens.kt,270,AccountRow,vertical = 14.dp,not explicit; inspect content,content driven
+collection\CashierCollectionScreen.kt,771,CustomerPickerDialog,vertical = 10.dp,not explicit; inspect content,heightIn; min = 56.dp
+collection\CashierCollectionScreen.kt,816,PaymentPickerDialog,vertical = 12.dp,not explicit; inspect content,heightIn; min = 56.dp
+expense\ExpenseEntryScreen.kt,555,CategoryPickerDialog,vertical = 12.dp,not explicit; inspect content,heightIn; min = 56.dp
+expense\ExpenseEntryScreen.kt,601,PaymentPickerDialog,vertical = 12.dp,not explicit; inspect content,heightIn; min = 56.dp
+manager\ManagerMoreScreen.kt,612,ManagerMoreMenuRow,"horizontal = 16.dp, vertical = 14.dp",explicit,heightIn; min = 72.dp
+manager\ManagerWorkScreen.kt,405,CommandRow,vertical = 12.dp,not explicit; inspect content,heightIn; min = 64.dp
+more\CashierMoreScreen.kt,616,MoreMenuRow,"horizontal = 16.dp, vertical = 14.dp",explicit,heightIn; min = 72.dp
+operations\OperationsMoreScreen.kt,485,OpsMoreMenuRow,"horizontal = 16.dp, vertical = 14.dp",explicit,heightIn; min = 72.dp
+operations\ReceiveMilkScreen.kt,531,VendorPickerDialog,vertical = 12.dp,not explicit; inspect content,heightIn; min = 56.dp
+operations\RecordSpoilageScreen.kt,541,ProductPickerDialog,vertical = 12.dp,not explicit; inspect content,heightIn; min = 56.dp
+operations\RecordSpoilageScreen.kt,579,ReasonPickerDialog,vertical = 12.dp,not explicit; inspect content,heightIn; min = 56.dp
+owner\OwnerCostingPlanningScreens.kt,970,requestLeave,vertical = 6.dp,not explicit; inspect content,content driven
+owner\OwnerCostingPlansScreen.kt,1330,OwnerCostingPolicyRow,"horizontal = 16.dp, vertical = 14.dp",explicit,heightIn; min = 72.dp
+owner\OwnerCustomersScreen.kt,814,OwnerCustomerRow,"horizontal = 16.dp, vertical = 14.dp",explicit,heightIn; min = 72.dp
+owner\OwnerEmployeesScreen.kt,802,OwnerEmployeeRow,"horizontal = 16.dp, vertical = 14.dp",explicit,heightIn; min = 72.dp
+owner\OwnerMoreScreen.kt,986,OwnerMoreMenuRow,"horizontal = 16.dp, vertical = 14.dp",explicit,heightIn; min = 72.dp
+owner\OwnerProductsScreen.kt,901,OwnerProductRow,"horizontal = 16.dp, vertical = 14.dp",explicit,heightIn; min = 72.dp
+owner\OwnerRecordsScreen.kt,405,RecordsBalancesBody,"horizontal = 16.dp, vertical = 12.dp",explicit,heightIn; min = 64.dp
+owner\OwnerRecordsScreen.kt,956,RecordsRow,"horizontal = 16.dp, vertical = 14.dp",explicit,heightIn; min = 64.dp
+owner\OwnerSecurityHistoryScreen.kt,244,OwnerSecurityAuditRow,"horizontal = 16.dp, vertical = 14.dp",explicit,heightIn; min = 72.dp
+owner\OwnerShopSettingsScreen.kt,555,OwnerShopSettingsScreenPane,vertical = 8.dp,not explicit; inspect content,content driven
+owner\OwnerSuppliersScreen.kt,744,OwnerSupplierRow,"horizontal = 16.dp, vertical = 14.dp",explicit,heightIn; min = 72.dp
+owner\OwnerSyncScreen.kt,197,takeCredential,vertical = 12.dp,not explicit; inspect content,content driven
+owner\OwnerUsersRolesScreen.kt,1061,OwnerUserRow,"horizontal = 16.dp, vertical = 14.dp",explicit,heightIn; min = 72.dp
+owner\OwnerWorkScreen.kt,347,CommandRow,vertical = 12.dp,not explicit; inspect content,heightIn; min = 64.dp
+salarypayment\SalaryPaymentEntryScreen.kt,539,EmployeePickerDialog,vertical = 12.dp,not explicit; inspect content,heightIn; min = 56.dp
+salarypayment\SalaryPaymentEntryScreen.kt,585,PaymentPickerDialog,vertical = 12.dp,not explicit; inspect content,heightIn; min = 56.dp
+sale\CashierSaleScreen.kt,771,SalePaymentPickerDialog,vertical = 12.dp,not explicit; inspect content,heightIn; min = 56.dp
+vendorpayment\VendorPaymentEntryScreen.kt,539,VendorPickerDialog,vertical = 12.dp,not explicit; inspect content,heightIn; min = 56.dp
+vendorpayment\VendorPaymentEntryScreen.kt,585,PaymentPickerDialog,vertical = 12.dp,not explicit; inspect content,heightIn; min = 56.dp

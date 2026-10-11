@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" tests="38" failures="0" errors="0" skipped="0" time="43.992" timestamp="2026-10-10T01:23:34" hostname="localhost">
+  <properties>
+    <property name="device" value="SM-S921W - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="collectionReauthorizationFailureCannotLeaveSavedCollection" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.201" />
+  <testcase name="drawingReceiptReadFailureCannotLeaveSavedDrawing" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.179" />
+  <testcase name="saleReceiptReadFailureRollsBackLedgerAndStock" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.239" />
+  <testcase name="successfulAbsorptionReturnsReceiptAndDurableSealEvidence" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.264" />
+  <testcase name="failedAbsorptionAuditRollsBackClose" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.238" />
+  <testcase name="successfulSaleReturnsReceiptForCommittedLedgerAndFreshTotals" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.239" />
+  <testcase name="countReceiptReadFailureCannotLeaveSavedCount" classname="com.saaf.milkshop.NativeReceiptAtomicityRegressionTest" time="0.216" />
+  <testcase name="operatorCannotLoadCashClose" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.549" />
+  <testcase name="closeThenReopenRestoresOpenPosting" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.418" />
+  <testcase name="recordCountThenCloseDayReturnsReceipt" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.214" />
+  <testcase name="loadExposesCashAccountExpectedAndOpenPosting" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.209" />
+  <testcase name="reopenRejectsBlankReasonAndWrongPassphrase" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.395" />
+  <testcase name="varianceRequiresReasonBeforeClose" classname="com.saaf.milkshop.NativeCashCloseFacadeTest" time="0.213" />
+  <testcase name="loadKeepsBalancesOutOfTheCustomerListAndResolvesOnlyTheSelection" classname="com.saaf.milkshop.NativeCollectionFacadeTest" time="0.212" />
+  <testcase name="recordAllowsAdvanceAndReturnsVerifiedCustomerAndCashMovements" classname="com.saaf.milkshop.NativeCollectionFacadeTest" time="0.238" />
+  <testcase name="operatorCannotLoadOrRecordCollectionData" classname="com.saaf.milkshop.NativeCollectionFacadeTest" time="0.548" />
+  <testcase name="loadExposesActiveCategoriesAndDefaultsCash" classname="com.saaf.milkshop.NativeExpenseFacadeTest" time="0.211" />
+  <testcase name="recordPostsExpenseAndReturnsReceipt" classname="com.saaf.milkshop.NativeExpenseFacadeTest" time="0.216" />
+  <testcase name="operatorCannotLoadOrRecordExpense" classname="com.saaf.milkshop.NativeExpenseFacadeTest" time="0.568" />
+  <testcase name="recordReturnsPhysicalConversionWithoutFinance" classname="com.saaf.milkshop.NativeMakeYogurtFacadeTest" time="0.571" />
+  <testcase name="loadExposesStockWithoutRatesOrMargins" classname="com.saaf.milkshop.NativeMakeYogurtFacadeTest" time="0.571" />
+  <testcase name="insufficientMilkKeepsDraftFriendlyMessage" classname="com.saaf.milkshop.NativeMakeYogurtFacadeTest" time="0.548" />
+  <testcase name="loadExposesSuppliersWithoutBalancesOrRates" classname="com.saaf.milkshop.NativeReceiveMilkFacadeTest" time="0.569" />
+  <testcase name="cashierCannotLoadReceiveMilk" classname="com.saaf.milkshop.NativeReceiveMilkFacadeTest" time="0.905" />
+  <testcase name="previewAndRecordReturnPhysicalValuesWithoutAmountOwed" classname="com.saaf.milkshop.NativeReceiveMilkFacadeTest" time="0.57" />
+  <testcase name="otherReasonRequiresNote" classname="com.saaf.milkshop.NativeRecordSpoilageFacadeTest" time="0.573" />
+  <testcase name="recordReturnsPhysicalRemovalWithoutFinance" classname="com.saaf.milkshop.NativeRecordSpoilageFacadeTest" time="0.548" />
+  <testcase name="insufficientStockKeepsDraftFriendlyMessage" classname="com.saaf.milkshop.NativeRecordSpoilageFacadeTest" time="0.571" />
+  <testcase name="loadExposesProductsWithoutRatesOrMargins" classname="com.saaf.milkshop.NativeRecordSpoilageFacadeTest" time="0.552" />
+  <testcase name="operatorCannotLoadOrRecordSalaryPayment" classname="com.saaf.milkshop.NativeSalaryPaymentFacadeTest" time="0.567" />
+  <testcase name="recordPostsSalaryPaymentAndReturnsReceipt" classname="com.saaf.milkshop.NativeSalaryPaymentFacadeTest" time="0.214" />
+  <testcase name="loadExposesActiveEmployeesAndDefaultsCash" classname="com.saaf.milkshop.NativeSalaryPaymentFacadeTest" time="0.208" />
+  <testcase name="loadExposesActiveVendorsAndDefaultsCash" classname="com.saaf.milkshop.NativeVendorPaymentFacadeTest" time="0.212" />
+  <testcase name="operatorCannotLoadOrRecordVendorPayment" classname="com.saaf.milkshop.NativeVendorPaymentFacadeTest" time="0.544" />
+  <testcase name="recordPostsVendorPaymentAndReturnsReceipt" classname="com.saaf.milkshop.NativeVendorPaymentFacadeTest" time="0.212" />
+  <testcase name="oldSaveCannotPublishIntoReopenedSameSessionHandle" classname="com.saaf.milkshop.NativeSaleStateRegressionTest" time="12.602" />
+  <testcase name="wholesaleFollowUpUsesExactBookedQuantity" classname="com.saaf.milkshop.NativeSaleStateRegressionTest" time="6.194" />
+  <testcase name="finishingRefreshCannotReopenSaveGateOrEraseReceipt" classname="com.saaf.milkshop.NativeSaleStateRegressionTest" time="10.299" />
+</testsuite>

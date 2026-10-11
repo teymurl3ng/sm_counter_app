@@ -1,6 +1,10 @@
 package com.saaf.milkshop.nativeui.manager
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.nativeListItemContent
+import com.saaf.milkshop.nativeui.common.nativeListItem
+
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -203,13 +207,13 @@ private fun WorkHomeBody(
                     label = "Record sale",
                     icon = Icons.Outlined.PointOfSale,
                     tag = NativeUiTags.ManagerWorkRecordSale,
-                    onClick = { onOpenDestination(NativeManagerWorkDestination.RecordSale) },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeManagerWorkDestination.RecordSale) },
                 )
                 PrimaryAction(
                     label = "Record payment",
                     icon = Icons.Outlined.Payments,
                     tag = NativeUiTags.ManagerWorkRecordPayment,
-                    onClick = { onOpenDestination(NativeManagerWorkDestination.RecordPayment) },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeManagerWorkDestination.RecordPayment) },
                 )
             }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -217,13 +221,13 @@ private fun WorkHomeBody(
                     label = "Receive milk",
                     icon = Icons.Outlined.WaterDrop,
                     tag = NativeUiTags.ManagerWorkReceiveMilk,
-                    onClick = { onOpenDestination(NativeManagerWorkDestination.ReceiveMilk) },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeManagerWorkDestination.ReceiveMilk) },
                 )
                 PrimaryAction(
                     label = "Expense",
                     icon = Icons.Outlined.ReceiptLong,
                     tag = NativeUiTags.ManagerWorkRecordExpense,
-                    onClick = { onOpenDestination(NativeManagerWorkDestination.RecordExpense) },
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeManagerWorkDestination.RecordExpense) },
                 )
             }
         }
@@ -241,14 +245,14 @@ private fun WorkHomeBody(
                 detail = "Record Milk used and Yogurt produced",
                 icon = Icons.Outlined.Science,
                 tag = NativeUiTags.ManagerWorkMakeYogurt,
-                onClick = { onOpenDestination(NativeManagerWorkDestination.MakeYogurt) },
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeManagerWorkDestination.MakeYogurt) },
             )
             CommandRow(
                 label = "Record spoilage",
                 detail = "Physical loss and reason",
                 icon = Icons.Outlined.Assignment,
                 tag = NativeUiTags.ManagerWorkRecordSpoilage,
-                onClick = { onOpenDestination(NativeManagerWorkDestination.RecordSpoilage) },
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeManagerWorkDestination.RecordSpoilage) },
             )
             CommandRow(
                 label = "Deliveries",
@@ -260,7 +264,7 @@ private fun WorkHomeBody(
                 icon = Icons.Outlined.LocalShipping,
                 tag = NativeUiTags.ManagerWorkDeliveries,
                 badge = context.activeDeliveryCount.takeIf { it > 0 }?.toString(),
-                onClick = { onOpenDestination(NativeManagerWorkDestination.Deliveries) },
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeManagerWorkDestination.Deliveries) },
             )
         }
 
@@ -277,7 +281,7 @@ private fun WorkHomeBody(
                 detail = "Supplier balance and payment",
                 icon = Icons.Outlined.AccountBalance,
                 tag = NativeUiTags.ManagerWorkPaySupplier,
-                onClick = { onOpenDestination(NativeManagerWorkDestination.PaySupplier) },
+                onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenDestination(NativeManagerWorkDestination.PaySupplier) },
             )
             CommandRow(
                 label = "Cash count and close",
@@ -339,7 +343,7 @@ private fun AttentionStrip(
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag(NativeUiTags.ManagerWorkAttention)
-                    .clickable(onClick = onOpenClose),
+                    .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onOpenClose)),
             ) {
                 Column(
                     Modifier.padding(16.dp),
@@ -400,11 +404,10 @@ private fun CommandRow(
 ) {
     Row(
         Modifier
-            .fillMaxWidth()
-            .heightIn(min = 64.dp)
+            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Navigation)
             .testTag(tag)
-            .clickable(onClick = onClick)
-            .padding(vertical = 12.dp),
+            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onClick))
+            .nativeListItemContent(NativeListStyle.Navigation),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

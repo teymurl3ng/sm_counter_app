@@ -1,6 +1,6 @@
 package com.saaf.milkshop.nativeui.more
 
-import androidx.activity.compose.BackHandler
+import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.unit.dp
@@ -61,12 +61,13 @@ fun CashierExpenseEntryScreen(
         onDispose { onRegisterGuard(null) }
     }
 
-    Box(
-        modifier
-            .fillMaxSize()
-            .testTag(NativeUiTags.CashierExpenseEntryRoot),
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+    com.saaf.milkshop.nativeui.common.AdaptiveNavigationScaffold(
+        snackbarHostState = snackbarHostState,
+        compactNavigation = { CashierNavigation(CashierSection.More) { section -> leaveGuard.requestLeave { onNavigate(section) } } },
+        expandedNavigation = { com.saaf.milkshop.nativeui.sale.CashierNavigationRail(CashierSection.More) { section -> leaveGuard.requestLeave { onNavigate(section) } } },
+        modifier = modifier.fillMaxSize().testTag(NativeUiTags.CashierExpenseEntryRoot),
+    ) { padding ->
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             NativeSectionTransition(
             targetState = state,
             contentKey = { if (it is NativeExpenseState.Idle || it is NativeExpenseState.Loading) NativeExpenseState.Loading::class else it::class },

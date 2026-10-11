@@ -1,0 +1,19 @@
+{
+  "collected_at": "2026-10-10T12:01:51.061454+00:00",
+  "device": "R8VXA02SNKH",
+  "package": "com.saaf.milkshop.qa",
+  "cursor": {
+    "state_id": 1,
+    "last_server_seq": 222,
+    "updated_at": "2026-10-10T11:45:44.985079Z"
+  },
+  "outbox": 0,
+  "parked": 0,
+  "holds": 0,
+  "events": 3,
+  "inventory_legs": 3,
+  "financial_legs": 3,
+  "semantic_skip_audits": 0,
+  "integrity_check": "ok",
+  "snapshot_path": "C:\\Users\\Teymur\\AppData\\Local\\Temp\\saaf-sync-final-93hyowv0"
+}

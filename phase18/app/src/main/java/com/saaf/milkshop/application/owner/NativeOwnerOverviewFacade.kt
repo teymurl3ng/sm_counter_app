@@ -146,7 +146,7 @@ class NativeOwnerOverviewFacade(
         return NativeOwnerOverviewSnapshot(
             businessDate = businessDate,
             postingOpen = postingOpen,
-            shopName = settings.store?.storeName?.takeIf { it.isNotBlank() } ?: "Saaf Milk",
+            shopName = settings.store?.storeName?.takeIf { it.isNotBlank() } ?: "Your shop",
             todaySalesPaisa = financial.totals.salesValuePaisa,
             estimatedGrossPaisa = profitability.estimatedRecordedResultPaisa,
             coverageComplete = coverageComplete,

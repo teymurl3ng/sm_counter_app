@@ -1,0 +1,10 @@
+{
+  "changedPaths": [
+    "phase18\\app\\src\\androidTest\\java\\com\\saaf\\milkshop\\NativeCollectionScreenContractTest.kt",
+    "phase18\\app\\src\\androidTest\\java\\com\\saaf\\milkshop\\NativeFoundationUiTest.kt",
+    "phase18\\app\\src\\androidTest\\java\\com\\saaf\\milkshop\\NativeSaleHardeningContractTest.kt",
+    "phase18\\app\\src\\androidTest\\java\\com\\saaf\\milkshop\\qa\\NativeLayoutImeEvidence.kt",
+    "phase18\\build.gradle.kts"
+  ],
+  "productionSourceChanged": false
+}

@@ -713,6 +713,12 @@ fun OwnerPreviewHost(
                     onBackFromCorrection = ownerRecordsViewModel::clearCorrection,
                     onUpdateCorrection = ownerRecordsViewModel::updateCorrection,
                     onSaveCorrection = ownerRecordsViewModel::saveCorrection,
+                    onRefreshCorrectionFacts = ownerRecordsViewModel::refreshCorrectionFacts,
+                    onOpenReceipt = ownerRecordsViewModel::openReceipt,
+                    onBackFromReceipt = ownerRecordsViewModel::clearReceipt,
+                    onUpdateReceipt = ownerRecordsViewModel::updateReceipt,
+                    onSaveReceipt = ownerRecordsViewModel::saveReceipt,
+                    onRefreshReceiptFacts = ownerRecordsViewModel::refreshReceiptFacts,
                 )
             }
             section == OwnerSection.Work &&

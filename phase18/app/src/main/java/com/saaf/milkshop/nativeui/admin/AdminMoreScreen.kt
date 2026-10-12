@@ -1,5 +1,14 @@
 package com.saaf.milkshop.nativeui.admin
 
+import com.saaf.milkshop.nativeui.common.NativePersonalSecurityPanel
+import com.saaf.milkshop.nativeui.common.NativePersonalSecurityTags
+import androidx.compose.foundation.layout.size
+import com.saaf.milkshop.nativeui.theme.nativeNavigationTitleTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeGroupLabelTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeValueTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeVisualColors
+
 import com.saaf.milkshop.nativeui.common.NativeListStyle
 import com.saaf.milkshop.nativeui.common.nativeListItemContent
 import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
@@ -518,7 +527,7 @@ private fun AdminMoreMenuScreen(
 }
 
 @Composable
-private fun AdminMorePersonalSecurityScreen(
+internal fun AdminMorePersonalSecurityScreen(
     snackbarHostState: SnackbarHostState,
     identity: NativeSignedInIdentity,
     state: NativeOwnerMoreState.Ready,
@@ -532,112 +541,43 @@ private fun AdminMorePersonalSecurityScreen(
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBack)
-    val security = state.security
-    var passphrase by remember { mutableStateOf("") }
-    var pin by remember { mutableStateOf("") }
-
-    if (state.confirmRemoveUnlock) {
-        AlertDialog(
-            onDismissRequest = onCancelRemove,
-            title = { Text("Remove Quick unlock?") },
-            text = {
-                Text("This clears Quick PIN and phone security for ${identity.displayName} on this phone.")
-            },
-            confirmButton = {
-                TextButton(onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction {
-                    val secret = passphrase.toCharArray()
-                    passphrase = ""
-                    pin = ""
-                    onRemove(secret)
-                }) { Text("Discard and leave") }
-            },
-            dismissButton = {
-                TextButton(onClick = hapticAction(onCancelRemove)) { Text("Keep editing") }
-            },
-        )
-    }
-
     admScaffold(snackbarHostState, modifier) { padding ->
         Column(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .imePadding()
-                .testTag(NativeUiTags.AdminMoreSecurityScreen),
+            Modifier.fillMaxSize().padding(padding).imePadding().testTag(NativeUiTags.AdminMoreSecurityScreen),
         ) {
             AdminMoreHeader(identity, state.context)
             Column(
-                Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
+                Modifier.weight(1f).verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp, vertical = 18.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                Text("Personal security", style = MaterialTheme.typography.headlineMedium)
-                if (security == null) {
-                    NativeColdLoadingPane(label = "Loading security…")
-                } else {
-                    AdminMoreSecurityStatus(security)
-                    OutlinedTextField(
-                        value = passphrase,
-                        onValueChange = { passphrase = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Current full passphrase") },
-                        visualTransformation = PasswordVisualTransformation(),
-                        singleLine = true,
-                        enabled = !state.saving,
-                    )
-                    OutlinedTextField(
-                        value = pin,
-                        onValueChange = { pin = it.filter { ch -> ch.isDigit() }.take(4) },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("New Quick PIN (4 digits)") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                        visualTransformation = PasswordVisualTransformation(),
-                        singleLine = true,
-                        enabled = !state.saving,
-                    )
-                    state.personalSecurity.error?.let {
-                        Text(it, color = MaterialTheme.colorScheme.error)
-                    }
-                    Button(
-                        onClick = com.saaf.milkshop.nativeui.common.hapticAction {
-                            if (passphrase.isBlank() || pin.length != 4) return@hapticAction
-                            val secret = passphrase.toCharArray()
-                            val quickPin = pin.toCharArray()
-                            passphrase = ""
-                            pin = ""
-                            onEnrollPin(secret, quickPin)
-                        },
-                        enabled = !state.saving && passphrase.isNotBlank() && pin.length == 4,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) { Text(if (state.saving) "Saving…" else "Save Quick PIN") }
-                    if (security.phoneSecurityAvailable) {
-                        Button(
-                            onClick = com.saaf.milkshop.nativeui.common.hapticAction {
-                                if (passphrase.isBlank()) return@hapticAction
-                                val secret = passphrase.toCharArray()
-                                val quickPin = pin.takeIf { it.length == 4 }?.toCharArray()
-                                passphrase = ""
-                                pin = ""
-                                onEnrollPhone(secret, quickPin)
-                            },
-                            enabled = !state.saving && passphrase.isNotBlank(),
-                            modifier = Modifier.fillMaxWidth(),
-                        ) { Text("Enable ${security.phoneSecurityLabel}") }
-                    }
-                    if (security.quickPinEnabled || security.phoneSecurityEnabled) {
-                        TextButton(
-                            onClick = hapticAction(onRequestRemove),
-                            enabled = !state.saving && passphrase.isNotBlank(),
-                        ) { Text("Remove Quick unlock") }
-                    }
-                }
+                NativePersonalSecurityPanel(
+                    identityKey = identity.userId,
+                    identityName = identity.displayName,
+                    security = state.security,
+                    saving = state.saving,
+                    error = state.personalSecurity.error,
+                    confirmRemove = state.confirmRemoveUnlock,
+                    tags = NativePersonalSecurityTags(
+                        status = NativeUiTags.AdminMoreSecurityStatus,
+                        passphrase = NativeUiTags.AdminMoreSecurityPassphrase,
+                        pin = NativeUiTags.AdminMoreSecurityPin,
+                        savePin = NativeUiTags.AdminMoreSecurityEnrollPin,
+                        enablePhone = NativeUiTags.AdminMoreSecurityEnrollPhone,
+                        remove = NativeUiTags.AdminMoreSecurityRemove,
+                        confirmRemove = NativeUiTags.AdminMoreSecurityRemoveConfirm,
+                        error = NativeUiTags.AdminMoreSecurityError,
+                    ),
+                    onRequestRemove = onRequestRemove,
+                    onCancelRemove = onCancelRemove,
+                    onRemove = onRemove,
+                    onEnrollPin = onEnrollPin,
+                    onEnrollPhone = onEnrollPhone,
+                )
             }
         }
     }
 }
-
 @Composable
 private fun AdminMoreHeader(identity: NativeSignedInIdentity, context: NativeOwnerMoreContext) {
     CashierScreenHeader(
@@ -650,11 +590,11 @@ private fun AdminMoreHeader(identity: NativeSignedInIdentity, context: NativeOwn
 }
 
 @Composable
-private fun AdminMoreSectionLabel(label: String) {
+internal fun AdminMoreSectionLabel(label: String) {
     Text(
         label,
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = nativeGroupLabelTextStyle(),
+        color = nativeVisualColors.supporting,
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier
             .fillMaxWidth()
@@ -664,7 +604,7 @@ private fun AdminMoreSectionLabel(label: String) {
 }
 
 @Composable
-private fun AdminMoreMenuRow(
+internal fun AdminMoreMenuRow(
     icon: ImageVector,
     title: String,
     subtitle: String,
@@ -681,36 +621,15 @@ private fun AdminMoreMenuRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(title, style = nativeNavigationTitleTextStyle())
             Text(
                 subtitle,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = nativeSupportingTextStyle(),
+                color = nativeVisualColors.supporting,
             )
         }
         Icon(Icons.Outlined.ChevronRight, contentDescription = null)
-    }
-}
-
-@Composable
-private fun AdminMoreSecurityStatus(security: NativeMoreSecurityStatus) {
-    Column(
-        Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        Text(
-            if (security.quickPinEnabled) "Quick PIN is on" else "Quick PIN is off",
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        Text(
-            if (security.phoneSecurityEnabled) {
-                "${security.phoneSecurityLabel} is on"
-            } else {
-                "${security.phoneSecurityLabel} is off"
-            },
-            style = MaterialTheme.typography.bodyLarge,
-        )
     }
 }

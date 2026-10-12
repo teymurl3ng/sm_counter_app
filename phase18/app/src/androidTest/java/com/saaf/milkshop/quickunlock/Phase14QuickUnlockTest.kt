@@ -105,6 +105,23 @@ class Phase14QuickUnlockTest {
     }
 
     @Test
+    fun twelveDigitPinWithLeadingZeroesRequiresCorrectFullPassphrase() = runBlocking {
+        val owner = owner()
+        val pin = "000456789012".toCharArray()
+        val rejected = runCatching {
+            quickUnlock.enroll(owner.session.sessionId, "wrong full passphrase".toCharArray(), false, pin.copyOf())
+        }
+        assertTrue(rejected.isFailure)
+        assertTrue(quickUnlock.status().accounts.isEmpty())
+
+        quickUnlock.enroll(owner.session.sessionId, PASSPHRASE.toCharArray(), false, pin.copyOf())
+        sessions.logout(owner.session.sessionId)
+        val unlocked = quickUnlock.login(owner.user.loginName, QuickUnlockMethod.PIN, pin.copyOf())
+        assertEquals(owner.user.userId, unlocked.userId)
+        pin.fill('\u0000')
+    }
+
+    @Test
     fun deviceAuthenticationIsStrongButPinCannotApproveDestructiveWork() = runBlocking {
         val owner = owner()
         quickUnlock.enroll(owner.session.sessionId, PASSPHRASE.toCharArray(), true, PIN.toCharArray())

@@ -1,0 +1,37 @@
+item,path,line,source_statement,evidence_type
+B1,phase18/app/src/main/java/com/saaf/milkshop/sync/SyncApplyEngine.kt,231,"private suspend fun applyProduct(uid: String, payload: JSONObject): PerRecord {",SOURCE_ONLY
+B1,phase18/app/src/main/java/com/saaf/milkshop/sync/SyncApplyEngine.kt,620,"private suspend fun applyProfileChild(payload: JSONObject, accountId: Long? = null) {",SOURCE_ONLY
+B1,phase18/app/src/main/java/com/saaf/milkshop/sync/SyncApplyEngine.kt,637,// Profile satellites for these categories ride along later;,SOURCE_ONLY
+B1,phase18/app/src/main/java/com/saaf/milkshop/sync/SyncEnvelopeFactory.kt,123,"profiles[product.productId]?.let { payload.put(""profile"", productProfileJson(it)) }",SOURCE_ONLY
+B1,phase18/app/src/main/java/com/saaf/milkshop/sync/SyncEnvelopeFactory.kt,143,"customers[id]?.let { payload.put(""profile"", customerProfileJson(it)) }",SOURCE_ONLY
+B1,phase18/app/src/main/java/com/saaf/milkshop/sync/SyncEnvelopeFactory.kt,144,"vendors[id]?.let { payload.put(""profile"", vendorProfileJson(it)) }",SOURCE_ONLY
+B1,phase18/app/src/main/java/com/saaf/milkshop/sync/SyncEnvelopeFactory.kt,145,"employees[id]?.let { payload.put(""profile"", employeeProfileJson(it)) }",SOURCE_ONLY
+B1,phase18/app/src/main/java/com/saaf/milkshop/sync/SyncEnvelopeFactory.kt,146,"expenseCategories[id]?.let { payload.put(""profile"", expenseCategoryProfileJson(it)) }",SOURCE_ONLY
+B1,phase18/app/src/main/java/com/saaf/milkshop/data/SyncMigrationSql.kt,104,private data class ProfileTable(,SOURCE_ONLY
+B1,phase18/app/src/main/java/com/saaf/milkshop/data/SyncMigrationSql.kt,111,"ProfileTable(""product_profiles"", ""products"", ""product_id""),",SOURCE_ONLY
+B1,phase18/app/src/main/java/com/saaf/milkshop/data/SyncMigrationSql.kt,112,"ProfileTable(""customer_profiles"", ""accounts"", ""account_id""),",SOURCE_ONLY
+B1,phase18/app/src/main/java/com/saaf/milkshop/data/SyncMigrationSql.kt,113,"ProfileTable(""vendor_profiles"", ""accounts"", ""account_id""),",SOURCE_ONLY
+B1,phase18/app/src/main/java/com/saaf/milkshop/data/SyncMigrationSql.kt,114,"ProfileTable(""employee_profiles"", ""accounts"", ""account_id""),",SOURCE_ONLY
+B1,phase18/app/src/main/java/com/saaf/milkshop/data/SyncMigrationSql.kt,115,"ProfileTable(""expense_category_profiles"", ""accounts"", ""account_id""),",SOURCE_ONLY
+B2,phase18/app/src/main/java/com/saaf/milkshop/sync/SyncApplyEngine.kt,134,"""budget_plans"", ""collections_targets"" -> PerRecord.SKIPPED // planning rows: pulled but not applied until planning sync lands",SOURCE_ONLY
+B2,phase18/app/src/main/java/com/saaf/milkshop/sync/SyncEnvelopeFactory.kt,195,"supersedesUids[id]?.let { uid -> put(""supersedes_uid"", uid) }",SOURCE_ONLY
+B2,phase18/app/src/main/java/com/saaf/milkshop/sync/SyncEnvelopeFactory.kt,226,"?.let { previous -> payload.put(""supersedes_uid"", previous.uid) }",SOURCE_ONLY
+B2,phase18/app/src/main/java/com/saaf/milkshop/sync/SyncEnvelopeFactory.kt,237,"?.let { previous -> payload.put(""supersedes_uid"", previous.uid) }",SOURCE_ONLY
+B3,phase18/app/src/main/java/com/saaf/milkshop/domain/OwnerDrawing.kt,44,"require(input.amount > 0.0) { ""Amount must be greater than zero"" }",SOURCE_ONLY
+B3,phase18/app/src/main/java/com/saaf/milkshop/domain/OwnerDrawing.kt,70,"amount = -input.amount,",SOURCE_ONLY
+B3,phase18/app/src/main/java/com/saaf/milkshop/data/DatabaseSql.kt,718,"THEN RAISE(ABORT, 'OWNER_DRAWING must decrease a Cash/Bank account')",SOURCE_ONLY
+B3,phase18/app/src/main/java/com/saaf/milkshop/domain/Correction.kt,456,val MONETARY_EVENT_TYPES = setOf(,SOURCE_ONLY
+B5,phase18/app/src/main/java/com/saaf/milkshop/application/sale/NativeSaleFacade.kt,98,?.let { kotlin.math.round(it * 100.0).toLong() },SOURCE_ONLY
+B5,phase18/app/src/main/java/com/saaf/milkshop/application/sale/NativeSaleFacade.kt,217,private fun moneyToPaisa(value: Double): Long = kotlin.math.round(value * 100.0).toLong(),SOURCE_ONLY
+B5,phase18/app/src/main/java/com/saaf/milkshop/application/activity/NativeActivityFacade.kt,193,".setScale(0, RoundingMode.HALF_UP)",SOURCE_ONLY
+B6,phase18/app/src/main/java/com/saaf/milkshop/application/activity/NativeActivityFacade.kt,60,.filter { it.eventType == SaleService.EVENT_TYPE_SALE || it.eventType == CreditCollectionService.EVENT_TYPE_CREDIT_COLLECTION },SOURCE_ONLY
+B7,phase18/app/src/main/java/com/saaf/milkshop/domain/ServerAccount.kt,48,const val ENFORCE_LINK_STATES = false,SOURCE_ONLY
+B7,phase18/app/src/main/java/com/saaf/milkshop/sync/SyncEnrollment.kt,75,"val isCounterDevice = auth.role == ""cashier""",SOURCE_ONLY
+U3,phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerMoreScreen.kt,892,"label = { Text(""New Quick PIN (4 digits)"") },",SOURCE_ONLY
+U3,phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerMoreScreen.kt,914,"enabled = !state.saving && passphrase.isNotBlank() && pin.length == 4,",SOURCE_ONLY
+U3,phase18/app/src/main/java/com/saaf/milkshop/nativeui/admin/AdminMoreScreen.kt,619,"enabled = !state.saving && passphrase.isNotBlank() && pin.length == 4,",SOURCE_ONLY
+U3,phase18/app/src/main/java/com/saaf/milkshop/nativeui/manager/ManagerMoreScreen.kt,563,"enabled = !state.saving && passphrase.isNotBlank() && pin.length == 4,",SOURCE_ONLY
+U3,phase18/app/src/main/java/com/saaf/milkshop/nativeui/more/CashierMoreScreen.kt,582,"enabled = !state.saving && passphrase.isNotBlank() && pin.length == 4,",SOURCE_ONLY
+U3,phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/OperationsMoreScreen.kt,449,"enabled = !state.saving && passphrase.isNotBlank() && pin.length == 4,",SOURCE_ONLY
+U3,phase18/app/src/main/java/com/saaf/milkshop/quickunlock/QuickUnlock.kt,529,const val MIN_PIN_LENGTH = 4,SOURCE_ONLY
+U3,phase18/app/src/main/java/com/saaf/milkshop/quickunlock/QuickUnlock.kt,530,const val MAX_PIN_LENGTH = 12,SOURCE_ONLY

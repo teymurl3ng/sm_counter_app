@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
+import com.saaf.milkshop.application.more.NativeMoreSecurityStatus
 import com.saaf.milkshop.application.operations.NativeOperationsMoreContext
 import com.saaf.milkshop.application.operations.NativeOperationsWorkRecord
 import com.saaf.milkshop.domain.AppRole
@@ -73,6 +74,18 @@ class NativeOperationsMoreScreenContractTest {
         )
         composeRule.onNodeWithTag(NativeUiTags.OpsMorePersonalSecurity).performClick()
         assertTrue(opened)
+    }
+
+    @Test
+    fun personalSecurityShowsGroupedStatusAndPinEntry() {
+        setScreen(NativeOperationsMoreState.Ready(
+            context = openContext(),
+            destination = NativeOperationsMoreDestination.PersonalSecurity,
+            security = NativeMoreSecurityStatus(false, false, true, "Phone security"),
+        ))
+        composeRule.onNodeWithTag(NativeUiTags.OpsMoreSecurityScreen).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsMoreSecurityStatus).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsMoreSecurityPin).assertIsDisplayed()
     }
 
     private fun setScreen(

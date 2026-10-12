@@ -23,6 +23,9 @@ internal class HistoryBridgeCommandService(
 ) {
     suspend fun correct(sessionHandle: String, input: CorrectionInput): CorrectionResult = database.withWriteTransaction {
         val actor = security.requirePermission(sessionHandle, AppPermission.CORRECTION)
+        if (input is CorrectionInput.OwnerDrawing || input is CorrectionInput.OwnerFundsIn) {
+            security.requirePermission(sessionHandle, AppPermission.OWNER_DRAWING)
+        }
         val original = database.eventDao().findById(input.originalEventId)
             ?: throw BridgeCommandNotFound("This transaction no longer exists")
         if (database.eventDao().findAllDescending().any { it.correctsEventId == original.eventId }) {

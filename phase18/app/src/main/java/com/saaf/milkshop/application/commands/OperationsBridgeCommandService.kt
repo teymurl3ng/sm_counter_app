@@ -17,6 +17,9 @@ import com.saaf.milkshop.domain.ExpenseService
 import com.saaf.milkshop.domain.OwnerDrawingInput
 import com.saaf.milkshop.domain.OwnerDrawingResult
 import com.saaf.milkshop.domain.OwnerDrawingService
+import com.saaf.milkshop.domain.OwnerFundsReceiptInput
+import com.saaf.milkshop.domain.OwnerFundsReceiptResult
+import com.saaf.milkshop.domain.OwnerFundsReceiptService
 import com.saaf.milkshop.domain.SaleInput
 import com.saaf.milkshop.domain.SalePayment
 import com.saaf.milkshop.domain.SaleResult
@@ -217,6 +220,23 @@ internal class OperationsBridgeCommandService(
         result
     }.also { SyncScheduler.requestPush() }
 
+    suspend fun recordOwnerFundsReceipt(
+        sessionHandle: String,
+        input: OwnerFundsReceiptInput,
+    ): OwnerFundsReceiptResult = database.withWriteTransaction {
+        val actor = security.requirePermission(sessionHandle, AppPermission.OWNER_DRAWING)
+        val result = OwnerFundsReceiptService(database).record(input)
+        if (!result.alreadySaved) {
+            attribute(result.eventId, actor.userId, actor.displayName, actor.role)
+            audit(
+                ACTION_RECORD_OWNER_FUNDS_RECEIPT,
+                "event_id=${result.eventId};withdrawal_root_event_id=${input.withdrawalRootEventId}",
+                actor.userId, actor.displayName, actor.role,
+            )
+        }
+        result
+    }.also { if (!it.alreadySaved) SyncScheduler.requestPush() }
+
     suspend fun recordVendorPayment(
         sessionHandle: String,
         input: VendorPaymentInput,
@@ -370,6 +390,7 @@ internal class OperationsBridgeCommandService(
         const val ACTION_RECORD_PRODUCTION = "bridge_record_production"
         const val ACTION_RECORD_EXPENSE = "bridge_record_expense"
         const val ACTION_RECORD_OWNER_DRAWING = "bridge_record_owner_drawing"
+        const val ACTION_RECORD_OWNER_FUNDS_RECEIPT = "bridge_record_owner_funds_receipt"
         const val ACTION_RECORD_VENDOR_PAYMENT = "bridge_record_vendor_payment"
         const val ACTION_RECORD_CREDIT_COLLECTION = "bridge_record_credit_collection"
         const val ACTION_RECORD_SALARY_PAYMENT = "bridge_record_salary_payment"

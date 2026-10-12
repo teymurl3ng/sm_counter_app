@@ -8,7 +8,7 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import androidx.sqlite.execSQL
 
 @Database(
-    version = 12,
+    version = 16,
     exportSchema = true,
     entities = [
         ProductEntity::class,
@@ -16,6 +16,7 @@ import androidx.sqlite.execSQL
         EventEntity::class,
         InventoryLogEntity::class,
         FinancialLogEntity::class,
+        OwnerFundsDetailEntity::class,
         SettingEntity::class,
         BudgetPlanEntity::class,
         CollectionsTargetEntity::class,
@@ -67,6 +68,7 @@ abstract class MilkShopDatabase : RoomDatabase() {
     abstract fun eventDao(): EventDao
     abstract fun inventoryLogDao(): InventoryLogDao
     abstract fun financialLogDao(): FinancialLogDao
+    abstract fun ownerFundsDao(): OwnerFundsDao
     abstract fun settingsDao(): SettingsDao
     abstract fun readModelDao(): ReadModelDao
     abstract fun analyticsReadDao(): AnalyticsReadDao
@@ -184,7 +186,7 @@ abstract class MilkShopDatabase : RoomDatabase() {
                 DatabaseSql.triggerNames.forEach { name ->
                     connection.execSQL("DROP TRIGGER IF EXISTS $name")
                 }
-                DatabaseSql.createTriggers.forEach(connection::execSQL)
+                DatabaseSql.version12CompatibleTriggers.forEach(connection::execSQL)
             }
         }
 
@@ -268,13 +270,61 @@ abstract class MilkShopDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_12_13 = object : androidx.room3.migration.Migration(12, 13) {
+            override suspend fun migrate(connection: androidx.sqlite.SQLiteConnection) {
+                connection.execSQL("ALTER TABLE daily_close_actions ADD COLUMN money_rounding_version INTEGER NOT NULL DEFAULT 2")
+                connection.execSQL("UPDATE daily_close_actions SET money_rounding_version = 1")
+                connection.execSQL("DROP VIEW IF EXISTS account_balances")
+                connection.execSQL("CREATE VIEW `account_balances` AS ${CanonicalMoneySql.ACCOUNT_BALANCES.trim()}")
+                connection.execSQL("DROP TRIGGER IF EXISTS validate_daily_close_action")
+                connection.execSQL(DatabaseSql.dailyCloseTrigger)
+            }
+        }
+
+        val MIGRATION_13_14 = object : androidx.room3.migration.Migration(13, 14) {
+            override suspend fun migrate(connection: androidx.sqlite.SQLiteConnection) {
+                val names = listOf("validate_event_values", "validate_inventory_values", "validate_financial_movement")
+                names.forEach { connection.execSQL("DROP TRIGGER IF EXISTS $it") }
+                DatabaseSql.createTriggers.filter { sql -> names.any { sql.contains("CREATE TRIGGER IF NOT EXISTS $it") } }
+                    .forEach(connection::execSQL)
+            }
+        }
+
+        val MIGRATION_14_15 = object : androidx.room3.migration.Migration(14, 15) {
+            override suspend fun migrate(connection: androidx.sqlite.SQLiteConnection) {
+                connection.execSQL(OwnerFundsMigrationSql.CREATE_TABLE)
+                connection.execSQL("CREATE INDEX IF NOT EXISTS index_owner_funds_details_payment_account_id ON owner_funds_details(payment_account_id)")
+                connection.execSQL("CREATE INDEX IF NOT EXISTS index_owner_funds_details_withdrawal_root_event_id ON owner_funds_details(withdrawal_root_event_id)")
+                OwnerFundsMigrationSql.backfill(connection)
+                val names = listOf("validate_event_values", "validate_financial_movement")
+                names.forEach { connection.execSQL("DROP TRIGGER IF EXISTS $it") }
+                DatabaseSql.ownerFundsCreateTriggers.filter { sql -> names.any { sql.contains("CREATE TRIGGER IF NOT EXISTS $it") } }
+                    .forEach(connection::execSQL)
+                OwnerFundsMigrationSql.detailTriggers.forEach(connection::execSQL)
+            }
+        }
+
+        val MIGRATION_15_16 = object : androidx.room3.migration.Migration(15, 16) {
+            override suspend fun migrate(connection: androidx.sqlite.SQLiteConnection) {
+                connection.execSQL("ALTER TABLE owner_funds_details ADD COLUMN reviewed_withdrawal_amount REAL")
+                connection.execSQL("ALTER TABLE owner_funds_details ADD COLUMN reviewed_received_total REAL")
+                connection.execSQL("ALTER TABLE owner_funds_details ADD COLUMN excess_acknowledged INTEGER NOT NULL DEFAULT 0")
+                val names = listOf("validate_event_values", "validate_inventory_values", "validate_financial_movement",
+                    "validate_owner_funds_detail", "prevent_owner_funds_update")
+                names.forEach { connection.execSQL("DROP TRIGGER IF EXISTS $it") }
+                DatabaseSql.ownerReceiptCreateTriggers.filter { sql ->
+                    names.any { sql.contains("CREATE TRIGGER IF NOT EXISTS $it") }
+                }.forEach(connection::execSQL)
+            }
+        }
+
         fun create(context: Context): MilkShopDatabase =
             Room.databaseBuilder<MilkShopDatabase>(
                 context = context.applicationContext,
                 name = DATABASE_NAME,
             )
                 .setDriver(BundledSQLiteDriver())
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16)
                 .addCallback(DatabaseCallback())
                 .build()
 
@@ -288,14 +338,14 @@ abstract class MilkShopDatabase : RoomDatabase() {
         fun createInMemory(driver: androidx.sqlite.SQLiteDriver? = BundledSQLiteDriver()): MilkShopDatabase =
             Room.inMemoryDatabaseBuilder<MilkShopDatabase>()
                 .apply { if (driver != null) setDriver(driver) }
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16)
                 .addCallback(DatabaseCallback())
                 .build()
     }
 
     private class DatabaseCallback : Callback() {
         override suspend fun onCreate(connection: androidx.sqlite.SQLiteConnection) {
-            DatabaseSql.createTriggers.forEach(connection::execSQL)
+            DatabaseSql.ownerReceiptCreateTriggers.forEach(connection::execSQL)
             // Capture triggers precede the seeds so fresh installs enqueue
             // their seed rows (including the shared well-known identities).
             SyncMigrationSql.captureTriggers.forEach(connection::execSQL)

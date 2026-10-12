@@ -3,6 +3,7 @@ package com.saaf.milkshop.application.sale
 import androidx.room3.withWriteTransaction
 import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
 import com.saaf.milkshop.application.readmodels.HybridReadModelService
+import com.saaf.milkshop.application.readmodels.money as moneyToPaisa
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.SaleInput
 import com.saaf.milkshop.domain.SalePayment
@@ -95,7 +96,7 @@ class NativeSaleFacade(
             // Catalog prices belong to the stable product ID, never a name prefix.
             // Keep the two original settings as fallback for legacy seeded items.
             val catalogRate = profiles[product.productId]?.defaultSaleRate
-                ?.let { kotlin.math.round(it * 100.0).toLong() }
+                ?.let(::moneyToPaisa)
             val legacyRate = when (product.name.trim().lowercase(java.util.Locale.ROOT)) {
                 "milk" -> references.retailMilkRatePaisaPerUnit
                 "yogurt" -> references.retailYogurtRatePaisaPerUnit
@@ -214,5 +215,4 @@ class NativeSaleFacade(
         }
     }
 
-    private fun moneyToPaisa(value: Double): Long = kotlin.math.round(value * 100.0).toLong()
 }

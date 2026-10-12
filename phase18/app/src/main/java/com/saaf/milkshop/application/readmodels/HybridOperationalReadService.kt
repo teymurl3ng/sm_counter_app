@@ -186,11 +186,17 @@ internal class HybridOperationalReadService(
 
     suspend fun reconciliationArchive(sessionHandle: String): ReconciliationArchiveDto {
         security.requirePermission(sessionHandle, AppPermission.CASH_COUNT_AND_CLOSE)
+        val closeActions = database.dailyCloseDao().all()
+        val actionsByCount = closeActions.associateBy { it.physicalCashCountId }
         val counts = database.physicalCashCountDao().all().map { count ->
-            val expected = database.physicalCashCountDao().canonicalBalanceAt(count.accountId, count.countedAt)
+            val expected = if (actionsByCount[count.countId]?.moneyRoundingVersion == 1) {
+                database.physicalCashCountDao().legacyBalanceAt(count.accountId, count.countedAt)
+            } else {
+                database.physicalCashCountDao().canonicalBalanceAt(count.accountId, count.countedAt)
+            }
             CashCountDto(count.countId, count.accountId, count.businessDate, money(count.countedAmount), money(expected), money(count.countedAmount - expected), count.countedAt, count.notes)
         }
-        val actions = database.dailyCloseDao().all().map {
+        val actions = closeActions.map {
             DailyCloseActionDto(it.actionId, it.businessDate, it.action, it.physicalCashCountId, AuditActorDto(it.actorUserId, it.actorName, it.actorRole), it.reason, it.createdAt, it.supersedesActionId)
         }
         return ReconciliationArchiveDto(counts, actions)

@@ -8,7 +8,13 @@ import com.saaf.milkshop.application.owner.NativeOwnerAccountLedgerDetail
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsFacade
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsRow
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsSnapshot
+import com.saaf.milkshop.application.owner.NativeOwnerFundsContext
 import com.saaf.milkshop.application.owner.NativeRecordsGroup
+import com.saaf.milkshop.application.owner.NativeCorrectionKind
+import com.saaf.milkshop.domain.OwnerFundsReceiptInput
+import com.saaf.milkshop.domain.OwnerFundsReview
+import com.saaf.milkshop.sync.BusinessClock
+import com.saaf.milkshop.sync.LegacyUid
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
 import com.saaf.milkshop.nativeui.DayStateBus
@@ -38,13 +44,36 @@ data class NativeCorrectionEditorState(
     val saleValue: String = prefill.saleValue,
     val saleChannel: String = prefill.saleChannel,
     val monetaryAmount: String = prefill.monetaryAmount,
+    val cancelDrawing: Boolean = false,
+    val ownerFundsAccountId: Long? = prefill.ownerFunds?.currentAccountId,
+    val acknowledgeExcess: Boolean = false,
+    val savedEventId: Long? = null,
     val spoilageQuantity: String = prefill.spoilageQuantity,
     val spoilageReason: String = prefill.spoilageReason,
     val saving: Boolean = false,
+    val refreshingFacts: Boolean = false,
     val error: String? = null,
     val draftTouched: Boolean = false,
 ) {
-    val dirty: Boolean get() = draftTouched && !saving
+    val dirty: Boolean get() = draftTouched && !saving && savedEventId == null
+}
+
+data class NativeOwnerFundsReceiptEditorState(
+    val funds: NativeOwnerFundsContext,
+    val amount: String = "",
+    val accountId: Long = funds.accounts.firstOrNull { it.name == "Cash" }?.accountId
+        ?: funds.accounts.firstOrNull()?.accountId ?: 0L,
+    val date: String = BusinessClock.today().toString(),
+    val note: String = "",
+    val submissionUid: String = LegacyUid.randomUid(),
+    val acknowledgeExcess: Boolean = false,
+    val saving: Boolean = false,
+    val refreshingFacts: Boolean = false,
+    val savedEventId: Long? = null,
+    val error: String? = null,
+    val draftTouched: Boolean = false,
+) {
+    val dirty: Boolean get() = draftTouched && !saving && savedEventId == null
 }
 
 sealed interface NativeOwnerRecordsState {
@@ -58,6 +87,7 @@ sealed interface NativeOwnerRecordsState {
         val detail: NativeOwnerRecordsDetail? = null,
         val ledger: NativeOwnerAccountLedgerDetail? = null,
         val correction: NativeCorrectionEditorState? = null,
+        val receipt: NativeOwnerFundsReceiptEditorState? = null,
         val loadingDetail: Boolean = false,
         val refreshing: Boolean = false,
         val error: String? = null,
@@ -89,7 +119,7 @@ class NativeOwnerRecordsViewModel(
         scope.launch {
             DataChangeBus.changes.collect {
                 val current = _state.value as? NativeOwnerRecordsState.Ready ?: return@collect
-                if (current.detail != null || current.ledger != null || current.correction != null) {
+                if (current.detail != null || current.ledger != null || current.correction != null || current.receipt != null) {
                     return@collect
                 }
                 refresh()
@@ -178,6 +208,7 @@ class NativeOwnerRecordsViewModel(
             visibleRecords = facade.filterRecords(current.snapshot.records, current.searchQuery, group),
             detail = null,
             ledger = null,
+            receipt = null,
             error = null,
         )
     }
@@ -209,7 +240,7 @@ class NativeOwnerRecordsViewModel(
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerRecordsState.Ready ?: return
         val generation = ++detailGeneration
-        _state.value = current.copy(loadingDetail = true, error = null, correction = null)
+        _state.value = current.copy(loadingDetail = true, error = null, correction = null, receipt = null)
         scope.launch {
             try {
                 val detail = withContext(Dispatchers.IO) { facade.loadDetail(session, eventId) }
@@ -231,7 +262,7 @@ class NativeOwnerRecordsViewModel(
     fun clearDetail() {
         val current = _state.value as? NativeOwnerRecordsState.Ready ?: return
         detailGeneration += 1L
-        _state.value = current.copy(detail = null, loadingDetail = false, error = null, correction = null)
+        _state.value = current.copy(detail = null, loadingDetail = false, error = null, correction = null, receipt = null)
     }
 
     fun openCorrection(prefill: NativeCorrectionPrefill) {
@@ -242,6 +273,100 @@ class NativeOwnerRecordsViewModel(
         )
     }
 
+    fun openReceipt(funds: NativeOwnerFundsContext) {
+        val current = _state.value as? NativeOwnerRecordsState.Ready ?: return
+        if (!funds.canRecordReceipt) return
+        _state.value = current.copy(receipt = NativeOwnerFundsReceiptEditorState(funds), error = null)
+    }
+
+    fun clearReceipt() {
+        val current = _state.value as? NativeOwnerRecordsState.Ready ?: return
+        _state.value = current.copy(receipt = null, error = null)
+        refresh()
+    }
+
+    fun updateReceipt(transform: (NativeOwnerFundsReceiptEditorState) -> NativeOwnerFundsReceiptEditorState) {
+        val current = _state.value as? NativeOwnerRecordsState.Ready ?: return
+        val editor = current.receipt ?: return
+        if (editor.saving || editor.refreshingFacts || editor.savedEventId != null) return
+        _state.value = current.copy(receipt = transform(editor.copy(draftTouched = true, error = null)))
+    }
+
+    fun saveReceipt() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerRecordsState.Ready ?: return
+        val editor = current.receipt ?: return
+        if (editor.saving || editor.refreshingFacts || editor.savedEventId != null) return
+        val input = try {
+            val amount = editor.amount.toDoubleOrNull() ?: error("Enter money received.")
+            require(OwnerFundsReview.paisa(amount) > 0) { "Received amount must be positive." }
+            require(editor.funds.accounts.any { it.accountId == editor.accountId }) { "Choose a Cash/Bank account." }
+            val proposed = java.math.BigDecimal.valueOf(editor.funds.receivedTotal)
+                .add(java.math.BigDecimal.valueOf(amount))
+            require(proposed <= java.math.BigDecimal.valueOf(editor.funds.currentWithdrawal) || editor.acknowledgeExcess) {
+                "Review and acknowledge money received above the corrected withdrawal."
+            }
+            OwnerFundsReceiptInput(editor.funds.rootEventId, amount, editor.accountId, editor.date,
+                editor.note, editor.submissionUid, editor.funds.currentWithdrawal,
+                editor.funds.receivedTotal, editor.acknowledgeExcess)
+        } catch (error: Throwable) {
+            _state.value = current.copy(receipt = editor.copy(error = publicMessage(error)))
+            return
+        }
+        _state.value = current.copy(receipt = editor.copy(saving = true, error = null))
+        scope.launch {
+            try {
+                val result = withContext(Dispatchers.IO) { facade.recordOwnerFundsReceipt(session, input) }
+                val latest = _state.value as? NativeOwnerRecordsState.Ready ?: return@launch
+                _state.value = latest.copy(receipt = editor.copy(saving = false, savedEventId = result.eventId, error = null))
+                try {
+                    val snapshot = withContext(Dispatchers.IO) { facade.loadHistory(session) }
+                    val detail = withContext(Dispatchers.IO) { facade.loadDetail(session, result.eventId) }
+                    val saved = _state.value as? NativeOwnerRecordsState.Ready ?: return@launch
+                    _state.value = saved.copy(snapshot = snapshot, visibleRecords = facade.filterRecords(snapshot.records,
+                        saved.searchQuery, saved.activeGroup), detail = detail)
+                } catch (_: Exception) { /* Saved state stays visible; Done refreshes Records. */ }
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.SessionExpired) {
+                    sessionHandle = null
+                    _state.value = NativeOwnerRecordsState.Idle
+                    onSessionExpired()
+                    return@launch
+                }
+                val latest = _state.value as? NativeOwnerRecordsState.Ready ?: return@launch
+                _state.value = latest.copy(receipt = editor.copy(saving = false, error = publicMessage(error)))
+            }
+        }
+    }
+
+    fun refreshReceiptFacts() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerRecordsState.Ready ?: return
+        val editor = current.receipt ?: return
+        if (editor.saving || editor.refreshingFacts || editor.savedEventId != null) return
+        _state.value = current.copy(receipt = editor.copy(refreshingFacts = true, error = null))
+        scope.launch {
+            try {
+                val facts = withContext(Dispatchers.IO) { facade.refreshReceiptContext(session, editor.funds.rootEventId) }
+                val latest = _state.value as? NativeOwnerRecordsState.Ready ?: return@launch
+                if (latest.receipt?.submissionUid != editor.submissionUid) return@launch
+                _state.value = latest.copy(receipt = editor.copy(funds = facts, refreshingFacts = false,
+                    acknowledgeExcess = false, error = if (facts.canRecordReceipt) null
+                        else "This withdrawal is cancelled or replaced; return to Records."))
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.SessionExpired) {
+                    sessionHandle = null
+                    _state.value = NativeOwnerRecordsState.Idle
+                    onSessionExpired()
+                    return@launch
+                }
+                val latest = _state.value as? NativeOwnerRecordsState.Ready ?: return@launch
+                if (latest.receipt?.submissionUid != editor.submissionUid) return@launch
+                _state.value = latest.copy(receipt = editor.copy(refreshingFacts = false, error = publicMessage(error)))
+            }
+        }
+    }
+
     fun clearCorrection() {
         val current = _state.value as? NativeOwnerRecordsState.Ready ?: return
         _state.value = current.copy(correction = null, error = null)
@@ -250,7 +375,7 @@ class NativeOwnerRecordsViewModel(
     fun updateCorrection(transform: (NativeCorrectionEditorState) -> NativeCorrectionEditorState) {
         val current = _state.value as? NativeOwnerRecordsState.Ready ?: return
         val editor = current.correction ?: return
-        if (editor.saving) return
+        if (editor.saving || editor.refreshingFacts || editor.savedEventId != null) return
         _state.value = current.copy(correction = transform(editor.copy(draftTouched = true, error = null)))
     }
 
@@ -258,7 +383,7 @@ class NativeOwnerRecordsViewModel(
         val session = sessionHandle ?: return
         val current = _state.value as? NativeOwnerRecordsState.Ready ?: return
         val editor = current.correction ?: return
-        if (editor.saving) return
+        if (editor.saving || editor.refreshingFacts || editor.savedEventId != null) return
         val input = try {
             facade.buildCorrectionInput(
                 prefill = editor.prefill,
@@ -277,6 +402,9 @@ class NativeOwnerRecordsViewModel(
                 monetaryAmount = editor.monetaryAmount,
                 spoilageQuantity = editor.spoilageQuantity,
                 spoilageReason = editor.spoilageReason,
+                cancelDrawing = editor.cancelDrawing,
+                ownerFundsAccountId = editor.ownerFundsAccountId,
+                acknowledgeExcess = editor.acknowledgeExcess,
             )
         } catch (error: Throwable) {
             _state.value = current.copy(
@@ -288,6 +416,12 @@ class NativeOwnerRecordsViewModel(
         scope.launch {
             try {
                 val result = withContext(Dispatchers.IO) { facade.correct(session, input) }
+                val ownerFundsCorrection = editor.prefill.kind in setOf(NativeCorrectionKind.Drawing,
+                    NativeCorrectionKind.FundsReceipt)
+                if (ownerFundsCorrection) {
+                    val committed = _state.value as? NativeOwnerRecordsState.Ready ?: return@launch
+                    _state.value = committed.copy(correction = editor.copy(saving = false, savedEventId = result.eventId))
+                }
                 val snapshot = withContext(Dispatchers.IO) { facade.loadHistory(session) }
                 val detail = withContext(Dispatchers.IO) { facade.loadDetail(session, result.eventId) }
                 val latest = _state.value as? NativeOwnerRecordsState.Ready ?: return@launch
@@ -299,7 +433,7 @@ class NativeOwnerRecordsViewModel(
                         latest.activeGroup,
                     ),
                     detail = detail,
-                    correction = null,
+                    correction = if (ownerFundsCorrection) editor.copy(saving = false, savedEventId = result.eventId) else null,
                     loadingDetail = false,
                     error = null,
                 )
@@ -312,9 +446,43 @@ class NativeOwnerRecordsViewModel(
                 }
                 val latest = _state.value as? NativeOwnerRecordsState.Ready ?: return@launch
                 val currentEditor = latest.correction ?: return@launch
+                if (currentEditor.savedEventId != null) return@launch
                 _state.value = latest.copy(
                     correction = currentEditor.copy(saving = false, error = publicMessage(error)),
                 )
+            }
+        }
+    }
+
+    fun refreshCorrectionFacts() {
+        val session = sessionHandle ?: return
+        val current = _state.value as? NativeOwnerRecordsState.Ready ?: return
+        val editor = current.correction ?: return
+        if (editor.prefill.kind !in setOf(NativeCorrectionKind.Drawing, NativeCorrectionKind.FundsReceipt) ||
+            editor.saving || editor.refreshingFacts || editor.savedEventId != null) return
+        _state.value = current.copy(correction = editor.copy(refreshingFacts = true, error = null))
+        scope.launch {
+            try {
+                val detail = withContext(Dispatchers.IO) { facade.loadDetail(session, editor.prefill.originalEventId) }
+                val latest = _state.value as? NativeOwnerRecordsState.Ready ?: return@launch
+                if (latest.correction?.prefill?.originalEventId != editor.prefill.originalEventId) return@launch
+                val updated = detail.correctionPrefill
+                _state.value = latest.copy(correction = if (updated == null) editor.copy(refreshingFacts = false,
+                    error = "This record changed; return to Records and open the latest entry.")
+                else editor.copy(prefill = updated, refreshingFacts = false, acknowledgeExcess = false,
+                    ownerFundsAccountId = editor.ownerFundsAccountId?.takeIf { selected ->
+                        updated.ownerFunds?.accounts?.any { it.accountId == selected } == true
+                    } ?: updated.ownerFunds?.currentAccountId, error = null))
+            } catch (error: Throwable) {
+                if (error is SecurityFailure.SessionExpired) {
+                    sessionHandle = null
+                    _state.value = NativeOwnerRecordsState.Idle
+                    onSessionExpired()
+                    return@launch
+                }
+                val latest = _state.value as? NativeOwnerRecordsState.Ready ?: return@launch
+                if (latest.correction?.prefill?.originalEventId != editor.prefill.originalEventId) return@launch
+                _state.value = latest.copy(correction = editor.copy(refreshingFacts = false, error = publicMessage(error)))
             }
         }
     }

@@ -1,5 +1,13 @@
 package com.saaf.milkshop.nativeui.more
 
+import com.saaf.milkshop.nativeui.common.NativePersonalSecurityPanel
+import com.saaf.milkshop.nativeui.common.NativePersonalSecurityTags
+
+import androidx.compose.foundation.layout.size
+import com.saaf.milkshop.nativeui.theme.nativeNavigationTitleTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeValueTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeVisualColors
 
 import com.saaf.milkshop.nativeui.common.NativeListStyle
 import com.saaf.milkshop.nativeui.common.nativeListItemContent
@@ -497,115 +505,44 @@ private fun MorePersonalSecurityScreen(
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBack)
-    val security = state.security
-    var passphrase by remember { mutableStateOf("") }
-    var pin by remember { mutableStateOf("") }
-
-    if (state.confirmRemoveUnlock) {
-        AlertDialog(
-            onDismissRequest = onCancelRemove,
-            title = { Text("Remove Quick unlock?") },
-            text = { Text("This clears Quick PIN and phone security for ${identity.displayName} on this phone.") },
-            confirmButton = {
-                TextButton(
-                    onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction {
-                        val secret = passphrase.toCharArray()
-                        passphrase = ""
-                        pin = ""
-                        onRemove(secret)
-                    },
-                    modifier = Modifier.testTag(NativeUiTags.MoreSecurityRemoveConfirm),
-                ) { Text("Discard and leave") }
-            },
-            dismissButton = {
-                TextButton(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onCancelRemove)) { Text("Keep editing") }
-            },
-        )
-    }
-
     MoreScaffold(snackbarHostState, onNavigate, modifier, NativeUiTags.MoreSecurityScreen) { padding ->
         Column(
-            Modifier
-                .fillMaxSize().nativeRefreshOverlay(state.refreshing)
-                .padding(padding)
-                .imePadding(),
+            Modifier.fillMaxSize().nativeRefreshOverlay(state.refreshing).padding(padding).imePadding().testTag(NativeUiTags.MoreSecurityScreen),
         ) {
             Column(
-                Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
+                Modifier.weight(1f).verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp, vertical = 18.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                Text("Personal security", style = MaterialTheme.typography.headlineMedium)
-                if (security == null) {
-                    NativeColdLoadingPane(label = "Loading security…")
-                } else {
-                    SecurityStatus(security)
-                    OutlinedTextField(
-                        value = passphrase,
-                        onValueChange = { passphrase = it },
-                        modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.MoreSecurityPassphrase),
-                        label = { Text("Current full passphrase") },
-                        visualTransformation = PasswordVisualTransformation(),
-                        singleLine = true,
-                        enabled = !state.saving,
-                    )
-                    OutlinedTextField(
-                        value = pin,
-                        onValueChange = { pin = it.filter { ch -> ch.isDigit() }.take(4) },
-                        modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.MoreSecurityPin),
-                        label = { Text("New Quick PIN (4 digits)") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                        visualTransformation = PasswordVisualTransformation(),
-                        singleLine = true,
-                        enabled = !state.saving,
-                    )
-                    state.error?.let {
-                        Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag(NativeUiTags.MoreError))
-                    }
-                    Button(
-                        onClick = com.saaf.milkshop.nativeui.common.hapticAction {
-                            if (passphrase.isBlank() || pin.length != 4) return@hapticAction
-                            val secret = passphrase.toCharArray()
-                            val quickPin = pin.toCharArray()
-                            passphrase = ""
-                            pin = ""
-                            onEnrollPin(secret, quickPin)
-                        },
-                        enabled = !state.saving && passphrase.isNotBlank() && pin.length == 4,
-                        modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.MoreSecurityEnrollPin),
-                    ) { Text(if (state.saving) "Saving…" else "Save Quick PIN") }
-                    if (security.phoneSecurityAvailable) {
-                        Button(
-                            onClick = com.saaf.milkshop.nativeui.common.hapticAction {
-                                if (passphrase.isBlank()) return@hapticAction
-                                val secret = passphrase.toCharArray()
-                                val quickPin = pin.takeIf { it.length == 4 }?.toCharArray()
-                                passphrase = ""
-                                pin = ""
-                                onEnrollPhone(secret, quickPin)
-                            },
-                            enabled = !state.saving && passphrase.isNotBlank(),
-                            modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.MoreSecurityEnrollPhone),
-                        ) { Text("Enable ${security.phoneSecurityLabel}") }
-                    }
-                    if (security.quickPinEnabled || security.phoneSecurityEnabled) {
-                        TextButton(
-                            onClick = com.saaf.milkshop.nativeui.common.hapticAction(onRequestRemove),
-                            enabled = !state.saving && passphrase.isNotBlank(),
-                            modifier = Modifier.testTag(NativeUiTags.MoreSecurityRemove),
-                        ) { Text("Remove Quick unlock") }
-                    }
-                }
+                NativePersonalSecurityPanel(
+                    identityKey = identity.userId,
+                    identityName = identity.displayName,
+                    security = state.security,
+                    saving = state.saving,
+                    error = state.error,
+                    confirmRemove = state.confirmRemoveUnlock,
+                    tags = NativePersonalSecurityTags(
+                        status = NativeUiTags.MoreSecurityStatus,
+                        passphrase = NativeUiTags.MoreSecurityPassphrase,
+                        pin = NativeUiTags.MoreSecurityPin,
+                        savePin = NativeUiTags.MoreSecurityEnrollPin,
+                        enablePhone = NativeUiTags.MoreSecurityEnrollPhone,
+                        remove = NativeUiTags.MoreSecurityRemove,
+                        confirmRemove = NativeUiTags.MoreSecurityRemoveConfirm,
+                        error = NativeUiTags.MoreError,
+                    ),
+                    onRequestRemove = onRequestRemove,
+                    onCancelRemove = onCancelRemove,
+                    onRemove = onRemove,
+                    onEnrollPin = onEnrollPin,
+                    onEnrollPhone = onEnrollPhone,
+                )
             }
         }
     }
 }
-
-
 @Composable
-private fun MoreMenuRow(
+internal fun MoreMenuRow(
     icon: ImageVector,
     title: String,
     subtitle: String,
@@ -623,10 +560,10 @@ private fun MoreMenuRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(title, style = nativeNavigationTitleTextStyle())
+            Text(subtitle, style = nativeSupportingTextStyle(), color = nativeVisualColors.supporting)
         }
         Icon(Icons.Outlined.ChevronRight, contentDescription = null)
     }
@@ -647,29 +584,6 @@ private fun CountSuccess(receipt: NativeBlindCashCountReceipt) {
             "This blind count does not reveal the shop expected drawer total.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-}
-
-@Composable
-private fun SecurityStatus(security: NativeMoreSecurityStatus) {
-    Column(
-        Modifier.fillMaxWidth().testTag(NativeUiTags.MoreSecurityStatus),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        Text(
-            "Quick PIN: ${if (security.quickPinEnabled) "On" else "Off"}",
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        Text(
-            "${security.phoneSecurityLabel}: ${
-                when {
-                    !security.phoneSecurityAvailable -> "Unavailable on this phone"
-                    security.phoneSecurityEnabled -> "On"
-                    else -> "Off"
-                }
-            }",
-            style = MaterialTheme.typography.bodyLarge,
         )
     }
 }

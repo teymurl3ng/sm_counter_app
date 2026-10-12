@@ -206,7 +206,7 @@ private fun ActivityListScreen(
                                 fontWeight = FontWeight.SemiBold,
                             )
                             Text(
-                                "Sales and collections you record today will show up here.",
+                                "Sales, collections and expenses you record today will show up here.",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(top = 8.dp),
@@ -281,19 +281,15 @@ private fun ActivityDetailScreen(
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                 )
-                Text(detail.summary.timeLabel, style = MaterialTheme.typography.bodyLarge)
-                Text(detail.summary.stateLabel, style = MaterialTheme.typography.bodyLarge)
-                detail.counterpartLabel?.let {
-                    LabeledValue("Customer", it)
-                }
-                detail.destinationLabel?.let {
-                    LabeledValue("Received in", it)
-                }
-                detail.quantityLabel?.let {
-                    LabeledValue("Quantity", it)
-                }
-                detail.notes?.let {
-                    LabeledValue("Note", it)
+                com.saaf.milkshop.nativeui.common.NativeInformationSection {
+                    com.saaf.milkshop.nativeui.common.NativeInformationFact("Time", detail.summary.timeLabel)
+                    com.saaf.milkshop.nativeui.common.NativeInformationFact("Status", detail.summary.stateLabel)
+                    detail.counterpartLabel?.let { com.saaf.milkshop.nativeui.common.NativeInformationFact("Customer", it) }
+                    detail.destinationLabel?.let { com.saaf.milkshop.nativeui.common.NativeInformationFact("Received in", it) }
+                    detail.expenseCategoryLabel?.let { com.saaf.milkshop.nativeui.common.NativeInformationFact("Category", it) }
+                    detail.paymentAccountLabel?.let { com.saaf.milkshop.nativeui.common.NativeInformationFact("Paid from", it) }
+                    detail.quantityLabel?.let { com.saaf.milkshop.nativeui.common.NativeInformationFact("Quantity", it) }
+                    detail.notes?.let { com.saaf.milkshop.nativeui.common.NativeInformationFact("Note", it, prose = true) }
                 }
                 Text(
                     "Corrections need a supervisor. This screen is inspect-only.",
@@ -320,22 +316,15 @@ private fun ActivityRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(record.taskLabel, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                Text(record.timeLabel, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            Text("#${record.eventId} · ${record.stateLabel}", style = MaterialTheme.typography.bodyMedium)
-            Text(formatMoney(record.amountPaisa), style = MaterialTheme.typography.titleMedium)
+            Text(record.taskLabel, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(formatMoney(record.amountPaisa), style = com.saaf.milkshop.nativeui.theme.nativeMetricTextStyle(),
+                color = com.saaf.milkshop.nativeui.theme.nativeVisualColors.metric)
+            Text("#${record.eventId} · ${record.timeLabel}",
+                style = com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle(),
+                color = com.saaf.milkshop.nativeui.theme.nativeVisualColors.supporting)
+            Text(record.stateLabel, style = com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle())
         }
         Icon(Icons.Outlined.ChevronRight, contentDescription = null)
-    }
-}
-
-@Composable
-private fun LabeledValue(label: String, value: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(label.uppercase(Locale.US), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(value, style = MaterialTheme.typography.bodyLarge)
     }
 }
 

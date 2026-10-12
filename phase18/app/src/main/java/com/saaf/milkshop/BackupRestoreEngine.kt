@@ -4,6 +4,7 @@ import androidx.room3.executeSQL
 import androidx.room3.withWriteTransaction
 import com.saaf.milkshop.data.*
 import com.saaf.milkshop.domain.ServerAccountPolicy
+import com.saaf.milkshop.domain.OwnerFundsTruth
 import org.json.JSONObject
 
 internal class BackupRestoreEngine(
@@ -49,16 +50,22 @@ internal class BackupRestoreEngine(
             if (selection.business) {
                 rebaselineStore.restoredRebaseline = formatVersion >= 5
                 rebaselineStore.liveRebaselinePending = false
+            } else if (selection.planning) {
+                // A partial planning restore uses the live body-comparison
+                // enrollment path, not a stale prior restore classification.
+                rebaselineStore.restoredRebaseline = false
+                rebaselineStore.liveRebaselinePending = false
             }
             database.withWriteTransaction<Unit> {
                 val data = json.getJSONObject("data")
                 val backupDao = database.backupDataDao()
+                if (selection.business || selection.planning) {
+                    // Neither a complete nor a planning-only snapshot is a
+                    // fresh local edit to push before server comparison.
+                    SyncMigrationSql.triggerNames.forEach { executeSQL("DROP TRIGGER IF EXISTS $it") }
+                }
                 if (selection.business) {
                     Phase3CostingMigrationSql.immutableTriggerNames.forEach { executeSQL("DROP TRIGGER IF EXISTS $it") }
-                    // Sync capture triggers must not fire while the snapshot's
-                    // rows stream in: a restored database starts with an empty
-                    // outbox, not a re-push of its own contents.
-                    SyncMigrationSql.triggerNames.forEach { executeSQL("DROP TRIGGER IF EXISTS $it") }
                     if (includeSecurity) {
                         executeSQL("DROP TRIGGER IF EXISTS prevent_app_user_delete")
                         executeSQL("DROP TRIGGER IF EXISTS prevent_security_audit_delete")
@@ -99,6 +106,7 @@ internal class BackupRestoreEngine(
                     backupDao.deleteExpenseCategoryProfiles()
                     backupDao.deleteFinancialLogs()
                     backupDao.deleteInventoryLogs()
+                    database.ownerFundsDao().deleteAll()
                     backupDao.deleteEvents()
                     backupDao.deleteAccounts()
                     backupDao.deleteProducts()
@@ -107,13 +115,54 @@ internal class BackupRestoreEngine(
                     backupDao.deleteSyncPullState()
                     backupDao.insertProducts(readProducts(data.optJSONArray("products")))
                     backupDao.insertAccounts(readAccounts(data.optJSONArray("accounts")))
-                    backupDao.insertEvents(readEvents(data.optJSONArray("events")))
+                    val restoredEvents = readEvents(data.optJSONArray("events"))
+                    // Correction references are dependencies, not an ordering by sender integer ID.
+                    val remainingEvents = restoredEvents.toMutableList()
+                    val insertedEventIds = mutableSetOf<Long>()
+                    while (remainingEvents.isNotEmpty()) {
+                        val ready = remainingEvents.filter { it.correctsEventId == null || it.correctsEventId in insertedEventIds }
+                        require(ready.isNotEmpty()) { "Backup correction history is incomplete or cyclic" }
+                        backupDao.insertEvents(ready)
+                        insertedEventIds.addAll(ready.map { it.eventId })
+                        remainingEvents.removeAll(ready.toSet())
+                    }
+                    val financial = readFinancialLogs(data.optJSONArray("financial_logs"))
+                    val inventory = readInventoryLogs(data.optJSONArray("inventory_logs"))
+                    val details = readOwnerFundsDetails(data.optJSONArray("owner_funds_details"))
+                    require(details.map { it.eventId }.distinct().size == details.size) { "Duplicate withdrawal details" }
+                    val detailByEvent = details.associateBy { it.eventId }
+                    require(detailByEvent.keys.all { id -> restoredEvents.any { it.eventId == id && it.eventType in setOf("OWNER_DRAWING", "OWNER_FUNDS_IN") } }) {
+                        "Backup owner funds details reference an invalid event"
+                    }
+                    val pendingOwnerFunds = restoredEvents.filter { it.eventType in setOf("OWNER_DRAWING", "OWNER_FUNDS_IN") }.toMutableList()
+                    while (pendingOwnerFunds.isNotEmpty()) {
+                        val ready = pendingOwnerFunds.filter { it.correctsEventId == null || database.ownerFundsDao().find(it.correctsEventId!!) != null }
+                        require(ready.isNotEmpty()) { "Backup withdrawal history is incomplete or ambiguous" }
+                        for (event in ready) {
+                            val parent = event.correctsEventId?.let { id -> database.eventDao().findById(id) }
+                            val prior = parent?.let { database.ownerFundsDao().find(it.eventId) }
+                            val rows = financial.filter { it.eventId == event.eventId }.map { it.accountId to it.amount }
+                            val detail = detailByEvent[event.eventId] ?: if (event.eventType == "OWNER_FUNDS_IN")
+                                error("Backup receipt details are missing")
+                                else if (prior != null) prior.copy(eventId = event.eventId)
+                                else OwnerFundsDetailEntity(event.eventId, rows.singleOrNull()?.first
+                                    ?: error("Backup original withdrawal account is ambiguous"), event.eventId)
+                            val schema = json.getJSONObject("metadata").getInt("schema_version")
+                            require((event.eventType == "OWNER_DRAWING" && schema < 11) ||
+                                (event.eventType == "OWNER_FUNDS_IN" && schema < 12) || detailByEvent.containsKey(event.eventId)) {
+                                "Backup owner funds details are missing"
+                            }
+                            OwnerFundsTruth(database).validate(event, detail, parent, prior, rows, inventory.any { it.eventId == event.eventId })
+                            database.ownerFundsDao().insert(detail)
+                        }
+                        pendingOwnerFunds.removeAll(ready.toSet())
+                    }
                     backupDao.insertStoreProfiles(readStoreProfiles(data.optJSONArray("store_profile")))
                     backupDao.insertOpeningBatches(readOpeningBatches(data.optJSONArray("opening_batches")))
                     backupDao.insertOpeningInventoryEntries(readOpeningInventoryEntries(data.optJSONArray("opening_inventory_entries")))
                     backupDao.insertOpeningAccountEntries(readOpeningAccountEntries(data.optJSONArray("opening_account_entries")))
-                    backupDao.insertInventoryLogs(readInventoryLogs(data.optJSONArray("inventory_logs")))
-                    backupDao.insertFinancialLogs(readFinancialLogs(data.optJSONArray("financial_logs")))
+                    backupDao.insertInventoryLogs(inventory)
+                    backupDao.insertFinancialLogs(financial)
                     backupDao.insertSettings(readSettings(data.optJSONArray("settings")))
                     backupDao.insertProductProfiles(readProductProfiles(data.optJSONArray("product_profiles")))
                     backupDao.insertCustomerProfiles(readCustomerProfiles(data.optJSONArray("customer_profiles")))
@@ -199,7 +248,6 @@ internal class BackupRestoreEngine(
                         backupDao.insertSyncOutbox(restoredOutbox.map { it.copy(held = true) })
                     }
                     Phase3CostingMigrationSql.immutableTriggers.forEach { executeSQL(it) }
-                    SyncMigrationSql.captureTriggers.forEach { executeSQL(it) }
                     if (includeSecurity) {
                         Phase3SecurityMigrationSql.triggerNames.zip(Phase3SecurityMigrationSql.createTriggers)
                             .filter { (name, _) ->
@@ -213,10 +261,21 @@ internal class BackupRestoreEngine(
                     }
                 }
                 if (selection.planning) {
+                    if (!selection.business) {
+                        // Replacement invalidates only planning work and
+                        // review state. Other local edits remain queued.
+                        val planningTables = "('budget_plans','collections_targets')"
+                        executeSQL("DELETE FROM sync_outbox WHERE table_name IN $planningTables")
+                        executeSQL("DELETE FROM sync_parked_rows WHERE table_name IN $planningTables")
+                        executeSQL("DELETE FROM sync_rebaseline_holds WHERE table_name IN $planningTables")
+                    }
                     backupDao.deleteBudgets()
                     backupDao.deleteCollectionsTargets()
                     backupDao.insertBudgets(readBudgets(data.optJSONArray("budgets")))
                     backupDao.insertCollectionsTargets(readCollectionsTargets(data.optJSONArray("collections_targets")))
+                }
+                if (selection.business || selection.planning) {
+                    SyncMigrationSql.captureTriggers.forEach { executeSQL(it) }
                 }
                 if (selection.preferences) restorePreferences(data.optJSONObject("preferences"))
 

@@ -12,6 +12,85 @@ import com.saaf.milkshop.sync.LegacyUid
  * their corresponding native integrity rules.
  */
 internal object DatabaseSql {
+    /** Keep historical migrations on their original guards; install these only at version 15. */
+    val ownerFundsCreateTriggers: List<String>
+        get() = createTriggers.map { sql ->
+            when {
+                sql.contains("CREATE TRIGGER IF NOT EXISTS validate_event_values") -> sql.replace(
+                    "NEW.amount = (SELECT amount FROM events WHERE event_id = NEW.corrects_event_id)",
+                    "NEW.amount IS NULL",
+                )
+                sql.contains("CREATE TRIGGER IF NOT EXISTS validate_financial_movement") -> {
+                    val correction = sql.indexOf("AND (SELECT corrects_event_id FROM events WHERE event_id = NEW.event_id) IS NOT NULL")
+                    val start = sql.lastIndexOf("WHEN ", correction)
+                    check(start >= 0)
+                    val end = sql.indexOf("WHEN (SELECT event_type FROM events WHERE event_id = NEW.event_id) = 'OPENING_STATE'", start)
+                    check(end > start)
+                    val legacy = sql.substring(start, end).replace(
+                        "AND (SELECT corrects_event_id FROM events WHERE event_id = NEW.event_id) IS NOT NULL",
+                        "AND (SELECT corrects_event_id FROM events WHERE event_id = NEW.event_id) IS NOT NULL\n                     AND NOT EXISTS (SELECT 1 FROM owner_funds_details WHERE event_id = NEW.event_id)",
+                    )
+                    sql.substring(0, start) + """
+                WHEN EXISTS (SELECT 1 FROM owner_funds_details d JOIN events e ON e.event_id = d.event_id
+                    LEFT JOIN events p ON p.event_id = e.corrects_event_id
+                    LEFT JOIN owner_funds_details pd ON pd.event_id = p.event_id
+                    WHERE d.event_id = NEW.event_id AND (
+                        NOT EXISTS (SELECT 1 FROM accounts WHERE account_id = NEW.account_id AND category = 'Cash/Bank')
+                        OR EXISTS (SELECT 1 FROM financial_log WHERE event_id = NEW.event_id AND account_id = NEW.account_id)
+                        OR NEW.amount = 0
+                        OR (e.corrects_event_id IS NULL AND (NEW.account_id <> d.payment_account_id OR NEW.amount <> -e.amount))
+                        OR (e.corrects_event_id IS NOT NULL AND (pd.event_id IS NULL
+                            OR NEW.account_id NOT IN (d.payment_account_id, pd.payment_account_id)
+                            OR NEW.amount <> (CASE WHEN NEW.account_id = pd.payment_account_id THEN p.amount ELSE 0 END)
+                                - (CASE WHEN NEW.account_id = d.payment_account_id THEN e.amount ELSE 0 END)))
+                    )) THEN RAISE(ABORT, 'Withdrawal movement must match its declared account and exact difference')
+
+""" + legacy + sql.substring(end)
+                }
+                else -> sql
+            }
+        } + OwnerFundsMigrationSql.detailTriggers
+
+    /** Version 16 guard delta. Historical migrations continue to use their original definitions. */
+    val ownerReceiptCreateTriggers: List<String>
+        get() = ownerFundsCreateTriggers.filterNot { sql ->
+            sql.contains("CREATE TRIGGER IF NOT EXISTS validate_owner_funds_detail") ||
+                sql.contains("CREATE TRIGGER IF NOT EXISTS prevent_owner_funds_update")
+        }.map { sql ->
+            when {
+                sql.contains("CREATE TRIGGER IF NOT EXISTS validate_event_values") -> sql
+                    .replace("'OPENING_STATE', 'OWNER_DRAWING'", "'OPENING_STATE', 'OWNER_DRAWING', 'OWNER_FUNDS_IN'")
+                    .replace("NEW.event_type = 'OWNER_DRAWING' AND NEW.corrects_event_id IS NOT NULL",
+                        "NEW.event_type IN ('OWNER_DRAWING','OWNER_FUNDS_IN') AND NEW.corrects_event_id IS NOT NULL")
+                    .replace("'SALARY_PAYMENT', 'OWNER_DRAWING')", "'SALARY_PAYMENT', 'OWNER_DRAWING', 'OWNER_FUNDS_IN')")
+                sql.contains("CREATE TRIGGER IF NOT EXISTS validate_inventory_values") -> sql
+                    .replace("NEW.event_type = 'OWNER_DRAWING'", "NEW.event_type IN ('OWNER_DRAWING','OWNER_FUNDS_IN')")
+                sql.contains("CREATE TRIGGER IF NOT EXISTS validate_financial_movement") -> {
+                    val anchor = "THEN RAISE(ABORT, 'Withdrawal movement must match its declared account and exact difference')"
+                    check(sql.contains(anchor))
+                    sql.replace("WHERE d.event_id = NEW.event_id AND (",
+                        "WHERE d.event_id = NEW.event_id AND e.event_type = 'OWNER_DRAWING' AND (")
+                        .replace(anchor, anchor + """
+
+                WHEN EXISTS (SELECT 1 FROM owner_funds_details d JOIN events e ON e.event_id = d.event_id
+                    LEFT JOIN events p ON p.event_id = e.corrects_event_id
+                    LEFT JOIN owner_funds_details pd ON pd.event_id = p.event_id
+                    WHERE d.event_id = NEW.event_id AND e.event_type = 'OWNER_FUNDS_IN' AND (
+                        NOT EXISTS (SELECT 1 FROM accounts WHERE account_id = NEW.account_id AND category = 'Cash/Bank')
+                        OR EXISTS (SELECT 1 FROM financial_log WHERE event_id = NEW.event_id AND account_id = NEW.account_id)
+                        OR NEW.amount = 0
+                        OR (e.corrects_event_id IS NULL AND (NEW.account_id <> d.payment_account_id OR NEW.amount <> e.amount))
+                        OR (e.corrects_event_id IS NOT NULL AND (pd.event_id IS NULL
+                            OR NEW.account_id NOT IN (d.payment_account_id, pd.payment_account_id)
+                            OR NEW.amount <> (CASE WHEN NEW.account_id = d.payment_account_id THEN e.amount ELSE 0 END)
+                                - (CASE WHEN NEW.account_id = pd.payment_account_id THEN p.amount ELSE 0 END)))
+                    )) THEN RAISE(ABORT, 'Owner receipt movement must match its declared account and exact difference')
+""")
+                }
+                else -> sql
+            }
+        } + OwnerFundsReceiptMigrationSql.detailTriggers
+
     val triggerNames: List<String> = listOf(
         "validate_product_values",
         "validate_account_values",
@@ -43,6 +122,114 @@ internal object DatabaseSql {
         "prevent_negative_stock",
         "validate_financial_movement",
     )
+
+    private val LEGACY_CLOSE_BALANCE = """COALESCE((
+                     SELECT ROUND(SUM(fl.amount), 2)
+                     FROM financial_log fl
+                     INNER JOIN events e ON e.event_id = fl.event_id
+                     WHERE fl.account_id = (
+                         SELECT account_id FROM physical_cash_counts WHERE count_id = NEW.physical_cash_count_id
+                     )
+                       AND e.created_at <= (
+                           SELECT counted_at FROM physical_cash_counts WHERE count_id = NEW.physical_cash_count_id
+                       )
+                 ), 0)"""
+
+    val legacyDailyCloseTrigger = """
+        CREATE TRIGGER IF NOT EXISTS validate_daily_close_action
+        BEFORE INSERT ON daily_close_actions
+        FOR EACH ROW
+        BEGIN
+            SELECT CASE
+                WHEN NEW.action NOT IN ('close', 'reopen')
+                    THEN RAISE(ABORT, 'Daily close action is invalid')
+                WHEN trim(NEW.actor_name) = ''
+                    THEN RAISE(ABORT, 'Daily close actor name is required')
+                WHEN NEW.actor_role NOT IN ('owner', 'admin', 'manager', 'cashier', 'operator')
+                    THEN RAISE(ABORT, 'Daily close actor role is invalid')
+                WHEN NEW.action = 'reopen' AND NEW.actor_role NOT IN ('owner', 'admin')
+                    THEN RAISE(ABORT, 'Only an owner or admin can reopen a date')
+                WHEN NEW.action = 'reopen' AND trim(COALESCE(NEW.reason, '')) = ''
+                    THEN RAISE(ABORT, 'Reopening reason is required')
+                WHEN NEW.action = 'close' AND NEW.physical_cash_count_id IS NULL
+                    THEN RAISE(ABORT, 'Daily close requires a physical cash count')
+                WHEN NEW.action = 'reopen' AND NEW.physical_cash_count_id IS NOT NULL
+                    THEN RAISE(ABORT, 'Reopen action cannot carry a cash count')
+                WHEN NEW.action = 'close' AND NOT EXISTS (
+                    SELECT 1
+                    FROM physical_cash_counts pcc
+                    INNER JOIN accounts a ON a.account_id = pcc.account_id
+                    WHERE pcc.count_id = NEW.physical_cash_count_id
+                      AND pcc.business_date = NEW.business_date
+                      AND a.name = 'Cash'
+                      AND a.category = 'Cash/Bank'
+                )
+                    THEN RAISE(ABORT, 'Daily close cash count is invalid')
+                WHEN NEW.action = 'close' AND EXISTS (
+                    SELECT 1
+                    FROM physical_cash_counts selected
+                    INNER JOIN physical_cash_counts later
+                      ON later.account_id = selected.account_id
+                     AND later.business_date = selected.business_date
+                    WHERE selected.count_id = NEW.physical_cash_count_id
+                      AND (later.counted_at > selected.counted_at OR
+                           (later.counted_at = selected.counted_at AND later.count_id > selected.count_id))
+                )
+                    THEN RAISE(ABORT, 'Daily close must use the latest cash count')
+                WHEN NEW.supersedes_action_id IS NULL
+                     AND NEW.action <> 'close'
+                    THEN RAISE(ABORT, 'The first daily close action must close the date')
+                WHEN NEW.supersedes_action_id IS NULL
+                     AND EXISTS (SELECT 1 FROM daily_close_actions prior WHERE prior.business_date = NEW.business_date)
+                    THEN RAISE(ABORT, 'Daily close history must append to the current action')
+                WHEN NEW.supersedes_action_id IS NOT NULL
+                     AND NOT EXISTS (
+                         SELECT 1 FROM daily_close_actions prior
+                         WHERE prior.action_id = NEW.supersedes_action_id
+                           AND prior.business_date = NEW.business_date
+                     )
+                    THEN RAISE(ABORT, 'Daily close action must supersede the same business date')
+                WHEN NEW.supersedes_action_id IS NOT NULL
+                     AND (SELECT action FROM daily_close_actions WHERE action_id = NEW.supersedes_action_id) = NEW.action
+                    THEN RAISE(ABORT, 'Daily close and reopen actions must alternate')
+                WHEN NEW.action = 'close'
+                     AND NEW.supersedes_action_id IS NOT NULL
+                     AND (
+                         SELECT counted_at FROM physical_cash_counts
+                         WHERE count_id = NEW.physical_cash_count_id
+                     ) <= (
+                         SELECT created_at FROM daily_close_actions
+                         WHERE action_id = NEW.supersedes_action_id
+                     )
+                    THEN RAISE(ABORT, 'Reclose requires a new cash count after reopening')
+                WHEN NEW.action = 'close'
+                     AND ABS(
+                         (SELECT counted_amount FROM physical_cash_counts WHERE count_id = NEW.physical_cash_count_id) -
+                         COALESCE((
+                             SELECT ROUND(SUM(fl.amount), 2)
+                             FROM financial_log fl
+                             INNER JOIN events e ON e.event_id = fl.event_id
+                             WHERE fl.account_id = (
+                                 SELECT account_id FROM physical_cash_counts WHERE count_id = NEW.physical_cash_count_id
+                             )
+                               AND e.created_at <= (
+                                   SELECT counted_at FROM physical_cash_counts WHERE count_id = NEW.physical_cash_count_id
+                               )
+                         ), 0)
+                     ) >= 0.005
+                     AND trim(COALESCE(NEW.reason, '')) = ''
+                    THEN RAISE(ABORT, 'Non-zero cash variance requires an explanation')
+            END;
+        END;
+        """.trimIndent()
+
+    val dailyCloseTrigger: String = legacyDailyCloseTrigger
+        .replace("WHEN NEW.action NOT IN", "WHEN NEW.money_rounding_version NOT IN (1, 2) THEN RAISE(ABORT, 'Invalid money rounding version')\n                WHEN NEW.action NOT IN")
+        .replace(LEGACY_CLOSE_BALANCE, "CASE WHEN NEW.money_rounding_version = 1 THEN $LEGACY_CLOSE_BALANCE ELSE ${CanonicalMoneySql.CLOSE_BALANCE_AT} END")
+        .also { check(it.contains("CASE WHEN NEW.money_rounding_version = 1")) }
+
+    val version12CompatibleTriggers: List<String>
+        get() = createTriggers.map { if (it == dailyCloseTrigger) legacyDailyCloseTrigger else it }
 
     val createTriggers: List<String> = listOf(
         // ------------------------------------------------------------------
@@ -112,8 +299,14 @@ internal object DatabaseSql {
                     THEN RAISE(ABORT, 'Adjusted liters must be greater than zero')
                 WHEN NEW.amount_owed IS NOT NULL AND NEW.amount_owed < 0
                     THEN RAISE(ABORT, 'Amount owed cannot be negative')
-                WHEN NEW.amount IS NOT NULL AND NEW.amount <= 0
+                WHEN NEW.amount IS NOT NULL AND (NEW.amount < 0 OR
+                     (NEW.amount = 0 AND NOT (NEW.event_type = 'OWNER_DRAWING' AND NEW.corrects_event_id IS NOT NULL)))
                     THEN RAISE(ABORT, 'Amount must be greater than zero')
+                WHEN NEW.event_type = 'OWNER_DRAWING' AND NEW.corrects_event_id IS NOT NULL
+                     AND (trim(COALESCE(NEW.notes, '')) = '' OR
+                          NEW.occurred_at <> (SELECT occurred_at FROM events WHERE event_id = NEW.corrects_event_id) OR
+                          NEW.amount = (SELECT amount FROM events WHERE event_id = NEW.corrects_event_id))
+                    THEN RAISE(ABORT, 'Withdrawal correction needs a changed amount, original date and reason')
                 WHEN NEW.milk_liters_used IS NOT NULL AND NEW.milk_liters_used <= 0
                     THEN RAISE(ABORT, 'Milk liters used must be greater than zero')
                 WHEN NEW.yogurt_kg_produced IS NOT NULL AND NEW.yogurt_kg_produced <= 0
@@ -172,6 +365,8 @@ internal object DatabaseSql {
         FOR EACH ROW
         BEGIN
             SELECT CASE
+                WHEN (SELECT event_type FROM events WHERE event_id = NEW.event_id) = 'OWNER_DRAWING'
+                    THEN RAISE(ABORT, 'Owner withdrawals cannot move inventory')
                 WHEN NEW.quantity = 0
                     THEN RAISE(ABORT, 'Inventory quantity cannot be zero')
             END;
@@ -300,93 +495,8 @@ internal object DatabaseSql {
         END;
         """.trimIndent(),
 
-        """
-        CREATE TRIGGER IF NOT EXISTS validate_daily_close_action
-        BEFORE INSERT ON daily_close_actions
-        FOR EACH ROW
-        BEGIN
-            SELECT CASE
-                WHEN NEW.action NOT IN ('close', 'reopen')
-                    THEN RAISE(ABORT, 'Daily close action is invalid')
-                WHEN trim(NEW.actor_name) = ''
-                    THEN RAISE(ABORT, 'Daily close actor name is required')
-                WHEN NEW.actor_role NOT IN ('owner', 'admin', 'manager', 'cashier', 'operator')
-                    THEN RAISE(ABORT, 'Daily close actor role is invalid')
-                WHEN NEW.action = 'reopen' AND NEW.actor_role NOT IN ('owner', 'admin')
-                    THEN RAISE(ABORT, 'Only an owner or admin can reopen a date')
-                WHEN NEW.action = 'reopen' AND trim(COALESCE(NEW.reason, '')) = ''
-                    THEN RAISE(ABORT, 'Reopening reason is required')
-                WHEN NEW.action = 'close' AND NEW.physical_cash_count_id IS NULL
-                    THEN RAISE(ABORT, 'Daily close requires a physical cash count')
-                WHEN NEW.action = 'reopen' AND NEW.physical_cash_count_id IS NOT NULL
-                    THEN RAISE(ABORT, 'Reopen action cannot carry a cash count')
-                WHEN NEW.action = 'close' AND NOT EXISTS (
-                    SELECT 1
-                    FROM physical_cash_counts pcc
-                    INNER JOIN accounts a ON a.account_id = pcc.account_id
-                    WHERE pcc.count_id = NEW.physical_cash_count_id
-                      AND pcc.business_date = NEW.business_date
-                      AND a.name = 'Cash'
-                      AND a.category = 'Cash/Bank'
-                )
-                    THEN RAISE(ABORT, 'Daily close cash count is invalid')
-                WHEN NEW.action = 'close' AND EXISTS (
-                    SELECT 1
-                    FROM physical_cash_counts selected
-                    INNER JOIN physical_cash_counts later
-                      ON later.account_id = selected.account_id
-                     AND later.business_date = selected.business_date
-                    WHERE selected.count_id = NEW.physical_cash_count_id
-                      AND (later.counted_at > selected.counted_at OR
-                           (later.counted_at = selected.counted_at AND later.count_id > selected.count_id))
-                )
-                    THEN RAISE(ABORT, 'Daily close must use the latest cash count')
-                WHEN NEW.supersedes_action_id IS NULL
-                     AND NEW.action <> 'close'
-                    THEN RAISE(ABORT, 'The first daily close action must close the date')
-                WHEN NEW.supersedes_action_id IS NULL
-                     AND EXISTS (SELECT 1 FROM daily_close_actions prior WHERE prior.business_date = NEW.business_date)
-                    THEN RAISE(ABORT, 'Daily close history must append to the current action')
-                WHEN NEW.supersedes_action_id IS NOT NULL
-                     AND NOT EXISTS (
-                         SELECT 1 FROM daily_close_actions prior
-                         WHERE prior.action_id = NEW.supersedes_action_id
-                           AND prior.business_date = NEW.business_date
-                     )
-                    THEN RAISE(ABORT, 'Daily close action must supersede the same business date')
-                WHEN NEW.supersedes_action_id IS NOT NULL
-                     AND (SELECT action FROM daily_close_actions WHERE action_id = NEW.supersedes_action_id) = NEW.action
-                    THEN RAISE(ABORT, 'Daily close and reopen actions must alternate')
-                WHEN NEW.action = 'close'
-                     AND NEW.supersedes_action_id IS NOT NULL
-                     AND (
-                         SELECT counted_at FROM physical_cash_counts
-                         WHERE count_id = NEW.physical_cash_count_id
-                     ) <= (
-                         SELECT created_at FROM daily_close_actions
-                         WHERE action_id = NEW.supersedes_action_id
-                     )
-                    THEN RAISE(ABORT, 'Reclose requires a new cash count after reopening')
-                WHEN NEW.action = 'close'
-                     AND ABS(
-                         (SELECT counted_amount FROM physical_cash_counts WHERE count_id = NEW.physical_cash_count_id) -
-                         COALESCE((
-                             SELECT ROUND(SUM(fl.amount), 2)
-                             FROM financial_log fl
-                             INNER JOIN events e ON e.event_id = fl.event_id
-                             WHERE fl.account_id = (
-                                 SELECT account_id FROM physical_cash_counts WHERE count_id = NEW.physical_cash_count_id
-                             )
-                               AND e.created_at <= (
-                                   SELECT counted_at FROM physical_cash_counts WHERE count_id = NEW.physical_cash_count_id
-                               )
-                         ), 0)
-                     ) >= 0.005
-                     AND trim(COALESCE(NEW.reason, '')) = ''
-                    THEN RAISE(ABORT, 'Non-zero cash variance requires an explanation')
-            END;
-        END;
-        """.trimIndent(),
+        dailyCloseTrigger,
+
 
         """
         CREATE TRIGGER IF NOT EXISTS prevent_closed_event
@@ -704,18 +814,35 @@ internal object DatabaseSql {
                      )
                     THEN RAISE(ABORT, 'SALARY_PAYMENT must affect Cash/Bank or Salary')
 
-                -- M18: an owner drawing leaves the drawer with no counter-leg
-                -- account — the event itself documents where the money went.
+                -- An original withdrawal only leaves Cash/Bank. A correction
+                -- can restore cash, but only by the exact linked amount delta.
                 WHEN (SELECT event_type FROM events WHERE event_id = NEW.event_id) = 'OWNER_DRAWING'
-                     AND (
-                         NOT EXISTS (
-                             SELECT 1 FROM accounts
-                             WHERE account_id = NEW.account_id
-                               AND category = 'Cash/Bank'
-                         )
-                         OR COALESCE(NEW.amount, 0) >= 0
-                     )
+                     AND NOT EXISTS (SELECT 1 FROM accounts WHERE account_id = NEW.account_id AND category = 'Cash/Bank')
+                    THEN RAISE(ABORT, 'Owner withdrawal must use a Cash/Bank account')
+                WHEN (SELECT event_type FROM events WHERE event_id = NEW.event_id) = 'OWNER_DRAWING'
+                     AND (SELECT corrects_event_id FROM events WHERE event_id = NEW.event_id) IS NULL
+                     AND NEW.amount >= 0
                     THEN RAISE(ABORT, 'OWNER_DRAWING must decrease a Cash/Bank account')
+                WHEN (SELECT event_type FROM events WHERE event_id = NEW.event_id) = 'OWNER_DRAWING'
+                     AND (SELECT corrects_event_id FROM events WHERE event_id = NEW.event_id) IS NOT NULL
+                     AND (
+                         NEW.account_id IS NOT (
+                             WITH RECURSIVE chain(event_id, parent_id) AS (
+                                 SELECT event_id, corrects_event_id FROM events WHERE event_id = NEW.event_id
+                                 UNION ALL
+                                 SELECT e.event_id, e.corrects_event_id FROM events e JOIN chain c ON e.event_id = c.parent_id
+                             )
+                             SELECT fl.account_id FROM chain c JOIN financial_log fl ON fl.event_id = c.event_id
+                             WHERE c.parent_id IS NULL
+                             AND (SELECT COUNT(*) FROM financial_log WHERE event_id = c.event_id) = 1
+                             AND fl.amount = -(SELECT amount FROM events WHERE event_id = c.event_id)
+                             LIMIT 1
+                         ) OR NEW.amount <> (
+                             SELECT prior.amount - child.amount FROM events child
+                             JOIN events prior ON prior.event_id = child.corrects_event_id WHERE child.event_id = NEW.event_id
+                         ) OR EXISTS (SELECT 1 FROM financial_log WHERE event_id = NEW.event_id)
+                     )
+                    THEN RAISE(ABORT, 'Withdrawal correction must use its original account and exact single cash delta')
 
                 WHEN (SELECT event_type FROM events WHERE event_id = NEW.event_id) = 'OPENING_STATE'
                      AND NOT EXISTS (

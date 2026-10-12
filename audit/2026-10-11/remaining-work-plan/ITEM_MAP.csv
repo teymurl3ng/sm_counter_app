@@ -1,0 +1,52 @@
+id,goal,evidence_status,batch,gate,scope_note,execution_status
+B1,Profile sync,VERIFIED_FIXED,2,TWO_DEVICE,Five-family receiver and controlled prior-row catch-up passed focused S24 QA; B1A_RESULT and B1B_RESULT 2026-10-12,DONE
+B2,Planning sync,VERIFIED_FIXED,3,SHARED_PLANNING,UID receiver and one-time current-row catch-up passed selected S24 checks; physical two-phone acceptance remains phase 5,DONE
+B3,Drawing correction/cancel,VERIFIED_FIXED,1b,DRAWINGS_USED,Same-account remedy and B3b/B3c verified; B3d Records UI accepted on S24 with final-source focused checks; B3D_RESULT 2026-10-12,DONE
+B4,Protected credential reset policy,POLICY,8a,ADMIN_USED,Owner-only protected-target reset proposal; alternate paths/concurrency included,NOT_STARTED
+B5,Rounding/tolerance,VERIFIED_FIXED,1a,MONEY_BOUNDARIES,Decimal sale/cash/count/close aligned; v13 preserves legacy close policy; 26 focused passing checks plus 3013 bundled-driver oracle values,DONE
+B6,Own cashier expenses in Activity,COMPLETE_BOUNDED_QA,5a,USABILITY,Actor/date-filtered list and direct detail verified on S24,DONE
+B7,Device/person revocation,DEFERRED_DESIGN,IDENTITY_LATER,CENTRAL_REVOCATION_REQUIRED,Do not flip enforcement flag without guardrails,NOT_STARTED
+B8,Conflict attention,RECORDED_PENDING,8-conflicts,MULTI_DEVICE_UNATTENDED,Persistent review attention; existing review list retained,NOT_STARTED
+B9,Lock/disconnect meaning,INTENTIONAL,8c,COPY,Installation sync survives local switch intentionally,NOT_STARTED
+B10,Planning restore enqueue,VERIFIED_FIXED,3,RESTORE_PLANNING,Planning-only restore defect reproduced and fixed; isolated restore and differing-server hold passed S24 QA,DONE
+B11,No hard deletes guardrail,INVARIANT,ENGINEERING_LATER,FUTURE_DELETE_FEATURE,No current user-facing hard delete proved,NOT_STARTED
+B12,General-purpose product rules,FUTURE,GENERAL_RETAIL,NOT_DAIRY_PILOT,Dynamic catalog exists; domain breadth not validated,NOT_STARTED
+U1,Transaction/product hierarchy,COMPLETE_BOUNDED_QA,5b,DESIGN_COMMITMENT,Five mapped families reflow with grouped facts; selected S24 contracts and dark 200% product check passed; full phone visual walkthrough remains phase 5,DONE
+U2,People hierarchy,PLANNED,6,DESIGN_COMMITMENT,Includes people/user details once,NOT_STARTED
+U3,Personal-security grouping,COMPLETE_BOUNDED_QA,4,DESIGN_COMMITMENT,Five roles grouped + 4–12-digit PIN setup aligned; S24 11 focused and host 2 focused passed,DONE
+U4,Entity/record detail grouping,PARTIAL_BOUNDED_QA,5b+6,DESIGN_COMMITMENT,Record and product details grouped in 5b; people details remain batch 6,IN_PROGRESS
+U5,Management grouping,PLANNED,7,DESIGN_COMMITMENT,Mapped facts/statuses; small presentation tails retained,NOT_STARTED
+A1,Uncoached shop day/pilot,RECORDED_PENDING,9a,LIVE_PILOT,Synthetic dry-run may start earlier,NOT_STARTED
+A2,Current app recovery rehearsal,RECORDED_PENDING,8b,LIVE_PILOT,Earlier live Drive/restore already passed,NOT_STARTED
+A3,Two-phone full-ledger convergence,RECORDED_PENDING,9b,TWO_DEVICE,Needs 2/3; compare UID headers and children,NOT_STARTED
+A4,Appearance/motion/haptics/platform prompt,RECORDED_PENDING,9c,ACCEPTANCE,Human/device judgment; fixtures distinct; batch 5b dark 200% capture shows shared header date abbreviation,NOT_STARTED
+A5,Frozen-candidate validation record,RECORDED_PENDING,10,FORMAL_RELEASE,Affected tests throughout; no broad suite now,NOT_STARTED
+A6,Commit/sign/install accepted build,CONFIRMED,10,SHIP_CURRENT_UI,Only post-b379f67 changes unpublished,NOT_STARTED
+A7,PROD administration acceptance,CONDITIONAL,8c,PROD_ADMIN_USED,Existing real DEV checks credited; disposable identity only,NOT_STARTED
+A8,Historical partial-record recovery,CONDITIONAL,9-history,AFFECTED_HISTORY_EXISTS,Authoritative UIDs/history needed; no guessed replay,NOT_STARTED
+A9,Native accessibility/IME/text,RECORDED_PENDING,9c,USED_SHOP_TASKS,Selected representative flows; no exhaustive crawl,NOT_STARTED
+A10,Release readiness/profiles,PARTIAL,10,WIDER_RELEASE,Existing signing/cutover credited; optimize on evidence,NOT_STARTED
+A11,Physical power-loss experiment,OPTIONAL,DURABILITY_LATER,IF_REQUIRED,Process-death proof does not cover physical power loss,NOT_STARTED
+O1,Server source/DR acceptance,RECORDED_PENDING,8b,LIVE_SYNC_RECOVERY,Verify remote before publishing,NOT_STARTED
+O2,Keepalive/quota/monitoring,VERIFY_FIRST,8c,OPERATIONS,Current plan/repo visibility/workflow state first,NOT_STARTED
+O3,Shared shop-device setup,RECORDED_PENDING,8c,PILOT_DEVICE,Cashier transport tier already exists,NOT_STARTED
+O4,Provider/security/delete policies,POLICY,8c,APPLICABLE_POLICY,Concrete read-only preflight before any change,NOT_STARTED
+O5,Later Viewer UI publication,VERIFY_FIRST,8c,VIEWER_PRESENTATION,Local b5122e8; deployment not freshly verified,NOT_STARTED
+O6,Signing-key/release recovery docs,RECORDED_PENDING,8b+10,RELEASE_RECOVERY,Off-machine key backup already verified historically,NOT_STARTED
+E1,Dormant WebView/presentation removal,DEFERRED,CLEANUP_LATER,NOT_PILOT_GATE,M28; cutover/command extraction done,NOT_STARTED
+E2,State/DI/toolchain/preview notes,DEFERRED,ENGINEERING_LATER,NOT_PILOT_GATE,M30/M31/M32/M35 in separate subruns,NOT_STARTED
+E3,Inventory nondeterminism,VERIFY_FIRST,ENGINEERING_LATER,IF_REPRODUCED,Current passes not reopened without evidence,NOT_STARTED
+E4,Ignored host test/costing host coverage,DEFERRED,TEST_HARNESS_LATER,NOT_PILOT_GATE,Bundled-driver evidence distinct,NOT_STARTED
+E5,Lint/static/artifact hygiene,DEFERRED,CLEANUP_LATER,NOT_PILOT_GATE,No fresh warning count/compile failure claimed,NOT_STARTED
+E6,Crash observability,FUTURE,OBSERVABILITY_LATER,IF_SELECTED,Privacy/secret redaction required,NOT_STARTED
+E7,Metadata/docs reconciliation,DEFERRED,10-docs,PROVENANCE,Old labels not proof live RPC failure,NOT_STARTED
+F1,Credit/reminders T1-T13,FUTURE_APPROVED_DIRECTION,CREDIT_LATER,NOT_PILOT_GATE,All 13 preserved in existing blueprint,NOT_STARTED
+F2,Reminder/payment integrations,FUTURE,INTEGRATIONS_LATER,NOT_PILOT_GATE,WA API/payment links/pause/bulk outside v1,NOT_STARTED
+F3,Approval queue,DOMAIN_API_REQUIRED,APPROVAL_LATER,NOT_PILOT_GATE,Existing correction is already implemented,NOT_STARTED
+F4,Urdu/general products/NRV,FUTURE_CONDITIONAL,PRODUCT_EXPANSION,NOT_DAIRY_PILOT,NRV triggers; B12 broader family plan,NOT_STARTED
+F5,Read-only snapshot viewer,REDECIDE,SNAPSHOT_LATER,NOT_PILOT_GATE,Old restriction predates approved live sync,NOT_STARTED
+F6,Central staff directory/MFA/reset,FUTURE,IDENTITY_LATER,CENTRAL_ACCESS_REQUIRED,Coordinate B7; no duplicated migration,NOT_STARTED
+F7,History sidecars/divergence/rate audit/old closes,FUTURE,AUDIT_RECOVERY_LATER,NOT_PILOT_GATE,Chosen reopen remedy retained; all subitems in reconciliation,NOT_STARTED
+F8,Time-trust/display abroad,OPTIONAL,TIME_LATER,NOT_PILOT_GATE,Business-date repairs already done,NOT_STARTED
+F9,Advanced audit/employee administration,RETAINED_EXCLUSION,ADMIN_DEPTH_LATER,IF_SELECTED,Existing salary/attendance tasks credited,NOT_STARTED
+F10,Receipt/artwork/wide layouts,OPTIONAL,VISUAL_LATER,NOT_PHONE_PILOT,Portrait only; no landscape task,NOT_STARTED

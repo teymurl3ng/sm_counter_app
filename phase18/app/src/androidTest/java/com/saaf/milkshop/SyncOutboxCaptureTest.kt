@@ -196,8 +196,15 @@ class SyncOutboxCaptureTest {
                 CustomerProfileEntity(accountId = accountId, createdAt = "2026-09-28T08:00:00Z"),
             )
 
-            val idAfter = database.syncOutboxDao().nextBatch(1000).single { it.rowUid == uid }.outboxId
-            assertTrue(idAfter > idBefore)
+            val stillQueued = database.syncOutboxDao().nextBatch(1000).single { it.rowUid == uid }.outboxId
+            assertEquals(idBefore, stillQueued) // A queued parent keeps its dependency-safe position.
+
+            database.syncOutboxDao().deleteEntry("accounts", uid) // Simulate successful push.
+            database.customerProfileDao().save(
+                CustomerProfileEntity(accountId = accountId, phone = "0300", createdAt = "2026-09-28T08:00:00Z"),
+            )
+            val requeued = database.syncOutboxDao().nextBatch(1000).single { it.rowUid == uid }.outboxId
+            assertTrue(requeued > idBefore)
         } finally {
             database.close()
         }

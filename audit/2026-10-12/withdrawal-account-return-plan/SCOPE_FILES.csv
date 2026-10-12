@@ -1,0 +1,43 @@
+run,file,status,purpose
+B3b,phase18/app/src/main/java/com/saaf/milkshop/data/OwnerFundsEntities.kt,implemented,Immutable event/account/root truth only; no reserved receipt-review fields
+B3b,phase18/app/src/main/java/com/saaf/milkshop/data/OwnerFundsDao.kt,implemented,Withdrawal account/root detail reads only; no receipt queries
+B3b,phase18/app/src/main/java/com/saaf/milkshop/domain/OwnerFundsTruth.kt,implemented,One small resolver for current declared account/root; do not infer arbitrary ledger legs
+B3b,phase18/app/src/main/java/com/saaf/milkshop/domain/OwnerDrawing.kt,existing,New originals write detail alongside header/ledger
+B3b,phase18/app/src/main/java/com/saaf/milkshop/domain/Correction.kt,existing,Corrected account and signed per-account differences
+B3b,phase18/app/src/main/java/com/saaf/milkshop/application/commands/HistoryBridgeCommandService.kt,existing,Preserve role/date/reason boundary
+B3b,phase18/app/src/main/java/com/saaf/milkshop/data/DatabaseSql.kt,existing,Owner-only money-family row/metadata guards
+B3b,phase18/app/src/main/java/com/saaf/milkshop/data/MilkShopDatabase.kt,existing,Register satellite/DAO and additive migration
+B3b,phase18/app/src/main/java/com/saaf/milkshop/data/BackupDaos.kt,existing,Satellite export/restore/delete support
+B3b,phase18/app/src/main/java/com/saaf/milkshop/data/SyncEntities.kt,existing,Envelope metadata/reference queries
+B3b,phase18/app/src/main/java/com/saaf/milkshop/data/SyncMigrationSql.kt,existing,Immutable child-to-parent capture if needed
+B3b,phase18/app/src/main/java/com/saaf/milkshop/BackupManager.kt,existing,Include details and portable-schema capability version
+B3b,phase18/app/src/main/java/com/saaf/milkshop/BackupSnapshotCodec.kt,existing,Encode/decode explicit details and supported legacy forms
+B3b,phase18/app/src/main/java/com/saaf/milkshop/BackupRestoreEngine.kt,existing,Dependency-ordered metadata before money rows; whole transaction
+B3b,phase18/app/src/main/java/com/saaf/milkshop/sync/SyncEnvelopeFactory.kt,existing,UID-referenced event metadata
+B3b,phase18/app/src/main/java/com/saaf/milkshop/sync/SyncApplyEngine.kt,existing,Parse-first atomic apply and metadata completeness on replay
+B3b,phase18/app/schemas/com.saaf.milkshop.data.MilkShopDatabase/15.json,generated,Exact Room 15 schema for migration 14 to 15
+B3c,phase18/app/src/main/java/com/saaf/milkshop/domain/OwnerFundsIn.kt,new_proposed,"Separate actual-receipt booking, review-required and stable retry UID"
+B3c,phase18/app/src/main/java/com/saaf/milkshop/domain/Correction.kt,existing_or_B3b,Received-money amount/account/cancel remedies
+B3c,phase18/app/src/main/java/com/saaf/milkshop/domain/OwnerFundsTruth.kt,existing_or_B3b,Effective received totals and review context
+B3c,phase18/app/src/main/java/com/saaf/milkshop/data/OwnerFundsDao.kt,existing_or_B3b,Linked receipt read model
+B3c,phase18/app/src/main/java/com/saaf/milkshop/data/DatabaseSql.kt,existing_or_B3b,New type and exact positive/negative receipt differences
+B3c,phase18/app/src/main/java/com/saaf/milkshop/data/MilkShopDatabase.kt,existing_or_B3b,Next guard migration
+B3c,phase18/app/src/main/java/com/saaf/milkshop/application/commands/OperationsBridgeCommandService.kt,existing_or_B3b,Owner/Admin booking/date/actor/audit boundary
+B3c,phase18/app/src/main/java/com/saaf/milkshop/application/commands/HistoryBridgeCommandService.kt,existing_or_B3b,Received-money correction boundary
+B3c,phase18/app/src/main/java/com/saaf/milkshop/BackupManager.kt,existing_or_B3b,Receipt-type snapshot capability
+B3c,phase18/app/src/main/java/com/saaf/milkshop/BackupSnapshotCodec.kt,existing_or_B3b,Type/metadata compatibility
+B3c,phase18/app/src/main/java/com/saaf/milkshop/BackupRestoreEngine.kt,existing_or_B3b,Receipt dependency ordering
+B3c,phase18/app/src/main/java/com/saaf/milkshop/sync/SyncEnvelopeFactory.kt,existing_or_B3b,Receipt root UID and reviewed context
+B3c,phase18/app/src/main/java/com/saaf/milkshop/sync/SyncApplyEngine.kt,existing_or_B3b,Full receipt apply/refusal/idempotence
+B3c,phase18/app/schemas/com.saaf.milkshop.data.MilkShopDatabase/next-guard-version.json,generated_proposed,Receipt-family guard version
+B3d,phase18/app/src/main/java/com/saaf/milkshop/application/owner/NativeOwnerRecordsFacade.kt,existing,"Account prefill, receipt detail/timeline, role flags"
+B3d,phase18/app/src/main/java/com/saaf/milkshop/application/owner/NativeOwnerOverviewFacade.kt,existing,Explicit Owner money received label and amount
+B3d,phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/NativeOwnerRecordsViewModel.kt,existing,Editor/receipt/review/saving/retry states
+B3d,phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerRecordsScreen.kt,existing,"Corrected account selector, linked receipt action/detail"
+B3d,phase18/app/src/main/java/com/saaf/milkshop/nativeui/NativeUiTags.kt,existing,Only new control/receipt tags
+B3d,phase18/app/src/main/java/com/saaf/milkshop/application/drawing/NativeOwnerFundsFacade.kt,new_proposed,"Typed actual-receipt context, atomic submission and readback"
+B3d,phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerFundsInEntryScreen.kt,new_proposed,"One new portrait form/review/receipt, date dialog included"
+all,phase18/app/src/androidTest/java/com/saaf/milkshop/OwnerFundsAccountCorrectionTest.kt,implemented_B3b,Finite independent cash/UID/migration/Records read cases
+all,phase18/app/src/androidTest/java/com/saaf/milkshop/DrawingRecordingRemedyTest.kt,existing,Preserve delivered same-account/remedy checks
+all,phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerRecords*Test.kt,existing_selected_methods,Only affected Records boundaries
+all,phase18/app/src/test/java/com/saaf/milkshop/data/OwnerDrawingTest.kt,existing,Ordinary drawing regression

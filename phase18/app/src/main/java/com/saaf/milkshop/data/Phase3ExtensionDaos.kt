@@ -142,6 +142,9 @@ interface PhysicalCashCountDao {
     @Query("SELECT * FROM physical_cash_counts ORDER BY business_date DESC, counted_at DESC, count_id DESC")
     suspend fun all(): List<PhysicalCashCountEntity>
 
+    @Query(CanonicalMoneySql.BALANCE_AT)
+    suspend fun canonicalBalanceAt(accountId: Long, createdAtInclusive: String): Double
+
     @Query(
         """
         SELECT ROUND(COALESCE(SUM(fl.amount), 0), 2)
@@ -150,7 +153,7 @@ interface PhysicalCashCountDao {
         WHERE fl.account_id = :accountId AND e.created_at <= :createdAtInclusive
         """
     )
-    suspend fun canonicalBalanceAt(accountId: Long, createdAtInclusive: String): Double
+    suspend fun legacyBalanceAt(accountId: Long, createdAtInclusive: String): Double
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(count: PhysicalCashCountEntity): Long
@@ -169,6 +172,9 @@ interface ExpenseCategoryProfileDao {
 
     @Query("UPDATE expense_category_profiles SET active = :active WHERE account_id = :accountId")
     suspend fun setActive(accountId: Long, active: Boolean): Int
+
+    @Query("UPDATE expense_category_profiles SET display_name = :displayName, active = :active, created_at = :createdAt WHERE account_id = :accountId")
+    suspend fun update(accountId: Long, displayName: String, active: Boolean, createdAt: String): Int
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(profile: ExpenseCategoryProfileEntity)

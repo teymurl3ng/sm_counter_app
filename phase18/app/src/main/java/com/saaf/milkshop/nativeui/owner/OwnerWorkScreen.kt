@@ -1,5 +1,9 @@
 package com.saaf.milkshop.nativeui.owner
 
+import com.saaf.milkshop.nativeui.theme.nativeVisualColors
+import com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeNavigationTitleTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeGroupLabelTextStyle
 import com.saaf.milkshop.nativeui.common.NativeListStyle
 import com.saaf.milkshop.nativeui.common.nativeListItemContent
 import com.saaf.milkshop.nativeui.common.nativeListItem
@@ -303,8 +307,8 @@ private fun WorkHomeBody(
 }
 
 @Composable
-private fun SectionTitle(text: String) {
-    Text(text, style = MaterialTheme.typography.labelLarge)
+internal fun SectionTitle(text: String) {
+    Text(text, style = nativeGroupLabelTextStyle(), color = nativeVisualColors.supporting)
 }
 
 @Composable
@@ -336,7 +340,7 @@ private fun PrimaryAction(
 }
 
 @Composable
-private fun CommandRow(
+internal fun CommandRow(
     label: String,
     detail: String,
     icon: ImageVector,
@@ -350,16 +354,16 @@ private fun CommandRow(
             .testTag(tag)
             .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onClick))
             .nativeListItemContent(NativeListStyle.Navigation),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(icon, contentDescription = null, modifier = Modifier.size(24.dp))
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(label, style = MaterialTheme.typography.titleMedium)
+            Text(label, style = nativeNavigationTitleTextStyle())
             Text(
                 detail,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = nativeSupportingTextStyle(),
+                color = nativeVisualColors.supporting,
             )
         }
         if (badge != null) {

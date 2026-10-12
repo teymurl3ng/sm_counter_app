@@ -43,7 +43,12 @@ class PhysicalCashCountService(private val database: MilkShopDatabase) {
 
     suspend fun latest(accountId: Long, businessDate: String): CashReconciliation? {
         val count = database.physicalCashCountDao().latest(accountId, businessDate) ?: return null
-        val expected = expectedBalance(accountId, count.countedAt)
+        val close = database.dailyCloseDao().findByCashCount(count.countId)
+        val expected = if (close?.moneyRoundingVersion == 1) {
+            database.physicalCashCountDao().legacyBalanceAt(accountId, count.countedAt)
+        } else {
+            expectedBalance(accountId, count.countedAt)
+        }
         return CashReconciliation(count, expected, count.countedAmount - expected)
     }
 

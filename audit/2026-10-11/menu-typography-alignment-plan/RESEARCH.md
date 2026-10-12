@@ -1,0 +1,9 @@
+# Primary guidance and adaptation
+
+Checked 2026-10-11. Limit research to typography, text alignment and touch-target geometry relevant to this repair.
+
+- [Android Material 3 theming: type scale and hierarchy](https://developer.android.com/codelabs/m3-design-theming) organizes text by purpose and combines size, weight and line height to communicate hierarchy. It also recommends scalable units and testing size adjustments. **Adaptation:** keep Manrope and the existing scale; give equal-level menu/section elements consistent roles; restore a smaller subgroup role. Different-purpose text does not all need the same size. Exact 14sp/16sp choices are ours.
+- [Compose alignment lines](https://developer.android.com/develop/ui/compose/layouts/alignment-lines) documents FirstBaseline/LastBaseline on text and alignment-line use by parent layouts. **Adaptation:** use text-baseline alignment for mixed-size inline facts and heading/action text. Test the rendered baseline positions, including propagation through the actual button layout. Text-box top or center equality is insufficient.
+- [Compose accessibility defaults: minimum touch targets](https://developer.android.com/develop/ui/compose/accessibility/api-defaults) recommends 48dp minimum interactive targets and explains target expansion/overlap. **Adaptation:** keep Edit/Add buttons usable while aligning their text; do not shrink their target just to make the typography appear aligned.
+
+Material's applying-type page returned no usable content and the mobile typography page returned an internal error; neither is treated as additional evidence. Existing night-palette research is retained in its earlier artifact, but this repair does not revisit that palette. Guidance supports the contract; it does not prove that the current app is visually correct or that a specific appearance will be preferred.

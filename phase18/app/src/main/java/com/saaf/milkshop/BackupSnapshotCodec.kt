@@ -115,7 +115,7 @@ internal fun dailyCloseActionJson(v: DailyCloseActionEntity, includeSecurity: Bo
     putNullable("physical_cash_count_id", v.physicalCashCountId); put("actor_name", v.actorName); put("actor_role", v.actorRole)
     if (includeSecurity) putNullable("actor_user_id", v.actorUserId)
     putNullable("reason", v.reason); put("created_at", v.createdAt); putNullable("supersedes_action_id", v.supersedesActionId)
-    put("uid", v.uid)
+    put("uid", v.uid); put("money_rounding_version", v.moneyRoundingVersion)
 }
 internal fun appUserJson(v: AppUserEntity) = JSONObject().apply {
     put("user_id", v.userId); put("login_name", v.loginName); put("display_name", v.displayName); put("role", v.role)
@@ -249,6 +249,19 @@ internal fun readEvents(a: JSONArray?): List<EventEntity> = (0 until (a?.length(
     timeTrust = it.optStringOrNull("time_trust") ?: EventTimeTrust.DEVICE_ONLY
 ) } }
 internal fun readInventoryLogs(a: JSONArray?): List<InventoryLogEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let { InventoryLogEntity(it.getLong("log_id"), it.getLong("event_id"), it.getLong("product_id"), it.getDouble("quantity")) } }
+internal fun ownerFundsDetailJson(v: OwnerFundsDetailEntity) = JSONObject().apply {
+    put("event_id", v.eventId); put("payment_account_id", v.paymentAccountId)
+    put("withdrawal_root_event_id", v.withdrawalRootEventId)
+    putNullable("reviewed_withdrawal_amount", v.reviewedWithdrawalAmount)
+    putNullable("reviewed_received_total", v.reviewedReceivedTotal)
+    put("excess_acknowledged", v.excessAcknowledged)
+}
+internal fun readOwnerFundsDetails(a: JSONArray?): List<OwnerFundsDetailEntity> =
+    (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
+        OwnerFundsDetailEntity(it.getLong("event_id"), it.getLong("payment_account_id"), it.getLong("withdrawal_root_event_id"),
+            it.optDoubleOrNull("reviewed_withdrawal_amount"), it.optDoubleOrNull("reviewed_received_total"),
+            it.optBoolean("excess_acknowledged", false))
+    } }
 internal fun readFinancialLogs(a: JSONArray?): List<FinancialLogEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let { FinancialLogEntity(it.getLong("log_id"), it.getLong("event_id"), it.getLong("account_id"), it.getDouble("amount")) } }
 internal fun readSettings(a: JSONArray?): List<SettingEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let { SettingEntity(it.getString("setting_key"), it.getDouble("setting_value"), it.getString("updated_at")) } }
 internal fun readBudgets(a: JSONArray?): List<BudgetPlanEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let { BudgetPlanEntity(
@@ -323,6 +336,7 @@ internal fun readDailyCloseActions(a: JSONArray?): List<DailyCloseActionEntity> 
         actionId = it.getLong("action_id"), businessDate = it.getString("business_date"), action = it.getString("action"),
         physicalCashCountId = it.optLongOrNull("physical_cash_count_id"), actorName = it.getString("actor_name"), actorRole = it.getString("actor_role"),
         actorUserId = it.optLongOrNull("actor_user_id"), reason = it.optStringOrNull("reason"), createdAt = it.getString("created_at"), supersedesActionId = it.optLongOrNull("supersedes_action_id"),
+        moneyRoundingVersion = it.optInt("money_rounding_version", 1),
         uid = it.restoredUid("uid")
             ?: LegacyUid.dailyCloseAction(it.getLong("action_id"), it.getString("business_date"), it.getString("action"), it.getString("created_at"))
     )

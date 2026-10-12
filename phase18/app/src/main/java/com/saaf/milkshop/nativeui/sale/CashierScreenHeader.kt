@@ -1,14 +1,11 @@
 package com.saaf.milkshop.nativeui.sale
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -17,6 +14,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.nativeui.theme.SaafInk
@@ -50,25 +54,46 @@ fun CashierScreenHeader(
 ) {
     if (!LocalPaneHeaderEnabled.current) return
     val dayStatusAction = onDayStatusClick ?: LocalDayStatusAction.current
+    val statusStyle = MaterialTheme.typography.labelLarge.copy(
+        fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold)
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    // Both states reserve the same space at the current global text setting.
+    val labelWidth = maxOf(
+        measurer.measure("Open", statusStyle, maxLines = 1, softWrap = false).size.width,
+        measurer.measure("Closed", statusStyle, maxLines = 1, softWrap = false).size.width,
+    )
+    // Padding rounds each edge separately; combining 24dp can lose one physical pixel.
+    val pillWidth = with(density) {
+        (labelWidth + 12.dp.roundToPx() * 2 + 1).toDp()
+    }.coerceAtLeast(72.dp)
+    val actionWidth = pillWidth.coerceAtLeast(96.dp)
+    val label = if (postingOpen) "Open" else "Closed"
+    val click = com.saaf.milkshop.nativeui.common.hapticAction { dayStatusAction?.invoke() }
     com.saaf.milkshop.nativeui.common.NativeChromeBand(
         title = when (title) {
             "Cash count and close", "Cash count & close" -> "Count & close"
             else -> title
         },
         modifier = modifier,
+        actionWidth = actionWidth,
         trailing = if (showDayChip) ({
+            Box(Modifier.width(pillWidth).heightIn(min = 48.dp)
+                .clip(RoundedCornerShape(50))
+                .semantics(mergeDescendants = true) { contentDescription = "Day status: $label" }
+                .then(if (dayStatusAction != null) Modifier.clickable(onClick = click) else Modifier),
+                contentAlignment = Alignment.Center) {
             Surface(
-                onClick = com.saaf.milkshop.nativeui.common.hapticAction { dayStatusAction?.invoke() },
-                enabled = dayStatusAction != null,
-                modifier = Modifier.height(48.dp),
+                modifier = Modifier.width(pillWidth).heightIn(min = 32.dp),
                 color = if (postingOpen) SaafYellow else MaterialTheme.colorScheme.error,
                 contentColor = if (postingOpen) SaafInk else MaterialTheme.colorScheme.onError,
-                shape = RoundedCornerShape(999.dp),
+                shape = RoundedCornerShape(50),
             ) {
-                Text(if (postingOpen) "Open" else "Closed",
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 12.sp, lineHeight = 16.sp),
-                    maxLines = 1)
+                Box(Modifier.padding(horizontal = 12.dp, vertical = 6.dp), contentAlignment = Alignment.Center) {
+                    Text(label, modifier = Modifier.fillMaxWidth(), style = statusStyle,
+                        textAlign = TextAlign.Center, maxLines = 1, softWrap = false)
+                }
+            }
             }
         }) else null,
     ) {

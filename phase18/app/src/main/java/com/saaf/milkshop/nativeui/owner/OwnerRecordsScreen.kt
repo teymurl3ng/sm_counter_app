@@ -30,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -51,6 +52,7 @@ import com.saaf.milkshop.application.owner.NativeOwnerRecordsContext
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsDetail
 import com.saaf.milkshop.application.owner.NativeOwnerAccountLedgerDetail
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsRow
+import com.saaf.milkshop.application.owner.NativeOwnerFundsContext
 import com.saaf.milkshop.application.owner.NativeRecordsGroup
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.nativeRefreshOverlay
@@ -66,7 +68,7 @@ import java.util.Locale
 private val SALE_CHANNELS = listOf("retail", "wholesale", "credit-retail", "credit-wholesale")
 
 /** Which pane the Ready records screen is showing; drives the section transition. */
-private enum class RecordsPane { List, Detail, Ledger, Correction }
+private enum class RecordsPane { List, Detail, Ledger, Correction, Receipt }
 
 @Composable
 fun OwnerRecordsScreen(
@@ -88,6 +90,12 @@ fun OwnerRecordsScreen(
     onBackFromCorrection: () -> Unit = {},
     onUpdateCorrection: ((NativeCorrectionEditorState) -> NativeCorrectionEditorState) -> Unit = {},
     onSaveCorrection: () -> Unit = {},
+    onRefreshCorrectionFacts: () -> Unit = {},
+    onOpenReceipt: (NativeOwnerFundsContext) -> Unit = {},
+    onBackFromReceipt: () -> Unit = {},
+    onUpdateReceipt: ((NativeOwnerFundsReceiptEditorState) -> NativeOwnerFundsReceiptEditorState) -> Unit = {},
+    onSaveReceipt: () -> Unit = {},
+    onRefreshReceiptFacts: () -> Unit = {},
     showHeader: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
@@ -129,11 +137,25 @@ fun OwnerRecordsScreen(
                 targetState = state,
                 contentKey = { pane -> when {
                     pane.correction != null -> RecordsPane.Correction
+                    pane.receipt != null -> RecordsPane.Receipt
                     pane.detail != null -> RecordsPane.Detail
                     pane.ledger != null -> RecordsPane.Ledger
                     else -> RecordsPane.List
                 } },
             ) { state -> when {
+                state.receipt != null -> OwnerFundsReceiptBody(
+                    snackbarHostState = snackbarHostState,
+                    context = state.snapshot.context,
+                    editor = state.receipt,
+                    onBack = onBackFromReceipt,
+                    onUpdate = onUpdateReceipt,
+                    onSave = onSaveReceipt,
+                    onRefreshFacts = onRefreshReceiptFacts,
+                    hostedScaffold = hostedScaffold,
+                    roleLabel = roleLabel,
+                    showHeader = showHeader,
+                    modifier = modifier,
+                )
                 state.correction != null -> {
                     val editor = state.correction ?: return@NativeSectionTransition
                     RecordsCorrectionBody(
@@ -143,6 +165,7 @@ fun OwnerRecordsScreen(
                         onBack = onBackFromCorrection,
                         onUpdate = onUpdateCorrection,
                         onSave = onSaveCorrection,
+                        onRefreshFacts = onRefreshCorrectionFacts,
                         hostedScaffold = hostedScaffold,
                         roleLabel = roleLabel,
                         showHeader = showHeader,
@@ -157,6 +180,8 @@ fun OwnerRecordsScreen(
                         detail = detail,
                         onBack = onBackFromDetail,
                         onOpenCorrection = onOpenCorrection,
+                        onOpenReceipt = onOpenReceipt,
+                        onOpenRecord = onOpenRecord,
                         hostedScaffold = hostedScaffold,
                         roleLabel = roleLabel,
                         showHeader = showHeader,
@@ -531,6 +556,8 @@ private fun RecordsDetailBody(
     detail: NativeOwnerRecordsDetail,
     onBack: () -> Unit,
     onOpenCorrection: (NativeCorrectionPrefill) -> Unit,
+    onOpenReceipt: (NativeOwnerFundsContext) -> Unit,
+    onOpenRecord: (Long) -> Unit,
     hostedScaffold: HostedScaffold,
     roleLabel: String,
     showHeader: Boolean,
@@ -573,29 +600,64 @@ private fun RecordsDetailBody(
                 detail.row.trailingLabel?.let {
                     Text(it, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                 }
-                Text(detail.row.timeLabel, style = MaterialTheme.typography.bodyLarge)
-                detail.row.actorLabel?.let { LabeledValue("Actor", it) }
-                Text(detail.row.stateLabel, style = MaterialTheme.typography.bodyLarge)
-                detail.row.correctsEventId?.let {
-                    LabeledValue("Corrects", "#$it")
+                com.saaf.milkshop.nativeui.common.NativeInformationSection {
+                    com.saaf.milkshop.nativeui.common.NativeInformationFact("Time", detail.row.timeLabel)
+                    detail.row.actorLabel?.let { com.saaf.milkshop.nativeui.common.NativeInformationFact("Actor", it) }
+                    com.saaf.milkshop.nativeui.common.NativeInformationFact("Status", detail.row.stateLabel)
+                    detail.row.correctsEventId?.let { com.saaf.milkshop.nativeui.common.NativeInformationFact("Corrects", "#$it") }
+                    detail.notes?.let { com.saaf.milkshop.nativeui.common.NativeInformationFact("Note", it, prose = true) }
                 }
-                detail.notes?.let { LabeledValue("Note", it) }
+                detail.ownerFunds?.let { funds ->
+                    com.saaf.milkshop.nativeui.common.NativeInformationSection {
+                        com.saaf.milkshop.nativeui.common.NativeInformationFact("Withdrawal", "PKR ${ownerFundsMoney(funds.currentWithdrawal)}")
+                        com.saaf.milkshop.nativeui.common.NativeInformationFact("Received", "PKR ${ownerFundsMoney(funds.receivedTotal)}")
+                        com.saaf.milkshop.nativeui.common.NativeInformationFact("Recorded account", funds.currentAccountName)
+                        if (funds.isReceipt) com.saaf.milkshop.nativeui.common.NativeInformationFact("Linked withdrawal", "#${funds.rootEventId}")
+                    }
+                    if (funds.isReceipt) {
+                        TextButton(onClick = hapticAction { onOpenRecord(funds.rootEventId) },
+                            modifier = Modifier.testTag(NativeUiTags.OwnerFundsOpenWithdrawal)) {
+                            Text("Open linked withdrawal #${funds.rootEventId}")
+                        }
+                    } else {
+                        Text("Money received against this withdrawal", style = MaterialTheme.typography.titleMedium)
+                        if (funds.linkedReceipts.isEmpty()) {
+                            Text("No money received yet", style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        } else funds.linkedReceipts.forEach { receipt ->
+                            TextButton(onClick = hapticAction { onOpenRecord(receipt.eventId) },
+                                modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.ownerFundsLinkedReceipt(receipt.eventId))) {
+                                Text("#${receipt.eventId} · ${receipt.occurredAt} · PKR ${ownerFundsMoney(receipt.amount)} · ${receipt.state}")
+                            }
+                        }
+                        if (funds.canRecordReceipt) Button(onClick = hapticAction { onOpenReceipt(funds) },
+                            modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.OwnerFundsRecordReceipt)) {
+                            Text("Record money returned")
+                        }
+                    }
+                }
                 if (detail.inventoryMovements.isNotEmpty()) {
                     Text("Inventory", style = MaterialTheme.typography.titleMedium)
-                    detail.inventoryMovements.forEach { line ->
-                        LabeledValue(line.productName, line.quantityLabel)
+                    com.saaf.milkshop.nativeui.common.NativeInformationSection {
+                        detail.inventoryMovements.forEach { line ->
+                            com.saaf.milkshop.nativeui.common.NativeInformationFact(line.productName, line.quantityLabel, emphasized = true)
+                        }
                     }
                 }
                 detail.financialMovements?.takeIf { it.isNotEmpty() }?.let { lines ->
                     Text("Money", style = MaterialTheme.typography.titleMedium)
-                    lines.forEach { line ->
-                        LabeledValue(line.accountName, line.amountLabel)
+                    com.saaf.milkshop.nativeui.common.NativeInformationSection {
+                        lines.forEach { line ->
+                            com.saaf.milkshop.nativeui.common.NativeInformationFact(line.accountName, line.amountLabel, emphasized = true)
+                        }
                     }
                 }
                 if (detail.originalValueLines.isNotEmpty()) {
                     Text("Original values", style = MaterialTheme.typography.titleMedium)
-                    detail.originalValueLines.forEach { (label, value) ->
-                        LabeledValue(label, value)
+                    com.saaf.milkshop.nativeui.common.NativeInformationSection {
+                        detail.originalValueLines.forEach { (label, value) ->
+                            com.saaf.milkshop.nativeui.common.NativeInformationFact(label, value)
+                        }
                     }
                 }
                 val correctionPrefill = detail.correctionPrefill
@@ -634,13 +696,14 @@ private fun RecordsCorrectionBody(
     onBack: () -> Unit,
     onUpdate: ((NativeCorrectionEditorState) -> NativeCorrectionEditorState) -> Unit,
     onSave: () -> Unit,
+    onRefreshFacts: () -> Unit,
     hostedScaffold: HostedScaffold,
     roleLabel: String,
     showHeader: Boolean,
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
-    val canLeave = !editor.saving
+    val canLeave = !editor.saving && !editor.refreshingFacts
 
     fun requestLeave(action: () -> Unit) {
         if (!canLeave) return
@@ -849,6 +912,8 @@ private fun RecordsCorrectionBody(
                                 },
                             )
                         }
+                        NativeCorrectionKind.Drawing, NativeCorrectionKind.FundsReceipt ->
+                            OwnerFundsCorrectionFields(editor, canLeave, onUpdate)
                         NativeCorrectionKind.Spoilage -> {
                             CorrectionField(
                                 value = editor.spoilageQuantity,
@@ -872,7 +937,8 @@ private fun RecordsCorrectionBody(
                     }
                     CorrectionField(
                         value = editor.notes,
-                        label = "Notes (optional)",
+                        label = if (editor.prefill.kind in setOf(NativeCorrectionKind.Drawing,
+                            NativeCorrectionKind.FundsReceipt)) "Reason (required)" else "Notes (optional)",
                         tag = NativeUiTags.OwnerRecordsCorrectionNotes,
                         enabled = canLeave,
                         singleLine = false,
@@ -886,15 +952,26 @@ private fun RecordsCorrectionBody(
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.testTag(NativeUiTags.OwnerRecordsCorrectionError),
                         )
+                        if (editor.prefill.kind in setOf(NativeCorrectionKind.Drawing, NativeCorrectionKind.FundsReceipt)) {
+                            OutlinedButton(onClick = hapticAction(onRefreshFacts), enabled = canLeave,
+                                modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.OwnerFundsCorrectionRefreshFacts)) {
+                                Text("Refresh current amounts")
+                            }
+                        }
                     }
+                    if (editor.savedEventId != null) Text("Saved as #${editor.savedEventId}",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerFundsSaved))
                     Button(
-                        onClick = hapticAction(onSave),
-                        enabled = canLeave,
+                        onClick = hapticAction(if (editor.savedEventId != null) onBack else onSave),
+                        enabled = canLeave && !editor.saving,
                         modifier = Modifier
                             .fillMaxWidth()
                             .testTag(NativeUiTags.OwnerRecordsCorrectionSave),
                     ) {
-                        Text(if (editor.saving) "Saving…" else "Save correction")
+                        Text(if (editor.savedEventId != null) "Done" else if (editor.saving) "Saving…"
+                            else if (editor.refreshingFacts) "Refreshing…"
+                            else if (editor.cancelDrawing) "Save cancellation" else "Save correction")
                     }
                 }
             }
@@ -962,39 +1039,18 @@ private fun RecordsRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(
-                    record.taskLabel,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Text(
-                    record.timeLabel,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Text(
-                listOfNotNull(record.identityLabel, record.actorLabel, record.stateLabel)
-                    .joinToString(" · "),
-                style = MaterialTheme.typography.bodyMedium,
-            )
+            Text(record.taskLabel, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             record.trailingLabel?.let {
-                Text(it, style = MaterialTheme.typography.titleMedium)
+                Text(it, style = com.saaf.milkshop.nativeui.theme.nativeMetricTextStyle(),
+                    color = com.saaf.milkshop.nativeui.theme.nativeVisualColors.metric)
             }
+            Text("${record.identityLabel} · ${record.timeLabel}",
+                style = com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle(),
+                color = com.saaf.milkshop.nativeui.theme.nativeVisualColors.supporting)
+            record.actorLabel?.let { Text(it, style = com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle(),
+                color = com.saaf.milkshop.nativeui.theme.nativeVisualColors.supporting) }
+            Text(record.stateLabel, style = com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle())
         }
         Icon(Icons.Outlined.ChevronRight, contentDescription = null)
-    }
-}
-
-@Composable
-private fun LabeledValue(label: String, value: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(
-            label.uppercase(Locale.US),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(value, style = MaterialTheme.typography.bodyLarge)
     }
 }

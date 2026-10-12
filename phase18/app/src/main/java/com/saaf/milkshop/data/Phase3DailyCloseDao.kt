@@ -83,6 +83,9 @@ interface DailyCloseDao {
     @Query("SELECT * FROM daily_close_actions WHERE business_date = :businessDate ORDER BY action_id")
     suspend fun history(businessDate: String): List<DailyCloseActionEntity>
 
+    @Query("SELECT * FROM daily_close_actions WHERE physical_cash_count_id = :countId LIMIT 1")
+    suspend fun findByCashCount(countId: Long): DailyCloseActionEntity?
+
     @Query("SELECT * FROM daily_close_actions ORDER BY business_date, action_id")
     suspend fun all(): List<DailyCloseActionEntity>
 

@@ -938,11 +938,10 @@ private fun NativeFoundationPreview(
         }
     }
 
-    // Access and role panes have a green identity band; Welcome uses the page surface.
+    // Signed-in headers are dark surfaces in both themes; access uses the neutral page surface.
     // Navigation icons independently follow the light/dark bottom surface.
     SystemBarAppearance(
-        useDarkStatusIcons = if (destination == PreviewDestination.Welcome) !isSystemInDarkTheme()
-            else isSystemInDarkTheme(),
+        useDarkStatusIcons = !showingAuthenticated && !isSystemInDarkTheme(),
         useDarkNavigationIcons = !isSystemInDarkTheme(),
     )
 
@@ -1195,6 +1194,7 @@ private fun NativeFoundationPreview(
                     onUseFullPassphrase = authenticationViewModel::useFullPassphrase,
                     onBackFromQuickPin = authenticationViewModel::backFromQuickPin,
                     onQuickPinSignIn = authenticationViewModel::signInWithQuickPin,
+                    onQuickPinEdit = authenticationViewModel::editQuickPin,
                     onSignIn = authenticationViewModel::signIn,
                     onBootstrapOwner = authenticationViewModel::bootstrapOwner,
                     onAcknowledgeRecoveryCode = authenticationViewModel::acknowledgeRecoveryCode,

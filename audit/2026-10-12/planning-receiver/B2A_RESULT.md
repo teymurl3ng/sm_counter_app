@@ -1,0 +1,9 @@
+# B2a planning receiver result — 2026-10-12
+
+Status: complete at bounded QA scope. B2b historical catch-up and B10 restore verification remain separate work; phase 2 is not complete.
+
+`SyncApplyEngine` now applies `budget_plans` and `collections_targets` by stable UID. It validates dates and finite nonnegative values, maps `supersedes_uid` to the receiver's local integer ID, parks a child until its parent arrives archived, applies archive updates, and makes repeat delivery idempotent. A missing UID link or changed in-place historical value is refused; competing active roots or sibling revisions are audited as conflicts. Existing pending-local-edit protection and per-record savepoints continue to apply.
+
+Verification: isolated `com.saaf.milkshop.qa.tests` APK on S24 (`RFCX116CYYX`), built with `-Psaaf.instrumentationSandbox=true`. `SyncPlanningReceiverTest` (3 cases) and `SyncOutboxCaptureTest#deliveryLink_attendanceArchive_budgetArchive_areCaptured` passed together: `OK (4 tests)`. The cases cover different local IDs, child-before-parent, archived parent transition, two-family values and snapshots, replay, sibling/root conflicts, malformed amount, and missing UID link. No broad suite, physical two-phone test, ordinary-app install, or server change was performed.
+
+B2b/B10 next: old clients already advanced their cursor while skipping planning rows. A filtered, controlled historical replay is needed to recover current server rows without resetting the ordinary cursor or erasing queued local edits. The restore UI also permits planning-only restore, while the current restore code resets the cursor and suppresses sync capture only when the business group is selected. This is a code-level risk, not yet a reproduced B10 fixture; verify it before changing restore behavior. Older Android builds still skip planning rows, so mixed-version two-phone planning convergence is not claimed.

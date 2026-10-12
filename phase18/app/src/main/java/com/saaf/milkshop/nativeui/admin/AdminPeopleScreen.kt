@@ -1,5 +1,10 @@
 package com.saaf.milkshop.nativeui.admin
 
+import androidx.compose.foundation.layout.size
+import com.saaf.milkshop.nativeui.theme.nativeVisualColors
+import com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeNavigationTitleTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeGroupLabelTextStyle
 import com.saaf.milkshop.nativeui.common.NativeListStyle
 import com.saaf.milkshop.nativeui.common.nativeListItemContent
 import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
@@ -406,11 +411,11 @@ private fun AdminPeopleHubScreen(
 }
 
 @Composable
-private fun AdminPeopleSectionLabel(label: String) {
+internal fun AdminPeopleSectionLabel(label: String) {
     Text(
         label,
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = nativeGroupLabelTextStyle(),
+        color = nativeVisualColors.supporting,
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier
             .fillMaxWidth()
@@ -420,7 +425,7 @@ private fun AdminPeopleSectionLabel(label: String) {
 }
 
 @Composable
-private fun AdminPeopleMenuRow(
+internal fun AdminPeopleMenuRow(
     icon: ImageVector,
     title: String,
     subtitle: String,
@@ -437,13 +442,13 @@ private fun AdminPeopleMenuRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(title, style = nativeNavigationTitleTextStyle())
             Text(
                 subtitle,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = nativeSupportingTextStyle(),
+                color = nativeVisualColors.supporting,
             )
         }
         Icon(Icons.Outlined.ChevronRight, contentDescription = null)

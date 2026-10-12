@@ -534,7 +534,9 @@ private fun LinkSaleCard(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(item.customerName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            Text("${item.productName} · ${item.quantityLabel}")
+            Text(item.productName, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+            Text(item.quantityLabel, style = com.saaf.milkshop.nativeui.theme.nativeMetricTextStyle(),
+                color = com.saaf.milkshop.nativeui.theme.nativeVisualColors.metric)
             Text(
                 "Delivery #${item.deliveryId} · ${item.businessDate}",
                 style = MaterialTheme.typography.bodySmall,
@@ -621,22 +623,22 @@ private fun DeliveryCard(
             if (item.saleEventId != null) {
                 Text(
                     "From sale #S-${item.saleEventId} — no linking needed",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle(),
+                    color = com.saaf.milkshop.nativeui.theme.nativeVisualColors.supporting,
                 )
             }
             if (item.route != null) {
                 Text(
                     "Route: ${item.route}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle(),
+                    color = com.saaf.milkshop.nativeui.theme.nativeVisualColors.supporting,
                 )
             }
             if (!item.isToday) {
                 Text(
                     "Date: ${item.businessDate}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle(),
+                    color = com.saaf.milkshop.nativeui.theme.nativeVisualColors.supporting,
                 )
             }
             Text(

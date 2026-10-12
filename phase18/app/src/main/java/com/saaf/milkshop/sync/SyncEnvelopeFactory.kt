@@ -77,6 +77,18 @@ class SyncEnvelopeFactory(private val database: MilkShopDatabase) {
                             return@forEach
                         }
                         val payload = eventJson(event).apply {
+                            if (event.eventType in setOf("OWNER_DRAWING", "OWNER_FUNDS_IN")) {
+                                val truth = com.saaf.milkshop.domain.OwnerFundsTruth(database).resolve(event)
+                                val rootUid = dao.eventsByIds(listOf(truth.withdrawalRootEventId)).single().eventUid
+                                val accountUid = dao.accountsByIds(listOf(truth.paymentAccountId)).single().uid
+                                put("owner_funds_contract_version", if (event.eventType == "OWNER_FUNDS_IN" ||
+                                    truth.reviewedWithdrawalAmount != null) 2 else 1)
+                                put("owner_funds_details", JSONObject().put("payment_account_uid", accountUid)
+                                    .put("withdrawal_root_event_uid", rootUid)
+                                    .put("reviewed_withdrawal_amount", truth.reviewedWithdrawalAmount ?: JSONObject.NULL)
+                                    .put("reviewed_received_total", truth.reviewedReceivedTotal ?: JSONObject.NULL)
+                                    .put("excess_acknowledged", truth.excessAcknowledged))
+                            }
                             event.correctsEventId?.let { original ->
                                 correctedUids[original]?.let { uid -> put("corrects_event_uid", uid) }
                             }

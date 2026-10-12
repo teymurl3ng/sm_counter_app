@@ -157,6 +157,44 @@ class NativeFoundationUiTest {
     }
 
     @Test
+    fun hierarchyCashierMenu() {
+        openCashier()
+        openMoreMenu()
+        assertMenuTextHierarchy(NativeUiTags.MoreCountCash)
+        captureUx("hierarchy-cashier-menu", "hierarchyCashierMenu")
+    }
+
+    private fun assertMenuTextHierarchy(tag: String) {
+        composeRule.onNodeWithTag(tag).performScrollTo().assertIsDisplayed()
+        val children = composeRule.onAllNodes(
+            androidx.compose.ui.test.hasAnyAncestor(androidx.compose.ui.test.hasTestTag(tag)) and
+                SemanticsMatcher.keyIsDefined(SemanticsActions.GetTextLayoutResult), useUnmergedTree = true)
+        assertEquals("A navigation row retains its name and supporting description", 2, children.fetchSemanticsNodes().size)
+        val styles = (0..1).map { index ->
+            val layouts = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
+            children[index].performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
+            val layout = layouts.single()
+            // A wrap-content Text can retain its parent's paragraph width while its node
+            // shrinks to the glyphs. Check painted line bounds, not unused paragraph space.
+            val linesFit = (0 until layout.lineCount).all { line ->
+                !layout.isLineEllipsized(line) && layout.getLineLeft(line) >= -1f &&
+                    layout.getLineRight(line) <= layout.size.width + 1f
+            }
+            org.junit.Assert.assertTrue("Complete menu text: ${layout.layoutInput.text}",
+                linesFit && layout.multiParagraph.height <= layout.size.height + 1f)
+            layouts.single().layoutInput.style
+        }
+        assertEquals(androidx.compose.ui.text.font.FontWeight.SemiBold, styles[0].fontWeight)
+        assertEquals(androidx.compose.ui.text.font.FontWeight.Medium, styles[1].fontWeight)
+        org.junit.Assert.assertTrue("Name remains larger than description", styles[0].fontSize.value > styles[1].fontSize.value)
+        org.junit.Assert.assertNotEquals("Name and description retain separate colors", styles[0].color, styles[1].color)
+        composeRule.activityRule.scenario.onActivity { activity ->
+            org.junit.Assert.assertFalse("Signed-in dark header needs light status icons in either theme",
+                androidx.core.view.WindowCompat.getInsetsController(activity.window, activity.window.decorView).isAppearanceLightStatusBars)
+        }
+    }
+
+    @Test
     fun cashierCountsClosesDayAndCannotReopen() {
         try {
             openCashier()
@@ -235,88 +273,49 @@ class NativeFoundationUiTest {
     @Test
     fun accessBackAccountChangeAndAuthenticationErrorFollowTheirVisibleContracts() {
         openAccountPicker()
-        composeRule.onNodeWithText("Owner · Quick PIN, full passphrase").assertIsDisplayed()
-
         composeRule.onNodeWithTag(NativeUiTags.AuthBackToWelcome).performClick()
-        composeRule.onNodeWithText(runBlocking { app().database.storeProfileDao().get()?.storeName?.trim()?.takeIf(String::isNotEmpty) ?: "Your shop" }).assertIsDisplayed()
         openAccountPicker()
-
-        composeRule.activityRule.scenario.onActivity { activity ->
-            activity.onBackPressedDispatcher.onBackPressed()
+        repeat(2) { iteration ->
+            composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_LOGIN)).performClick()
+            composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinKeypad).assertIsDisplayed()
+            composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinMethod).assertDoesNotExist()
+            composeRule.onNodeWithTag(NativeUiTags.AuthPhoneSecurityMethod).assertDoesNotExist()
+            composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinSubmit).assertIsNotEnabled()
+            if (iteration == 0) composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinBack).performClick()
+            else composeRule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
+            waitForText("Choose account")
         }
-        composeRule.onNodeWithText(runBlocking { app().database.storeProfileDao().get()?.storeName?.trim()?.takeIf(String::isNotEmpty) ?: "Your shop" }).assertIsDisplayed()
-        openAccountPicker()
-
         composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_LOGIN)).performClick()
-        composeRule.onNodeWithText("Sign-in method").assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinMethod).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.AuthPhoneSecurityMethod).assertDoesNotExist()
-        composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.AuthMethodBack).performClick()
-        waitForText("Choose account")
-
-        composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_LOGIN)).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.AuthChooseAnotherAccount).performClick()
-        waitForText("Choose account")
-
-        composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_LOGIN)).performClick()
-        composeRule.onNodeWithText("Sign-in method").assertIsDisplayed()
-        composeRule.activityRule.scenario.onActivity { activity ->
-            activity.onBackPressedDispatcher.onBackPressed()
-        }
-        waitForText("Choose account")
-
-        composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_LOGIN)).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinMethod).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinInput).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinSubmit).assertIsNotEnabled()
-        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinBack).performClick()
-        composeRule.onNodeWithText("Sign-in method").assertIsDisplayed()
-
-        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinMethod).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinInput).assertIsDisplayed()
-        composeRule.activityRule.scenario.onActivity { activity ->
-            activity.onBackPressedDispatcher.onBackPressed()
-        }
-        composeRule.onNodeWithText("Sign-in method").assertIsDisplayed()
-
-        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinMethod).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinUsePassphrase).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.AuthSignIn).assertIsNotEnabled()
+        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinUsePassphrase).performScrollTo().performClick()
         composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseBack).performClick()
-        composeRule.onNodeWithText("Sign-in method").assertIsDisplayed()
-
-        composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinKeypad).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinUsePassphrase).performScrollTo().performClick()
+        // Wait for the destination and its Back handler before dispatching another action.
+        composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).assertIsDisplayed()
+        composeRule.waitForIdle()
+        composeRule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
+        val keypadBackStarted = android.os.SystemClock.uptimeMillis()
+        try {
+            composeRule.waitUntil(timeoutMillis = 5_000) {
+                runCatching { composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinKeypad).assertIsDisplayed() }.isSuccess
+            }
+        } catch (failure: Throwable) {
+            println("PIN Back route failure: " + composeRule.onRoot(useUnmergedTree = true).printToString())
+            throw failure
+        }
+        println("Quick PIN hardware Back settled in ${android.os.SystemClock.uptimeMillis() - keypadBackStarted} ms")
+        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinUsePassphrase).performScrollTo().performClick()
         composeRule.onNodeWithTag(NativeUiTags.AuthChooseAnotherAccount).performClick()
         waitForText("Choose account")
-
         composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_LOGIN)).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).assertIsDisplayed()
-        composeRule.activityRule.scenario.onActivity { activity ->
-            activity.onBackPressedDispatcher.onBackPressed()
-        }
-        composeRule.onNodeWithText("Sign-in method").assertIsDisplayed()
-
-        composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput)
-            .performTextReplacement("incorrect full passphrase")
+        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinUsePassphrase).performScrollTo().performClick()
+        composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).performTextReplacement("incorrect full passphrase")
         composeRule.onNodeWithTag(NativeUiTags.AuthSignIn).performClick()
-
         waitForText("The login name or passphrase is incorrect, or this account is unavailable.")
-        composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).assertIsDisplayed()
-
-        composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput)
-            .performTextReplacement(SaafMilkTestRunner.TEST_PASSPHRASE)
-        composeRule.onNodeWithText(
-            "The login name or passphrase is incorrect, or this account is unavailable.",
-        ).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).performTextReplacement(SaafMilkTestRunner.TEST_PASSPHRASE)
         composeRule.onNodeWithTag(NativeUiTags.AuthSignIn).performClick()
         composeRule.waitUntil(timeoutMillis = 15_000) {
-            runCatching {
-                composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).fetchSemanticsNode()
-            }.isSuccess
+            runCatching { composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).fetchSemanticsNode() }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OwnerOverviewRoot).assertIsDisplayed()
     }
@@ -325,10 +324,8 @@ class NativeFoundationUiTest {
     fun quickPinUnlocksTheSelectedAccount() {
         openAccountPicker()
         composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_LOGIN)).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinMethod).performClick()
 
-        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinInput)
-            .performTextReplacement(SaafMilkTestRunner.TEST_PIN)
+        enterQuickPin(SaafMilkTestRunner.TEST_PIN)
         composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinSubmit).performClick()
         composeRule.waitUntil(timeoutMillis = 15_000) {
             runCatching {
@@ -342,10 +339,8 @@ class NativeFoundationUiTest {
     fun quickPinRejectsAnotherAccountsPinAndUnlocksTheSelectedAccount() {
         openAccountPicker()
         composeRule.onNodeWithTag(NativeUiTags.authAccount(SaafMilkTestRunner.TEST_LOGIN)).performClick()
-        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinMethod).performClick()
 
-        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinInput)
-            .performTextReplacement(SaafMilkTestRunner.TEST_CASHIER_PIN)
+        enterQuickPin(SaafMilkTestRunner.TEST_CASHIER_PIN)
         composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinSubmit).performClick()
         waitForText(
             "That Quick PIN did not unlock Instrumentation Owner. " +
@@ -353,8 +348,7 @@ class NativeFoundationUiTest {
         )
         composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinInput).assertIsDisplayed()
 
-        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinInput)
-            .performTextReplacement(SaafMilkTestRunner.TEST_PIN)
+        enterQuickPin(SaafMilkTestRunner.TEST_PIN)
         composeRule.onNodeWithText(
             "That Quick PIN did not unlock Instrumentation Owner. " +
                 "Check the selected account or use the full passphrase.",
@@ -446,6 +440,7 @@ class NativeFoundationUiTest {
             }.isSuccess
         }
         composeRule.onNodeWithTag(NativeUiTags.OpsMoreMenu).assertIsDisplayed()
+        assertMenuTextHierarchy(NativeUiTags.OpsMoreTodayWork)
         captureUx("operations-more-surfaces", workflowId = "operationsMoreOpensConnectedEntry")
         composeRule.onNodeWithTag(NativeUiTags.OpsMoreTodayWork).assertIsDisplayed()
         composeRule.onNodeWithText("Count cash").assertDoesNotExist()
@@ -530,6 +525,15 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithTag(NativeUiTags.ManagerWorkRoot).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.ManagerNavWork).assertIsSelected()
         assertManagerShellWithoutForeignNav()
+        for (group in listOf("Daily shortcuts", "Make and move stock")) {
+            composeRule.onNodeWithText(group, useUnmergedTree = true).performScrollTo()
+            val layouts = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
+            composeRule.onNodeWithText(group, useUnmergedTree = true).performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
+            assertEquals(14f, layouts.single().layoutInput.style.fontSize.value, .01f)
+            assertEquals(androidx.compose.ui.text.font.FontWeight.SemiBold, layouts.single().layoutInput.style.fontWeight)
+        }
+        assertMenuTextHierarchy(NativeUiTags.ManagerWorkMakeYogurt)
+        captureUx("manager-work-surfaces", workflowId = "managerShellOpensUnderManagerChrome")
     }
 
     @Test
@@ -900,6 +904,7 @@ class NativeFoundationUiTest {
 
         composeRule.onNodeWithTag(NativeUiTags.ManagerMoreRoot).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.ManagerMoreMenu).assertIsDisplayed()
+        assertMenuTextHierarchy(NativeUiTags.ManagerMoreProducts)
         captureUx("manager-more-surfaces", workflowId = "managerMoreOpensUnderManagerChrome")
         composeRule.onNodeWithTag(NativeUiTags.ManagerMoreProducts).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.ManagerMorePersonalSecurity)
@@ -1134,6 +1139,8 @@ class NativeFoundationUiTest {
         assertAdminShellWithoutForeignNav()
         composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertDoesNotExist()
         composeRule.onNodeWithTag(NativeUiTags.OwnerShellRoot).assertDoesNotExist()
+        assertMenuTextHierarchy(NativeUiTags.AdminPeopleUsersRoles)
+        captureUx("admin-people-surfaces", workflowId = "adminPeopleOpensUnderAdminChrome")
     }
 
     @Test
@@ -1251,6 +1258,8 @@ class NativeFoundationUiTest {
         assertAdminShellWithoutForeignNav()
         composeRule.onNodeWithTag(NativeUiTags.OwnerShellRoot).assertDoesNotExist()
         composeRule.onNodeWithTag(NativeUiTags.ManagerShellRoot).assertDoesNotExist()
+        assertMenuTextHierarchy(NativeUiTags.AdminRecordsBusiness)
+        captureUx("admin-records-surfaces", workflowId = "adminRecordsOpensUnderAdminChrome")
     }
 
     @Test
@@ -1321,6 +1330,7 @@ class NativeFoundationUiTest {
         openAdminMore()
         composeRule.onNodeWithTag(NativeUiTags.AdminMoreRoot).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.AdminMoreMenu).assertIsDisplayed()
+        assertMenuTextHierarchy(NativeUiTags.AdminMoreProducts)
         captureUx("admin-more-surfaces", workflowId = "adminMoreOpensUnderAdminChrome")
         composeRule.onNodeWithTag(NativeUiTags.AdminMoreCosting).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.AdminMoreShopSettings)
@@ -1481,6 +1491,8 @@ class NativeFoundationUiTest {
         composeRule.onNodeWithTag(NativeUiTags.OwnerWorkRecordSale).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerWorkPrimaryActions).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerNavWork).assertIsSelected()
+        assertMenuTextHierarchy(NativeUiTags.OwnerWorkMakeYogurt)
+        captureUx("owner-work-surfaces", workflowId = "ownerWorkOpensConnectedEntry")
     }
 
     @Test
@@ -1577,6 +1589,7 @@ class NativeFoundationUiTest {
 
         composeRule.onNodeWithTag(NativeUiTags.OwnerMoreRoot).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerMoreMenu).assertIsDisplayed()
+        assertMenuTextHierarchy(NativeUiTags.OwnerMoreProducts)
         captureUx("owner-more-surfaces", workflowId = "ownerMoreOpensUnderOwnerChrome")
         composeRule.onNodeWithTag(NativeUiTags.OwnerMoreProducts).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerMorePersonalSecurity)
@@ -2865,14 +2878,14 @@ class NativeFoundationUiTest {
                 composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).fetchSemanticsNode()
             }.isSuccess ||
                 runCatching {
-                    composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).fetchSemanticsNode()
+                    composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinUsePassphrase).fetchSemanticsNode()
                 }.isSuccess
         }
         if (runCatching {
-                composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).fetchSemanticsNode()
+                composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinUsePassphrase).fetchSemanticsNode()
             }.isSuccess
         ) {
-            composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).performClick()
+            composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinUsePassphrase).performScrollTo().performClick()
         }
         composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput)
             .performTextReplacement(SaafMilkTestRunner.TEST_CASHIER_PASSPHRASE)
@@ -2888,14 +2901,14 @@ class NativeFoundationUiTest {
                 composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).fetchSemanticsNode()
             }.isSuccess ||
                 runCatching {
-                    composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).fetchSemanticsNode()
+                    composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinUsePassphrase).fetchSemanticsNode()
                 }.isSuccess
         }
         if (runCatching {
-                composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).fetchSemanticsNode()
+                composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinUsePassphrase).fetchSemanticsNode()
             }.isSuccess
         ) {
-            composeRule.onNodeWithTag(NativeUiTags.AuthFullPassphraseMethod).performClick()
+            composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinUsePassphrase).performScrollTo().performClick()
         }
         composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput)
             .performTextReplacement(SaafMilkTestRunner.TEST_PASSPHRASE)
@@ -3788,6 +3801,10 @@ class NativeFoundationUiTest {
             throw failure
         }
         composeRule.waitForIdle()
+    }
+
+    private fun enterQuickPin(value: String) {
+        value.forEach { composeRule.onNodeWithTag(NativeUiTags.authQuickPinDigit(it.digitToInt())).performScrollTo().performClick() }
     }
 
     private fun openAccountPicker() {

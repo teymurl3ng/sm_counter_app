@@ -9,9 +9,11 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.ui.graphics.luminance
 import com.saaf.milkshop.application.authentication.NativeAccountSummary
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.nativeui.NativeUiTags
@@ -29,7 +31,7 @@ class NativeAuthenticationScreenContractTest {
     val composeRule = createComposeRule()
 
     @Test
-    fun darkSystemHostKeepsTheBrandedAccountPickerContrast() {
+    fun darkSystemHostKeepsNeutralAccountPickerContrast() {
         val account = NativeAccountSummary(
             userId = 9L,
             loginName = "contrast.owner",
@@ -60,24 +62,25 @@ class NativeAuthenticationScreenContractTest {
             }
         }
 
-        // The access screens now follow the system theme: in a dark host the
-        // body goes dark and its text goes light (it used to stay ivory-light).
+        // Verify actual rendered heading contrast on the neutral dark canvas.
         val titlePixels = composeRule.onNodeWithText("Choose account")
             .captureToImage()
             .toPixelMap()
-        var darkestTitlePixel = 3f
+        var darkestTitlePixel = 1f
+        var brightestTitlePixel = 0f
         for (y in 0 until titlePixels.height) {
             for (x in 0 until titlePixels.width) {
                 val color = titlePixels[x, y]
-                darkestTitlePixel = minOf(darkestTitlePixel, color.red + color.green + color.blue)
+                darkestTitlePixel = minOf(darkestTitlePixel, color.luminance())
+                brightestTitlePixel = maxOf(brightestTitlePixel, color.luminance())
             }
         }
         assertTrue(
-            "The access header must follow the dark theme: dark title on the brand band.",
-            darkestTitlePixel < 1.8f,
+            "The page heading needs readable contrast on the neutral dark canvas.",
+            (brightestTitlePixel + .05f) / (darkestTitlePixel + .05f) >= 4.5f,
         )
 
-        val labelPixels = composeRule.onNodeWithText("ACCOUNTS ON THIS PHONE")
+        val labelPixels = composeRule.onNodeWithText("Contrast Owner", useUnmergedTree = true)
             .captureToImage()
             .toPixelMap()
         var brightestLabelPixel = 0f
@@ -193,6 +196,7 @@ class NativeAuthenticationScreenContractTest {
                         NativeAuthenticationState.QuickPin(
                             account = account,
                             error = "Quick unlock is paused. Sign in with your full passphrase.",
+                            persistentError = true,
                         ),
                     )
                 }
@@ -218,8 +222,8 @@ class NativeAuthenticationScreenContractTest {
             }
         }
 
-        composeRule.onNodeWithText("Quick unlock is paused. Sign in with your full passphrase.").assertIsDisplayed()
-        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinUsePassphrase).assertIsDisplayed().performClick()
+        composeRule.onNodeWithText("Quick unlock is paused. Sign in with your full passphrase.").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.AuthQuickPinUsePassphrase).performScrollTo().assertIsDisplayed().performClick()
         composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.AuthPassphraseInput).assertIsDisplayed()
     }

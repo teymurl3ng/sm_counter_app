@@ -27,7 +27,9 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
+import com.saaf.milkshop.nativeui.theme.nativeVisualColors
 
 /** Slots depend only on the global text setting, never on the destination's wording. */
 @Composable
@@ -38,6 +40,7 @@ fun NativeChromeBand(
     reserveNavigationSpace: Boolean = false,
     trailing: (@Composable () -> Unit)? = null,
     reserveActionSpace: Boolean = true,
+    actionWidth: Dp = 96.dp,
     context: @Composable ColumnScope.() -> Unit,
 ) {
     val density = LocalDensity.current
@@ -52,8 +55,8 @@ fun NativeChromeBand(
     val identityStyle = nativeChromeContextStyle(true)
     val titleHeight = (lineHeight(titleStyle) + 16.dp).coerceAtLeast(56.dp)
     val contextHeight = (lineHeight(metadataStyle) * 2 + lineHeight(identityStyle) + 16.dp).coerceAtLeast(80.dp)
-    Surface(modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.onPrimary) {
+    Surface(modifier.fillMaxWidth(), color = nativeVisualColors.header,
+        contentColor = nativeVisualColors.onHeader) {
         Column(Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars).padding(horizontal = 16.dp)) {
             Row(Modifier.fillMaxWidth().height(titleHeight), verticalAlignment = Alignment.CenterVertically) {
                 if (reserveNavigationSpace || navigation != null) {
@@ -66,7 +69,7 @@ fun NativeChromeBand(
                 Column(Modifier.weight(1f).padding(end = 12.dp), content = context)
                 // Reserving the action slot also keeps context text still when Back/day status is absent.
                 if (reserveActionSpace || trailing != null) {
-                    Box(Modifier.width(96.dp), contentAlignment = Alignment.CenterEnd) { trailing?.invoke() }
+                    Box(Modifier.width(actionWidth), contentAlignment = Alignment.CenterEnd) { trailing?.invoke() }
                 }
             }
         }
@@ -76,7 +79,7 @@ fun NativeChromeBand(
 @Composable
 fun NativeChromeContext(text: String, prominent: Boolean = false) {
     Text(text, style = nativeChromeContextStyle(prominent),
-        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = if (prominent) 1f else .82f),
+        color = if (prominent) nativeVisualColors.onHeader else nativeVisualColors.headerSupporting,
         maxLines = 1, overflow = TextOverflow.Ellipsis)
 }
 

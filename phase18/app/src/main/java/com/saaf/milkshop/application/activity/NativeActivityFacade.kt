@@ -3,6 +3,7 @@ package com.saaf.milkshop.application.activity
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.CreditCollectionService
+import com.saaf.milkshop.domain.ExpenseService
 import com.saaf.milkshop.domain.SaleService
 import com.saaf.milkshop.domain.UserSecurityService
 import java.math.BigDecimal
@@ -34,6 +35,8 @@ data class NativeActivityRecordDetail(
     val destinationLabel: String?,
     val notes: String?,
     val quantityLabel: String?,
+    val expenseCategoryLabel: String? = null,
+    val paymentAccountLabel: String? = null,
 )
 
 data class NativeActivityDay(
@@ -57,7 +60,7 @@ class NativeActivityFacade(
         val businessDate = date.toString()
         val events = database.eventDao().findAllDescending()
             .filter { it.occurredAt == businessDate }
-            .filter { it.eventType == SaleService.EVENT_TYPE_SALE || it.eventType == CreditCollectionService.EVENT_TYPE_CREDIT_COLLECTION }
+            .filter { it.eventType in ACTIVITY_EVENT_TYPES }
         val records = ArrayList<NativeActivityRecordSummary>()
         for (event in events) {
             val link = database.eventActorLinkDao().find(event.eventId) ?: continue
@@ -86,9 +89,7 @@ class NativeActivityFacade(
         if (link.actorUserId != actor.userId) {
             throw IllegalArgumentException("That record belongs to another account.")
         }
-        if (event.eventType != SaleService.EVENT_TYPE_SALE &&
-            event.eventType != CreditCollectionService.EVENT_TYPE_CREDIT_COLLECTION
-        ) {
+        if (event.eventType !in ACTIVITY_EVENT_TYPES) {
             throw IllegalArgumentException("That record is not part of Cashier Activity.")
         }
         // Prefer same-day Activity entries; still allow Collect View record the same day.
@@ -102,6 +103,8 @@ class NativeActivityFacade(
             summary = summary,
             counterpartLabel = parties.counterpart,
             destinationLabel = parties.destination,
+            expenseCategoryLabel = parties.expenseCategory,
+            paymentAccountLabel = parties.paymentAccount,
             notes = event.notes?.trim()?.takeIf { it.isNotEmpty() },
             quantityLabel = event.saleQuantity?.let { qty ->
                 val unit = database.inventoryLogDao().findByEventId(event.eventId)
@@ -117,17 +120,23 @@ class NativeActivityFacade(
         val counterpart: String?,
         val destination: String?,
         val stateLabel: String,
+        val expenseCategory: String? = null,
+        val paymentAccount: String? = null,
     )
 
     private suspend fun resolveParties(eventId: Long): Parties {
         val movements = database.financialLogDao().findByEventId(eventId)
         var customerName: String? = null
         var cashBankName: String? = null
+        var expenseCategoryName: String? = null
         for (movement in movements) {
             val account = database.accountDao().findById(movement.accountId) ?: continue
             when (account.category) {
                 "Customer" -> customerName = cleanAccountName(account.name, account.category)
                 "Cash/Bank" -> cashBankName = cleanAccountName(account.name, account.category)
+                "Operating Expense" -> expenseCategoryName = database.expenseCategoryProfileDao()
+                    .findByAccountId(account.accountId)?.displayName?.trim()?.takeIf { it.isNotEmpty() }
+                    ?: account.name.trim()
             }
         }
         val event = database.eventDao().findById(eventId)
@@ -153,6 +162,16 @@ class NativeActivityFacade(
                 stateLabel = listOfNotNull(customerName, cashBankName?.let { "Received in $it" })
                     .joinToString(" · "),
             )
+            ExpenseService.EVENT_TYPE_EXPENSE -> Parties(
+                counterpart = null,
+                destination = null,
+                stateLabel = listOfNotNull(
+                    expenseCategoryName,
+                    cashBankName?.let { "Paid from $it" },
+                ).joinToString(" · ").ifEmpty { "Recorded" },
+                expenseCategory = expenseCategoryName,
+                paymentAccount = cashBankName,
+            )
             else -> Parties(null, null, "Recorded")
         }
     }
@@ -165,6 +184,7 @@ class NativeActivityFacade(
         val amountPaisa = when (event.eventType) {
             SaleService.EVENT_TYPE_SALE -> moneyToPaisa((event.saleValue ?: 0.0) + event.surchargeApplied)
             CreditCollectionService.EVENT_TYPE_CREDIT_COLLECTION -> moneyToPaisa(event.amount ?: 0.0)
+            ExpenseService.EVENT_TYPE_EXPENSE -> moneyToPaisa(event.amount ?: 0.0)
             else -> 0L
         }
         return NativeActivityRecordSummary(
@@ -174,6 +194,7 @@ class NativeActivityFacade(
             taskLabel = when (event.eventType) {
                 SaleService.EVENT_TYPE_SALE -> "Sale"
                 CreditCollectionService.EVENT_TYPE_CREDIT_COLLECTION -> "Collection"
+                ExpenseService.EVENT_TYPE_EXPENSE -> "Expense"
                 else -> event.eventType
             },
             amountPaisa = amountPaisa,
@@ -200,4 +221,12 @@ class NativeActivityFacade(
 
     private fun formatClock(createdAt: String): String =
         com.saaf.milkshop.application.AppTimeFormats.clock(createdAt)
+
+    private companion object {
+        val ACTIVITY_EVENT_TYPES = setOf(
+            SaleService.EVENT_TYPE_SALE,
+            CreditCollectionService.EVENT_TYPE_CREDIT_COLLECTION,
+            ExpenseService.EVENT_TYPE_EXPENSE,
+        )
+    }
 }

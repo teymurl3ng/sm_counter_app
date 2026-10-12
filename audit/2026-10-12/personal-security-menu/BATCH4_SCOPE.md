@@ -1,0 +1,5 @@
+# Phase 3 batch 4 — personal security
+
+Five More security destinations only: cashier, operator, manager, admin and owner. The core Quick PIN verifier accepts 4–12 ASCII digits, but all five setup forms truncate to four and the three form controllers require exactly four when keeping an existing PIN while enabling phone security. This run aligns those five forms and controller checks with the core rule, preserves leading zeroes, and presents status, full-passphrase confirmation, Quick PIN and phone security as deliberate groups. Keep existing callbacks, test tags, confirmation/cancel, haptics, loading/error/busy behavior, crypto and Android prompt behavior.
+
+Selected checks: shared 3/4/12/13-digit and nonnumeric input behavior, leading-zero transfer, wrong full passphrase at the facade boundary, busy/error/cancel, five-role render/navigation, and representative light/night/large-text. Do not change login keypad, remote credentials, central revocation, security history or other menus. Stop after this family; actual biometric prompt feel stays in phase 5 phone acceptance.

@@ -2,6 +2,18 @@ package com.saaf.milkshop
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.text.TextLayoutResult
+import android.graphics.Bitmap
+import androidx.test.platform.app.InstrumentationRegistry
+import java.io.File
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsSelected
@@ -127,6 +139,27 @@ class NativeOwnerProductsScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailUnarchive).performClick()
         composeRule.onNodeWithTag(NativeUiTags.OwnerProductsUnarchiveConfirm).performClick()
         assertTrue(unarchived)
+    }
+
+    @Test
+    fun longProductDetailReflowsInDarkExtraLargeText() {
+        val product = sampleProduct().copy(
+            name = "Extra thick full cream yoghurt for the northern market route",
+            rateLabel = "PKR 123,456,789.00 / Kg",
+            notes = "Keep chilled until the customer receives the complete order.",
+        )
+        setScreen(products = listOf(product), productDetail = NativeOwnerProductDetail(product),
+            darkTheme = true, fontScale = 2f)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerProductsDetailName).assertIsDisplayed()
+        composeRule.onNodeWithText(product.rateLabel!!, useUnmergedTree = true).performScrollTo()
+        val layouts = mutableListOf<TextLayoutResult>()
+        composeRule.onNodeWithText(product.rateLabel!!, useUnmergedTree = true)
+            .performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
+        assertTrue("Full price and unit must reflow", layouts.isNotEmpty() && layouts.none { it.hasVisualOverflow })
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val output = File(context.getExternalFilesDir(null), "batch5b-product-detail-dark-200.png")
+        output.outputStream().use { composeRule.onRoot().captureToImage().asAndroidBitmap()
+            .compress(Bitmap.CompressFormat.PNG, 100, it) }
     }
 
     @Test
@@ -280,9 +313,13 @@ class NativeOwnerProductsScreenContractTest {
         onArchiveProduct: () -> Unit = {},
         onUnarchiveProduct: () -> Unit = {},
         onNavigate: (OwnerSection) -> Unit = {},
+        darkTheme: Boolean = false,
+        fontScale: Float? = null,
     ) {
         composeRule.setContent {
-            SaafTheme(darkTheme = false) {
+            val density = LocalDensity.current
+            CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale ?: density.fontScale)) {
+            SaafTheme(darkTheme = darkTheme) {
                 OwnerProductsScreen(
                     snackbarHostState = remember { SnackbarHostState() },
                     identity = NativeSignedInIdentity(
@@ -331,6 +368,7 @@ class NativeOwnerProductsScreenContractTest {
                         )
                     },
                 )
+            }
             }
         }
     }

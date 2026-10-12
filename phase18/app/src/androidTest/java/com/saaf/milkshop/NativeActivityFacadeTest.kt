@@ -4,6 +4,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.activity.NativeActivityFacade
 import com.saaf.milkshop.application.collection.NativeCollectionFacade
 import com.saaf.milkshop.application.collection.NativeCollectionRequest
+import com.saaf.milkshop.application.expense.NativeExpenseFacade
+import com.saaf.milkshop.application.expense.NativeExpenseRequest
 import com.saaf.milkshop.data.MilkShopDatabase
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.CreateUserInput
@@ -96,6 +98,49 @@ class NativeActivityFacadeTest {
     }
 
     @Test
+    fun todayListAndDetailIncludeOnlyTheCashiersOwnExpenses() = runBlocking {
+        val expenseFacade = NativeExpenseFacade(database, security)
+        val references = expenseFacade.load(cashierSession, DATE)
+        val fuel = references.categories.single { it.name == "Fuel" }
+        val cash = references.paymentAccounts.single { it.name == "Cash" }
+        val second = security.beginUserEnrollment(ownerSession, CreateUserInput(
+            loginName = "activity.second.cashier",
+            displayName = "Second Cashier",
+            role = AppRole.CASHIER.wireValue,
+        ))
+        security.completeUserEnrollment(second.enrollmentToken, SECOND_CASHIER_PASSPHRASE.toCharArray())
+        val secondSession = security.login("activity.second.cashier", SECOND_CASHIER_PASSPHRASE.toCharArray()).sessionId
+        suspend fun record(session: String, date: LocalDate, amount: Long, note: String): Long =
+            expenseFacade.record(session, NativeExpenseRequest(fuel.accountId, cash.accountId, amount, note), date)
+                .receipt.eventId
+
+        val ownEvent = record(cashierSession, DATE, 12_550L, "Generator fuel")
+        val secondEvent = record(secondSession, DATE, 5_000L, "Other cashier's fuel")
+        val ownerEvent = record(ownerSession, DATE, 3_000L, "Owner's fuel")
+        val priorEvent = record(cashierSession, DATE.minusDays(1), 750L, "Prior day")
+        val profile = database.expenseCategoryProfileDao().findByAccountId(fuel.accountId)!!
+        database.expenseCategoryProfileDao().update(
+            fuel.accountId, profile.displayName, false, profile.createdAt,
+        )
+
+        val day = activityFacade.loadToday(cashierSession, DATE)
+        assertEquals(listOf(ownEvent), day.records.map { it.eventId })
+        assertEquals(listOf(secondEvent), activityFacade.loadToday(secondSession, DATE).records.map { it.eventId })
+        assertEquals("Expense", day.records.single().taskLabel)
+        assertEquals(12_550L, day.records.single().amountPaisa)
+        assertEquals("Fuel · Paid from Cash", day.records.single().stateLabel)
+
+        val detail = activityFacade.loadDetail(cashierSession, ownEvent, DATE)
+        assertEquals("Fuel", detail.expenseCategoryLabel)
+        assertEquals("Cash", detail.paymentAccountLabel)
+        assertEquals("Generator fuel", detail.notes)
+        assertEquals(12_550L, detail.summary.amountPaisa)
+        assertTrue(runCatching { activityFacade.loadDetail(cashierSession, secondEvent, DATE) }.isFailure)
+        assertTrue(runCatching { activityFacade.loadDetail(cashierSession, ownerEvent, DATE) }.isFailure)
+        assertTrue(priorEvent !in day.records.map { it.eventId })
+    }
+
+    @Test
     fun operatorWithoutOperationalViewIsDenied() = runBlocking {
         // Operator has VIEW_OPERATIONAL — use a role without it? Operator has VIEW_OPERATIONAL.
         // PermissionDenied for Activity uses VIEW_OPERATIONAL which Operator has.
@@ -122,5 +167,6 @@ class NativeActivityFacadeTest {
         const val OWNER_PASSPHRASE = "activity owner passphrase 2026"
         const val CASHIER_PASSPHRASE = "activity cashier passphrase 2026"
         const val OPERATOR_PASSPHRASE = "activity operator passphrase 2026"
+        const val SECOND_CASHIER_PASSPHRASE = "activity second cashier passphrase 2026"
     }
 }

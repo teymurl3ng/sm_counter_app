@@ -356,19 +356,7 @@ data class CurrentStockView(
     @ColumnInfo(name = "quantity_on_hand") val quantityOnHand: Double,
 )
 
-@DatabaseView(
-    viewName = "account_balances",
-    value = """
-        SELECT
-            a.account_id,
-            a.name,
-            a.type,
-            a.category,
-            ROUND(COALESCE(SUM(fl.amount), 0), 2) AS balance
-        FROM accounts a
-        LEFT JOIN financial_log fl ON fl.account_id = a.account_id
-        GROUP BY a.account_id, a.name, a.type, a.category
-    """)
+@DatabaseView(viewName = "account_balances", value = CanonicalMoneySql.ACCOUNT_BALANCES)
 data class AccountBalanceView(
     @ColumnInfo(name = "account_id") val accountId: Long,
     val name: String,

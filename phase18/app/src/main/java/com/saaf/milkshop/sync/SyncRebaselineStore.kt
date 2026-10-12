@@ -43,6 +43,22 @@ class SyncRebaselineStore(private val context: Context) {
         get() = prefs.getBoolean(KEY_LIVE_REBASELINE, false)
         set(value) { check(prefs.edit().putBoolean(KEY_LIVE_REBASELINE, value).commit()) }
 
+    /** The profile-only historical replay is one-time per server/shop/installation. */
+    fun profileCatchupCompletedFor(identityKey: String): Boolean =
+        prefs.getString(KEY_PROFILE_CATCHUP, null) == identityKey
+
+    fun markProfileCatchupCompleted(identityKey: String) {
+        check(prefs.edit().putString(KEY_PROFILE_CATCHUP, identityKey).commit())
+    }
+
+    /** Historical planning rows may have been consumed by a receiver that skipped them. */
+    fun planningCatchupCompletedFor(identityKey: String): Boolean =
+        prefs.getString(KEY_PLANNING_CATCHUP, null) == identityKey
+
+    fun markPlanningCatchupCompleted(identityKey: String) {
+        check(prefs.edit().putString(KEY_PLANNING_CATCHUP, identityKey).commit())
+    }
+
     fun clear() {
         check(prefs.edit().clear().commit())
     }
@@ -53,5 +69,7 @@ class SyncRebaselineStore(private val context: Context) {
         const val KEY_PREV_DEVICE = "prev_device_id"
         const val KEY_RESTORED_REBASELINE = "restored_rebaseline"
         const val KEY_LIVE_REBASELINE = "live_rebaseline_pending"
+        const val KEY_PROFILE_CATCHUP = "profile_catchup_v1"
+        const val KEY_PLANNING_CATCHUP = "planning_catchup_v1"
     }
 }

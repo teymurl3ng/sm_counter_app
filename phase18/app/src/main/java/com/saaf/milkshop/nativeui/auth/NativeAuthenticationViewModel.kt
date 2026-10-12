@@ -44,6 +44,8 @@ sealed interface NativeAuthenticationState {
         val account: NativeAccountSummary,
         val busy: Boolean = false,
         val error: String? = null,
+        val persistentError: Boolean = false,
+        val checkingPhoneSecurity: Boolean = false,
     ) : NativeAuthenticationState
     data class RecoveryCode(
         val identity: NativeSignedInIdentity,
@@ -95,11 +97,7 @@ class NativeAuthenticationViewModel(
             return
         }
         // Keep the current session until a different account actually signs in (or switch is cancelled).
-        _state.value = if (account.hasQuickUnlock) {
-            NativeAuthenticationState.MethodPicker(account)
-        } else {
-            NativeAuthenticationState.Passphrase(account)
-        }
+        _state.value = accountEntry(account)
     }
 
     fun beginAccountSwitch() {
@@ -169,35 +167,67 @@ class NativeAuthenticationViewModel(
 
     fun backFromQuickPin() {
         val current = _state.value as? NativeAuthenticationState.QuickPin ?: return
-        if (!current.busy) _state.value = NativeAuthenticationState.MethodPicker(current.account)
+        if (!current.busy) chooseAnotherAccount()
+    }
+
+    fun editQuickPin() {
+        val current = _state.value as? NativeAuthenticationState.QuickPin ?: return
+        if (!current.busy && !current.persistentError && current.error != null) {
+            _state.value = current.copy(error = null)
+        }
+    }
+
+    private fun accountEntry(account: NativeAccountSummary): NativeAuthenticationState = when {
+        account.quickPinEnabled -> NativeAuthenticationState.QuickPin(account)
+        account.phoneSecurityEnabled -> NativeAuthenticationState.MethodPicker(account)
+        else -> NativeAuthenticationState.Passphrase(account)
     }
 
     fun backFromPassphrase() {
         val current = _state.value as? NativeAuthenticationState.Passphrase ?: return
         if (current.busy) return
         if (current.account.hasQuickUnlock) {
-            _state.value = NativeAuthenticationState.MethodPicker(current.account)
+            _state.value = accountEntry(current.account)
         } else {
             chooseAnotherAccount()
         }
     }
 
     fun signInWithPhoneSecurity() {
-        val current = _state.value as? NativeAuthenticationState.MethodPicker ?: return
-        if (!current.account.phoneSecurityEnabled || current.busy) return
+        val current = _state.value
+        val account = when (current) {
+            is NativeAuthenticationState.MethodPicker -> current.account.takeUnless { current.busy }
+            is NativeAuthenticationState.QuickPin -> current.account.takeUnless { current.busy }
+            else -> null
+        } ?: return
+        if (!account.phoneSecurityEnabled) return
+        fun failed(error: Throwable): NativeAuthenticationState = when (current) {
+            is NativeAuthenticationState.QuickPin -> current.copy(busy = false,
+                checkingPhoneSecurity = false, error = publicMessage(error, account),
+                persistentError = error is QuickUnlockFailure.RateLimited)
+            is NativeAuthenticationState.MethodPicker -> current.copy(busy = false, error = publicMessage(error, account))
+            else -> current
+        }
         val quick = quickUnlock ?: run {
-            _state.value = current.copy(error = "Phone security is unavailable. Use your full passphrase.")
+            _state.value = failed(QuickUnlockFailure.Unavailable("Phone security is unavailable. Use your full passphrase."))
             return
         }
-        _state.value = current.copy(busy = true, error = null)
+        val checking = when (current) {
+            is NativeAuthenticationState.QuickPin -> current.copy(busy = true, error = null,
+                persistentError = false, checkingPhoneSecurity = true)
+            is NativeAuthenticationState.MethodPicker -> current.copy(busy = true, error = null)
+            else -> return
+        }
+        _state.value = checking
         scope.launch {
             try {
                 val session = withContext(Dispatchers.IO) {
-                    quick.signIn(current.account, NativeQuickUnlockMethod.PHONE_SECURITY, null)
+                    quick.signIn(account, NativeQuickUnlockMethod.PHONE_SECURITY, null)
                 }
-                acceptSession(session)
+                if (_state.value === checking) acceptSession(session)
+                else withContext(Dispatchers.IO) { facade.signOut(session.sessionHandle) }
             } catch (error: Throwable) {
-                _state.value = current.copy(error = publicMessage(error, current.account))
+                if (_state.value === checking) _state.value = failed(error)
             }
         }
     }
@@ -216,7 +246,7 @@ class NativeAuthenticationViewModel(
             _state.value = current.copy(error = "Quick PIN is unavailable. Use your full passphrase.")
             return
         }
-        _state.value = current.copy(busy = true, error = null)
+        _state.value = current.copy(busy = true, error = null, persistentError = false)
         scope.launch {
             try {
                 val session = withContext(Dispatchers.IO) {
@@ -225,7 +255,8 @@ class NativeAuthenticationViewModel(
                 runCatching { withContext(Dispatchers.IO) { facade.ensurePreviewVendor() } }
                 acceptSession(session)
             } catch (error: Throwable) {
-                _state.value = current.copy(error = publicMessage(error, current.account))
+                _state.value = current.copy(error = publicMessage(error, current.account),
+                    persistentError = error is QuickUnlockFailure.RateLimited)
             } finally {
                 pin.fill('\u0000')
             }

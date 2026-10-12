@@ -214,7 +214,6 @@ internal fun CashierNavigationRail(
         CashierRailItem(Icons.Outlined.MoreHoriz, stringResource(R.string.native_more), selected == CashierSection.More, NativeUiTags.CashierNavMore) { onNavigate(CashierSection.More) }
     }
 }
-
 @Composable
 private fun CashierRailItem(
     icon: ImageVector,
@@ -947,10 +946,6 @@ private fun SectionHeading(title: String, supporting: String? = null, stacked: B
     }
 }
 
-private fun productRateLabel(product: NativeSaleProduct): String =
-    if (product.ratePaisaPerUnit <= 0L) "No retail price. Set a price in Products."
-    else "PKR ${formatAmount(product.ratePaisaPerUnit / 100.0)} / ${product.unit.toDisplayUnit()} · ${product.quantityOnHand} in stock"
-
 @Composable
 private fun ProductSelector(
     products: List<NativeSaleProduct>,
@@ -970,7 +965,7 @@ private fun ProductSelector(
         var search by rememberSaveable { mutableStateOf("") }
         val selected = products.firstOrNull { it.productId == selectedProductId } ?: products.first()
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            ProductCard(selected.name, productRateLabel(selected), selected = true,
+            ProductCard(selected, selected = true,
                 onClick = com.saaf.milkshop.nativeui.common.hapticAction { search = ""; pickerOpen = true },
                 modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashierProductPickerOpen))
             Text("Tap to choose from ${products.size} products", style = MaterialTheme.typography.bodyMedium,
@@ -992,7 +987,7 @@ private fun ProductSelector(
                             verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             if (visible.isEmpty()) item { Text("No matching products") }
                             items(visible, key = { it.productId }) { option ->
-                                ProductCard(option.name, productRateLabel(option), option.productId == selectedProductId,
+                                ProductCard(option, option.productId == selectedProductId,
                                     onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction {
                                         onSelected(option)
                                         pickerOpen = false
@@ -1015,8 +1010,7 @@ private fun ProductSelector(
         ) {
             products.forEach { option ->
                 ProductCard(
-                    title = option.name,
-                    rate = productRateLabel(option),
+                    product = option,
                     selected = selectedProductId == option.productId,
                     onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelected(option) },
                     modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.cashierProduct(option.name)),
@@ -1030,8 +1024,7 @@ private fun ProductSelector(
         ) {
             products.forEach { option ->
                 ProductCard(
-                    title = option.name,
-                    rate = productRateLabel(option),
+                    product = option,
                     selected = selectedProductId == option.productId,
                     onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelected(option) },
                     modifier = Modifier.weight(1f).testTag(NativeUiTags.cashierProduct(option.name)),
@@ -1051,8 +1044,7 @@ private fun SectionDivider() {
 
 @Composable
 private fun ProductCard(
-    title: String,
-    rate: String,
+    product: NativeSaleProduct,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -1075,12 +1067,21 @@ private fun ProductCard(
             modifier = Modifier.nativeListItemContent(NativeListStyle.Entity),
             verticalArrangement = Arrangement.Center,
         ) {
-            Text(text = title, style = MaterialTheme.typography.titleMedium)
+            Text(text = product.name, style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold)
             Text(
-                text = rate,
-                style = MaterialTheme.typography.bodyMedium,
-                color = if (selected) MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.82f) else MaterialTheme.colorScheme.onSurfaceVariant,
+                text = if (product.ratePaisaPerUnit <= 0L) "No retail price. Set a price in Products."
+                    else "PKR ${formatAmount(product.ratePaisaPerUnit / 100.0)} / ${product.unit.toDisplayUnit()}",
+                style = if (product.ratePaisaPerUnit <= 0L) MaterialTheme.typography.bodyMedium
+                    else com.saaf.milkshop.nativeui.theme.nativeMetricTextStyle(),
+                color = if (selected) MaterialTheme.colorScheme.onPrimary
+                    else if (product.ratePaisaPerUnit <= 0L) MaterialTheme.colorScheme.onSurfaceVariant
+                    else com.saaf.milkshop.nativeui.theme.nativeVisualColors.metric,
             )
+            Text("${product.quantityOnHand} in stock",
+                style = com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle(),
+                color = if (selected) MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f)
+                    else com.saaf.milkshop.nativeui.theme.nativeVisualColors.supporting)
         }
     }
 }
@@ -1906,27 +1907,17 @@ private fun SaleChequePane(
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.ExtraBold,
         )
-        Surface(
-            color = MaterialTheme.colorScheme.surface,
-            shape = RoundedCornerShape(16.dp),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                SaleChequeRow("Sale", "#S-${receipt.eventId}")
-                HorizontalDivider()
-                SaleChequeRow("Product", "$productName · ${formatQuantity(receipt.quantity)} $quantityUnit")
-                HorizontalDivider()
-                SaleChequeRow("Payment", paymentSummary)
+        com.saaf.milkshop.nativeui.common.NativeInformationSection {
+                com.saaf.milkshop.nativeui.common.NativeInformationFact("Sale", "#S-${receipt.eventId}")
+                com.saaf.milkshop.nativeui.common.NativeInformationFact("Product", productName)
+                com.saaf.milkshop.nativeui.common.NativeInformationFact("Quantity", "${formatQuantity(receipt.quantity)} $quantityUnit", emphasized = true)
+                com.saaf.milkshop.nativeui.common.NativeInformationFact("Payment", paymentSummary)
                 if (priceLabel != null) {
-                    HorizontalDivider()
-                    SaleChequeRow("Price", priceLabel)
+                    com.saaf.milkshop.nativeui.common.NativeInformationFact("Price", priceLabel, emphasized = true)
                 }
                 if (note != null) {
-                    HorizontalDivider()
-                    SaleChequeRow("Note", note)
+                    com.saaf.milkshop.nativeui.common.NativeInformationFact("Note", note, prose = true)
                 }
-            }
         }
         followUp?.let { followUp ->
             if (!followUp.sent) {
@@ -1966,14 +1957,5 @@ private fun SaleChequePane(
                 style = MaterialTheme.typography.titleMedium,
             )
         }
-    }
-}
-
-@Composable
-private fun SaleChequeRow(label: String, value: String) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.width(16.dp))
-        Text(value, fontWeight = FontWeight.SemiBold)
     }
 }

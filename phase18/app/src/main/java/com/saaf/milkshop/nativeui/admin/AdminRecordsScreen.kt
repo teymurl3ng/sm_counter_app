@@ -1,5 +1,10 @@
 package com.saaf.milkshop.nativeui.admin
 
+import androidx.compose.foundation.layout.size
+import com.saaf.milkshop.nativeui.theme.nativeVisualColors
+import com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeNavigationTitleTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeGroupLabelTextStyle
 import com.saaf.milkshop.nativeui.common.NativeListStyle
 import com.saaf.milkshop.nativeui.common.nativeListItemContent
 import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
@@ -85,6 +90,12 @@ fun AdminRecordsScreen(
     onBackFromCorrection: () -> Unit = {},
     onUpdateCorrection: ((NativeCorrectionEditorState) -> NativeCorrectionEditorState) -> Unit = {},
     onSaveCorrection: () -> Unit = {},
+    onRefreshCorrectionFacts: () -> Unit = {},
+    onOpenReceipt: (com.saaf.milkshop.application.owner.NativeOwnerFundsContext) -> Unit = {},
+    onBackFromReceipt: () -> Unit = {},
+    onUpdateReceipt: ((com.saaf.milkshop.nativeui.owner.NativeOwnerFundsReceiptEditorState) -> com.saaf.milkshop.nativeui.owner.NativeOwnerFundsReceiptEditorState) -> Unit = {},
+    onSaveReceipt: () -> Unit = {},
+    onRefreshReceiptFacts: () -> Unit = {},
     admScaffold: AdmScaffold,
     modifier: Modifier = Modifier,
 ) {
@@ -111,7 +122,7 @@ fun AdminRecordsScreen(
                 .testTag(NativeUiTags.AdminBusinessRecordsRoot),
         ) {
             val ready = ownerRecordsState as? NativeOwnerRecordsState.Ready
-            BackHandler(enabled = ready?.detail == null && ready?.ledger == null && ready?.correction == null, onBack = onBackToHub)
+            BackHandler(enabled = ready?.detail == null && ready?.ledger == null && ready?.correction == null && ready?.receipt == null, onBack = onBackToHub)
             OwnerRecordsScreen(
             showHeader = false,
                 snackbarHostState = snackbarHostState,
@@ -132,6 +143,12 @@ fun AdminRecordsScreen(
                 onBackFromCorrection = onBackFromCorrection,
                 onUpdateCorrection = onUpdateCorrection,
                 onSaveCorrection = onSaveCorrection,
+                onRefreshCorrectionFacts = onRefreshCorrectionFacts,
+                onOpenReceipt = onOpenReceipt,
+                onBackFromReceipt = onBackFromReceipt,
+                onUpdateReceipt = onUpdateReceipt,
+                onSaveReceipt = onSaveReceipt,
+                onRefreshReceiptFacts = onRefreshReceiptFacts,
                 modifier = modifier,
             )
         }
@@ -229,11 +246,11 @@ private fun AdminRecordsHubScreen(
 }
 
 @Composable
-private fun AdminRecordsSectionLabel(label: String) {
+internal fun AdminRecordsSectionLabel(label: String) {
     Text(
         label,
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = nativeGroupLabelTextStyle(),
+        color = nativeVisualColors.supporting,
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier
             .fillMaxWidth()
@@ -243,7 +260,7 @@ private fun AdminRecordsSectionLabel(label: String) {
 }
 
 @Composable
-private fun AdminRecordsMenuRow(
+internal fun AdminRecordsMenuRow(
     icon: ImageVector,
     title: String,
     subtitle: String,
@@ -260,13 +277,13 @@ private fun AdminRecordsMenuRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(title, style = nativeNavigationTitleTextStyle())
             Text(
                 subtitle,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = nativeSupportingTextStyle(),
+                color = nativeVisualColors.supporting,
             )
         }
         Icon(Icons.Outlined.ChevronRight, contentDescription = null)

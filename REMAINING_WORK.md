@@ -1,5 +1,9 @@
 # REMAINING WORK — consolidated 2026-10-08
 
+> **Current execution baseline: 2026-10-12.** Start with [CURRENT_BASELINE.md](CURRENT_BASELINE.md) for the six remaining phases, completed money work, conditional readiness gates and fixed next run. This dated document remains historical tracking.
+
+> **Current reconciliation: 2026-10-11.** Use [REMAINING_WORK_RECONCILED_2026-10-11.md](REMAINING_WORK_RECONCILED_2026-10-11.md) for the current backlog and pilot-readiness assessment. The dated list below is retained as history; several open items were subsequently completed or superseded.
+
 Single-source sweep of every tracking surface: FINDINGS_STATUS.md, BEFORE_PILOT_DECISIONS.md,
 the 2026-10-02 "what is truly left" inventory, the transition/static-chrome program memory,
 the Phase 14.9 program memory, and the 2026-10-08 decision batch. Stale items removed; done
@@ -119,3 +123,17 @@ in place, never delete.
 
 - A06 full instrumented run (see §2) · the parked owed-debug test (see §1) · H11 dark-mode
   owner check (see §2) · 236 lint warnings (hygiene bucket, non-gating).
+
+2026-10-11 execution update: B5's scoped rounding repair is complete (audit/2026-10-11/canonical-cash-rounding/RESULT.md), with 26 latest focused passing checks. Current phased status is in audit/2026-10-11/remaining-work-plan/ITEM_MAP.csv. Next bounded run: B3 owner-withdrawal correction/cancellation. Ordinary app not installed by these test runs.
+
+2026-10-12 execution update: B3's same-account amount correction and explicit cancellation unit is complete with 16 focused passing checks (audit/2026-10-12/drawing-recording-remedy/RESULT.md). B3 remains partial: wrong-account correction and actual cash return need the separate remaining unit. Room v14; no ordinary app installed or shop data changed.
+
+2026-10-12 final phase-1 update: wrong-account correction, actual owner money received/remedy and the Records UI are complete at their bounded QA scope. Final selected screen checks passed on S24; see audit/2026-10-12/withdrawal-account-return-plan/B3D_RESULT.md and CURRENT_BASELINE.md. Phase 2 profile receiving is next. The ordinary app remains unchanged by these QA runs.
+
+2026-10-12 phase-2 update: five-family profile receiving and controlled historical profile catch-up are complete at bounded QA scope on S24. See audit/2026-10-12/profile-receiver/B1A_RESULT.md and B1B_RESULT.md. Planning receiving B2/B10 remains the next bounded batch; the ordinary app remains unchanged.
+
+2026-10-12 final phase-2 update: budget and collections target receiving, controlled historical planning catch-up, and the reproduced planning-only restore queue fix are complete at bounded QA scope on S24. See audit/2026-10-12/planning-receiver/B2A_RESULT.md and B2B_B10_RESULT.md. Physical two-phone acceptance remains in phase 5. The next bounded run is phase 3 batch 4 mapped personal-security menus; the ordinary app has not been installed by these QA runs.
+
+2026-10-12 phase-3 batch-4 update: the five personal-security More destinations now share grouped status/change controls and the 4–12-digit Quick PIN setup rule. Focused S24 QA passed 11 selected instrumentation checks; 2 host policy checks passed. See audit/2026-10-12/personal-security-menu/BATCH4_RESULT.md. Phase 3 remains open; next is bounded batch 5a, cashier Activity's own expenses only. The ordinary app was not installed by this QA run.
+
+2026-10-12 phase-3 batch-5a update: cashier Activity now lists and opens only that cashier's current-day expenses, with category, payment account, amount and note. Focused S24 QA passed 5 selected checks, followed by 1 successful rerun of the strengthened archived-category/second-cashier fixture. See audit/2026-10-12/cashier-activity-expenses/BATCH5A_RESULT.md. Phase 3 remains open; next is bounded batch 5b transaction/product presentation. The ordinary app was not installed by this QA run.

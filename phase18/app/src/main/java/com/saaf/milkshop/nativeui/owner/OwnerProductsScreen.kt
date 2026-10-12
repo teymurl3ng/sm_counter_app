@@ -774,12 +774,14 @@ private fun OwnerProductsDetailScreen(
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.testTag(NativeUiTags.OwnerProductsDetailName),
                 )
-                OwnerProductFact("Unit", row.unit)
-                OwnerProductFact("Status", row.statusLabel)
-                OwnerProductFact("Tracking", row.trackingLabel)
-                OwnerProductFact("Default rate", row.rateLabel ?: "Not set")
-                if (!row.notes.isNullOrBlank()) {
-                    OwnerProductFact("Notes", row.notes)
+                com.saaf.milkshop.nativeui.common.NativeInformationSection {
+                    com.saaf.milkshop.nativeui.common.NativeInformationFact("Unit", row.unit)
+                    com.saaf.milkshop.nativeui.common.NativeInformationFact("Status", row.statusLabel)
+                    com.saaf.milkshop.nativeui.common.NativeInformationFact("Tracking", row.trackingLabel)
+                    com.saaf.milkshop.nativeui.common.NativeInformationFact("Default rate", row.rateLabel ?: "Not set", emphasized = row.rateLabel != null)
+                    if (!row.notes.isNullOrBlank()) {
+                        com.saaf.milkshop.nativeui.common.NativeInformationFact("Notes", row.notes, prose = true)
+                    }
                 }
                 error?.let {
                     Text(
@@ -914,33 +916,15 @@ private fun OwnerProductRow(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
-            Text(
-                buildString {
-                    append(product.unit)
-                    append(" · ")
-                    append(product.statusLabel)
-                    product.rateLabel?.let {
-                        append(" · ")
-                        append(it)
-                    }
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            product.rateLabel?.let {
+                Text(it, style = com.saaf.milkshop.nativeui.theme.nativeMetricTextStyle(),
+                    color = com.saaf.milkshop.nativeui.theme.nativeVisualColors.metric)
+            }
+            Text(product.unit, style = com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle(),
+                color = com.saaf.milkshop.nativeui.theme.nativeVisualColors.supporting)
+            Text(product.statusLabel, style = com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle())
         }
         Icon(Icons.Outlined.ChevronRight, contentDescription = null)
-    }
-}
-
-@Composable
-private fun OwnerProductFact(label: String, value: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(
-            label,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(value, style = MaterialTheme.typography.bodyLarge)
     }
 }
 

@@ -432,7 +432,8 @@ Schema version: %3$d</string>
     <string name="native_offline_assurance">Daily work works offline</string>
     <string name="native_private_access_assurance">Private account access</string>
     <string name="native_continue">Continue</string>
-    <string name="native_continue_hint">Choose your account on the next screen.</string>
+    <string name="native_continue_hint">Choose your account next.</string>
+    <string name="native_welcome_reassurance">Daily work offline · Private account access</string>
     <string name="native_splash_stage_1">Verifying yesterday\'s closing balance…</string>
     <string name="native_splash_stage_2">Checking local yogurt &amp; milk batches…</string>
     <string name="native_splash_stage_3">Shop ledger ready.</string>

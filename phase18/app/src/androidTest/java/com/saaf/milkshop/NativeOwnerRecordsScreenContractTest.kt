@@ -1,28 +1,43 @@
 package com.saaf.milkshop
 
+import android.graphics.Bitmap
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.saaf.milkshop.application.owner.NativeCorrectionKind
 import com.saaf.milkshop.application.owner.NativeCorrectionPrefill
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsContext
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsDetail
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsRow
 import com.saaf.milkshop.application.owner.NativeOwnerRecordsSnapshot
+import com.saaf.milkshop.application.owner.NativeOwnerFundsAccount
+import com.saaf.milkshop.application.owner.NativeOwnerFundsContext
+import com.saaf.milkshop.application.owner.NativeOwnerFundsLinkedReceipt
 import com.saaf.milkshop.application.owner.NativeRecordsGroup
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.owner.NativeCorrectionEditorState
 import com.saaf.milkshop.nativeui.owner.NativeOwnerRecordsState
+import com.saaf.milkshop.nativeui.owner.NativeOwnerFundsReceiptEditorState
 import com.saaf.milkshop.nativeui.owner.OwnerRecordsScreen
 import com.saaf.milkshop.nativeui.owner.OwnerSection
 import com.saaf.milkshop.nativeui.theme.SaafTheme
@@ -32,6 +47,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class NativeOwnerRecordsScreenContractTest {
@@ -185,6 +201,157 @@ class NativeOwnerRecordsScreenContractTest {
         assertEquals(1, navigated)
     }
 
+    @Test
+    fun drawingCancellationUsesExplicitChoiceAndRequiredReason() {
+        val record = row(88L).copy(eventTypeCode = "OWNER_DRAWING", taskLabel = "Owner drawing")
+        val prefill = monetaryPrefill(record).copy(kind = NativeCorrectionKind.Drawing,
+            drawingPaymentAccountName = "Cash", notes = "", ownerFunds = funds())
+        var state by mutableStateOf<NativeOwnerRecordsState>(NativeOwnerRecordsState.Ready(
+            snapshot = snapshotWith(record), correction = NativeCorrectionEditorState(prefill)))
+        var saved: NativeCorrectionEditorState? = null
+        setScreen(stateProvider = { state }, onUpdateCorrection = { transform ->
+            val ready = state as NativeOwnerRecordsState.Ready
+            state = ready.copy(correction = transform(ready.correction!!))
+        }, onSaveCorrection = { saved = (state as NativeOwnerRecordsState.Ready).correction })
+        composeRule.onNodeWithText("PKR 250 · Cash").assertExists()
+        composeRule.onNodeWithText("Reason (required)").assertExists()
+        composeRule.onNodeWithText("Cancel withdrawal").performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionMonetaryAmount).assertIsNotEnabled()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionNotes).performScrollTo().performTextReplacement("Withdrawal never happened")
+        composeRule.onNodeWithText("Save cancellation").performScrollTo().performClick()
+        assertTrue(saved!!.cancelDrawing)
+        assertEquals("Withdrawal never happened", saved!!.notes)
+    }
+
+    @Test
+    fun withdrawalDetailShowsLinkedReceiptsAndOwnerAction() {
+        val record = row(88L).copy(eventTypeCode = "OWNER_DRAWING", taskLabel = "Owner drawing")
+        val ownerFunds = funds().copy(linkedReceipts = listOf(
+            NativeOwnerFundsLinkedReceipt(91L, "2026-09-21", 30.0, "Superseded"),
+            NativeOwnerFundsLinkedReceipt(92L, "2026-09-21", 25.0, "Corrected")))
+        var opened: NativeOwnerFundsContext? = null
+        setScreen(NativeOwnerRecordsState.Ready(snapshot = snapshotWith(record),
+            detail = detail(record).copy(ownerFunds = ownerFunds)),
+            onOpenReceipt = { opened = it })
+        composeRule.onNodeWithText("Money received against this withdrawal").assertExists()
+        composeRule.onNodeWithTag(NativeUiTags.ownerFundsLinkedReceipt(91L)).assertExists()
+        composeRule.onNodeWithTag(NativeUiTags.ownerFundsLinkedReceipt(92L)).assertExists()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerFundsRecordReceipt).performScrollTo().performClick()
+        assertEquals(88L, opened?.rootEventId)
+    }
+
+    @Test
+    fun managerWithdrawalDetailHasNoReceiptAction() {
+        val record = row(88L).copy(eventTypeCode = "OWNER_DRAWING", taskLabel = "Owner drawing")
+        setScreen(NativeOwnerRecordsState.Ready(snapshot = snapshotWith(record),
+            detail = detail(record).copy(ownerFunds = funds().copy(canRecordReceipt = false))))
+        composeRule.onNodeWithText("Money received against this withdrawal").assertExists()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerFundsRecordReceipt).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsDetailCorrect).assertDoesNotExist()
+    }
+
+    @Test
+    fun receiptDraftUsesMaterialDateDialog() {
+        var state by mutableStateOf<NativeOwnerRecordsState>(NativeOwnerRecordsState.Ready(
+            snapshot = emptySnapshot(), receipt = NativeOwnerFundsReceiptEditorState(funds())))
+        setScreen(stateProvider = { state }, onUpdateReceipt = { transform ->
+            val ready = state as NativeOwnerRecordsState.Ready
+            state = ready.copy(receipt = transform(ready.receipt!!))
+        })
+        composeRule.onNodeWithTag(NativeUiTags.OwnerFundsReceiptRoot).assertExists()
+        saveQaScreenshot("receipt-light")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerFundsReceiptAmount).performTextReplacement("40")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerFundsReceiptDate).performScrollTo().performClick()
+        composeRule.onNodeWithText("Use date").assertExists()
+        composeRule.onNodeWithText("Use date").performClick()
+        composeRule.waitUntil(3_000) {
+            composeRule.onAllNodesWithText("Use date").fetchSemanticsNodes().isEmpty()
+        }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerFundsReceiptDate).assertExists()
+    }
+
+    @Test
+    fun receiptSaveShowsPersistentConfirmationAndCannotRepeat() {
+        var state by mutableStateOf<NativeOwnerRecordsState>(NativeOwnerRecordsState.Ready(
+            snapshot = emptySnapshot(), receipt = NativeOwnerFundsReceiptEditorState(funds(), amount = "40")))
+        var saves = 0
+        setScreen(stateProvider = { state }, onSaveReceipt = {
+            saves++
+            val ready = state as NativeOwnerRecordsState.Ready
+            state = ready.copy(receipt = ready.receipt!!.copy(savedEventId = 93L))
+        })
+        composeRule.onNodeWithTag(NativeUiTags.OwnerFundsReceiptSave).performScrollTo().performClick()
+        assertEquals(1, saves)
+        composeRule.onNodeWithText("Money received saved").assertExists()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerFundsDone).assertExists()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerFundsReceiptSave).assertDoesNotExist()
+    }
+
+    @Test
+    fun receiptFailureKeepsDraftAndOffersCurrentFactsRefresh() {
+        var refreshes = 0
+        setScreen(NativeOwnerRecordsState.Ready(snapshot = emptySnapshot(),
+            receipt = NativeOwnerFundsReceiptEditorState(funds(), amount = "275", note = "Actually returned",
+                error = "Owner funds changed; review again", draftTouched = true)),
+            onRefreshReceiptFacts = { refreshes++ })
+        composeRule.onNodeWithTag(NativeUiTags.OwnerFundsReceiptError).performScrollTo().assertExists()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerFundsRefreshFacts).performScrollTo().performClick()
+        assertEquals(1, refreshes)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerFundsReceiptAmount).assertExists()
+    }
+
+    @Test
+    fun ownerFundsCorrectionSavedStateRequiresDone() {
+        val record = row(88L).copy(eventTypeCode = "OWNER_DRAWING", taskLabel = "Owner drawing")
+        val prefill = monetaryPrefill(record).copy(kind = NativeCorrectionKind.Drawing,
+            drawingPaymentAccountName = "Cash", notes = "", ownerFunds = funds())
+        setScreen(NativeOwnerRecordsState.Ready(snapshot = snapshotWith(record),
+            correction = NativeCorrectionEditorState(prefill, savedEventId = 94L)))
+        composeRule.onNodeWithText("Saved as #94").performScrollTo().assertExists()
+        composeRule.onNodeWithText("Done").performScrollTo().assertExists()
+        composeRule.onNodeWithText("Save correction").assertDoesNotExist()
+    }
+
+    @Test
+    fun correctionFailureKeepsDraftAndOffersCurrentFactsRefresh() {
+        val record = row(88L).copy(eventTypeCode = "OWNER_DRAWING", taskLabel = "Owner drawing")
+        val prefill = monetaryPrefill(record).copy(kind = NativeCorrectionKind.Drawing,
+            drawingPaymentAccountName = "Cash", notes = "", ownerFunds = funds())
+        var refreshes = 0
+        setScreen(NativeOwnerRecordsState.Ready(snapshot = snapshotWith(record),
+            correction = NativeCorrectionEditorState(prefill, monetaryAmount = "200", notes = "Wrong account",
+                error = "Owner funds changed; review again", draftTouched = true)),
+            onRefreshCorrectionFacts = { refreshes++ })
+        composeRule.onNodeWithTag(NativeUiTags.OwnerFundsCorrectionRefreshFacts).performScrollTo().performClick()
+        assertEquals(1, refreshes)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionMonetaryAmount).assertExists()
+    }
+
+    @Test
+    fun receiptFormControlsRemainReachableInDarkLargeText() {
+        setScreen(NativeOwnerRecordsState.Ready(snapshot = emptySnapshot(),
+            receipt = NativeOwnerFundsReceiptEditorState(funds())), darkTheme = true, fontScale = 1.5f)
+        saveQaScreenshot("receipt-dark-large")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerFundsReceiptAmount).assertExists()
+        composeRule.onNodeWithTag(NativeUiTags.ownerFundsAccount(2L)).performScrollTo().assertExists()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerFundsReceiptDate).performScrollTo().assertExists()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerFundsReceiptSave).performScrollTo().assertExists()
+    }
+
+    @Test
+    fun correctionFormControlsRemainReachableInDarkLargeText() {
+        val record = row(88L).copy(eventTypeCode = "OWNER_DRAWING", taskLabel = "Owner drawing")
+        val prefill = monetaryPrefill(record).copy(kind = NativeCorrectionKind.Drawing,
+            drawingPaymentAccountName = "Cash", notes = "", ownerFunds = funds())
+        setScreen(NativeOwnerRecordsState.Ready(snapshot = snapshotWith(record),
+            correction = NativeCorrectionEditorState(prefill)), darkTheme = true, fontScale = 1.5f)
+        saveQaScreenshot("correction-dark-large")
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionMonetaryAmount).performScrollTo().assertExists()
+        composeRule.onNodeWithTag(NativeUiTags.ownerFundsAccount(2L)).performScrollTo().assertExists()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionNotes).performScrollTo().assertExists()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerRecordsCorrectionSave).performScrollTo().assertExists()
+    }
+
     private fun setScreen(
         state: NativeOwnerRecordsState,
         onRetry: () -> Unit = {},
@@ -197,7 +364,14 @@ class NativeOwnerRecordsScreenContractTest {
         onBackFromCorrection: () -> Unit = {},
         onUpdateCorrection: ((NativeCorrectionEditorState) -> NativeCorrectionEditorState) -> Unit = {},
         onSaveCorrection: () -> Unit = {},
+        onRefreshCorrectionFacts: () -> Unit = {},
+        onOpenReceipt: (NativeOwnerFundsContext) -> Unit = {},
+        onUpdateReceipt: ((NativeOwnerFundsReceiptEditorState) -> NativeOwnerFundsReceiptEditorState) -> Unit = {},
+        onSaveReceipt: () -> Unit = {},
+        onRefreshReceiptFacts: () -> Unit = {},
         onNavigate: (OwnerSection) -> Unit = {},
+        darkTheme: Boolean = false,
+        fontScale: Float? = null,
     ) {
         setScreen(
             stateProvider = { state },
@@ -211,7 +385,14 @@ class NativeOwnerRecordsScreenContractTest {
             onBackFromCorrection = onBackFromCorrection,
             onUpdateCorrection = onUpdateCorrection,
             onSaveCorrection = onSaveCorrection,
+            onRefreshCorrectionFacts = onRefreshCorrectionFacts,
+            onOpenReceipt = onOpenReceipt,
+            onUpdateReceipt = onUpdateReceipt,
+            onSaveReceipt = onSaveReceipt,
+            onRefreshReceiptFacts = onRefreshReceiptFacts,
             onNavigate = onNavigate,
+            darkTheme = darkTheme,
+            fontScale = fontScale,
         )
     }
 
@@ -227,10 +408,19 @@ class NativeOwnerRecordsScreenContractTest {
         onBackFromCorrection: () -> Unit = {},
         onUpdateCorrection: ((NativeCorrectionEditorState) -> NativeCorrectionEditorState) -> Unit = {},
         onSaveCorrection: () -> Unit = {},
+        onRefreshCorrectionFacts: () -> Unit = {},
+        onOpenReceipt: (NativeOwnerFundsContext) -> Unit = {},
+        onUpdateReceipt: ((NativeOwnerFundsReceiptEditorState) -> NativeOwnerFundsReceiptEditorState) -> Unit = {},
+        onSaveReceipt: () -> Unit = {},
+        onRefreshReceiptFacts: () -> Unit = {},
         onNavigate: (OwnerSection) -> Unit = {},
+        darkTheme: Boolean = false,
+        fontScale: Float? = null,
     ) {
         composeRule.setContent {
-            SaafTheme(darkTheme = false) {
+            val density = LocalDensity.current
+            CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale ?: density.fontScale)) {
+            SaafTheme(darkTheme = darkTheme) {
                 OwnerRecordsScreen(
                     snackbarHostState = remember { SnackbarHostState() },
                     state = stateProvider(),
@@ -253,8 +443,17 @@ class NativeOwnerRecordsScreenContractTest {
                     onBackFromCorrection = onBackFromCorrection,
                     onUpdateCorrection = onUpdateCorrection,
                     onSaveCorrection = onSaveCorrection,
+                    onRefreshCorrectionFacts = onRefreshCorrectionFacts,
+                    onOpenReceipt = onOpenReceipt,
+                    onUpdateReceipt = onUpdateReceipt,
+                    onSaveReceipt = onSaveReceipt,
+                    onRefreshReceiptFacts = onRefreshReceiptFacts,
                 )
             }
+            }
+        }
+        composeRule.waitUntil(5_000) {
+            runCatching { composeRule.onRoot().fetchSemanticsNode() }.isSuccess
         }
     }
 
@@ -302,6 +501,20 @@ class NativeOwnerRecordsScreenContractTest {
         notes = row.notes.orEmpty(),
         monetaryAmount = "250",
     )
+
+    private fun funds() = NativeOwnerFundsContext(
+        rootEventId = 88L, rootDate = "2026-09-21", currentWithdrawal = 250.0,
+        receivedTotal = 25.0, currentAccountId = 1L, currentAccountName = "Cash",
+        accounts = listOf(NativeOwnerFundsAccount(1L, "Cash"), NativeOwnerFundsAccount(2L, "Bank")),
+        linkedReceipts = emptyList(), canRecordReceipt = true, isReceipt = false)
+
+    private fun saveQaScreenshot(name: String) {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val output = File(context.getExternalFilesDir(null), "b3d-$name.png")
+        output.outputStream().use { stream ->
+            composeRule.onRoot().captureToImage().asAndroidBitmap().compress(Bitmap.CompressFormat.PNG, 100, stream)
+        }
+    }
 
     private fun detail(
         row: NativeOwnerRecordsRow,

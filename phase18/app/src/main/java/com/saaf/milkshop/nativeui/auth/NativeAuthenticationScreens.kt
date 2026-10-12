@@ -13,11 +13,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -57,6 +61,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import com.saaf.milkshop.nativeui.common.hapticTap
 import com.saaf.milkshop.nativeui.common.hapticSelect
 import com.saaf.milkshop.nativeui.common.hapticCommit
@@ -65,7 +70,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.saaf.milkshop.application.authentication.NativeAccountSummary
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.nativeui.NativeUiTags
@@ -92,15 +104,15 @@ private fun accessHeader(
     is NativeAuthenticationState.StartupFailure -> AccessHeader("Accounts could not open", state.message)
     is NativeAuthenticationState.OwnerSetup -> AccessHeader("Create the Owner account", "This is the first private account for this shop’s data vault.", welcome)
     is NativeAuthenticationState.AccountPicker -> AccessHeader(
-        if (state.cancelReturnsToSession) "Switch account" else "Who is signing in?",
-        if (state.cancelReturnsToSession) "Pick another account to sign in. Back keeps you signed in on this account."
-        else "Choose your own account. Your access stays separate from everyone else on this phone.", welcome)
+        if (state.cancelReturnsToSession) "Switch account" else "Choose account",
+        if (state.cancelReturnsToSession) "Choose another account. Back keeps you signed in."
+        else "Tap your name to sign in.", welcome)
     is NativeAuthenticationState.Passphrase -> AccessHeader("Welcome back, ${state.account.displayName}",
         "Sign in with the full passphrase for this account.", passphraseBack, NativeUiTags.AuthPassphraseBack)
     is NativeAuthenticationState.MethodPicker -> AccessHeader("Unlock ${state.account.displayName}",
         "Choose a sign-in method already set up for this account on this phone.", picker, NativeUiTags.AuthMethodBack)
     is NativeAuthenticationState.QuickPin -> AccessHeader("Enter Quick PIN",
-        "This PIN belongs only to ${state.account.displayName} on this phone.", pinBack, NativeUiTags.AuthQuickPinBack)
+        "Enter your account PIN.", pinBack, NativeUiTags.AuthQuickPinBack)
     is NativeAuthenticationState.RecoveryCode -> AccessHeader("Save your recovery code",
         "${state.identity.displayName}, store this code somewhere private. It is shown only once.")
     is NativeAuthenticationState.Authenticated -> AccessHeader("", "")
@@ -123,8 +135,9 @@ fun NativeAuthenticationHost(
     onBootstrapOwner: (String, String, CharArray, CharArray) -> Unit,
     onAcknowledgeRecoveryCode: () -> Unit,
     modifier: Modifier = Modifier,
+    onQuickPinEdit: () -> Unit = {},
 ) {
-    // The identity band stays mounted; only the step's body transitions.
+    // The neutral toolbar stays mounted; only the step's body transitions.
     if (state is NativeAuthenticationState.Authenticated) return
     val frame = accessHeader(state, onBackToWelcome, onChooseAnotherAccount,
         onBackFromPassphrase, onBackFromQuickPin)
@@ -192,6 +205,9 @@ fun NativeAuthenticationHost(
                 error = state.error,
                 onBack = onBackFromQuickPin,
                 onUseFullPassphrase = onUseFullPassphrase,
+                onUsePhoneSecurity = onUsePhoneSecurity,
+                onEdit = onQuickPinEdit,
+                checkingPhoneSecurity = state.checkingPhoneSecurity,
                 onSignIn = onQuickPinSignIn,
                 modifier = modifier,
             )
@@ -218,29 +234,23 @@ private fun AccountPickerScreen(
     modifier: Modifier = Modifier,
 ) {
     AccessFrame(
-        title = if (cancelReturnsToSession) "Switch account" else "Who is signing in?",
+        title = if (cancelReturnsToSession) "Switch account" else "Choose account",
         subtitle = if (cancelReturnsToSession) {
-            "Pick another account to sign in. Back keeps you signed in on this account."
+            "Choose another account. Back keeps you signed in."
         } else {
-            "Choose your own account. Your access stays separate from everyone else on this phone."
+            "Tap your name to sign in."
         },
         onBack = onBack,
         modifier = modifier,
     ) {
         if (error != null) AccessError(error)
-        Text(
-            text = "ACCOUNTS ON THIS PHONE",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Spacer(Modifier.height(8.dp))
         if (accounts.isEmpty()) {
             AccessError("No active account is ready to sign in.")
         } else {
             accounts.forEachIndexed { index, account ->
                 AccountRow(account = account, onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelectAccount(account) })
                 if (index != accounts.lastIndex) {
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    Spacer(Modifier.height(8.dp))
                 }
             }
         }
@@ -257,7 +267,7 @@ private fun AccountPickerScreen(
         }
         Spacer(Modifier.height(20.dp))
         Text(
-            text = "New staff accounts are created privately by an Owner or Administrator.",
+            text = "Staff accounts are created by an Owner or Administrator.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -269,7 +279,7 @@ private fun AccountRow(account: NativeAccountSummary, onClick: () -> Unit) {
     val context = LocalContext.current
     Row(
         modifier = Modifier
-            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Entity)
+            .fillMaxWidth().nativeListItem(NativeListStyle.Entity)
             .testTag(NativeUiTags.authAccount(account.loginName))
             .clickable(onClick = { context.hapticSelect(); onClick() })
             .nativeListItemContent(NativeListStyle.Entity),
@@ -279,22 +289,24 @@ private fun AccountRow(account: NativeAccountSummary, onClick: () -> Unit) {
             color = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             shape = RoundedCornerShape(14.dp),
-            modifier = Modifier.size(48.dp),
+            modifier = Modifier.sizeIn(minWidth = 40.dp, minHeight = 40.dp),
         ) {
-            Box(contentAlignment = Alignment.Center) {
-                Text(account.displayName.initials(), style = MaterialTheme.typography.titleMedium)
+            Box(Modifier.padding(4.dp), contentAlignment = Alignment.Center) {
+                Text(account.displayName.initials(), style = MaterialTheme.typography.titleMedium.copy(
+                    fontSize = 14.sp, lineHeight = 20.sp), maxLines = 1)
             }
         }
         Spacer(Modifier.size(12.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(account.displayName, style = MaterialTheme.typography.titleMedium)
+            Text(account.displayName, style = MaterialTheme.typography.titleMedium.copy(
+                fontSize = 16.sp, lineHeight = 24.sp, fontWeight = FontWeight.SemiBold))
             Text(
                 text = "${account.role.label()} · ${account.availableMethodSummary()}",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp, lineHeight = 20.sp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        Icon(Icons.Outlined.ChevronRight, contentDescription = null)
+        Icon(Icons.Outlined.ChevronRight, contentDescription = null, modifier = Modifier.size(24.dp))
     }
 }
 
@@ -454,70 +466,57 @@ private fun QuickPinSignInScreen(
     error: String?,
     onBack: () -> Unit,
     onUseFullPassphrase: () -> Unit,
+    onUsePhoneSecurity: () -> Unit,
+    onEdit: () -> Unit,
+    checkingPhoneSecurity: Boolean,
     onSignIn: (CharArray) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val pinInput = remember(account.loginName) { mutableStateOf("") }
-    val focusManager = LocalFocusManager.current
-    val currentFocusManager = rememberUpdatedState(focusManager)
-    val currentOnSignIn = rememberUpdatedState(onSignIn)
-    val submit = remember(account.loginName) {
-        {
-            val entered = pinInput.value
-            if (entered.isNotBlank()) {
-                val secret = entered.toCharArray()
-                pinInput.value = ""
-                currentFocusManager.value.clearFocus()
-                currentOnSignIn.value(secret)
-            }
+    var pin by remember(account.userId) { mutableStateOf("") }
+    val submit = {
+        if (!busy && pin.length in 4..12) {
+            val secret = pin.toCharArray()
+            pin = ""
+            onSignIn(secret)
         }
     }
-
-    AccessFrame(
-        title = "Enter Quick PIN",
-        subtitle = "This PIN belongs only to ${account.displayName} on this phone.",
-        onBack = onBack,
-        backTag = NativeUiTags.AuthQuickPinBack,
-        modifier = modifier,
-    ) {
+    val edit: (String) -> Unit = { entered ->
+        if (!busy) { pin = entered; onEdit() }
+    }
+    // State replacements after an attempt keep the same content pane and keypad anchors.
+    AccessFrame("Enter Quick PIN", "Enter your account PIN.", onBack,
+        NativeUiTags.AuthQuickPinBack, modifier) {
         IdentityCard(account)
-        Spacer(Modifier.height(18.dp))
-        OutlinedTextField(
-            value = pinInput.value,
-            onValueChange = { entered -> pinInput.value = entered.filter(Char::isDigit).take(12) },
-            label = { Text("Quick PIN") },
-            supportingText = { Text("4–12 digits") },
-            leadingIcon = { Icon(Icons.Outlined.Dialpad, contentDescription = null) },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.NumberPassword,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(onDone = { submit() }),
-            singleLine = true,
-            enabled = !busy,
-            modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.AuthQuickPinInput),
-        )
-        if (error != null && pinInput.value.isBlank()) {
-            Spacer(Modifier.height(10.dp))
-            AccessError(error)
-        }
-        Spacer(Modifier.height(18.dp))
-        AccessPrimaryButton(
-            label = if (busy) "Checking PIN…" else "Unlock",
-            tag = NativeUiTags.AuthQuickPinSubmit,
-            enabled = !busy && pinInput.value.isNotBlank(),
-            onClick = submit,
-        )
-        TextButton(
-            onClick = com.saaf.milkshop.nativeui.common.hapticAction(onUseFullPassphrase),
-            enabled = !busy,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp)
-                .testTag(NativeUiTags.AuthQuickPinUsePassphrase),
-        ) {
-            Text("Use full passphrase")
+        Spacer(Modifier.height(12.dp))
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(Modifier.widthIn(max = 320.dp).fillMaxWidth()) {
+                QuickPinKeypad(pin.length, !busy,
+                    onDigit = { if (pin.length < 12) edit(pin + it) },
+                    onClear = { edit("") }, onDelete = { edit(pin.dropLast(1)) }, onSubmit = submit)
+                Spacer(Modifier.height(12.dp))
+                AccessPrimaryButton(
+                    label = if (busy && !checkingPhoneSecurity) "Checking PIN…" else "Unlock",
+                    tag = NativeUiTags.AuthQuickPinSubmit,
+                    enabled = !busy && pin.length in 4..12, onClick = submit,
+                )
+                Spacer(Modifier.height(8.dp))
+                Box(Modifier.fillMaxWidth().heightIn(min = 24.dp)) {
+                    if (error != null) AccessError(error)
+                    else if (checkingPhoneSecurity) Text("Waiting for phone security…",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.semantics { liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite })
+                }
+                if (account.phoneSecurityEnabled) {
+                    TextButton(onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                        pin = ""; onUsePhoneSecurity()
+                    }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                        .testTag(NativeUiTags.AuthPhoneSecurityMethod)) { Text(account.phoneSecurityLabel) }
+                }
+                TextButton(onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                    pin = ""; onUseFullPassphrase()
+                }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                    .testTag(NativeUiTags.AuthQuickPinUsePassphrase)) { Text("Use full passphrase") }
+            }
         }
     }
 }
@@ -698,6 +697,13 @@ private fun AccessFrame(
         return
     }
     val context = LocalContext.current
+    val scroll = rememberScrollState()
+    LaunchedEffect(title) { scroll.scrollTo(0) }
+    val density = LocalDensity.current
+    val toolbarStyle = MaterialTheme.typography.bodyMedium.copy(
+        fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold)
+    val metrics = rememberTextMeasurer().measure("Ag", style = toolbarStyle, maxLines = 1, softWrap = false)
+    val toolbarHeight = with(density) { metrics.size.height.toDp() + 16.dp }.coerceAtLeast(56.dp)
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -705,33 +711,38 @@ private fun AccessFrame(
                 .navigationBarsPadding()
                 .imePadding(),
         ) {
-            com.saaf.milkshop.nativeui.common.NativeChromeBand(
-                title = compactAccessTitle(title),
-                reserveNavigationSpace = true,
-                reserveActionSpace = false,
-                navigation = if (onBack != null) ({
-                    androidx.compose.material3.IconButton(
-                        onClick = { context.hapticTap(); onBack() },
-                        modifier = Modifier.size(48.dp).testTag(backTag),
-                    ) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onPrimary)
+            Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 16.dp)
+                .height(toolbarHeight), verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.width(48.dp), contentAlignment = Alignment.CenterStart) {
+                    if (onBack != null) {
+                        androidx.compose.material3.IconButton(
+                            onClick = { context.hapticTap(); onBack() },
+                            modifier = Modifier.size(48.dp).testTag(backTag),
+                        ) {
+                            Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.primary)
+                        }
                     }
-                }) else null,
-            ) {
-                com.saaf.milkshop.nativeui.common.NativeChromeContext(com.saaf.milkshop.nativeui.common.LocalShopName.current)
-                com.saaf.milkshop.nativeui.common.NativeChromeContext("Private account access", prominent = true)
-                com.saaf.milkshop.nativeui.common.NativeChromeContext("On this phone")
+                }
+                // Text semantics retains the complete shop name even when the toolbar ellipsizes.
+                Text(com.saaf.milkshop.nativeui.common.LocalShopName.current,
+                    modifier = Modifier.weight(1f), style = toolbarStyle,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp, vertical = 20.dp),
+                    .verticalScroll(scroll)
+                    .padding(horizontal = 16.dp, vertical = 24.dp),
             ) {
-                Text(subtitle, style = MaterialTheme.typography.bodyMedium,
+                Text(compactAccessTitle(title), modifier = Modifier.semantics { heading() },
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                    fontSize = 24.sp, lineHeight = 32.sp, fontWeight = FontWeight.SemiBold))
+                Spacer(Modifier.height(8.dp))
+                Text(subtitle, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp, lineHeight = 20.sp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(20.dp))
                 content()
             }
         }
@@ -763,7 +774,7 @@ private fun IdentityCard(account: NativeAccountSummary) {
         ) {
             Icon(Icons.Outlined.Person, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.size(12.dp))
-            Column {
+            Column(Modifier.weight(1f)) {
                 Text(account.displayName, style = MaterialTheme.typography.titleMedium)
                 Text(
                     "${account.role.label()} · ${account.loginName}",
@@ -809,7 +820,7 @@ private fun AccessPrimaryButton(
             containerColor = MaterialTheme.colorScheme.secondary,
             contentColor = MaterialTheme.colorScheme.onSecondary,
         ),
-        modifier = Modifier.pressScale(press).fillMaxWidth().height(54.dp).testTag(tag),
+        modifier = Modifier.pressScale(press).fillMaxWidth().heightIn(min = 54.dp).testTag(tag),
     ) {
         Text(label, style = MaterialTheme.typography.titleMedium)
     }
@@ -831,7 +842,7 @@ private fun AccessMethodButton(
         enabled = enabled,
         shape = RoundedCornerShape(13.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-        modifier = Modifier.pressScale(press).fillMaxWidth().height(68.dp).testTag(tag),
+        modifier = Modifier.pressScale(press).fillMaxWidth().heightIn(min = 68.dp).testTag(tag),
         interactionSource = press,
     ) {
         icon()

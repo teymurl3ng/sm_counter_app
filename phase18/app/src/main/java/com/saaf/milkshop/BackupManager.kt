@@ -68,7 +68,7 @@ class BackupManager(
          * identity). Formats 3/4 restore via the legacy push-first path.
          */
         const val FORMAT_VERSION = 5
-        const val CURRENT_SCHEMA_VERSION = 10
+        const val CURRENT_SCHEMA_VERSION = 12
 
         /**
          * Oldest portable/local/cloud backup format this build can still
@@ -462,6 +462,7 @@ class BackupManager(
             put("events", JSONArray(dao.events().map(::eventJson)))
             put("inventory_logs", JSONArray(dao.inventoryLogs().map(::inventoryJson)))
             put("financial_logs", JSONArray(dao.financialLogs().map(::financialJson)))
+            put("owner_funds_details", JSONArray(database.ownerFundsDao().all().map(::ownerFundsDetailJson)))
             put("settings", JSONArray(dao.settings().map(::settingJson)))
             put("budgets", JSONArray(dao.budgets().map(::budgetJson)))
             put("collections_targets", JSONArray(dao.collectionsTargets().map(::collectionJson)))

@@ -59,6 +59,30 @@ sealed interface CorrectionInput {
         override val notes: String? = null,
     ) : CorrectionInput
 
+    /** Recording mistake; zero cancels a withdrawal which never happened. */
+    data class OwnerDrawing(
+        override val originalEventId: Long,
+        override val occurredAt: String,
+        val amount: Double,
+        override val notes: String? = null,
+        val paymentAccountId: Long? = null,
+        val reviewedWithdrawalAmount: Double? = null,
+        val reviewedReceivedTotal: Double? = null,
+        val acknowledgeExcess: Boolean = false,
+    ) : CorrectionInput
+
+    /** Correct a receipt's declared amount/account, or cancel a receipt that never occurred. */
+    data class OwnerFundsIn(
+        override val originalEventId: Long,
+        override val occurredAt: String,
+        val amount: Double,
+        override val notes: String? = null,
+        val paymentAccountId: Long? = null,
+        val reviewedWithdrawalAmount: Double? = null,
+        val reviewedReceivedTotal: Double? = null,
+        val acknowledgeExcess: Boolean = false,
+    ) : CorrectionInput
+
     data class Spoilage(
         override val originalEventId: Long,
         override val occurredAt: String,
@@ -92,6 +116,8 @@ class CorrectionService(
                 is CorrectionInput.Production -> correctProduction(input, original)
                 is CorrectionInput.Sale -> correctSale(input, original)
                 is CorrectionInput.Monetary -> correctMonetary(input, original)
+                is CorrectionInput.OwnerDrawing -> correctOwnerDrawing(input, original)
+                is CorrectionInput.OwnerFundsIn -> correctOwnerFundsIn(input, original)
                 is CorrectionInput.Spoilage -> correctSpoilage(input, original)
             }
         }
@@ -371,6 +397,71 @@ class CorrectionService(
         }
 
         return CorrectionResult(correctionEventId, original.eventType)
+    }
+
+    private suspend fun correctOwnerDrawing(input: CorrectionInput.OwnerDrawing, original: EventEntity): CorrectionResult {
+        require(original.eventType == OwnerDrawingService.EVENT_TYPE_OWNER_DRAWING) { "Reference an owner withdrawal" }
+        require(input.occurredAt == original.occurredAt) { "A withdrawal correction must keep its original business date" }
+        require(input.amount.isFinite() && input.amount >= 0.0) { "Corrected withdrawal must be a finite nonnegative amount" }
+        require(runCatching { java.math.BigDecimal.valueOf(input.amount).movePointRight(2).longValueExact() }.isSuccess) {
+            "Use at most two decimal places and an amount within the supported range"
+        }
+        val reason = input.notes?.trim()?.takeIf { it.isNotEmpty() }
+            ?: throw IllegalArgumentException("Explain the withdrawal correction or cancellation")
+        val truth = OwnerFundsTruth(database)
+        val priorDetail = truth.resolve(original)
+        val account = input.paymentAccountId ?: priorDetail.paymentAccountId
+        require(accountDao.findById(account)?.category == "Cash/Bank") { "Withdrawal account is invalid" }
+        require(input.amount != original.amount || account != priorDetail.paymentAccountId) { "The corrected withdrawal truth must change" }
+        require(input.amount != 0.0 || account == priorDetail.paymentAccountId) { "Cancellation retains its account" }
+        truth.ensureDetails(original)
+        val (withdrawal, received) = truth.currentTotals(priorDetail.withdrawalRootEventId)
+        OwnerFundsReview.requireCurrent(withdrawal, received, received,
+            input.reviewedWithdrawalAmount, input.reviewedReceivedTotal, input.acknowledgeExcess,
+            proposedWithdrawal = input.amount)
+        val id = eventDao.insert(EventEntity(createdAt = Instant.now().toString(), occurredAt = input.occurredAt,
+            eventType = OwnerDrawingService.EVENT_TYPE_OWNER_DRAWING, correctsEventId = original.eventId,
+            amount = input.amount, notes = reason))
+        database.ownerFundsDao().insert(priorDetail.copy(eventId = id, paymentAccountId = account,
+            reviewedWithdrawalAmount = input.reviewedWithdrawalAmount,
+            reviewedReceivedTotal = input.reviewedReceivedTotal,
+            excessAcknowledged = input.acknowledgeExcess))
+        OwnerFundsTruth.movements(input.amount, account, original, priorDetail).forEach { (accountId, amount) ->
+            financialLogDao.insert(FinancialLogEntity(eventId = id, accountId = accountId, amount = amount))
+        }
+        truth.resolve(eventDao.findById(id)!!)
+        return CorrectionResult(id, OwnerDrawingService.EVENT_TYPE_OWNER_DRAWING)
+    }
+
+    private suspend fun correctOwnerFundsIn(input: CorrectionInput.OwnerFundsIn, original: EventEntity): CorrectionResult {
+        require(original.eventType == OwnerFundsReceiptService.EVENT_TYPE) { "Reference an owner money receipt" }
+        require(input.occurredAt == original.occurredAt) { "A receipt correction keeps its original receiving date" }
+        OwnerFundsReview.paisa(input.amount)
+        val reason = input.notes?.trim()?.takeIf { it.isNotEmpty() }
+            ?: throw IllegalArgumentException("Explain the receipt correction or cancellation")
+        val truth = OwnerFundsTruth(database)
+        val prior = truth.resolve(original)
+        val account = input.paymentAccountId ?: prior.paymentAccountId
+        require(accountDao.findById(account)?.category == "Cash/Bank") { "Receipt account is invalid" }
+        require(input.amount != original.amount || account != prior.paymentAccountId) { "Receipt truth must change" }
+        require(input.amount != 0.0 || account == prior.paymentAccountId) { "Cancellation retains its account" }
+        val (withdrawal, received) = truth.currentTotals(prior.withdrawalRootEventId)
+        val proposed = java.math.BigDecimal.valueOf(received).subtract(java.math.BigDecimal.valueOf(original.amount!!))
+            .add(java.math.BigDecimal.valueOf(input.amount)).toDouble()
+        OwnerFundsReview.requireCurrent(withdrawal, received, proposed,
+            input.reviewedWithdrawalAmount, input.reviewedReceivedTotal, input.acknowledgeExcess)
+        val id = eventDao.insert(EventEntity(createdAt = Instant.now().toString(), occurredAt = input.occurredAt,
+            eventType = OwnerFundsReceiptService.EVENT_TYPE, correctsEventId = original.eventId,
+            amount = input.amount, notes = reason))
+        database.ownerFundsDao().insert(prior.copy(eventId = id, paymentAccountId = account,
+            reviewedWithdrawalAmount = input.reviewedWithdrawalAmount,
+            reviewedReceivedTotal = input.reviewedReceivedTotal,
+            excessAcknowledged = input.acknowledgeExcess))
+        OwnerFundsTruth.receiptMovements(input.amount, account, original, prior).forEach { (accountId, amount) ->
+            financialLogDao.insert(FinancialLogEntity(eventId = id, accountId = accountId, amount = amount))
+        }
+        truth.resolve(eventDao.findById(id)!!)
+        return CorrectionResult(id, OwnerFundsReceiptService.EVENT_TYPE)
     }
 
     private suspend fun correctSpoilage(

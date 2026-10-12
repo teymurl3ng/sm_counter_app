@@ -205,6 +205,12 @@ interface SyncPullStateDao {
 
 @Dao
 interface SyncApplyDao {
+    @Query("""UPDATE budget_plans SET archived = :archived, sync_updated_at = :stamp WHERE uid = :uid""")
+    suspend fun updateBudgetStateByUid(uid: String, archived: Boolean, stamp: String): Int
+
+    @Query("""UPDATE collections_targets SET archived = :archived, sync_updated_at = :stamp WHERE uid = :uid""")
+    suspend fun updateCollectionsTargetStateByUid(uid: String, archived: Boolean, stamp: String): Int
+
     @Query("UPDATE products SET name = :name, unit = :unit, sync_updated_at = :stamp WHERE uid = :uid")
     suspend fun updateProductByUid(uid: String, name: String, unit: String, stamp: String): Int
 
@@ -258,6 +264,12 @@ interface SyncApplyDao {
  */
 @Dao
 interface SyncEnvelopeDao {
+    @Query("SELECT * FROM budget_plans WHERE supersedes_id = :parentId AND uid != :uid LIMIT 1")
+    suspend fun otherBudgetRevision(parentId: Long, uid: String): BudgetPlanEntity?
+
+    @Query("SELECT * FROM collections_targets WHERE supersedes_id = :parentId AND uid != :uid LIMIT 1")
+    suspend fun otherCollectionsRevision(parentId: Long, uid: String): CollectionsTargetEntity?
+
     @Query("SELECT * FROM events WHERE event_uid IN (:uids)")
     suspend fun eventsByUid(uids: List<String>): List<EventEntity>
 

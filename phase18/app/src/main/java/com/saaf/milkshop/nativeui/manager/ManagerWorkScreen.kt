@@ -1,5 +1,9 @@
 package com.saaf.milkshop.nativeui.manager
 
+import com.saaf.milkshop.nativeui.theme.nativeGroupLabelTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeVisualColors
+import com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeNavigationTitleTextStyle
 import com.saaf.milkshop.nativeui.common.NativeListStyle
 import com.saaf.milkshop.nativeui.common.nativeListItemContent
 import com.saaf.milkshop.nativeui.common.nativeListItem
@@ -194,7 +198,8 @@ private fun WorkHomeBody(
 
         Text(
             text = "Daily shortcuts",
-            style = MaterialTheme.typography.labelLarge,
+            style = nativeGroupLabelTextStyle(),
+            color = nativeVisualColors.supporting,
         )
         Row(
             Modifier
@@ -234,7 +239,8 @@ private fun WorkHomeBody(
 
         Text(
             text = "Make and move stock",
-            style = MaterialTheme.typography.labelLarge,
+            style = nativeGroupLabelTextStyle(),
+            color = nativeVisualColors.supporting,
         )
         Column(
             Modifier.testTag(NativeUiTags.ManagerWorkStockSection),
@@ -394,7 +400,7 @@ private fun PrimaryAction(
 }
 
 @Composable
-private fun CommandRow(
+internal fun CommandRow(
     label: String,
     detail: String,
     icon: ImageVector,
@@ -408,7 +414,7 @@ private fun CommandRow(
             .testTag(tag)
             .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onClick))
             .nativeListItemContent(NativeListStyle.Navigation),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
@@ -417,11 +423,11 @@ private fun CommandRow(
             modifier = Modifier.size(24.dp),
         )
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(label, style = MaterialTheme.typography.titleMedium)
+            Text(label, style = nativeNavigationTitleTextStyle())
             Text(
                 detail,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = nativeSupportingTextStyle(),
+                color = nativeVisualColors.supporting,
             )
         }
         if (badge != null) {

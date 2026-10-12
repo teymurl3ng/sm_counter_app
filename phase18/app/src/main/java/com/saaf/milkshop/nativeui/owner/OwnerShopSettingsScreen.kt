@@ -1,6 +1,9 @@
 package com.saaf.milkshop.nativeui.owner
 
 import com.saaf.milkshop.nativeui.common.NativeListStyle
+import com.saaf.milkshop.nativeui.common.NativeInformationSection
+import com.saaf.milkshop.nativeui.common.NativeInformationHeading
+import com.saaf.milkshop.nativeui.common.NativeInformationFact
 import com.saaf.milkshop.nativeui.common.nativeListItemContent
 import com.saaf.milkshop.nativeui.common.nativeListItem
 
@@ -420,170 +423,156 @@ private fun OwnerShopSettingsScreenPane(
                                 .verticalScroll(rememberScrollState())
                                 .padding(horizontal = 16.dp, vertical = 12.dp)
                                 .testTag(NativeUiTags.OwnerShopSettingsContent),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
                         ) {
-                            Row(
-                                Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(
-                                    snapshot.shopName,
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.weight(1f),
+                            NativeInformationSection {
+                                NativeInformationHeading(
+                                    title = "Shop details",
+                                    actionLabel = "Edit details",
+                                    actionTag = NativeUiTags.OwnerShopSettingsEditIdentity,
+                                    onAction = onOpenIdentityEdit,
                                 )
-                                TextButton(
-                                    onClick = hapticAction(onOpenIdentityEdit),
-                                    modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsEditIdentity),
-                                ) { Text("Edit identity") }
-                            }
-                            OwnerShopSettingsFact("Phone", snapshot.phone ?: "Not set")
-                            OwnerShopSettingsFact("Address", snapshot.address ?: "Not set")
-                            OwnerShopSettingsFact("Currency", snapshot.currencyCode)
-
-                            Row(
-                                Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(
-                                    "Rates",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsRatesSection),
-                                )
-                                TextButton(
-                                    onClick = hapticAction(onOpenRatesEdit),
-                                    modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsEditRates),
-                                ) { Text("Edit rates") }
-                            }
-                            OwnerShopSettingsFact("Vendor milk rate", snapshot.vendorMilkRateLabel)
-                            OwnerShopSettingsFact("Vendor delivery fee", snapshot.vendorDeliveryFeeLabel)
-                            OwnerShopSettingsFact("TS standard", snapshot.tsStandardLabel)
-                            OwnerShopSettingsFact("Retail milk rate", snapshot.retailMilkRateLabel)
-                            OwnerShopSettingsFact("Retail yogurt rate", snapshot.retailYogurtRateLabel)
-                            OwnerShopSettingsFact("Default delivery surcharge", snapshot.defaultSurchargeLabel)
-
-                            Text(
-                                "Opening state",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsOpeningSection),
-                            )
-                            OwnerShopSettingsFact("Opening date", snapshot.openingDateLabel)
-                            snapshot.openingNotes?.takeIf { it.isNotBlank() }?.let {
-                                OwnerShopSettingsFact("Opening notes", it)
-                            }
-                            when {
-                                !snapshot.hasStoreIdentity -> {
-                                    Text(
-                                        "Save shop identity first. Opening balances need a store name before they can be recorded.",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsOpeningNotice),
-                                    )
-                                }
-                                snapshot.openingRecorded -> {
-                                    OwnerShopSettingsFact(
-                                        "Stock items",
-                                        snapshot.openingInventoryCount.toString(),
-                                    )
-                                    OwnerShopSettingsFact(
-                                        "Account balances",
-                                        snapshot.openingAccountCount.toString(),
-                                    )
-                                    Text(
-                                        "A correction creates a new history record. It does not erase the original.",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                    Button(
-                                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenOpeningEdit(true) },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .testTag(NativeUiTags.OwnerShopSettingsOpeningCorrect),
-                                    ) { Text("Correct opening balances") }
-                                }
-                                snapshot.canRecordOpening -> {
-                                    Text(
-                                        "Optional starting picture for stock and money already in the shop when this installation began.",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                    Button(
-                                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenOpeningEdit(false) },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .testTag(NativeUiTags.OwnerShopSettingsOpeningRecord),
-                                    ) { Text("Record opening balances") }
-                                }
-                                else -> {
-                                    Text(
-                                        "Opening balances can no longer be recorded because business activity already exists.",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsOpeningNotice),
-                                    )
-                                }
+                                NativeInformationFact("Shop name", snapshot.shopName)
+                                NativeInformationFact("Phone", snapshot.phone ?: "Not set")
+                                NativeInformationFact("Address", snapshot.address ?: "Not set", stacked = true, prose = true)
+                                NativeInformationFact("Currency", snapshot.currencyCode)
                             }
 
-                            Row(
-                                Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(
-                                    "Expense categories",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsCategoriesSection),
+                            NativeInformationSection(Modifier.testTag(NativeUiTags.OwnerShopSettingsRatesSection)) {
+                                NativeInformationHeading(
+                                    title = "Rates",
+                                    actionLabel = "Edit rates",
+                                    actionTag = NativeUiTags.OwnerShopSettingsEditRates,
+                                    onAction = onOpenRatesEdit,
                                 )
-                                TextButton(
-                                    onClick = hapticAction(onOpenCategoryCreate),
-                                    modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsAddCategory),
-                                ) { Text("Add category") }
+                                Text("Supplier", style = com.saaf.milkshop.nativeui.theme.nativeGroupLabelTextStyle(),
+                                    color = com.saaf.milkshop.nativeui.theme.nativeVisualColors.supporting,
+                                    modifier = Modifier.padding(top = 8.dp, bottom = 4.dp))
+                                NativeInformationFact("Vendor milk rate", snapshot.vendorMilkRateLabel, emphasized = true)
+                                NativeInformationFact("Vendor delivery fee", snapshot.vendorDeliveryFeeLabel, emphasized = true)
+                                NativeInformationFact("TS standard", snapshot.tsStandardLabel)
+                                HorizontalDivider(Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant)
+                                Text("Retail & delivery", style = com.saaf.milkshop.nativeui.theme.nativeGroupLabelTextStyle(),
+                                    color = com.saaf.milkshop.nativeui.theme.nativeVisualColors.supporting,
+                                    modifier = Modifier.padding(bottom = 4.dp))
+                                NativeInformationFact("Retail milk rate", snapshot.retailMilkRateLabel, emphasized = true)
+                                NativeInformationFact("Retail yogurt rate", snapshot.retailYogurtRateLabel, emphasized = true)
+                                NativeInformationFact("Default delivery surcharge", snapshot.defaultSurchargeLabel, emphasized = true)
                             }
-                            if (snapshot.expenseCategories.isEmpty()) {
-                                Text(
-                                    "No expense categories yet.",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            } else {
-                                snapshot.expenseCategories.forEach { category ->
-                                    Row(
-                                        Modifier
-                                            .fillMaxWidth().padding(vertical = 4.dp).nativeListItem(NativeListStyle.Record)
-                                            .semantics { role = Role.Button }
-                                            .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenCategory(category.accountId) })
-                                            .testTag(NativeUiTags.ownerShopExpenseCategory(category.accountId))
-                                            .nativeListItemContent(NativeListStyle.Record),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Column(
-                                            Modifier.weight(1f),
-                                            verticalArrangement = Arrangement.spacedBy(2.dp),
-                                        ) {
+
+                            NativeInformationSection(Modifier.testTag(NativeUiTags.OwnerShopSettingsOpeningSection)) {
+                                NativeInformationHeading(title = "Opening balances")
+                                NativeInformationFact("Opening date", snapshot.openingDateLabel)
+                                snapshot.openingNotes?.takeIf { it.isNotBlank() }?.let {
+                                    NativeInformationFact("Opening notes", it, stacked = true, prose = true)
+                                }
+                                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                    when {
+                                        !snapshot.hasStoreIdentity -> {
                                             Text(
-                                                category.name,
-                                                style = MaterialTheme.typography.bodyLarge,
-                                                fontWeight = FontWeight.Medium,
+                                                "Save shop identity first. Opening balances need a store name before they can be recorded.",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsOpeningNotice),
+                                            )
+                                        }
+                                        snapshot.openingRecorded -> {
+                                            NativeInformationFact(
+                                                "Stock items",
+                                                snapshot.openingInventoryCount.toString(),
+                                            )
+                                            NativeInformationFact(
+                                                "Account balances",
+                                                snapshot.openingAccountCount.toString(),
                                             )
                                             Text(
-                                                "#${category.accountId} · ${category.statusLabel}",
+                                                "A correction creates a new history record. It does not erase the original.",
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             )
+                                            Button(
+                                                onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenOpeningEdit(true) },
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .testTag(NativeUiTags.OwnerShopSettingsOpeningCorrect),
+                                            ) { Text("Correct opening balances") }
                                         }
-                                        Icon(
-                                            Icons.Outlined.ChevronRight,
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        )
+                                        snapshot.canRecordOpening -> {
+                                            Text(
+                                                "Optional starting picture for stock and money already in the shop when this installation began.",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                            Button(
+                                                onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenOpeningEdit(false) },
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .testTag(NativeUiTags.OwnerShopSettingsOpeningRecord),
+                                            ) { Text("Record opening balances") }
+                                        }
+                                        else -> {
+                                            Text(
+                                                "Opening balances can no longer be recorded because business activity already exists.",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsOpeningNotice),
+                                            )
+                                        }
                                     }
-                                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                                }
+                            }
+
+                            Column(
+                                Modifier.fillMaxWidth().padding(top = 8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                NativeInformationHeading(
+                                    title = "Expense categories",
+                                    modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsCategoriesSection),
+                                    actionLabel = "Add category",
+                                    actionTag = NativeUiTags.OwnerShopSettingsAddCategory,
+                                    onAction = onOpenCategoryCreate,
+                                )
+                                if (snapshot.expenseCategories.isEmpty()) {
+                                    Text(
+                                        "No expense categories yet.",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                } else {
+                                    snapshot.expenseCategories.forEach { category ->
+                                        Row(
+                                            Modifier
+                                                .nativeListItem(NativeListStyle.Record)
+                                                .semantics { role = Role.Button }
+                                                .clickable(onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenCategory(category.accountId) })
+                                                .testTag(NativeUiTags.ownerShopExpenseCategory(category.accountId))
+                                                .nativeListItemContent(NativeListStyle.Record),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            Column(
+                                                Modifier.weight(1f),
+                                                verticalArrangement = Arrangement.spacedBy(2.dp),
+                                            ) {
+                                                Text(
+                                                    category.name,
+                                                    style = MaterialTheme.typography.bodyLarge,
+                                                    fontWeight = FontWeight.Medium,
+                                                )
+                                                Text(
+                                                    "#${category.accountId} · ${category.statusLabel}",
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                )
+                                            }
+                                            Icon(
+                                                Icons.Outlined.ChevronRight,
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1093,14 +1082,15 @@ private fun OwnerShopSettingsCategoryDetailScreen(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Text(
-                    category.name,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsCategoryDetailName),
-                )
-                OwnerShopSettingsFact("Account", "#${category.accountId}")
-                OwnerShopSettingsFact("Status", category.statusLabel)
+                NativeInformationSection {
+                    NativeInformationHeading(
+                        title = "Category details",
+                    )
+                    NativeInformationFact("Category name", category.name,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerShopSettingsCategoryDetailName))
+                    NativeInformationFact("Account", "#${category.accountId}")
+                    NativeInformationFact("Status", category.statusLabel)
+                }
                 error?.let {
                     Text(
                         it,
@@ -1214,18 +1204,6 @@ private fun OwnerShopSettingsRateField(
             .fillMaxWidth()
             .testTag(tag),
     )
-}
-
-@Composable
-private fun OwnerShopSettingsFact(label: String, value: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(
-            label,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(value, style = MaterialTheme.typography.bodyLarge)
-    }
 }
 
 @Composable

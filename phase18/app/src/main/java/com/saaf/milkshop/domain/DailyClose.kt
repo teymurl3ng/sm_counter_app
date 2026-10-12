@@ -145,7 +145,11 @@ class DailyCloseService(private val database: MilkShopDatabase) {
         }
         val count = database.physicalCashCountDao().findById(action.physicalCashCountId!!)
             ?: error("Close action ${action.actionId} has no cash count")
-        val expected = database.physicalCashCountDao().canonicalBalanceAt(count.accountId, count.countedAt)
+        val expected = if (action.moneyRoundingVersion == 1) {
+            database.physicalCashCountDao().legacyBalanceAt(count.accountId, count.countedAt)
+        } else {
+            database.physicalCashCountDao().canonicalBalanceAt(count.accountId, count.countedAt)
+        }
         return DailyCloseRecord(
             action,
             STATUS_CLOSED,

@@ -441,6 +441,12 @@ fun AdminPreviewHost(
                     onBackFromCorrection = ownerRecordsViewModel::clearCorrection,
                     onUpdateCorrection = ownerRecordsViewModel::updateCorrection,
                     onSaveCorrection = ownerRecordsViewModel::saveCorrection,
+                    onRefreshCorrectionFacts = ownerRecordsViewModel::refreshCorrectionFacts,
+                    onOpenReceipt = ownerRecordsViewModel::openReceipt,
+                    onBackFromReceipt = ownerRecordsViewModel::clearReceipt,
+                    onUpdateReceipt = ownerRecordsViewModel::updateReceipt,
+                    onSaveReceipt = ownerRecordsViewModel::saveReceipt,
+                    onRefreshReceiptFacts = ownerRecordsViewModel::refreshReceiptFacts,
                     admScaffold = { s, m, content ->
                         Box(modifier = m.testTag(NativeUiTags.AdminShellRoot)) {
                             CompositionLocalProvider(LocalPaneHeaderEnabled provides false) {

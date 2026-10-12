@@ -286,9 +286,9 @@ class NativeMoreViewModel(
             pin?.fill('\u0000')
             return
         }
-        if (current.security?.quickPinEnabled == true && (pin == null || pin.size != 4)) {
+        if (current.security?.quickPinEnabled == true && (!com.saaf.milkshop.nativeui.common.QuickPinEntryPolicy.valid(pin))) {
             _state.value = current.copy(
-                error = "Enter your 4-digit Quick PIN to keep it while enabling phone security.",
+                error = "Enter a 4–12 digit PIN to save alongside phone security.",
             )
             passphrase.fill('\u0000')
             pin?.fill('\u0000')

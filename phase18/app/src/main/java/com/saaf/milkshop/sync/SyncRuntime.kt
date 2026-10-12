@@ -213,9 +213,63 @@ class SyncRuntime(
     suspend fun pullOnce(): SyncPullSummary = SyncOperationGate.exclusive {
         val summary = pullOnce(originCollector = null)
         if (summary is SyncPullSummary.Done) {
+            when (val catchup = catchUpProfilesIfPending()) {
+                is SyncProfileCatchup.Outcome.RetryLater ->
+                    return@exclusive SyncPullSummary.RetryLater("profile_catchup_${catchup.reason}")
+                is SyncProfileCatchup.Outcome.Done -> Unit
+            }
+            when (val catchup = catchUpPlanningIfPending()) {
+                is SyncPlanningCatchup.Outcome.RetryLater ->
+                    return@exclusive SyncPullSummary.RetryLater("planning_catchup_${catchup.reason}")
+                is SyncPlanningCatchup.Outcome.Done -> Unit
+            }
             refreshLinkVerificationIfDue()
         }
         summary
+    }
+
+    /** One-time current-master replay for devices whose old pull cursor passed profile content. */
+    private suspend fun catchUpProfilesIfPending(): SyncProfileCatchup.Outcome {
+        val config = SyncServerConfigStore.load(context)
+            ?: return SyncProfileCatchup.Outcome.RetryLater("not_configured")
+        val binding = SyncShopBindingStore.load(context)
+            ?: return SyncProfileCatchup.Outcome.RetryLater("not_configured")
+        val state = SyncRebaselineStore(context)
+        val identityKey = listOf(config.environment, config.baseUrl.trimEnd('/'), binding.shopId,
+            SyncIdentity.warmUp(context)).joinToString("|")
+        if (state.profileCatchupCompletedFor(identityKey)) return SyncProfileCatchup.Outcome.Done(0, 0, 0)
+        val client = SyncPullClient(http, config, tokenStore)
+        val result = SyncProfileCatchup(database).replay { sequence ->
+            var outcome = client.pull(sequence, maxRows = 100, shopId = binding.shopId)
+            if (outcome is SyncPullOutcome.RetryLater && outcome.reason == "unauthorized" && refreshSession(config)) {
+                outcome = client.pull(sequence, maxRows = 100, shopId = binding.shopId)
+            }
+            outcome
+        }
+        if (result is SyncProfileCatchup.Outcome.Done) state.markProfileCatchupCompleted(identityKey)
+        return result
+    }
+
+    /** Replays current planning rows after the ordinary cursor has advanced past an older skip. */
+    private suspend fun catchUpPlanningIfPending(): SyncPlanningCatchup.Outcome {
+        val config = SyncServerConfigStore.load(context)
+            ?: return SyncPlanningCatchup.Outcome.RetryLater("not_configured")
+        val binding = SyncShopBindingStore.load(context)
+            ?: return SyncPlanningCatchup.Outcome.RetryLater("not_configured")
+        val state = SyncRebaselineStore(context)
+        val identityKey = listOf(config.environment, config.baseUrl.trimEnd('/'), binding.shopId,
+            SyncIdentity.warmUp(context)).joinToString("|")
+        if (state.planningCatchupCompletedFor(identityKey)) return SyncPlanningCatchup.Outcome.Done(0, 0, 0)
+        val client = SyncPullClient(http, config, tokenStore)
+        val result = SyncPlanningCatchup(database).replay { sequence ->
+            var outcome = client.pull(sequence, maxRows = 100, shopId = binding.shopId)
+            if (outcome is SyncPullOutcome.RetryLater && outcome.reason == "unauthorized" && refreshSession(config)) {
+                outcome = client.pull(sequence, maxRows = 100, shopId = binding.shopId)
+            }
+            outcome
+        }
+        if (result is SyncPlanningCatchup.Outcome.Done) state.markPlanningCatchupCompleted(identityKey)
+        return result
     }
 
     /**

@@ -7,6 +7,7 @@ import com.saaf.milkshop.data.EventEntity
 import com.saaf.milkshop.data.FinancialLogDao
 import com.saaf.milkshop.data.FinancialLogEntity
 import com.saaf.milkshop.data.MilkShopDatabase
+import com.saaf.milkshop.data.OwnerFundsDetailEntity
 import java.time.Instant
 
 /**
@@ -17,9 +18,9 @@ import java.time.Instant
  * enforces the Cash/Bank + negative-movement shape; reports exclude the type
  * from operating expenses by not listing it in their CASE sums.
  *
- * Not correctable for now: CorrectionService's monetary branch deliberately
- * excludes OWNER_DRAWING, so a mistaken drawing is repaired by recording a
- * reverse drawing, never by a silent ledger delta.
+ * Recording mistakes are corrected through CorrectionInput.OwnerDrawing on the
+ * declared account. Cancellation is a linked zero-amount corrected truth; an
+ * actual cash return is a distinct operation and is not supported by cancellation.
  */
 data class OwnerDrawingInput(
     val amount: Double,
@@ -63,6 +64,7 @@ class OwnerDrawingService(
                     notes = notes,
                 ),
             )
+            database.ownerFundsDao().insert(OwnerFundsDetailEntity(eventId, paymentAccount.accountId, eventId))
             financialLogDao.insert(
                 FinancialLogEntity(
                     eventId = eventId,
@@ -70,6 +72,7 @@ class OwnerDrawingService(
                     amount = -input.amount,
                 ),
             )
+            OwnerFundsTruth(database).resolve(eventDao.findById(eventId)!!)
             OwnerDrawingResult(eventId = eventId, amount = input.amount)
         }
 

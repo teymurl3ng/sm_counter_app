@@ -1,6 +1,7 @@
 package com.saaf.milkshop.application.owner
 
 import com.saaf.milkshop.application.commands.HistoryBridgeCommandService
+import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
 import com.saaf.milkshop.application.readmodels.EventHistoryDto
 import com.saaf.milkshop.application.readmodels.FinancialMovementDto
 import com.saaf.milkshop.application.readmodels.HybridReadModelService
@@ -16,6 +17,10 @@ import com.saaf.milkshop.domain.CreditCollectionService
 import com.saaf.milkshop.domain.ExpenseService
 import com.saaf.milkshop.domain.OpeningStateService
 import com.saaf.milkshop.domain.OwnerDrawingService
+import com.saaf.milkshop.domain.OwnerFundsReceiptInput
+import com.saaf.milkshop.domain.OwnerFundsReceiptResult
+import com.saaf.milkshop.domain.OwnerFundsReceiptService
+import com.saaf.milkshop.domain.OwnerFundsTruth
 import com.saaf.milkshop.domain.RolePermissions
 import com.saaf.milkshop.domain.SalaryPaymentService
 import com.saaf.milkshop.domain.SaleService
@@ -107,6 +112,28 @@ data class NativeOwnerRecordsFinancialLine(
     val amountLabel: String,
 )
 
+data class NativeOwnerFundsAccount(val accountId: Long, val name: String)
+
+data class NativeOwnerFundsLinkedReceipt(
+    val eventId: Long,
+    val occurredAt: String,
+    val amount: Double,
+    val state: String,
+)
+
+data class NativeOwnerFundsContext(
+    val rootEventId: Long,
+    val rootDate: String,
+    val currentWithdrawal: Double,
+    val receivedTotal: Double,
+    val currentAccountId: Long,
+    val currentAccountName: String,
+    val accounts: List<NativeOwnerFundsAccount>,
+    val linkedReceipts: List<NativeOwnerFundsLinkedReceipt>,
+    val canRecordReceipt: Boolean,
+    val isReceipt: Boolean,
+)
+
 enum class NativeRecordsGroup {
     Recent,
     Balances,
@@ -119,6 +146,8 @@ enum class NativeCorrectionKind {
     Production,
     Sale,
     Monetary,
+    Drawing,
+    FundsReceipt,
     Spoilage,
 }
 
@@ -140,6 +169,8 @@ data class NativeCorrectionPrefill(
     val saleValue: String = "",
     val saleChannel: String = "retail",
     val monetaryAmount: String = "",
+    val drawingPaymentAccountName: String = "",
+    val ownerFunds: NativeOwnerFundsContext? = null,
     val spoilageQuantity: String = "",
     val spoilageReason: String = "",
 )
@@ -152,6 +183,7 @@ data class NativeOwnerRecordsDetail(
     val notes: String?,
     val canCorrect: Boolean,
     val correctionPrefill: NativeCorrectionPrefill?,
+    val ownerFunds: NativeOwnerFundsContext? = null,
 )
 
 /**
@@ -166,6 +198,7 @@ class NativeOwnerRecordsFacade(
     private val reads: HybridReadModelService = HybridReadModelService(database, security),
 ) {
     private val commands = HistoryBridgeCommandService(database, security)
+    private val operations = OperationsBridgeCommandService(database, security)
 
     suspend fun loadHistory(
         sessionHandle: String,
@@ -286,16 +319,29 @@ class NativeOwnerRecordsFacade(
         )
         val alreadyReplaced = database.eventDao().findAllDescending()
             .any { it.correctsEventId == eventId }
-        val prefill = entity?.let { buildCorrectionPrefill(it, row) }
-        val canCorrect = canCorrectPermission && !alreadyReplaced && prefill != null && !row.isSuperseded
+        val drawingPermission = entity?.eventType !in setOf(OwnerDrawingService.EVENT_TYPE_OWNER_DRAWING,
+            OwnerFundsReceiptService.EVENT_TYPE) ||
+            RolePermissions.allows(AppRole.parse(actor.role), AppPermission.OWNER_DRAWING)
+        val ownerFunds = entity?.takeIf { it.eventType in setOf(OwnerDrawingService.EVENT_TYPE_OWNER_DRAWING,
+            OwnerFundsReceiptService.EVENT_TYPE) }?.let { loadOwnerFundsContext(it,
+                RolePermissions.allows(AppRole.parse(actor.role), AppPermission.OWNER_DRAWING) && !row.isSuperseded) }
+        val prefill = entity?.let { buildCorrectionPrefill(it, row, ownerFunds) }
+        val canCorrect = canCorrectPermission && drawingPermission && !alreadyReplaced && prefill != null && !row.isSuperseded
         return NativeOwnerRecordsDetail(
-            row = row,
+            row = when {
+                entity?.eventType == OwnerDrawingService.EVENT_TYPE_OWNER_DRAWING && ownerFunds == null ->
+                    row.copy(stateLabel = "Account needs review")
+                entity?.eventType == OwnerFundsReceiptService.EVENT_TYPE && ownerFunds == null ->
+                    row.copy(stateLabel = "Owner funds need review")
+                else -> row
+            },
             inventoryMovements = detail.inventoryMovements.map { it.toLine() },
             financialMovements = detail.financialMovements?.map { it.toLine() },
             originalValueLines = detail.originalValues?.toLines().orEmpty(),
             notes = detail.event.notes?.trim()?.takeIf { it.isNotEmpty() },
             canCorrect = canCorrect,
             correctionPrefill = prefill.takeIf { canCorrect },
+            ownerFunds = ownerFunds,
         )
     }
 
@@ -309,6 +355,60 @@ class NativeOwnerRecordsFacade(
     ): CorrectionResult {
         requireRecordsHost(sessionHandle)
         return commands.correct(sessionHandle, input)
+    }
+
+    suspend fun recordOwnerFundsReceipt(sessionHandle: String, input: OwnerFundsReceiptInput): OwnerFundsReceiptResult {
+        requireRecordsHost(sessionHandle)
+        return operations.recordOwnerFundsReceipt(sessionHandle, input)
+    }
+
+    suspend fun refreshReceiptContext(sessionHandle: String, rootId: Long): NativeOwnerFundsContext {
+        requireRecordsHost(sessionHandle)
+        security.requirePermission(sessionHandle, AppPermission.OWNER_DRAWING)
+        val events = database.eventDao().findAllDescending()
+        val corrected = events.mapNotNull { it.correctsEventId }.toSet()
+        val latest = events.filter { it.eventType == OwnerDrawingService.EVENT_TYPE_OWNER_DRAWING &&
+            it.eventId !in corrected }.singleOrNull { candidate ->
+            try { OwnerFundsTruth(database).resolve(candidate).withdrawalRootEventId == rootId }
+            catch (failure: Exception) {
+                if (failure is kotlinx.coroutines.CancellationException) throw failure
+                false
+            }
+        } ?: error("Current withdrawal is unavailable; return to Records.")
+        return loadOwnerFundsContext(latest, true)
+            ?: error("Owner funds need review; return to Records.")
+    }
+
+    private suspend fun loadOwnerFundsContext(entity: EventEntity, canWrite: Boolean): NativeOwnerFundsContext? {
+        val truth = OwnerFundsTruth(database)
+        val detail = try { truth.resolve(entity) } catch (failure: Exception) {
+            if (failure is kotlinx.coroutines.CancellationException) throw failure
+            return null
+        }
+        val rootId = detail.withdrawalRootEventId
+        val root = database.eventDao().findById(rootId) ?: return null
+        val (withdrawal, received) = try { truth.currentTotals(rootId) } catch (failure: Exception) {
+            if (failure is kotlinx.coroutines.CancellationException) throw failure
+            return null
+        }
+        val allEvents = database.eventDao().findAllDescending()
+        val correctedIds = allEvents.mapNotNull { it.correctsEventId }.toSet()
+        val linked = allEvents.filter { it.eventType == OwnerFundsReceiptService.EVENT_TYPE &&
+            database.ownerFundsDao().find(it.eventId)?.withdrawalRootEventId == rootId }.map { receipt ->
+            NativeOwnerFundsLinkedReceipt(receipt.eventId, receipt.occurredAt, receipt.amount ?: 0.0,
+                when {
+                    receipt.eventId in correctedIds -> "Superseded"
+                    receipt.amount == 0.0 -> "Cancelled"
+                    receipt.correctsEventId != null -> "Corrected"
+                    else -> "Recorded"
+                })
+        }
+        val account = database.accountDao().findById(detail.paymentAccountId)
+        return NativeOwnerFundsContext(rootId, root.occurredAt, withdrawal, received,
+            detail.paymentAccountId, account?.name.orEmpty(),
+            database.accountDao().findByCategory("Cash/Bank").map { NativeOwnerFundsAccount(it.accountId, it.name) },
+            linked, canWrite && entity.eventType == OwnerDrawingService.EVENT_TYPE_OWNER_DRAWING && withdrawal > 0.0,
+            entity.eventType == OwnerFundsReceiptService.EVENT_TYPE)
     }
 
     fun filterRecords(
@@ -358,6 +458,9 @@ class NativeOwnerRecordsFacade(
         monetaryAmount: String,
         spoilageQuantity: String,
         spoilageReason: String,
+        cancelDrawing: Boolean = false,
+        ownerFundsAccountId: Long? = null,
+        acknowledgeExcess: Boolean = false,
     ): CorrectionInput {
         val cleanedNotes = notes?.trim()?.takeIf { it.isNotEmpty() }
         return when (prefill.kind) {
@@ -444,6 +547,43 @@ class NativeOwnerRecordsFacade(
                     notes = cleanedNotes,
                 )
             }
+            NativeCorrectionKind.Drawing -> {
+                require(cleanedNotes != null) { "Explain the withdrawal correction or cancellation." }
+                val funds = prefill.ownerFunds ?: error("Withdrawal account needs review.")
+                val amount = if (cancelDrawing) 0.0 else monetaryAmount.toDoubleOrNull()
+                    ?: error("Enter the corrected withdrawal amount.")
+                require(cancelDrawing || amount > 0.0) { "Use Cancel withdrawal if it never happened." }
+                val selectedAccount = if (cancelDrawing) funds.currentAccountId else ownerFundsAccountId ?: funds.currentAccountId
+                require(funds.accounts.any { it.accountId == selectedAccount }) { "Choose a Cash/Bank account." }
+                require(!cancelDrawing || ownerFundsAccountId == null || ownerFundsAccountId == funds.currentAccountId) {
+                    "Cancellation keeps the recorded account."
+                }
+                val exceeds = BigDecimal.valueOf(funds.receivedTotal) > BigDecimal.valueOf(amount)
+                require(!exceeds || acknowledgeExcess) { "Review and acknowledge money received above the corrected withdrawal." }
+                CorrectionInput.OwnerDrawing(prefill.originalEventId, prefill.occurredAt, amount, cleanedNotes,
+                    paymentAccountId = selectedAccount, reviewedWithdrawalAmount = funds.currentWithdrawal,
+                    reviewedReceivedTotal = funds.receivedTotal, acknowledgeExcess = acknowledgeExcess)
+            }
+            NativeCorrectionKind.FundsReceipt -> {
+                require(cleanedNotes != null) { "Explain the receipt correction or cancellation." }
+                val funds = prefill.ownerFunds ?: error("Receipt details need review.")
+                val amount = if (cancelDrawing) 0.0 else monetaryAmount.toDoubleOrNull()
+                    ?: error("Enter the corrected received amount.")
+                require(cancelDrawing || amount > 0.0) { "Use Cancel receipt if no money was received." }
+                val selectedAccount = if (cancelDrawing) funds.currentAccountId else ownerFundsAccountId ?: funds.currentAccountId
+                require(funds.accounts.any { it.accountId == selectedAccount }) { "Choose a Cash/Bank account." }
+                require(!cancelDrawing || ownerFundsAccountId == null || ownerFundsAccountId == funds.currentAccountId) {
+                    "Cancellation keeps the recorded account."
+                }
+                val previous = prefill.monetaryAmount.toDoubleOrNull() ?: error("Receipt amount needs review.")
+                val proposed = BigDecimal.valueOf(funds.receivedTotal).subtract(BigDecimal.valueOf(previous))
+                    .add(BigDecimal.valueOf(amount))
+                val exceeds = proposed > BigDecimal.valueOf(funds.currentWithdrawal)
+                require(!exceeds || acknowledgeExcess) { "Review and acknowledge money received above the corrected withdrawal." }
+                CorrectionInput.OwnerFundsIn(prefill.originalEventId, prefill.occurredAt, amount, cleanedNotes,
+                    paymentAccountId = selectedAccount, reviewedWithdrawalAmount = funds.currentWithdrawal,
+                    reviewedReceivedTotal = funds.receivedTotal, acknowledgeExcess = acknowledgeExcess)
+            }
             NativeCorrectionKind.Spoilage -> {
                 val quantity = spoilageQuantity.toDoubleOrNull()
                     ?: error("Enter corrected spoilage quantity.")
@@ -472,6 +612,7 @@ class NativeOwnerRecordsFacade(
     private suspend fun buildCorrectionPrefill(
         entity: EventEntity,
         row: NativeOwnerRecordsRow,
+        ownerFunds: NativeOwnerFundsContext?,
     ): NativeCorrectionPrefill? {
         val kind = correctionKind(entity.eventType) ?: return null
         val notes = entity.notes.orEmpty()
@@ -519,6 +660,21 @@ class NativeOwnerRecordsFacade(
                 notes = notes,
                 monetaryAmount = formatField(entity.amount),
             )
+            NativeCorrectionKind.Drawing -> {
+                val account = ownerFunds?.currentAccountId ?: return null
+                NativeCorrectionPrefill(kind = kind, originalEventId = entity.eventId, occurredAt = entity.occurredAt,
+                    taskLabel = row.taskLabel, identityLabel = row.identityLabel, notes = "",
+                    monetaryAmount = formatField(entity.amount),
+                    drawingPaymentAccountName = database.accountDao().findById(account)?.name.orEmpty(),
+                    ownerFunds = ownerFunds)
+            }
+            NativeCorrectionKind.FundsReceipt -> {
+                val funds = ownerFunds ?: return null
+                NativeCorrectionPrefill(kind = kind, originalEventId = entity.eventId, occurredAt = entity.occurredAt,
+                    taskLabel = row.taskLabel, identityLabel = row.identityLabel, notes = "",
+                    monetaryAmount = formatField(entity.amount), drawingPaymentAccountName = funds.currentAccountName,
+                    ownerFunds = funds)
+            }
             NativeCorrectionKind.Spoilage -> {
                 val spoilage = database.spoilageDao().findByEventId(entity.eventId)
                 NativeCorrectionPrefill(
@@ -544,6 +700,8 @@ class NativeOwnerRecordsFacade(
         SalaryPaymentService.EVENT_TYPE_SALARY_PAYMENT,
         VendorPaymentService.EVENT_TYPE_VENDOR_PAYMENT,
         -> NativeCorrectionKind.Monetary
+        OwnerDrawingService.EVENT_TYPE_OWNER_DRAWING -> NativeCorrectionKind.Drawing
+        OwnerFundsReceiptService.EVENT_TYPE -> NativeCorrectionKind.FundsReceipt
         SpoilageService.EVENT_TYPE_SPOILAGE -> NativeCorrectionKind.Spoilage
         else -> null
     }
@@ -562,6 +720,8 @@ class NativeOwnerRecordsFacade(
         val identityLabel = identityLabel(dto.eventTypeCode, dto.eventId)
         val stateLabel = when {
             dto.isSuperseded -> "Superseded"
+            dto.isCorrection && entity?.eventType in setOf(OwnerDrawingService.EVENT_TYPE_OWNER_DRAWING,
+                OwnerFundsReceiptService.EVENT_TYPE) && entity?.amount == 0.0 -> "Cancelled"
             dto.isCorrection -> "Correction"
             else -> "Recorded"
         }
@@ -593,6 +753,7 @@ class NativeOwnerRecordsFacade(
         VendorPaymentService.EVENT_TYPE_VENDOR_PAYMENT -> "Supplier payment"
         SalaryPaymentService.EVENT_TYPE_SALARY_PAYMENT -> "Salary payment"
         OwnerDrawingService.EVENT_TYPE_OWNER_DRAWING -> "Owner drawing"
+        OwnerFundsReceiptService.EVENT_TYPE -> "Owner money received"
         OpeningStateService.EVENT_TYPE_OPENING_STATE -> "Opening balance"
         else -> eventType.replace('_', ' ').lowercase(Locale.US)
             .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.US) else it.toString() }
@@ -626,6 +787,7 @@ class NativeOwnerRecordsFacade(
             VendorPaymentService.EVENT_TYPE_VENDOR_PAYMENT,
             SalaryPaymentService.EVENT_TYPE_SALARY_PAYMENT,
             OwnerDrawingService.EVENT_TYPE_OWNER_DRAWING,
+            OwnerFundsReceiptService.EVENT_TYPE,
             -> entity.amount?.let { "PKR ${formatMoney(money(it))}" }
             VendorPurchaseService.EVENT_TYPE_PURCHASE_RECEIPT ->
                 entity.rawLiters?.let { "${formatQuantity(it)} L" }

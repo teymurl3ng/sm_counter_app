@@ -38,6 +38,7 @@ class NativeActivityScreenContractTest {
         setScreen(NativeActivityState.Ready(day = emptyDay()))
         composeRule.onNodeWithTag(NativeUiTags.ActivityEmpty).assertIsDisplayed()
         composeRule.onNodeWithText("No records yet today").assertIsDisplayed()
+        composeRule.onNodeWithText("Sales, collections and expenses you record today will show up here.").assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.CashierNavActivity).assertIsSelected()
     }
 
@@ -65,6 +66,37 @@ class NativeActivityScreenContractTest {
         assertEquals(41L, openedId)
         composeRule.onNodeWithTag(NativeUiTags.ActivityDetail).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.ActivityDetailEventId).assertIsDisplayed()
+    }
+
+    @Test
+    fun expenseRowOpensOwnDetailWithCategoryAndPaymentAccount() {
+        val expense = summary(52L).copy(
+            taskLabel = "Expense",
+            amountPaisa = 12_550L,
+            stateLabel = "Fuel · Paid from Cash",
+        )
+        var openedId: Long? = null
+        var state by mutableStateOf<NativeActivityState>(NativeActivityState.Ready(day = dayWith(expense)))
+        setScreen(stateProvider = { state }, onOpenRecord = { eventId ->
+            openedId = eventId
+            state = (state as NativeActivityState.Ready).copy(detail = NativeActivityRecordDetail(
+                summary = expense,
+                counterpartLabel = null,
+                destinationLabel = null,
+                notes = "Generator fuel",
+                quantityLabel = null,
+                expenseCategoryLabel = "Fuel",
+                paymentAccountLabel = "Cash",
+            ))
+        })
+        composeRule.onNodeWithTag(NativeUiTags.activityRecord(52L)).performClick()
+        assertEquals(52L, openedId)
+        composeRule.onNodeWithTag(NativeUiTags.ActivityDetail).assertIsDisplayed()
+        composeRule.onNodeWithText("Category").assertIsDisplayed()
+        composeRule.onNodeWithText("Fuel").assertIsDisplayed()
+        composeRule.onNodeWithText("Paid from").assertIsDisplayed()
+        composeRule.onNodeWithText("Cash").assertIsDisplayed()
+        composeRule.onNodeWithText("PKR 125.50").assertIsDisplayed()
     }
 
     @Test

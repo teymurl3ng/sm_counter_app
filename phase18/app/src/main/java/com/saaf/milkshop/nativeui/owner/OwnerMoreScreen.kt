@@ -1,5 +1,14 @@
 package com.saaf.milkshop.nativeui.owner
 
+import com.saaf.milkshop.nativeui.common.NativePersonalSecurityPanel
+import com.saaf.milkshop.nativeui.common.NativePersonalSecurityTags
+import androidx.compose.foundation.layout.size
+import com.saaf.milkshop.nativeui.theme.nativeNavigationTitleTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeGroupLabelTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeValueTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeVisualColors
+
 import com.saaf.milkshop.nativeui.common.NativeListStyle
 import com.saaf.milkshop.nativeui.common.nativeListItemContent
 import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
@@ -816,128 +825,43 @@ private fun OwnerMorePersonalSecurityScreen(
     modifier: Modifier,
 ) {
     BackHandler(onBack = onBack)
-    val security = state.security
-    var passphrase by remember { mutableStateOf("") }
-    var pin by remember { mutableStateOf("") }
-
-    if (state.confirmRemoveUnlock) {
-        AlertDialog(
-            onDismissRequest = onCancelRemove,
-            title = { Text("Remove Quick unlock?") },
-            text = {
-                Text("This clears Quick PIN and phone security for ${identity.displayName} on this phone.")
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = com.saaf.milkshop.nativeui.common.hapticDestructiveAction {
-                        val secret = passphrase.toCharArray()
-                        passphrase = ""
-                        pin = ""
-                        onRemove(secret)
-                    },
-                    modifier = Modifier.testTag(NativeUiTags.OwnerMoreSecurityRemoveConfirm),
-                ) { Text("Discard and leave") }
-            },
-            dismissButton = {
-                TextButton(onClick = hapticAction(onCancelRemove)) { Text("Keep editing") }
-            },
-        )
-    }
-
     hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .imePadding()
-                .testTag(NativeUiTags.OwnerMoreSecurityScreen),
+            Modifier.fillMaxSize().padding(padding).imePadding().testTag(NativeUiTags.OwnerMoreSecurityScreen),
         ) {
             OwnerMoreHeader(identity, state.context)
             Column(
-                Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
+                Modifier.weight(1f).verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp, vertical = 18.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                Text("Personal security", style = MaterialTheme.typography.headlineMedium)
-                if (security == null) {
-                    NativeColdLoadingPane(label = "Loading security…")
-                } else {
-                    OwnerMoreSecurityStatus(security)
-                    OutlinedTextField(
-                        value = passphrase,
-                        onValueChange = { passphrase = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag(NativeUiTags.OwnerMoreSecurityPassphrase),
-                        label = { Text("Current full passphrase") },
-                        visualTransformation = PasswordVisualTransformation(),
-                        singleLine = true,
-                        enabled = !state.saving,
-                    )
-                    OutlinedTextField(
-                        value = pin,
-                        onValueChange = { pin = it.filter { ch -> ch.isDigit() }.take(4) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag(NativeUiTags.OwnerMoreSecurityPin),
-                        label = { Text("New Quick PIN (4 digits)") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                        visualTransformation = PasswordVisualTransformation(),
-                        singleLine = true,
-                        enabled = !state.saving,
-                    )
-                    state.personalSecurity.error?.let {
-                        Text(
-                            it,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerMoreError),
-                        )
-                    }
-                    Button(
-                        onClick = com.saaf.milkshop.nativeui.common.hapticAction {
-                            if (passphrase.isBlank() || pin.length != 4) return@hapticAction
-                            val secret = passphrase.toCharArray()
-                            val quickPin = pin.toCharArray()
-                            passphrase = ""
-                            pin = ""
-                            onEnrollPin(secret, quickPin)
-                        },
-                        enabled = !state.saving && passphrase.isNotBlank() && pin.length == 4,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag(NativeUiTags.OwnerMoreSecurityEnrollPin),
-                    ) { Text(if (state.saving) "Saving…" else "Save Quick PIN") }
-                    if (security.phoneSecurityAvailable) {
-                        Button(
-                            onClick = com.saaf.milkshop.nativeui.common.hapticAction {
-                                if (passphrase.isBlank()) return@hapticAction
-                                val secret = passphrase.toCharArray()
-                                val quickPin = pin.takeIf { it.length == 4 }?.toCharArray()
-                                passphrase = ""
-                                pin = ""
-                                onEnrollPhone(secret, quickPin)
-                            },
-                            enabled = !state.saving && passphrase.isNotBlank(),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .testTag(NativeUiTags.OwnerMoreSecurityEnrollPhone),
-                        ) { Text("Enable ${security.phoneSecurityLabel}") }
-                    }
-                    if (security.quickPinEnabled || security.phoneSecurityEnabled) {
-                        TextButton(
-                            onClick = hapticAction(onRequestRemove),
-                            enabled = !state.saving && passphrase.isNotBlank(),
-                            modifier = Modifier.testTag(NativeUiTags.OwnerMoreSecurityRemove),
-                        ) { Text("Remove Quick unlock") }
-                    }
-                }
+                NativePersonalSecurityPanel(
+                    identityKey = identity.userId,
+                    identityName = identity.displayName,
+                    security = state.security,
+                    saving = state.saving,
+                    error = state.personalSecurity.error,
+                    confirmRemove = state.confirmRemoveUnlock,
+                    tags = NativePersonalSecurityTags(
+                        status = NativeUiTags.OwnerMoreSecurityStatus,
+                        passphrase = NativeUiTags.OwnerMoreSecurityPassphrase,
+                        pin = NativeUiTags.OwnerMoreSecurityPin,
+                        savePin = NativeUiTags.OwnerMoreSecurityEnrollPin,
+                        enablePhone = NativeUiTags.OwnerMoreSecurityEnrollPhone,
+                        remove = NativeUiTags.OwnerMoreSecurityRemove,
+                        confirmRemove = NativeUiTags.OwnerMoreSecurityRemoveConfirm,
+                        error = NativeUiTags.OwnerMoreError,
+                    ),
+                    onRequestRemove = onRequestRemove,
+                    onCancelRemove = onCancelRemove,
+                    onRemove = onRemove,
+                    onEnrollPin = onEnrollPin,
+                    onEnrollPhone = onEnrollPhone,
+                )
             }
         }
     }
 }
-
 @Composable
 private fun OwnerMoreHeader(identity: NativeSignedInIdentity, context: NativeOwnerMoreContext) {
     CashierScreenHeader(
@@ -950,11 +874,11 @@ private fun OwnerMoreHeader(identity: NativeSignedInIdentity, context: NativeOwn
 }
 
 @Composable
-private fun OwnerMoreSectionLabel(label: String) {
+internal fun OwnerMoreSectionLabel(label: String) {
     Text(
         label,
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = nativeGroupLabelTextStyle(),
+        color = nativeVisualColors.supporting,
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier
             .fillMaxWidth()
@@ -964,7 +888,7 @@ private fun OwnerMoreSectionLabel(label: String) {
 }
 
 @Composable
-private fun OwnerMoreMenuRow(
+internal fun OwnerMoreMenuRow(
     icon: ImageVector,
     title: String,
     subtitle: String,
@@ -982,40 +906,15 @@ private fun OwnerMoreMenuRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(title, style = nativeNavigationTitleTextStyle())
             Text(
                 subtitle,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = nativeSupportingTextStyle(),
+                color = nativeVisualColors.supporting,
             )
         }
         Icon(Icons.Outlined.ChevronRight, contentDescription = null)
-    }
-}
-
-@Composable
-private fun OwnerMoreSecurityStatus(security: NativeMoreSecurityStatus) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .testTag(NativeUiTags.OwnerMoreSecurityStatus),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        Text(
-            "Quick PIN: ${if (security.quickPinEnabled) "On" else "Off"}",
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        Text(
-            "${security.phoneSecurityLabel}: ${
-                when {
-                    !security.phoneSecurityAvailable -> "Unavailable on this phone"
-                    security.phoneSecurityEnabled -> "On"
-                    else -> "Off"
-                }
-            }",
-            style = MaterialTheme.typography.bodyLarge,
-        )
     }
 }

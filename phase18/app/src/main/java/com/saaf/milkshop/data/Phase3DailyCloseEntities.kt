@@ -63,4 +63,7 @@ data class DailyCloseActionEntity(
 
     @ColumnInfo(name = "uid", defaultValue = "''")
     val uid: String = LegacyUid.randomUid(),
+    /** 1 = historical SQLite ROUND, 2 = canonical decimal HALF_UP. */
+    @ColumnInfo(name = "money_rounding_version", defaultValue = "2")
+    val moneyRoundingVersion: Int = 2,
 )

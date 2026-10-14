@@ -1,0 +1,1984 @@
+{
+  "scope": "native launcher production Kotlin; call-site inventory, not runtime proof",
+  "files": [
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/activity/CashierActivityScreen.kt",
+      "sha256": "e7e366fcde614f018a22c3ec8536671441844fdb54e840728edc455e0add889c",
+      "fields": [],
+      "ime": [],
+      "scroll": [
+        217,
+        265
+      ],
+      "consumption": [],
+      "header": [],
+      "buttons": [],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/admin/AdminMoreScreen.kt",
+      "sha256": "9bb47ab632e64195c4762257898ab8145e3ace8638b1bc6d661823ea1ceeca71",
+      "fields": [],
+      "ime": [
+        546
+      ],
+      "scroll": [
+        467,
+        550
+      ],
+      "consumption": [],
+      "header": [
+        583
+      ],
+      "buttons": [
+        182
+      ],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/admin/AdminPeopleScreen.kt",
+      "sha256": "b03604d401ad9afc80d1302585dd99d7476b757b18a0d9b60cd455a293267a5c",
+      "fields": [],
+      "ime": [],
+      "scroll": [
+        373
+      ],
+      "consumption": [],
+      "header": [
+        363
+      ],
+      "buttons": [
+        159
+      ],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/admin/AdminPreviewHost.kt",
+      "sha256": "022d7d83d71bb1b7f9db1456061e4d19c77e30f1f9d7e6fa5fb0e8f1ae115e9e",
+      "fields": [],
+      "ime": [],
+      "scroll": [],
+      "consumption": [],
+      "header": [
+        277,
+        540
+      ],
+      "buttons": [],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/admin/AdminRecordsScreen.kt",
+      "sha256": "7e53980dafff5943448b2b817aa839b5fa2ad03ef8a4b959fca7c1fec91343ac",
+      "fields": [],
+      "ime": [],
+      "scroll": [
+        224
+      ],
+      "consumption": [],
+      "header": [
+        214
+      ],
+      "buttons": [],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/admin/AdminWorkScreen.kt",
+      "sha256": "9e695fd023432a07f83b0da22530825a3e0b640885addfc7aa21be9814fe2705",
+      "fields": [],
+      "ime": [],
+      "scroll": [
+        187
+      ],
+      "consumption": [],
+      "header": [
+        142
+      ],
+      "buttons": [
+        263
+      ],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/auth/NativeAuthenticationScreens.kt",
+      "sha256": "65527084d0a766eb6b166ffcecc4a02647ba3be7d8b4a5bca943d659b2e8a906",
+      "fields": [
+        348,
+        553,
+        565,
+        577,
+        590
+      ],
+      "ime": [
+        712
+      ],
+      "scroll": [
+        736
+      ],
+      "consumption": [],
+      "header": [],
+      "buttons": [
+        374,
+        449,
+        510,
+        515,
+        814,
+        840
+      ],
+      "dialogs": [],
+      "field_functions": [
+        {
+          "line": 348,
+          "function": "submit"
+        },
+        {
+          "line": 553,
+          "function": "submit"
+        },
+        {
+          "line": 565,
+          "function": "submit"
+        },
+        {
+          "line": 577,
+          "function": "submit"
+        },
+        {
+          "line": 590,
+          "function": "submit"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/auth/QuickPinKeypad.kt",
+      "sha256": "d614a957836a217338d4b12257352a941dcd7eb0d1bb3b48c628a38c049c94ed",
+      "fields": [],
+      "ime": [],
+      "scroll": [],
+      "consumption": [],
+      "header": [],
+      "buttons": [
+        82
+      ],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/cashclose/CashCloseEntryScreen.kt",
+      "sha256": "f20bbb0bccf6623bcfb19c70749c8a1ef569dd802516038032045c3c2bbf30db",
+      "fields": [
+        374,
+        396,
+        504,
+        606,
+        616
+      ],
+      "ime": [
+        172
+      ],
+      "scroll": [
+        304,
+        711
+      ],
+      "consumption": [],
+      "header": [
+        174
+      ],
+      "buttons": [
+        116,
+        122,
+        408,
+        482,
+        517,
+        565,
+        570,
+        633,
+        746
+      ],
+      "dialogs": [
+        111,
+        557
+      ],
+      "field_functions": [
+        {
+          "line": 374,
+          "function": "CashCloseForm"
+        },
+        {
+          "line": 396,
+          "function": "CashCloseForm"
+        },
+        {
+          "line": 504,
+          "function": "CashCloseForm"
+        },
+        {
+          "line": 606,
+          "function": "ReopenPanel"
+        },
+        {
+          "line": 616,
+          "function": "ReopenPanel"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/collection/CashierCollectionScreen.kt",
+      "sha256": "33136cb922c3094ae41765a9af1b85bce53c86bfb4092b910325c46050b12742",
+      "fields": [
+        497,
+        557,
+        753
+      ],
+      "ime": [
+        352
+      ],
+      "scroll": [
+        463,
+        678,
+        765,
+        813
+      ],
+      "consumption": [],
+      "header": [
+        354
+      ],
+      "buttons": [
+        228,
+        234,
+        519,
+        524,
+        547,
+        596,
+        712,
+        716,
+        793,
+        839,
+        873,
+        888
+      ],
+      "dialogs": [
+        223,
+        747,
+        809,
+        856
+      ],
+      "field_functions": [
+        {
+          "line": 497,
+          "function": "CollectionForm"
+        },
+        {
+          "line": 557,
+          "function": "CollectionForm"
+        },
+        {
+          "line": 753,
+          "function": "CustomerPickerDialog"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/ImePaddings.kt",
+      "sha256": "04d141965c22d7d31ab84844a50e38a1ddadd054828e365388cb8e1eb62b4cf9",
+      "fields": [],
+      "ime": [
+        22
+      ],
+      "scroll": [],
+      "consumption": [],
+      "header": [],
+      "buttons": [],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/NativeAsyncUi.kt",
+      "sha256": "e4de9379da73612c5176464fae1c4be4ce5d9812a67d8b858bf9a6e067e2fd82",
+      "fields": [],
+      "ime": [],
+      "scroll": [],
+      "consumption": [],
+      "header": [],
+      "buttons": [
+        78
+      ],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/NativeChrome.kt",
+      "sha256": "9402c42643b356bbc346092d89f19dd4fbdb3c95d72a9f24c8a0f48f544fc733",
+      "fields": [],
+      "ime": [],
+      "scroll": [],
+      "consumption": [],
+      "header": [
+        36
+      ],
+      "buttons": [],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/NativeInformationSection.kt",
+      "sha256": "18dc98081018cae262d09201a11b0faf4ca8f4fbab2d9e3d2cae0369a8c417fa",
+      "fields": [],
+      "ime": [],
+      "scroll": [],
+      "consumption": [],
+      "header": [],
+      "buttons": [
+        74
+      ],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/NativePersonalSecurityPanel.kt",
+      "sha256": "267f6f20877d299158f5baa003b27adc18cada0cc6965008b0433160318a2be7",
+      "fields": [
+        112,
+        121
+      ],
+      "ime": [],
+      "scroll": [],
+      "consumption": [],
+      "header": [],
+      "buttons": [
+        72,
+        84,
+        132,
+        150,
+        166
+      ],
+      "dialogs": [
+        67
+      ],
+      "field_functions": [
+        {
+          "line": 112,
+          "function": "NativePersonalSecurityPanel"
+        },
+        {
+          "line": 121,
+          "function": "NativePersonalSecurityPanel"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/drawing/DrawingEntryScreen.kt",
+      "sha256": "3f8d6e6dbbee22873268bf6a3a9a8e0385acdcf9946bf981a927bca379499a05",
+      "fields": [
+        251,
+        289
+      ],
+      "ime": [
+        179
+      ],
+      "scroll": [
+        210,
+        382
+      ],
+      "consumption": [],
+      "header": [
+        181
+      ],
+      "buttons": [
+        276,
+        320,
+        406,
+        416
+      ],
+      "dialogs": [],
+      "field_functions": [
+        {
+          "line": 251,
+          "function": "DrawingEntryContent"
+        },
+        {
+          "line": 289,
+          "function": "DrawingEntryContent"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/expense/ExpenseEntryScreen.kt",
+      "sha256": "1b9eb9c872a89798d08793a04eeea88146e2ec70ea9867fadf345faf655b3a79",
+      "fields": [
+        356,
+        403
+      ],
+      "ime": [
+        230
+      ],
+      "scroll": [
+        322,
+        493,
+        553,
+        598
+      ],
+      "consumption": [],
+      "header": [
+        232
+      ],
+      "buttons": [
+        124,
+        130,
+        393,
+        432,
+        525,
+        579,
+        624
+      ],
+      "dialogs": [
+        119,
+        548,
+        594
+      ],
+      "field_functions": [
+        {
+          "line": 356,
+          "function": "ExpenseForm"
+        },
+        {
+          "line": 403,
+          "function": "ExpenseForm"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/manager/ManagerMoreScreen.kt",
+      "sha256": "7c39c8e006d0f11c45ca45eaeaa81abc71173f485d8a55331695dca67776f1b0",
+      "fields": [],
+      "ime": [
+        491
+      ],
+      "scroll": [
+        410,
+        494
+      ],
+      "consumption": [],
+      "header": [],
+      "buttons": [
+        186
+      ],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/manager/ManagerPreviewHost.kt",
+      "sha256": "7df37f870591a3a37b20f35109efcd8b956d75fff20fbd2a00e01a1aaa4c00dd",
+      "fields": [],
+      "ime": [],
+      "scroll": [],
+      "consumption": [],
+      "header": [
+        285,
+        638
+      ],
+      "buttons": [],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/manager/ManagerWorkScreen.kt",
+      "sha256": "8a38a77065e45ccb2b41c891916fef14fab01a1ad7ba55cefe141e3021d61eba",
+      "fields": [],
+      "ime": [],
+      "scroll": [
+        183
+      ],
+      "consumption": [],
+      "header": [],
+      "buttons": [
+        383
+      ],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/more/CashierMoreScreen.kt",
+      "sha256": "18f76a08aa3bdf0034639babc6e69cf3579b593c291f094badc98cceb3849162",
+      "fields": [
+        448,
+        457
+      ],
+      "ime": [
+        420,
+        510
+      ],
+      "scroll": [
+        327,
+        425,
+        513
+      ],
+      "consumption": [],
+      "header": [],
+      "buttons": [
+        440,
+        474
+      ],
+      "dialogs": [],
+      "field_functions": [
+        {
+          "line": 448,
+          "function": "MoreCountCashScreen"
+        },
+        {
+          "line": 457,
+          "function": "MoreCountCashScreen"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/AttendanceScreen.kt",
+      "sha256": "c6f306c86a5ab6de1158067af033d1049279aa1843fe88faeecb79c1c4bf9dd6",
+      "fields": [],
+      "ime": [],
+      "scroll": [
+        141
+      ],
+      "consumption": [],
+      "header": [],
+      "buttons": [
+        247
+      ],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/DeliveriesScreen.kt",
+      "sha256": "40503c6d0e4e648dd40d8d24ae3b6e20416cd4a74bbd93004aafe50c9d81ede5",
+      "fields": [
+        359,
+        376,
+        393,
+        405,
+        415,
+        545
+      ],
+      "ime": [
+        160
+      ],
+      "scroll": [
+        170,
+        483
+      ],
+      "consumption": [],
+      "header": [],
+      "buttons": [
+        346,
+        368,
+        385,
+        424,
+        492,
+        509,
+        557,
+        578,
+        650
+      ],
+      "dialogs": [
+        479
+      ],
+      "field_functions": [
+        {
+          "line": 359,
+          "function": "NewDeliveryCard"
+        },
+        {
+          "line": 376,
+          "function": "NewDeliveryCard"
+        },
+        {
+          "line": 393,
+          "function": "NewDeliveryCard"
+        },
+        {
+          "line": 405,
+          "function": "NewDeliveryCard"
+        },
+        {
+          "line": 415,
+          "function": "NewDeliveryCard"
+        },
+        {
+          "line": 545,
+          "function": "LinkSaleCard"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/MakeYogurtScreen.kt",
+      "sha256": "80db42403a29007360e64a747a91162270972df2a295dc92a62c7b3c057aab60",
+      "fields": [
+        263,
+        361
+      ],
+      "ime": [
+        191
+      ],
+      "scroll": [
+        197
+      ],
+      "consumption": [],
+      "header": [],
+      "buttons": [
+        255,
+        296,
+        339,
+        345,
+        443
+      ],
+      "dialogs": [
+        334
+      ],
+      "field_functions": [
+        {
+          "line": 263,
+          "function": "requestLeave"
+        },
+        {
+          "line": 361,
+          "function": "MeasurementField"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/OperationsMoreScreen.kt",
+      "sha256": "60803cc9e5d25ccef0d78edc6ba5ed38dd2a9ef0866ad09b4f6fe2f219cc1144",
+      "fields": [],
+      "ime": [
+        289,
+        377
+      ],
+      "scroll": [
+        237,
+        295,
+        380
+      ],
+      "consumption": [],
+      "header": [],
+      "buttons": [],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/OperationsPreviewHost.kt",
+      "sha256": "5a68a25b4962629229aaf5874bf603eee6301708f36df56b8bd6f16b56dfb248",
+      "fields": [],
+      "ime": [],
+      "scroll": [],
+      "consumption": [],
+      "header": [
+        207
+      ],
+      "buttons": [],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/OperationsWorkScreen.kt",
+      "sha256": "87c2f2e702ea5754055d49e4ff83505ced5e29b4bdbd92243e7e7cf4a92e4db8",
+      "fields": [],
+      "ime": [],
+      "scroll": [
+        221
+      ],
+      "consumption": [],
+      "header": [],
+      "buttons": [
+        304
+      ],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/ReceiveMilkScreen.kt",
+      "sha256": "655acd7e70907b46f82167d7e1f541b6e7644a0e2f56ecd0982d93c279bfa5f3",
+      "fields": [
+        292,
+        428
+      ],
+      "ime": [
+        223
+      ],
+      "scroll": [
+        229,
+        525
+      ],
+      "consumption": [],
+      "header": [],
+      "buttons": [
+        284,
+        313,
+        372,
+        378,
+        500,
+        552
+      ],
+      "dialogs": [
+        367,
+        516
+      ],
+      "field_functions": [
+        {
+          "line": 292,
+          "function": "requestLeave"
+        },
+        {
+          "line": 428,
+          "function": "MeasurementField"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/operations/RecordSpoilageScreen.kt",
+      "sha256": "a4d44174dba737fada0bc89d8d061a07ad3de2cef57c6e8fb481fdb97b69d54a",
+      "fields": [
+        275,
+        309
+      ],
+      "ime": [
+        225
+      ],
+      "scroll": [
+        231,
+        538,
+        576
+      ],
+      "consumption": [],
+      "header": [],
+      "buttons": [
+        300,
+        332,
+        396,
+        402,
+        513,
+        560,
+        598
+      ],
+      "dialogs": [
+        391,
+        529,
+        571
+      ],
+      "field_functions": [
+        {
+          "line": 275,
+          "function": "requestLeave"
+        },
+        {
+          "line": 309,
+          "function": "requestLeave"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerBackupScreen.kt",
+      "sha256": "485b45b15bcc7828bead4b0cd4b117915e88eeb14eaeac737c06754b03b73250",
+      "fields": [
+        673,
+        687,
+        811,
+        965,
+        979,
+        1092,
+        1243
+      ],
+      "ime": [
+        656,
+        793,
+        948,
+        1073,
+        1193
+      ],
+      "scroll": [
+        422,
+        657,
+        794,
+        949,
+        1194
+      ],
+      "consumption": [],
+      "header": [
+        387,
+        646,
+        783,
+        938,
+        1063,
+        1183
+      ],
+      "buttons": [
+        439,
+        494,
+        501,
+        516,
+        532,
+        537,
+        545,
+        553,
+        558,
+        583,
+        589,
+        701,
+        825,
+        869,
+        1004,
+        1077,
+        1103,
+        1205,
+        1224,
+        1256,
+        1295,
+        1332,
+        1338
+      ],
+      "dialogs": [
+        574,
+        1327
+      ],
+      "field_functions": [
+        {
+          "line": 673,
+          "function": "requestLeave"
+        },
+        {
+          "line": 687,
+          "function": "requestLeave"
+        },
+        {
+          "line": 811,
+          "function": "requestLeave"
+        },
+        {
+          "line": 965,
+          "function": "requestLeave"
+        },
+        {
+          "line": 979,
+          "function": "requestLeave"
+        },
+        {
+          "line": 1092,
+          "function": "OwnerBackupReauthScreen"
+        },
+        {
+          "line": 1243,
+          "function": "requestLeave"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCostingPlanningScreens.kt",
+      "sha256": "7cfefbb469afd3600183bd3e5ab57ab48d814ad1c2d34bfb1306a58799aa78f5",
+      "fields": [
+        379,
+        406,
+        546,
+        558,
+        799,
+        821,
+        1016
+      ],
+      "ime": [
+        330,
+        520,
+        902
+      ],
+      "scroll": [
+        147,
+        331,
+        521,
+        637,
+        778,
+        915
+      ],
+      "consumption": [],
+      "header": [
+        335,
+        525,
+        905
+      ],
+      "buttons": [
+        164,
+        225,
+        438,
+        452,
+        578,
+        654,
+        744,
+        830,
+        853,
+        946,
+        1035
+      ],
+      "dialogs": [
+        773
+      ],
+      "field_functions": [
+        {
+          "line": 379,
+          "function": "requestLeave"
+        },
+        {
+          "line": 406,
+          "function": "requestLeave"
+        },
+        {
+          "line": 546,
+          "function": "requestLeave"
+        },
+        {
+          "line": 558,
+          "function": "requestLeave"
+        },
+        {
+          "line": 799,
+          "function": "OwnerCostingYieldBody"
+        },
+        {
+          "line": 821,
+          "function": "OwnerCostingYieldBody"
+        },
+        {
+          "line": 1016,
+          "function": "requestLeave"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCostingPlansScreen.kt",
+      "sha256": "14d97d81ee3376a91298a385e323e4d1b6c2cec5121098d15edeb2ca262c863b",
+      "fields": [
+        1062,
+        1075,
+        1121,
+        1135,
+        1160,
+        1250
+      ],
+      "ime": [
+        1040
+      ],
+      "scroll": [
+        797,
+        847,
+        1041
+      ],
+      "consumption": [],
+      "header": [
+        634,
+        837,
+        1030
+      ],
+      "buttons": [
+        757,
+        882,
+        1180,
+        1268,
+        1279,
+        1302,
+        1308
+      ],
+      "dialogs": [
+        1243,
+        1297
+      ],
+      "field_functions": [
+        {
+          "line": 1062,
+          "function": "requestLeave"
+        },
+        {
+          "line": 1075,
+          "function": "requestLeave"
+        },
+        {
+          "line": 1121,
+          "function": "requestLeave"
+        },
+        {
+          "line": 1135,
+          "function": "requestLeave"
+        },
+        {
+          "line": 1160,
+          "function": "requestLeave"
+        },
+        {
+          "line": 1250,
+          "function": "OwnerCostingPlansReauthDialog"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCustomersScreen.kt",
+      "sha256": "7e354a5d1ea3867a4565d00038a477af088d0e425f96732baccf7c83859ec34c",
+      "fields": [
+        408,
+        547,
+        560,
+        573,
+        585,
+        598,
+        610,
+        629
+      ],
+      "ime": [
+        398,
+        537
+      ],
+      "scroll": [
+        324,
+        399,
+        538,
+        778
+      ],
+      "consumption": [],
+      "header": [
+        249,
+        388,
+        527,
+        768
+      ],
+      "buttons": [
+        280,
+        295,
+        428,
+        447,
+        671,
+        701,
+        733,
+        739,
+        805
+      ],
+      "dialogs": [
+        728
+      ],
+      "field_functions": [
+        {
+          "line": 408,
+          "function": "requestLeave"
+        },
+        {
+          "line": 547,
+          "function": "requestLeave"
+        },
+        {
+          "line": 560,
+          "function": "requestLeave"
+        },
+        {
+          "line": 573,
+          "function": "requestLeave"
+        },
+        {
+          "line": 585,
+          "function": "requestLeave"
+        },
+        {
+          "line": 598,
+          "function": "requestLeave"
+        },
+        {
+          "line": 610,
+          "function": "requestLeave"
+        },
+        {
+          "line": 629,
+          "function": "requestLeave"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerEmployeesScreen.kt",
+      "sha256": "c37f1c16bafc8c41442f67370440cb032a9a20a24470faedf4498fcf9b937c8b",
+      "fields": [
+        409,
+        544,
+        557,
+        570,
+        583,
+        602,
+        615
+      ],
+      "ime": [
+        399,
+        534
+      ],
+      "scroll": [
+        325,
+        400,
+        535,
+        763
+      ],
+      "consumption": [],
+      "header": [
+        250,
+        389,
+        524,
+        753
+      ],
+      "buttons": [
+        281,
+        296,
+        429,
+        448,
+        657,
+        686,
+        718,
+        724,
+        789
+      ],
+      "dialogs": [
+        713
+      ],
+      "field_functions": [
+        {
+          "line": 409,
+          "function": "requestLeave"
+        },
+        {
+          "line": 544,
+          "function": "requestLeave"
+        },
+        {
+          "line": 557,
+          "function": "requestLeave"
+        },
+        {
+          "line": 570,
+          "function": "requestLeave"
+        },
+        {
+          "line": 583,
+          "function": "requestLeave"
+        },
+        {
+          "line": 602,
+          "function": "requestLeave"
+        },
+        {
+          "line": 615,
+          "function": "requestLeave"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerFundsRecordsForms.kt",
+      "sha256": "e69bc03bd3b77f772e62341b2887a612d4bfbf2859a559f152637a3735f023e1",
+      "fields": [
+        83,
+        190,
+        212
+      ],
+      "ime": [
+        167
+      ],
+      "scroll": [
+        167
+      ],
+      "consumption": [],
+      "header": [
+        165
+      ],
+      "buttons": [
+        177,
+        205,
+        228,
+        233,
+        255,
+        264,
+        277,
+        278
+      ],
+      "dialogs": [
+        274
+      ],
+      "field_functions": [
+        {
+          "line": 83,
+          "function": "OwnerFundsCorrectionFields"
+        },
+        {
+          "line": 190,
+          "function": "requestLeave"
+        },
+        {
+          "line": 212,
+          "function": "requestLeave"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerMoreScreen.kt",
+      "sha256": "3dcdc98370b8ddb90d365def4093dc4461ea348c273924a9e2966a4ba039b6e8",
+      "fields": [],
+      "ime": [
+        830
+      ],
+      "scroll": [
+        694,
+        834
+      ],
+      "consumption": [],
+      "header": [
+        867
+      ],
+      "buttons": [
+        264
+      ],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerOpeningCostBasisScreen.kt",
+      "sha256": "a3f974556cc98d38251593a3507b73c9e32f3e091ca33b35d7c6589e84f80586",
+      "fields": [
+        267,
+        276,
+        316
+      ],
+      "ime": [],
+      "scroll": [
+        92,
+        253
+      ],
+      "consumption": [],
+      "header": [
+        243
+      ],
+      "buttons": [
+        113,
+        166,
+        359
+      ],
+      "dialogs": [],
+      "field_functions": [
+        {
+          "line": 267,
+          "function": "OwnerOpeningCostBasisEditorScreen"
+        },
+        {
+          "line": 276,
+          "function": "OwnerOpeningCostBasisEditorScreen"
+        },
+        {
+          "line": 316,
+          "function": "OwnerOpeningCostBasisEditorScreen"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerOverviewScreen.kt",
+      "sha256": "f898c9a19b2b012611c2954c48873e41695f058012e02a7bcc536667d2fdee56",
+      "fields": [],
+      "ime": [],
+      "scroll": [
+        145
+      ],
+      "consumption": [],
+      "header": [
+        88
+      ],
+      "buttons": [
+        149,
+        187
+      ],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerPreviewHost.kt",
+      "sha256": "8fb7278738431273d66c6fd980ab6f1b7e729ba5229427c5a880356308bb4582",
+      "fields": [],
+      "ime": [],
+      "scroll": [],
+      "consumption": [],
+      "header": [
+        524
+      ],
+      "buttons": [],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerProductsScreen.kt",
+      "sha256": "8591f48e4e121b4edb4262b25b3ccea325fed79aca17e01888fc2a691036eea8",
+      "fields": [
+        532,
+        572,
+        611
+      ],
+      "ime": [
+        519
+      ],
+      "scroll": [
+        382,
+        520,
+        767
+      ],
+      "consumption": [],
+      "header": [
+        278,
+        509,
+        757
+      ],
+      "buttons": [
+        311,
+        327,
+        631,
+        663,
+        709,
+        715,
+        794,
+        811,
+        818,
+        848,
+        858,
+        878,
+        888
+      ],
+      "dialogs": [
+        688,
+        837,
+        867
+      ],
+      "field_functions": [
+        {
+          "line": 532,
+          "function": "requestLeave"
+        },
+        {
+          "line": 572,
+          "function": "requestLeave"
+        },
+        {
+          "line": 611,
+          "function": "requestLeave"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerRecordsScreen.kt",
+      "sha256": "6140e94daebc6325b425c0231281be1c46d72bae6db9d38b067d60b7e97c74a7",
+      "fields": [
+        264,
+        992
+      ],
+      "ime": [
+        743
+      ],
+      "scroll": [
+        379,
+        428,
+        468,
+        527,
+        586,
+        744
+      ],
+      "consumption": [],
+      "header": [
+        250,
+        502,
+        575,
+        732
+      ],
+      "buttons": [
+        128,
+        618,
+        628,
+        633,
+        665,
+        956,
+        965,
+        1013,
+        1019
+      ],
+      "dialogs": [
+        1007
+      ],
+      "field_functions": [
+        {
+          "line": 264,
+          "function": "RecordsListBody"
+        },
+        {
+          "line": 992,
+          "function": "CorrectionField"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerReportsScreen.kt",
+      "sha256": "006b39a13a38f1e1a8c3255a5f0e6846dd0ac4f422ea582dd1732dc21841b928",
+      "fields": [
+        241,
+        248
+      ],
+      "ime": [],
+      "scroll": [
+        150
+      ],
+      "consumption": [],
+      "header": [
+        90
+      ],
+      "buttons": [
+        125,
+        258,
+        267
+      ],
+      "dialogs": [
+        235
+      ],
+      "field_functions": [
+        {
+          "line": 241,
+          "function": "OwnerReportsScreen"
+        },
+        {
+          "line": 248,
+          "function": "OwnerReportsScreen"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerSecurityHistoryScreen.kt",
+      "sha256": "2167cb0d6ffd22ffeb13ee5b30f5d61fe679f48ed88302b0060db6daa94b626b",
+      "fields": [],
+      "ime": [],
+      "scroll": [
+        146,
+        196
+      ],
+      "consumption": [],
+      "header": [
+        99,
+        186
+      ],
+      "buttons": [],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerShopSettingsScreen.kt",
+      "sha256": "65264603fcba879c81e317d67a477465e098d5af14549345175bba009397a3ff",
+      "fields": [
+        652,
+        665,
+        678,
+        985,
+        1196,
+        1384,
+        1460,
+        1587,
+        1628
+      ],
+      "ime": [
+        642,
+        820,
+        975,
+        1365,
+        1568
+      ],
+      "scroll": [
+        423,
+        643,
+        821,
+        976,
+        1081,
+        1366
+      ],
+      "consumption": [],
+      "header": [
+        373,
+        632,
+        810,
+        965,
+        1071,
+        1355,
+        1558
+      ],
+      "buttons": [
+        403,
+        493,
+        506,
+        697,
+        719,
+        879,
+        904,
+        1005,
+        1021,
+        1102,
+        1116,
+        1142,
+        1152,
+        1168,
+        1178,
+        1223,
+        1229,
+        1503,
+        1519,
+        1572,
+        1598
+      ],
+      "dialogs": [
+        1135,
+        1161,
+        1218
+      ],
+      "field_functions": [
+        {
+          "line": 652,
+          "function": "requestLeave"
+        },
+        {
+          "line": 665,
+          "function": "requestLeave"
+        },
+        {
+          "line": 678,
+          "function": "requestLeave"
+        },
+        {
+          "line": 985,
+          "function": "requestLeave"
+        },
+        {
+          "line": 1196,
+          "function": "OwnerShopSettingsRateField"
+        },
+        {
+          "line": 1384,
+          "function": "buildInputOrNull"
+        },
+        {
+          "line": 1460,
+          "function": "buildInputOrNull"
+        },
+        {
+          "line": 1587,
+          "function": "OpeningReauthScreen"
+        },
+        {
+          "line": 1628,
+          "function": "OpeningAmountField"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerSuppliersScreen.kt",
+      "sha256": "881d19c03c1cd32a9092d0ccecb242dff4d8fbac33c43040de8105b39e69a290",
+      "fields": [
+        407,
+        533,
+        546,
+        559,
+        572
+      ],
+      "ime": [
+        397,
+        523
+      ],
+      "scroll": [
+        323,
+        398,
+        524,
+        711
+      ],
+      "consumption": [],
+      "header": [
+        248,
+        387,
+        513,
+        701
+      ],
+      "buttons": [
+        279,
+        294,
+        427,
+        446,
+        607,
+        634,
+        666,
+        672,
+        735
+      ],
+      "dialogs": [
+        661
+      ],
+      "field_functions": [
+        {
+          "line": 407,
+          "function": "requestLeave"
+        },
+        {
+          "line": 533,
+          "function": "requestLeave"
+        },
+        {
+          "line": 546,
+          "function": "requestLeave"
+        },
+        {
+          "line": 559,
+          "function": "requestLeave"
+        },
+        {
+          "line": 572,
+          "function": "requestLeave"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerSyncScreen.kt",
+      "sha256": "a851a94aca536c5cd19950adf37d529dcea046af1c6ced3d50ce1d572717ab7d",
+      "fields": [
+        450,
+        461
+      ],
+      "ime": [],
+      "scroll": [
+        134
+      ],
+      "consumption": [],
+      "header": [
+        122
+      ],
+      "buttons": [
+        246,
+        293,
+        302,
+        386,
+        391,
+        402,
+        407,
+        414,
+        476,
+        503
+      ],
+      "dialogs": [
+        284
+      ],
+      "field_functions": [
+        {
+          "line": 450,
+          "function": "OwnerSyncEnrollBody"
+        },
+        {
+          "line": 461,
+          "function": "OwnerSyncEnrollBody"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerUsersRolesScreen.kt",
+      "sha256": "7177429a535b08bf11bd1e5e7ac382896a0de65d46c5d81b287dd81560a96d08",
+      "fields": [
+        667,
+        680,
+        805,
+        820,
+        991
+      ],
+      "ime": [
+        652,
+        790
+      ],
+      "scroll": [
+        415,
+        474,
+        653,
+        791,
+        926
+      ],
+      "consumption": [],
+      "header": [
+        341,
+        464,
+        642,
+        780,
+        916
+      ],
+      "buttons": [
+        371,
+        386,
+        503,
+        511,
+        519,
+        527,
+        535,
+        568,
+        581,
+        715,
+        842,
+        956,
+        1008,
+        1020,
+        1109,
+        1115
+      ],
+      "dialogs": [
+        555,
+        984,
+        1104
+      ],
+      "field_functions": [
+        {
+          "line": 667,
+          "function": "requestLeave"
+        },
+        {
+          "line": 680,
+          "function": "requestLeave"
+        },
+        {
+          "line": 805,
+          "function": "requestLeave"
+        },
+        {
+          "line": 820,
+          "function": "requestLeave"
+        },
+        {
+          "line": 991,
+          "function": "OwnerUsersRolesReauthDialog"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerWorkScreen.kt",
+      "sha256": "b2182afa4f49bfaaeeff25e1e6963cb1f87e2eb1cdfd5b8284b878a24a3adf98",
+      "fields": [],
+      "ime": [],
+      "scroll": [
+        176
+      ],
+      "consumption": [],
+      "header": [
+        126
+      ],
+      "buttons": [
+        195,
+        323
+      ],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/salarypayment/SalaryPaymentEntryScreen.kt",
+      "sha256": "1620232506985f064a6ef8df61eaa9cc0b67c15fc4f6863a84b2827a42d96d28",
+      "fields": [
+        340,
+        387
+      ],
+      "ime": [
+        214
+      ],
+      "scroll": [
+        306,
+        477,
+        537,
+        582
+      ],
+      "consumption": [],
+      "header": [
+        216
+      ],
+      "buttons": [
+        123,
+        129,
+        377,
+        416,
+        509,
+        563,
+        608
+      ],
+      "dialogs": [
+        118,
+        532,
+        578
+      ],
+      "field_functions": [
+        {
+          "line": 340,
+          "function": "SalaryPaymentForm"
+        },
+        {
+          "line": 387,
+          "function": "SalaryPaymentForm"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/sale/CashierPreviewHost.kt",
+      "sha256": "09159bef2d850729f49c5e4a1427d1c3349df1fe848404c6cf8545829770bc78",
+      "fields": [],
+      "ime": [],
+      "scroll": [],
+      "consumption": [],
+      "header": [
+        257
+      ],
+      "buttons": [
+        484,
+        496
+      ],
+      "dialogs": [
+        479
+      ],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/sale/CashierSaleScreen.kt",
+      "sha256": "0fac5ecfd153433256876cfd9c5330b1efff8d69f3e8f26d650659608ab4c399",
+      "fields": [
+        557,
+        980,
+        1221,
+        1619,
+        1632,
+        1832
+      ],
+      "ime": [
+        343
+      ],
+      "scroll": [
+        398,
+        770,
+        986,
+        1486,
+        1891
+      ],
+      "consumption": [],
+      "header": [
+        345
+      ],
+      "buttons": [
+        801,
+        838,
+        844,
+        1000,
+        1525,
+        1723,
+        1843,
+        1941
+      ],
+      "dialogs": [
+        766,
+        833,
+        975,
+        1482
+      ],
+      "field_functions": [
+        {
+          "line": 557,
+          "function": "SaleEntryContent"
+        },
+        {
+          "line": 980,
+          "function": "ProductSelector"
+        },
+        {
+          "line": 1221,
+          "function": "QuantityEditor"
+        },
+        {
+          "line": 1619,
+          "function": "SecondaryDetails"
+        },
+        {
+          "line": 1632,
+          "function": "SecondaryDetails"
+        },
+        {
+          "line": 1832,
+          "function": "SaleDeliveryFollowUpCard"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/sale/CashierScreenHeader.kt",
+      "sha256": "f3d9940835b9905b615d0c48ade4102c841e234d236ee1d63def6a85ba1ba587",
+      "fields": [],
+      "ime": [],
+      "scroll": [],
+      "consumption": [],
+      "header": [
+        45,
+        73
+      ],
+      "buttons": [],
+      "dialogs": [],
+      "field_functions": []
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/vendorpayment/VendorPaymentEntryScreen.kt",
+      "sha256": "cb3699c3748afdb504c2fc3e3fddc1e4bc2130d9405918efcb30ab6eaf45b58b",
+      "fields": [
+        340,
+        387
+      ],
+      "ime": [
+        214
+      ],
+      "scroll": [
+        306,
+        477,
+        537,
+        582
+      ],
+      "consumption": [],
+      "header": [
+        216
+      ],
+      "buttons": [
+        123,
+        129,
+        377,
+        416,
+        509,
+        563,
+        608
+      ],
+      "dialogs": [
+        118,
+        532,
+        578
+      ],
+      "field_functions": [
+        {
+          "line": 340,
+          "function": "VendorPaymentForm"
+        },
+        {
+          "line": 387,
+          "function": "VendorPaymentForm"
+        }
+      ]
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/welcome/WelcomeScreen.kt",
+      "sha256": "f53a686c03788bf2c5999ae888f3124826e1bd38c1592ea0fbcf66f018c4480b",
+      "fields": [],
+      "ime": [],
+      "scroll": [
+        54
+      ],
+      "consumption": [],
+      "header": [],
+      "buttons": [
+        76
+      ],
+      "dialogs": [],
+      "field_functions": []
+    }
+  ]
+}

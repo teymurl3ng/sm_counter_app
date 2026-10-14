@@ -5,12 +5,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -18,7 +19,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 
 private val LocalNavigationHosted = compositionLocalOf { false }
@@ -45,11 +45,6 @@ internal fun AdaptiveNavigationScaffold(
     }
     BoxWithConstraints(modifier = modifier) {
         val useNavigationRail = maxWidth >= 600.dp
-        // While the keyboard is open the bar would sit behind the IME but its
-        // slot still pads the content, painting a dead background-colored band
-        // above the keyboard. Drop the bar from composition instead — forms
-        // (which imePadding themselves) then end exactly at the keyboard top.
-        val imeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
         Row(Modifier.fillMaxSize()) {
             if (useNavigationRail) expandedNavigation()
             Scaffold(
@@ -58,10 +53,19 @@ internal fun AdaptiveNavigationScaffold(
                 contentWindowInsets = contentWindowInsets,
                 snackbarHost = { SnackbarHost(snackbarHostState) },
                 bottomBar = {
-                    if (!useNavigationRail && !imeVisible) compactNavigation()
+                    if (!useNavigationRail) compactNavigation()
                 },
                 content = { padding ->
-                    CompositionLocalProvider(LocalNavigationHosted provides true) { content(padding) }
+                    // Navigation stays at the physical bottom, behind the IME.
+                    // Account for its slot before applying only the remaining
+                    // animated inset. Removing the slot on the first IME frame
+                    // made every form jump, and unconsumed padding left a gap.
+                    Box(Modifier.fillMaxSize().padding(padding)
+                        .consumeWindowInsets(padding).imePadding()) {
+                        CompositionLocalProvider(LocalNavigationHosted provides true) {
+                            content(PaddingValues(0.dp))
+                        }
+                    }
                 },
             )
         }

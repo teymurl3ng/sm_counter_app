@@ -1,0 +1,11 @@
+# Focused acceptance, deferred
+
+No new functional tests ran during this repair. Retain earlier unrelated accepted evidence. The source repair is compiled, not physically accepted.
+
+1. Costing: cycle Policies/Plans/Opening/Yield twice. Verify identical tab and toolbar vertical bounds, one applicable primary action, original callback/permission behavior, and readable large text. Include cold loading, empty and failed data states. Do not perform a real policy approval merely to check geometry.
+2. Shared keyboard: on each of the five eligible role hosts, open one hosted form, focus its first then lowest editable field, switch fields with the keyboard open, dismiss with Done/Back and reopen twice. Header coordinates remain steady; only the form viewport shrinks/scrolls. Navigation stays behind the keyboard, returns at the same position after dismissal and leaves no extra reserved band. Fields and supporting text stay reachable; drafts survive focus changes.
+3. P1 exceptions: Sale amount/quantity and >6-product search; Collection/customer search; Deliveries; count/reopen; shop settings identity/rates/opening; cost/plan/target/yield; Opening cost basis; Sync enrollment; access passphrase/owner setup. Read-only fields must not summon a keyboard. Existing keypad and native biometric flows retain their behavior.
+4. P2 forms/dialogs: products, people/staff roles, personal security, payments, drawing/correction/receipt, backup/cloud and reauthentication, custom report dates. Short dialog and full-screen reauthentication bodies must remain scrollable with a tall keyboard and large system text. Use disposable credentials/data if actual submissions are required later.
+5. Use portrait, light/dark and normal/larger text. One phone is sufficient for the first focused run; a second device is for the final Samsung/navigation-mode geometry comparison, not another full suite. Expand only if a concrete mismatch is reproduced. No landscape, unrelated design audit or server recovery/reset test belongs to this repair.
+
+After acceptance, rebuild/freeze the app candidate with this source. The existing finish-engineering 0.4.2 APK does not contain this repair. Compilation alone cannot verify perceived motion or certify every field/device combination.

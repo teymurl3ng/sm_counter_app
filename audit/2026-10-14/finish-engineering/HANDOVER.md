@@ -1,3 +1,7 @@
+# Candidate superseded by presentation repair
+
+14 October: release/publication is paused. The saved 0.4.2 APK predates the [layout/keyboard source repair](../layout-keyboard-audit/RESULT.md). Keep it as a provenance artifact; rebuild/freeze a new candidate before installation or publication of that repair. Phone and business acceptance remain deferred, not passed.
+
 # Release candidate handover
 
 Android candidate0.4.2/versionCode6 uses the existing com.saaf.milkshop package and release signing key. Follow RESULT.md for its exact APK/hash/certificate/source commit. This engineering finish does not claim acceptance tests or actual shop setup were performed.

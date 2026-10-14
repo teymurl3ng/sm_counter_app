@@ -1,0 +1,45 @@
+{
+  "base_app_commit": "565e7476440c23ebe00035eafc1ca4f761586165",
+  "files": [
+    {
+      "path": "phase18/app/src/main/AndroidManifest.xml",
+      "sha256": "18192f3b34795cf35a0c14a2310c0ba826e88a4dd4e0d0de8f1fca1f727eed05"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/AdaptiveNavigationScaffold.kt",
+      "sha256": "ffad8187d0cd27a23737bdddd804070634a856a227c1954162534706e43587f8"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/ImePaddings.kt",
+      "sha256": "5d027ea4320a4e908d59e624c170725c1ec0b4e06a67fa36f743d24da11545d2"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerBackupScreen.kt",
+      "sha256": "bc3a5ca19b3a34f8eb7fc907a9163bc84e13ec84babbf7b1bbdfbe0abbf82281"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCostingPlanningScreens.kt",
+      "sha256": "d2ffbc26c33af06e8abfd20bdb7bf54197198874a0582abd56dbf8fd3ad21663"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCostingPlansScreen.kt",
+      "sha256": "a61b5a25f0a8c99441666b008f4da5c187669ba2e82c07a160d3cc5610a56fa3"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerReportsScreen.kt",
+      "sha256": "2f02cbb95a63fbd8c9f9bfe4c784b14f0b3fc1d9e520b72a1f0b00c229e4927d"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerShopSettingsScreen.kt",
+      "sha256": "edbb98386ae4830e08918910f762a94ab05b05481cb1ef47235f520108302b3c"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerUsersRolesScreen.kt",
+      "sha256": "427e66b1f3c1be88511f49657d97e22147cd159e3d9f5f356e18df7d02fa3216"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/NativePaneActionBar.kt",
+      "sha256": "59e8565fa147d53dfc4e7651453004eae6e08bf2eea99ce7e816bf204706859b"
+    }
+  ]
+}

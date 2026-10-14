@@ -236,7 +236,7 @@ fun OwnerReportsScreen(
             onDismissRequest = { customRangeOpen = false },
             title = { Text("Custom report range") },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text("Use calendar dates in YYYY-MM-DD format.")
                     OutlinedTextField(
                         value = customStart,

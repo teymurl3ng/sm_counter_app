@@ -986,7 +986,7 @@ private fun OwnerUsersRolesReauthDialog(
         modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesReauth),
         title = { Text("Confirm with passphrase") },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("Enter your full Owner passphrase to continue this sensitive action.")
                 OutlinedTextField(
                     value = passphrase,

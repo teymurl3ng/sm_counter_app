@@ -29,13 +29,11 @@
         <activity
             android:name=".nativeui.NativePreviewActivity"
             android:exported="false"
-            android:theme="@style/Theme.SaafMilk.Native" />
-        <!-- No windowSoftInputMode here: the activity runs edge-to-edge
-             (enableEdgeToEdge → decorFitsSystemWindows=false) and every form
-             applies imePadding() once. adjustResize on top of that applied the
-             keyboard height twice, painting a background-colored band above
-             the keyboard. HybridActivity keeps adjustResize: its WebView
-             publishes IME insets to CSS separately. -->
+            android:theme="@style/Theme.SaafMilk.Native"
+            android:windowSoftInputMode="adjustResize" />
+        <!-- Native Compose receives animated IME insets under edge-to-edge.
+             The shared scaffold consumes its padding before IME padding;
+             access forms own their insets outside the signed-in scaffold. -->
         <activity
             android:name=".MainActivity"
             android:exported="false" />

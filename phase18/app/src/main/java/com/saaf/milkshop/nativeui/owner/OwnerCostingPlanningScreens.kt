@@ -120,7 +120,6 @@ internal fun OwnerCostingPlansBody(
     budgets: List<NativeOwnerBudgetRow>,
     targets: List<NativeOwnerCollectionsTargetRow>,
     error: String?,
-    onOpenBudgetEditor: () -> Unit,
     onOpenCollectionsEditor: () -> Unit,
     hostedScaffold: HostedScaffold,
     modifier: Modifier = Modifier,
@@ -161,10 +160,6 @@ internal fun OwnerCostingPlansBody(
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                         )
-                        TextButton(
-                            onClick = hapticAction(onOpenBudgetEditor),
-                            modifier = Modifier.testTag(NativeUiTags.OwnerCostingBudgetOpen),
-                        ) { Text("New plan") }
                     }
                 }
                 if (budgets.none { !it.archived }) {
@@ -608,7 +603,6 @@ internal fun OwnerCostingYieldBody(
     batches: List<NativeOwnerYieldBatchRow>,
     summary: String?,
     error: String?,
-    onOpenApprove: () -> Unit,
     savingAssessment: Boolean,
     classifications: List<String>,
     reasons: List<String>,
@@ -651,10 +645,6 @@ internal fun OwnerCostingYieldBody(
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                         )
-                        TextButton(
-                            onClick = hapticAction(onOpenApprove),
-                            modifier = Modifier.testTag(NativeUiTags.OwnerCostingYieldApprove),
-                        ) { Text("Approve baseline") }
                     }
                 }
                 summary?.let {

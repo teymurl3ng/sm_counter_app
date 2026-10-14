@@ -630,7 +630,7 @@ private fun OwnerCostingPlansListBody(
     BackHandler(onBack = onBackToMenu)
 
     @Composable
-    fun HubHeader(extraActions: @Composable () -> Unit = {}) {
+    fun HubHeader() {
         CashierScreenHeader(
             title = "Costing & plans",
             displayName = context.shopName,
@@ -638,18 +638,22 @@ private fun OwnerCostingPlansListBody(
             businessDate = context.businessDate,
             postingOpen = context.postingOpen,
         )
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            extraActions()
-        }
         OwnerCostingPlansSectionTabs(
             section = section,
             onSectionChange = onSectionChange,
+        )
+        val (label, action, tag) = when (section) {
+            NativeOwnerCostingSection.Policies -> Triple("Approve policy", onOpenApprove, NativeUiTags.OwnerCostingPlansApprove)
+            NativeOwnerCostingSection.Plans -> Triple("New plan", onOpenBudgetEditor, NativeUiTags.OwnerCostingBudgetOpen)
+            NativeOwnerCostingSection.Opening -> Triple("Shop settings", onOpenShopSettings, null)
+            NativeOwnerCostingSection.Yield -> Triple("Approve baseline", onOpenYieldApprove, NativeUiTags.OwnerCostingYieldApprove)
+        }
+        com.saaf.milkshop.nativeui.common.NativePaneActionBar(
+            label = label,
+            onClick = action,
+            actionTag = tag,
+            enabled = !(policiesLoading && policies.isEmpty() && budgets.isEmpty() && yieldPolicies.isEmpty()) &&
+                !(policiesError != null && policies.isEmpty() && budgets.isEmpty() && section == NativeOwnerCostingSection.Policies),
         )
     }
 
@@ -699,7 +703,6 @@ private fun OwnerCostingPlansListBody(
                 budgets = budgets,
                 targets = targets,
                 error = policiesError,
-                onOpenBudgetEditor = onOpenBudgetEditor,
                 onOpenCollectionsEditor = onOpenCollectionsEditor,
                 hostedScaffold = hostedScaffold,
                 modifier = modifier.testTag(NativeUiTags.OwnerCostingPlansRoot),
@@ -732,7 +735,6 @@ private fun OwnerCostingPlansListBody(
                 batches = yieldBatches,
                 summary = yieldSummary,
                 error = policiesError,
-                onOpenApprove = onOpenYieldApprove,
                 savingAssessment = lossSaving,
                 classifications = lossClassifications,
                 reasons = lossReasons,
@@ -752,14 +754,7 @@ private fun OwnerCostingPlansListBody(
                         .padding(padding)
                         .testTag(NativeUiTags.OwnerCostingPlansRoot),
                 ) {
-                    HubHeader(
-                        extraActions = {
-                            TextButton(
-                                onClick = hapticAction(onOpenApprove),
-                                modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansApprove),
-                            ) { Text("Approve policy") }
-                        },
-                    )
+                    HubHeader()
                     currentMonthSummary?.let { summary ->
                         Text(
                             summary,
@@ -1245,7 +1240,7 @@ private fun OwnerCostingPlansReauthDialog(
         modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansReauth),
         title = { Text("Confirm with passphrase") },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("Enter your passphrase again to approve this costing change.")
                 OutlinedTextField(
                     value = passphrase,

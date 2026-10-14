@@ -138,7 +138,7 @@ internal fun securityAuditEntryJson(v: SecurityAuditEntryEntity) = JSONObject().
     putNullable("actor_role_snapshot", v.actorRoleSnapshot); putNullable("target_user_id", v.targetUserId); putNullable("details", v.details)
 }
 internal fun eventActorLinkJson(v: EventActorLinkEntity) = JSONObject().apply {
-    put("event_id", v.eventId); put("actor_user_id", v.actorUserId); put("actor_name_snapshot", v.actorNameSnapshot)
+    put("event_id", v.eventId); putNullable("actor_user_id", v.actorUserId); put("actor_name_snapshot", v.actorNameSnapshot)
     put("actor_role_snapshot", v.actorRoleSnapshot); put("attributed_at", v.attributedAt)
 }
 internal fun costingPolicyVersionJson(v: CostingPolicyVersionEntity) = JSONObject().apply {
@@ -373,7 +373,7 @@ internal fun readSecurityAuditEntries(a: JSONArray?): List<SecurityAuditEntryEnt
 } }
 internal fun readEventActorLinks(a: JSONArray?): List<EventActorLinkEntity> = (0 until (a?.length() ?: 0)).map { i -> a!!.getJSONObject(i).let {
     EventActorLinkEntity(
-        eventId = it.getLong("event_id"), actorUserId = it.getLong("actor_user_id"), actorNameSnapshot = it.getString("actor_name_snapshot"),
+        eventId = it.getLong("event_id"), actorUserId = if (it.get("actor_user_id") == JSONObject.NULL) null else it.getLong("actor_user_id"), actorNameSnapshot = it.getString("actor_name_snapshot"),
         actorRoleSnapshot = it.getString("actor_role_snapshot"), attributedAt = it.getString("attributed_at")
     )
 } }

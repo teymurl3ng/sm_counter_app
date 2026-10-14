@@ -55,6 +55,9 @@ class SyncEnvelopeFactory(private val database: MilkShopDatabase) {
                     val financial = dao.financialLogsForEvents(eventIds).groupBy { it.eventId }
                     val spoilage = dao.spoilageDetailsForEvents(eventIds).groupBy { it.eventId }
                     val actors = dao.actorLinksForEvents(eventIds).associateBy { it.eventId }
+                    val openingBatches = dao.openingBatchesForEvents(eventIds).associateBy { it.eventId }
+                    val openingInventory = dao.openingInventoryForEvents(eventIds).groupBy { it.eventId }
+                    val openingAccounts = dao.openingAccountsForEvents(eventIds).groupBy { it.eventId }
                     // Corrections reference their original by uid, never by the
                     // local integer id (D3): resolve every corrects_event_id in
                     // the batch before serializing.
@@ -65,10 +68,12 @@ class SyncEnvelopeFactory(private val database: MilkShopDatabase) {
                     // receiving device can remap to its own local ids.
                     val productUids = dao.productsByIds(
                         inventory.values.flatten().map { it.productId }.distinct() +
-                            spoilage.values.flatten().map { it.productId },
+                            spoilage.values.flatten().map { it.productId } +
+                            openingInventory.values.flatten().map { it.productId },
                     ).associate { it.productId to it.uid }
                     val accountUids = dao.accountsByIds(
-                        financial.values.flatten().map { it.accountId }.distinct(),
+                        (financial.values.flatten().map { it.accountId } +
+                            openingAccounts.values.flatten().map { it.accountId }).distinct(),
                     ).associate { it.accountId to it.uid }
                     tableRows.forEach { row ->
                         val event = byUid[row.rowUid]
@@ -107,11 +112,22 @@ class SyncEnvelopeFactory(private val database: MilkShopDatabase) {
                                     productUids[entry.productId]?.let { uid -> put("product_uid", uid) }
                                 }
                             }))
+                            if (event.eventId in openingBatches) {
+                                check(event.eventType == "OPENING_STATE") { "Opening details belong to an opening event" }
+                                put("opening_state_contract_version", 1)
+                                put("opening_state", JSONObject()
+                                    .put("inventory_entries", JSONArray(openingInventory[event.eventId].orEmpty().map { entry ->
+                                        JSONObject().put("product_uid", productUids.getValue(entry.productId)).put("quantity", entry.quantity)
+                                    }))
+                                    .put("account_entries", JSONArray(openingAccounts[event.eventId].orEmpty().map { entry ->
+                                        JSONObject().put("account_uid", accountUids.getValue(entry.accountId)).put("balance", entry.balance)
+                                    })))
+                            }
                             actors[event.eventId]?.let { link ->
                                 put(
                                     "actor_link",
                                     JSONObject()
-                                        .put("actor_user_id", link.actorUserId)
+                                        .put("actor_user_id", link.actorUserId ?: JSONObject.NULL)
                                         .put("actor_name_snapshot", link.actorNameSnapshot)
                                         .put("actor_role_snapshot", link.actorRoleSnapshot)
                                         .put("attributed_at", link.attributedAt),
@@ -320,7 +336,12 @@ class SyncEnvelopeFactory(private val database: MilkShopDatabase) {
             }
         }
 
-        return BuildResult(envelopes, skipped)
+        // Grouped reads must not regroup the wire history. In particular,
+        // count/close/reopen/count/reclose must reach the receiver in capture
+        // order so its existing latest-count/history guards remain valid.
+        val positions = rows.mapIndexed { index, row -> (row.tableName to row.rowUid) to index }.toMap()
+        val ordered = envelopes.sortedBy { positions.getValue(it.getString("table") to it.getString("uid")) }
+        return BuildResult(ordered, skipped)
     }
 
     private suspend fun emit(

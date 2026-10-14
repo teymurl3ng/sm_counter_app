@@ -1,0 +1,21 @@
+{
+  "batch": "9a0",
+  "planning_complete": true,
+  "independent_arithmetic": "PASS",
+  "frozen_specs": "PASS",
+  "source_files_hashed": 394,
+  "all_ten_table_rows_match_oracle": true,
+  "backlog_rows_preserved": 51,
+  "a1_not_marked_accepted": true,
+  "android_or_human_execution": false,
+  "remote_or_ordinary_device_mutation": false,
+  "next_batch": "9a1 two new + two existing exact methods",
+  "artifact_sha256": {
+    "calculate-expectations.py": "5374209026f18cb8c266ff3380217ef3ef8e25b5e6fa850eac10f400a86ba17a",
+    "EXPECTED.json": "633716d5cc1f7c489f3ae4eaa804c3c6ed425e53de8115b94243ca3555384f4d",
+    "RESULT.md": "b984c2babe5e6f9856617bd1f39ff1d1939e184b3909c0311a28fda7c31bbee7",
+    "SCOPE.md": "5ed50732011674b8fbc7284fb21229f4ab052cdac40cebbcb34bc3d6fa3e9ea5",
+    "SOURCE_BASELINE.json": "d6c9d84c5932447637533a7c09e517d5fe2aecbabb9083389497087fdf0db500",
+    "TASK_CARDS.md": "79d7780ab1aff2c8359b2e6ce7b77291689ce20e9ed50e41649ab21c1c3616dd"
+  }
+}

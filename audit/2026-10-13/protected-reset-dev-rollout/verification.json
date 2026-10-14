@@ -1,0 +1,15 @@
+{
+  "status": "DEV_API_ACCEPTED_BROWSER_BLOCKED_PRODUCTION_PENDING",
+  "migration": "20261012194632",
+  "dev_project": "tghzmofkkdsaasvnixps",
+  "preview": "https://sm-server-view-hotwmja5d-mkrc.vercel.app",
+  "candidate_commit": "f41936e2a7943854ff37111325b1d5372734cdc1",
+  "live_groups_passed": 10,
+  "fixture_resets_completed": 4,
+  "fixture_accounts_retired": 5,
+  "held_fixture_participants": 0,
+  "catalog_grants_rls_verified": true,
+  "actual_browser_check": "NOT_RUN_AUTO_REVIEW_DENIED_AFTER_APPROVAL",
+  "production_guard_installed": false,
+  "existing_staff_credentials_changed": false
+}

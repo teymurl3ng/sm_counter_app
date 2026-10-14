@@ -26,8 +26,14 @@ import com.saaf.milkshop.data.SpoilageDetailEntity
 import com.saaf.milkshop.domain.InventoryCostProjectionService
 import com.saaf.milkshop.domain.OwnerFundsTruth
 import com.saaf.milkshop.data.OwnerFundsDetailEntity
+import com.saaf.milkshop.data.OpeningBatchEntity
+import com.saaf.milkshop.data.OpeningInventoryEntryEntity
+import com.saaf.milkshop.data.OpeningAccountEntryEntity
 import org.json.JSONObject
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.ResolverStyle
 import java.time.LocalDate
 import java.time.DayOfWeek
 import com.saaf.milkshop.domain.BUDGET_CATEGORY_MILK_PURCHASES
@@ -119,8 +125,9 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
     private suspend fun applyAtomically(record: SyncPulledRecord, execute: suspend (String) -> Unit): PerRecord {
         execute("SAVEPOINT record_apply")
         return try {
-            val result = applyOne(record)
-            if (record.tableName == "events" && record.payload.optString("event_type") in setOf("OWNER_DRAWING", "OWNER_FUNDS_IN")
+            val result = applyOne(record, execute)
+            if ((record.tableName == "daily_close_actions" ||
+                (record.tableName == "events" && record.payload.optString("event_type") in setOf("OWNER_DRAWING", "OWNER_FUNDS_IN")))
                 && result in listOf(PerRecord.APPLIED, PerRecord.UPDATED, PerRecord.PRESENT)) {
                 // A verified current body supersedes an older retained refusal of this UID.
                 // Never discard a later server version while accepting an earlier one.
@@ -135,6 +142,9 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
             execute("ROLLBACK TO record_apply")
             execute("RELEASE record_apply")
             if (failure is kotlinx.coroutines.CancellationException || failure is AuditPersistenceFailure) throw failure
+            if (record.tableName == "daily_close_actions") {
+                return park(record, "daily_close_refused: ${failure.message ?: failure.javaClass.simpleName}")
+            }
             if (record.tableName == "events" && (record.payload.optString("event_type") in setOf("OWNER_DRAWING", "OWNER_FUNDS_IN")
                     || record.payload.has("owner_funds_contract_version") || record.payload.has("owner_funds_details"))) {
                 return park(record, "owner_funds_refused: ${failure.message ?: failure.javaClass.simpleName}")
@@ -144,7 +154,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         }
     }
 
-    private suspend fun applyOne(record: SyncPulledRecord): PerRecord {
+    private suspend fun applyOne(record: SyncPulledRecord, execute: suspend (String) -> Unit): PerRecord {
         val payload = record.payload
         // C1 pending-edit guard: a pulled row whose uid still has an unpushed
         // local edit is parked, never applied — the local edit must reach the
@@ -165,7 +175,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                 "collections_targets" -> applyCollectionsTarget(record)
                 "delivery_status_history" -> applyDeliveryStatus(record)
                 "physical_cash_counts" -> applyCashCount(record)
-                "daily_close_actions" -> applyCloseAction(record)
+                "daily_close_actions" -> applyCloseAction(record, execute)
                 "store_profile" -> applyStoreProfile(payload)
                 else -> PerRecord.SKIPPED
         }
@@ -373,6 +383,42 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
             }
         }
 
+        // Legacy bodies may lack details; explicit new bodies must be complete.
+        val openingObject = payload.optJSONObject("opening_state")
+        require(!payload.has("opening_state") || openingObject != null) { "Opening state must be an object" }
+        require((openingObject == null && !payload.has("opening_state_contract_version")) ||
+            (openingObject != null && payload.getInt("opening_state_contract_version") == 1)) { "Unsupported opening state contract" }
+        require(openingObject == null || payload.getString("event_type") == "OPENING_STATE") { "Opening details belong to an opening event" }
+        val openingInventory = ArrayList<Pair<Long, Double>>()
+        val openingAccounts = ArrayList<Pair<Long, Double>>()
+        openingObject?.let { details ->
+            val inventory = details.getJSONArray("inventory_entries")
+            for (index in 0 until inventory.length()) {
+                val row = inventory.getJSONObject(index)
+                val productUid = row.requiredText("product_uid")
+                val id = resolveProduct(productUid) ?: return park(record, "opening product $productUid not local yet")
+                val quantity = row.requiredFiniteNumber("quantity")
+                require(quantity >= 0 && openingInventory.none { it.first == id }) { "Invalid or repeated opening product" }
+                openingInventory += id to quantity
+            }
+            val accounts = details.getJSONArray("account_entries")
+            for (index in 0 until accounts.length()) {
+                val row = accounts.getJSONObject(index)
+                val accountUid = row.requiredText("account_uid")
+                val id = resolveAccount(accountUid) ?: return park(record, "opening account $accountUid not local yet")
+                val balance = row.requiredFiniteNumber("balance")
+                require(balance >= 0 && openingAccounts.none { it.first == id }) { "Invalid or repeated opening account" }
+                require(database.accountDao().findById(id)!!.category in setOf("Cash/Bank", "Customer", "Vendor")) { "Invalid opening account category" }
+                openingAccounts += id to balance
+            }
+        }
+        val actorObject = payload.optJSONObject("actor_link")
+        require(!payload.has("actor_link") || actorObject != null) { "Actor snapshot must be an object" }
+        val actor = actorObject?.let { link ->
+            val time = link.requiredText("attributed_at").also { Instant.parse(it) }
+            EventActorLinkEntity(0, null, link.requiredText("actor_name_snapshot"), link.requiredText("actor_role_snapshot"), time)
+        }
+
         val event = EventEntity(
             createdAt = payload.getString("created_at"),
             occurredAt = payload.getString("occurred_at"),
@@ -443,7 +489,10 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
             subtractExisting(financialRows, database.financialLogDao().findByEventId(existing.eventId).map { it.accountId to it.amount })
             subtractExisting(spoilageRows, database.syncEnvelopeDao().spoilageDetailsForEvents(listOf(existing.eventId)).map { Triple(it.productId, it.quantity, it.reason) })
             if (inventoryRows.isEmpty() && financialRows.isEmpty() && spoilageRows.isEmpty()
-                && (ownerDetail == null || storedOwnerDetail != null)) return PerRecord.PRESENT
+                && (ownerDetail == null || storedOwnerDetail != null)) {
+                val repaired = persistEventDetails(existing.eventId, openingObject != null, openingInventory, openingAccounts, actor)
+                return if (repaired) PerRecord.UPDATED else PerRecord.PRESENT
+            }
         }
         val eventId = existing?.eventId ?: database.eventDao().insert(event)
         ownerDetail?.let { detail ->
@@ -474,24 +523,77 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
             )
         }
 
-        // Actor attribution is best-effort cross-device: app users are
-        // device-local, so a receiving device may have no matching user row.
-        // The event and its ledger apply regardless; attribution appears
-        // once the staff account exists locally (all-staff linking).
-        payload.optJSONObject("actor_link")?.let { link ->
-            runCatching {
-                database.eventActorLinkDao().insert(
-                    EventActorLinkEntity(
-                        eventId = eventId,
-                        actorUserId = 0L,
-                        actorNameSnapshot = link.optNullableString("actor_name_snapshot") ?: "synced",
-                        actorRoleSnapshot = link.optNullableString("actor_role_snapshot") ?: "synced",
-                        attributedAt = link.optNullableString("attributed_at") ?: Instant.now().toString(),
-                    ),
-                )
+        persistEventDetails(eventId, openingObject != null, openingInventory, openingAccounts, actor)
+        return PerRecord.APPLIED
+    }
+
+    /** Details share the event savepoint. Replay repairs missing subsets but never rewrites history. */
+    private suspend fun persistEventDetails(
+        eventId: Long,
+        hasOpening: Boolean,
+        inventory: List<Pair<Long, Double>>,
+        accounts: List<Pair<Long, Double>>,
+        actor: EventActorLinkEntity?,
+    ): Boolean {
+        var changed = false
+        if (hasOpening) {
+            // Full restated values must agree with cumulative opening ledger
+            // deltas, including corrections whose older bodies had no details.
+            val ledgerInventory = mutableMapOf<Long, Double>()
+            val ledgerAccounts = mutableMapOf<Long, Double>()
+            var id: Long? = eventId
+            val seen = mutableSetOf<Long>()
+            while (id != null) {
+                require(seen.add(id)) { "Opening correction cycle" }
+                val event = requireNotNull(database.eventDao().findById(id))
+                require(event.eventType == "OPENING_STATE") { "Opening correction needs an opening parent" }
+                database.inventoryLogDao().findByEventId(id).forEach { row ->
+                    ledgerInventory[row.productId] = (ledgerInventory[row.productId] ?: 0.0) + row.quantity
+                }
+                database.financialLogDao().findByEventId(id).forEach { row ->
+                    ledgerAccounts[row.accountId] = (ledgerAccounts[row.accountId] ?: 0.0) + row.amount
+                }
+                id = event.correctsEventId
+            }
+            fun agrees(details: Map<Long, Double>, ledger: Map<Long, Double>): Boolean =
+                (details.keys + ledger.keys).all { key ->
+                    val a = details[key] ?: 0.0
+                    val b = ledger[key] ?: 0.0
+                    a.isFinite() && b.isFinite() && kotlin.math.abs(a - b) <=
+                        maxOf(1e-9, maxOf(Math.ulp(a), Math.ulp(b)) * maxOf(4, seen.size * 2))
+                }
+            require(agrees(inventory.toMap(), ledgerInventory) && agrees(accounts.toMap(), ledgerAccounts)) {
+                "Opening details differ from ledger history"
+            }
+            val dao = database.openingStateDao()
+            val missingInventory = inventory.toMutableList()
+            val missingAccounts = accounts.toMutableList()
+            subtractExisting(missingInventory, dao.inventoryEntries(eventId).map { it.productId to it.quantity })
+            subtractExisting(missingAccounts, dao.accountEntries(eventId).map { it.accountId to it.balance })
+            if (dao.findBatch(eventId) == null) {
+                dao.insertBatch(OpeningBatchEntity(eventId))
+                changed = true
+            }
+            if (missingInventory.isNotEmpty()) {
+                dao.insertInventoryEntries(missingInventory.map { OpeningInventoryEntryEntity(eventId, it.first, it.second) })
+                changed = true
+            }
+            if (missingAccounts.isNotEmpty()) {
+                dao.insertAccountEntries(missingAccounts.map { OpeningAccountEntryEntity(eventId, it.first, it.second) })
+                changed = true
             }
         }
-        return PerRecord.APPLIED
+        if (actor != null) {
+            val incoming = actor.copy(eventId = eventId)
+            val stored = database.eventActorLinkDao().find(eventId)
+            if (stored == null) {
+                database.eventActorLinkDao().insert(incoming)
+                changed = true
+            } else {
+                require(stored.copy(actorUserId = null) == incoming) { "Existing actor snapshot differs from server history" }
+            }
+        }
+        return changed
     }
 
     private fun <T> subtractExisting(expected: MutableList<T>, existing: List<T>) {
@@ -776,10 +878,10 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         return PerRecord.APPLIED
     }
 
-    private suspend fun applyCloseAction(record: SyncPulledRecord): PerRecord {
+    private suspend fun applyCloseAction(record: SyncPulledRecord, execute: suspend (String) -> Unit): PerRecord {
         val uid = record.rowUid
         val payload = record.payload
-        if (database.syncEnvelopeDao().dailyCloseActionsByUid(listOf(uid)).isNotEmpty()) return PerRecord.PRESENT
+        val existing = database.syncEnvelopeDao().dailyCloseActionsByUid(listOf(uid)).firstOrNull()
         // A present-but-unresolvable count link is a dependency, not a null
         // (C1: silent nulls made close/count associations diverge).
         val countUid = payload.optNullableString("count_uid")
@@ -791,8 +893,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
             database.syncEnvelopeDao().dailyCloseActionsByUid(listOf(it)).firstOrNull()?.actionId
                 ?: return park(record, "close action supersedes $it not local yet")
         }
-        database.backupDataDao().insertDailyCloseAction(
-            DailyCloseActionEntity(
+        val received = DailyCloseActionEntity(
                 businessDate = payload.getString("business_date"),
                 action = payload.getString("action"),
                 physicalCashCountId = countId,
@@ -803,8 +904,26 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
                 supersedesActionId = supersedesId,
                 uid = uid,
                 moneyRoundingVersion = payload.optInt("money_rounding_version", 1),
-            ),
-        )
+            )
+        if (existing != null) {
+            require(existing.copy(actionId = 0, actorUserId = null) == received) {
+                "Remote daily close differs from immutable local history"
+            }
+            return PerRecord.PRESENT
+        }
+        // Another phone's actor is a snapshot, never a local identity or a
+        // permission grant. Only the local-login guard is suspended, inside
+        // this record's writer savepoint; all history/count/role guards remain.
+        // A rollback (including cancellation) restores the original DDL too.
+        val actorGuard = requireNotNull(database.syncApplyDao().verifiedCloseActorTriggerSql()) {
+            "Verified daily close actor guard is missing"
+        }
+        execute("DROP TRIGGER validate_verified_daily_close_actor")
+        try {
+            database.backupDataDao().insertDailyCloseAction(received)
+        } finally {
+            execute(actorGuard)
+        }
         return PerRecord.APPLIED
     }
 
@@ -971,7 +1090,19 @@ private fun JSONObject.requiredText(name: String): String =
     (get(name) as? String)?.takeIf { it.isNotBlank() }
         ?: error("Profile $name must be text")
 
-private fun JSONObject.requiredCreatedAt(): String = requiredText("created_at").also { Instant.parse(it) }
+    private fun JSONObject.requiredCreatedAt(): String = requiredText("created_at").also { value ->
+        // Historical seed/backfill dates have no zone. Validate their calendar
+        // fields without assigning a zone or changing the stored representation.
+        if (SQLITE_PROFILE_DATE.matches(value)) {
+            LocalDateTime.parse(value, SQLITE_PROFILE_FORMAT)
+        } else {
+            Instant.parse(value)
+        }
+    }
+
+    private val SQLITE_PROFILE_DATE = Regex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}")
+    private val SQLITE_PROFILE_FORMAT = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss")
+        .withResolverStyle(ResolverStyle.STRICT)
 
 private fun JSONObject.nullableText(name: String): String? = when (val value = get(name)) {
     JSONObject.NULL -> null

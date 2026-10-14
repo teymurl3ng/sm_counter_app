@@ -2556,11 +2556,28 @@ class NativeFoundationUiTest {
     @Test
     fun saleEntryDoneActionClearsKeyboardFocus() {
         openCashier()
-
-        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput)
-            .performClick()
-            .performImeAction()
-        composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput).assertIsNotFocused()
+        val input = composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput, useUnmergedTree = true)
+        input.assertIsDisplayed().performClick()
+        composeRule.waitUntil(5_000) {
+            var visible = false
+            composeRule.activityRule.scenario.onActivity { activity ->
+                visible = com.saaf.milkshop.qa.NativeLayoutImeEvidence.imeInsets(activity)
+                    .isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())
+            }
+            visible
+        }
+        captureUx("sale-keyboard-before-done", "saleEntryDoneActionClearsKeyboardFocus")
+        input.performImeAction()
+        input.assertIsNotFocused()
+        composeRule.waitUntil(5_000) {
+            var hidden = false
+            composeRule.activityRule.scenario.onActivity { activity ->
+                hidden = !com.saaf.milkshop.qa.NativeLayoutImeEvidence.imeInsets(activity)
+                    .isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())
+            }
+            hidden
+        }
+        captureUx("sale-keyboard-after-done", "saleEntryDoneActionClearsKeyboardFocus")
     }
 
     @Test

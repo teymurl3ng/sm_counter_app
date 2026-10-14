@@ -131,6 +131,21 @@ class NativeOwnerUsersRolesScreenContractTest {
             .assertCountEquals(0)
     }
 
+    @Test
+    fun disabledDetailKeepsStatusAndEnableAction() {
+        val user = sampleUser().copy(enabled = false, statusLabel = "Disabled", setupRequired = true)
+        var requested: Boolean? = null
+        setScreen(users = listOf(user), userDetail = NativeOwnerUserDetail(
+            row = user, createdAt = "2026-01-01T00:00:00Z", updatedAt = "2026-01-02T00:00:00Z",
+            disabledAt = "2026-01-02T00:00:00Z", employeeAccountIdLabel = "Not linked"),
+            onRequestSetEnabled = { requested = it })
+        composeRule.onNodeWithText("Disabled", useUnmergedTree = true).performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerUsersRolesDetailDisable).assertDoesNotExist()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerUsersRolesDetailEnable).performScrollTo().performClick()
+        assertEquals(true, requested)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerUsersRolesResumeSetup).performScrollTo().assertIsDisplayed()
+    }
+
 
     @Test
     fun enrollOpensIdentityForm() {

@@ -1,0 +1,22 @@
+{
+  "reviewer": "Codex visual inspection",
+  "observed_system_font_scale": 1.0,
+  "settled_captures_reviewed": [
+    "phone-portrait-lock.png",
+    "receive-milk-tenth-entry.png",
+    "deliveries-tenth-entry.png",
+    "products-list.png",
+    "sale-keyboard-before-done.png",
+    "sale-keyboard-after-done.png"
+  ],
+  "observations": [
+    "Portrait welcome content visible",
+    "Receive fields stacked; bottom content is scrollable",
+    "Delivery empty state and New delivery visible",
+    "Product cards have readable inset spacing",
+    "Sale quantity remains above visible keyboard; Done capture has no keyboard"
+  ],
+  "phone-prompt.png": "Black secure window; visually unreviewable. UIAutomator title/cancellation is functional evidence only.",
+  "motion_or_haptic_feel_accepted": false,
+  "full_app_visual_acceptance": false
+}

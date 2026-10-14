@@ -57,7 +57,12 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
+import com.saaf.milkshop.nativeui.common.NativeInformationFact
+import com.saaf.milkshop.nativeui.common.NativeInformationSection
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
+import com.saaf.milkshop.nativeui.theme.nativeMetricTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeVisualColors
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import java.util.Locale
@@ -780,14 +785,16 @@ private fun OwnerCustomersDetailScreen(
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.testTag(NativeUiTags.OwnerCustomersDetailName),
                 )
-                OwnerCustomerFact("Status", row.statusLabel)
-                OwnerCustomerFact("Balance", row.balanceLabel)
-                row.phone?.takeIf { it.isNotBlank() }?.let { OwnerCustomerFact("Phone", it) }
-                row.areaRoute?.takeIf { it.isNotBlank() }?.let { OwnerCustomerFact("Area / route", it) }
-                detail.address?.takeIf { it.isNotBlank() }?.let { OwnerCustomerFact("Address", it) }
-                detail.creditLimitLabel?.let { OwnerCustomerFact("Credit limit", it) }
-                detail.dailyQuotaLabel?.let { OwnerCustomerFact("Daily quota", it) }
-                detail.notes?.takeIf { it.isNotBlank() }?.let { OwnerCustomerFact("Notes", it) }
+                NativeInformationSection {
+                    NativeInformationFact("Status", row.statusLabel)
+                    NativeInformationFact("Balance", row.balanceLabel, emphasized = true)
+                    row.phone?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Phone", it) }
+                    row.areaRoute?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Area / route", it) }
+                    detail.address?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Address", it, prose = true) }
+                    detail.creditLimitLabel?.let { NativeInformationFact("Credit limit", it, emphasized = true) }
+                    detail.dailyQuotaLabel?.let { NativeInformationFact("Daily quota", it) }
+                    detail.notes?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Notes", it, prose = true) }
+                }
                 error?.let {
                     Text(
                         it,
@@ -827,33 +834,14 @@ private fun OwnerCustomerRow(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
-            Text(
-                buildString {
-                    append(customer.statusLabel)
-                    append(" · ")
-                    append(customer.balanceLabel)
-                    customer.areaRoute?.takeIf { it.isNotBlank() }?.let {
-                        append(" · ")
-                        append(it)
-                    }
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Text(customer.balanceLabel, modifier = Modifier.fillMaxWidth(),
+                style = nativeMetricTextStyle(), color = nativeVisualColors.metric)
+            customer.areaRoute?.takeIf { it.isNotBlank() }?.let {
+                Text(it, style = nativeSupportingTextStyle(), color = nativeVisualColors.supporting)
+            }
+            Text(customer.statusLabel, style = nativeSupportingTextStyle())
         }
         Icon(Icons.Outlined.ChevronRight, contentDescription = null)
-    }
-}
-
-@Composable
-private fun OwnerCustomerFact(label: String, value: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(
-            label,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(value, style = MaterialTheme.typography.bodyLarge)
     }
 }
 

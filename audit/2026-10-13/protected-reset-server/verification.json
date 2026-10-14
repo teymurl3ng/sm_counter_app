@@ -1,0 +1,28 @@
+{
+  "runtime": "native PostgreSQL, localhost disposable cluster",
+  "checks": [
+    "migration installs against current C1 source",
+    "Owner may reserve all five known roles",
+    "Admin may reserve active Manager/Cashier/Operator only",
+    "Owner reset of disabled target does not enable it",
+    "Owner self-reset uses one participant; unknown roles fail closed",
+    "cross-business/missing/terminated/unlinked denial leaves no reservation",
+    "lower-role/disabled/terminated/unlinked caller denied",
+    "anonymous cannot begin; authenticated cannot claim or finalize; private state hidden",
+    "participant guard covers both caller and target, direct writes and deletion",
+    "maintenance shares target guard and remains service-only",
+    "same request is idempotent but cannot claim twice or change participants",
+    "uncertain outcome neither expires nor permits cancel/replay/account change",
+    "pending lookup supports lost-response recovery without client/table/Auth exposure",
+    "unresolved duplicate reset is denied and audit failure retains guards",
+    "two-connection: reserve first blocks concurrent protected field update",
+    "two-connection: role promotion first is rechecked before Admin reservation",
+    "two-connection: caller demotion first is rechecked before reservation",
+    "two-connection: same target cannot receive overlapping reset reservations",
+    "older repeatable-read participant snapshot cannot bypass a newer reservation",
+    "older repeatable-read caller snapshot cannot authorize after demotion"
+  ],
+  "total": 20,
+  "realAuthMutation": false,
+  "deployed": false
+}

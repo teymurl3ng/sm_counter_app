@@ -8,7 +8,7 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import androidx.sqlite.execSQL
 
 @Database(
-    version = 16,
+    version = 17,
     exportSchema = true,
     entities = [
         ProductEntity::class,
@@ -318,13 +318,35 @@ abstract class MilkShopDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_16_17 = object : androidx.room3.migration.Migration(16, 17) {
+            override suspend fun migrate(connection: androidx.sqlite.SQLiteConnection) {
+                // Preserve every existing local link and both FKs; only the
+                // device-local user reference becomes optional for remote history.
+                connection.execSQL("""
+                    CREATE TABLE event_actor_links_new (
+                        event_id INTEGER NOT NULL PRIMARY KEY,
+                        actor_user_id INTEGER,
+                        actor_name_snapshot TEXT NOT NULL,
+                        actor_role_snapshot TEXT NOT NULL,
+                        attributed_at TEXT NOT NULL,
+                        FOREIGN KEY(event_id) REFERENCES events(event_id) ON UPDATE NO ACTION ON DELETE NO ACTION,
+                        FOREIGN KEY(actor_user_id) REFERENCES app_users(user_id) ON UPDATE NO ACTION ON DELETE NO ACTION
+                    )
+                """.trimIndent())
+                connection.execSQL("INSERT INTO event_actor_links_new SELECT * FROM event_actor_links")
+                connection.execSQL("DROP TABLE event_actor_links")
+                connection.execSQL("ALTER TABLE event_actor_links_new RENAME TO event_actor_links")
+                connection.execSQL("CREATE INDEX index_event_actor_links_actor_user_id ON event_actor_links(actor_user_id)")
+            }
+        }
+
         fun create(context: Context): MilkShopDatabase =
             Room.databaseBuilder<MilkShopDatabase>(
                 context = context.applicationContext,
                 name = DATABASE_NAME,
             )
                 .setDriver(BundledSQLiteDriver())
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17)
                 .addCallback(DatabaseCallback())
                 .build()
 
@@ -338,7 +360,7 @@ abstract class MilkShopDatabase : RoomDatabase() {
         fun createInMemory(driver: androidx.sqlite.SQLiteDriver? = BundledSQLiteDriver()): MilkShopDatabase =
             Room.inMemoryDatabaseBuilder<MilkShopDatabase>()
                 .apply { if (driver != null) setDriver(driver) }
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17)
                 .addCallback(DatabaseCallback())
                 .build()
     }

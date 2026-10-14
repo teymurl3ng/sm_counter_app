@@ -2,6 +2,7 @@ package com.saaf.milkshop
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -38,6 +39,7 @@ class NativeOperationsMoreScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.OpsMoreTodayWork).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OpsMorePersonalSecurity).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OpsMoreSwitchAccount).assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OpsMoreSignOut).assertTextContains("Lock app").assertTextContains("End your session. Business sync is unchanged.")
         composeRule.onNodeWithTag(NativeUiTags.OpsMoreSignOut).assertIsDisplayed()
         composeRule.onNodeWithText("Count cash").assertDoesNotExist()
         composeRule.onNodeWithTag(NativeUiTags.OpsNavMore).assertIsSelected()

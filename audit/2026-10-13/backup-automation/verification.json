@@ -1,0 +1,14 @@
+{
+  "batch": "8b2",
+  "complete": true,
+  "published_main_sha": "802ec5009cf767dc588f87439d6edb47b5ac79ec",
+  "focused_checks_passed": 13,
+  "verified_live_runs": [
+    "38363862127",
+    "38364747021"
+  ],
+  "all_historical_blobs_unchanged": true,
+  "security_workflow_all_green": false,
+  "identity_restore_accepted": false,
+  "next_existing_batch": "8b3"
+}

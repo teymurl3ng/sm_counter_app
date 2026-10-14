@@ -57,7 +57,12 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
+import com.saaf.milkshop.nativeui.common.NativeInformationFact
+import com.saaf.milkshop.nativeui.common.NativeInformationSection
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
+import com.saaf.milkshop.nativeui.theme.nativeMetricTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeVisualColors
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import java.time.LocalDate
@@ -765,16 +770,14 @@ private fun OwnerEmployeesDetailScreen(
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.testTag(NativeUiTags.OwnerEmployeesDetailName),
                 )
-                OwnerEmployeeFact("Status", row.statusLabel)
-                OwnerEmployeeFact("Balance", row.balanceLabel)
-                row.role?.takeIf { it.isNotBlank() }?.let { OwnerEmployeeFact("Role", it) }
-                row.phone?.takeIf { it.isNotBlank() }?.let { OwnerEmployeeFact("Phone", it) }
-                detail.referenceSalaryLabel?.let { OwnerEmployeeFact("Reference salary", it) }
-                detail.salaryPeriod?.takeIf { it.isNotBlank() }?.let {
-                    OwnerEmployeeFact("Salary period", it)
-                }
-                detail.joinDate?.takeIf { it.isNotBlank() }?.let {
-                    OwnerEmployeeFact("Join date", it)
+                NativeInformationSection {
+                    NativeInformationFact("Status", row.statusLabel)
+                    NativeInformationFact("Balance", row.balanceLabel, emphasized = true)
+                    row.role?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Role", it) }
+                    row.phone?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Phone", it) }
+                    detail.referenceSalaryLabel?.let { NativeInformationFact("Reference salary", it, emphasized = true) }
+                    detail.salaryPeriod?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Salary period", it) }
+                    detail.joinDate?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Join date", it) }
                 }
                 error?.let {
                     Text(
@@ -815,33 +818,14 @@ private fun OwnerEmployeeRow(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
-            Text(
-                buildString {
-                    append(employee.statusLabel)
-                    append(" · ")
-                    append(employee.balanceLabel)
-                    employee.role?.takeIf { it.isNotBlank() }?.let {
-                        append(" · ")
-                        append(it)
-                    }
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Text(employee.balanceLabel, modifier = Modifier.fillMaxWidth(),
+                style = nativeMetricTextStyle(), color = nativeVisualColors.metric)
+            employee.role?.takeIf { it.isNotBlank() }?.let {
+                Text(it, style = nativeSupportingTextStyle(), color = nativeVisualColors.supporting)
+            }
+            Text(employee.statusLabel, style = nativeSupportingTextStyle())
         }
         Icon(Icons.Outlined.ChevronRight, contentDescription = null)
-    }
-}
-
-@Composable
-private fun OwnerEmployeeFact(label: String, value: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(
-            label,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(value, style = MaterialTheme.typography.bodyLarge)
     }
 }
 

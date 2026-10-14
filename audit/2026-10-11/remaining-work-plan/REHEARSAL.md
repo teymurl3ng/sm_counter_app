@@ -1,5 +1,7 @@
 # Independently specified ledger slice
 
+2026-10-13: retained as the historical small slice. The next complete shop-day run uses the fixed [9a0 scope](../../2026-10-13/shop-day-scope/SCOPE.md), its independently calculated EXPECTED.json and separate staff task cards. That planning result is complete; Android execution and uncoached acceptance are pending.
+
 Synthetic PKR scenario for saved-domain verification and uncoached task testing. Do not run it against a live shop or the interactive preview's existing records. These are planned expectations, not executed results.
 
 Fixture: Cash drawer 10,000.00; customer receivable 0; Milk stock 20 L; Yogurt stock 10 kg; selling rates Milk 190.00/L and Yogurt 200.00/kg. No surcharge/tax/fee/spoilage in this slice; no supplier payable or Bank movement. Use current valid opening/cost setup so no unsupported state is invented.

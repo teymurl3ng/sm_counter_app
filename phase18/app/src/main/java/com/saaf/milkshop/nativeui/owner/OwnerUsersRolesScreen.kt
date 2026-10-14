@@ -59,7 +59,12 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
+import com.saaf.milkshop.nativeui.common.NativeInformationFact
+import com.saaf.milkshop.nativeui.common.NativeInformationSection
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
+import com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeValueTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeVisualColors
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.application.AppTimeFormats
@@ -476,16 +481,18 @@ private fun OwnerUsersRolesDetailScreen(
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.testTag(NativeUiTags.OwnerUsersRolesDetailName),
                 )
-                OwnerUserFact("Login", row.loginName)
-                OwnerUserFact("Role", row.roleLabel)
-                OwnerUserFact("Status", row.statusLabel)
-                OwnerUserFact("Setup required", if (row.setupRequired) "Yes" else "No")
-                OwnerUserFact("Created at", AppTimeFormats.dateTime(detail.createdAt))
-                OwnerUserFact("Updated at", detail.updatedAt)
-                detail.disabledAt?.takeIf { it.isNotBlank() }?.let {
-                    OwnerUserFact("Disabled at", it)
+                NativeInformationSection {
+                    NativeInformationFact("Login", row.loginName)
+                    NativeInformationFact("Role", row.roleLabel)
+                    NativeInformationFact("Status", row.statusLabel)
+                    NativeInformationFact("Setup required", if (row.setupRequired) "Yes" else "No")
+                    NativeInformationFact("Created at", AppTimeFormats.dateTime(detail.createdAt))
+                    NativeInformationFact("Updated at", detail.updatedAt)
+                    detail.disabledAt?.takeIf { it.isNotBlank() }?.let {
+                        NativeInformationFact("Disabled at", it)
+                    }
+                    NativeInformationFact("Employee account", detail.employeeAccountIdLabel)
                 }
-                OwnerUserFact("Employee account", detail.employeeAccountIdLabel)
                 error?.let {
                     Text(
                         it,
@@ -1074,32 +1081,14 @@ private fun OwnerUserRow(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
-            Text(
-                buildString {
-                    append(user.roleLabel)
-                    append(" · ")
-                    append(user.statusLabel)
-                    append(" · ")
-                    append(user.loginName)
-                    if (user.setupRequired) append(" · Setup required")
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Text(user.roleLabel, style = nativeValueTextStyle())
+            Text(user.loginName, style = nativeSupportingTextStyle(), color = nativeVisualColors.supporting)
+            Text(user.statusLabel, style = nativeSupportingTextStyle())
+            if (user.setupRequired) {
+                Text("Setup required", style = nativeSupportingTextStyle(), color = MaterialTheme.colorScheme.primary)
+            }
         }
         Icon(Icons.Outlined.ChevronRight, contentDescription = null)
-    }
-}
-
-@Composable
-private fun OwnerUserFact(label: String, value: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(
-            label,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(value, style = MaterialTheme.typography.bodyLarge)
     }
 }
 

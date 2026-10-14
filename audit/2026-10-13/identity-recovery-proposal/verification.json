@@ -1,0 +1,15 @@
+{
+  "batch": "8b3b",
+  "proposal_complete": true,
+  "payload_files": 13,
+  "selected_host_checks_passed": 3,
+  "pagination_probe_passed": true,
+  "native_groups_passed": 9,
+  "source_publication": false,
+  "remote_mutations": false,
+  "hosted_auth_accepted": false,
+  "cost_quote_available": false,
+  "organization_selected_by_user": "hlewlyngnpziytterocd",
+  "next_independent_batch": "8b4 isolated app restore",
+  "optional_hosted_route_requires_explicit_dev_pause_and_qa_teardown_authorization": true
+}

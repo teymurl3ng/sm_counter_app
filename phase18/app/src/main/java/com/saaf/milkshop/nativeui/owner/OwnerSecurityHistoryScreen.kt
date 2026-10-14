@@ -21,7 +21,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
+import com.saaf.milkshop.nativeui.common.NativeInformationSection
+import com.saaf.milkshop.nativeui.common.NativeInformationFact
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
+import com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeValueTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeVisualColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
@@ -108,24 +113,9 @@ fun OwnerSecurityHistoryScreen(
                     )
                 }
                 auditsError != null && audits.isEmpty() -> {
-                    Column(
-                        Modifier
-                            .fillMaxSize()
-                            .padding(24.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            auditsError,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerSecurityHistoryError),
-                        )
-                        Spacer(Modifier.height(16.dp))
-                        Button(
-                            onClick = hapticAction(onRetry),
-                            modifier = Modifier.testTag(NativeUiTags.OwnerSecurityHistoryRetry),
-                        ) { Text("Try again") }
-                    }
+                    NativeLoadFailurePane(message = auditsError, onRetry = onRetry,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerSecurityHistoryError),
+                        retryTestTag = NativeUiTags.OwnerSecurityHistoryRetry)
                 }
                 else -> {
                     Column(Modifier.fillMaxSize()) {
@@ -213,17 +203,19 @@ private fun OwnerSecurityHistoryDetailScreen(
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.testTag(NativeUiTags.OwnerSecurityHistoryDetailAction),
                 )
-                OwnerSecurityAuditFact("Occurred at", AppTimeFormats.dateTime(row.occurredAt))
-                OwnerSecurityAuditFact("Result", row.resultCode)
-                OwnerSecurityAuditFact("Actor", row.actorLabel)
-                detail.reasonCode?.takeIf { it.isNotBlank() }?.let {
-                    OwnerSecurityAuditFact("Reason", it)
-                }
-                detail.targetUserId?.let {
-                    OwnerSecurityAuditFact("Target user", it.toString())
-                }
-                detail.details?.takeIf { it.isNotBlank() }?.let {
-                    OwnerSecurityAuditFact("Details", it)
+                NativeInformationSection {
+                    OwnerSecurityAuditFact("Occurred at", AppTimeFormats.dateTime(row.occurredAt))
+                    OwnerSecurityAuditFact("Result", row.resultCode)
+                    OwnerSecurityAuditFact("Actor", row.actorLabel)
+                    detail.reasonCode?.takeIf { it.isNotBlank() }?.let {
+                        OwnerSecurityAuditFact("Reason", it)
+                    }
+                    detail.targetUserId?.let {
+                        OwnerSecurityAuditFact("Target user", it.toString())
+                    }
+                    detail.details?.takeIf { it.isNotBlank() }?.let {
+                        NativeInformationFact("Details", it, prose = true)
+                    }
                 }
                 Text(
                     "Read only audit trail. Filtering and export come later.",
@@ -257,21 +249,10 @@ private fun OwnerSecurityAuditRow(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
-            Text(
-                buildString {
-                    append(audit.resultCode)
-                    append(" · ")
-                    append(audit.actorLabel)
-                    append(" · ")
-                    append(audit.occurredAt)
-                    audit.detailsPreview?.let {
-                        append(" · ")
-                        append(it)
-                    }
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Text(audit.resultCode, style = nativeValueTextStyle())
+            Text(audit.actorLabel, style = nativeSupportingTextStyle(), color = nativeVisualColors.supporting)
+            Text(audit.occurredAt, style = nativeSupportingTextStyle(), color = nativeVisualColors.supporting)
+            audit.detailsPreview?.let { Text(it, style = nativeSupportingTextStyle(), color = nativeVisualColors.supporting) }
         }
         Icon(Icons.Outlined.ChevronRight, contentDescription = null)
     }
@@ -279,12 +260,5 @@ private fun OwnerSecurityAuditRow(
 
 @Composable
 private fun OwnerSecurityAuditFact(label: String, value: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(
-            label,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(value, style = MaterialTheme.typography.bodyLarge)
-    }
+    NativeInformationFact(label, value)
 }

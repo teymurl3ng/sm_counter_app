@@ -2,6 +2,7 @@ package com.saaf.milkshop
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -76,6 +77,7 @@ class NativeOwnerMoreScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.OwnerMoreSignOut)
             .performScrollTo()
             .assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreSignOut).assertTextContains("Lock app").assertTextContains("End your session. Business sync is unchanged.")
         composeRule.onNodeWithText("Count cash").assertDoesNotExist()
         composeRule.onNodeWithTag(NativeUiTags.OwnerNavMore).assertIsSelected()
         composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).assertDoesNotExist()
@@ -608,6 +610,7 @@ class NativeOwnerMoreScreenContractTest {
             .performScrollTo()
             .performClick()
         composeRule.onNodeWithText("Stop syncing this phone?").assertIsDisplayed()
+        composeRule.onNodeWithText("Uploads and downloads stop until this phone reconnects. Local accounts, saved records and unsent entries remain.").assertIsDisplayed()
     }
 
     @Test
@@ -751,6 +754,21 @@ class NativeOwnerMoreScreenContractTest {
         composeRule.onNodeWithTag(NativeUiTags.OwnerSyncOwnerPicker).performScrollTo().assertIsDisplayed()
         composeRule.onNodeWithText("Owner Two").performScrollTo().performClick()
         assertEquals(2L, picked)
+    }
+
+    @Test
+    fun revokedStatusExplainsLocalAccountsAreSeparate() {
+        setScreen(NativeOwnerMoreState.Ready(context = openContext(), destination = NativeOwnerMoreDestination.Sync,
+            syncState = OwnerSyncState(status = syncStatus().copy(identityStatus = "revoked"))))
+        composeRule.onNodeWithText("Business sync connection").assertIsDisplayed()
+        composeRule.onNodeWithText("This server status concerns business sync. It does not disable local accounts.").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun expiredGraceExplainsDailyWorkContinues() {
+        setScreen(NativeOwnerMoreState.Ready(context = openContext(), destination = NativeOwnerMoreDestination.Sync,
+            syncState = OwnerSyncState(status = syncStatus().copy(graceDaysLeft = 0, graceWarningLevel = 3))))
+        composeRule.onNodeWithText("Daily work continues; reconnect for privileged actions").performScrollTo().assertIsDisplayed()
     }
 
     private fun syncStatus() = NativeSyncStatus(

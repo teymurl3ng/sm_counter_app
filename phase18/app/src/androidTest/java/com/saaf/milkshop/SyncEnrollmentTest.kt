@@ -133,6 +133,77 @@ class SyncEnrollmentTest {
         assertNull(SyncTokenStore(context).load())
     }
 
+    @Test fun counterFactoryQueueComparesBeforePushAndTakeServerUsesReview() = runBlocking {
+        val db = MilkShopDatabase.createInMemory()
+        try {
+            val initial = db.syncOutboxDao().all()
+            assertEquals(19, initial.size)
+            assertTrue(initial.none { it.held })
+            val server = com.saaf.milkshop.sync.SyncEnvelopeFactory(db).build(initial).envelopes
+            val milk = db.productDao().findByName("Milk")!!
+            server.single { it.getString("uid") == milk.uid }.getJSONObject("payload")
+                .getJSONObject("profile").put("default_sale_rate", 215.0)
+            var pushes = 0
+            val auth = allowedHttp(role = "cashier")
+            val http = SyncHttp { request ->
+                when {
+                    request.url.contains("sync_pull") -> {
+                        val records = org.json.JSONArray()
+                        if (org.json.JSONObject(String(request.body!!)).getLong("since_seq") == 0L) {
+                            server.forEachIndexed { index, envelope -> records.put(org.json.JSONObject()
+                                .put("server_seq", index + 1).put("shop_id", "249b9c78-475d-483d-b252-314dc5784ff9")
+                                .put("table", envelope.getString("table"))
+                                .put("uid", envelope.getString("uid")).put("payload", envelope.getJSONObject("payload"))
+                                .put("origin_device", "owner-phone")) }
+                        }
+                        SyncHttpResponse(200, org.json.JSONObject().put("ok", true).put("records", records).toString().toByteArray())
+                    }
+                    request.url.contains("sync_push") -> {
+                        pushes++
+                        SyncHttpResponse(403, """{"code":"master_data_privilege_required"}""".toByteArray())
+                    }
+                    else -> auth.execute(request)
+                }
+            }
+            assertTrue(SyncEnrollment(context, http, db).enroll(config, "Counter", "x".toCharArray()) is SyncEnrollment.Outcome.Enrolled)
+            assertEquals(initial.map { it.copy(held = true) }, db.syncOutboxDao().all())
+            val runtime = com.saaf.milkshop.sync.SyncRuntime(context, db, http)
+            assertEquals(com.saaf.milkshop.sync.SyncPushEngine.DrainOutcome.Drained(0), runtime.drainOnce())
+            assertEquals(0, pushes)
+            assertEquals(1, db.syncRebaselineHoldDao().count())
+            assertNull(db.productProfileDao().findByProductId(milk.productId)!!.defaultSaleRate)
+            com.saaf.milkshop.application.owner.NativeOwnerSyncFacade(context, db).resolveHold("products", milk.uid, keepMine = false)
+            assertTrue(runtime.pullOnce() is com.saaf.milkshop.sync.SyncRuntime.SyncPullSummary.Done)
+            assertEquals(215.0, db.productProfileDao().findByProductId(milk.productId)!!.defaultSaleRate)
+            assertEquals(0, db.syncOutboxDao().count())
+            assertEquals(0, db.syncParkedRowDao().count())
+            assertEquals(0, db.syncRebaselineHoldDao().count())
+            assertEquals(0, pushes)
+        } finally { db.close() }
+    }
+
+    @Test fun counterEnrollmentPreservesChangedDefaultAndGenuinePendingLedger() = runBlocking {
+        val db = MilkShopDatabase.createInMemory()
+        try {
+            val milk = db.productDao().findByName("Milk")!!
+            db.productProfileDao().save(com.saaf.milkshop.data.ProductProfileEntity(milk.productId, 222.0, createdAt = "2026-01-01 00:00:00"))
+            db.settingsDao().updateValue("retail_rate_milk", 222.0)
+            val cash = db.accountDao().findByCategory("Cash/Bank").single { it.name == "Cash" }
+            com.saaf.milkshop.domain.StoreIdentityService(db).save(com.saaf.milkshop.domain.StoreIdentityInput("Pending counter test"))
+            com.saaf.milkshop.domain.OpeningStateService(db).record(com.saaf.milkshop.domain.OpeningStateInput(
+                "2026-10-14", accountBalances = listOf(com.saaf.milkshop.domain.OpeningAccountBalance(cash.accountId, 100.0))))
+            val before = db.syncOutboxDao().all()
+            val ledger = db.backupDataDao().financialLogs()
+            val pendingKeys = setOf("products" to milk.uid, "settings" to "setting:retail_rate_milk") +
+                before.filter { it.tableName in setOf("events", "store_profile") }.map { it.tableName to it.rowUid }
+            assertTrue(SyncEnrollment(context, allowedHttp(role = "cashier"), db).enroll(config, "Counter", "x".toCharArray()) is SyncEnrollment.Outcome.Enrolled)
+            assertEquals(before.map { if (it.tableName to it.rowUid in pendingKeys) it else it.copy(held = true) }, db.syncOutboxDao().all())
+            assertEquals(ledger, db.backupDataDao().financialLogs())
+            assertEquals(222.0, db.productProfileDao().findByProductId(milk.productId)!!.defaultSaleRate)
+            assertEquals(222.0, db.settingsDao().getValue("retail_rate_milk"))
+        } finally { db.close() }
+    }
+
     @Test
     fun failedEnrollment_leavesZeroState() = runBlocking {
         val disabled = allowedHttp(active = false)

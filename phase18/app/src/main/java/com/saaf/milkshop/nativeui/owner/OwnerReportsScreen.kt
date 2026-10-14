@@ -19,7 +19,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.HorizontalDivider
+import com.saaf.milkshop.nativeui.common.NativeInformationSection
+import com.saaf.milkshop.nativeui.common.NativeInformationFact
+import com.saaf.milkshop.nativeui.common.NativeInformationHeading
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
+import com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeVisualColors
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -102,25 +107,11 @@ fun OwnerReportsScreen(
                         .fillMaxSize()
                         .testTag(NativeUiTags.OwnerReportsLoading),
                 )
-                is NativeOwnerReportsState.LoadFailure ->
-                    Column(
-                        Modifier
-                            .fillMaxSize()
-                            .padding(24.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            state.message,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerReportsError),
-                        )
-                        Spacer(Modifier.height(16.dp))
-                        Button(
-                            onClick = hapticAction(onRetry),
-                            modifier = Modifier.testTag(NativeUiTags.OwnerReportsRetry),
-                        ) { Text("Try again") }
-                    }
+                is NativeOwnerReportsState.LoadFailure -> NativeLoadFailurePane(
+                    message = state.message, onRetry = onRetry,
+                    modifier = Modifier.testTag(NativeUiTags.OwnerReportsError),
+                    retryTestTag = NativeUiTags.OwnerReportsRetry,
+                )
                 is NativeOwnerReportsState.Ready -> {
                     val snapshot = state.snapshot
                     Column(Modifier.fillMaxSize()) {
@@ -203,19 +194,16 @@ fun OwnerReportsScreen(
 
                         CoverageBanner(snapshot)
 
-                        Text(
-                            "Period totals",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerReportsSummary),
-                        )
-                        OwnerReportsFact("Delivery surcharge", snapshot.deliverySurchargeLabel)
-                        OwnerReportsFact("Operating expenses", snapshot.operatingExpensesLabel)
-                        OwnerReportsFact("Salary payments", snapshot.salaryPaymentsLabel)
-                        OwnerReportsFact(
-                            "Estimated result",
-                            snapshot.estimatedResultLabel ?: "Not available yet",
-                        )
+                        NativeInformationHeading("Period totals", Modifier.testTag(NativeUiTags.OwnerReportsSummary))
+                        NativeInformationSection {
+                            OwnerReportsFact("Delivery surcharge", snapshot.deliverySurchargeLabel)
+                            OwnerReportsFact("Operating expenses", snapshot.operatingExpensesLabel)
+                            OwnerReportsFact("Salary payments", snapshot.salaryPaymentsLabel)
+                            OwnerReportsFact(
+                                "Estimated result",
+                                snapshot.estimatedResultLabel ?: "Not available yet",
+                            )
+                        }
                         Text(
                             "The estimated result uses saved product costs. It is not bank balance " +
                                 "or drawer cash.",
@@ -223,12 +211,7 @@ fun OwnerReportsScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
 
-                        Text(
-                            "Result by product",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerReportsProducts),
-                        )
+                        NativeInformationHeading("Result by product", Modifier.testTag(NativeUiTags.OwnerReportsProducts))
                         if (snapshot.products.isEmpty()) {
                             Text(
                                 "No product sales were recorded in this period.",
@@ -239,7 +222,6 @@ fun OwnerReportsScreen(
                         } else {
                             snapshot.products.forEach { row ->
                                 ProductRow(row)
-                                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                             }
                         }
                     }
@@ -327,23 +309,8 @@ private fun ProductRow(row: NativeOwnerReportsProductRow) {
             .testTag(NativeUiTags.ownerReportsProduct(row.productId)),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top,
-        ) {
-            Text(
-                row.productName,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.weight(1f),
-            )
-            Text(
-                row.coverageLabel,
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+        NativeInformationHeading(row.productName)
+        Text(row.coverageLabel, style = nativeSupportingTextStyle(), color = nativeVisualColors.supporting)
         OwnerReportsFact("Sales", row.salesRevenueLabel)
         row.costLabel?.let { OwnerReportsFact("Cost of products sold", it) }
         row.profitLabel?.let { OwnerReportsFact("Sales minus product cost", it) }
@@ -352,12 +319,5 @@ private fun ProductRow(row: NativeOwnerReportsProductRow) {
 
 @Composable
 private fun OwnerReportsFact(label: String, value: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(
-            label,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(value, style = MaterialTheme.typography.bodyLarge)
-    }
+    NativeInformationFact(label, value, emphasized = true)
 }

@@ -1,0 +1,17 @@
+{
+  "batch": "9b2 baseline/planning",
+  "planning_complete": true,
+  "selected_methods": 4,
+  "controls_passed": 3,
+  "initialized_receiver_acceptance_passed": false,
+  "confirmed_reason": "Daily close requires a verified user",
+  "production_edited": false,
+  "main_qa_apk_matches_accepted_9b1": true,
+  "ordinary_package_provenance_preserved": true,
+  "remote_or_radio_operations_run": false,
+  "physical_offline_closing_accepted": false,
+  "next": "9b2a remote close import isolation and refusal retention; FIX_SCOPE.md",
+  "connected_devices": [
+    "A06"
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "batch": "Finish batch3 / 9b3 / R11",
+  "result": "ACCEPTED_BOUNDED_RECOVERY_AND_NEW_QUEUED_HISTORY",
+  "focusedAccepted": 7,
+  "focusedMethods": [
+    "com.saaf.milkshop.SyncClosePreflightTest#queuedCloseReopenAndRecountMustImportInQueueOrder",
+    "com.saaf.milkshop.SyncClosePreflightTest#sequentialCloseReopenAndRecountHistoryRemapsEveryLink",
+    "com.saaf.milkshop.SyncClosePreflightTest#refusedCloseIsRetainedUntilCorrectedWithoutWeakeningLocalActors",
+    "com.saaf.milkshop.SyncOutboxCaptureTest#eventInsert_isCapturedWithItsUid_andPrecedesItsClose",
+    "com.saaf.milkshop.SyncPushEngineTest#drainsInStrictOrder_andEmptiesTheQueue",
+    "com.saaf.milkshop.SyncPushEngineTest#transientFailure_leavesQueueIntactForRetry",
+    "com.saaf.milkshop.SyncPushEngineTest#editDuringUploadKeepsItsOutboxMarker"
+  ],
+  "initialPassed": 6,
+  "testFixtureRerunPassed": 1,
+  "baselineFailure": "Daily close must use the latest cash count; later actions missing superseded parents",
+  "productionChange": "SyncEnvelopeFactory.kt grouped reads retained; outgoing envelopes preserve input queue order",
+  "mainOtherSchemaUnchanged": true,
+  "physicalRun": "1e51f7a435e3",
+  "shopId": "a3bb8aed-a2ec-488b-bf95-0094d3e42dfd",
+  "project": "tghzmofkkdsaasvnixps",
+  "physicalSelectedStages": 24,
+  "full20TableCheckpoints": [
+    "base",
+    "server-accepted-before-retry",
+    "retry-converged",
+    "sale-repeat",
+    "queued-history",
+    "history-repeat"
+  ],
+  "lostAck": {
+    "run": "1e51f7a435e3",
+    "phone": "counter",
+    "stage": "lost_ack_push",
+    "eventUid": "u1_b127ee1e503e4e6890ec53918447dfb1",
+    "discardedSuccessfulPushResponses": 1,
+    "queueAndLedgerPreserved": true,
+    "drain": "RetryLater(pushed=0)",
+    "httpStatuses": [
+      "/rest/v1/rpc/sync_push:200",
+      "/rest/v1/rpc/sync_push:transport_IOException"
+    ],
+    "pid": 17644,
+    "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+    "outbox": 1,
+    "parks": 0,
+    "holds": 0,
+    "postingClosed": false,
+    "dbFilename": "milk_shop.db"
+  },
+  "restart": {
+    "before_pid": 17644,
+    "pids_before_force_stop": "",
+    "after_pid": 18125,
+    "queue_before": 1,
+    "queue_after": 1,
+    "method": "Explicit force-stop isolated QA package after retained accepted sale"
+  },
+  "finalCashPkr": "10190.00",
+  "finalMilkLitres": 79,
+  "yogurtKg": 17,
+  "saleCount": 1,
+  "cashCountRows": 2,
+  "dailyActions": [
+    "close",
+    "reopen",
+    "close"
+  ],
+  "cleanup": {
+    "run": "1e51f7a435e3",
+    "results": [
+      "owner: transport cleared, non-test packages unchanged",
+      "counter: transport cleared, non-test packages unchanged",
+      "cashier: disposable Auth retired",
+      "owner: disposable Auth retired",
+      "created fixture shop deactivated; synthetic sync evidence retained"
+    ]
+  },
+  "existingDevHashesEqual": true,
+  "ordinaryPhonePackagesUnchanged": true,
+  "limitations": [
+    "Real server success response deliberately discarded via test seam; not an actual radio loss after HTTP completion.",
+    "Source instrumentation process had already exited before force-stop; persisted queue/new PID proves fresh-process recovery, not kill during a write or physical power loss.",
+    "Newly emitted queued cycles accepted; old incorrectly ordered hosted feeds not automatically rewritten. Known affected historical replay remains the existing exact-UID conditional C03."
+  ],
+  "apkHashes": {
+    "phase18\\app\\build\\outputs\\apk\\debug\\app-debug.apk": "f92080052af46f84c2a02c35f11b3e524aeac79b315098a4a4c92f8d56f6e2d5",
+    "phase18\\app\\build\\outputs\\apk\\androidTest\\debug\\app-debug-androidTest.apk": "166185af9c8ff92389f160fd9051a8d5f898f7cdb705f2d05f64d4d97bbcf5d0"
+  }
+}

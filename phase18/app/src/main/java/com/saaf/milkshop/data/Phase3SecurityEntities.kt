@@ -200,7 +200,8 @@ data class EventActorLinkEntity(
     @ColumnInfo(name = "event_id")
     val eventId: Long,
     @ColumnInfo(name = "actor_user_id")
-    val actorUserId: Long,
+    /** Null for a remote snapshot; a foreign device's integer ID is not a local identity. */
+    val actorUserId: Long?,
     @ColumnInfo(name = "actor_name_snapshot")
     val actorNameSnapshot: String,
     @ColumnInfo(name = "actor_role_snapshot")

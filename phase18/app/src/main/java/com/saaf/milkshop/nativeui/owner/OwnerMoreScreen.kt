@@ -799,8 +799,8 @@ private fun OwnerMoreMenuScreen(
                 )
                 OwnerMoreMenuRow(
                     icon = Icons.AutoMirrored.Outlined.Logout,
-                    title = "Lock / switch user",
-                    subtitle = "Locks this phone's session - sync enrollment is separate",
+                    title = com.saaf.milkshop.nativeui.common.NativeAccessCopy.LOCK_TITLE,
+                    subtitle = com.saaf.milkshop.nativeui.common.NativeAccessCopy.LOCK_DETAIL,
                     tag = NativeUiTags.OwnerMoreSignOut,
                     onClick = hapticAction(onSignOut),
                 )

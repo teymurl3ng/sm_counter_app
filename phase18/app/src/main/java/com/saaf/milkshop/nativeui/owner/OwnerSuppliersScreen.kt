@@ -57,7 +57,12 @@ import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.EntryLeaveGuard
 import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.nativeui.common.NativeColdLoadingPane
+import com.saaf.milkshop.nativeui.common.NativeInformationFact
+import com.saaf.milkshop.nativeui.common.NativeInformationSection
 import com.saaf.milkshop.nativeui.common.rememberEntryLeaveGuard
+import com.saaf.milkshop.nativeui.theme.nativeMetricTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeVisualColors
 import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 
@@ -713,11 +718,13 @@ private fun OwnerSuppliersDetailScreen(
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.testTag(NativeUiTags.OwnerSuppliersDetailName),
                 )
-                OwnerSupplierFact("Status", row.statusLabel)
-                OwnerSupplierFact("Balance", row.balanceLabel)
-                row.phone?.takeIf { it.isNotBlank() }?.let { OwnerSupplierFact("Phone", it) }
-                row.location?.takeIf { it.isNotBlank() }?.let { OwnerSupplierFact("Location", it) }
-                detail.notes?.takeIf { it.isNotBlank() }?.let { OwnerSupplierFact("Notes", it) }
+                NativeInformationSection {
+                    NativeInformationFact("Status", row.statusLabel)
+                    NativeInformationFact("Balance", row.balanceLabel, emphasized = true)
+                    row.phone?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Phone", it) }
+                    row.location?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Location", it) }
+                    detail.notes?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Notes", it, prose = true) }
+                }
                 error?.let {
                     Text(
                         it,
@@ -757,32 +764,13 @@ private fun OwnerSupplierRow(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
-            Text(
-                buildString {
-                    append(supplier.statusLabel)
-                    append(" · ")
-                    append(supplier.balanceLabel)
-                    supplier.location?.takeIf { it.isNotBlank() }?.let {
-                        append(" · ")
-                        append(it)
-                    }
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Text(supplier.balanceLabel, modifier = Modifier.fillMaxWidth(),
+                style = nativeMetricTextStyle(), color = nativeVisualColors.metric)
+            supplier.location?.takeIf { it.isNotBlank() }?.let {
+                Text(it, style = nativeSupportingTextStyle(), color = nativeVisualColors.supporting)
+            }
+            Text(supplier.statusLabel, style = nativeSupportingTextStyle())
         }
         Icon(Icons.Outlined.ChevronRight, contentDescription = null)
-    }
-}
-
-@Composable
-private fun OwnerSupplierFact(label: String, value: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(
-            label,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(value, style = MaterialTheme.typography.bodyLarge)
     }
 }

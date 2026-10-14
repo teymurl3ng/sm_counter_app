@@ -205,6 +205,10 @@ interface SyncPullStateDao {
 
 @Dao
 interface SyncApplyDao {
+    /** Preserve the installed guard exactly across a trusted remote history insert. */
+    @Query("SELECT sql FROM sqlite_master WHERE type = 'trigger' AND name = 'validate_verified_daily_close_actor'")
+    suspend fun verifiedCloseActorTriggerSql(): String?
+
     @Query("""UPDATE budget_plans SET archived = :archived, sync_updated_at = :stamp WHERE uid = :uid""")
     suspend fun updateBudgetStateByUid(uid: String, archived: Boolean, stamp: String): Int
 
@@ -347,6 +351,15 @@ interface SyncEnvelopeDao {
 
     @Query("SELECT * FROM event_actor_links WHERE event_id IN (:eventIds)")
     suspend fun actorLinksForEvents(eventIds: List<Long>): List<EventActorLinkEntity>
+
+    @Query("SELECT * FROM opening_batches WHERE event_id IN (:eventIds)")
+    suspend fun openingBatchesForEvents(eventIds: List<Long>): List<OpeningBatchEntity>
+
+    @Query("SELECT * FROM opening_inventory_entries WHERE event_id IN (:eventIds)")
+    suspend fun openingInventoryForEvents(eventIds: List<Long>): List<OpeningInventoryEntryEntity>
+
+    @Query("SELECT * FROM opening_account_entries WHERE event_id IN (:eventIds)")
+    suspend fun openingAccountsForEvents(eventIds: List<Long>): List<OpeningAccountEntryEntity>
 
     @Query("SELECT * FROM product_profiles WHERE product_id IN (:productIds)")
     suspend fun productProfilesFor(productIds: List<Long>): List<ProductProfileEntity>

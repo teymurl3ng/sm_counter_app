@@ -158,7 +158,7 @@ class SyncEnrollment(
         database?.let { db ->
             if (!rebaseline.restoredRebaseline) {
                 rebaseline.liveRebaselinePending = true
-                SyncBaseline.enqueueAllHeld(db)
+                SyncBaseline.enqueueAllHeld(db, reconcileCapturedDefaults = isCounterDevice)
             }
             db.syncPullStateDao().upsert(
                 com.saaf.milkshop.data.SyncPullStateEntity(

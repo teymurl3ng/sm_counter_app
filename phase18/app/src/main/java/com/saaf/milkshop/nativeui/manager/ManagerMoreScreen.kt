@@ -461,8 +461,8 @@ private fun ManagerMoreMenuScreen(
                 )
                 ManagerMoreMenuRow(
                     icon = Icons.AutoMirrored.Outlined.Logout,
-                    title = "Sign out",
-                    subtitle = "Return to Welcome",
+                    title = com.saaf.milkshop.nativeui.common.NativeAccessCopy.LOCK_TITLE,
+                    subtitle = com.saaf.milkshop.nativeui.common.NativeAccessCopy.LOCK_DETAIL,
                     tag = NativeUiTags.ManagerMoreSignOut,
                     onClick = hapticAction(onSignOut),
                 )

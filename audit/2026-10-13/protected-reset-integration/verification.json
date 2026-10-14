@@ -1,0 +1,21 @@
+{
+  "status": "LOCAL_INTEGRATION_VERIFIED_DEPLOYMENT_PENDING",
+  "tests": {
+    "route_eligibility": 35,
+    "transport": 4,
+    "controlled_ui": 4,
+    "cli": 8,
+    "existing_security_response_helpers": 11
+  },
+  "scoped_types": "PASS",
+  "targeted_lint": "PASS",
+  "sql_unchanged_sha256": "282876836d1981a934c7a5e0ff31fe1be58c3f2ba64751d39b87636e4a08d204",
+  "real_auth_calls": 0,
+  "remote_operations": 0,
+  "installed_files_verified": 8,
+  "limits": [
+    "Synthetic gateways; no live deployment or Auth acceptance",
+    "Controlled hooks/JSX UI checks; no browser appearance acceptance",
+    "No Android tests/build"
+  ]
+}

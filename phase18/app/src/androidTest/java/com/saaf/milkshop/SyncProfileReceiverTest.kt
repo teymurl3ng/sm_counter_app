@@ -35,6 +35,15 @@ class SyncProfileReceiverTest {
 
     @Test
     fun allFiveProfiles_insertUpdateAndReplayWithDifferentLocalIds() = runBlocking {
+        verifyAllFiveProfiles(createdAt)
+    }
+
+    @Test
+    fun allFiveProfiles_sqliteDatesPreserveTextAcrossInsertUpdateAndReplay() = runBlocking {
+        verifyAllFiveProfiles("2026-01-01 00:00:00")
+    }
+
+    private suspend fun verifyAllFiveProfiles(createdAt: String) {
         val source = MilkShopDatabase.createInMemory()
         val target = MilkShopDatabase.createInMemory()
         try {

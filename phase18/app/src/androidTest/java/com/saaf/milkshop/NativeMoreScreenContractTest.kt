@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -150,6 +151,7 @@ class NativeMoreScreenContractTest {
             onSignOut = { signedOut = true },
         )
         composeRule.onNodeWithTag(NativeUiTags.MoreSwitchAccount).performClick()
+        composeRule.onNodeWithTag(NativeUiTags.MoreSignOut).assertTextContains("Lock app").assertTextContains("End your session. Business sync is unchanged.")
         composeRule.onNodeWithTag(NativeUiTags.MoreSignOut).performClick()
         assertTrue(switched)
         assertTrue(signedOut)

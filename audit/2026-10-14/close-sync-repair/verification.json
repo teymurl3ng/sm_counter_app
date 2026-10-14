@@ -1,0 +1,36 @@
+{
+  "batch": "9b2a / finish batch 1",
+  "result": "ACCEPTED_SCOPED",
+  "device": "A06 R8VXA02SNKH",
+  "focusedDistinctAccepted": 10,
+  "acceptedMethods": [
+    "com.saaf.milkshop.SyncClosePreflightTest#verifiedCashierCloseMustReachAnotherUserInitializedPhone",
+    "com.saaf.milkshop.SyncClosePreflightTest#emptyReceiverControlAcceptsTheSameVerifiedCloseEnvelope",
+    "com.saaf.milkshop.SyncClosePreflightTest#refusedCloseIsRetainedUntilCorrectedWithoutWeakeningLocalActors",
+    "com.saaf.milkshop.SyncClosePreflightTest#immutableReplayCannotDiscardANewerRefusedBody",
+    "com.saaf.milkshop.SyncClosePreflightTest#missingCountRetriesWhenParentArrivesAndCancellationRollsBack",
+    "com.saaf.milkshop.SyncClosePreflightTest#sequentialCloseReopenAndRecountHistoryRemapsEveryLink",
+    "com.saaf.milkshop.NativeCashCloseFacadeTest#cashierClosesOwnDayNextDateOpensAndReopenIsDenied",
+    "com.saaf.milkshop.NativeCashCloseFacadeTest#closeThenReopenRestoresOpenPosting",
+    "com.saaf.milkshop.NativeCashCloseFacadeTest#reopenRejectsBlankReasonAndWrongPassphrase",
+    "com.saaf.milkshop.Phase8ReconciliationOperationsTest#reopenNeedsOwnerRecentAuthenticationAndNewCountBeforeReclose"
+  ],
+  "initialPassed": 8,
+  "initialFailed": 2,
+  "affectedRerunPassed": 2,
+  "productionChanges": [
+    "phase18/app/src/main/java/com/saaf/milkshop/data/SyncEntities.kt",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/SyncApplyEngine.kt"
+  ],
+  "schemaUnchanged": true,
+  "ordinaryAndPreviewPackagesUnchanged": true,
+  "sourceChangesBetweenRuns": [
+    "phase18\\app\\src\\androidTest\\java\\com\\saaf\\milkshop\\SyncClosePreflightTest.kt"
+  ],
+  "knownLimitation": "Bulk queued close/reopen cycles: see DEFERRED_FINDING.md; sequential import is accepted, aggregate catch-up is not.",
+  "cancellationEvidence": "Synthetic cancellation of surrounding Room writer transaction after imported close; does not certify process kill or power loss.",
+  "artifacts": {
+    "phase18\\app\\build\\outputs\\apk\\debug\\app-debug.apk": "12f63c690c94cd8e7f26db8a639ec6919f805bc14588cb0f4fdc8015dc4feb63",
+    "phase18\\app\\build\\outputs\\apk\\androidTest\\debug\\app-debug-androidTest.apk": "9d6432e40b6fa1a4cad1bf34f05ffa80528bab6c03b4231b3cc0f4e35a3b3fea"
+  }
+}

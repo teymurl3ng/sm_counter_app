@@ -1,0 +1,21 @@
+{
+  "status": "PREFLIGHT_COMPLETE_RECOVERY_NOT_ACCEPTED",
+  "stored_snapshot": "2026-10-09",
+  "matching_project": "tlsuxbghuhlqntkgtrxt",
+  "snapshot_stale_by_counts": {
+    "shops": {
+      "stored": 1,
+      "current": 2
+    },
+    "audit_log": {
+      "stored": 32,
+      "current": 50
+    }
+  },
+  "focused_offline_checks": 5,
+  "characterization_checks": 4,
+  "remote_writes": 0,
+  "restores": 0,
+  "key_reads": 0,
+  "next_unit": "8b2 backup automation prepared fix/publication acceptance"
+}

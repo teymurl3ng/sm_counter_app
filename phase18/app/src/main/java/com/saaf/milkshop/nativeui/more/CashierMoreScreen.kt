@@ -382,8 +382,8 @@ private fun MoreMenuScreen(
                 )
                 MoreMenuRow(
                     icon = Icons.Outlined.Logout,
-                    title = "Sign out",
-                    subtitle = "Return to Welcome",
+                    title = com.saaf.milkshop.nativeui.common.NativeAccessCopy.LOCK_TITLE,
+                    subtitle = com.saaf.milkshop.nativeui.common.NativeAccessCopy.LOCK_DETAIL,
                     tag = NativeUiTags.MoreSignOut,
                     onClick = onSignOut,
                 )

@@ -46,6 +46,11 @@ class SyncOutboxCaptureTest {
 
     @Test
     fun eventInsert_isCapturedWithItsUid_andPrecedesItsClose() = runBlocking {
+        // This unanchored-clock fixture must not inherit the QA app's
+        // persisted trusted-time anchor from earlier live transport checks.
+        com.saaf.milkshop.sync.TrustedTime.resetForTest(
+            androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext,
+        )
         val database = openDatabase()
         try {
             val event = EventEntity(

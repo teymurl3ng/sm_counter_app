@@ -1,0 +1,75 @@
+{
+  "batch": "Finish batch 2 / 9b2 / R03-R10",
+  "result": "ACCEPTED_STAGED_PHYSICAL_SCENARIO",
+  "run": "cefb3dc1cfe7",
+  "shop_id": "5577806a-e0be-494c-b536-11ebbef96ee5",
+  "project": "tghzmofkkdsaasvnixps",
+  "phones": {
+    "A06": "R8VXA02SNKH",
+    "S24": "RFCX116CYYX / adb-RFCX116CYYX-JYuekC._adb-tls-connect._tcp"
+  },
+  "stages": 45,
+  "full20TableCheckpoints": [
+    "base",
+    "sale",
+    "recovered",
+    "sales-repeat",
+    "closed",
+    "reopened",
+    "reclosed",
+    "closing-repeat"
+  ],
+  "offlineEvidence": {
+    "run": "cefb3dc1cfe7",
+    "phone": "owner",
+    "stage": "offline_probe",
+    "validatedNetworks": 0,
+    "drain": "RetryLater(pushed=0)",
+    "pull": "RetryLater(reason=network)",
+    "queueAndLedgerPreserved": true,
+    "httpStatuses": [
+      "/rest/v1/rpc/sync_push:transport_UnknownHostException",
+      "/rest/v1/rpc/sync_pull:transport_UnknownHostException"
+    ],
+    "deviceId": "edd49c4f0bba45e181d1e9169627096a",
+    "outbox": 1,
+    "parks": 0,
+    "holds": 0,
+    "postingClosed": false,
+    "dbFilename": "milk_shop.db"
+  },
+  "finalCashPkr": "10760.00",
+  "finalMilkLitres": 76,
+  "finalYogurtKg": 17,
+  "newSaleMovements": 2,
+  "cashCounts": 2,
+  "dailyActions": [
+    "close",
+    "reopen",
+    "close"
+  ],
+  "existingDevIntegrityEqual": true,
+  "ordinaryPackageProvenanceUnchanged": true,
+  "radiosRestored": true,
+  "mainSchemaExistingTestsUnchanged": true,
+  "onlyNewTest": "PhysicalOfflineCloseProbe.kt",
+  "cleanup": {
+    "run": "cefb3dc1cfe7",
+    "results": [
+      "owner: transport cleared, non-test packages unchanged",
+      "counter: transport cleared, non-test packages unchanged",
+      "cashier: disposable Auth retired",
+      "owner: disposable Auth retired",
+      "created fixture shop deactivated; synthetic sync evidence retained"
+    ]
+  },
+  "limits": [
+    "Sequential closing stages, not coalesced queued-history catch-up; recorded ordering limitation remains pending in recovery scope.",
+    "No process-kill, lost-ack, power-loss or restore interruption certification in this batch.",
+    "Synthetic isolated QA package; ordinary app installation and human staff acceptance remain open."
+  ],
+  "apkHashes": {
+    "phase18\\app\\build\\outputs\\apk\\debug\\app-debug.apk": "12f63c690c94cd8e7f26db8a639ec6919f805bc14588cb0f4fdc8015dc4feb63",
+    "phase18\\app\\build\\outputs\\apk\\androidTest\\debug\\app-debug-androidTest.apk": "b16692e748b074adbd31cc8632612eb8d65e6d6a5b3476d480084dc54c0d373f"
+  }
+}

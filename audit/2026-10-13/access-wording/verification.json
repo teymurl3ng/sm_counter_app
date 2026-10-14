@@ -1,0 +1,14 @@
+{
+  "batch": "8c2",
+  "complete_at_bounded_qa_scope": true,
+  "selected_a06_checks_passed": 13,
+  "menu_roles_verified": 5,
+  "actual_domain_preservation_checks": 2,
+  "sync_default_light_and_200_percent_dark_passed": true,
+  "native_policy_enrollment_runtime_facade_sources_unchanged": true,
+  "five_menu_callbacks_tags_modifiers_unchanged": true,
+  "ordinary_package_provenance_unchanged": true,
+  "real_auth_or_ordinary_device_configuration": false,
+  "published_or_signed_release": false,
+  "next_independent_existing_batch": "9a synthetic shop-day baseline/rehearsal scope"
+}

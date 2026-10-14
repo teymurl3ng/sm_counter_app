@@ -65,3 +65,8 @@ audit/**/*.perfetto-trace
 audit/**/logcat-*.txt
 audit/**/*.pb
 audit/**/*.textproto
+
+# Isolated finish/publication candidates and generated release outputs
+audit/2026-10-14/finish-engineering/server-checkout/
+audit/2026-10-14/finish-engineering/viewer-checkout/
+audit/2026-10-14/finish-engineering/release/

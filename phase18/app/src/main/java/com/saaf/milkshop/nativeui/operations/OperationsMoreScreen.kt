@@ -261,8 +261,8 @@ private fun OpsMoreMenuScreen(
                 )
                 OpsMoreMenuRow(
                     icon = Icons.Outlined.Logout,
-                    title = "Sign out",
-                    subtitle = "Return to Welcome",
+                    title = com.saaf.milkshop.nativeui.common.NativeAccessCopy.LOCK_TITLE,
+                    subtitle = com.saaf.milkshop.nativeui.common.NativeAccessCopy.LOCK_DETAIL,
                     tag = NativeUiTags.OpsMoreSignOut,
                     onClick = hapticAction(onSignOut),
                 )

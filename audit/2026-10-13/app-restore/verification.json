@@ -1,0 +1,23 @@
+{
+  "batch": "8b4",
+  "complete_at_bounded_qa_scope": true,
+  "device": "R8VXA02SNKH",
+  "model": "SM_A065F",
+  "exact_selected_methods": 10,
+  "passed": 10,
+  "failed": 0,
+  "instrumentation_package": "com.saaf.milkshop.qa.tests",
+  "ordinary_package_provenance_unchanged": true,
+  "synthetic_acceptance_cache_files_removed": true,
+  "source_in_memory_destination_file_backed": true,
+  "database_close_reopen_verified": true,
+  "ordinary_app_data_read_or_restored": false,
+  "drive_objects_touched": false,
+  "current_drive_rehearsal": false,
+  "forced_process_death_repeated": false,
+  "signing_key_read": false,
+  "hosted_identity_acceptance": false,
+  "product_behavior_changes": 0,
+  "new_focused_instrumentation_test": 1,
+  "next_existing_batch": "8c shop setup preflight"
+}

@@ -1,0 +1,50 @@
+{
+  "batch": "4 preparation / R12 plus R19-R21 scoped visuals",
+  "result": "PREPARED_HUMAN_RESULTS_PENDING",
+  "package": "com.saaf.milkshop.acceptance",
+  "launcherLabel": "Shop Day QA",
+  "versionName": "0.4.1-qa-tests",
+  "previewFillerEnabled": false,
+  "phoneFixtures": {
+    "a06": {
+      "package": "com.saaf.milkshop.acceptance",
+      "date": "2026-10-14",
+      "shop": "Shop Day QA",
+      "cashPkr": 10000,
+      "stockEmpty": true,
+      "nativeLaunchPreservedFixture": true,
+      "cloudConfigured": false
+    },
+    "s24": {
+      "package": "com.saaf.milkshop.acceptance",
+      "date": "2026-10-14",
+      "shop": "Shop Day QA",
+      "cashPkr": 10000,
+      "stockEmpty": true,
+      "nativeLaunchPreservedFixture": true,
+      "cloudConfigured": false
+    }
+  },
+  "setupMethodsPassed": 2,
+  "namedVisualMethodsPassedPerPhone": 3,
+  "a06UpdatedFrameRerunPassed": 2,
+  "newTestFiles": [
+    "StaffAcceptanceSetupTest.kt",
+    "StaffVisualTailTest.kt"
+  ],
+  "existingMainSchemaTestsUnchanged": true,
+  "existingPhonePackagesUnchanged": true,
+  "nativeLaunchPreservedStartingFacts": true,
+  "humanPending": [
+    "R13 uncoached staff story/actual next-date observation",
+    "R14/R15 actually enrolled unlock cancellation and success",
+    "R16 vibration comfort",
+    "R17 motion/flash observation",
+    "R18 actual Sale/Count/Settings text usability"
+  ],
+  "apkHashes": {
+    "shop-day-qa.apk": "2dc8317f90c5838de69eb8eb3a671c62a1150f98e23a0f798ac326b898ad4e72",
+    "shop-day-qa-test.apk": "01427d0ce2baf34f8ebe8ac9dcad9864aabc00d8354893c57ae336b64904ed72"
+  },
+  "testFixes": "See VISUAL_TEST_NOTE.md; original failed visual runs retained; S24 locked-hierarchy failures are not counted as passes."
+}

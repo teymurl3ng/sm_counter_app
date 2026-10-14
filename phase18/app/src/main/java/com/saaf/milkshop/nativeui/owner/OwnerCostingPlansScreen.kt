@@ -26,7 +26,13 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.HorizontalDivider
+import com.saaf.milkshop.nativeui.common.NativeInformationSection
+import com.saaf.milkshop.nativeui.common.NativeInformationFact
+import com.saaf.milkshop.nativeui.common.NativeInformationHeading
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
+import com.saaf.milkshop.nativeui.theme.nativeMetricTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeVisualColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -679,24 +685,9 @@ private fun OwnerCostingPlansListBody(
                         .testTag(NativeUiTags.OwnerCostingPlansRoot),
                 ) {
                     HubHeader()
-                    Column(
-                        Modifier
-                            .fillMaxSize()
-                            .padding(24.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            policiesError,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansError),
-                        )
-                        Spacer(Modifier.height(16.dp))
-                        Button(
-                            onClick = hapticAction(onRetry),
-                            modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansRetry),
-                        ) { Text("Try again") }
-                    }
+                    NativeLoadFailurePane(message = policiesError, onRetry = onRetry,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansError),
+                        retryTestTag = NativeUiTags.OwnerCostingPlansRetry)
                 }
             }
         }
@@ -863,19 +854,17 @@ private fun OwnerCostingPlansDetailScreen(
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.testTag(NativeUiTags.OwnerCostingPlansDetailMonth),
                 )
-                OwnerCostingFact("Status", row.statusLabel)
-                OwnerCostingFact("Conversion cost", row.conversionCostLabel)
-                OwnerCostingFact("Review reason", row.reviewReason)
-                OwnerCostingFact("Normal capacity (kg)", detail.normalCapacityKg)
-                OwnerCostingFact("Approved at", detail.approvedAt)
-                detail.notes?.takeIf { it.isNotBlank() }?.let {
-                    OwnerCostingFact("Notes", it)
+                NativeInformationSection {
+                    OwnerCostingFact("Status", row.statusLabel)
+                    NativeInformationFact("Conversion cost", row.conversionCostLabel, emphasized = true)
+                    OwnerCostingFact("Review reason", row.reviewReason)
+                    OwnerCostingFact("Normal capacity (kg)", detail.normalCapacityKg)
+                    OwnerCostingFact("Approved at", detail.approvedAt)
+                    detail.notes?.takeIf { it.isNotBlank() }?.let {
+                        NativeInformationFact("Notes", it, prose = true)
+                    }
                 }
-                Text(
-                    "Components",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
+                NativeInformationHeading("Components")
                 if (detail.components.isEmpty()) {
                     Text(
                         "No components on this policy snapshot.",
@@ -883,8 +872,10 @@ private fun OwnerCostingPlansDetailScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 } else {
-                    detail.components.forEach { component ->
-                        OwnerCostingComponentFact(component)
+                    NativeInformationSection {
+                        detail.components.forEach { component ->
+                            OwnerCostingComponentFact(component)
+                        }
                     }
                 }
                 if (row.statusLabel == "Active") {
@@ -1343,11 +1334,9 @@ private fun OwnerCostingPolicyRow(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
-            Text(
-                "${policy.statusLabel} · ${policy.conversionCostLabel} · ${policy.reviewReason}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Text(policy.conversionCostLabel, Modifier.fillMaxWidth(), style = nativeMetricTextStyle(), color = nativeVisualColors.metric)
+            Text(policy.statusLabel, style = nativeSupportingTextStyle())
+            Text(policy.reviewReason, style = nativeSupportingTextStyle(), color = nativeVisualColors.supporting)
         }
         Icon(Icons.Outlined.ChevronRight, contentDescription = null)
     }
@@ -1355,29 +1344,14 @@ private fun OwnerCostingPolicyRow(
 
 @Composable
 private fun OwnerCostingComponentFact(component: NativeOwnerCostingComponentRow) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(
-            component.componentCode,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(
-            "${component.sourceAmountLabel} · basis ${component.basisQuantityKg} kg",
-            style = MaterialTheme.typography.bodyLarge,
-        )
-    }
+    NativeInformationHeading(component.componentCode)
+    NativeInformationFact("Source amount", component.sourceAmountLabel, emphasized = true)
+    NativeInformationFact("Basis quantity", "${component.basisQuantityKg} kg")
 }
 
 @Composable
 private fun OwnerCostingFact(label: String, value: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(
-            label,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(value, style = MaterialTheme.typography.bodyLarge)
-    }
+    NativeInformationFact(label, value)
 }
 
 private fun humanizeCode(code: String): String =

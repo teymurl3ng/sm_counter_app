@@ -1,0 +1,13 @@
+{
+  "batch": "8c1",
+  "preflight_complete": true,
+  "selected_a06_checks_passed": 6,
+  "source_unchanged": true,
+  "ordinary_package_provenance_unchanged": true,
+  "provider_writes": false,
+  "viewer_presentation_already_live": true,
+  "prod_reset_rollout_accepted": false,
+  "actual_shop_device_configured": false,
+  "central_offline_person_revocation_available": false,
+  "next_existing_batch": "8c2 wording and two synthetic boundary checks"
+}

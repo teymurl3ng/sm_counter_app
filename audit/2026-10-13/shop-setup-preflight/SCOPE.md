@@ -1,0 +1,3 @@
+# 8c1 operations/setup preflight
+
+Inspect only current project/plan/repo/Viewer/keepalive state and shop-device enrollment/local sign-out/stop-sync/server-verdict boundaries. Read selected security-advisor metadata, not account payloads or tokens. Reuse exact current isolated test APK and six existing enrollment/transport/runtime checks on A06; no build/suite expansion, ordinary app configuration, staff changes, remote writes, deployment, policy change or identity feature. Record current unsupported trust guarantees, provider options and the smallest next setup/copy verification boundary. Stop with this baseline/operator plan.

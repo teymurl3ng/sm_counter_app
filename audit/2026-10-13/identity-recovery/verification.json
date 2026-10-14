@@ -1,0 +1,12 @@
+{
+  "batch": "8b3a",
+  "local_source_and_database_complete": true,
+  "host_checks_passed": 16,
+  "native_postgresql_groups_passed": 9,
+  "source_hashes_verified_after_sync": true,
+  "disposable_clusters_remaining": 0,
+  "published": false,
+  "deployed": false,
+  "actual_supabase_auth_accepted": false,
+  "next_existing_boundary": "8b3b publication/empty-project/live Auth proposal"
+}

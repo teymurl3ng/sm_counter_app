@@ -1,0 +1,10 @@
+{
+  "relevant_dev_prod_catalog_equal": true,
+  "guard_installed_dev": false,
+  "guard_installed_prod": false,
+  "remote_postgresql": "17.6",
+  "seven_reset_dependency_definitions_match_saved_native_catalog": true,
+  "ten_current_C1_sources_match_8a1_fixture_hashes": true,
+  "eight_installed_integration_files_match_reviewed_manifest": true,
+  "comparison_limit": "Selected reset dependencies only; historical native catalog, not a new live PostgreSQL 17 concurrency test."
+}

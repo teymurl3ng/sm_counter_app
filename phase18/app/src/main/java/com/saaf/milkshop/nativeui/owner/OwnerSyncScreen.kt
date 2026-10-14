@@ -1,5 +1,6 @@
 package com.saaf.milkshop.nativeui.owner
 
+import com.saaf.milkshop.nativeui.common.NativeAccessCopy
 import com.saaf.milkshop.nativeui.common.NativeListStyle
 import com.saaf.milkshop.nativeui.common.nativeListItemContent
 import com.saaf.milkshop.nativeui.common.nativeListItem
@@ -47,6 +48,11 @@ import com.saaf.milkshop.nativeui.sale.CashierScreenHeader
 import com.saaf.milkshop.nativeui.sale.formatCashierRoleLabel
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
+import com.saaf.milkshop.nativeui.common.NativeInformationSection
+import com.saaf.milkshop.nativeui.common.NativeInformationFact
+import com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeValueTextStyle
+import com.saaf.milkshop.nativeui.theme.nativeVisualColors
 import com.saaf.milkshop.nativeui.common.HostedScaffold
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.domain.ServerAccountPolicy
@@ -280,8 +286,7 @@ fun OwnerSyncScreen(
             title = { Text("Stop syncing this phone?") },
             text = {
                 Text(
-                    "New entries stay on this phone and stop uploading. " +
-                        "Existing data on this phone is not deleted.",
+                    NativeAccessCopy.STOP_SYNC_DETAIL,
                 )
             },
             confirmButton = {
@@ -310,10 +315,13 @@ private fun OwnerSyncEnrolledBody(
     onSyncNow: () -> Unit,
     onUnenroll: () -> Unit,
 ) {
-    Column(Modifier.testTag(NativeUiTags.OwnerSyncStatus)) {
+    NativeInformationSection(Modifier.testTag(NativeUiTags.OwnerSyncStatus)) {
+        Text("Business sync connection", style = MaterialTheme.typography.titleSmall)
+        Text(NativeAccessCopy.SYNC_DETAIL, style = nativeSupportingTextStyle(), color = nativeVisualColors.supporting)
+
         OwnerSyncStatusRow("Server", status.environment.uppercase())
         OwnerSyncStatusRow("Shop", status.shopName ?: "—")
-        OwnerSyncStatusRow("Signed in as", status.role)
+        OwnerSyncStatusRow("Sync account role", status.role)
         val identityLabel = when (status.identityStatus) {
             ServerAccountPolicy.LinkStatus.VERIFIED -> "verified"
             ServerAccountPolicy.LinkStatus.SUSPENDED -> "suspended on the server"
@@ -324,6 +332,11 @@ private fun OwnerSyncEnrolledBody(
         }
         if (identityLabel != null) {
             OwnerSyncStatusRow("Identity", identityLabel)
+            if (!ServerAccountPolicy.ENFORCE_LINK_STATES && status.identityStatus in setOf(
+                    ServerAccountPolicy.LinkStatus.SUSPENDED, ServerAccountPolicy.LinkStatus.REVOKED)) {
+                Text(NativeAccessCopy.SERVER_STATUS_DETAIL, style = nativeSupportingTextStyle(), color = nativeVisualColors.supporting)
+            }
+
         }
         status.identityServerUsername?.let {
             OwnerSyncStatusRow("Server account", it)
@@ -333,11 +346,11 @@ private fun OwnerSyncEnrolledBody(
         }
         status.graceDaysLeft?.let { daysLeft ->
             OwnerSyncStatusRow(
-                "Offline operation",
-                if (status.graceWarningLevel >= 3) "URGENT - $daysLeft day(s) left before limited mode" else "$daysLeft day(s) of full operation left",
+                "Offline work",
+                NativeAccessCopy.offlineWork(daysLeft),
             )
         }
-        OwnerSyncStatusRow("Session", if (status.sessionPresent) "active" else "needs sign-in again")
+        OwnerSyncStatusRow("Sync session", if (status.sessionPresent) "active" else "needs sign-in again")
         OwnerSyncStatusRow("Trusted time", if (status.trustedTimeAnchored) "server-anchored" else "phone clock only")
         OwnerSyncStatusRow("Waiting to upload", status.outboxCount.toString())
         OwnerSyncStatusRow("Last pulled record", status.pullCursor.toString())
@@ -351,35 +364,34 @@ private fun OwnerSyncEnrolledBody(
             modifier = Modifier.testTag(NativeUiTags.OwnerSyncHolds),
         )
         holds.forEach { hold ->
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-            Column(Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+            NativeInformationSection(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                 Text(
                     hold.label.ifBlank { "${hold.tableName} · ${hold.rowUid}" },
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = nativeValueTextStyle(),
                 )
                 if (hold.label.isNotBlank()) {
                     Text(
                         hold.rowUid,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = nativeSupportingTextStyle(),
+                        color = nativeVisualColors.supporting,
                     )
                 }
                 Text(
                     "Server version from ${hold.originDevice ?: "an unknown device"}" +
                         " · held ${hold.heldAt.take(10)}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = nativeSupportingTextStyle(),
+                    color = nativeVisualColors.supporting,
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(
                         onClick = com.saaf.milkshop.nativeui.common.hapticAction { onResolveHold(hold.tableName, hold.rowUid, true) },
                         enabled = !busy,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerSyncHoldKeep),
+                        modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.OwnerSyncHoldKeep),
                     ) { Text("Keep mine") }
                     OutlinedButton(
                         onClick = com.saaf.milkshop.nativeui.common.hapticAction { onResolveHold(hold.tableName, hold.rowUid, false) },
                         enabled = !busy,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerSyncHoldTake),
+                        modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.OwnerSyncHoldTake),
                     ) { Text("Take server") }
                 }
             }
@@ -408,20 +420,7 @@ private fun OwnerSyncEnrolledBody(
 
 @Composable
 private fun OwnerSyncStatusRow(label: String, value: String) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Text(label, style = MaterialTheme.typography.bodyMedium)
-        Text(
-            value,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+    NativeInformationFact(label, value)
 }
 
 @Composable

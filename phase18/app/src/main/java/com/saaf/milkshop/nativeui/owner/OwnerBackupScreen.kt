@@ -21,7 +21,10 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
+import com.saaf.milkshop.nativeui.common.NativeInformationSection
+import com.saaf.milkshop.nativeui.common.NativeInformationFact
+import com.saaf.milkshop.nativeui.common.NativeInformationHeading
+import com.saaf.milkshop.nativeui.common.NativeLoadFailurePane
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
@@ -124,7 +127,7 @@ fun OwnerBackupScreen(
     onConfirmCloudRestore: (Boolean) -> Unit = {},
     hostedScaffold: HostedScaffold,
     showHeader: Boolean = true,
-    backToHubLabel: String = "Back to More",
+    backToHubLabel: String = "Done",
     localExportOnly: Boolean = false,
     cloudOpen: Boolean = false,
     modifier: Modifier = Modifier,
@@ -249,7 +252,7 @@ private fun OwnerBackupScreenPane(
     onConfirmCloudRestore: (Boolean) -> Unit = {},
     hostedScaffold: HostedScaffold,
     showHeader: Boolean = true,
-    backToHubLabel: String = "Back to More",
+    backToHubLabel: String = "Done",
     localExportOnly: Boolean = false,
     cloudOpen: Boolean = false,
     modifier: Modifier = Modifier,
@@ -398,24 +401,9 @@ private fun OwnerBackupStatusScreen(
                     )
                 }
                 error != null && snapshot == null -> {
-                    Column(
-                        Modifier
-                            .fillMaxSize()
-                            .padding(24.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            error,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.testTag(NativeUiTags.OwnerBackupError),
-                        )
-                        Spacer(Modifier.height(16.dp))
-                        Button(
-                            onClick = hapticAction(onRetry),
-                            modifier = Modifier.testTag(NativeUiTags.OwnerBackupRetry),
-                        ) { Text("Try again") }
-                    }
+                    NativeLoadFailurePane(message = error, onRetry = onRetry,
+                        modifier = Modifier.testTag(NativeUiTags.OwnerBackupError),
+                        retryTestTag = NativeUiTags.OwnerBackupRetry)
                 }
                 snapshot != null -> {
                     Column(Modifier.fillMaxSize()) {
@@ -462,38 +450,40 @@ private fun OwnerBackupStatusScreen(
                                     fontWeight = FontWeight.SemiBold,
                                     modifier = Modifier.testTag(NativeUiTags.OwnerBackupStatusHeadline),
                                 )
-                                OwnerBackupFact("Schedule", snapshot.scheduleDescription)
-                                OwnerBackupFact(
-                                    "Configured",
-                                    if (snapshot.configured) "Yes" else "No",
-                                )
-                                OwnerBackupFact(
-                                    "Enabled",
-                                    if (snapshot.enabled) "Yes" else "No",
-                                )
-                                OwnerBackupFact(
-                                    "Account",
-                                    snapshot.accountDisplay ?: "Not linked",
-                                )
-                                OwnerBackupFact(
-                                    "Last success",
-                                    snapshot.lastSuccessAt ?: "Never",
-                                )
-                                OwnerBackupFact(
-                                    "Last attempt",
-                                    snapshot.lastAttemptAt ?: "Never",
-                                )
-                                snapshot.lastErrorMessage?.takeIf { it.isNotBlank() }?.let {
-                                    OwnerBackupFact("Last error", it)
+                                NativeInformationSection {
+                                    OwnerBackupFact("Schedule", snapshot.scheduleDescription)
+                                    OwnerBackupFact(
+                                        "Configured",
+                                        if (snapshot.configured) "Yes" else "No",
+                                    )
+                                    OwnerBackupFact(
+                                        "Enabled",
+                                        if (snapshot.enabled) "Yes" else "No",
+                                    )
+                                    OwnerBackupFact(
+                                        "Account",
+                                        snapshot.accountDisplay ?: "Not linked",
+                                    )
+                                    OwnerBackupFact(
+                                        "Last success",
+                                        snapshot.lastSuccessAt ?: "Never",
+                                    )
+                                    OwnerBackupFact(
+                                        "Last attempt",
+                                        snapshot.lastAttemptAt ?: "Never",
+                                    )
+                                    snapshot.lastErrorMessage?.takeIf { it.isNotBlank() }?.let {
+                                        OwnerBackupFact("Last error", it)
+                                    }
+                                    OwnerBackupFact(
+                                        "Stale",
+                                        if (snapshot.stale) "Yes" else "No",
+                                    )
+                                    OwnerBackupFact(
+                                        "Pending upload",
+                                        if (snapshot.pending) "Yes" else "No",
+                                    )
                                 }
-                                OwnerBackupFact(
-                                    "Stale",
-                                    if (snapshot.stale) "Yes" else "No",
-                                )
-                                OwnerBackupFact(
-                                    "Pending upload",
-                                    if (snapshot.pending) "Yes" else "No",
-                                )
 
                                 Spacer(Modifier.height(4.dp))
                                 Text(
@@ -616,7 +606,7 @@ private fun OwnerBackupExportScreen(
     onBack: () -> Unit,
     onExport: (Uri, CharArray) -> Unit,
     hostedScaffold: HostedScaffold,
-    backToHubLabel: String = "Back to More",
+    backToHubLabel: String = "Done",
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -754,7 +744,7 @@ private fun OwnerBackupRestoreScreen(
     onInspect: (Uri, CharArray) -> Unit,
     onConfirmRestore: (Boolean) -> Unit,
     hostedScaffold: HostedScaffold,
-    backToHubLabel: String = "Back to More",
+    backToHubLabel: String = "Done",
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -853,10 +843,7 @@ private fun OwnerBackupRestoreScreen(
                             }
                         }
                     } else {
-                        Column(
-                            Modifier.testTag(NativeUiTags.OwnerBackupRestoreInspection),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
+                        NativeInformationSection(Modifier.testTag(NativeUiTags.OwnerBackupRestoreInspection)) {
                             OwnerBackupFact("File", inspection.fileName)
                             OwnerBackupFact("Created", AppTimeFormats.dateTime(inspection.createdAt))
                             OwnerBackupFact("Format", inspection.formatVersion.toString())
@@ -919,7 +906,7 @@ private fun OwnerBackupConnectScreen(
     onBack: () -> Unit,
     onConnect: (CharArray, Boolean) -> Unit,
     hostedScaffold: HostedScaffold,
-    backToHubLabel: String = "Back to More",
+    backToHubLabel: String = "Done",
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
@@ -1061,7 +1048,7 @@ private fun OwnerBackupReauthScreen(
     onConfirm: (CharArray) -> Unit,
     onCancel: () -> Unit,
     hostedScaffold: HostedScaffold,
-    backToHubLabel: String = "Back to More",
+    backToHubLabel: String = "Done",
     modifier: Modifier,
 ) {
     var passphrase by remember { mutableStateOf("") }
@@ -1140,14 +1127,7 @@ private fun OwnerBackupReauthScreen(
 
 @Composable
 private fun OwnerBackupFact(label: String, value: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(
-            label,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(value, style = MaterialTheme.typography.bodyLarge)
-    }
+    NativeInformationFact(label, value)
 }
 
 @Composable
@@ -1237,18 +1217,10 @@ private fun OwnerBackupCloudScreen(
                         )
                     } else {
                         remotes.forEach { remote ->
-                            Column(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .testTag(NativeUiTags.ownerBackupCloudRemote(remote.remoteFileId)),
-                                verticalArrangement = Arrangement.spacedBy(4.dp),
-                            ) {
-                                Text(remote.name, fontWeight = FontWeight.SemiBold)
-                                Text(
-                                    AppTimeFormats.dateTime(remote.createdAt),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
+                            NativeInformationSection(Modifier.fillMaxWidth()
+                                .testTag(NativeUiTags.ownerBackupCloudRemote(remote.remoteFileId))) {
+                                NativeInformationHeading(remote.name)
+                                NativeInformationFact("Created", AppTimeFormats.dateTime(remote.createdAt))
                                 Button(
                                     onClick = com.saaf.milkshop.nativeui.common.hapticAction {
                                         selectedRemoteId = remote.remoteFileId
@@ -1261,7 +1233,6 @@ private fun OwnerBackupCloudScreen(
                                         .testTag(NativeUiTags.OwnerBackupCloudInspect),
                                 ) { Text("Inspect") }
                             }
-                            HorizontalDivider()
                         }
                     }
                     if (needsRecovery || selectedRemoteId != null) {
@@ -1300,13 +1271,15 @@ private fun OwnerBackupCloudScreen(
                                 .testTag(NativeUiTags.OwnerBackupRestoreInspection),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            OwnerBackupFact("File", inspected.fileName)
-                            OwnerBackupFact("Created", AppTimeFormats.dateTime(inspected.createdAt))
-                            OwnerBackupFact("Format", inspected.formatVersion.toString())
-                            OwnerBackupFact(
-                                "Security state",
-                                if (inspected.containsSecurityState) "Included" else "Missing",
-                            )
+                            NativeInformationSection {
+                                OwnerBackupFact("File", inspected.fileName)
+                                OwnerBackupFact("Created", AppTimeFormats.dateTime(inspected.createdAt))
+                                OwnerBackupFact("Format", inspected.formatVersion.toString())
+                                OwnerBackupFact(
+                                    "Security state",
+                                    if (inspected.containsSecurityState) "Included" else "Missing",
+                                )
+                            }
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Checkbox(
                                     checked = confirmed,

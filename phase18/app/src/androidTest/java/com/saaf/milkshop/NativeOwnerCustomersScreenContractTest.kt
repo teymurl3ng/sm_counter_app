@@ -2,6 +2,18 @@ package com.saaf.milkshop
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.test.platform.app.InstrumentationRegistry
+import android.graphics.Bitmap
+import java.io.File
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsSelected
@@ -75,11 +87,66 @@ class NativeOwnerCustomersScreenContractTest {
         )
         composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersDetail).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersDetailName).assertIsDisplayed()
+        saveScreenshot("customer-detail-light")
         composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersDetailEdit)
             .performScrollTo()
             .assertIsDisplayed()
             .performClick()
         assertTrue(editOpened)
+    }
+
+    @Test
+    fun longCustomerRowKeepsSignedBalanceAndCallbackAtLargeText() {
+        val customer = sampleCustomer().copy(name = "Northern market community cafe and delivery counter",
+            balanceLabel = "PKR -123,456,789.99", statusLabel = "Archived",
+            areaRoute = "North district — community market route")
+        var opened: Long? = null
+        setScreen(customers = listOf(customer), fontScale = 1.5f, onOpenCustomer = { opened = it })
+        assertCompleteText(customer.name)
+        assertCompleteText(customer.balanceLabel)
+        assertCompleteText(customer.statusLabel)
+        saveScreenshot("customer-row-light-150")
+        composeRule.onNodeWithTag(NativeUiTags.ownerCustomer(customer.accountId)).performClick()
+        assertEquals(customer.accountId, opened)
+    }
+
+    @Test
+    fun longCustomerDetailReflowsInDarkExtraLargeText() {
+        val customer = sampleCustomer().copy(name = "Northern market community cafe and delivery counter",
+            balanceLabel = "PKR -123,456,789.99", statusLabel = "Archived")
+        val detail = sampleDetail().copy(row = customer, active = false,
+            address = "12 Market Road, beside the community centre, North District")
+        var edited = false
+        setScreen(customers = listOf(customer), customerDetail = detail, darkTheme = true,
+            fontScale = 2f, onOpenEdit = { edited = true })
+        assertCompleteText(customer.name)
+        assertCompleteText(customer.balanceLabel)
+        saveScreenshot("customer-detail-dark-200")
+        assertCompleteText(detail.address!!)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersDetailEdit).performScrollTo().performClick()
+        assertTrue(edited)
+    }
+
+    private fun assertCompleteText(text: String) {
+        val node = composeRule.onNodeWithText(text, useUnmergedTree = true).performScrollTo()
+        val layouts = mutableListOf<TextLayoutResult>()
+        node.performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
+        // Android rounds the text container to whole pixels; a fractional last
+        // glyph edge can set didOverflowWidth even on a short word. Allow that
+        // rounding only, while still checking every glyph and complete lines.
+        assertTrue("Text must reflow completely: $text", layouts.isNotEmpty() && layouts.all { layout ->
+            !layout.didOverflowHeight && layout.getLineEnd(layout.lineCount - 1) == text.length &&
+                (0 until layout.lineCount).all { line ->
+                    !layout.isLineEllipsized(line) && layout.getLineRight(line) <= layout.size.width + 1f
+                }
+        })
+    }
+
+    private fun saveScreenshot(name: String) {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        File(context.getExternalFilesDir(null), "batch6-$name.png").outputStream().use {
+            composeRule.onRoot().captureToImage().asAndroidBitmap().compress(Bitmap.CompressFormat.PNG, 100, it)
+        }
     }
 
     @Test
@@ -216,9 +283,13 @@ class NativeOwnerCustomersScreenContractTest {
         onBackFromEdit: () -> Unit = {},
         onUpdateCustomer: (String, CustomerProfileInput) -> Unit = { _, _ -> },
         onNavigate: (OwnerSection) -> Unit = {},
+        darkTheme: Boolean = false,
+        fontScale: Float? = null,
     ) {
         composeRule.setContent {
-            SaafTheme(darkTheme = false) {
+            val density = LocalDensity.current
+            CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale ?: density.fontScale)) {
+            SaafTheme(darkTheme = darkTheme) {
                 OwnerCustomersScreen(
                     snackbarHostState = remember { SnackbarHostState() },
                     identity = NativeSignedInIdentity(
@@ -261,6 +332,7 @@ class NativeOwnerCustomersScreenContractTest {
                         )
                     },
                 )
+            }
             }
         }
     }

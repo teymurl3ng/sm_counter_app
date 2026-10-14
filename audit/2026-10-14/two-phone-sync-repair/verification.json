@@ -1,0 +1,23 @@
+{
+  "scoped_repairs_complete": [
+    "9b1a",
+    "9b1b"
+  ],
+  "focused_distinct_methods_accepted": 12,
+  "first_run_passed": 11,
+  "fixture_only_rerun_passed": 1,
+  "physical_online_accepted": false,
+  "physical_run": "78e28f3ec93e",
+  "complete_table_count": 18,
+  "matching_table_count": 15,
+  "differing_tables": [
+    "opening_batches",
+    "opening_account_entries",
+    "event_actor_links"
+  ],
+  "sale_replay_reached": false,
+  "existing_dev_unchanged": true,
+  "non_test_packages_unchanged": true,
+  "next": "9b1c event details only; frozen NEXT_SCOPE.md",
+  "full_suite_run": false
+}

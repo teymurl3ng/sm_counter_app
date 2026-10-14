@@ -1,0 +1,17 @@
+{
+  "scope": "Three named visual tails at each phone current text/theme with real app composables and synthetic UI states; not full app/human acceptance",
+  "phones": [
+    "A06 R8VXA02SNKH",
+    "S24 RFCX116CYYX"
+  ],
+  "observed": [
+    "Owner Overview separates heading/amount/secondary result and grouped balances; complete latest activity text can be reached by scroll.",
+    "Operator Today has three outlined record groups with aligned title/time, full physical detail and record IDs; host header/footer preserved.",
+    "Close receipt separates counted/expected/variance/record number with dividers and a visible Done control. Content scrolls when needed; no label truncation reproduced."
+  ],
+  "limits": [
+    "Screenshots are fixture examples, not actual staff transaction results.",
+    "Current text scale only; no global setting change, broad size matrix or screen-reader traversal.",
+    "Motion/vibration comfort and actual biometric authentication are pending human observations."
+  ]
+}

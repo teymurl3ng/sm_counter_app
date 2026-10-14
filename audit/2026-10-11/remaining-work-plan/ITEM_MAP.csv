@@ -1,38 +1,38 @@
 id,goal,evidence_status,batch,gate,scope_note,execution_status
-B1,Profile sync,VERIFIED_FIXED,2,TWO_DEVICE,Five-family receiver and controlled prior-row catch-up passed focused S24 QA; B1A_RESULT and B1B_RESULT 2026-10-12,DONE
-B2,Planning sync,VERIFIED_FIXED,3,SHARED_PLANNING,UID receiver and one-time current-row catch-up passed selected S24 checks; physical two-phone acceptance remains phase 5,DONE
+B1,Profile sync,VERIFIED_FIXED_SEED_TIMESTAMP_COMPATIBILITY_ACCEPTED,2+9b1a,TWO_DEVICE,Existing ISO cases and strict app-emitted SQLite dates accepted; actual factory/migration catch-up and all five families preserve text; malformed dates roll back; physical profile comparison matches; 9b1 physical hosted online profile/planning tables match on both phones,DONE
+B2,Planning sync,VERIFIED_FIXED,3,SHARED_PLANNING,UID receiver and one-time current-row catch-up passed selected S24 checks; physical two-phone acceptance remains phase 5; 9b1 physical hosted online profile/planning tables match on both phones,DONE
 B3,Drawing correction/cancel,VERIFIED_FIXED,1b,DRAWINGS_USED,Same-account remedy and B3b/B3c verified; B3d Records UI accepted on S24 with final-source focused checks; B3D_RESULT 2026-10-12,DONE
-B4,Protected credential reset policy,POLICY,8a,ADMIN_USED,Owner-only protected-target reset proposal; alternate paths/concurrency included,NOT_STARTED
+B4,Protected credential reset policy,DEV_API_ACCEPTED_BROWSER_BLOCKED_PRODUCTION_PENDING,8a1+8a2,ADMIN_USED,Exact DEV guard and protected preview deployed; ten live API groups pass; all five fixtures retired with zero held participants; browser auto-review denied even after approval; production remains unchanged,IN_PROGRESS
 B5,Rounding/tolerance,VERIFIED_FIXED,1a,MONEY_BOUNDARIES,Decimal sale/cash/count/close aligned; v13 preserves legacy close policy; 26 focused passing checks plus 3013 bundled-driver oracle values,DONE
 B6,Own cashier expenses in Activity,COMPLETE_BOUNDED_QA,5a,USABILITY,Actor/date-filtered list and direct detail verified on S24,DONE
 B7,Device/person revocation,DEFERRED_DESIGN,IDENTITY_LATER,CENTRAL_REVOCATION_REQUIRED,Do not flip enforcement flag without guardrails,NOT_STARTED
 B8,Conflict attention,RECORDED_PENDING,8-conflicts,MULTI_DEVICE_UNATTENDED,Persistent review attention; existing review list retained,NOT_STARTED
-B9,Lock/disconnect meaning,INTENTIONAL,8c,COPY,Installation sync survives local switch intentionally,NOT_STARTED
+B9,Lock/disconnect meaning,COPY_AND_PRESERVATION_VERIFIED,8c2,COPY,Five menus and Sync explain separate local/session/transport actions; 13 A06 checks including two complete-row/outbox-preservation boundaries pass,DONE
 B10,Planning restore enqueue,VERIFIED_FIXED,3,RESTORE_PLANNING,Planning-only restore defect reproduced and fixed; isolated restore and differing-server hold passed S24 QA,DONE
 B11,No hard deletes guardrail,INVARIANT,ENGINEERING_LATER,FUTURE_DELETE_FEATURE,No current user-facing hard delete proved,NOT_STARTED
 B12,General-purpose product rules,FUTURE,GENERAL_RETAIL,NOT_DAIRY_PILOT,Dynamic catalog exists; domain breadth not validated,NOT_STARTED
 U1,Transaction/product hierarchy,COMPLETE_BOUNDED_QA,5b,DESIGN_COMMITMENT,Five mapped families reflow with grouped facts; selected S24 contracts and dark 200% product check passed; full phone visual walkthrough remains phase 5,DONE
-U2,People hierarchy,PLANNED,6,DESIGN_COMMITMENT,Includes people/user details once,NOT_STARTED
-U3,Personal-security grouping,COMPLETE_BOUNDED_QA,4,DESIGN_COMMITMENT,Five roles grouped + 4–12-digit PIN setup aligned; S24 11 focused and host 2 focused passed,DONE
-U4,Entity/record detail grouping,PARTIAL_BOUNDED_QA,5b+6,DESIGN_COMMITMENT,Record and product details grouped in 5b; people details remain batch 6,IN_PROGRESS
-U5,Management grouping,PLANNED,7,DESIGN_COMMITMENT,Mapped facts/statuses; small presentation tails retained,NOT_STARTED
-A1,Uncoached shop day/pilot,RECORDED_PENDING,9a,LIVE_PILOT,Synthetic dry-run may start earlier,NOT_STARTED
-A2,Current app recovery rehearsal,RECORDED_PENDING,8b,LIVE_PILOT,Earlier live Drive/restore already passed,NOT_STARTED
-A3,Two-phone full-ledger convergence,RECORDED_PENDING,9b,TWO_DEVICE,Needs 2/3; compare UID headers and children,NOT_STARTED
-A4,Appearance/motion/haptics/platform prompt,RECORDED_PENDING,9c,ACCEPTANCE,Human/device judgment; fixtures distinct; batch 5b dark 200% capture shows shared header date abbreviation,NOT_STARTED
+U2,People hierarchy,COMPLETE_BOUNDED_QA,6,DESIGN_COMMITMENT,Four mapped people families grouped; selected S24 actions and representative long signed-balance fixtures passed; phone acceptance remains phase 5,DONE
+U3,Personal-security grouping,COMPLETE_BOUNDED_QA,4,DESIGN_COMMITMENT,Five roles grouped + 4â€“12-digit PIN setup aligned; S24 11 focused and host 2 focused passed,DONE
+U4,Entity/record detail grouping,COMPLETE_BOUNDED_QA,5b+6,DESIGN_COMMITMENT,Record and product details grouped in 5b; four people detail families grouped in 6 with existing actions retained,DONE
+U5,Management grouping,COMPLETE_BOUNDED_QA,7,DESIGN_COMMITMENT,Five mapped implementation files grouped; 20 selected S24 contracts and 3 Sync text/busy fixtures passed; named visual tails retained phase 5,DONE
+A1,Uncoached shop day/pilot,AUTOMATED_STORY_ACCEPTED_UNCOACHED_PENDING,9a,LIVE_PILOT,9a0 independent oracle and 9a1 four selected A06 methods accepted; uncoached staff and intended-device handover remain distinct; batch4 separate Shop Day QA prepared on A06/S24; Overview OperatorToday countreceipt captures accepted; actual human outcomes pending,IN_PROGRESS
+A2,Current app recovery rehearsal,CURRENT_ISOLATED_RESTORE_VERIFIED,8b4,LIVE_PILOT,Ten selected A06 checks pass including exact rows typed preferences wrong-password preservation file-backed reopen and sync planning/security; historical Drive/interruption credited,COMPLETE_BOUNDED_QA
+A3,Two-phone full-ledger convergence,COMPLETE_BOUNDED_ONLINE_OFFLINE_CLOSE_RECOVERY_QA,9b,TWO_DEVICE,9b1 online18-table proof; 9b2 actual outage and staged closing eight20-table checkpoints; 9b3 missed-success-response/fresh-process retry and newly emitted FIFO queued history six20-table checkpoints accepted; exact history/refusal/cleanup integrity; old affected feeds conditional C03; no power-loss claim,DONE
+A4,Appearance/motion/haptics/platform prompt,REPRESENTATIVE_A06_DEVICE_CHECKS_ACCEPTED_HUMAN_PENDING,9c,ACCEPTANCE,9c1 portrait PIN Back isolation vibration history ten route cycles and real phone-security setup Back cancellation passed; perceived motion haptics and enrolled authentication remain human checks; batch4 separate Shop Day QA prepared on A06/S24; Overview OperatorToday countreceipt captures accepted; actual human outcomes pending,IN_PROGRESS
 A5,Frozen-candidate validation record,RECORDED_PENDING,10,FORMAL_RELEASE,Affected tests throughout; no broad suite now,NOT_STARTED
 A6,Commit/sign/install accepted build,CONFIRMED,10,SHIP_CURRENT_UI,Only post-b379f67 changes unpublished,NOT_STARTED
 A7,PROD administration acceptance,CONDITIONAL,8c,PROD_ADMIN_USED,Existing real DEV checks credited; disposable identity only,NOT_STARTED
 A8,Historical partial-record recovery,CONDITIONAL,9-history,AFFECTED_HISTORY_EXISTS,Authoritative UIDs/history needed; no guessed replay,NOT_STARTED
-A9,Native accessibility/IME/text,RECORDED_PENDING,9c,USED_SHOP_TASKS,Selected representative flows; no exhaustive crawl,NOT_STARTED
-A10,Release readiness/profiles,PARTIAL,10,WIDER_RELEASE,Existing signing/cutover credited; optimize on evidence,NOT_STARTED
+A9,Native accessibility/IME/text,SALE_REAL_IME_ACCEPTED_HUMAN_TEXT_TALKBACK_PENDING,9c,USED_SHOP_TASKS,9c1 Sale keyboard visibility Done focus and dismissal passed on A06; existing larger-text fixtures credited; actual large-text and TalkBack acceptance remain; batch4 separate Shop Day QA prepared on A06/S24; Overview OperatorToday countreceipt captures accepted; actual human outcomes pending,IN_PROGRESS
+A10,Release readiness/profiles,PARTIAL,10,WIDER_RELEASE,Existing signing/cutover credited; optimize on evidence; batch4 separate Shop Day QA prepared on A06/S24; Overview OperatorToday countreceipt captures accepted; actual human outcomes pending,NOT_STARTED
 A11,Physical power-loss experiment,OPTIONAL,DURABILITY_LATER,IF_REQUIRED,Process-death proof does not cover physical power loss,NOT_STARTED
-O1,Server source/DR acceptance,RECORDED_PENDING,8b,LIVE_SYNC_RECOVERY,Verify remote before publishing,NOT_STARTED
-O2,Keepalive/quota/monitoring,VERIFY_FIRST,8c,OPERATIONS,Current plan/repo visibility/workflow state first,NOT_STARTED
-O3,Shared shop-device setup,RECORDED_PENDING,8c,PILOT_DEVICE,Cashier transport tier already exists,NOT_STARTED
-O4,Provider/security/delete policies,POLICY,8c,APPLICABLE_POLICY,Concrete read-only preflight before any change,NOT_STARTED
-O5,Later Viewer UI publication,VERIFY_FIRST,8c,VIEWER_PRESENTATION,Local b5122e8; deployment not freshly verified,NOT_STARTED
-O6,Signing-key/release recovery docs,RECORDED_PENDING,8b+10,RELEASE_RECOVERY,Off-machine key backup already verified historically,NOT_STARTED
+O1,Server source/DR acceptance,BACKUP_ACCEPTED_RECOVERY_PROPOSAL_VERIFIED_HOSTED_PENDING,8b3c_ISOLATED_ROUTE,LIVE_SYNC_RECOVERY,13-file recovery proposal verified; Free quota full and quote tools unavailable; hosted Auth and publication await exact isolated-route authorization; app restore complete and independent shop-day baseline next,IN_PROGRESS
+O2,Keepalive/quota/monitoring,CURRENT_VISIBILITY_VERIFIED,8c1,OPERATIONS,Free healthy projects and successful DEV/PROD keepalive verified; raw DB size recorded; full provider usage totals unmeasured,COMPLETE_BOUNDED_PREFLIGHT
+O3,Shared shop-device setup,LOCAL_COPY_BOUNDARIES_COMPLETE_ACTUAL_HANDOVER_PENDING,9+10,PILOT_DEVICE,Setup note and five-role lock/sync copy verified; cashier transport limits explicit; intended ordinary device credentials/enrollment and handover remain pending,IN_PROGRESS
+O4,Provider/security/delete policies,CURRENT_POLICY_BASELINE_RECORDED,8c1,APPLICABLE_POLICY,Advisors and provider session/pause/delete/paid password-protection limits recorded; no settings or policy changes,COMPLETE_BOUNDED_PREFLIGHT
+O5,Later Viewer UI publication,ALREADY_LIVE_CURRENTLY_VERIFIED,8c1,VIEWER_PRESENTATION,Production dpl_C13bg6 and repo main b5122e8 freshly verified; no republish; reset production separate,DONE
+O6,Signing-key/release recovery docs,OPERATOR_RECOVERY_NOTE_COMPLETE_RELEASE_PROOF_PENDING,10,RELEASE_RECOVERY,8b4 note separates app/server/signing recovery; historical off-machine proof credited; current custody and recovered-key signing remain phase 6,IN_PROGRESS
 E1,Dormant WebView/presentation removal,DEFERRED,CLEANUP_LATER,NOT_PILOT_GATE,M28; cutover/command extraction done,NOT_STARTED
 E2,State/DI/toolchain/preview notes,DEFERRED,ENGINEERING_LATER,NOT_PILOT_GATE,M30/M31/M32/M35 in separate subruns,NOT_STARTED
 E3,Inventory nondeterminism,VERIFY_FIRST,ENGINEERING_LATER,IF_REPRODUCED,Current passes not reopened without evidence,NOT_STARTED

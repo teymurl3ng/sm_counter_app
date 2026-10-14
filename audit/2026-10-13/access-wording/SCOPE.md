@@ -1,0 +1,3 @@
+# 8c2 — access wording and two preservation checks
+
+Five More menu action labels/details and Owner Sync status/offline/stop-sync explanations only. Share the short lock/sync copy, keep all actions/tags/roles/14-day policy/portrait geometry. Add two synthetic tests that compare full saved rows/outbox/Room identity before/after local sign-out and stop-sync (including unavailable remote logout). Strengthen existing menu/Sync assertions, select those five roles plus stop dialog/action and larger-text Sync fixtures. No real enrollment, server/ordinary app/Drive mutation, credential/reset change, central revoke, flag toggle, new feature or broad suite. Stop at selected A06 result.

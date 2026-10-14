@@ -463,9 +463,9 @@ Schema version: %3$d</string>
     <string name="native_payment_destination">Payment destination</string>
     <string name="native_paid_now">Paid now</string>
     <string name="native_cash">Cash</string>
-    <string name="native_customer_account">Customer account</string>
-    <string name="native_choose_customer_account">Choose customer account</string>
-    <string name="native_customer_required">Required for a customer-account sale</string>
+    <string name="native_customer_account">Credit</string>
+    <string name="native_choose_customer_account">Choose customer</string>
+    <string name="native_customer_required">Required for a credit sale</string>
     <string name="native_sale_added_to_balance">This sale will be added to their balance</string>
     <string name="native_choose">Choose</string>
     <string name="native_change">Change</string>

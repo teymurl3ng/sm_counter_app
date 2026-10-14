@@ -17,4 +17,10 @@ Two production files: CashierSaleScreen.kt and values/strings.xml. Sale calculat
 
 ## Verification and delivery limits
 
-Source diff reviewed and whitespace checked. `:app:compileDebugKotlin -Psaaf.instrumentationSandbox=true` succeeded (42 seconds; no tests). Functional tests and visual phone acceptance remain deferred at the user's request. No phone installation, commit or push were performed for this sale cleanup. The phones retain the earlier security/header repair build.
+Source diff reviewed and whitespace checked. `:app:compileDebugKotlin -Psaaf.instrumentationSandbox=true` succeeded (42 seconds; no tests). Functional tests and visual phone acceptance remain deferred at the user's request.
+
+## Requested commit and installation
+
+Source committed as `d2928710ca8d96602d2fb0a2dbe20d31dad2110e`, including the prior recovery/header/Quick PIN setup fixes. `:app:assembleRelease` then succeeded; the signed regular 0.4.2/code 6 build has the existing release certificate, preview fixtures disabled and embedded Git SHA matching this commit. PACKAGE_MANIFEST.json records source and APK hashes.
+
+S24 was the only connected phone. It received a normal-profile `install -r --user 0` update, without uninstalling or clearing app data. Its installed APK hash and version match the verified artifact, and the launcher opened. A06 was disconnected and retains the prior build. INSTALLED.json records the exact result. No functional tests or Git push ran. Installation does not establish broader business-data, visual or staff acceptance.

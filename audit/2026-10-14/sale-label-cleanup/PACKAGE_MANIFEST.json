@@ -1,0 +1,19 @@
+{
+  "package": "com.saaf.milkshop",
+  "versionCode": 6,
+  "versionName": "0.4.2",
+  "sourceCommit": "d2928710ca8d96602d2fb0a2dbe20d31dad2110e",
+  "sourceHashes": {
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/auth/NativeAuthenticationScreens.kt": "f463533bf2b460ef0403a3b0ffba43cd253971a7851c5fa12de5e4088dbef9ba",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/NativeChrome.kt": "4ccd1ee20c8c70b7864a87a90d8fddd8f39ac99039821d11407dfdcc242b31ef",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/NativePersonalSecurityPanel.kt": "cf6af5af7cb06fc4cc36a9d41ac1232876705a465391fddd855605778489bddd",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/sale/CashierSaleScreen.kt": "0f36849a4443958380d6f601268f27fe4bee4fd092b6f1b034983ac0068bf772",
+    "phase18/app/src/main/res/values/strings.xml": "602d719b7033cb8d21d506ea2477c3ee2ca0f18790e966db56ca1a7572442d49"
+  },
+  "apk": "Saaf-Milk-0.4.2-ui-cleanup.apk",
+  "apkSha256": "225ecf6fb10e6526057300b42ed25f551046e18c5dcc0ba05b5d113eb292c59b",
+  "signingCertificateSha256": "9c9e03d7969d79018e2880b79b8d9ec46c43ab50eaf30512ee3fb989bc6abfa1",
+  "debuggable": false,
+  "previewFixtures": false,
+  "scope": "Committed recovery/header/Quick PIN setup fixes and sale presentation cleanup; functional tests deferred"
+}

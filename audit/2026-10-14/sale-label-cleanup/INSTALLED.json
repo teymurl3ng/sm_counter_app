@@ -1,0 +1,17 @@
+{
+  "sourceCommit": "d2928710ca8d96602d2fb0a2dbe20d31dad2110e",
+  "package": "com.saaf.milkshop",
+  "devices": [
+    {
+      "name": "S24",
+      "serial": "RFCX116CYYX",
+      "normalProfile": 0,
+      "install": "install -r --user 0",
+      "apkSha256": "225ecf6fb10e6526057300b42ed25f551046e18c5dcc0ba05b5d113eb292c59b",
+      "launcherStarted": true
+    }
+  ],
+  "unavailable": [
+    "A06"
+  ]
+}

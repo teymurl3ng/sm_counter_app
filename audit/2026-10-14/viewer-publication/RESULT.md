@@ -1,0 +1,13 @@
+# Guarded-reset Viewer publication — 14 October 2026
+
+The four reviewed Viewer files were published to private `teymurl3ng/sm-server-view` main at `d2c94e15070eeee78628a9513b2eb7270b6bf950`. Remote main was read back and matched. The candidate checkout stayed clean; its four file hashes match the earlier publication manifest. No Viewer implementation changes or new functional tests were needed in this run.
+
+The Git push automatically deployed that commit to production in MKRC's existing sm-server-view project (`prj_x3nKY8gE7Qllsl5Dvf0oyoivjIsR`). Deployment `dpl_5mXUBaWUGDBtcLBGkcjSsLdWK8m5` is READY and is the project's production target. All three aliases point to it: sm-server-view.vercel.app, sm-server-view-mkrc.vercel.app and sm-server-view-git-main-mkrc.vercel.app. No manual promotion or rebuild was needed. The earlier CLI-created candidate had held one alias while the project's production target was still an older commit; the Git deployment resolved that mismatch.
+
+Read-only catalog inspection on exact PROD `tlsuxbghuhlqntkgtrxt` confirms all eight reset-function bodies match the approved migration, empty search paths, the expected public function permissions, inaccessible private schema, two protected RLS tables and the enabled staff-change guard trigger. No database write, migration reapplication, Auth call or real password reset occurred. This establishes the installed guard's identity/configuration, not its full functional acceptance.
+
+Vercel's production URL/environment entries exist but their values are masked even in the authenticated API; `final.json` explicitly records them as unreadable and their value match as unknown. Source, production deployment/aliases and PROD guard have been independently verified. Authenticated runtime proof of the Viewer-to-server connection, browser permissions/reset outcomes and live credential acceptance remain with the already deferred tests. They were not silently performed or marked passed.
+
+The Vercel connector returned scope-access denial; the already authenticated CLI successfully resolved the intended MKRC project and supplied the narrow metadata reads. No reauthentication, secret retrieval, environment/protection modification, unrelated rollout, phone installation, billing change or hosted recovery test was performed. Metadata captures exclude environment values and Git credential IDs.
+
+Publication is complete within finish batch 6. Batch 6 remains open for its deferred functional/browser/production acceptance. Other batches retain their existing status. The ordinary S24 app remains the Credit-label build from source 305a91d; A06 update and final handover/custody remain outstanding.

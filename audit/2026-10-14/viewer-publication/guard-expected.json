@@ -1,0 +1,10 @@
+{
+  "credential_reset_private.guard_staff_change": "f1ab7ba1e142e972ca082c7fc596ffa8",
+  "credential_reset_private.begin_reset": "3edab0cddf5a64a9ffddcd3da3830052",
+  "public.admin_begin_credential_reset": "41d6ded3949a2f29287d9e92bc510e0a",
+  "public.admin_begin_maintenance_credential_reset": "40835ca8c9fa22fae6e083370c27f68e",
+  "public.admin_claim_credential_reset": "592d9384446bd3fd2a21388f1fe732fc",
+  "public.admin_mark_credential_reset_uncertain": "4ee4991507ea1d121b3c1f5a490769f9",
+  "public.admin_find_pending_credential_reset": "cd4345c812f4b5bf8427b2847a5e1665",
+  "public.admin_finish_credential_reset": "395719ec1137c38b3bdc857b1ba4ee32"
+}

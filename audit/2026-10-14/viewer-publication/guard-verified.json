@@ -1,0 +1,148 @@
+{
+  "project": "tlsuxbghuhlqntkgtrxt",
+  "functionBodiesMatch": true,
+  "functionConfiguration": true,
+  "publicExecutePermissions": true,
+  "privateSchemaInaccessible": true,
+  "privateTablesProtected": true,
+  "guardTriggerEnabled": true,
+  "catalog": {
+    "functions": [
+      {
+        "name": "credential_reset_private.begin_reset",
+        "args": "p_target uuid, p_request uuid, p_actor_auth uuid, p_maintenance boolean",
+        "body_md5": "3edab0cddf5a64a9ffddcd3da3830052",
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon_exec": false,
+        "authenticated_exec": false,
+        "service_exec": false
+      },
+      {
+        "name": "credential_reset_private.guard_staff_change",
+        "args": "",
+        "body_md5": "f1ab7ba1e142e972ca082c7fc596ffa8",
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon_exec": false,
+        "authenticated_exec": false,
+        "service_exec": false
+      },
+      {
+        "name": "public.admin_begin_credential_reset",
+        "args": "p_staff_id uuid, p_request_id uuid",
+        "body_md5": "41d6ded3949a2f29287d9e92bc510e0a",
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon_exec": false,
+        "authenticated_exec": true,
+        "service_exec": false
+      },
+      {
+        "name": "public.admin_begin_maintenance_credential_reset",
+        "args": "p_staff_id uuid, p_request_id uuid",
+        "body_md5": "40835ca8c9fa22fae6e083370c27f68e",
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon_exec": false,
+        "authenticated_exec": false,
+        "service_exec": true
+      },
+      {
+        "name": "public.admin_claim_credential_reset",
+        "args": "p_request_id uuid",
+        "body_md5": "592d9384446bd3fd2a21388f1fe732fc",
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon_exec": false,
+        "authenticated_exec": false,
+        "service_exec": true
+      },
+      {
+        "name": "public.admin_find_pending_credential_reset",
+        "args": "p_staff_id uuid",
+        "body_md5": "cd4345c812f4b5bf8427b2847a5e1665",
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon_exec": false,
+        "authenticated_exec": false,
+        "service_exec": true
+      },
+      {
+        "name": "public.admin_finish_credential_reset",
+        "args": "p_request_id uuid, p_outcome text",
+        "body_md5": "395719ec1137c38b3bdc857b1ba4ee32",
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon_exec": false,
+        "authenticated_exec": false,
+        "service_exec": true
+      },
+      {
+        "name": "public.admin_mark_credential_reset_uncertain",
+        "args": "p_request_id uuid, p_code text",
+        "body_md5": "4ee4991507ea1d121b3c1f5a490769f9",
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon_exec": false,
+        "authenticated_exec": false,
+        "service_exec": true
+      }
+    ],
+    "schema": {
+      "anon_usage": false,
+      "authenticated_usage": false,
+      "service_usage": false
+    },
+    "tables": [
+      {
+        "name": "participants",
+        "rls": true,
+        "anon_select": false,
+        "authenticated_select": false,
+        "service_select": false,
+        "constraints": [
+          "PRIMARY KEY (staff_id)",
+          "FOREIGN KEY (request_id) REFERENCES credential_reset_private.requests(id)",
+          "FOREIGN KEY (staff_id) REFERENCES staff(id)"
+        ]
+      },
+      {
+        "name": "requests",
+        "rls": true,
+        "anon_select": false,
+        "authenticated_select": false,
+        "service_select": false,
+        "constraints": [
+          "FOREIGN KEY (business_id) REFERENCES businesses(id)",
+          "FOREIGN KEY (caller_staff_id) REFERENCES staff(id)",
+          "PRIMARY KEY (id)",
+          "CHECK ((state = ANY (ARRAY['reserved'::text, 'dispatching'::text, 'uncertain'::text, 'completed'::text, 'not_applied'::text])))",
+          "FOREIGN KEY (target_staff_id) REFERENCES staff(id)",
+          "CHECK ((uncertainty_code = ANY (ARRAY['AUTH_UNREACHABLE'::text, 'AUTH_UNKNOWN'::text])))"
+        ]
+      }
+    ],
+    "trigger": {
+      "enabled": "O",
+      "definition": "CREATE TRIGGER staff_credential_reset_guard BEFORE DELETE OR UPDATE ON public.staff FOR EACH ROW EXECUTE FUNCTION credential_reset_private.guard_staff_change()",
+      "function": "credential_reset_private.guard_staff_change"
+    }
+  }
+}

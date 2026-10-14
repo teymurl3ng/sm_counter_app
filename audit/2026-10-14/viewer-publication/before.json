@@ -1,0 +1,203 @@
+{
+  "preparedDeployment": {
+    "id": "dpl_9A3Bs3kVwzmgUvvuGNuXsdF5Rc7R",
+    "url": "sm-server-view-fvh5r0ooi-mkrc.vercel.app",
+    "readyState": "READY",
+    "target": "production",
+    "projectId": "prj_x3nKY8gE7Qllsl5Dvf0oyoivjIsR",
+    "alias": [
+      "sm-server-view-mkrc.vercel.app"
+    ],
+    "aliasAssigned": true,
+    "aliasError": null,
+    "gitSource": null,
+    "sourceMetadata": {
+      "githubCommitRef": "main",
+      "githubCommitSha": "d2c94e15070eeee78628a9513b2eb7270b6bf950",
+      "githubRepo": "sm-server-view"
+    },
+    "envNames": []
+  },
+  "project": {
+    "id": "prj_x3nKY8gE7Qllsl5Dvf0oyoivjIsR",
+    "name": "sm-server-view",
+    "accountId": "team_4S1INLjqHa6cjTQCbHxuAt6l",
+    "gitLink": {
+      "type": "github",
+      "repo": "sm-server-view",
+      "org": "teymurl3ng",
+      "productionBranch": "main"
+    },
+    "productionTarget": {
+      "id": "dpl_C13bg6KbNN1mCsCCbKqbVc3MLHts",
+      "url": "sm-server-view-lxv79iqpk-mkrc.vercel.app",
+      "readyState": "READY",
+      "target": "production",
+      "projectId": null,
+      "alias": [
+        "sm-server-view.vercel.app",
+        "sm-server-view-mkrc.vercel.app",
+        "sm-server-view-git-main-mkrc.vercel.app"
+      ],
+      "aliasAssigned": 1791652433524,
+      "aliasError": null,
+      "gitSource": null,
+      "sourceMetadata": {
+        "githubCommitRef": "main",
+        "githubCommitSha": "b5122e820ebb79f18c3288a5e4a49805911e7f02",
+        "githubRepo": "sm-server-view"
+      },
+      "envNames": []
+    },
+    "protectionConfigured": false,
+    "environmentKeys": [
+      {
+        "key": "ACCOUNT_SERVER_URL",
+        "target": [
+          "preview"
+        ],
+        "id": "ObJXLe1W7Zzwb2TR",
+        "type": "sensitive"
+      },
+      {
+        "key": "ACCOUNT_SERVER_URL",
+        "target": [
+          "development"
+        ],
+        "id": "DDDLXFQpdlfGfL7q",
+        "type": "encrypted"
+      },
+      {
+        "key": "ACCOUNT_SERVER_PUBLISHABLE_KEY",
+        "target": [
+          "preview"
+        ],
+        "id": "5h79cDoSxJTjjTNI",
+        "type": "sensitive"
+      },
+      {
+        "key": "ACCOUNT_SERVER_PUBLISHABLE_KEY",
+        "target": [
+          "development"
+        ],
+        "id": "o7MnA1pnW13D8VmI",
+        "type": "encrypted"
+      },
+      {
+        "key": "ACCOUNT_SERVER_ENV",
+        "target": [
+          "preview"
+        ],
+        "id": "Y8v8zquA3saxVRdw",
+        "type": "sensitive"
+      },
+      {
+        "key": "ACCOUNT_SERVER_ENV",
+        "target": [
+          "development"
+        ],
+        "id": "ipYv4xbBSWFqjRUE",
+        "type": "encrypted"
+      },
+      {
+        "key": "ACCOUNT_SERVER_CONTRACT",
+        "target": [
+          "preview"
+        ],
+        "id": "HqouXyqp9b7YI023",
+        "type": "sensitive"
+      },
+      {
+        "key": "ACCOUNT_SERVER_CONTRACT",
+        "target": [
+          "development"
+        ],
+        "id": "EwcLWDq2rBeZ4GdI",
+        "type": "encrypted"
+      },
+      {
+        "key": "FAKE_DOMAIN",
+        "target": [
+          "preview"
+        ],
+        "id": "NuzaRjGblATsLNfQ",
+        "type": "sensitive"
+      },
+      {
+        "key": "FAKE_DOMAIN",
+        "target": [
+          "development"
+        ],
+        "id": "DG2486J0YdbHbc1H",
+        "type": "encrypted"
+      },
+      {
+        "key": "ACCOUNT_SERVER_URL",
+        "target": [
+          "production"
+        ],
+        "id": "TJeodXEYcuELzXvl",
+        "type": "sensitive"
+      },
+      {
+        "key": "ACCOUNT_SERVER_PUBLISHABLE_KEY",
+        "target": [
+          "production"
+        ],
+        "id": "LdHiX5kfDDj32jNQ",
+        "type": "sensitive"
+      },
+      {
+        "key": "ACCOUNT_SERVER_ENV",
+        "target": [
+          "production"
+        ],
+        "id": "kZy6uOanH4BRcW99",
+        "type": "sensitive"
+      },
+      {
+        "key": "ACCOUNT_SERVER_CONTRACT",
+        "target": [
+          "production"
+        ],
+        "id": "torzdCZJM0iFgr2Y",
+        "type": "sensitive"
+      },
+      {
+        "key": "FAKE_DOMAIN",
+        "target": [
+          "production"
+        ],
+        "id": "8ywNmqKomhhOPiQJ",
+        "type": "sensitive"
+      },
+      {
+        "key": "ACCOUNT_SERVER_ADMIN_KEY",
+        "target": [
+          "production"
+        ],
+        "id": "Qa7r4oQJ7hjJ1ZWP",
+        "type": "sensitive"
+      },
+      {
+        "key": "ACCOUNT_SERVER_ADMIN_KEY",
+        "target": [
+          "preview"
+        ],
+        "id": "DCCTHeWT27EQcGZb",
+        "type": "sensitive"
+      }
+    ]
+  },
+  "alias": {
+    "alias": "sm-server-view-mkrc.vercel.app",
+    "deploymentId": "dpl_9A3Bs3kVwzmgUvvuGNuXsdF5Rc7R",
+    "projectId": "prj_x3nKY8gE7Qllsl5Dvf0oyoivjIsR",
+    "deployment": {
+      "id": "dpl_9A3Bs3kVwzmgUvvuGNuXsdF5Rc7R",
+      "url": "sm-server-view-fvh5r0ooi-mkrc.vercel.app"
+    }
+  },
+  "sourceHashesMatch": true,
+  "sourceCommit": "d2c94e15070eeee78628a9513b2eb7270b6bf950"
+}

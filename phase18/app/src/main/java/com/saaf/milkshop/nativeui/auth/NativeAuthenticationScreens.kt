@@ -143,7 +143,8 @@ fun NativeAuthenticationHost(
         onBackFromPassphrase, onBackFromQuickPin)
     val focus = LocalFocusManager.current
     LaunchedEffect(state::class) { focus.clearFocus() }
-    AccessFrame(frame.title, frame.subtitle, frame.back, frame.backTag, modifier) {
+    AccessFrame(frame.title, frame.subtitle, frame.back, frame.backTag, modifier,
+        showMerchantLabel = state !is NativeAuthenticationState.RecoveryCode) {
     CompositionLocalProvider(LocalAccessContentOnly provides true) {
     NativeSectionTransition(
         targetState = state,
@@ -625,6 +626,7 @@ private fun RecoveryCodeScreen(
         subtitle = "$displayName, store this code somewhere private. It is shown only once.",
         onBack = null,
         modifier = modifier,
+        showMerchantLabel = false,
     ) {
         Surface(
             color = MaterialTheme.colorScheme.primaryContainer,
@@ -690,6 +692,7 @@ private fun AccessFrame(
     onBack: (() -> Unit)?,
     backTag: String = NativeUiTags.AuthBackToWelcome,
     modifier: Modifier = Modifier,
+    showMerchantLabel: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     if (LocalAccessContentOnly.current) {
@@ -725,10 +728,12 @@ private fun AccessFrame(
                     }
                 }
                 // Text semantics retains the complete shop name even when the toolbar ellipsizes.
-                Text(com.saaf.milkshop.nativeui.common.LocalShopName.current,
-                    modifier = Modifier.weight(1f), style = toolbarStyle,
-                    color = MaterialTheme.colorScheme.primary,
-                    maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (showMerchantLabel) {
+                    Text(com.saaf.milkshop.nativeui.common.LocalShopName.current,
+                        modifier = Modifier.weight(1f), style = toolbarStyle,
+                        color = MaterialTheme.colorScheme.primary,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
             }
             Column(
                 modifier = Modifier

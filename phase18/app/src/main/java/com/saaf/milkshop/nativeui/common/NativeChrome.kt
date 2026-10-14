@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
@@ -62,7 +63,7 @@ fun NativeChromeBand(
                 if (reserveNavigationSpace || navigation != null) {
                     Box(Modifier.width(48.dp), contentAlignment = Alignment.CenterStart) { navigation?.invoke() }
                 }
-                Text(title, modifier = Modifier.weight(1f), style = titleStyle,
+                Text(title, modifier = Modifier.weight(1f).offset(y = 8.dp), style = titleStyle,
                     maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             Row(Modifier.fillMaxWidth().height(contextHeight), verticalAlignment = Alignment.CenterVertically) {

@@ -1,0 +1,15 @@
+{
+  "serial": "RFCX116CYYX",
+  "methods": [
+    "com.saaf.milkshop.NativeSecurityImeTraceTest#pinSetupKeyboardTrace"
+  ],
+  "tests": [
+    {
+      "test": "pinSetupKeyboardTrace",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "returncode": 0,
+  "passed": 1
+}

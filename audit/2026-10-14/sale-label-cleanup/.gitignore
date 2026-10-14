@@ -1,0 +1,4 @@
+compile-build.txt
+release-build.txt
+*.apk
+installed-*-console.txt

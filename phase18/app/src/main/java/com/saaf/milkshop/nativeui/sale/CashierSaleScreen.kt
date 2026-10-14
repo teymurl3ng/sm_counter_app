@@ -407,15 +407,12 @@ internal fun SaleEntryContent(
                     )
                     Spacer(Modifier.height(10.dp))
                 }
-                SectionHeading(
-                    title = stringResource(R.string.native_product),
-                    supporting = stringResource(R.string.native_switch_product),
-                    stacked = useStackedLayout,
-                )
                 ProductSelector(
                     products = context.products,
                     selectedProductId = product?.productId,
                     stacked = useStackedLayout,
+                    wholesale = wholesale,
+                    wholesaleRatePaisa = wholesaleRatePaisa,
                     onSelected = { option ->
                         selectedProductId = option.productId
                         leaveGuard.markDirty()
@@ -425,7 +422,6 @@ internal fun SaleEntryContent(
 
 
                 SectionDivider()
-                SectionHeading(title = stringResource(R.string.native_enter_sale))
                 EntryModeSelector(
                     selected = entryMode,
                     onSelected = { nextMode ->
@@ -489,12 +485,7 @@ internal fun SaleEntryContent(
                     },
                 )
                 Spacer(Modifier.height(6.dp))
-                EntryCalculationRow(
-                    rate = stringResource(
-                        R.string.native_entry_rate_format,
-                        formatAmount(rate),
-                        quantityUnit,
-                    ),
+                EntryCalculationResult(
                     result = if (entryMode == EntryMode.Quantity) {
                         stringResource(R.string.native_sale_total_format, totalText)
                     } else {
@@ -504,11 +495,9 @@ internal fun SaleEntryContent(
                             quantityUnit,
                         )
                     },
-                    stacked = useStackedLayout,
                 )
 
                 SectionDivider()
-                SectionHeading(title = stringResource(R.string.native_payment_destination))
                 PaymentSelector(
                     paidNowTitle = stringResource(R.string.native_paid_now),
                     paidNowDetail = paidNowAccount?.name ?: "Unavailable",
@@ -912,45 +901,12 @@ private fun formatAmountInput(value: Double): String = when {
 }
 
 @Composable
-private fun SectionHeading(title: String, supporting: String? = null, stacked: Boolean = false) {
-    if (stacked && supporting != null) {
-        Column(modifier = Modifier.fillMaxWidth().padding(bottom = 7.dp)) {
-            Text(
-                text = title.uppercase(),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(
-                text = supporting,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    } else Row(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 7.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = title.uppercase(),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        if (supporting != null) {
-            Spacer(Modifier.weight(1f))
-            Text(
-                text = supporting,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
 private fun ProductSelector(
     products: List<NativeSaleProduct>,
     selectedProductId: Long?,
     stacked: Boolean,
+    wholesale: Boolean,
+    wholesaleRatePaisa: Long?,
     onSelected: (NativeSaleProduct) -> Unit,
 ) {
     if (products.isEmpty()) {
@@ -966,10 +922,9 @@ private fun ProductSelector(
         val selected = products.firstOrNull { it.productId == selectedProductId } ?: products.first()
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             ProductCard(selected, selected = true,
+                wholesale = wholesale, wholesaleRatePaisa = wholesaleRatePaisa, opensPicker = true,
                 onClick = com.saaf.milkshop.nativeui.common.hapticAction { search = ""; pickerOpen = true },
                 modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.CashierProductPickerOpen))
-            Text("Tap to choose from ${products.size} products", style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         if (pickerOpen) {
             AlertDialog(
@@ -988,6 +943,7 @@ private fun ProductSelector(
                             if (visible.isEmpty()) item { Text("No matching products") }
                             items(visible, key = { it.productId }) { option ->
                                 ProductCard(option, option.productId == selectedProductId,
+                                    wholesale = wholesale, wholesaleRatePaisa = wholesaleRatePaisa,
                                     onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction {
                                         onSelected(option)
                                         pickerOpen = false
@@ -1012,6 +968,8 @@ private fun ProductSelector(
                 ProductCard(
                     product = option,
                     selected = selectedProductId == option.productId,
+                    wholesale = wholesale,
+                    wholesaleRatePaisa = wholesaleRatePaisa,
                     onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelected(option) },
                     modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.cashierProduct(option.name)),
                 )
@@ -1026,6 +984,8 @@ private fun ProductSelector(
                 ProductCard(
                     product = option,
                     selected = selectedProductId == option.productId,
+                    wholesale = wholesale,
+                    wholesaleRatePaisa = wholesaleRatePaisa,
                     onClick = com.saaf.milkshop.nativeui.common.hapticSelectionAction { onSelected(option) },
                     modifier = Modifier.weight(1f).testTag(NativeUiTags.cashierProduct(option.name)),
                 )
@@ -1048,8 +1008,14 @@ private fun ProductCard(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    wholesale: Boolean = false,
+    wholesaleRatePaisa: Long? = null,
+    opensPicker: Boolean = false,
 ) {
     val context = LocalContext.current
+    val usesWholesale = selected && wholesale
+    val displayedRatePaisa = if (usesWholesale) wholesaleRatePaisa else product.ratePaisaPerUnit
+    val hasPrice = displayedRatePaisa != null && displayedRatePaisa > 0L
     Surface(
         color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
         contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
@@ -1070,18 +1036,30 @@ private fun ProductCard(
             Text(text = product.name, style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold)
             Text(
-                text = if (product.ratePaisaPerUnit <= 0L) "No retail price. Set a price in Products."
-                    else "PKR ${formatAmount(product.ratePaisaPerUnit / 100.0)} / ${product.unit.toDisplayUnit()}",
-                style = if (product.ratePaisaPerUnit <= 0L) MaterialTheme.typography.bodyMedium
+                text = when {
+                    usesWholesale && !hasPrice -> stringResource(R.string.native_enter_wholesale_rate)
+                    !hasPrice -> "No retail price. Set a price in Products."
+                    usesWholesale -> stringResource(R.string.native_wholesale_price_format,
+                        formatAmount(requireNotNull(displayedRatePaisa) / 100.0), product.unit.toDisplayUnit())
+                    else -> "PKR ${formatAmount(requireNotNull(displayedRatePaisa) / 100.0)} / ${product.unit.toDisplayUnit()}"
+                },
+                style = if (!hasPrice) MaterialTheme.typography.bodyMedium
                     else com.saaf.milkshop.nativeui.theme.nativeMetricTextStyle(),
                 color = if (selected) MaterialTheme.colorScheme.onPrimary
-                    else if (product.ratePaisaPerUnit <= 0L) MaterialTheme.colorScheme.onSurfaceVariant
+                    else if (!hasPrice) MaterialTheme.colorScheme.onSurfaceVariant
                     else com.saaf.milkshop.nativeui.theme.nativeVisualColors.metric,
             )
             Text("${product.quantityOnHand} in stock",
                 style = com.saaf.milkshop.nativeui.theme.nativeSupportingTextStyle(),
                 color = if (selected) MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f)
                     else com.saaf.milkshop.nativeui.theme.nativeVisualColors.supporting)
+            if (opensPicker) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.native_change_product),
+                        style = MaterialTheme.typography.labelLarge, modifier = Modifier.weight(1f))
+                    Icon(Icons.Outlined.ExpandMore, contentDescription = null)
+                }
+            }
         }
     }
 }
@@ -1266,36 +1244,13 @@ private fun QuantityEditor(
 }
 
 @Composable
-private fun EntryCalculationRow(
-    rate: String,
+private fun EntryCalculationResult(
     result: String,
-    stacked: Boolean,
 ) {
-    if (stacked) {
-        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)) {
-            Text(
-                text = rate,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(
-                text = result,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
-            )
-        }
-        return
-    }
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.End,
     ) {
-        Text(
-            text = rate,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(1f),
-        )
         Text(
             text = result,
             style = MaterialTheme.typography.titleMedium,

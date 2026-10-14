@@ -1,0 +1,55 @@
+{
+  "sourceCommit": "3579bf5cfc49bbc7911f340ad2aa4a4f4ce05d04",
+  "userClarifications": {
+    "header": "Move title text lower",
+    "pinShape": "When PIN screen opens"
+  },
+  "planningOnly": true,
+  "runtimeCauseOfPinShape": "NOT_YET_VERIFIED",
+  "files": [
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/auth/NativeAuthenticationScreens.kt",
+      "sha256": "65527084d0a766eb6b166ffcecc4a02647ba3be7d8b4a5bca943d659b2e8a906"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/auth/QuickPinKeypad.kt",
+      "sha256": "d614a957836a217338d4b12257352a941dcd7eb0d1bb3b48c628a38c049c94ed"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/auth/NativeAuthenticationViewModel.kt",
+      "sha256": "c7f4ff55971864bdf3b121c071f9736c2510bf1fec0bb4bb82a98c1022e7e7f0"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/NativeChrome.kt",
+      "sha256": "9402c42643b356bbc346092d89f19dd4fbdb3c95d72a9f24c8a0f48f544fc733"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/ShopIdentity.kt",
+      "sha256": "e3ce1fee88a3c84d019fc83f3cfcccc5a0cddcef9b3cce1bb2cc9e0c95792201"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/NativeAsyncUi.kt",
+      "sha256": "e4de9379da73612c5176464fae1c4be4ce5d9812a67d8b858bf9a6e067e2fd82"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/NativePreviewActivity.kt",
+      "sha256": "4f968b9853abfc8ae4819e5bfcff41d1ef3ea945f66d8f95439cce02ddd6246d"
+    },
+    {
+      "path": "phase18/app/src/main/res/values/styles.xml",
+      "sha256": "4fc0235c2bc89b6c6ce7529e6d9e3ed37fc7c62c05462e47e11f39d7cec46e9e"
+    },
+    {
+      "path": "phase18/app/src/main/res/values-night/styles.xml",
+      "sha256": "d9c3ea9e7af8656f5afae17a8678c6202c40e7055031c837e1a1154c3d8582bf"
+    },
+    {
+      "path": "phase18/app/src/androidTest/java/com/saaf/milkshop/NativeQuickPinContractTest.kt",
+      "sha256": "c996cf770b7c6c006405b2ee48516a056f24eb7ec04e6bb7b5552b27ab7e1599"
+    },
+    {
+      "path": "phase18/app/src/androidTest/java/com/saaf/milkshop/NativeChromeGeometryTest.kt",
+      "sha256": "d12fd76ccba7cb41554d853cbb251373dc32b9a417a9716893189ed3c628b945"
+    }
+  ]
+}

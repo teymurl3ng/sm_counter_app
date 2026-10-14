@@ -1,0 +1,31 @@
+{
+  "package": "com.saaf.milkshop",
+  "baseCommit": "3579bf5cfc49bbc7911f340ad2aa4a4f4ce05d04",
+  "workingTreePresentationChanges": {
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/auth/NativeAuthenticationScreens.kt": "f463533bf2b460ef0403a3b0ffba43cd253971a7851c5fa12de5e4088dbef9ba",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/NativeChrome.kt": "4ccd1ee20c8c70b7864a87a90d8fddd8f39ac99039821d11407dfdcc242b31ef",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/NativePersonalSecurityPanel.kt": "cf6af5af7cb06fc4cc36a9d41ac1232876705a465391fddd855605778489bddd"
+  },
+  "devices": [
+    {
+      "name": "A06",
+      "serial": "R8VXA02SNKH",
+      "normalProfile": 0,
+      "install": "install -r --user 0",
+      "apkSha256": "01ae172f190c3fcccabcd88e8994b32d24f87d272207d690e3956ec04ec96f2b",
+      "versionName": "0.4.2",
+      "versionCode": 6,
+      "launcherStarted": true
+    },
+    {
+      "name": "S24",
+      "serial": "RFCX116CYYX",
+      "normalProfile": 0,
+      "install": "install -r --user 0",
+      "apkSha256": "01ae172f190c3fcccabcd88e8994b32d24f87d272207d690e3956ec04ec96f2b",
+      "versionName": "0.4.2",
+      "versionCode": 6,
+      "launcherStarted": true
+    }
+  ]
+}

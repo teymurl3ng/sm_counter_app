@@ -102,6 +102,9 @@ class NativeChromeGeometryTest {
         }
         val baseline = rule.onNodeWithTag("test-body").fetchSemanticsNode().boundsInRoot
         val headerHeight = rule.onNodeWithTag("test-header").fetchSemanticsNode().boundsInRoot.height
+        assertTrue("Lowered title must stay clear of shop metadata",
+            rule.onNode(hasText("More") and hasAnyAncestor(hasTestTag("test-header")), useUnmergedTree = true).fetchSemanticsNode().boundsInRoot.bottom <=
+                rule.onNode(hasText("A shop with a very long registered business name") and hasAnyAncestor(hasTestTag("test-header")), useUnmergedTree = true).fetchSemanticsNode().boundsInRoot.top + 1f)
         val statusBounds = rule.onNodeWithContentDescription("Day status: Open").fetchSemanticsNode().boundsInRoot
         for (nextOpen in listOf(true, false, true)) {
             rule.runOnIdle { open = nextOpen }
@@ -221,8 +224,14 @@ class NativeChromeGeometryTest {
             pageTitle.assertIsDisplayed()
             assertEquals("$label keeps the page heading in the same slot", top,
                 pageTitle.fetchSemanticsNode().boundsInRoot.top, 1f)
-            assertEquals("Back availability and state cannot move the shop toolbar", shop,
-                rule.onNodeWithText("Your shop").fetchSemanticsNode().boundsInRoot)
+            if (step is NativeAuthenticationState.RecoveryCode) {
+                rule.onNodeWithText("Your shop").assertDoesNotExist()
+                rule.onNodeWithText("DEMO-CODE-FOR-LAYOUT-ONLY").assertExists()
+                rule.onNodeWithTag(NativeUiTags.AuthRecoveryAcknowledge).performScrollTo().assertIsDisplayed()
+            } else {
+                assertEquals("Back availability and state cannot move the shop toolbar", shop,
+                    rule.onNodeWithText("Your shop").fetchSemanticsNode().boundsInRoot)
+            }
         }
         capture("access-fixed-band-$fontScale", false, fontScale)
     }

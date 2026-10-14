@@ -1,0 +1,21 @@
+{
+  "serial": "R8VXA02SNKH",
+  "methods": [
+    "com.saaf.milkshop.NativeSecurityImeTraceTest#pinSetupKeyboardTrace",
+    "com.saaf.milkshop.NativePersonalSecurityFieldsTest#secureSetupPreservesValidationAndClearsSubmittedSecrets"
+  ],
+  "tests": [
+    {
+      "test": "pinSetupKeyboardTrace",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "secureSetupPreservesValidationAndClearsSubmittedSecrets",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "returncode": 0,
+  "passed": 2
+}

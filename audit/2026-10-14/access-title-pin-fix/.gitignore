@@ -1,0 +1,8 @@
+*-build.txt
+*-console.txt
+*-install-*.txt
+*-evidence/
+*.apk
+release-build.txt
+certificate.txt
+installed-*.txt

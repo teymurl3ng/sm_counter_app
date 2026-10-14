@@ -441,6 +441,9 @@ Schema version: %3$d</string>
     <string name="native_cashier_context">Areeba · Cashier  ·  19 Sep 2026 · Open</string>
     <string name="native_product">Product</string>
     <string name="native_switch_product">Tap to switch</string>
+    <string name="native_change_product">Change product</string>
+    <string name="native_wholesale_price_format">Wholesale · PKR %1$s / %2$s</string>
+    <string name="native_enter_wholesale_rate">Enter a wholesale rate below</string>
     <string name="native_milk">Milk</string>
     <string name="native_yogurt">Yogurt</string>
     <string name="native_milk_rate">PKR 300 / L</string>

@@ -1,0 +1,19 @@
+{
+  "package": "com.saaf.milkshop",
+  "versionCode": 6,
+  "versionName": "0.4.2",
+  "sourceCommit": "305a91dac8ba70e839e92f80d52de8e4920089a7",
+  "sourceHashes": {
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/auth/NativeAuthenticationScreens.kt": "f463533bf2b460ef0403a3b0ffba43cd253971a7851c5fa12de5e4088dbef9ba",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/NativeChrome.kt": "4ccd1ee20c8c70b7864a87a90d8fddd8f39ac99039821d11407dfdcc242b31ef",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/common/NativePersonalSecurityPanel.kt": "cf6af5af7cb06fc4cc36a9d41ac1232876705a465391fddd855605778489bddd",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/sale/CashierSaleScreen.kt": "0f36849a4443958380d6f601268f27fe4bee4fd092b6f1b034983ac0068bf772",
+    "phase18/app/src/main/res/values/strings.xml": "f7c24049fbe4603ac21a601e84d2c97282864bfd0d0169437b790f3a8f999b9c"
+  },
+  "apk": "Saaf-Milk-0.4.2-credit-label-fix.apk",
+  "apkSha256": "ec2cf295884fece77d951e8022e3270ab5e0ec8fd9c223943178a677eed64ba0",
+  "signingCertificateSha256": "9c9e03d7969d79018e2880b79b8d9ec46c43ab50eaf30512ee3fb989bc6abfa1",
+  "debuggable": false,
+  "previewFixtures": false,
+  "scope": "Sale Credit terminology correction plus prior committed UI fixes; functional tests deferred"
+}

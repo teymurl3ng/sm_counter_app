@@ -1,0 +1,139 @@
+{
+  "projectRef": "ppoofakqrjhqwbjhpyoe",
+  "verified": true,
+  "catalog": {
+    "functions": [
+      {
+        "name": "credential_reset_private.guard_staff_change",
+        "md5": "f1ab7ba1e142e972ca082c7fc596ffa8",
+        "anon": false,
+        "authenticated": false,
+        "service": false,
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ]
+      },
+      {
+        "name": "public.admin_claim_credential_reset",
+        "md5": "592d9384446bd3fd2a21388f1fe732fc",
+        "anon": false,
+        "authenticated": false,
+        "service": true,
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ]
+      },
+      {
+        "name": "credential_reset_private.begin_reset",
+        "md5": "3edab0cddf5a64a9ffddcd3da3830052",
+        "anon": false,
+        "authenticated": false,
+        "service": false,
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ]
+      },
+      {
+        "name": "public.admin_begin_credential_reset",
+        "md5": "41d6ded3949a2f29287d9e92bc510e0a",
+        "anon": false,
+        "authenticated": true,
+        "service": false,
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ]
+      },
+      {
+        "name": "public.admin_begin_maintenance_credential_reset",
+        "md5": "40835ca8c9fa22fae6e083370c27f68e",
+        "anon": false,
+        "authenticated": false,
+        "service": true,
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ]
+      },
+      {
+        "name": "public.admin_mark_credential_reset_uncertain",
+        "md5": "4ee4991507ea1d121b3c1f5a490769f9",
+        "anon": false,
+        "authenticated": false,
+        "service": true,
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ]
+      },
+      {
+        "name": "public.admin_find_pending_credential_reset",
+        "md5": "cd4345c812f4b5bf8427b2847a5e1665",
+        "anon": false,
+        "authenticated": false,
+        "service": true,
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ]
+      },
+      {
+        "name": "public.admin_finish_credential_reset",
+        "md5": "395719ec1137c38b3bdc857b1ba4ee32",
+        "anon": false,
+        "authenticated": false,
+        "service": true,
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ]
+      },
+      {
+        "name": "public.admin_identity_recovery_source_status",
+        "md5": "f8d48f3360fd538d7f67baea1cd8a085",
+        "anon": false,
+        "authenticated": false,
+        "service": true,
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ]
+      },
+      {
+        "name": "public.admin_restore_empty_identity",
+        "md5": "686485fc6b72d75b7ab95f7915138031",
+        "anon": false,
+        "authenticated": false,
+        "service": true,
+        "security_definer": true,
+        "config": [
+          "search_path=\"\""
+        ]
+      }
+    ],
+    "roles": [
+      "admin",
+      "cashier",
+      "manager",
+      "operator",
+      "owner"
+    ],
+    "counts": {
+      "businesses": 0,
+      "shops": 0,
+      "staff": 0,
+      "audit": 0,
+      "auth": 0,
+      "sync": 0,
+      "reconciliation": 0,
+      "requests": 0,
+      "participants": 0
+    },
+    "guards": 2,
+    "private_closed": true,
+    "private_rls": true
+  }
+}

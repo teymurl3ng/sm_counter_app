@@ -1,0 +1,26 @@
+{
+  "project": {
+    "id": "bnwckedamzyhbfeierlm",
+    "ref": "bnwckedamzyhbfeierlm",
+    "organization_id": "hlewlyngnpziytterocd",
+    "organization_slug": "hlewlyngnpziytterocd",
+    "name": "saafmilk-recovery-qa-20261014",
+    "region": "ap-northeast-1",
+    "status": "ACTIVE_HEALTHY",
+    "database": {
+      "host": "db.bnwckedamzyhbfeierlm.supabase.co",
+      "version": "17.11.0.003",
+      "postgres_engine": "17",
+      "release_channel": "ga"
+    },
+    "created_at": "2026-10-14T15:45:45.395818Z"
+  },
+  "organization": {
+    "id": "hlewlyngnpziytterocd",
+    "plan": "free"
+  },
+  "empty": {
+    "auth_users": 0,
+    "public_tables": 0
+  }
+}

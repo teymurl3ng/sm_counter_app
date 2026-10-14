@@ -1,0 +1,15 @@
+{
+  "projectRef": "bnwckedamzyhbfeierlm",
+  "checks": {
+    "fresh_destination_empty": true,
+    "exactly_two_auth_creates": true,
+    "businesses_identities_preserved": true,
+    "shops_identities_preserved": true,
+    "staff_identities_preserved": false
+  },
+  "authCreateCalls": 2,
+  "passed": false,
+  "errorType": "AssertionError",
+  "failedCheck": "staff_identities_preserved",
+  "stage": null
+}

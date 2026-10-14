@@ -1,0 +1,41 @@
+{
+  "sourceCommit": "c21b9837584725d95e8d5de63c00974fa92e30df",
+  "sourceFiles": {
+    "bootstrap_recovery.sql": "376d5dd1e91f3bc4710c8a1b3e59158d87d88a7a0ac56d80fbf77eca322691dd",
+    "bootstrap.sql": "f1fafa175f54e420dd750e9bb5573d4416f3b70367c63acf237603274e00f4db",
+    "migration.sql": "299d58863a947d69bcda31570ea47ec7eef6a20fc7f50345a0ed3643f220e1da",
+    "migration_c0_admin_read.sql": "e987cd3073d972f18844dea6e53962b5a52f1467b8bc46973b19c2ccdbb42092",
+    "migration_c1_admin_write.sql": "37950a4b4d85ff5ab904302db45ca4e017a8038910dd073217e8b608707ca240",
+    "migration_c1_1_admin_write_rpcs.sql": "d0f5b3d91cb1caf8952990409d6857968e79bb6d6a3f296118f91b9204e80c71",
+    "migration_c1_2_admin_auth_db_helpers.sql": "ee021a10b9994403a9fe34670493d961c020cbd6f0f73ec6210803652494d4a1",
+    "migration_c1_3_hardening.sql": "ea41c7eb3014dfc6b8cbecf5f3ad186efd04e950a93c2da03b2fcdd820eb2069",
+    "migration_c1_4_reconciliation.sql": "a5d7018622320fbc8bee811c4b2f0c6899aaa2294bc4721fb1fef05e1f0b68da",
+    "migration_c1_5_error_semantics.sql": "88f7aa99c65ed170b7e4e5d4155ae8ed027a8273e962bbeead1503bfe052f698",
+    "migration_c1_6_integrity.sql": "0b1138ffc5f3ce6fa589381055f4f71540b11a9f16c65e07a71437952e0dd309",
+    "migration_sync_fresh.sql": "0e900d06f0e6beb108e803fec11f804e9ffb03da458aee3e83b8a4677a28cd56",
+    "supabase\\migrations\\20261012194632_protected_credential_reset_guard.sql": "282876836d1981a934c7a5e0ff31fe1be58c3f2ba64751d39b87636e4a08d204",
+    "supabase\\migrations\\20261013075706_safe_empty_identity_restore.sql": "c702d447c574190dd634c7bd7c0d6e162ffcd464d8b1a4ccf9b742fa78571f54"
+  },
+  "expandedSqlSha256": "7b40e1ea93ebd9d21ee9c2a8a805f08697be9c0caa288374caa1b66e85b63797",
+  "sqlChars": 113336,
+  "fixtureSha256": "9a6891063f71b25baa5c3f3e78a081f76c586f088b9832bba0616d7586426b30",
+  "fixtureCounts": {
+    "businesses": 1,
+    "shops": 1,
+    "staff": 3,
+    "staff_shops": 1,
+    "audit_log": 2
+  },
+  "expectedFunctionBodies": {
+    "credential_reset_private.guard_staff_change": "f1ab7ba1e142e972ca082c7fc596ffa8",
+    "credential_reset_private.begin_reset": "3edab0cddf5a64a9ffddcd3da3830052",
+    "public.admin_begin_credential_reset": "41d6ded3949a2f29287d9e92bc510e0a",
+    "public.admin_begin_maintenance_credential_reset": "40835ca8c9fa22fae6e083370c27f68e",
+    "public.admin_claim_credential_reset": "592d9384446bd3fd2a21388f1fe732fc",
+    "public.admin_mark_credential_reset_uncertain": "4ee4991507ea1d121b3c1f5a490769f9",
+    "public.admin_find_pending_credential_reset": "cd4345c812f4b5bf8427b2847a5e1665",
+    "public.admin_finish_credential_reset": "395719ec1137c38b3bdc857b1ba4ee32",
+    "public.admin_identity_recovery_source_status": "f8d48f3360fd538d7f67baea1cd8a085",
+    "public.admin_restore_empty_identity": "686485fc6b72d75b7ab95f7915138031"
+  }
+}

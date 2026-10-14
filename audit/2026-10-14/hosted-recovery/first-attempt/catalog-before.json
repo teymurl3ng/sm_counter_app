@@ -1,0 +1,145 @@
+{
+  "roles": [
+    "admin",
+    "cashier",
+    "manager",
+    "operator",
+    "owner"
+  ],
+  "counts": {
+    "businesses": 0,
+    "shops": 0,
+    "staff": 0,
+    "staff_shops": 0,
+    "audit_log": 0,
+    "auth_users": 0,
+    "sync_records": 0,
+    "auth_reconciliation": 0,
+    "reset_requests": 0,
+    "reset_participants": 0
+  },
+  "functions": [
+    {
+      "name": "credential_reset_private.begin_reset",
+      "md5": "3edab0cddf5a64a9ffddcd3da3830052",
+      "security_definer": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "anon": false,
+      "authenticated": false,
+      "service": false
+    },
+    {
+      "name": "credential_reset_private.guard_staff_change",
+      "md5": "f1ab7ba1e142e972ca082c7fc596ffa8",
+      "security_definer": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "anon": false,
+      "authenticated": false,
+      "service": false
+    },
+    {
+      "name": "public.admin_begin_credential_reset",
+      "md5": "41d6ded3949a2f29287d9e92bc510e0a",
+      "security_definer": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "anon": false,
+      "authenticated": true,
+      "service": false
+    },
+    {
+      "name": "public.admin_begin_maintenance_credential_reset",
+      "md5": "40835ca8c9fa22fae6e083370c27f68e",
+      "security_definer": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "anon": false,
+      "authenticated": false,
+      "service": true
+    },
+    {
+      "name": "public.admin_claim_credential_reset",
+      "md5": "592d9384446bd3fd2a21388f1fe732fc",
+      "security_definer": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "anon": false,
+      "authenticated": false,
+      "service": true
+    },
+    {
+      "name": "public.admin_find_pending_credential_reset",
+      "md5": "cd4345c812f4b5bf8427b2847a5e1665",
+      "security_definer": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "anon": false,
+      "authenticated": false,
+      "service": true
+    },
+    {
+      "name": "public.admin_finish_credential_reset",
+      "md5": "395719ec1137c38b3bdc857b1ba4ee32",
+      "security_definer": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "anon": false,
+      "authenticated": false,
+      "service": true
+    },
+    {
+      "name": "public.admin_identity_recovery_source_status",
+      "md5": "f8d48f3360fd538d7f67baea1cd8a085",
+      "security_definer": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "anon": false,
+      "authenticated": false,
+      "service": true
+    },
+    {
+      "name": "public.admin_mark_credential_reset_uncertain",
+      "md5": "4ee4991507ea1d121b3c1f5a490769f9",
+      "security_definer": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "anon": false,
+      "authenticated": false,
+      "service": true
+    },
+    {
+      "name": "public.admin_restore_empty_identity",
+      "md5": "686485fc6b72d75b7ab95f7915138031",
+      "security_definer": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "anon": false,
+      "authenticated": false,
+      "service": true
+    }
+  ],
+  "triggers": [
+    {
+      "name": "staff_credential_reset_guard",
+      "enabled": "O"
+    },
+    {
+      "name": "staff_last_owner_guard",
+      "enabled": "O"
+    }
+  ],
+  "private_schema_closed": true,
+  "private_rls": true
+}

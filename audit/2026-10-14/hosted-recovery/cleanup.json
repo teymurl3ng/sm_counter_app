@@ -1,0 +1,24 @@
+{
+  "originalProjects": [
+    {
+      "ref": "tghzmofkkdsaasvnixps",
+      "name": "saafmilk-dev",
+      "status": "ACTIVE_HEALTHY"
+    },
+    {
+      "ref": "tlsuxbghuhlqntkgtrxt",
+      "name": "saafmilk-prod",
+      "status": "ACTIVE_HEALTHY"
+    }
+  ],
+  "organization": {
+    "id": "hlewlyngnpziytterocd",
+    "plan": "free"
+  },
+  "deletedQARefs": [
+    "bnwckedamzyhbfeierlm",
+    "ppoofakqrjhqwbjhpyoe"
+  ],
+  "qaProjectsAbsent": true,
+  "devCheckpointUnchanged": true
+}

@@ -1,0 +1,10 @@
+{
+  "businesses": 2,
+  "shops": 10,
+  "staff": 63,
+  "staff_shops": 34,
+  "audit_log": 621,
+  "auth_users": 17,
+  "identity_sha": "ad31607d7669a5fc9e5dfbeb155a5823",
+  "auth_ids_sha": "dfcce47043ab9300ea033e9cca9a7b5d"
+}

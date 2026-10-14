@@ -1,0 +1,4 @@
+bootstrap-expanded.sql
+__pycache__/
+*.env
+*-console.txt

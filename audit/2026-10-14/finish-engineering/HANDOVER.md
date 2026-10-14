@@ -12,7 +12,7 @@ Real shop setup needs your intended shop name/currency/rates, correct opening ba
 
 Signing keystore is present and protected from Git. Its independent backup location/custody still needs your confirmation; do not paste passwords into this chat. The existing prior public certificate hash is recorded for package continuity. Keep the keystore/properties securely in independent storage for future updates.
 
-Hosted identity recovery uses the published safe empty-destination workflow. Never run fresh bootstrap/restore against populated DEV/PROD. The isolated hosted rehearsal is deferred; source publication alone is not a recovery proof.
+Hosted identity recovery uses the published safe empty-destination workflow. The isolated synthetic rehearsal is accepted: 27 hosted PostgreSQL/Auth checks using source c21b983, with stable identity/audit comparison, real generated-credential sign-in, access restrictions and safe repeat-import refusal. Both QA projects were deleted and original DEV resumed with unchanged checkpoints. [Result](../hosted-recovery/RESULT.md). A real recovery still requires a verified portable backup and a separately authorized empty destination; app records and signing-key custody remain separate.
 
 Guarded credential reset preserves a pending reference on unknown Auth outcome. Do not resend Auth or force-release uncertain participants. Known success can complete the original request without changing a credential again. Private keys stay on the server. Use published PROTECTED_RESET_OPERATIONS.md for exact operator guidance.
 

@@ -1,0 +1,17 @@
+{
+  "project": {
+    "ref": "ppoofakqrjhqwbjhpyoe",
+    "name": "saafmilk-recovery-qa-20261014",
+    "organization_id": "hlewlyngnpziytterocd",
+    "region": "ap-northeast-1",
+    "status": "ACTIVE_HEALTHY"
+  },
+  "organization": {
+    "id": "hlewlyngnpziytterocd",
+    "plan": "free"
+  },
+  "empty": {
+    "auth_users": 0,
+    "public_tables": 0
+  }
+}

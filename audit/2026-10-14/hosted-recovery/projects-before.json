@@ -1,0 +1,18 @@
+[
+  {
+    "id": "tghzmofkkdsaasvnixps",
+    "ref": "tghzmofkkdsaasvnixps",
+    "name": "saafmilk-dev",
+    "organization_id": "hlewlyngnpziytterocd",
+    "status": "ACTIVE_HEALTHY",
+    "region": "ap-northeast-1"
+  },
+  {
+    "id": "tlsuxbghuhlqntkgtrxt",
+    "ref": "tlsuxbghuhlqntkgtrxt",
+    "name": "saafmilk-prod",
+    "organization_id": "hlewlyngnpziytterocd",
+    "status": "ACTIVE_HEALTHY",
+    "region": "ap-northeast-1"
+  }
+]

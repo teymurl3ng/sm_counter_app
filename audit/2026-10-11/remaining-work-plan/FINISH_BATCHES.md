@@ -1,5 +1,7 @@
 # Seven finite finish batches
 
+**14 October controlling publication update:** ~~Push the combined app UI fixes and installation records.~~ App main through 6ce305b was pushed and verified against the remote. This supersedes the app-push-pending wording in the earlier chronological follow-ups below. S24 is updated; A06 update and final acceptance/handover remain open. Viewer publication/live-version confirmation is still separate and unfinished in batch 6; no Viewer deployment or new functional tests ran in this push-only step.
+
 These are the reporting units. FLAT_CHECKLIST.md retains their substeps, not 38 separate jobs. Cross out a whole batch only after its named scope is accepted. Leaving tests for later defers acceptance checks, not unfinished engineering. App Git publication and phone installation are now completed under the user's explicit instructions. Viewer publication and final release acceptance remain pending.
 
 1. [x] ~~Fix closing sync and retry.~~ R01-R02. Accepted 14 October: ten targeted A06 checks. [Result](../../2026-10-14/close-sync-repair/RESULT.md).

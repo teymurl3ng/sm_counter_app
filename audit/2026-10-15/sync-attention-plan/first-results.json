@@ -1,0 +1,133 @@
+{
+  "label": "first",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.SyncReviewAttentionTest#committedHoldsEmitAndSurviveFileReopen",
+    "com.saaf.milkshop.SyncReviewAttentionTest#outboxParkAndHistoricalConflictAreNotReviewHolds",
+    "com.saaf.milkshop.SyncReviewAttentionTest#readFailureRetainsCountAndCancellationIsNotFailure",
+    "com.saaf.milkshop.SyncReviewAttentionTest#ownerReadWorksWithoutEnrollmentButExpiredAndCashierSessionsAreDenied",
+    "com.saaf.milkshop.OwnerSyncAttentionUiTest#badgeLightDefaultKeepsChromeStable",
+    "com.saaf.milkshop.OwnerSyncAttentionUiTest#badgeDarkDoubleTextKeepsChromeStable",
+    "com.saaf.milkshop.OwnerSyncAttentionUiTest#disconnectedHoldsStayVisibleAndCannotResolve",
+    "com.saaf.milkshop.OwnerSyncAttentionUiTest#sessionReplacementCancelsOldObservationAndFailureCanRetry",
+    "com.saaf.milkshop.OwnerSyncAttentionUiTest#localHoldUpdatesReachOpenReviewAndResolveWithoutReload",
+    "com.saaf.milkshop.NativeOwnerMoreScreenContractTest#syncMenuShowsPersistentReviewCountAndKeepsExistingRoute",
+    "com.saaf.milkshop.NativeOwnerMoreScreenContractTest#syncRowOpensFromMenu",
+    "com.saaf.milkshop.NativeOwnerMoreScreenContractTest#restoredHoldsListedForReview",
+    "com.saaf.milkshop.NativeOwnerMoreScreenContractTest#keepMineReleasesEntryToPush",
+    "com.saaf.milkshop.NativeOwnerMoreScreenContractTest#takeServerDropsEntrySoParkApplies",
+    "com.saaf.milkshop.SyncRepairBoundaryTest#failedTakeServerKeepsReviewAndLocalEditThenSuccessfulApplyResolvesBoth",
+    "com.saaf.milkshop.NativeManagementPresentationTest#syncLightDefault",
+    "com.saaf.milkshop.NativeManagementPresentationTest#syncDarkExtraLarge"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.SyncReviewAttentionTest",
+      "test": "committedHoldsEmitAndSurviveFileReopen",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.SyncReviewAttentionTest",
+      "test": "readFailureRetainsCountAndCancellationIsNotFailure",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.SyncReviewAttentionTest",
+      "test": "outboxParkAndHistoricalConflictAreNotReviewHolds",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.SyncReviewAttentionTest",
+      "test": "ownerReadWorksWithoutEnrollmentButExpiredAndCashierSessionsAreDenied",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.OwnerSyncAttentionUiTest",
+      "test": "sessionReplacementCancelsOldObservationAndFailureCanRetry",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.OwnerSyncAttentionUiTest",
+      "test": "disconnectedHoldsStayVisibleAndCannotResolve",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.OwnerSyncAttentionUiTest",
+      "test": "badgeDarkDoubleTextKeepsChromeStable",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Assert failed: The component with TestTag = 'owner_sync_review_badge' is not displayed!"
+    },
+    {
+      "class": "com.saaf.milkshop.OwnerSyncAttentionUiTest",
+      "test": "localHoldUpdatesReachOpenReviewAndResolveWithoutReload",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Assert failed: The component with TestTag = 'owner_sync_review_badge' is not displayed!"
+    },
+    {
+      "class": "com.saaf.milkshop.OwnerSyncAttentionUiTest",
+      "test": "badgeLightDefaultKeepsChromeStable",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Assert failed: The component with TestTag = 'owner_sync_review_badge' is not displayed!"
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+      "test": "takeServerDropsEntrySoParkApplies",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+      "test": "restoredHoldsListedForReview",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+      "test": "keepMineReleasesEntryToPush",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+      "test": "syncRowOpensFromMenu",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+      "test": "syncMenuShowsPersistentReviewCountAndKeepsExistingRoute",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.SyncRepairBoundaryTest",
+      "test": "failedTakeServerKeepsReviewAndLocalEditThenSuccessfulApplyResolvesBoth",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeManagementPresentationTest",
+      "test": "syncDarkExtraLarge",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeManagementPresentationTest",
+      "test": "syncLightDefault",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 14,
+  "expected": 17,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "dad64b10f7ff30026e30490f362a53110b10b98444d680727e13b75ac429be71"
+}

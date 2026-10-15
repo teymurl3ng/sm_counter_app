@@ -114,6 +114,12 @@ interface SyncRebaselineHoldDao {
     @Query("SELECT COUNT(*) FROM sync_rebaseline_holds")
     suspend fun count(): Int
 
+    @Query("SELECT COUNT(*) FROM sync_rebaseline_holds")
+    fun observeCount(): kotlinx.coroutines.flow.Flow<Int>
+
+    @Query("SELECT * FROM sync_rebaseline_holds ORDER BY held_at")
+    fun observeAll(): kotlinx.coroutines.flow.Flow<List<SyncRebaselineHoldEntity>>
+
     @Query("DELETE FROM sync_rebaseline_holds")
     suspend fun clear()
 }

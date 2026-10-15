@@ -10,6 +10,8 @@ import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material.icons.outlined.WorkOutline
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -21,10 +23,15 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.saaf.milkshop.nativeui.NativeUiTags
 import com.saaf.milkshop.nativeui.common.hapticTap
@@ -66,6 +73,7 @@ internal fun OwnerScaffold(
 @Composable
 internal fun OwnerNavigationRail(
     selected: OwnerSection,
+    syncAttention: OwnerSyncAttention? = null,
     onNavigate: (OwnerSection) -> Unit,
 ) {
     NavigationRail(
@@ -75,7 +83,7 @@ internal fun OwnerNavigationRail(
         OwnerRailItem(selected == OwnerSection.Overview, NativeUiTags.OwnerNavOverview, { onNavigate(OwnerSection.Overview) }, Icons.Outlined.GridView, "Overview")
         OwnerRailItem(selected == OwnerSection.Work, NativeUiTags.OwnerNavWork, { onNavigate(OwnerSection.Work) }, Icons.Outlined.WorkOutline, "Work")
         OwnerRailItem(selected == OwnerSection.Records, NativeUiTags.OwnerNavRecords, { onNavigate(OwnerSection.Records) }, Icons.Outlined.History, "Records")
-        OwnerRailItem(selected == OwnerSection.More, NativeUiTags.OwnerNavMore, { onNavigate(OwnerSection.More) }, Icons.Outlined.MoreHoriz, "More")
+        OwnerRailItem(selected == OwnerSection.More, NativeUiTags.OwnerNavMore, { onNavigate(OwnerSection.More) }, Icons.Outlined.MoreHoriz, "More", syncAttention)
     }
 }
 
@@ -86,13 +94,16 @@ private fun OwnerRailItem(
     onClick: () -> Unit,
     icon: ImageVector,
     label: String,
+    syncAttention: OwnerSyncAttention? = null,
 ) {
     val context = LocalContext.current
     val onClickHaptic = { context.hapticTap(); onClick() }
     NavigationRailItem(
         selected = selected,
         onClick = onClickHaptic,
-        modifier = Modifier.testTag(tag).heightIn(min = 56.dp),
+        modifier = Modifier.testTag(tag).heightIn(min = 56.dp).semantics {
+            if (syncAttention != null) stateDescription = syncAttention.description
+        },
         colors = NavigationRailItemDefaults.colors(
             selectedIconColor = MaterialTheme.colorScheme.onPrimary,
             selectedTextColor = MaterialTheme.colorScheme.primary,
@@ -100,7 +111,7 @@ private fun OwnerRailItem(
             unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
             unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
-        icon = { Icon(icon, contentDescription = null) },
+        icon = { OwnerNavigationIcon(icon, syncAttention) },
         label = { NativeNavigationLabel(label) },
     )
 }
@@ -108,6 +119,7 @@ private fun OwnerRailItem(
 @Composable
 internal fun OwnerNavigation(
     selected: OwnerSection,
+    syncAttention: OwnerSyncAttention? = null,
     onNavigate: (OwnerSection) -> Unit,
 ) {
     NativeBottomNavigation {
@@ -138,6 +150,7 @@ internal fun OwnerNavigation(
             onClick = { onNavigate(OwnerSection.More) },
             icon = Icons.Outlined.MoreHoriz,
             label = "More",
+            syncAttention = syncAttention,
         )
     }
 }
@@ -149,6 +162,7 @@ private fun RowScope.OwnerNavItem(
     onClick: () -> Unit,
     icon: ImageVector,
     label: String,
+    syncAttention: OwnerSyncAttention? = null,
 ) {
     val context = LocalContext.current
     val onClickHaptic = { context.hapticTap(); onClick() }
@@ -157,8 +171,9 @@ private fun RowScope.OwnerNavItem(
         onClick = onClickHaptic,
         modifier = Modifier
             .testTag(tag)
-            .heightIn(min = 56.dp),
-        icon = { Icon(icon, contentDescription = null) },
+            .heightIn(min = 56.dp)
+            .semantics { if (syncAttention != null) stateDescription = syncAttention.description },
+        icon = { OwnerNavigationIcon(icon, syncAttention) },
         label = { NativeNavigationLabel(label) },
         colors = NavigationBarItemDefaults.colors(
             selectedIconColor = MaterialTheme.colorScheme.onPrimary,
@@ -168,4 +183,20 @@ private fun RowScope.OwnerNavItem(
             unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
     )
+}
+
+@Composable
+private fun OwnerNavigationIcon(icon: ImageVector, attention: OwnerSyncAttention?) {
+    BadgedBox(badge = {
+        attention?.count?.takeIf { it > 0 }?.let { count ->
+            val density = LocalDensity.current
+            // The duplicated status glyph stays compact; the exact count is available
+            // in navigation semantics and fully scaled text on the Sync menu row.
+            CompositionLocalProvider(LocalDensity provides Density(density.density, density.fontScale.coerceAtMost(1.3f))) {
+                Badge(Modifier.testTag(NativeUiTags.OwnerSyncReviewBadge)) {
+                    Text(if (count > 99) "99+" else count.toString())
+                }
+            }
+        }
+    }) { Icon(icon, contentDescription = null) }
 }

@@ -232,6 +232,7 @@ fun OwnerMoreScreen(
     onSignOut: () -> Unit,
     hostedScaffold: HostedScaffold,
     modifier: Modifier = Modifier,
+    syncAttention: OwnerSyncAttention? = null,
 ) {
     NativeSectionTransition(
         targetState = state,
@@ -276,6 +277,7 @@ fun OwnerMoreScreen(
         ) { destination ->
             when (destination) {
             NativeOwnerMoreDestination.Menu -> OwnerMoreMenuScreen(
+                syncAttention = syncAttention,
                 snackbarHostState = snackbarHostState,
                 identity = identity,
                 state = state,
@@ -602,7 +604,8 @@ fun OwnerMoreScreen(
                 onEnrollInShop = { shopId, username, chars, env, localUserId -> onEnrollSyncInShop(shopId, username, chars, env, localUserId) },
                 onEnrollAs = onEnrollAs,
                 onSyncNow = onSyncNow,
-                holds = state.syncState.holds,
+                holds = syncAttention?.holds ?: state.syncState.holds,
+                reviewUnavailable = syncAttention?.let { it.unavailable || it.holdsUnavailable } ?: false,
                 onResolveHold = onResolveHoldSync,
                 onUnenroll = onUnenrollSync,
                 allowDevEnvironment = com.saaf.milkshop.BuildConfig.DEBUG,
@@ -661,6 +664,7 @@ fun OwnerMoreScreen(
 
 @Composable
 private fun OwnerMoreMenuScreen(
+    syncAttention: OwnerSyncAttention?,
     snackbarHostState: SnackbarHostState,
     identity: NativeSignedInIdentity,
     state: NativeOwnerMoreState.Ready,
@@ -784,7 +788,7 @@ private fun OwnerMoreMenuScreen(
                 OwnerMoreMenuRow(
                     icon = Icons.Outlined.CloudSync,
                     title = "Sync",
-                    subtitle = "Upload entries to your shop's online record",
+                    subtitle = syncAttention?.description ?: "Upload entries to your shop's online record",
                     tag = NativeUiTags.OwnerMoreSync,
                     onClick = hapticAction(onOpenSync),
                 )

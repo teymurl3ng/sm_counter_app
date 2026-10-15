@@ -257,6 +257,7 @@ class NativeOwnerMoreScreenContractTest {
 
     private fun setScreen(
         state: NativeOwnerMoreState,
+        syncAttention: com.saaf.milkshop.nativeui.owner.OwnerSyncAttention? = null,
         onRetry: () -> Unit = {},
         onOpenPersonalSecurity: () -> Unit = {},
         onOpenProducts: () -> Unit = {},
@@ -284,7 +285,7 @@ class NativeOwnerMoreScreenContractTest {
         composeRule.setContent {
             SaafTheme(darkTheme = false) {
                 OwnerMoreScreen(
-                    snackbarHostState = remember { SnackbarHostState() },
+                    syncAttention = syncAttention,                    snackbarHostState = remember { SnackbarHostState() },
                     identity = NativeSignedInIdentity(
                         userId = 1L,
                         loginName = "owner",
@@ -432,6 +433,17 @@ class NativeOwnerMoreScreenContractTest {
     )
 
     // ---- Sync screen (14.8.6 cutover) ----
+
+    @Test
+    fun syncMenuShowsPersistentReviewCountAndKeepsExistingRoute() {
+        var opened = 0
+        setScreen(NativeOwnerMoreState.Ready(context = openContext()),
+            syncAttention = com.saaf.milkshop.nativeui.owner.OwnerSyncAttention(3),
+            onOpenSync = { opened++ })
+        composeRule.onNodeWithTag(NativeUiTags.OwnerMoreSync).performScrollTo()
+            .assertTextContains("3 entries need review").performClick()
+        assertEquals(1, opened)
+    }
 
     @Test
     fun syncRowOpensFromMenu() {

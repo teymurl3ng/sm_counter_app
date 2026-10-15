@@ -15,6 +15,11 @@ import com.saaf.milkshop.sync.SyncApplyEngine
 import com.saaf.milkshop.sync.SyncPulledRecord
 import androidx.room3.withWriteTransaction
 import org.json.JSONObject
+import com.saaf.milkshop.domain.AppPermission
+import com.saaf.milkshop.domain.AppRole
+import com.saaf.milkshop.domain.UserSecurityService
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 
 /**
  * Owner-facing sync enrollment and status (sync Phase 8.6 cutover). Wraps
@@ -32,6 +37,26 @@ class NativeOwnerSyncFacade(
     fun isEnrolled(): Boolean = runtime.isEnrolled()
 
     suspend fun status(): NativeSyncStatus? = runtime.status()
+
+    /** Local review truth, independent of transport configuration or notification access. */
+    fun observeReviewCount(sessionHandle: String, security: UserSecurityService) =
+        database.syncRebaselineHoldDao().observeCount().onEach {
+            requireReviewOwner(sessionHandle, security)
+        }
+
+    fun observeReviewHolds(sessionHandle: String, security: UserSecurityService) =
+        database.syncRebaselineHoldDao().observeAll().map { entries ->
+            requireReviewOwner(sessionHandle, security)
+            entries.map { entry ->
+                NativeSyncHold(entry.tableName, entry.rowUid, entry.originDevice, entry.heldAt,
+                    SyncHoldLabels.holdLabel(entry.tableName, entry.payloadJson, entry.rowUid))
+            }
+        }
+
+    private suspend fun requireReviewOwner(sessionHandle: String, security: UserSecurityService) {
+        val actor = security.requirePermission(sessionHandle, AppPermission.VIEW_OPERATIONAL)
+        require(AppRole.parse(actor.role) == AppRole.OWNER) { "Sync review is only available to Owner." }
+    }
 
     suspend fun enroll(
         username: String,

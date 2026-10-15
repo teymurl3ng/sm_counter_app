@@ -2,6 +2,8 @@
 
 Status: PLANNED (not started). Owner: "MUST-DO — we will do it one day" (2026-10-02).
 
+15 October business input: the owner confirmed **weekly settlement** for regular credit customers. The [follow-on delivery plan](LATER_FEATURE_PLAN_2026-10-15.md) records the seven-day cycle; exact category boundaries, grace and fixed-weekday versus rolling-age interpretation remain to be defined. This adds no due-date fields and does not start implementation.
+
 15 October reconciliation: the core Credit/reminders system remains planned. T4's sale wording subpart is complete in source `305a91d` and the latest signed S24 build: Credit / Choose customer / Required for a credit sale. T4 customer search remains unbuilt in the inspected Sale picker. The tasks below preserve the original plan; they are not thirteen wholly untouched tasks. See [current inventory](REMAINING_AND_LATER_2026-10-15.md). Android SMS/distribution and external integration assumptions must be revalidated when implementation is scoped.
 Numbering: **14.9 deliberately** — root Phase 15 is RESERVED for uncoached Shopkeeper QA and
 Phase 16 for Release Readiness in the frozen roadmap (POSTMORTEM.md, ROADMAP_RECONCILIATION);

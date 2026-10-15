@@ -1,0 +1,142 @@
+{
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "uniqueLatestPasses": 17,
+  "finalApplicationApkSha256": "88c262f5503e2041e2c997e5efabffca15f1ea55f9ac2d2cb0c37180763d39f8",
+  "firstRun": {
+    "passed": 14,
+    "failed": 3
+  },
+  "rerunScope": "three badge/UI methods only; final production delta was badge-only font-scale constraint",
+  "creditedUnchangedScope": "query/facade/controller/menu/resolution paths in the original fourteen passing methods",
+  "notificationPermission": "denied for isolated package",
+  "realShopAppInstalledOrChanged": false,
+  "ordinarySignedReleaseBuilt": false,
+  "visualInspection": "light/default, dark/200%, disconnected and live synthetic held-entry captures; final compact badge inspected",
+  "limitations": [
+    "local Owner held entries only",
+    "audit-only conflict review remains partial",
+    "human staff acceptance separate"
+  ],
+  "latestResults": [
+    {
+      "class": "com.saaf.milkshop.SyncReviewAttentionTest",
+      "test": "committedHoldsEmitAndSurviveFileReopen",
+      "code": 0,
+      "stack": null,
+      "run": "first"
+    },
+    {
+      "class": "com.saaf.milkshop.SyncReviewAttentionTest",
+      "test": "readFailureRetainsCountAndCancellationIsNotFailure",
+      "code": 0,
+      "stack": null,
+      "run": "first"
+    },
+    {
+      "class": "com.saaf.milkshop.SyncReviewAttentionTest",
+      "test": "outboxParkAndHistoricalConflictAreNotReviewHolds",
+      "code": 0,
+      "stack": null,
+      "run": "first"
+    },
+    {
+      "class": "com.saaf.milkshop.SyncReviewAttentionTest",
+      "test": "ownerReadWorksWithoutEnrollmentButExpiredAndCashierSessionsAreDenied",
+      "code": 0,
+      "stack": null,
+      "run": "first"
+    },
+    {
+      "class": "com.saaf.milkshop.OwnerSyncAttentionUiTest",
+      "test": "sessionReplacementCancelsOldObservationAndFailureCanRetry",
+      "code": 0,
+      "stack": null,
+      "run": "first"
+    },
+    {
+      "class": "com.saaf.milkshop.OwnerSyncAttentionUiTest",
+      "test": "disconnectedHoldsStayVisibleAndCannotResolve",
+      "code": 0,
+      "stack": null,
+      "run": "first"
+    },
+    {
+      "class": "com.saaf.milkshop.OwnerSyncAttentionUiTest",
+      "test": "badgeDarkDoubleTextKeepsChromeStable",
+      "code": 0,
+      "stack": null,
+      "run": "visual-final"
+    },
+    {
+      "class": "com.saaf.milkshop.OwnerSyncAttentionUiTest",
+      "test": "localHoldUpdatesReachOpenReviewAndResolveWithoutReload",
+      "code": 0,
+      "stack": null,
+      "run": "visual-final"
+    },
+    {
+      "class": "com.saaf.milkshop.OwnerSyncAttentionUiTest",
+      "test": "badgeLightDefaultKeepsChromeStable",
+      "code": 0,
+      "stack": null,
+      "run": "visual-final"
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+      "test": "takeServerDropsEntrySoParkApplies",
+      "code": 0,
+      "stack": null,
+      "run": "first"
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+      "test": "restoredHoldsListedForReview",
+      "code": 0,
+      "stack": null,
+      "run": "first"
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+      "test": "keepMineReleasesEntryToPush",
+      "code": 0,
+      "stack": null,
+      "run": "first"
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+      "test": "syncRowOpensFromMenu",
+      "code": 0,
+      "stack": null,
+      "run": "first"
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerMoreScreenContractTest",
+      "test": "syncMenuShowsPersistentReviewCountAndKeepsExistingRoute",
+      "code": 0,
+      "stack": null,
+      "run": "first"
+    },
+    {
+      "class": "com.saaf.milkshop.SyncRepairBoundaryTest",
+      "test": "failedTakeServerKeepsReviewAndLocalEditThenSuccessfulApplyResolvesBoth",
+      "code": 0,
+      "stack": null,
+      "run": "first"
+    },
+    {
+      "class": "com.saaf.milkshop.NativeManagementPresentationTest",
+      "test": "syncDarkExtraLarge",
+      "code": 0,
+      "stack": null,
+      "run": "first"
+    },
+    {
+      "class": "com.saaf.milkshop.NativeManagementPresentationTest",
+      "test": "syncLightDefault",
+      "code": 0,
+      "stack": null,
+      "run": "first"
+    }
+  ]
+}

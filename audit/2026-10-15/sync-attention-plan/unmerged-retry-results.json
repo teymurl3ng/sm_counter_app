@@ -1,0 +1,35 @@
+{
+  "label": "unmerged-retry",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.OwnerSyncAttentionUiTest#badgeLightDefaultKeepsChromeStable",
+    "com.saaf.milkshop.OwnerSyncAttentionUiTest#badgeDarkDoubleTextKeepsChromeStable",
+    "com.saaf.milkshop.OwnerSyncAttentionUiTest#localHoldUpdatesReachOpenReviewAndResolveWithoutReload"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.OwnerSyncAttentionUiTest",
+      "test": "badgeDarkDoubleTextKeepsChromeStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.OwnerSyncAttentionUiTest",
+      "test": "localHoldUpdatesReachOpenReviewAndResolveWithoutReload",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.OwnerSyncAttentionUiTest",
+      "test": "badgeLightDefaultKeepsChromeStable",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 3,
+  "expected": 3,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "dad64b10f7ff30026e30490f362a53110b10b98444d680727e13b75ac429be71"
+}

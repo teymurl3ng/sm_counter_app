@@ -94,6 +94,7 @@ fun OwnerSyncScreen(
     onResolveHold: (String, String, Boolean) -> Unit = { _, _, _ -> },
     hostedScaffold: HostedScaffold,
     modifier: Modifier = Modifier,
+    reviewUnavailable: Boolean = false,
 ) {
     var unenrollConfirmOpen by remember { mutableStateOf(false) }
     // Holds the credential between a first (possibly ambiguous) attempt
@@ -188,6 +189,16 @@ fun OwnerSyncScreen(
                         )
                         Spacer(Modifier.height(12.dp))
                     }
+                }
+            }
+
+            if (status == null) {
+                OwnerSyncHeldEntries(holds, busy, connected = false, onResolveHold = onResolveHold)
+            }
+            if (reviewUnavailable) {
+                NativeInformationSection(Modifier.testTag(NativeUiTags.OwnerSyncReviewUnavailable)) {
+                    Text("Sync review unavailable. Previously loaded entries may be out of date.")
+                    TextButton(onClick = hapticAction(onRefresh), enabled = !busy) { Text("Retry review") }
                 }
             }
 
@@ -355,48 +366,7 @@ private fun OwnerSyncEnrolledBody(
         OwnerSyncStatusRow("Waiting to upload", status.outboxCount.toString())
         OwnerSyncStatusRow("Last pulled record", status.pullCursor.toString())
     }
-    if (holds.isNotEmpty()) {
-        Spacer(Modifier.height(16.dp))
-        Text(
-            "Needs review — entries restored from a backup that the server " +
-                "holds newer versions of. Nothing uploads until you decide.",
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.testTag(NativeUiTags.OwnerSyncHolds),
-        )
-        holds.forEach { hold ->
-            NativeInformationSection(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-                Text(
-                    hold.label.ifBlank { "${hold.tableName} · ${hold.rowUid}" },
-                    style = nativeValueTextStyle(),
-                )
-                if (hold.label.isNotBlank()) {
-                    Text(
-                        hold.rowUid,
-                        style = nativeSupportingTextStyle(),
-                        color = nativeVisualColors.supporting,
-                    )
-                }
-                Text(
-                    "Server version from ${hold.originDevice ?: "an unknown device"}" +
-                        " · held ${hold.heldAt.take(10)}",
-                    style = nativeSupportingTextStyle(),
-                    color = nativeVisualColors.supporting,
-                )
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(
-                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onResolveHold(hold.tableName, hold.rowUid, true) },
-                        enabled = !busy,
-                        modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.OwnerSyncHoldKeep),
-                    ) { Text("Keep mine") }
-                    OutlinedButton(
-                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onResolveHold(hold.tableName, hold.rowUid, false) },
-                        enabled = !busy,
-                        modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.OwnerSyncHoldTake),
-                    ) { Text("Take server") }
-                }
-            }
-        }
-    }
+    OwnerSyncHeldEntries(holds, busy, status.sessionPresent, onResolveHold)
     Spacer(Modifier.height(16.dp))
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Button(
@@ -508,5 +478,58 @@ private fun OwnerSyncEnrollBody(
                 .height(56.dp)
                 .testTag(NativeUiTags.OwnerSyncEnroll),
         ) { Text(if (busy) "Connecting…" else "Connect this phone") }
+    }
+}
+
+@Composable
+private fun OwnerSyncHeldEntries(
+    holds: List<NativeSyncHold>,
+    busy: Boolean,
+    connected: Boolean,
+    onResolveHold: (String, String, Boolean) -> Unit,
+) {
+    if (holds.isNotEmpty()) {
+        Spacer(Modifier.height(16.dp))
+        Text(
+            "Entries need review. These held entries will not upload until you choose which version to keep.",
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.testTag(NativeUiTags.OwnerSyncHolds),
+        )
+        if (!connected) Text("Reconnect sync to review these entries.",
+            modifier = Modifier.testTag(NativeUiTags.OwnerSyncReconnectReview),
+            style = nativeSupportingTextStyle())
+        holds.forEach { hold ->
+            NativeInformationSection(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                Text(
+                    hold.label.ifBlank { "${hold.tableName} · ${hold.rowUid}" },
+                    style = nativeValueTextStyle(),
+                )
+                if (hold.label.isNotBlank()) {
+                    Text(
+                        hold.rowUid,
+                        style = nativeSupportingTextStyle(),
+                        color = nativeVisualColors.supporting,
+                    )
+                }
+                Text(
+                    "Server version from ${hold.originDevice ?: "an unknown device"}" +
+                        " · held ${hold.heldAt.take(10)}",
+                    style = nativeSupportingTextStyle(),
+                    color = nativeVisualColors.supporting,
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onResolveHold(hold.tableName, hold.rowUid, true) },
+                        enabled = !busy && connected,
+                        modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.OwnerSyncHoldKeep),
+                    ) { Text("Keep mine") }
+                    OutlinedButton(
+                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onResolveHold(hold.tableName, hold.rowUid, false) },
+                        enabled = !busy && connected,
+                        modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.OwnerSyncHoldTake),
+                    ) { Text("Take server") }
+                }
+            }
+        }
     }
 }

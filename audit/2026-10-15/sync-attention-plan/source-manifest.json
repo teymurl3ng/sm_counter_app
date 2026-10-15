@@ -1,0 +1,15 @@
+{
+  "sourceBase": "3af011775b5529a3228cfbf1557ebdab8d6355af",
+  "workingSourceFiles": {
+    "phase18/app/src/main/java/com/saaf/milkshop/application/owner/NativeOwnerSyncFacade.kt": "58fcc984cc0f27ddbf69a31299cb89e2953b09c513bea35bace207ae882a00ed",
+    "phase18/app/src/main/java/com/saaf/milkshop/data/SyncEntities.kt": "317ad72df825a1f590d9d95c19febec7cdbfb00ff0da0878479a457a3c6f246c",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/NativeUiTags.kt": "ecb680a655b99a5bcc0e6da48010744617c645d905bddc2f1b9019c5857016fd",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerMoreScreen.kt": "bcbc18a616fbd2fd912acb781378c0d914909b65537a97b353e90ca6bfa06700",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerPreviewHost.kt": "fcdf4d399dcd83b344387c9526c3ea397199d6966cbfcc9f922043d88cc237de",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerShell.kt": "55b45e694a3c3d98adf404c8a12cdc65798d447eb50ef9506defb3ac9968f576",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerSyncController.kt": "682bff0db475a24c1ce341c3c17530e0ad3b1d7eea30a9f473643807f1fbbdb5",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerSyncScreen.kt": "5f85d88f16332ddf3fb800254389366753eaec93f555d27136b0b9ab063d5977",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerSyncAttention.kt": "b50d7596e82496670e2f82e49fbdcf0daacc4486d8a2c7332cb87e60526295ba"
+  },
+  "ordinaryReleaseVersionUnchanged": true
+}

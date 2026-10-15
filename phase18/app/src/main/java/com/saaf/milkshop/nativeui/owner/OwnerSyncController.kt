@@ -277,7 +277,7 @@ internal class OwnerSyncController(
                             notice = if (keepMine) {
                                 "Your version will upload with the next sync."
                             } else {
-                                "The server version will be applied with the next sync."
+                                "The server version has been applied on this phone."
                             },
                         ),
                     )

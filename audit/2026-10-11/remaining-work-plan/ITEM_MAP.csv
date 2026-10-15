@@ -6,7 +6,7 @@ B4,Protected credential reset policy,PROD_BROWSER_POLICY_SUCCESS_PENDING_ACCEPTE
 B5,Rounding/tolerance,VERIFIED_FIXED,1a,MONEY_BOUNDARIES,Decimal sale/cash/count/close aligned; v13 preserves legacy close policy; 26 focused passing checks plus 3013 bundled-driver oracle values,DONE
 B6,Own cashier expenses in Activity,COMPLETE_BOUNDED_QA,5a,USABILITY,Actor/date-filtered list and direct detail verified on S24,DONE
 B7,Device/person revocation,DEFERRED_DESIGN,IDENTITY_LATER,CENTRAL_REVOCATION_REQUIRED,Do not flip enforcement flag without guardrails,NOT_STARTED
-B8,Conflict attention,RECORDED_PENDING,8-conflicts,MULTI_DEVICE_UNATTENDED,Persistent review attention; existing review list retained,NOT_STARTED
+B8,Conflict attention,OWNER_LOCAL_HELD_ENTRY_ATTENTION_ACCEPTED_AUDIT_ONLY_PENDING,8-conflicts,MULTI_DEVICE_UNATTENDED,Phase2 localOwner Room-backed More badge and retained review accepted17 affected A06 checks; audit-only conflict review policy and cross-phone unattended attention not claimed,IN_PROGRESS
 B9,Lock/disconnect meaning,COPY_AND_PRESERVATION_VERIFIED,8c2,COPY,Five menus and Sync explain separate local/session/transport actions; 13 A06 checks including two complete-row/outbox-preservation boundaries pass,DONE
 B10,Planning restore enqueue,VERIFIED_FIXED,3,RESTORE_PLANNING,Planning-only restore defect reproduced and fixed; isolated restore and differing-server hold passed S24 QA,DONE
 B11,No hard deletes guardrail,INVARIANT,ENGINEERING_LATER,FUTURE_DELETE_FEATURE,No current user-facing hard delete proved,NOT_STARTED

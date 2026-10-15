@@ -474,6 +474,20 @@ fun OwnerPreviewHost(
         val ownerWorkReady = ownerWorkState as? NativeOwnerWorkState.Ready
         val ownerMoreDestination =
             (ownerMoreState as? NativeOwnerMoreState.Ready)?.destination
+        val syncReviewContext = androidx.compose.ui.platform.LocalContext.current.applicationContext
+        val syncReviewFacade = remember(database, syncReviewContext) {
+            com.saaf.milkshop.application.owner.NativeOwnerSyncFacade(syncReviewContext, database)
+        }
+        val syncReviewCounts = remember(sessionHandle, syncReviewFacade, security) {
+            syncReviewFacade.observeReviewCount(sessionHandle, security)
+        }
+        val syncReviewHolds = remember(sessionHandle, syncReviewFacade, security) {
+            syncReviewFacade.observeReviewHolds(sessionHandle, security)
+        }
+        var syncReviewRetry by remember(sessionHandle) { mutableStateOf(0) }
+        val syncAttention = rememberOwnerSyncAttention(sessionHandle, syncReviewCounts, syncReviewHolds,
+            ownerSection == OwnerSection.More && ownerMoreDestination == NativeOwnerMoreDestination.Sync,
+            syncReviewRetry)
         // Static chrome (Cashier pattern): one scaffold + one header at the
         // host, outside the pane transition — nav and header never reload.
         var activeEntryGuard by remember { mutableStateOf<EntryLeaveGuard?>(null) }
@@ -517,8 +531,8 @@ fun OwnerPreviewHost(
             modifier = Modifier.fillMaxSize(),
             containerColor = MaterialTheme.colorScheme.background,
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
-            compactNavigation = { OwnerNavigation(selected = ownerSection, onNavigate = guardedNavigateOwner) },
-            expandedNavigation = { OwnerNavigationRail(selected = ownerSection, onNavigate = guardedNavigateOwner) },
+            compactNavigation = { OwnerNavigation(selected = ownerSection, onNavigate = guardedNavigateOwner, syncAttention = syncAttention) },
+            expandedNavigation = { OwnerNavigationRail(selected = ownerSection, onNavigate = guardedNavigateOwner, syncAttention = syncAttention) },
         ) { hostPadding ->
             Column(Modifier.fillMaxSize().padding(hostPadding)) {
         CashierScreenHeader(
@@ -546,6 +560,7 @@ fun OwnerPreviewHost(
                     snackbarHostState = snackbarHostState,
                     identity = identity,
                     state = ownerMoreState,
+                    syncAttention = syncAttention,
                     onRetry = ownerMoreViewModel::refresh,
                     onOpenPersonalSecurity = ownerMoreViewModel::openPersonalSecurity,
                     onOpenProducts = ownerMoreViewModel::openProducts,
@@ -557,8 +572,8 @@ fun OwnerPreviewHost(
                     onOpenUsersRoles = ownerMoreViewModel::openUsersRoles,
                     onOpenSecurityHistory = ownerMoreViewModel::openSecurityHistory,
                     onOpenBackup = ownerMoreViewModel::openBackup,
-                    onOpenSync = ownerMoreViewModel::openSync,
-                    onRefreshSync = ownerMoreViewModel::refreshSync,
+                    onOpenSync = { syncReviewRetry++; ownerMoreViewModel.openSync() },
+                    onRefreshSync = { syncReviewRetry++; ownerMoreViewModel.refreshSync() },
                     onEnrollSync = { username, chars, env, localUserId ->
                         ownerMoreViewModel.enrollSync(username, chars, env, localUserId)
                     },

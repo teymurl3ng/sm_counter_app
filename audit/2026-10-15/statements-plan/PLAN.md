@@ -2,6 +2,8 @@
 
 15 October 2026. Baseline `a596cd8e663415ae8d56ecf6a9d762cf37a838d9`. Planning/research/judgment complete; implementation has not started. This is phase 5/L3 of the existing six-phase plan. No new phase is added.
 
+**UI fit supplement:** [Exact placement, design-resource reuse, navigation, reflow and feedback](UI_FIT.md), with an [interactive layout study](UI_PREVIEW.html). This is the controlling layout brief: customer detail is locally regrouped first; a single Statements & reminders entry opens dedicated Statement/Reminder body panes inside the existing role host. The first implementation piece includes that presentation extraction, not a new global design pass. Native acceptance remains pending.
+
 ## Plain-English outcome
 
 Open a customer, preview a statement for a chosen period, then share its PDF or images. Separately, prepare a polite WhatsApp or SMS message showing that customer's current outstanding balance. The operator reviews the recipient and sends from the other app. Sunday bill preparation does not change any sale's agreed payment deadline.

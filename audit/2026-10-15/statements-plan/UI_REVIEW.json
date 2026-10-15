@@ -1,0 +1,12 @@
+{
+  "baselineCommit": "3dd5468",
+  "planningOnly": true,
+  "resources": ["Accepted native Counter Ledger blueprints", "October capsule/grouping/typography/night/chrome plans", "Current SaafTheme and NativeVisualRoles", "Bundled Manrope regular/semibold/bold", "Impeccable layout/typeset references", "Android components/accessibility references"],
+  "decision": "One Statements & reminders entry after a single summary; existing histories/profile/Owner controls grouped; statement and reminder are body panes in the existing role host.",
+  "alternativesRejected": ["Four export/channel buttons appended to detail", "New bottom tab", "Long modal sheet workflow", "New internal overview/statements/history tabs"],
+  "prototype": "UI_PREVIEW.html",
+  "browserObserved": ["Customer summary, single feature entry and three disclosures visible", "Entry opens Statement body with period/preview/share/reminder", "Share opens PDF/Images format choice; Cancel returns", "Prepare reminder opens recipient/message/handoff body", "Dark and large-text mode inspected", "Existing Manrope fonts loaded", "Large reminder body has no horizontal overflow; content scrolls vertically"],
+  "largeTextObservation": {"phoneWidth": 388, "bodyWidth": 378, "horizontalOverflow": false, "bodyScrollable": true, "fontReady": "loaded", "manropeLoaded": true},
+  "limitations": ["Browser mockup is not Android acceptance or an exact reproduction of native chrome geometry", "Large text control is a body-layout study; native 200% shared-header/footer/IME behavior still requires implementation checks", "Synthetic single-page sample; actual arithmetic/export, long/multi-page output and held states are scoped but not implemented", "No real external composer, file export or sending occurs in the prototype", "No app code, phone, cloud or financial data changed"],
+  "hook": "Fixed reminder executed, not a validator or independent reviewer"
+}

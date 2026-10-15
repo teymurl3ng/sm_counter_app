@@ -1,5 +1,7 @@
 # Current technical finish — 15 October 2026
 
+**Later ordinary-app check:** The user confirmed the already-open ordinary A06 installation is the real configured shop. Authenticated Owner, PROD binding and historical records/details are observed. A live zero-outbox sync then exposed a nullable-timezone refresh defect. [Bounded repair](../prod-timezone-fix/RESULT.md) reproduces it, passes six affected checks and delivers signed0.4.3/code7 to A06 without data clearing. Post-patch private sign-in/live acceptance and S24 patch update remain open. Earlier305a91d freeze and “no production source change” statements below describe the initial finish run only.
+
 Completed in this bounded run: production reset/browser acceptance, latest signed A06 update, seventeen affected phone checks, current signing-key proof and the revised handover. No production app feature or schema change was needed. Staff/private ordinary-app acceptance and independent custody are not inferred from these results.
 
 ## Production reset acceptance: batch 6 complete

@@ -1,5 +1,7 @@
 # Remaining finish work and recovered later plans — 15 October 2026
 
+**Latest ordinary-app follow-up:** Real A06 shop/Owner/PROD setup and historical records are observed. One live sync exposed a JSON-null timezone refresh failure; the six-check-verified signed0.4.3 patch from62c9d31 is now on A06 without data clearing. Its post-patch ordinary sign-in/sync needs the owner's private authentication; S24 matching patch installation needs connection. This remains batch7; staff feedback and independent custody remain open. [Current patch](audit/2026-10-15/prod-timezone-fix/RESULT.md). Earlier matched0.4.2 phone/freeze statements below describe their original completion, not this later patch.
+
 This inventory reconciles the current seven-batch plan with older roadmap, pilot-decision and feature-blueprint records. It does not authorize new implementation or testing. Earlier dated evidence stays intact; later verified results take precedence over stale unchecked boxes. This is a repository/source/evidence review, not a fresh phone or hosted-platform run.
 
 **Subsequent 15 October execution:** The user then requested finishing the current technical list. Production reset/browser verification, A06 update, seventeen affected checks, current signing proof and final instructions are now complete. See [execution result](audit/2026-10-15/current-finish/RESULT.md). The later-feature inventory below is unchanged. Staff outcomes, private ordinary-app sign-in/records/PROD setup and independent custody still need actual participation; no new feature work was opened.

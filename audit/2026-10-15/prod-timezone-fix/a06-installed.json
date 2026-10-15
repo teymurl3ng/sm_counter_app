@@ -1,0 +1,25 @@
+{
+  "serial": "R8VXA02SNKH",
+  "normalProfile": 0,
+  "package": "com.saaf.milkshop",
+  "sourceCommit": "62c9d315662e67f871d9c124f86d73675c5f06f1",
+  "apkSha256": "d467d09d60c6490a8578b3945221c3afe9a34a3b1b492222b38ab8ca4ecf12ae",
+  "versionName": "0.4.3",
+  "versionCode": 7,
+  "sameUidAndFirstInstallTime": true,
+  "dataCleared": false,
+  "before": [
+    "versionCode=6 minSdk=26 targetSdk=36",
+    "versionName=0.4.2",
+    "lastUpdateTime=2026-10-15 10:42:55",
+    "firstInstallTime=2026-10-10 19:31:03"
+  ],
+  "after": [
+    "versionCode=7 minSdk=26 targetSdk=36",
+    "versionName=0.4.3",
+    "lastUpdateTime=2026-10-15 12:25:06",
+    "firstInstallTime=2026-10-10 19:31:03"
+  ],
+  "installedBytesMatch": true,
+  "launcherOpened": true
+}

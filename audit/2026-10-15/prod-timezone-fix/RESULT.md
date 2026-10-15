@@ -8,4 +8,8 @@ The isolated real-Android regression reproduces the bug before the repair: expec
 
 Six affected auth/refresh checks pass, including three timezone cases, ordinary allowed sign-in, disabled/no-profile classification and unknown outcomes. [After](after-results.json). Existing seventeen presentation checks are credited; no broad suite was rerun.
 
-The patch is versioned 0.4.3/code7 for ordinary signed installation. Build/installation/live sync acceptance is recorded separately; compilation and fake HTTP checks alone do not prove the live phone sync succeeds. The earlier305a91d candidate/freeze records are historical after this production repair. S24 needs the same patch when connected. Human staff checks and independent backup/signing custody remain their existing open items.
+The patch is versioned 0.4.3/code7 from committed source `62c9d315662e67f871d9c124f86d73675c5f06f1`. Signed release assembly passes; non-debuggable/preview-disabled package and the existing certificate are verified. APK SHA-256: `d467d09d60c6490a8578b3945221c3afe9a34a3b1b492222b38ab8ca4ecf12ae`. [Manifest](PACKAGE_MANIFEST.json).
+
+A06 received a normal profile0 replacement update without uninstalling or clearing data. UID and first-install time are unchanged; installed bytes match the signed artifact and the ordinary app launches. [Installation](a06-installed.json). Restart correctly returned to the welcome/private-account flow. The owner has been asked to sign in privately again for post-patch live sync and sampled retained-record verification. Compilation/fake HTTP checks and successful installation alone do not prove that final live result.
+
+The earlier305a91d candidate/freeze records are historical after this production repair. S24 is absent from ADB and one mDNS discovery; it needs the same patch when connected. Human staff checks and independent backup/signing custody remain their existing open items. No broad reconnection or testing run was opened.

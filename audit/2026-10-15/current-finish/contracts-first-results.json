@@ -1,0 +1,76 @@
+{
+  "group": "contracts",
+  "serial": "R8VXA02SNKH",
+  "target": "com.saaf.milkshop.qa.tests",
+  "methods": [
+    "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest#switchingSectionsKeepsTabAndActionBoundsStable",
+    "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest#switchingSectionsKeepsTabAndActionBoundsStableAtDoubleText",
+    "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest#emptyStateIsHonest",
+    "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest#loadFailureOffersRetry",
+    "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest#reauthDialogIsShownWhenRequired",
+    "com.saaf.milkshop.NativeChromeGeometryTest#workHeaderDefault",
+    "com.saaf.milkshop.NativeChromeGeometryTest#workHeaderDarkExtraLarge",
+    "com.saaf.milkshop.NativeSecurityImeTraceTest#pinSetupKeyboardTrace",
+    "com.saaf.milkshop.NativeSaleScreenContractTest#catalogPickerHandlesZeroOneTwoThreeTwelveAndFiftyProducts",
+    "com.saaf.milkshop.NativeSaleScreenContractTest#salePaymentPickerCancelsAndChangesDestination",
+    "com.saaf.milkshop.NativeSaleScreenContractTest#saleWholesaleRateAndNoteStayEditable"
+  ],
+  "tests": [
+    {
+      "test": "switchingSectionsKeepsTabAndActionBoundsStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "switchingSectionsKeepsTabAndActionBoundsStableAtDoubleText",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Tab baseline moves on Approve baseline expected:<406.0> but was:<0.0>"
+    },
+    {
+      "test": "loadFailureOffersRetry",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "reauthDialogIsShownWhenRequired",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "emptyStateIsHonest",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "workHeaderDefault",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "workHeaderDarkExtraLarge",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "pinSetupKeyboardTrace",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "saleWholesaleRateAndNoteStayEditable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "salePaymentPickerCancelsAndChangesDestination",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "catalogPickerHandlesZeroOneTwoThreeTwelveAndFiftyProducts",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 10
+}

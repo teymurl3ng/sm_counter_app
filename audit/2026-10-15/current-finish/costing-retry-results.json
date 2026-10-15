@@ -1,0 +1,16 @@
+{
+  "group": "costing-retry",
+  "serial": "R8VXA02SNKH",
+  "target": "com.saaf.milkshop.qa.tests",
+  "methods": [
+    "com.saaf.milkshop.NativeOwnerCostingPlansScreenContractTest#switchingSectionsKeepsTabAndActionBoundsStableAtDoubleText"
+  ],
+  "tests": [
+    {
+      "test": "switchingSectionsKeepsTabAndActionBoundsStableAtDoubleText",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 1
+}

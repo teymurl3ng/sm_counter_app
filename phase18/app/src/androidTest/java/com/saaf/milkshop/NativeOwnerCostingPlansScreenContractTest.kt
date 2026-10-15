@@ -6,6 +6,9 @@ import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
@@ -346,6 +349,40 @@ class NativeOwnerCostingPlansScreenContractTest {
     }
 
     @Test
+    fun switchingSectionsKeepsTabAndActionBoundsStable() = assertStableSectionBounds(1f)
+
+    @Test
+    fun switchingSectionsKeepsTabAndActionBoundsStableAtDoubleText() = assertStableSectionBounds(2f)
+
+    private fun assertStableSectionBounds(fontScale: Float) {
+        setScreen(policies = listOf(samplePolicy()), fontScale = fontScale, interactiveSections = true)
+        val actions = listOf(
+            NativeUiTags.OwnerCostingSectionPolicies to "Approve policy",
+            NativeUiTags.OwnerCostingSectionPlans to "New plan",
+            NativeUiTags.OwnerCostingSectionOpening to "Shop settings",
+            NativeUiTags.OwnerCostingSectionYield to "Approve baseline",
+        )
+        var tabTop: Float? = null
+        var actionTop: Float? = null
+        var actionBottom: Float? = null
+        repeat(2) {
+            actions.forEach { (tag, label) ->
+                composeRule.onNodeWithTag(tag).performScrollTo().performClick()
+                // Measure the tab strip, not a chip whose clipped bounds become
+                // empty when its horizontal scroll position changes on selection.
+                val tab = composeRule.onNodeWithTag(NativeUiTags.OwnerCostingPlansHub).fetchSemanticsNode().boundsInRoot
+                val action = composeRule.onNodeWithText(label).assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+                if (tabTop == null) {
+                    tabTop = tab.top; actionTop = action.top; actionBottom = action.bottom
+                }
+                org.junit.Assert.assertEquals("Tab baseline moves on $label", tabTop!!, tab.top, 1f)
+                org.junit.Assert.assertEquals("Action top moves on $label", actionTop!!, action.top, 1f)
+                org.junit.Assert.assertEquals("Content baseline moves on $label", actionBottom!!, action.bottom, 1f)
+            }
+        }
+    }
+
+    @Test
     fun openingEditorRequiresEstimateEvidenceAndSavesCorrection() {
         var saved: OpeningCostBasisInput? = null
         setScreen(
@@ -545,8 +582,10 @@ class NativeOwnerCostingPlansScreenContractTest {
         onCancelReauth: () -> Unit = {},
         onNavigate: (OwnerSection) -> Unit = {},
         fontScale: Float = 1f,
+        interactiveSections: Boolean = false,
     ) {
         composeRule.setContent {
+            var visibleSection by remember { mutableStateOf(section) }
             val currentDensity = LocalDensity.current
             CompositionLocalProvider(
                 LocalDensity provides Density(currentDensity.density, fontScale),
@@ -572,7 +611,7 @@ class NativeOwnerCostingPlansScreenContractTest {
                         policyDetail = policyDetail,
                         policiesError = policiesError,
                         currentMonthSummary = currentMonthSummary,
-                        section = section,
+                        section = if (interactiveSections) visibleSection else section,
                         budgets = budgets,
                         targets = targets,
                         budgetCategories = budgetCategories,
@@ -599,7 +638,7 @@ class NativeOwnerCostingPlansScreenContractTest {
                         componentCodes = componentCodes,
                         onBackToMenu = onBackToMenu,
                         onRetry = onRetry,
-                        onSectionChange = onSectionChange,
+                        onSectionChange = { if (interactiveSections) visibleSection = it; onSectionChange(it) },
                         onOpenPolicy = onOpenPolicy,
                         onBackFromDetail = onBackFromDetail,
                         onOpenApprove = onOpenApprove,

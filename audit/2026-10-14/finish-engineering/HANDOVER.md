@@ -1,4 +1,6 @@
-# Candidate superseded by presentation repair
+# Historical candidate handover — superseded
+
+Use the [15 October current handover](../../2026-10-15/current-finish/HANDOVER.md) for the signed source-305a91d APK now verified on A06/S24, accepted production reset/browser checks, current signing proof and actual remaining private setup. The pre-repair candidate and paused-publication wording below describe their original date only.
 
 14 October: release/publication is paused. The saved 0.4.2 APK predates the [layout/keyboard source repair](../layout-keyboard-audit/RESULT.md). Keep it as a provenance artifact; rebuild/freeze a new candidate before installation or publication of that repair. Phone and business acceptance remain deferred, not passed.
 

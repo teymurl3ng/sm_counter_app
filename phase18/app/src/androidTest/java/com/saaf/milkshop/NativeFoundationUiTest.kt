@@ -2556,8 +2556,9 @@ class NativeFoundationUiTest {
     @Test
     fun saleEntryDoneActionClearsKeyboardFocus() {
         openCashier()
+        dismissTransientNotice()
         val input = composeRule.onNodeWithTag(NativeUiTags.CashierEntryInput, useUnmergedTree = true)
-        input.assertIsDisplayed().performClick()
+        input.performScrollTo().assertIsDisplayed().performClick()
         composeRule.waitUntil(5_000) {
             var visible = false
             composeRule.activityRule.scenario.onActivity { activity ->
@@ -2578,6 +2579,69 @@ class NativeFoundationUiTest {
             hidden
         }
         captureUx("sale-keyboard-after-done", "saleEntryDoneActionClearsKeyboardFocus")
+    }
+
+    @Test fun ownerHostedSecurityImeKeepsHeaderStable() {
+        openOwnerMore()
+        checkHostedSecurityIme(NativeUiTags.OwnerMorePersonalSecurity, NativeUiTags.OwnerMoreSecurityPassphrase, NativeUiTags.OwnerMoreSecurityPin)
+    }
+
+    @Test fun cashierHostedSecurityImeKeepsHeaderStable() {
+        openCashier()
+        composeRule.onNodeWithTag(NativeUiTags.CashierNavMore).performClick()
+        checkHostedSecurityIme(NativeUiTags.MorePersonalSecurity, NativeUiTags.MoreSecurityPassphrase, NativeUiTags.MoreSecurityPin)
+    }
+
+    @Test fun managerHostedSecurityImeKeepsHeaderStable() {
+        openManagerMore()
+        checkHostedSecurityIme(NativeUiTags.ManagerMorePersonalSecurity, NativeUiTags.ManagerMoreSecurityPassphrase, NativeUiTags.ManagerMoreSecurityPin)
+    }
+
+    @Test fun adminHostedSecurityImeKeepsHeaderStable() {
+        openAdminMore()
+        checkHostedSecurityIme(NativeUiTags.AdminMorePersonalSecurity, NativeUiTags.AdminMoreSecurityPassphrase, NativeUiTags.AdminMoreSecurityPin)
+    }
+
+    @Test fun operationsHostedSecurityImeKeepsHeaderStable() {
+        openOperationsWork()
+        composeRule.onNodeWithTag(NativeUiTags.OpsNavMore).performClick()
+        checkHostedSecurityIme(NativeUiTags.OpsMorePersonalSecurity, NativeUiTags.OpsMoreSecurityPassphrase, NativeUiTags.OpsMoreSecurityPin)
+    }
+
+    private fun checkHostedSecurityIme(menu: String, first: String, last: String) {
+        composeRule.onNodeWithTag(menu).performScrollTo().performClick()
+        composeRule.waitUntil(10_000) { composeRule.onAllNodesWithTag(first).fetchSemanticsNodes().isNotEmpty() }
+        fun headerTop(): Float = listOf("Personal security", "More").flatMap {
+            composeRule.onAllNodesWithText(it).fetchSemanticsNodes()
+        }.filter { it.boundsInWindow.height > 0f }.minOf { it.boundsInWindow.top }
+        val top = headerTop()
+        repeat(2) {
+            listOf(first, last).forEach { tag ->
+                val field = composeRule.onNodeWithTag(tag)
+                field.performScrollTo().performClick()
+                composeRule.waitUntil(5_000) {
+                    var visible = false
+                    composeRule.activityRule.scenario.onActivity { activity ->
+                        visible = com.saaf.milkshop.qa.NativeLayoutImeEvidence.imeInsets(activity)
+                            .isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())
+                    }
+                    visible
+                }
+                com.saaf.milkshop.qa.NativeLayoutImeEvidence.assertFocusedFieldNotOccluded(composeRule.activity, field)
+                assertEquals("Hosted keyboard must not move the title", top, headerTop(), 1f)
+            }
+            androidx.test.uiautomator.UiDevice.getInstance(androidx.test.platform.app.InstrumentationRegistry.getInstrumentation()).pressBack()
+            composeRule.waitUntil(5_000) {
+                var hidden = false
+                composeRule.activityRule.scenario.onActivity { activity ->
+                    hidden = !com.saaf.milkshop.qa.NativeLayoutImeEvidence.imeInsets(activity)
+                        .isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())
+                }
+                hidden
+            }
+            composeRule.waitForIdle()
+            assertEquals("Dismissing keyboard must preserve the title", top, headerTop(), 1f)
+        }
     }
 
     @Test

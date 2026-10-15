@@ -1,0 +1,15 @@
+{
+  "serial": "R8VXA02SNKH",
+  "package": "com.saaf.milkshop",
+  "normalProfile": 0,
+  "observedStaticLabels": [],
+  "credentialEntryPerformed": false,
+  "businessWritePerformed": false,
+  "rawHierarchySaved": false,
+  "limitation": "Private ordinary-app authentication/setup and retained-record comparison are not inferred from installation or QA fixtures.",
+  "visualReview": "Ordinary app Welcome opened; Continue showed the existing Owner account and configured Quick PIN/full-passphrase options.",
+  "accountPresenceObserved": true,
+  "privateLoginObserved": false,
+  "businessRecordsCompared": false,
+  "hierarchyLimitation": "UI hierarchy exposed no useful text; two local ignored screenshots were reviewed instead. No raw hierarchy retained."
+}

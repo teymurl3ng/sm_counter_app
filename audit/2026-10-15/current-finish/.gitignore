@@ -1,0 +1,7 @@
+*.png
+*.xml
+*.apk
+*-console.txt
+__pycache__/
+*.env
+private/

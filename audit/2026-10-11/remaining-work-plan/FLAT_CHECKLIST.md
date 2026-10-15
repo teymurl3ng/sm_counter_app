@@ -1,5 +1,8 @@
 # Flat completion checklist â€” 14 October 2026
 
+**15 October reconciliation:** R22–R28 and R30–R35 are complete at their named technical scope. Hosted recovery, source publication, production browser/reset, both signed phone installations and seventeen affected checks are credited. R29 still needs independent custody/recovered-backup acceptance; R36/R37 need private ordinary-app records/login and real setup; R38 has completed instructions but final private handover remains open. Batch 4 human outcomes remain open. [Current result](../../2026-10-15/current-finish/RESULT.md). Older dated notes below are historical.
+
+
 Detailed substeps retained from the inventory. The user-facing progress plan is [seven finite batches](FINISH_BATCHES.md); these 38 rows are not 38 separate jobs. Preserve stable R/C IDs for evidence mapping. New findings stay attached to their blocking batch and need a bounded scope before editing.
 
 ## Remaining completion tasks
@@ -25,27 +28,27 @@ Detailed substeps retained from the inventory. The user-facing progress plan is 
 - [x] **R19** ~~Finish the named Overview screen visual check.~~ <!-- 9c / A10 -->
 - [x] **R20** ~~Finish the named Operator Today visual check.~~ <!-- 9c / A10 -->
 - [x] **R21** ~~Finish the cash-count receipt visual check.~~ <!-- 9c / A10 -->
-- [ ] **R22** Choose and authorize the isolated hosted recovery test environment. <!-- 8b3b / O1; existing proposal needs exact route approval -->
-- [ ] **R23** Test server identity recovery and real account sign-in there. <!-- 8b3 / O1 -->
-- [ ] **R24** Publish the accepted server recovery tools. <!-- 8b3 / O1 -->
-- [ ] **R25** Complete the real browser credential-reset feedback check. <!-- 8a / B4; currently blocked by approval/access review -->
-- [ ] **R26** Roll out the protected reset guard to production when accepting that feature. <!-- 8a / B4 -->
-- [ ] **R27** Publish/promote the updated reset interface in the admin Viewer. <!-- 8a / B4 -->
-- [ ] **R28** Publish the updated protected-reset CLI integration. <!-- 8a / B4 -->
+- [x] **R22** ~~Choose and authorize the isolated hosted recovery test environment.~~ <!-- 8b3b / O1; existing proposal needs exact route approval -->
+- [x] **R23** ~~Test server identity recovery and real account sign-in there.~~ <!-- 8b3 / O1 -->
+- [x] **R24** ~~Publish the accepted server recovery tools.~~ <!-- 8b3 / O1 -->
+- [x] **R25** ~~Complete the real browser credential-reset feedback check.~~ <!-- 8a / B4; currently blocked by approval/access review -->
+- [x] **R26** ~~Roll out the protected reset guard to production when accepting that feature.~~ <!-- 8a / B4 -->
+- [x] **R27** ~~Publish/promote the updated reset interface in the admin Viewer.~~ <!-- 8a / B4 -->
+- [x] **R28** ~~Publish the updated protected-reset CLI integration.~~ <!-- 8a / B4 -->
 - [ ] **R29** Verify current signing-key custody and signing with the recovered key. <!-- 10 / O6 -->
-- [ ] **R30** Freeze the accepted source version. <!-- 10 / A5 -->
-- [ ] **R31** Run the agreed final checks on that frozen version. <!-- 10 / A5; affected-only preference retained -->
-- [ ] **R32** Save the exact release evidence, build hashes and limitations. <!-- 10 / A5 -->
-- [ ] **R33** Commit and push the accepted app changes. <!-- 10 / A6 -->
-- [ ] **R34** Build and version the signed ordinary app; verify its certificate/package. <!-- 10 / A6 -->
-- [ ] **R35** Install matching accepted builds on the intended shop phones. <!-- 10 / A6 -->
+- [x] **R30** ~~Freeze the accepted source version.~~ <!-- 10 / A5 -->
+- [x] **R31** ~~Run the agreed final checks on that frozen version.~~ <!-- 10 / A5; affected-only preference retained -->
+- [x] **R32** ~~Save the exact release evidence, build hashes and limitations.~~ <!-- 10 / A5 -->
+- [x] **R33** ~~Commit and push the accepted app changes.~~ <!-- 10 / A6 -->
+- [x] **R34** ~~Build and version the signed ordinary app; verify its certificate/package.~~ <!-- 10 / A6 -->
+- [x] **R35** ~~Install matching accepted builds on the intended shop phones.~~ <!-- 10 / A6 -->
 - [ ] **R36** Verify the upgrade preserves existing records and logins. <!-- 10 / A6 -->
 - [ ] **R37** Configure the actual shop, staff access, PINs and sync connection. <!-- O3 / actual handover -->
 - [ ] **R38** Hand over the devices with final recovery/rollback instructions. <!-- O3 / O6 / 10 -->
 
 R01/R02 are accepted in [close-sync repair](../../2026-10-14/close-sync-repair/RESULT.md), following the scope in [closing repair](../../2026-10-14/offline-close-baseline/FIX_SCOPE.md). R03â€“R10 are accepted in [physical offline/closing](../../2026-10-14/physical-offline-close/RESULT.md), using the frozen [offline expectations](../../2026-10-14/offline-close-baseline/EXPECTED.json), after that repair. R11 is accepted at its frozen missed-response/fresh-process scenario in [recovery result](../../2026-10-14/sync-recovery/RESULT.md); newly emitted queued closing history is repaired. Old affected feeds remain conditional C03. A06 and S24 both completed the accepted physical scenario. Check current connectivity before the separate recovery run.
 
-R22 does not authorize pausing DEV or creating/deleting a project. R25 retains the actual approval-review blocker and must not be retried by bypassing it. Production reset publication is separate from current DEV acceptance. Ordinary app installation has not occurred.
+Historical pre-acceptance note superseded: the user subsequently authorized the exact hosted-recovery route and the current technical finish. Those tests, publication and installation are now accepted at the scopes above. No permission to broaden platform changes is implied.
 
 ## Conditional items â€” enable only when their stated condition applies
 

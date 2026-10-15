@@ -1,0 +1,18 @@
+{
+  "businesses": {
+    "count": 1,
+    "sha256": "0509f0ce745ac8fd5148b18491530c4da4ecd9749dcede6b700a2a9118272e59"
+  },
+  "shops": {
+    "count": 2,
+    "sha256": "86690c9827f6fa8ee133f440dc7a968c14206e70364716e4104491574cade2e6"
+  },
+  "staff": {
+    "count": 3,
+    "sha256": "dff8926a8f0b9a9ddbf93220a8ebfd0410160a9348346c4dd1d8866212a64ea0"
+  },
+  "auth_ids": {
+    "count": 3,
+    "sha256": "5a55aff85c9b6bbc9a755446b95fb01f952b42cd467845e781782a1f90161db9"
+  }
+}

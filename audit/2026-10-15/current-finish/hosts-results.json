@@ -1,0 +1,46 @@
+{
+  "group": "hosts",
+  "serial": "R8VXA02SNKH",
+  "target": "com.saaf.milkshop.qa.tests",
+  "methods": [
+    "com.saaf.milkshop.NativeFoundationUiTest#ownerHostedSecurityImeKeepsHeaderStable",
+    "com.saaf.milkshop.NativeFoundationUiTest#cashierHostedSecurityImeKeepsHeaderStable",
+    "com.saaf.milkshop.NativeFoundationUiTest#managerHostedSecurityImeKeepsHeaderStable",
+    "com.saaf.milkshop.NativeFoundationUiTest#adminHostedSecurityImeKeepsHeaderStable",
+    "com.saaf.milkshop.NativeFoundationUiTest#operationsHostedSecurityImeKeepsHeaderStable",
+    "com.saaf.milkshop.NativeFoundationUiTest#saleEntryDoneActionClearsKeyboardFocus"
+  ],
+  "tests": [
+    {
+      "test": "managerHostedSecurityImeKeepsHeaderStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "cashierHostedSecurityImeKeepsHeaderStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "operationsHostedSecurityImeKeepsHeaderStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "adminHostedSecurityImeKeepsHeaderStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "ownerHostedSecurityImeKeepsHeaderStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "saleEntryDoneActionClearsKeyboardFocus",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 6
+}

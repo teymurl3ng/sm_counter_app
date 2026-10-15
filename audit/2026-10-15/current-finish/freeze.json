@@ -1,0 +1,33 @@
+{
+  "productionSourceCommit": "305a91dac8ba70e839e92f80d52de8e4920089a7",
+  "productionDiffFromCandidate": [],
+  "package": "com.saaf.milkshop",
+  "apkSha256": "ec2cf295884fece77d951e8022e3270ab5e0ec8fd9c223943178a677eed64ba0",
+  "certificateSha256": "9c9e03d7969d79018e2880b79b8d9ec46c43ab50eaf30512ee3fb989bc6abfa1",
+  "affectedUniqueChecks": 17,
+  "affectedLatestPasses": [
+    "adminHostedSecurityImeKeepsHeaderStable",
+    "cashierHostedSecurityImeKeepsHeaderStable",
+    "catalogPickerHandlesZeroOneTwoThreeTwelveAndFiftyProducts",
+    "emptyStateIsHonest",
+    "loadFailureOffersRetry",
+    "managerHostedSecurityImeKeepsHeaderStable",
+    "operationsHostedSecurityImeKeepsHeaderStable",
+    "ownerHostedSecurityImeKeepsHeaderStable",
+    "pinSetupKeyboardTrace",
+    "reauthDialogIsShownWhenRequired",
+    "saleEntryDoneActionClearsKeyboardFocus",
+    "salePaymentPickerCancelsAndChangesDestination",
+    "saleWholesaleRateAndNoteStayEditable",
+    "switchingSectionsKeepsTabAndActionBoundsStable",
+    "switchingSectionsKeepsTabAndActionBoundsStableAtDoubleText",
+    "workHeaderDarkExtraLarge",
+    "workHeaderDefault"
+  ],
+  "testSourceHashes": {
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/NativeFoundationUiTest.kt": "6e615a5df47d967b471cdf583abae7d61720a7151a9bc3ccfcd1a6f641621861",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerCostingPlansScreenContractTest.kt": "35ccec8c3ad10ca3e7b719ea5fc4831ad862fd0748e327cc6d57cc646900237a"
+  },
+  "ordinaryPrivateSetupAndRecordsLoginAcceptance": "pending user participation",
+  "independentBackupCustody": "pending user confirmation"
+}

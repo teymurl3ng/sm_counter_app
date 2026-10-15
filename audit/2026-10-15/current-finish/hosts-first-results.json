@@ -1,0 +1,46 @@
+{
+  "group": "hosts",
+  "serial": "R8VXA02SNKH",
+  "target": "com.saaf.milkshop.qa.tests",
+  "methods": [
+    "com.saaf.milkshop.NativeFoundationUiTest#ownerHostedSecurityImeKeepsHeaderStable",
+    "com.saaf.milkshop.NativeFoundationUiTest#cashierHostedSecurityImeKeepsHeaderStable",
+    "com.saaf.milkshop.NativeFoundationUiTest#managerHostedSecurityImeKeepsHeaderStable",
+    "com.saaf.milkshop.NativeFoundationUiTest#adminHostedSecurityImeKeepsHeaderStable",
+    "com.saaf.milkshop.NativeFoundationUiTest#operationsHostedSecurityImeKeepsHeaderStable",
+    "com.saaf.milkshop.NativeFoundationUiTest#saleEntryDoneActionClearsKeyboardFocus"
+  ],
+  "tests": [
+    {
+      "test": "managerHostedSecurityImeKeepsHeaderStable",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Failed: assertExists."
+    },
+    {
+      "test": "cashierHostedSecurityImeKeepsHeaderStable",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Failed: assertExists."
+    },
+    {
+      "test": "operationsHostedSecurityImeKeepsHeaderStable",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Dismissing keyboard must preserve the title expected:<80.0> but was:<487.0>"
+    },
+    {
+      "test": "adminHostedSecurityImeKeepsHeaderStable",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Failed: assertExists."
+    },
+    {
+      "test": "ownerHostedSecurityImeKeepsHeaderStable",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Dismissing keyboard must preserve the title expected:<80.0> but was:<0.0>"
+    },
+    {
+      "test": "saleEntryDoneActionClearsKeyboardFocus",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Assert failed: The component with TestTag = 'cashier_entry_input' is not displayed!"
+    }
+  ],
+  "passed": 0
+}

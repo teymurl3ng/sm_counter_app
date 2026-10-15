@@ -1,0 +1,22 @@
+{
+  "exactProd": false,
+  "envProd": false,
+  "adminKeyPresent": true,
+  "publishableKeyPresent": true,
+  "browserStatus": 200,
+  "loginText": "S\nSaaf Milk Admin\n\nSign in with your username and server credential.\n\nPROD Environment\nUsername\nServer credential\nShow\nSign in\n\nSecure access for owners and admins.",
+  "inputs": [
+    {
+      "type": "text",
+      "id": "",
+      "name": "username",
+      "placeholder": "Enter your username"
+    },
+    {
+      "type": "password",
+      "id": "server-credential",
+      "name": "credential",
+      "placeholder": "Enter server credential"
+    }
+  ]
+}

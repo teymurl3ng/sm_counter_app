@@ -1,0 +1,11 @@
+{
+  "originalUnchanged": {
+    "businesses": true,
+    "shops": true,
+    "staff": true,
+    "auth_ids": true,
+    "fixturesRetired": true
+  },
+  "fixtureCount": 2,
+  "outstanding": {}
+}

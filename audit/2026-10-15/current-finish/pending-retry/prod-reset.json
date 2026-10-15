@@ -1,0 +1,30 @@
+{
+  "run": "qa_finish_b4be27",
+  "project": "tlsuxbghuhlqntkgtrxt",
+  "viewer": "https://sm-server-view.vercel.app",
+  "viewerCommit": "d2c94e1",
+  "passed": [
+    "uncertain reservation shown with reference and safe warning; repeat reset blocked; participant edits and second claim denied",
+    "trusted known-success completion is idempotent; one audit, no Auth replay; browser status releases pending controls",
+    "all QA fixtures retired through supported lifecycle, with no held participants",
+    "original businesses, shops, staff rows and Auth IDs unchanged; fixture identities removed and history retained"
+  ],
+  "failure": null,
+  "fixtures": [
+    {
+      "id": "8d94a4ff-faac-4e8a-91f2-92050dea64e5",
+      "username": "qa_finish_b4be27_owner",
+      "role": "owner",
+      "auth_user_id": "100479c4-b892-4da5-b12b-797bae671842",
+      "business_id": "4b981b57-0f3f-40b0-8e82-1656af4544ab"
+    },
+    {
+      "id": "ee7b4fa0-68a5-4513-9c24-9b42ba81d9aa",
+      "username": "qa_finish_b4be27_cashier",
+      "role": "cashier",
+      "auth_user_id": "f7e67913-a405-449d-ba16-09d2c399efc4",
+      "business_id": "4b981b57-0f3f-40b0-8e82-1656af4544ab"
+    }
+  ],
+  "outstanding": {}
+}

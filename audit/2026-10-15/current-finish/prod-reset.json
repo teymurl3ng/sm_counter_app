@@ -1,0 +1,44 @@
+{
+  "run": "qa_finish_27c8da",
+  "project": "tlsuxbghuhlqntkgtrxt",
+  "viewer": "https://sm-server-view.vercel.app",
+  "viewerCommit": "d2c94e1",
+  "passed": [
+    "actual browser Owner/Admin login reaches published PROD with online authenticated account-server response",
+    "ordinary staff token cannot call service-only reset claim",
+    "Admin cannot reset Owner/Admin/disabled Cashier; browser disables protected-target reset and explains why",
+    "browser confirmation cancellation sends no reset and keeps original fixture credential",
+    "Owner browser reset displays working one-time credential; old fails; disabled target stays disabled; one audit; dismissal works",
+    "Admin can reset active Cashier; replacement works and completion audit occurs once",
+    "all three QA fixtures retired through supported lifecycle, with no held participants",
+    "original businesses, shops, staff rows and Auth IDs unchanged; fixture identities removed and history retained"
+  ],
+  "failure": {
+    "type": "RuntimeError",
+    "line": 69
+  },
+  "fixtures": [
+    {
+      "id": "d9e4cda9-8a39-43de-b9bf-aea931951b67",
+      "username": "qa_finish_27c8da_owner",
+      "role": "owner",
+      "auth_user_id": "fe2e458f-2a5c-4d3f-ad4d-cd986c1d56e1",
+      "business_id": "4b981b57-0f3f-40b0-8e82-1656af4544ab"
+    },
+    {
+      "id": "3485ed55-77a1-4859-961f-b9e0edafae46",
+      "username": "qa_finish_27c8da_admin",
+      "role": "admin",
+      "auth_user_id": "a9f41841-f5fe-457c-9444-ab21febc848c",
+      "business_id": "4b981b57-0f3f-40b0-8e82-1656af4544ab"
+    },
+    {
+      "id": "498b319d-1fd8-4c48-85ce-dbb0123b745a",
+      "username": "qa_finish_27c8da_cashier",
+      "role": "cashier",
+      "auth_user_id": "c3a7b3c3-ec2e-4455-b317-cfac30ca630d",
+      "business_id": "4b981b57-0f3f-40b0-8e82-1656af4544ab"
+    }
+  ],
+  "outstanding": {}
+}

@@ -1,0 +1,342 @@
+{
+  "scope": "Phase 4 DEV server protocol only; not Android, HTTP/JWT end-to-end, phone convergence or PROD acceptance",
+  "project": "tghzmofkkdsaasvnixps",
+  "migrationVersion": "20261015120815",
+  "migrationName": "credit_metadata_v1",
+  "baseline": {
+    "businesses": 2,
+    "shops": 10,
+    "staff": 63,
+    "auth": 17,
+    "sync": 262,
+    "credit_schema": null
+  },
+  "dryRun": [
+    {
+      "credit_protocol_test_result": {
+        "checks": [
+          "activation requires explicit upgrade confirmation",
+          "activation retry is idempotent",
+          "admin master-data access does not grant owner credit edits",
+          "agreement cannot hide another financial destination",
+          "anonymous has no RPC execution grant",
+          "authenticated cannot directly read private metadata",
+          "bad agreement rolls back earlier global batch sale",
+          "cashier cannot activate",
+          "cashier cannot write terms or flags",
+          "cashier may post original sale with valid agreement",
+          "cashier may read assigned shop metadata",
+          "changed revision identity rejected",
+          "clear references observed set only",
+          "clear retry idempotent",
+          "concurrent sets accepted as distinct history",
+          "contracted sale retry accepted",
+          "explicit owner activation",
+          "fractional term rejected",
+          "future preference advances accepted head",
+          "identical legacy retry still accepted after activation",
+          "inactive server owner loses access despite existing identity",
+          "inactive shop remains inactive",
+          "legacy originals explicitly classified in separate feed",
+          "legacy sale accepted before activation",
+          "metadata batch failure rolls back earlier operations",
+          "metadata customer must resolve in the same shop",
+          "missing accepted revision refused",
+          "no automatic activation or metadata leak",
+          "offline sale may retain historically accepted agreement",
+          "old client new credit sale refused after activation",
+          "old feed excludes metadata types",
+          "owner cannot access unrelated business",
+          "owner monthly revision accepted with server stamp",
+          "paid-now sale unchanged",
+          "revision retry idempotent",
+          "sale and monthly agreement accepted atomically",
+          "same sale cannot acknowledge a changed agreement",
+          "stale revision rejected without head overwrite",
+          "unknown clear dependency refused"
+        ],
+        "passed": 39
+      }
+    }
+  ],
+  "installed": [
+    {
+      "credit_protocol_test_result": {
+        "checks": [
+          "activation requires explicit upgrade confirmation",
+          "activation retry is idempotent",
+          "admin master-data access does not grant owner credit edits",
+          "agreement cannot hide another financial destination",
+          "anonymous has no RPC execution grant",
+          "authenticated cannot directly read private metadata",
+          "bad agreement rolls back earlier global batch sale",
+          "cashier cannot activate",
+          "cashier cannot write terms or flags",
+          "cashier may post original sale with valid agreement",
+          "cashier may read assigned shop metadata",
+          "changed revision identity rejected",
+          "clear references observed set only",
+          "clear retry idempotent",
+          "concurrent sets accepted as distinct history",
+          "contracted sale retry accepted",
+          "explicit owner activation",
+          "fractional term rejected",
+          "future preference advances accepted head",
+          "identical legacy retry still accepted after activation",
+          "inactive server owner loses access despite existing identity",
+          "inactive shop remains inactive",
+          "legacy originals explicitly classified in separate feed",
+          "legacy sale accepted before activation",
+          "metadata batch failure rolls back earlier operations",
+          "metadata customer must resolve in the same shop",
+          "missing accepted revision refused",
+          "no automatic activation or metadata leak",
+          "offline sale may retain historically accepted agreement",
+          "old client new credit sale refused after activation",
+          "old feed excludes metadata types",
+          "owner cannot access unrelated business",
+          "owner monthly revision accepted with server stamp",
+          "paid-now sale unchanged",
+          "revision retry idempotent",
+          "sale and monthly agreement accepted atomically",
+          "same sale cannot acknowledge a changed agreement",
+          "stale revision rejected without head overwrite",
+          "unknown clear dependency refused"
+        ],
+        "passed": 39
+      }
+    }
+  ],
+  "post": [
+    {
+      "verification": {
+        "auth": 17,
+        "sync": 262,
+        "shops": 10,
+        "staff": 63,
+        "tables": [
+          {
+            "rls": true,
+            "name": "contracts",
+            "anon_select": false,
+            "authenticated_select": false
+          },
+          {
+            "rls": true,
+            "name": "records",
+            "anon_select": false,
+            "authenticated_select": false
+          },
+          {
+            "rls": true,
+            "name": "heads",
+            "anon_select": false,
+            "authenticated_select": false
+          }
+        ],
+        "functions": [
+          {
+            "md5": "ad67add533d3ae35d1782c7dfa194562",
+            "name": "sync_push",
+            "schema": "public",
+            "search_path": [
+              "search_path=\"\""
+            ],
+            "anon_execute": false,
+            "security_definer": true,
+            "authenticated_execute": true
+          },
+          {
+            "md5": "4866c3288d82a77d05b3f4dba65c461d",
+            "name": "actor",
+            "schema": "credit_private",
+            "search_path": [
+              "search_path=\"\""
+            ],
+            "anon_execute": false,
+            "security_definer": true,
+            "authenticated_execute": false
+          },
+          {
+            "md5": "ef2df768d6308e9674cd2230893d0f43",
+            "name": "assert_term",
+            "schema": "credit_private",
+            "search_path": [
+              "search_path=\"\""
+            ],
+            "anon_execute": false,
+            "security_definer": false,
+            "authenticated_execute": false
+          },
+          {
+            "md5": "b34e3fd6bd9bb0a7b46209e3cbbca1bc",
+            "name": "assert_customer",
+            "schema": "credit_private",
+            "search_path": [
+              "search_path=\"\""
+            ],
+            "anon_execute": false,
+            "security_definer": false,
+            "authenticated_execute": false
+          },
+          {
+            "md5": "3ab8eceae971cb32d9b3481a7ea1ec18",
+            "name": "validate_sale",
+            "schema": "credit_private",
+            "search_path": [
+              "search_path=\"\""
+            ],
+            "anon_execute": false,
+            "security_definer": false,
+            "authenticated_execute": false
+          },
+          {
+            "md5": "a40f97be7013ed8da3a76f22c5f55111",
+            "name": "credit_contract_status_v1",
+            "schema": "public",
+            "search_path": [
+              "search_path=\"\""
+            ],
+            "anon_execute": false,
+            "security_definer": true,
+            "authenticated_execute": true
+          },
+          {
+            "md5": "3087031b20d6ba656bda10960ac9f3a8",
+            "name": "credit_contract_enable_v1",
+            "schema": "public",
+            "search_path": [
+              "search_path=\"\""
+            ],
+            "anon_execute": false,
+            "security_definer": true,
+            "authenticated_execute": true
+          },
+          {
+            "md5": "3fec3e48d09092193aab2c598d1420f6",
+            "name": "credit_metadata_push_v1",
+            "schema": "public",
+            "search_path": [
+              "search_path=\"\""
+            ],
+            "anon_execute": false,
+            "security_definer": true,
+            "authenticated_execute": true
+          },
+          {
+            "md5": "9239485a7082f78a87bf144b693b7e99",
+            "name": "credit_metadata_pull_v1",
+            "schema": "public",
+            "search_path": [
+              "search_path=\"\""
+            ],
+            "anon_execute": false,
+            "security_definer": true,
+            "authenticated_execute": true
+          }
+        ],
+        "migration": [
+          {
+            "name": "credit_metadata_v1",
+            "version": "20261015120815"
+          }
+        ],
+        "businesses": 2,
+        "credit_heads": 0,
+        "credit_records": 0,
+        "activated_shops": 0
+      }
+    }
+  ],
+  "cleanup": "Both synthetic runs used transactions ending ROLLBACK. Existing row counts match; private contract/records/heads remain empty. Sequence gaps may remain.",
+  "advisors": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy",
+      "findings": [
+        {
+          "detail": "Table \\`credit_private.contracts\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "name": "contracts",
+            "type": "table",
+            "schema": "credit_private"
+          },
+          "observed_at": "2026-10-15T12:09:10.737Z"
+        },
+        {
+          "detail": "Table \\`credit_private.heads\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "name": "heads",
+            "type": "table",
+            "schema": "credit_private"
+          },
+          "observed_at": "2026-10-15T12:09:10.737Z"
+        },
+        {
+          "detail": "Table \\`credit_private.records\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "name": "records",
+            "type": "table",
+            "schema": "credit_private"
+          },
+          "observed_at": "2026-10-15T12:09:10.737Z"
+        }
+      ],
+      "interpretation": "Intentional deny-all private storage: no schema/table grants for anon/authenticated; all access through explicitly checked RPCs."
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN",
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable",
+      "findings": [
+        {
+          "detail": "Function `public.credit_contract_enable_v1(shop uuid, posting_phones_updated boolean)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/credit_contract_enable_v1`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "name": "credit_contract_enable_v1",
+            "schema": "public",
+            "language": "plpgsql",
+            "arguments": "shop uuid, posting_phones_updated boolean",
+            "security_definer": true
+          },
+          "observed_at": "2026-10-15T12:09:10.737Z"
+        },
+        {
+          "detail": "Function `public.credit_contract_status_v1(shop uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/credit_contract_status_v1`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "name": "credit_contract_status_v1",
+            "schema": "public",
+            "language": "plpgsql",
+            "arguments": "shop uuid",
+            "security_definer": true
+          },
+          "observed_at": "2026-10-15T12:09:10.737Z"
+        },
+        {
+          "detail": "Function `public.credit_metadata_pull_v1(shop uuid, since_seq bigint, max_rows integer)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/credit_metadata_pull_v1`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "name": "credit_metadata_pull_v1",
+            "schema": "public",
+            "language": "plpgsql",
+            "arguments": "shop uuid, since_seq bigint, max_rows integer",
+            "security_definer": true
+          },
+          "observed_at": "2026-10-15T12:09:10.737Z"
+        },
+        {
+          "detail": "Function `public.credit_metadata_push_v1(shop uuid, operations jsonb)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/credit_metadata_push_v1`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "name": "credit_metadata_push_v1",
+            "schema": "public",
+            "language": "plpgsql",
+            "arguments": "shop uuid, operations jsonb",
+            "security_definer": true
+          },
+          "observed_at": "2026-10-15T12:09:10.737Z"
+        }
+      ],
+      "interpretation": "Intentional authenticated RPC entry points: active server actor/shop/Owner authorization and empty search_path; helpers inaccessible. Advisor warnings retained, not suppressed."
+    }
+  ],
+  "attempts": "Early fixture type/parenthesis errors corrected; PL/pgSQL financial-row alias ambiguity fixed; inactive-Owner fixture adjusted to respect existing last-active-Owner guard. Final 39 checks passed before apply and against installed functions."
+}

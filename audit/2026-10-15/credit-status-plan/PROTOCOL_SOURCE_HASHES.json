@@ -1,0 +1,9 @@
+{
+  "sourceBaseline": "88e392af2f938feae1e74dc343e75a83c3d387d0",
+  "files": {
+    "supabase/migrations/20261015120815_credit_metadata_v1.sql": "e2c89f431683e3ffd4607a22762cd65a3559287d606f2f847bf3fa976b8dc108",
+    "audit/2026-10-15/credit-status-plan/protocol-fixtures.sql": "cfdf8afdf4afce0adaa149bf1f8b04178b5cd6553ac984a3d1a583c2f7f0b772",
+    "audit/2026-10-15/credit-status-plan/sync-push-before.sql": "8494be36b1c980e81937605956e74c427c0b0ebb4054d0864ff6e27b27cb0758",
+    "audit/2026-10-15/credit-status-plan/sync-push-after.sql": "60fbe43c4e7a9334050b6086615e652bacfae37cd1e01089e89ffb0ee48e9b68"
+  }
+}

@@ -59,7 +59,7 @@ This is the current reading order for unfinished work. It replaces the sequence 
 
 ### 4. Show which credit customers need attention
 
-**Planning update:** [Phase 4 baseline, research and scoped proposal](audit/2026-10-15/credit-status-plan/PLAN.md). The owner clarified seven days per sale, Sunday bills as a separate practice, and per-customer monthly/custom terms, then authorized implementation. ✅ ~~Term/status/flag calculations and frozen data contract~~ pass 17 affected JVM checks; [checkpoint](audit/2026-10-15/credit-status-plan/CHECKPOINT_1.md). ✅ ~~Local storage/permissions/migration/backup~~ are now accepted at [checkpoint 2](audit/2026-10-15/credit-status-plan/CHECKPOINT_2.md). Compatible server/client transport, contracted posting, screens and final acceptance remain pending; no server mutation or ordinary-app installation ran.
+**Implementation update:** [Phase 4 baseline, research and scoped proposal](audit/2026-10-15/credit-status-plan/PLAN.md). The owner clarified seven days per sale, Sunday bills as a separate practice, and per-customer monthly/custom terms, then authorized implementation. ✅ ~~Term/status/flag calculations and frozen data contract~~ pass 17 affected JVM checks; [checkpoint](audit/2026-10-15/credit-status-plan/CHECKPOINT_1.md). ✅ ~~Local storage/permissions/migration/backup~~ are accepted at [checkpoint 2](audit/2026-10-15/credit-status-plan/CHECKPOINT_2.md). ✅ ~~DEV server protocol~~ passes 39 focused SQL checks before and after migration; [checkpoint 3](audit/2026-10-15/credit-status-plan/CHECKPOINT_3.md). No existing shop activated; PROD and ordinary app untouched. Android transport/contracted posting, restore reconciliation, screens and final two-phone acceptance remain pending. Phase 4 is not complete.
 
 **Goal:** make payment status clear in customer lists and history.
 
@@ -138,7 +138,7 @@ These items have not been cancelled. They are deliberately unscheduled or condit
 - [ ] 1. Existing handover and human acceptance — remaining participation only.
 - [x] ✅ ~~2. Persistent Owner attention for held sync entries.~~ Accepted at local Owner scope; audit-only conflict policy remains a separate retained B8 boundary. [Result](audit/2026-10-15/sync-attention-plan/RESULT.md).
 - [x] ✅ ~~3. Credit basics: aging, customer search and advisory warning.~~ [Result](audit/2026-10-15/credit-basics-plan/RESULT.md). Ordinary-app delivery remains phase 1.
-- [ ] 4. Customer payment terms, credit categories, overrides and history — in progress: ✅ ~~calculations/data contract and local storage/permissions/migration/backup~~; server/client sync, contracted posting, screens and final affected acceptance remain. [Checkpoint](audit/2026-10-15/credit-status-plan/CHECKPOINT_2.md).
+- [ ] 4. Customer payment terms, credit categories, overrides and history — in progress: ✅ ~~calculations/data contract, local storage/permissions/migration/backup and DEV server protocol~~; Android transport/contracted posting, restore reconciliation, screens and final affected acceptance remain. [Latest checkpoint](audit/2026-10-15/credit-status-plan/CHECKPOINT_3.md).
 - [ ] 5. Statements, sharing and manual reminders.
 - [ ] 6. Owner reminder automation and a separately recorded automatic-SMS decision.
 

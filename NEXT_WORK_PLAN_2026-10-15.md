@@ -42,6 +42,8 @@ This is the current reading order for unfinished work. It replaces the sequence 
 
 ### 3. Build Credit basics
 
+**Pinned plan:** [Phase 3 baseline, research, judgment and acceptance](audit/2026-10-15/credit-basics-plan/PLAN.md). ✅ ~~Phase 3 planning.~~ Implementation remains pending. The warning must include surcharge, treat correction deltas correctly, preserve aggregate rounding and use an explicitly revalidated advisory confirmation. Weekly category cutoffs remain phase 4.
+
 **Goal:** find the right customer quickly, understand unpaid debt, and get a clear credit-limit warning.
 
 - Search the existing Sale customer picker.

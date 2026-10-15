@@ -65,6 +65,19 @@ class SyncRuntime(
         drainOnceLocked()
     }
 
+    /** Local Owner authorization is enforced by the customer command facade; server rechecks actual Owner. */
+    internal suspend fun enableCreditContract() = SyncOperationGate.exclusive {
+        check(isEnrolled()) { "Connect this installation to shop sync first." }
+        val config=requireNotNull(SyncServerConfigStore.load(context))
+        val binding=requireNotNull(SyncShopBindingStore.load(context))
+        val client=CreditMetadataClient(http,config,tokenStore)
+        val body=org.json.JSONObject().put("shop",binding.shopId).put("posting_phones_updated",true)
+        var result=client.call("credit_contract_enable_v1",body)
+        if(result is CreditRpcResult.Retry && result.reason=="unauthorized" && refreshSession(config)) result=client.call("credit_contract_enable_v1",body)
+        check(result is CreditRpcResult.Ok) { "Could not enable credit terms. Check sync and try again." }
+        check(exchangeCredit(config,binding) == CreditMetadataSync.Outcome.Done) { "Enabled on the server; sync again to finish agreement catch-up." }
+    }
+
     /**
      * H2 (audit 2026-10-02): every drain/pull entry point in the process
      * serializes on [SyncOperationGate] — the start-up kick, the WorkManager worker, the

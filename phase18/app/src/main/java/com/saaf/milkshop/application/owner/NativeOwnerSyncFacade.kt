@@ -77,6 +77,8 @@ class NativeOwnerSyncFacade(
     /** Drains the outbox to the server. */
     suspend fun push(): SyncPushEngine.DrainOutcome = runtime.drainOnce()
 
+    internal suspend fun enableCreditContract() = runtime.enableCreditContract()
+
     /** go 8: restored entries held out of the push for an owner decision. */
     suspend fun holds(): List<NativeSyncHold> =
         database.syncRebaselineHoldDao().all().map {

@@ -76,4 +76,24 @@ internal class CreditReviewService(private val db: MilkShopDatabase, private val
         require(prior == null || (prior.kind == "REVIEW_ACTION" && prior.payloadJson == body)) { "Conflicting credit queue identity." }
         if (prior == null) dao.insertPending(CreditMetadataPendingEntity(row.actionUid, "REVIEW_ACTION", body, row.occurredAt))
     }
+
+    suspend fun reviewPending(session: String, customerUid: String, operationUid: String, discardTerm: Boolean) = db.withWriteTransaction {
+        owner(session); ready(); store.requireCustomer(customerUid)
+        val pending=requireNotNull(dao.pending(operationUid)) { "This proposal is no longer pending. Refresh the customer." }
+        require(pending.held) { "Sync this pending change before reviewing it." }
+        val body=JSONObject(pending.payloadJson)
+        require(body.getString("customer_uid")==customerUid)
+        if(discardTerm) {
+            require(pending.kind=="TERM_REVISION") { "Flag history is retained; retry the same action." }
+            db.securityAuditDao().insert(SecurityAuditEntryEntity(occurredAt=now(),action="credit_proposal_discarded",
+                result="info",reasonCode="owner_review",details=pending.payloadJson))
+            dao.deletePending(operationUid)
+        } else {
+            if(pending.kind=="TERM_REVISION") require(body.getString("prior_revision_uid")==
+                (dao.head(customerUid)?.revisionUid?:CreditMetadataStore.DEFAULT_REVISION)) {
+                "Terms changed on another phone. Discard this held proposal, then choose terms again."
+            }
+            dao.setHeld(operationUid,false)
+        }
+    }
 }

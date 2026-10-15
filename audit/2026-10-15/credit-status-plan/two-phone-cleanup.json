@@ -1,0 +1,47 @@
+{
+  "run": "da9d5388705b",
+  "cleanup": [
+    "owner: isolated transport cleared; ordinary package provenance unchanged",
+    "counter: isolated transport cleared; ordinary package provenance unchanged",
+    "owner: disposable Auth retired",
+    "cashier: disposable Auth retired",
+    "Exact disposable shop deactivated"
+  ],
+  "before": {
+    "businesses": {
+      "count": 2,
+      "sha256": "516e7fed9b3f5b37bb41ad3ac0f4e2d63f3593e224d7a59e5247d82b0e1430c6"
+    },
+    "shops": {
+      "count": 13,
+      "sha256": "bce503a226dceef17ce34a51c6ea81ab9cf2f84332af56c670d4f40cf60e9906"
+    },
+    "staff": {
+      "count": 69,
+      "sha256": "d52bd263b90072f748ee11d965c33d751ba3aaac9dd5b210cf097f1bb3db055d"
+    },
+    "sync_records": {
+      "count": 315,
+      "sha256": "048f53642df706868e03d26cd0e721e91828b10ead0ecdb3dfb72090ebf091a0"
+    }
+  },
+  "after": {
+    "businesses": {
+      "count": 2,
+      "sha256": "516e7fed9b3f5b37bb41ad3ac0f4e2d63f3593e224d7a59e5247d82b0e1430c6"
+    },
+    "shops": {
+      "count": 13,
+      "sha256": "bce503a226dceef17ce34a51c6ea81ab9cf2f84332af56c670d4f40cf60e9906"
+    },
+    "staff": {
+      "count": 69,
+      "sha256": "d52bd263b90072f748ee11d965c33d751ba3aaac9dd5b210cf097f1bb3db055d"
+    },
+    "sync_records": {
+      "count": 315,
+      "sha256": "048f53642df706868e03d26cd0e721e91828b10ead0ecdb3dfb72090ebf091a0"
+    }
+  },
+  "existingRowsUnchanged": true
+}

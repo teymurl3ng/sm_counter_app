@@ -10,6 +10,7 @@ import kotlinx.coroutines.withContext
 internal class OwnerCustomersController(
     private val facade: NativeOwnerCustomersFacade,
     private val runtime: OwnerMoreRuntime,
+    private val enableCredit: suspend () -> Unit = {},
 ) {
     fun openCustomers() {
         val token = runtime.captureSession() ?: return
@@ -265,6 +266,36 @@ internal class OwnerCustomersController(
         }
     }
 
+
+    fun creditAction(action: com.saaf.milkshop.application.owner.CustomerCreditCommand) {
+        val token=runtime.captureSession()?:return
+        val current=runtime.ready()?:return
+        val id=current.customerDetail?.row?.accountId?:return
+        if(current.customerUpdating || current.destination!=NativeOwnerMoreDestination.Customers) return
+        runtime.state.value=current.copy(customerUpdating=true,customersError=null)
+        runtime.scope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    facade.creditAction(token.handle,id,action)
+                    if(action==com.saaf.milkshop.application.owner.CustomerCreditCommand.Enable) enableCredit()
+                }
+                val detail=withContext(Dispatchers.IO) { facade.loadDetail(token.handle,id) }
+                val snapshot=withContext(Dispatchers.IO) { facade.loadCustomers(token.handle) }
+                runtime.updateCurrent(token,NativeOwnerMoreDestination.Customers) {
+                    if(it.customerDetail?.row?.accountId==id) it.copy(customerDetail=detail,customers=snapshot.customers,customerUpdating=false,customersError=null)
+                    else it.copy(customerUpdating=false)
+                }
+                if(runtime.isCurrent(token)) com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved(
+                    when(action) {
+                        com.saaf.milkshop.application.owner.CustomerCreditCommand.Enable -> "Credit terms enabled"
+                        is com.saaf.milkshop.application.owner.CustomerCreditCommand.Terms -> "Terms proposal saved. Effective after sync acceptance."
+                        is com.saaf.milkshop.application.owner.CustomerCreditCommand.Retry -> "Held change queued for retry"
+                        is com.saaf.milkshop.application.owner.CustomerCreditCommand.DiscardTerm -> "Held terms proposal discarded"
+                        else -> "Review action saved. Pending sync acceptance."
+                    })
+            } catch(error: Throwable) { handleFailure(token,error) }
+        }
+    }
 
     private fun handleFailure(token: OwnerSessionToken, error: Throwable) {
         runtime.handleFailure(token, NativeOwnerMoreDestination.Customers, error) { current, message ->

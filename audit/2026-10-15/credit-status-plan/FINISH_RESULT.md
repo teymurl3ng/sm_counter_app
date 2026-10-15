@@ -1,0 +1,35 @@
+# Phase 4 remaining screens and real two-phone acceptance
+
+15 October 2026. Baseline `3e7c2b12a31c8c51c15f9e79616efb37e217978f`. The owner authorized finishing both remaining phase-4 substeps. [Frozen scope](FINISH_SCOPE.md), [verification](FINISH_VERIFICATION.json), [judgment reminder](finish-judgment.json).
+
+- [x] ✅ ~~Existing Customer/Sale/history screens and explicit pending-change review.~~
+- [x] ✅ ~~18 unique affected local Android methods, including light/dark/200% text and customer filters.~~
+- [x] ✅ ~~55 stages and nine real DEV two-phone comparisons, including encrypted restore and duplicate-free repeat.~~
+- [ ] PROD protocol publication: exact migration approval required by automatic approval review.
+- [ ] Signed compatible build/install evidence: prepared next; do not claim delivery until verified.
+
+## Delivered screens
+
+Customers now has name/phone/route search and All/Watch/Late/Bad/Needs review filters. Bad includes a retained Owner flag even on a settled account. Existing rows retain the shared list surface, with a textual credit status and restrained semantic color. Customer detail shows current computed status, known/partial overdue explanation, next deadline, accepted future-sale terms and legacy weekly explanation. It reuses `NativeOwnerRecordsFacade.loadLedger` for account history; it does not calculate another balance. Terms and review history are visible in the same destination. Shared header and bottom navigation geometry remain unchanged.
+
+Owner can propose 7 days, one calendar month, 30 days or custom 1–365 days; the confirmation explains future-only effects and the month/day distinction. SET/CLEAR require a reason. CLEAR captures exactly the accepted SETs the Owner reviewed; later unseen SETs survive. Pending and restored/held actions do not masquerade as server-accepted flags. Held proposals can be retried explicitly; stale term proposals must be discarded into the security audit and proposed again against the current head. Accepted agreements/actions remain immutable. Manager/Admin can read these customer facts but cannot execute Owner commands. Sale shows selected-customer terms/status alongside the existing debt/limit summary, without adding another warning dialog.
+
+The customer list uses bounded batch reads within a consistent Room snapshot, without a full-ledger query per row. The Owner controller guards duplicate actions and obsolete-session/customer results, reports saving/errors and distinguishes queued, retried and discarded outcomes. Missing balance reads show Needs review rather than a reassuring Settled. No derived balance or status is stored. The explicit shop contract activation dialog requires the Owner to confirm all posting phones are compatible and synced; runtime and server both retain their authorization boundaries. No real shop was activated by QA.
+
+## Accepted checks
+
+Eighteen unique focused local methods pass on A06: initial fifteen all passed; ten touched read/presentation methods then passed, including one new filter check; two existing Sale geometry methods passed with the new terms/status fields populated. The final read snapshots are transactional. Light/default and dark/200% synthetic captures were inspected; long content scrolls without overlapping fixed chrome. Test captures/logs remain local; no full suite or whole-app audit ran. [Initial](finish-first-results.json), [final touched methods](finish-final-results.json), [Sale](finish-sale-final-results.json).
+
+The final real DEV run uses A06 Owner and S24 Cashier, distinct local IDs, actual HTTPS/Auth/RPC and a dedicated shop. Nine comparisons cover initial legacy finance (20 tables), activated legacy and seven later checkpoints (25 business/metadata tables each): lost accepted terms acknowledgment and fresh-process retry; monthly sale; changed future weekly preference without rewriting the monthly root; correction/payment; older-client refusal; observed CLEAR plus unseen SET; stale encrypted restore into a fresh recovery target; and duplicate-free repeat. Fixed final totals are customer credit PKR300, Cash PKR10050 and Milk96.5L. The restored device retains only the unseen active flag. [Full stages/comparisons](two-phone-results.json), [cleanup/hash proof](two-phone-cleanup.json).
+
+Fixture/setup failures are retained in the verification, not counted as passing: the legacy admin helper appended an invalid ID sort; opening required saved identity and no earlier business event; server credentials require their existing 15-digit format; Counter reporting originally ran before customer catch-up; security recovery correctly refused an initialized target. The fixture now honors those existing guards. No permission, stock, channel, restore or ledger invariant was weakened. Each created Auth account was retired and each exact test shop deactivated; existing DEV row hashes match. Final DEV has its original17 Auth users, zero active credit-QA staff and zero active-shop contracts. Synthetic inactive shop/staff/history rows are retained as QA evidence. Ordinary package provenance on both phones matches through hosted QA.
+
+## Production rollout boundary
+
+PROD is `tlsuxbghuhlqntkgtrxt` / saafmilk-prod. Read-only inspection confirms the credit schema is absent and saves [the original global function](prod-sync-push-before.sql), MD5 `cc681db1a8a41e61971876750b908da8`. Counts before rollout: 1 business, 2 shops, 8 staff, 3 Auth users and 36 sync records. DEV/PROD global function definitions differ; the migration preserves the target implementation and adds only the reviewed anchored agreement validation and atomic refusal boundary.
+
+Automatic approval review rejected `credit_metadata_v1` on PROD because this is a persistent production schema/shared `sync_push` change and requires approval of that exact action. No PROD mutation was applied. The reviewable [migration](../../../supabase/migrations/20261015120815_credit_metadata_v1.sql) creates private metadata tables and four authenticated RPCs and patches `sync_push`. It activates no shop and rewrites no existing financial records. Until publication, the compatible app safely retains ordinary inactive-shop sync when the new RPC is unavailable. Real activation remains a deliberate authenticated Owner choice after every posting phone has been updated and synced.
+
+Prepared rollout after approval: apply that exact SQL to PROD, verify installed protocol/ACL and zero activation with original counts, run the scoped rolled-back protocol checks, review advisors, and record the remote migration version. Compatible signed0.5.0/code8 will be installed with `install -r` and verified for APK hash, retained UID/first-install time and native launch. Private sign-in, actual business-record acceptance and independent custody remain phase1; they are not silently claimed by an installer.
+
+Phases2–3 remain accepted, phase4 stays open solely for its remaining rollout gates, and phases1/5/6 retain their existing scope. No statement/reminder/SMS/identity expansion was added.

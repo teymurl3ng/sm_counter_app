@@ -35,7 +35,8 @@ class CreditBasicsUiTest {
     private val request = NativeSaleRequest(1, NativeSaleEntryMode.AMOUNT, 180.0,
         NativeSalePaymentKind.CUSTOMER_ACCOUNT, null, 7, surchargeEnabled = true, surchargeAmountRs = 50.0)
     private val summary = NativeSaleCreditSummary(7, "Ahmed Store", 80000, 100000, 103000, 23000,
-        CreditAge(true, 5), false, "one-reviewed-snapshot")
+        CreditAge(true, 5), false, "one-reviewed-snapshot", paymentTerms = "1 calendar month",
+        currentStatus = "Late", statusExplanation = "PKR 100 overdue · oldest 3 days.")
     private val identity = NativeSignedInIdentity(1, "synthetic.owner", "Synthetic Owner", AppRole.OWNER,
         RolePermissions.permissions(AppRole.OWNER))
     private var state by mutableStateOf(NativeSaleState.Ready(context))
@@ -99,6 +100,8 @@ class CreditBasicsUiTest {
         rule.onNodeWithText("Checking credit…").assertExists()
         rule.runOnIdle { state = state.copy(creditLoading = false, creditSummary = summary) }
         rule.onNodeWithText("Oldest unpaid sale: 5 days.").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithText("1 calendar month").assertExists()
+        rule.onNodeWithText("Late").assertExists()
         assertEquals(header, rule.onNodeWithTag("credit_header").fetchSemanticsNode().boundsInRoot)
         assertEquals(nav, rule.onNodeWithTag("credit_nav").fetchSemanticsNode().boundsInRoot)
         capture("summary-$scale-$dark")

@@ -14,7 +14,7 @@ internal sealed interface CreditRpcResult {
 internal class CreditMetadataClient(private val http: SyncHttp, private val config: SyncServerConfig,
     private val tokens: SyncTokenStore) {
     suspend fun call(name: String, body: JSONObject): CreditRpcResult {
-        require(name in setOf("credit_contract_status_v1", "credit_metadata_pull_v1", "credit_metadata_push_v1"))
+        require(name in setOf("credit_contract_status_v1", "credit_contract_enable_v1", "credit_metadata_pull_v1", "credit_metadata_push_v1"))
         val session = tokens.load() ?: return CreditRpcResult.Retry("no_session")
         val response = try {
             http.execute(SyncHttpRequest("POST", config.url("/rest/v1/rpc/$name"), mapOf(

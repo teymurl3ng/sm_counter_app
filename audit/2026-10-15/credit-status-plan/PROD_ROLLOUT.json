@@ -1,0 +1,18 @@
+{
+  "project": "tlsuxbghuhlqntkgtrxt",
+  "name": "saafmilk-prod",
+  "status": "Awaiting exact approval after automatic-review rejection; no PROD mutation applied",
+  "migration": "credit_metadata_v1",
+  "source": "supabase/migrations/20261015120815_credit_metadata_v1.sql",
+  "before": {
+    "auth": 3,
+    "sync": 36,
+    "shops": 2,
+    "staff": 8,
+    "businesses": 1,
+    "sync_push_md5": "cc681db1a8a41e61971876750b908da8",
+    "credit_installed": false
+  },
+  "approvalRequired": "Apply the reviewed private schema/four authenticated RPCs/shared sync_push agreement validator to PROD, without activating any real shop or rewriting financial records.",
+  "rejection": "Persistent production schema/shared sync_push change requires explicit approval of this exact action."
+}

@@ -12,6 +12,9 @@ data class NativeSaleCreditSummary(
     val age: CreditAge,
     val checkUnavailable: Boolean,
     val warningKey: String?,
+    val paymentTerms: String? = null,
+    val currentStatus: String? = null,
+    val statusExplanation: String? = null,
 )
 
 data class NativeSaleCreditWarning(val request: NativeSaleRequest, val summary: NativeSaleCreditSummary)

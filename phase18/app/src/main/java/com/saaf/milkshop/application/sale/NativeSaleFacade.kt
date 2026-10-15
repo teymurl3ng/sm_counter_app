@@ -280,8 +280,10 @@ class NativeSaleFacade(
                 request.copy(creditAcknowledgment = null)).joinToString("|")
             MessageDigest.getInstance("SHA-256").digest(snapshot.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
         }
+        val review = balance?.let { com.saaf.milkshop.application.owner.CustomerCreditViews(database).load(mapOf(customer.accountId to (it/100.0)),date)[customer.accountId] }
         return NativeSaleCreditSummary(customer.accountId, customer.name, balance, limit, projected,
-            moneyToPaisa(amounts.total), age, unavailable, key)
+            moneyToPaisa(amounts.total), age, unavailable, key,review?.term?.label,if(balance==null) "Needs review" else review?.label,
+            if(balance==null) "Balance unavailable. Review records before saving." else review?.explanation)
     }
 
 }

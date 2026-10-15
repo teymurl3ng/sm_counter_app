@@ -60,7 +60,7 @@ class NativeOwnerMoreViewModel internal constructor(
     )
     private val personalSecurityController = OwnerPersonalSecurityController(dependencies.more, runtime)
     private val productsController = OwnerProductsController(dependencies.products, runtime)
-    private val customersController = OwnerCustomersController(dependencies.customers, runtime)
+    private val customersController = OwnerCustomersController(dependencies.customers, runtime, dependencies.sync::enableCreditContract)
     private val suppliersController = OwnerSuppliersController(dependencies.suppliers, runtime)
     private val employeesController = OwnerEmployeesController(dependencies.employees, runtime)
     private val costingController = OwnerCostingController(dependencies.costing, runtime)
@@ -177,6 +177,8 @@ class NativeOwnerMoreViewModel internal constructor(
     fun archiveProduct() = productsController.archive()
 
     fun unarchiveProduct() = productsController.unarchive()
+
+    fun customerCreditAction(action: com.saaf.milkshop.application.owner.CustomerCreditCommand) = customersController.creditAction(action)
 
     fun openCustomers() = customersController.openCustomers()
 

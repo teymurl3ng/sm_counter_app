@@ -1,0 +1,3145 @@
+{
+  "run": "da9d5388705b",
+  "shop": "eb5fa0c2-3fe8-40d4-affb-023e83128d30",
+  "steps": [
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "init",
+      "httpStatuses": [],
+      "outbox": 25,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 14001,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "init",
+      "httpStatuses": [],
+      "outbox": 19,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 8012,
+      "balances": {
+        "Cash": 0,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0
+      },
+      "stock": {
+        "Milk": 0,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "enroll",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/auth/v1/token?grant_type=password:200",
+        "/rest/v1/rpc/my_profile:200"
+      ],
+      "outbox": 25,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 14070,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "exchange",
+      "drain": "Drained(pushed=25)",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/sync_push:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 14134,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "enroll",
+      "httpStatuses": [
+        "/auth/v1/token?grant_type=password:200",
+        "/rest/v1/rpc/my_profile:200"
+      ],
+      "outbox": 19,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 8891,
+      "balances": {
+        "Cash": 0,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0
+      },
+      "stock": {
+        "Milk": 0,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "exchange",
+      "drain": "Drained(pushed=0)",
+      "term": "7 days",
+      "status": "Needs review",
+      "flags": [],
+      "agreements": [],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 9410,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "status",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 14210,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "status",
+      "term": "7 days",
+      "status": "Needs review",
+      "flags": [],
+      "agreements": [],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 9940,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "activate",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_enable_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 14267,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "exchange",
+      "drain": "Drained(pushed=0)",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 11406,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "status",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 14335,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "status",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 11522,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "terms_lost_ack",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 1,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_metadata_push_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 14392,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "exchange",
+      "drain": "Drained(pushed=0)",
+      "term": "1 calendar month",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 14457,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "exchange",
+      "drain": "Drained(pushed=0)",
+      "term": "1 calendar month",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 12179,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "status",
+      "term": "1 calendar month",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 14528,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "status",
+      "term": "1 calendar month",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 12262,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "sale",
+      "saleUid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+      "term": "1 calendar month",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 1,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 12318,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 97,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "exchange",
+      "drain": "Drained(pushed=1)",
+      "term": "1 calendar month",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/sync_push:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 12373,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 97,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "exchange",
+      "drain": "Drained(pushed=0)",
+      "term": "1 calendar month",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 14598,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 97,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "status",
+      "term": "1 calendar month",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 14669,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 97,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "status",
+      "term": "1 calendar month",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 12461,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 97,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "terms_weekly",
+      "term": "1 calendar month",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 1,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 14723,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 97,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "exchange",
+      "drain": "Drained(pushed=0)",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_metadata_push_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 14773,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 97,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "exchange",
+      "drain": "Drained(pushed=0)",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 12538,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 97,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "correct_collect",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 2,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 14845,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "exchange",
+      "drain": "Drained(pushed=2)",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/sync_push:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 14894,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "exchange",
+      "drain": "Drained(pushed=0)",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 12618,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "status",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 14966,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "status",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 12694,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "old_client_refused",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/sync_push:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 12743,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "status",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 15026,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "status",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 12806,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "flag_a",
+      "term": "7 days",
+      "status": "Good",
+      "flags": [],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 1,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 15085,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "exchange",
+      "drain": "Drained(pushed=0)",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-a-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_metadata_push_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 15136,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "exchange",
+      "drain": "Drained(pushed=0)",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-a-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 12876,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "backup",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-a-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 15209,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "flags_clear_and_b",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-a-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 2,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 15261,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "exchange",
+      "drain": "Drained(pushed=0)",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-b-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_metadata_push_v1:200",
+        "/rest/v1/rpc/credit_metadata_push_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 15317,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "exchange",
+      "drain": "Drained(pushed=0)",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-b-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 13264,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "status",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-b-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 15392,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "status",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-b-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 13351,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "restore",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-a-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 15449,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "restored-db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "enroll",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-a-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/auth/v1/token?grant_type=password:200",
+        "/rest/v1/rpc/my_profile:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "1ee9c406d64d44e7891846b524307bd3",
+      "pid": 15507,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "restored-db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "exchange",
+      "drain": "Drained(pushed=0)",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-b-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 15566,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "restored-db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "exchange",
+      "drain": "Drained(pushed=0)",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-b-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 13425,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "status",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-b-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 15644,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "restored-db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "status",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-b-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 15694,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "restored-db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "status",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-b-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 13545,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "exchange",
+      "drain": "Drained(pushed=0)",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-b-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 15750,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "restored-db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "exchange",
+      "drain": "Drained(pushed=0)",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-b-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 13635,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "status",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-b-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 15823,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "restored-db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "status",
+      "term": "7 days",
+      "status": "Good \u00b7 Owner flagged",
+      "flags": [
+        "set-b-da9d5388705b"
+      ],
+      "agreements": [
+        {
+          "root_sale_uid": "u1_14ce841740564871a3d4e857c014bedd",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "LEGACY_WEEKLY",
+          "term_kind": "NET_DAYS",
+          "term_value": 7,
+          "revision_uid": "weekly-default-v1",
+          "contract_version": 1
+        },
+        {
+          "root_sale_uid": "u1_b57e21b992a44970a58fb94ac3b5982e",
+          "customer_uid": "u1_e2fbb9cc11d54b828d9c45776ec8fc01",
+          "evidence": "RECORDED",
+          "term_kind": "CALENDAR_MONTHS",
+          "term_value": 1,
+          "revision_uid": "monthly-da9d5388705b",
+          "contract_version": 1
+        }
+      ],
+      "metadataPending": 0,
+      "httpStatuses": [],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 13708,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "owner",
+      "stage": "cleanup",
+      "httpStatuses": [
+        "/auth/v1/logout?scope=local:204"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "79b2b99e71954af4a9109becc862f353",
+      "pid": 15880,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "restored-db"
+    },
+    {
+      "run": "da9d5388705b",
+      "phone": "counter",
+      "stage": "cleanup",
+      "httpStatuses": [
+        "/auth/v1/logout?scope=local:204"
+      ],
+      "outbox": 0,
+      "parks": 0,
+      "deviceId": "db5047278d2a4ea1a085ff24da03f24c",
+      "pid": 13770,
+      "balances": {
+        "Cash": 10050,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 300,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 96.5,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db",
+      "dbSubdir": "db"
+    }
+  ],
+  "comparisons": [
+    {
+      "label": "legacy",
+      "tablesEqual": 20,
+      "cash": 10000,
+      "debt": 100,
+      "milk": 99,
+      "sha256": "954056e67971d804f7047d3807a8e7d5857dac52c913c2ae37e9a6f126cfec70"
+    },
+    {
+      "label": "activated-legacy",
+      "tablesEqual": 25,
+      "cash": 10000,
+      "debt": 100,
+      "milk": 99,
+      "sha256": "954056e67971d804f7047d3807a8e7d5857dac52c913c2ae37e9a6f126cfec70"
+    },
+    {
+      "label": "monthly-after-lost-ack",
+      "tablesEqual": 25,
+      "cash": 10000,
+      "debt": 100,
+      "milk": 99,
+      "sha256": "77449d62066d1cb3ac4772ded826e62b7f91ed83eaf560ec411ad2dc41389792"
+    },
+    {
+      "label": "monthly-sale",
+      "tablesEqual": 25,
+      "cash": 10000,
+      "debt": 300,
+      "milk": 97,
+      "sha256": "e3d1dfeca48945c85d9b3ea996cc2ca1b735587fa5097c75a53df4c079a1941d"
+    },
+    {
+      "label": "correction-payment",
+      "tablesEqual": 25,
+      "cash": 10050,
+      "debt": 300,
+      "milk": 96.5,
+      "sha256": "db84e5d1f9ffe0fae9486831103b03c21b176024b729f0ee5ccac39194ddb6d1"
+    },
+    {
+      "label": "old-client-refusal-preserves-finance",
+      "tablesEqual": 25,
+      "cash": 10050,
+      "debt": 300,
+      "milk": 96.5,
+      "sha256": "db84e5d1f9ffe0fae9486831103b03c21b176024b729f0ee5ccac39194ddb6d1"
+    },
+    {
+      "label": "clear-and-concurrent-set",
+      "tablesEqual": 25,
+      "cash": 10050,
+      "debt": 300,
+      "milk": 96.5,
+      "sha256": "a7d246efb8d93a0323d63fcbb2ed51685c99c1716b799b10582dac886c3200ec"
+    },
+    {
+      "label": "encrypted-restore-convergence",
+      "tablesEqual": 25,
+      "cash": 10050,
+      "debt": 300,
+      "milk": 96.5,
+      "sha256": "a7d246efb8d93a0323d63fcbb2ed51685c99c1716b799b10582dac886c3200ec"
+    },
+    {
+      "label": "idempotent-repeat",
+      "tablesEqual": 25,
+      "cash": 10050,
+      "debt": 300,
+      "milk": 96.5,
+      "sha256": "a7d246efb8d93a0323d63fcbb2ed51685c99c1716b799b10582dac886c3200ec"
+    }
+  ],
+  "failure": null
+}

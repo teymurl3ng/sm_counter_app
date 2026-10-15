@@ -3,6 +3,7 @@ package com.saaf.milkshop.nativeui.owner
 import com.saaf.milkshop.nativeui.common.NativeListStyle
 import com.saaf.milkshop.nativeui.common.nativeListItemContent
 import com.saaf.milkshop.nativeui.common.ActivePaneBackHandler as BackHandler
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -111,6 +112,7 @@ fun OwnerCustomersScreen(
     hostedScaffold: HostedScaffold,
     showHeader: Boolean = true,
     modifier: Modifier = Modifier,
+    onCreditAction: (com.saaf.milkshop.application.owner.CustomerCreditCommand) -> Unit = {},
 ) {
     val snapshot = OwnerCustomersScreenSnapshot(
         identity = identity,
@@ -157,6 +159,7 @@ fun OwnerCustomersScreen(
             onOpenEdit = onOpenEdit,
             onBackFromEdit = onBackFromEdit,
             onUpdateCustomer = onUpdateCustomer,
+            onCreditAction = onCreditAction,
             hostedScaffold = hostedScaffold,
             showHeader = pane.showHeader,
             modifier = modifier,
@@ -190,6 +193,7 @@ private fun OwnerCustomersScreenPane(
     hostedScaffold: HostedScaffold,
     showHeader: Boolean = true,
     modifier: Modifier = Modifier,
+    onCreditAction: (com.saaf.milkshop.application.owner.CustomerCreditCommand) -> Unit = {},
 ) {
     if (customerCreateOpen) {
         OwnerCustomersCreateScreen(
@@ -231,12 +235,20 @@ private fun OwnerCustomersScreenPane(
             error = customersError,
             onBack = onBackFromDetail,
             onOpenEdit = onOpenEdit,
+            onCreditAction = onCreditAction,
+            creditBusy = customerUpdating,
             hostedScaffold = hostedScaffold,
             modifier = modifier,
         )
         return
     }
 
+    var query by rememberSaveable { mutableStateOf("") }
+    var creditFilter by rememberSaveable { mutableStateOf("All") }
+    val filteredCustomers = customers.filter { row ->
+        (query.isBlank() || listOfNotNull(row.name,row.phone,row.areaRoute).any { it.contains(query.trim(),ignoreCase=true) }) &&
+        when(creditFilter) { "All"->true; "Bad"->row.credit?.status?.needsBadFilter==true; else->row.credit?.status?.kind?.let { it.name.replace('_',' ').equals(creditFilter,ignoreCase=true) }==true }
+    }
     BackHandler(onBack = onBackToMenu)
     hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
@@ -285,6 +297,15 @@ private fun OwnerCustomersScreenPane(
                 }
                 else -> {
                     Column(Modifier.fillMaxSize()) {
+                        OutlinedTextField(query,{query=it},label={ Text("Search customers") },singleLine=true,
+                            modifier=Modifier.fillMaxWidth().padding(horizontal=16.dp).testTag("credit-customer-search"))
+                        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal=16.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                            listOf("All","Watch","Late","Bad","Needs review").forEach { filter ->
+                                androidx.compose.material3.FilterChip(selected=creditFilter==filter,onClick=hapticAction { creditFilter=filter },
+                                    label={ Text(filter) },modifier=Modifier.testTag("credit-filter-$filter"))
+                            }
+                        }
+
                         Row(
                             Modifier
                                 .fillMaxWidth()
@@ -306,7 +327,7 @@ private fun OwnerCustomersScreenPane(
                                     .testTag(NativeUiTags.OwnerCustomersError),
                             )
                         }
-                        if (customers.isEmpty()) {
+                        if (filteredCustomers.isEmpty()) {
                             Box(
                                 Modifier
                                     .fillMaxSize()
@@ -315,7 +336,7 @@ private fun OwnerCustomersScreenPane(
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Text(
-                                    "No customers yet.",
+                                    if(customers.isEmpty()) "No customers yet." else "No customers match this filter.",
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -327,7 +348,7 @@ private fun OwnerCustomersScreenPane(
                                     .padding(horizontal = 16.dp)
                                     .testTag(NativeUiTags.OwnerCustomersList),
                             ) {
-                                items(customers, key = { it.accountId }) { customer ->
+                                items(filteredCustomers, key = { it.accountId }) { customer ->
                                     OwnerCustomerRow(
                                         customer = customer,
                                         onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenCustomer(customer.accountId) },
@@ -755,6 +776,8 @@ private fun OwnerCustomersDetailScreen(
     onOpenEdit: () -> Unit,
     hostedScaffold: HostedScaffold,
     modifier: Modifier,
+    onCreditAction: (com.saaf.milkshop.application.owner.CustomerCreditCommand)->Unit,
+    creditBusy: Boolean,
 ) {
     BackHandler(onBack = onBack)
     val row = detail.row
@@ -796,6 +819,7 @@ private fun OwnerCustomersDetailScreen(
                     detail.dailyQuotaLabel?.let { NativeInformationFact("Daily quota", it) }
                     detail.notes?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Notes", it, prose = true) }
                 }
+                CustomerCreditPanel(detail,identity.role.wireValue=="owner",creditBusy,onCreditAction)
                 error?.let {
                     Text(
                         it,
@@ -841,6 +865,7 @@ private fun OwnerCustomerRow(
                 Text(it, style = nativeSupportingTextStyle(), color = nativeVisualColors.supporting)
             }
             Text(customer.statusLabel, style = nativeSupportingTextStyle())
+            customer.credit?.let { CustomerCreditStatusText(it) }
         }
         Icon(Icons.Outlined.ChevronRight, contentDescription = null)
     }

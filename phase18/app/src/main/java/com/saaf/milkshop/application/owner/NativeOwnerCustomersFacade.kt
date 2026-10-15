@@ -1,6 +1,7 @@
 package com.saaf.milkshop.application.owner
 
 import com.saaf.milkshop.data.MilkShopDatabase
+import androidx.room3.withReadTransaction
 import com.saaf.milkshop.domain.AppPermission
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.CustomerManagementService
@@ -16,6 +17,7 @@ data class NativeOwnerCustomerRow(
     val statusLabel: String,
     val phone: String?,
     val areaRoute: String?,
+    val credit: CustomerCreditView? = null,
 )
 
 data class NativeOwnerCustomerDetail(
@@ -28,6 +30,7 @@ data class NativeOwnerCustomerDetail(
     val creditLimitLabel: String?,
     val dailyQuotaLabel: String?,
     val creditAge: com.saaf.milkshop.domain.CreditAge? = null,
+    val ledger: NativeOwnerAccountLedgerDetail? = null,
 )
 
 data class NativeOwnerCustomersSnapshot(
@@ -45,23 +48,26 @@ class NativeOwnerCustomersFacade(
     private val customers: CustomerManagementService = CustomerManagementService(database),
     private val profiles: CustomerProfileService = CustomerProfileService(database),
 ) {
-    suspend fun loadCustomers(sessionHandle: String): NativeOwnerCustomersSnapshot {
+    suspend fun loadCustomers(sessionHandle: String): NativeOwnerCustomersSnapshot = database.withReadTransaction {
         requireOwnerMasterData(sessionHandle)
-        val rows = customers.list().map { info ->
-            val profile = profiles.get(info.accountId)
+        val infos = customers.list()
+        val credit = CustomerCreditViews(database).load(infos.associate { it.accountId to it.balance })
+        val profileRows = database.backupDataDao().customerProfiles().associateBy { it.accountId }
+        val rows = infos.map { info ->
+            val profile = profileRows[info.accountId]
             info.toRow(
                 active = profile?.active ?: true,
                 phone = profile?.phone,
                 areaRoute = profile?.areaRoute,
-            )
+            ).copy(credit = credit[info.accountId])
         }
-        return NativeOwnerCustomersSnapshot(customers = rows)
+        NativeOwnerCustomersSnapshot(customers = rows)
     }
 
     suspend fun loadDetail(
         sessionHandle: String,
         accountId: Long,
-    ): NativeOwnerCustomerDetail {
+    ): NativeOwnerCustomerDetail = database.withReadTransaction {
         requireOwnerMasterData(sessionHandle)
         val info = customers.list().firstOrNull { it.accountId == accountId }
             ?: error("This customer is not in the customer list.")
@@ -72,10 +78,12 @@ class NativeOwnerCustomersFacade(
             phone = profile?.phone,
             areaRoute = profile?.areaRoute,
         )
-        return NativeOwnerCustomerDetail(
+        val credit = CustomerCreditViews(database).load(mapOf(accountId to info.balance))[accountId]
+        NativeOwnerCustomerDetail(
+            ledger = NativeOwnerRecordsFacade(database,security).loadLedger(sessionHandle,accountId),
             creditAge = com.saaf.milkshop.domain.CustomerCreditAgeService(database).load(accountId,
                 com.saaf.milkshop.application.readmodels.money(info.balance), com.saaf.milkshop.sync.BusinessClock.today()),
-            row = row,
+            row = row.copy(credit = credit),
             address = profile?.address,
             notes = profile?.notes,
             creditLimit = profile?.creditLimit,
@@ -108,6 +116,23 @@ class NativeOwnerCustomersFacade(
         requireOwnerMasterData(sessionHandle)
         customers.rename(accountId, name)
         profiles.save(accountId, profile)
+    }
+
+    suspend fun creditAction(sessionHandle: String, accountId: Long, action: CustomerCreditCommand) {
+        requireOwnerMasterData(sessionHandle)
+        val actor=security.requirePermission(sessionHandle,AppPermission.MANAGE_MASTER_DATA)
+        require(actor.role == AppRole.OWNER.wireValue) { "Only Owner can change credit terms or review flags." }
+        val uid=requireNotNull(database.accountDao().findById(accountId)).uid
+        val service=com.saaf.milkshop.domain.CreditReviewService(database,security)
+        when(action) {
+            is CustomerCreditCommand.Terms -> service.proposeTerms(sessionHandle,uid,action.expectedRevision,action.term)
+            is CustomerCreditCommand.Flag -> service.setFlag(sessionHandle,uid,action.reason)
+            is CustomerCreditCommand.Clear -> service.clearFlag(sessionHandle,uid,action.reviewedSets,action.reason)
+            is CustomerCreditCommand.Retry -> service.reviewPending(sessionHandle,uid,action.uid,false)
+            is CustomerCreditCommand.DiscardTerm -> service.reviewPending(sessionHandle,uid,action.uid,true)
+            CustomerCreditCommand.Enable -> Unit // The controller calls the authenticated runtime only after this local Owner check.
+        }
+        com.saaf.milkshop.sync.SyncScheduler.requestPush()
     }
 
     private suspend fun requireOwnerMasterData(sessionHandle: String) {

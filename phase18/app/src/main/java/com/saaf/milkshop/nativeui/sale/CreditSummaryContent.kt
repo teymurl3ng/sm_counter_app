@@ -23,6 +23,9 @@ internal fun CreditSummaryContent(summary: NativeSaleCreditSummary?, loading: Bo
         if (loading) Text("Checking credit…", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
         else if (summary == null) Text("Credit summary unavailable. The credit check will run when you save.", color = MaterialTheme.colorScheme.onSurface)
         else {
+            summary.currentStatus?.let { NativeInformationFact("Current credit",it) }
+            summary.paymentTerms?.let { NativeInformationFact("New sale terms",it) }
+            summary.statusExplanation?.let { Text(it,style=MaterialTheme.typography.bodyMedium) }
             NativeInformationFact(if ((summary.balancePaisa ?: 0) < 0) "Customer balance" else "Owes now",
                 creditBalanceText(summary.balancePaisa), emphasized = true)
             NativeInformationFact("After sale", creditBalanceText(summary.projectedBalancePaisa), emphasized = true)

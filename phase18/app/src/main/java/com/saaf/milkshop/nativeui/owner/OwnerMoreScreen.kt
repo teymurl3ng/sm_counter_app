@@ -233,6 +233,7 @@ fun OwnerMoreScreen(
     hostedScaffold: HostedScaffold,
     modifier: Modifier = Modifier,
     syncAttention: OwnerSyncAttention? = null,
+    onCustomerCreditAction: (com.saaf.milkshop.application.owner.CustomerCreditCommand) -> Unit = {},
 ) {
     NativeSectionTransition(
         targetState = state,
@@ -363,6 +364,7 @@ fun OwnerMoreScreen(
                 onOpenEdit = onOpenCustomerEdit,
                 onBackFromEdit = onBackFromCustomerEdit,
                 onUpdateCustomer = onUpdateCustomer,
+                onCreditAction = onCustomerCreditAction,
                 hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )

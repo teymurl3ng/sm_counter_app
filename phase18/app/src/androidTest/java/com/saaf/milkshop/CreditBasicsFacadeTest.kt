@@ -121,6 +121,7 @@ class CreditBasicsFacadeTest {
         db.customerProfileDao().save(CustomerProfileEntity(accountId = customer, creditLimit = Double.POSITIVE_INFINITY, createdAt = date.toString()))
         val summary = facade.previewCredit(session, request(), date)
         assertTrue(summary.checkUnavailable)
+        assertEquals("Needs review", summary.currentStatus)
         val before = db.eventDao().count()
         assertTrue(runCatching { facade.record(session, request(), date) }.exceptionOrNull() is CreditWarningRequired)
         assertEquals(before, db.eventDao().count())

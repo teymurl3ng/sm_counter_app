@@ -1,0 +1,28 @@
+{
+  "label": "finish-sale-final",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.CreditBasicsUiTest#creditLightDefaultSummaryAndWarningKeepChromeStable",
+    "com.saaf.milkshop.CreditBasicsUiTest#creditDarkDoubleTextSummaryAndWarningKeepChromeStable"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.CreditBasicsUiTest",
+      "test": "creditDarkDoubleTextSummaryAndWarningKeepChromeStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsUiTest",
+      "test": "creditLightDefaultSummaryAndWarningKeepChromeStable",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 2,
+  "expected": 2,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "b5b997d2966255b1291c06409ded653fd4778d8d4c6bd6551ff5d7054b8853a9"
+}

@@ -1,0 +1,119 @@
+{
+  "label": "finish-first",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.CreditFinishTest#batchStatusUsesEveryAgreementAndCanonicalLedger",
+    "com.saaf.milkshop.CreditFinishTest#pendingAndRestoredClearsCannotHideAcceptedFlag",
+    "com.saaf.milkshop.CreditFinishTest#heldTermReviewChecksOwnerCustomerAndNewAcceptedHead",
+    "com.saaf.milkshop.CreditFinishUiTest#lightTermsReviewAndHistoryKeepChromeStable",
+    "com.saaf.milkshop.CreditFinishUiTest#darkLargeTextTermsReviewAndHistoryKeepChromeStable",
+    "com.saaf.milkshop.CreditFinishUiTest#managerCanReadStatusWithoutOwnerActions",
+    "com.saaf.milkshop.NativeOwnerCustomersFacadeTest#loadCustomersListsAccountsWithBalanceAndStatus",
+    "com.saaf.milkshop.NativeOwnerCustomersFacadeTest#loadDetailReturnsProfileFacts",
+    "com.saaf.milkshop.CreditBasicsFacadeTest#correctionsAndZeroDeltaAncestorPreserveAgeAndCustomerDetail",
+    "com.saaf.milkshop.CreditBasicsFacadeTest#invalidLimitRequiresUnavailableCheckConfirmationAndStillPostsOnlyOnce",
+    "com.saaf.milkshop.CreditMetadataTransportTest#monthlySaleSnapshotsAcceptedTermsAndLaterChangesDoNotRewriteEnvelope",
+    "com.saaf.milkshop.CreditMetadataTransportTest#changedAcceptedTermsRequireFreshAdvisoryAcknowledgment",
+    "com.saaf.milkshop.CreditMetadataTransportTest#incomingAgreementParksWholeSaleThenReplaysWithRevisionAndNoEchoOrDuplicate",
+    "com.saaf.milkshop.CreditMetadataTransportTest#restoreReconcilesRemoteClearAndPreservesUnseenConcurrentFlag",
+    "com.saaf.milkshop.CreditMetadataTransportTest#runtimeRefreshesOnceAndUnknownRefreshKeepsRequiredContractAndTokens"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.CreditFinishTest",
+      "test": "heldTermReviewChecksOwnerCustomerAndNewAcceptedHead",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditFinishTest",
+      "test": "batchStatusUsesEveryAgreementAndCanonicalLedger",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditFinishTest",
+      "test": "pendingAndRestoredClearsCannotHideAcceptedFlag",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditFinishUiTest",
+      "test": "lightTermsReviewAndHistoryKeepChromeStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditFinishUiTest",
+      "test": "managerCanReadStatusWithoutOwnerActions",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditFinishUiTest",
+      "test": "darkLargeTextTermsReviewAndHistoryKeepChromeStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerCustomersFacadeTest",
+      "test": "loadCustomersListsAccountsWithBalanceAndStatus",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerCustomersFacadeTest",
+      "test": "loadDetailReturnsProfileFacts",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsFacadeTest",
+      "test": "correctionsAndZeroDeltaAncestorPreserveAgeAndCustomerDetail",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsFacadeTest",
+      "test": "invalidLimitRequiresUnavailableCheckConfirmationAndStillPostsOnlyOnce",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "incomingAgreementParksWholeSaleThenReplaysWithRevisionAndNoEchoOrDuplicate",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "monthlySaleSnapshotsAcceptedTermsAndLaterChangesDoNotRewriteEnvelope",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "changedAcceptedTermsRequireFreshAdvisoryAcknowledgment",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "runtimeRefreshesOnceAndUnknownRefreshKeepsRequiredContractAndTokens",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "restoreReconcilesRemoteClearAndPreservesUnseenConcurrentFlag",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 15,
+  "expected": 15,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "361be228e59fd26bb28ca338ee56d28dfc57942152e8bb66d67c6b7a9031cf7f"
+}

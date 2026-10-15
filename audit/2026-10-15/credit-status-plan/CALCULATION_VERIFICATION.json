@@ -1,0 +1,68 @@
+{
+  "baseline": "08d0e28149f02acb4b11778d996618c21825cb4b",
+  "status": "calculation and pure review projection accepted; phase 4 remains in progress",
+  "build": "testDebugUnitTest with only CreditPaymentStatusTest and CreditAgingCalculatorTest",
+  "results": [
+    {
+      "class": "CreditPaymentStatusTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "methods": [
+        "completePaymentAndAdvanceKeepOwnerFlagSeparate",
+        "weeklyStatusChangesAtEverySpecifiedBoundary",
+        "rawDustDoesNotCreateAnOlderOverdueLot",
+        "concurrentSetSurvivesClearAndTransportOrderDoesNotMatter",
+        "malformedAllocationAndIncompleteHistoryNeedReview",
+        "unknownOpeningDebtKeepsKnownOverduePartialInformationWithoutGoodClassification",
+        "flagDependencyMissingIsIncompleteAndIdentityConflictIsRefused",
+        "calendarMonthClampsAndIsDifferentFromThirtyDays",
+        "newerWeeklyDebtCanBeOverdueWhileOldestMonthlyDebtIsCurrentAndFifoStaysTheSame",
+        "missingOrWrongAgreementNeverBecomesSilentLegacy",
+        "correctedRootKeepsItsTermAndFuturePreferenceCannotRewriteIt"
+      ]
+    },
+    {
+      "class": "CreditAgingCalculatorTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "methods": [
+        "sharedSaleAmountIncludesSurchargeForQuantityAndAmount",
+        "partialFullPaymentAndAdvance",
+        "incompleteOrInconsistentHistoryNeverInventsAge",
+        "correctionFamiliesRetainOriginalAgeAndPaymentMeaning",
+        "openingDebtIsUnknownAndPaidFirst",
+        "stableUidOrderingAndSubPaisaDust"
+      ]
+    }
+  ],
+  "totalTests": 17,
+  "productionFiles": [
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/CustomerCreditAging.kt",
+      "sha256": "301b9cb0835d00acc8145e400244c6e734f5a0c10fc3e69aa9174526b8aa8034"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/CreditPaymentTerms.kt",
+      "sha256": "66b1b619ead35ec82db3781c512785812f5725989a214a2e90b0b804ca50058c"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/CustomerCreditStatus.kt",
+      "sha256": "8087074fcf922044ba80072c3898230b61d87ca83d494f4a3a562858c127f0b7"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/CreditReviewActions.kt",
+      "sha256": "f7d2beb225fab4078ff6951fa5d5df9a8126d11cf121adaabc6febdc73aa6ea9"
+    },
+    {
+      "path": "phase18/app/src/test/java/com/saaf/milkshop/CreditPaymentStatusTest.kt",
+      "sha256": "8bd8ca4699ca58138fc9eb4e67dedc941f603a37acc24a0dc45224fe65a002d8"
+    }
+  ],
+  "schemaChange": false,
+  "serverMutation": false,
+  "phoneTestsRun": false,
+  "appInstalled": false,
+  "newScreenBehaviorEnabled": false
+}

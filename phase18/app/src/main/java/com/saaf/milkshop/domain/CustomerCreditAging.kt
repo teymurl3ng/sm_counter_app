@@ -30,8 +30,20 @@ data class CreditAgeFact(
     val amount: BigDecimal,
 )
 
+/** Reconciled visible-paisa obligations, in the same FIFO order used for age. */
+data class UnpaidCreditLot(val rootSaleUid: String, val saleDate: LocalDate?, val remainingPaisa: Long)
+
+data class CreditAllocation(
+    val balancePaisa: Long,
+    val age: CreditAge,
+    val unpaidLots: List<UnpaidCreditLot>,
+)
+
 object CustomerCreditAging {
-    fun calculate(facts: List<CreditAgeFact>, canonicalBalancePaisa: Long, asOf: LocalDate): CreditAge {
+    fun calculate(facts: List<CreditAgeFact>, canonicalBalancePaisa: Long, asOf: LocalDate): CreditAge =
+        allocate(facts, canonicalBalancePaisa, asOf).age
+
+    fun allocate(facts: List<CreditAgeFact>, canonicalBalancePaisa: Long, asOf: LocalDate): CreditAllocation {
         return try {
             val byId = facts.associateBy { it.eventId }
             require(byId.size == facts.size)
@@ -74,6 +86,7 @@ object CustomerCreditAging {
             var rounded = 0L
             var unknown = 0L
             var oldest: Long? = null
+            val unpaid = mutableListOf<UnpaidCreditLot>()
             for (lot in lots.sortedWith(compareBy<Lot>({ it.date ?: LocalDate.MIN }, { it.uid }))) {
                 val paid = credit.min(lot.amount)
                 credit -= paid
@@ -82,13 +95,14 @@ object CustomerCreditAging {
                 val remaining = nextRounded - rounded
                 rounded = nextRounded
                 if (remaining > 0) {
+                    unpaid += UnpaidCreditLot(lot.uid, lot.date, remaining)
                     if (lot.date == null) unknown += remaining
                     else if (oldest == null) oldest = java.time.temporal.ChronoUnit.DAYS.between(lot.date, asOf)
                 }
             }
             require(rounded == canonicalBalancePaisa.coerceAtLeast(0))
-            CreditAge(true, oldest, unknown)
-        } catch (_: Exception) { CreditAge(false) }
+            CreditAllocation(canonicalBalancePaisa, CreditAge(true, oldest, unknown), unpaid.toList())
+        } catch (_: Exception) { CreditAllocation(canonicalBalancePaisa, CreditAge(false), emptyList()) }
     }
 }
 

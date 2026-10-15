@@ -1,6 +1,6 @@
 # Phase 4: customer payment terms, credit status and review history
 
-15 October 2026. Source baseline: `f186c3fcbbfb751e3e8d61117fe667f717efa976`. **Planning only; no implementation or schema/cloud change.** Parent: [six-phase plan](../../../NEXT_WORK_PLAN_2026-10-15.md). This is phase 4/L2, not new phases in the roadmap.
+15 October 2026. Source baseline: `f186c3fcbbfb751e3e8d61117fe667f717efa976`. **Implementation started after owner approval.** [Calculation/data-contract checkpoint](CHECKPOINT_1.md): 17 affected JVM tests pass; storage/sync/backup/screens remain pending. No schema or server mutation ran. Parent: [six-phase plan](../../../NEXT_WORK_PLAN_2026-10-15.md). This is phase 4/L2, not new phases in the roadmap.
 
 ## Owner input and bounded outcome
 
@@ -82,7 +82,7 @@ Pin these before coding; exact SQL/DTO names can follow existing conventions:
 
 ## Three implementation checkpoints inside phase 4
 
-- [ ] **Rules and data contract:** confirm proposed status bands/monthly meaning/future-only changes; extend the existing allocation result, add terms/snapshot/flag metadata, migration and exact compatibility contract. Stop before UI rollout if compatibility cannot be kept bounded.
+- [ ] **Rules and data contract:** ✅ ~~Agreed meanings/bands, remaining-lot allocation, typed term-aware status and pure flag projection; read-only DEV check and frozen transport contract.~~ Persisted terms/snapshots/flags, permissions, migrations, sync and backup are still required. [Checkpoint](CHECKPOINT_1.md).
 - [ ] **Existing screens:** customer terms editor, list status/filters, detail explanations, reused ledger and flag audit actions; selected Sale summary. No new top-level destination or global visual overhaul.
 - [ ] **Affected acceptance:** focused calculation/permission/migration/sync/restore tests, then synthetic two-phone metadata propagation and the affected light/dark/large-text screens. Reconcile the same six-phase checklist and stop.
 
@@ -105,4 +105,4 @@ Pin the exact selected test methods once the data contract is implemented; do no
 
 The [judgment hook](hook-output.json) is a fixed reminder, not code validation. Reject hardcoded seven-day-only categories, treating bill day as due day, calling unknown debt Good, changing historical deadlines when a customer setting changes, storing derived balances/scores, overwriting flag history, or claiming the new table syncs automatically. Reject a generic workflow/terms builder or complete risk-scoring system.
 
-The proposed future-only term snapshots are a deliberate bounded adjustment to the old blueprint required by the owner's new per-customer-period request. The exact category cutoffs and monthly definition remain **proposals for review**, not facts supplied by industry or previously approved business rules. Implementation has not started. Phases 1 and 5–6 remain pending; phases 2–3 stay complete. Sunday statement preparation and scheduling are retained for phases 5–6, with sending authorization/cost/automatic-SMS decisions still distinct.
+The future-only term snapshots are a deliberate bounded adjustment to the old blueprint required by the owner's new per-customer-period request. The owner subsequently authorized implementation after the proposed category cutoffs/monthly definition were explained; these are this shop's agreed operating rules, not industry-mandated facts. Implementation is in progress at the checkpoint above. Phases 1 and 5–6 remain pending; phases 2–3 stay complete. Sunday statement preparation and scheduling are retained for phases 5–6, with sending authorization/cost/automatic-SMS decisions still distinct.

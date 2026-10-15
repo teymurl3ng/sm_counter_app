@@ -1,0 +1,17 @@
+{
+  "project": "tghzmofkkdsaasvnixps",
+  "scope": "DEV read-only function definitions; no customer rows or credentials queried",
+  "mutations": false,
+  "functions": [
+    {
+      "name": "sync_pull",
+      "arguments": "since_seq bigint, max_rows integer, shop uuid",
+      "definitionSha256": "5ef97fd055f2617b6833cd95393e1c3b57af820638b834075bd731dbae3d3828"
+    },
+    {
+      "name": "sync_push",
+      "arguments": "envelopes jsonb, device_id text, shop_id uuid, pull_cursor bigint",
+      "definitionSha256": "8494be36b1c980e81937605956e74c427c0b0ebb4054d0864ff6e27b27cb0758"
+    }
+  ]
+}

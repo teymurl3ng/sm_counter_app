@@ -21,9 +21,9 @@
     "installedHashVerified": true,
     "sameUidAndFirstInstallTime": true,
     "dataCleared": false,
-    "privateSignIn": "requested after update restart",
-    "liveSyncAcceptance": "pending private sign-in",
-    "historicalRecordComparison": "pending private sign-in"
+    "privateSignIn": "authenticated Owner observed after user private sign-in",
+    "liveSyncAcceptance": "accepted: Push Drained; all pull counters zero; queue empty",
+    "historicalRecordComparison": "accepted at sampled balances, three sale summaries and one sale detail scope"
   },
   "agentEnteredCredential": false,
   "newBusinessTransactionPosted": false,

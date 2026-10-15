@@ -1,5 +1,7 @@
 # Flat completion checklist â€” 14 October 2026
 
+**15October post-patch live acceptance:** R36 is complete at the sampled ordinary-app upgrade/login/records scope: privateOwner access on0.4.3, successful livePROD Drained/zero-pull sync, and matching historicalrecords/detail/Overview balance samples. S24 matching installation, humanstaff outcomes and independent custody/private handover remain open. [Live result](../../2026-10-15/prod-timezone-fix/RESULT.md). Earlier R36-pending notes are historical.
+
 **Later15October current patch:** Real ordinaryA06 Owner/PROD setup and historicalrecords are observed. A live null-timezone sync failure is reproduced/fixed with6 affected passes. Signed0.4.3/code7 is installed/hash-verified onA06, dataretained; S24 matching patch is pending connection, so R35 is open for the current patch. R36 remains partial until post-update private signin/live sync/record comparison. [Patch](../../2026-10-15/prod-timezone-fix/RESULT.md). Earlier installation/freeze completion notes refer to0.4.2.
 
 **15 October reconciliation:** R22–R28 and R30–R35 are complete at their named technical scope. Hosted recovery, source publication, production browser/reset, both signed phone installations and seventeen affected checks are credited. R29 still needs independent custody/recovered-backup acceptance; R36/R37 need private ordinary-app records/login and real setup; R38 has completed instructions but final private handover remains open. Batch 4 human outcomes remain open. [Current result](../../2026-10-15/current-finish/RESULT.md). Older dated notes below are historical.
@@ -44,7 +46,7 @@ Detailed substeps retained from the inventory. The user-facing progress plan is 
 - [x] **R33** ~~Commit and push the accepted app changes.~~ <!-- 10 / A6 -->
 - [x] **R34** ~~Build and version the signed ordinary app; verify its certificate/package.~~ <!-- 10 / A6 -->
 - [ ] **R35** Install the current0.4.3 patch on intended phones: A06 done; S24 awaits connection. <!-- 10 / A6 -->
-- [ ] **R36** Verify the upgrade preserves existing records and logins. <!-- 10 / A6 -->
+- [x] **R36** ~~Verify the upgrade preserves existing records and logins.~~ <!-- 10 / A6 -->
 - [ ] **R37** Configure the actual shop, staff access, PINs and sync connection. <!-- O3 / actual handover -->
 - [ ] **R38** Hand over the devices with final recovery/rollback instructions. <!-- O3 / O6 / 10 -->
 

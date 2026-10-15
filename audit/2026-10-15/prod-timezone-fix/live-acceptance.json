@@ -1,0 +1,37 @@
+{
+  "device": "A06",
+  "package": "com.saaf.milkshop",
+  "normalProfile": 0,
+  "versionName": "0.4.3",
+  "versionCode": 7,
+  "sourceCommit": "62c9d315662e67f871d9c124f86d73675c5f06f1",
+  "authenticatedOwnerObserved": true,
+  "agentEnteredCredential": false,
+  "environment": "PROD",
+  "liveSync": {
+    "attemptsThisAcceptance": 1,
+    "push": "Drained",
+    "pull": { "applied": 0, "updated": 0, "skipped": 0, "parked": 0, "conflicts": 0 },
+    "queuedUploadsBefore": 0,
+    "queuedUploadsAfter": 0,
+    "cursorBefore": 107,
+    "cursorAfter": 107,
+    "identityVerified": true,
+    "sessionActive": true,
+    "trustedTimeServerAnchored": true,
+    "timezoneErrorObserved": false
+  },
+  "sampledPreservation": {
+    "overviewBalancesMatchPreUpdate": true,
+    "threeHistoricalSaleSummariesMatch": true,
+    "sampleSaleDateStatusInventoryAndCashDetailMatch": true,
+    "entireDatabaseAuditClaimed": false
+  },
+  "businessTransactionPosted": false,
+  "recordOrSettingEdited": false,
+  "privateFinancialFiguresPublished": false,
+  "leftOnOverview": true,
+  "s24MatchingPatchInstallation": "pending connection",
+  "independentBackupCustody": "pending owner confirmation",
+  "humanStaffAcceptance": "pending"
+}

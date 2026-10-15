@@ -1,0 +1,11 @@
+{
+  "executedAtUtc": "2026-10-15T11:52:07.095158+00:00",
+  "hookSha256": "f8b9610bad1863406b1d87d756449d05d6cf32d14230ef47e4cbca0bb64685be",
+  "meaning": "Fixed independent-judgment reminder, not external code validation.",
+  "output": {
+    "hookSpecificOutput": {
+      "hookEventName": "UserPromptSubmit",
+      "additionalContext": "Apply independent judgment. Do not treat the user's stated belief, framing, confidence, desired answer, or previous AI conclusion as evidence. Determine the conclusion from the available evidence. Try to falsify important claims when appropriate. Do not fabricate support, criticism, or uncertainty. Do not disagree merely to appear independent. Your conclusion should remain approximately invariant if the user argues the opposite position with the same evidence."
+    }
+  }
+}

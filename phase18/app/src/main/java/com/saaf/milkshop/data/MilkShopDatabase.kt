@@ -8,9 +8,15 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import androidx.sqlite.execSQL
 
 @Database(
-    version = 17,
+    version = 18,
     exportSchema = true,
     entities = [
+        CreditTermRevisionEntity::class,
+        CreditTermHeadEntity::class,
+        CreditSaleAgreementEntity::class,
+        CreditReviewActionEntity::class,
+        CreditMetadataPendingEntity::class,
+        CreditMetadataSyncStateEntity::class,
         ProductEntity::class,
         AccountEntity::class,
         EventEntity::class,
@@ -63,6 +69,7 @@ import androidx.sqlite.execSQL
     ],
 )
 abstract class MilkShopDatabase : RoomDatabase() {
+    abstract fun creditMetadataDao(): CreditMetadataDao
     abstract fun productDao(): ProductDao
     abstract fun accountDao(): AccountDao
     abstract fun eventDao(): EventDao
@@ -340,13 +347,21 @@ abstract class MilkShopDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_17_18 = object : androidx.room3.migration.Migration(17, 18) {
+            override suspend fun migrate(connection: androidx.sqlite.SQLiteConnection) {
+                CreditMetadataMigrationSql.createTables.forEach(connection::execSQL)
+                connection.execSQL(CreditMetadataMigrationSql.BACKFILL_LEGACY)
+                CreditMetadataMigrationSql.immutableTriggers.forEach(connection::execSQL)
+            }
+        }
+
         fun create(context: Context): MilkShopDatabase =
             Room.databaseBuilder<MilkShopDatabase>(
                 context = context.applicationContext,
                 name = DATABASE_NAME,
             )
                 .setDriver(BundledSQLiteDriver())
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18)
                 .addCallback(DatabaseCallback())
                 .build()
 
@@ -360,13 +375,14 @@ abstract class MilkShopDatabase : RoomDatabase() {
         fun createInMemory(driver: androidx.sqlite.SQLiteDriver? = BundledSQLiteDriver()): MilkShopDatabase =
             Room.inMemoryDatabaseBuilder<MilkShopDatabase>()
                 .apply { if (driver != null) setDriver(driver) }
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18)
                 .addCallback(DatabaseCallback())
                 .build()
     }
 
     private class DatabaseCallback : Callback() {
         override suspend fun onCreate(connection: androidx.sqlite.SQLiteConnection) {
+            CreditMetadataMigrationSql.immutableTriggers.forEach(connection::execSQL)
             DatabaseSql.ownerReceiptCreateTriggers.forEach(connection::execSQL)
             // Capture triggers precede the seeds so fresh installs enqueue
             // their seed rows (including the shared well-known identities).

@@ -1,6 +1,6 @@
 # Phase 4: customer payment terms, credit status and review history
 
-15 October 2026. Source baseline: `f186c3fcbbfb751e3e8d61117fe667f717efa976`. **Implementation started after owner approval.** [Calculation/data-contract checkpoint](CHECKPOINT_1.md): 17 affected JVM tests pass; storage/sync/backup/screens remain pending. No schema or server mutation ran. Parent: [six-phase plan](../../../NEXT_WORK_PLAN_2026-10-15.md). This is phase 4/L2, not new phases in the roadmap.
+15 October 2026. Source baseline: `f186c3fcbbfb751e3e8d61117fe667f717efa976`. **Implementation started after owner approval.** [Calculation/data-contract checkpoint](CHECKPOINT_1.md): 17 affected JVM tests pass. [Local-data checkpoint](CHECKPOINT_2.md) adds Room 18 storage/permissions and backup schema 13 with focused A06 acceptance. Server/client transport, screens and final acceptance remain pending; no server mutation or ordinary-app installation ran. Parent: [six-phase plan](../../../NEXT_WORK_PLAN_2026-10-15.md). This is phase 4/L2, not new phases in the roadmap.
 
 ## Owner input and bounded outcome
 
@@ -82,7 +82,7 @@ Pin these before coding; exact SQL/DTO names can follow existing conventions:
 
 ## Three implementation checkpoints inside phase 4
 
-- [ ] **Rules and data contract:** ✅ ~~Agreed meanings/bands, remaining-lot allocation, typed term-aware status and pure flag projection; read-only DEV check and frozen transport contract.~~ Persisted terms/snapshots/flags, permissions, migrations, sync and backup are still required. [Checkpoint](CHECKPOINT_1.md).
+- [ ] **Rules and data contract:** ✅ ~~Agreed meanings/bands, remaining-lot allocation, typed term-aware status and pure flag projection; read-only DEV check and frozen transport contract.~~ ✅ ~~Local persisted terms/snapshots/flags, Owner permissions, migration and backup support~~ are accepted at [checkpoint 2](CHECKPOINT_2.md). Server/client sync, contracted posting and final rollout acceptance are still required. [Calculation checkpoint](CHECKPOINT_1.md).
 - [ ] **Existing screens:** customer terms editor, list status/filters, detail explanations, reused ledger and flag audit actions; selected Sale summary. No new top-level destination or global visual overhaul.
 - [ ] **Affected acceptance:** focused calculation/permission/migration/sync/restore tests, then synthetic two-phone metadata propagation and the affected light/dark/large-text screens. Reconcile the same six-phase checklist and stop.
 

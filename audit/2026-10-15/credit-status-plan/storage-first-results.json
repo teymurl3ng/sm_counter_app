@@ -1,0 +1,119 @@
+{
+  "label": "storage-first",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.CreditMetadataStorageTest#migrationPreservesLedgerAndClassifiesOnlyOriginalCreditSales",
+    "com.saaf.milkshop.CreditMetadataStorageTest#acceptedRevisionsRejectStaleHeadsIdentityChangesAndSqlMutation",
+    "com.saaf.milkshop.CreditMetadataStorageTest#ownerProposalsStayPendingAndOtherRolesAndExpiredSessionsCannotWrite",
+    "com.saaf.milkshop.CreditMetadataStorageTest#saleLegacyEvidenceIsAtomicAndCannotBeRewrittenByFutureTerms",
+    "com.saaf.milkshop.CreditMetadataStorageTest#recordedAgreementKeepsAcceptedRevisionAndRefusesForeignOrMissingFacts",
+    "com.saaf.milkshop.CreditMetadataStorageTest#flagsKeepConcurrentSetsAndFailedMultiClearRollsBack",
+    "com.saaf.milkshop.CreditMetadataStorageTest#encryptedRoundTripKeepsCreditHistoryAndHoldsPendingWithoutReenabling",
+    "com.saaf.milkshop.CreditMetadataStorageTest#malformedNewBackupFailsWithoutReplacingExistingBusinessAndOldBackupGetsExplicitLegacy",
+    "com.saaf.milkshop.CreditBasicsFacadeTest#surchargeCrossingAndChangedSnapshotRequireFreshAcknowledgement",
+    "com.saaf.milkshop.CreditBasicsFacadeTest#fractionalAggregateUsesCanonicalProjectionInsteadOfRoundedOperands",
+    "com.saaf.milkshop.CreditBasicsFacadeTest#correctionsAndZeroDeltaAncestorPreserveAgeAndCustomerDetail",
+    "com.saaf.milkshop.Phase9BackupRestoreTest#localSnapshot_isCreated_andContainsExpectedMetadata",
+    "com.saaf.milkshop.Phase9BackupRestoreTest#fullBackupRestore_preservesPhase3NativeExtensionState",
+    "com.saaf.milkshop.OwnerFundsReceiptTest#ordinaryAndEncryptedBackupPreserveReceiptFacts",
+    "com.saaf.milkshop.Phase8SaleOperationsTest#cashierRecordsQuantitySaleToCashWithNativeDefaultSurchargeAndSummaries"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.CreditMetadataStorageTest",
+      "test": "flagsKeepConcurrentSetsAndFailedMultiClearRollsBack",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataStorageTest",
+      "test": "migrationPreservesLedgerAndClassifiesOnlyOriginalCreditSales",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataStorageTest",
+      "test": "encryptedRoundTripKeepsCreditHistoryAndHoldsPendingWithoutReenabling",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataStorageTest",
+      "test": "ownerProposalsStayPendingAndOtherRolesAndExpiredSessionsCannotWrite",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataStorageTest",
+      "test": "recordedAgreementKeepsAcceptedRevisionAndRefusesForeignOrMissingFacts",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataStorageTest",
+      "test": "acceptedRevisionsRejectStaleHeadsIdentityChangesAndSqlMutation",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataStorageTest",
+      "test": "saleLegacyEvidenceIsAtomicAndCannotBeRewrittenByFutureTerms",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataStorageTest",
+      "test": "malformedNewBackupFailsWithoutReplacingExistingBusinessAndOldBackupGetsExplicitLegacy",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsFacadeTest",
+      "test": "correctionsAndZeroDeltaAncestorPreserveAgeAndCustomerDetail",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsFacadeTest",
+      "test": "surchargeCrossingAndChangedSnapshotRequireFreshAcknowledgement",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsFacadeTest",
+      "test": "fractionalAggregateUsesCanonicalProjectionInsteadOfRoundedOperands",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.Phase9BackupRestoreTest",
+      "test": "fullBackupRestore_preservesPhase3NativeExtensionState",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.Phase9BackupRestoreTest",
+      "test": "localSnapshot_isCreated_andContainsExpectedMetadata",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.OwnerFundsReceiptTest",
+      "test": "ordinaryAndEncryptedBackupPreserveReceiptFacts",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.Phase8SaleOperationsTest",
+      "test": "cashierRecordsQuantitySaleToCashWithNativeDefaultSurchargeAndSummaries",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 15,
+  "expected": 15,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "3df0ee9cf20f2ebc9bb83b905f2e2a188c43cc91acc4bbf1d01efe9bf9b7aa6f"
+}

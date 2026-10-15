@@ -1,0 +1,4319 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 18,
+    "identityHash": "04767247b9547d6db9837bf6f7d3906e",
+    "entities": [
+      {
+        "tableName": "credit_term_revisions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`revision_uid` TEXT NOT NULL, `customer_uid` TEXT NOT NULL, `prior_revision_uid` TEXT NOT NULL, `term_kind` TEXT NOT NULL, `term_value` INTEGER NOT NULL, `local_actor_uid` TEXT NOT NULL, `accepted_at` TEXT NOT NULL, `contract_version` INTEGER NOT NULL, PRIMARY KEY(`revision_uid`), FOREIGN KEY(`customer_uid`) REFERENCES `accounts`(`uid`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "revisionUid",
+            "columnName": "revision_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "customerUid",
+            "columnName": "customer_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "priorRevisionUid",
+            "columnName": "prior_revision_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "termKind",
+            "columnName": "term_kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "termValue",
+            "columnName": "term_value",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "localActorUid",
+            "columnName": "local_actor_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "acceptedAt",
+            "columnName": "accepted_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "contractVersion",
+            "columnName": "contract_version",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "revision_uid"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_credit_term_revisions_customer_uid",
+            "unique": false,
+            "columnNames": [
+              "customer_uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_credit_term_revisions_customer_uid` ON `${TABLE_NAME}` (`customer_uid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "accounts",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "customer_uid"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "credit_term_heads",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`customer_uid` TEXT NOT NULL, `revision_uid` TEXT NOT NULL, PRIMARY KEY(`customer_uid`), FOREIGN KEY(`customer_uid`) REFERENCES `accounts`(`uid`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`revision_uid`) REFERENCES `credit_term_revisions`(`revision_uid`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "customerUid",
+            "columnName": "customer_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "revisionUid",
+            "columnName": "revision_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "customer_uid"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_credit_term_heads_revision_uid",
+            "unique": false,
+            "columnNames": [
+              "revision_uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_credit_term_heads_revision_uid` ON `${TABLE_NAME}` (`revision_uid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "accounts",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "customer_uid"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          },
+          {
+            "table": "credit_term_revisions",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "revision_uid"
+            ],
+            "referencedColumns": [
+              "revision_uid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "credit_sale_agreements",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`root_sale_uid` TEXT NOT NULL, `customer_uid` TEXT NOT NULL, `evidence` TEXT NOT NULL, `term_kind` TEXT NOT NULL, `term_value` INTEGER NOT NULL, `revision_uid` TEXT NOT NULL, `contract_version` INTEGER NOT NULL, PRIMARY KEY(`root_sale_uid`), FOREIGN KEY(`root_sale_uid`) REFERENCES `events`(`event_uid`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`customer_uid`) REFERENCES `accounts`(`uid`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "rootSaleUid",
+            "columnName": "root_sale_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "customerUid",
+            "columnName": "customer_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "evidence",
+            "columnName": "evidence",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "termKind",
+            "columnName": "term_kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "termValue",
+            "columnName": "term_value",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "revisionUid",
+            "columnName": "revision_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "contractVersion",
+            "columnName": "contract_version",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "root_sale_uid"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_credit_sale_agreements_customer_uid",
+            "unique": false,
+            "columnNames": [
+              "customer_uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_credit_sale_agreements_customer_uid` ON `${TABLE_NAME}` (`customer_uid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "events",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "root_sale_uid"
+            ],
+            "referencedColumns": [
+              "event_uid"
+            ]
+          },
+          {
+            "table": "accounts",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "customer_uid"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "credit_review_actions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`action_uid` TEXT NOT NULL, `customer_uid` TEXT NOT NULL, `kind` TEXT NOT NULL, `clears_set_uid` TEXT, `reason` TEXT NOT NULL, `local_actor_uid` TEXT NOT NULL, `occurred_at` TEXT NOT NULL, `business_date` TEXT NOT NULL, `contract_version` INTEGER NOT NULL, PRIMARY KEY(`action_uid`), FOREIGN KEY(`customer_uid`) REFERENCES `accounts`(`uid`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "actionUid",
+            "columnName": "action_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "customerUid",
+            "columnName": "customer_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kind",
+            "columnName": "kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "clearsSetUid",
+            "columnName": "clears_set_uid",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "reason",
+            "columnName": "reason",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "localActorUid",
+            "columnName": "local_actor_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "occurredAt",
+            "columnName": "occurred_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "businessDate",
+            "columnName": "business_date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "contractVersion",
+            "columnName": "contract_version",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "action_uid"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_credit_review_actions_customer_uid",
+            "unique": false,
+            "columnNames": [
+              "customer_uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_credit_review_actions_customer_uid` ON `${TABLE_NAME}` (`customer_uid`)"
+          },
+          {
+            "name": "index_credit_review_actions_clears_set_uid",
+            "unique": false,
+            "columnNames": [
+              "clears_set_uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_credit_review_actions_clears_set_uid` ON `${TABLE_NAME}` (`clears_set_uid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "accounts",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "customer_uid"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "credit_metadata_pending",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`operation_uid` TEXT NOT NULL, `kind` TEXT NOT NULL, `payload_json` TEXT NOT NULL, `created_at` TEXT NOT NULL, `held` INTEGER NOT NULL, PRIMARY KEY(`operation_uid`))",
+        "fields": [
+          {
+            "fieldPath": "operationUid",
+            "columnName": "operation_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kind",
+            "columnName": "kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "payloadJson",
+            "columnName": "payload_json",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "held",
+            "columnName": "held",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "operation_uid"
+          ]
+        }
+      },
+      {
+        "tableName": "credit_metadata_sync_state",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`state_id` INTEGER NOT NULL, `shop_uid` TEXT NOT NULL, `last_server_seq` INTEGER NOT NULL, `contract_version` INTEGER NOT NULL, `enabled` INTEGER NOT NULL, PRIMARY KEY(`state_id`))",
+        "fields": [
+          {
+            "fieldPath": "stateId",
+            "columnName": "state_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shopUid",
+            "columnName": "shop_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastServerSeq",
+            "columnName": "last_server_seq",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "contractVersion",
+            "columnName": "contract_version",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "enabled",
+            "columnName": "enabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "state_id"
+          ]
+        }
+      },
+      {
+        "tableName": "products",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`product_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `unit` TEXT NOT NULL, `uid` TEXT NOT NULL DEFAULT '', `sync_updated_at` TEXT NOT NULL DEFAULT '')",
+        "fields": [
+          {
+            "fieldPath": "productId",
+            "columnName": "product_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "syncUpdatedAt",
+            "columnName": "sync_updated_at",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "product_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_products_name",
+            "unique": true,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_products_name` ON `${TABLE_NAME}` (`name`)"
+          },
+          {
+            "name": "index_products_uid",
+            "unique": true,
+            "columnNames": [
+              "uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_products_uid` ON `${TABLE_NAME}` (`uid`)"
+          }
+        ]
+      },
+      {
+        "tableName": "accounts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`account_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `type` TEXT NOT NULL, `category` TEXT NOT NULL, `uid` TEXT NOT NULL DEFAULT '', `sync_updated_at` TEXT NOT NULL DEFAULT '')",
+        "fields": [
+          {
+            "fieldPath": "accountId",
+            "columnName": "account_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "syncUpdatedAt",
+            "columnName": "sync_updated_at",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "account_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_accounts_name",
+            "unique": true,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_accounts_name` ON `${TABLE_NAME}` (`name`)"
+          },
+          {
+            "name": "index_accounts_uid",
+            "unique": true,
+            "columnNames": [
+              "uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_accounts_uid` ON `${TABLE_NAME}` (`uid`)"
+          }
+        ]
+      },
+      {
+        "tableName": "events",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `created_at` TEXT NOT NULL, `occurred_at` TEXT NOT NULL, `event_type` TEXT NOT NULL, `channel` TEXT, `corrects_event_id` INTEGER, `raw_liters` REAL, `fat_percentage` REAL, `lr_reading` REAL, `snf_percentage` REAL, `ts_percentage` REAL, `adjusted_liters` REAL, `amount_owed` REAL, `milk_liters_used` REAL, `yogurt_kg_produced` REAL, `amount` REAL, `milk_rate_used` REAL, `delivery_fee_used` REAL, `ts_standard_used` REAL, `sale_quantity` REAL, `sale_value` REAL, `unit_rate` REAL, `surcharge_applied` REAL NOT NULL, `notes` TEXT, `event_uid` TEXT NOT NULL DEFAULT '', `origin_device_id` TEXT NOT NULL DEFAULT '', `raw_device_ts` TEXT NOT NULL DEFAULT '', `trusted_estimated_at` TEXT NOT NULL DEFAULT '', `time_trust` TEXT NOT NULL DEFAULT 'device_only', FOREIGN KEY(`corrects_event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "occurredAt",
+            "columnName": "occurred_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventType",
+            "columnName": "event_type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "channel",
+            "columnName": "channel",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "correctsEventId",
+            "columnName": "corrects_event_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "rawLiters",
+            "columnName": "raw_liters",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "fatPercentage",
+            "columnName": "fat_percentage",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "lrReading",
+            "columnName": "lr_reading",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "snfPercentage",
+            "columnName": "snf_percentage",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "tsPercentage",
+            "columnName": "ts_percentage",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "adjustedLiters",
+            "columnName": "adjusted_liters",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "amountOwed",
+            "columnName": "amount_owed",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "milkLitersUsed",
+            "columnName": "milk_liters_used",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "yogurtKgProduced",
+            "columnName": "yogurt_kg_produced",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "milkRateUsed",
+            "columnName": "milk_rate_used",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "deliveryFeeUsed",
+            "columnName": "delivery_fee_used",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "tsStandardUsed",
+            "columnName": "ts_standard_used",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "saleQuantity",
+            "columnName": "sale_quantity",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "saleValue",
+            "columnName": "sale_value",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "unitRate",
+            "columnName": "unit_rate",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "surchargeApplied",
+            "columnName": "surcharge_applied",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "eventUid",
+            "columnName": "event_uid",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "originDeviceId",
+            "columnName": "origin_device_id",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "rawDeviceTs",
+            "columnName": "raw_device_ts",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "trustedEstimatedAt",
+            "columnName": "trusted_estimated_at",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "timeTrust",
+            "columnName": "time_trust",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'device_only'"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "event_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_events_event_type",
+            "unique": false,
+            "columnNames": [
+              "event_type"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_events_event_type` ON `${TABLE_NAME}` (`event_type`)"
+          },
+          {
+            "name": "index_events_occurred_at",
+            "unique": false,
+            "columnNames": [
+              "occurred_at"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_events_occurred_at` ON `${TABLE_NAME}` (`occurred_at`)"
+          },
+          {
+            "name": "index_events_corrects_event_id",
+            "unique": false,
+            "columnNames": [
+              "corrects_event_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_events_corrects_event_id` ON `${TABLE_NAME}` (`corrects_event_id`)"
+          },
+          {
+            "name": "index_events_event_uid",
+            "unique": true,
+            "columnNames": [
+              "event_uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_events_event_uid` ON `${TABLE_NAME}` (`event_uid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "events",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "corrects_event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "inventory_log",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`log_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `event_id` INTEGER NOT NULL, `product_id` INTEGER NOT NULL, `quantity` REAL NOT NULL, FOREIGN KEY(`event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`product_id`) REFERENCES `products`(`product_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "logId",
+            "columnName": "log_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productId",
+            "columnName": "product_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "log_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_inventory_log_event_id",
+            "unique": false,
+            "columnNames": [
+              "event_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_inventory_log_event_id` ON `${TABLE_NAME}` (`event_id`)"
+          },
+          {
+            "name": "index_inventory_log_product_id",
+            "unique": false,
+            "columnNames": [
+              "product_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_inventory_log_product_id` ON `${TABLE_NAME}` (`product_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "events",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          },
+          {
+            "table": "products",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "product_id"
+            ],
+            "referencedColumns": [
+              "product_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "financial_log",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`log_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `event_id` INTEGER NOT NULL, `account_id` INTEGER NOT NULL, `amount` REAL NOT NULL, FOREIGN KEY(`event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`account_id`) REFERENCES `accounts`(`account_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "logId",
+            "columnName": "log_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accountId",
+            "columnName": "account_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "log_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_financial_log_event_id",
+            "unique": false,
+            "columnNames": [
+              "event_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_financial_log_event_id` ON `${TABLE_NAME}` (`event_id`)"
+          },
+          {
+            "name": "index_financial_log_account_id",
+            "unique": false,
+            "columnNames": [
+              "account_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_financial_log_account_id` ON `${TABLE_NAME}` (`account_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "events",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          },
+          {
+            "table": "accounts",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "account_id"
+            ],
+            "referencedColumns": [
+              "account_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "owner_funds_details",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` INTEGER NOT NULL, `payment_account_id` INTEGER NOT NULL, `withdrawal_root_event_id` INTEGER NOT NULL, `reviewed_withdrawal_amount` REAL, `reviewed_received_total` REAL, `excess_acknowledged` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`event_id`), FOREIGN KEY(`event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`withdrawal_root_event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`payment_account_id`) REFERENCES `accounts`(`account_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "paymentAccountId",
+            "columnName": "payment_account_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "withdrawalRootEventId",
+            "columnName": "withdrawal_root_event_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reviewedWithdrawalAmount",
+            "columnName": "reviewed_withdrawal_amount",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "reviewedReceivedTotal",
+            "columnName": "reviewed_received_total",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "excessAcknowledged",
+            "columnName": "excess_acknowledged",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "event_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_owner_funds_details_payment_account_id",
+            "unique": false,
+            "columnNames": [
+              "payment_account_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_owner_funds_details_payment_account_id` ON `${TABLE_NAME}` (`payment_account_id`)"
+          },
+          {
+            "name": "index_owner_funds_details_withdrawal_root_event_id",
+            "unique": false,
+            "columnNames": [
+              "withdrawal_root_event_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_owner_funds_details_withdrawal_root_event_id` ON `${TABLE_NAME}` (`withdrawal_root_event_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "events",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          },
+          {
+            "table": "events",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "withdrawal_root_event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          },
+          {
+            "table": "accounts",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "payment_account_id"
+            ],
+            "referencedColumns": [
+              "account_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "settings",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`setting_key` TEXT NOT NULL, `setting_value` REAL NOT NULL, `updated_at` TEXT NOT NULL, PRIMARY KEY(`setting_key`))",
+        "fields": [
+          {
+            "fieldPath": "key",
+            "columnName": "setting_key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "setting_value",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "setting_key"
+          ]
+        }
+      },
+      {
+        "tableName": "budget_plans",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`budget_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `category` TEXT NOT NULL, `period_start` TEXT NOT NULL, `period_end_exclusive` TEXT NOT NULL, `planned_liters` REAL, `planned_amount` REAL, `vendor_rate_snapshot` REAL, `retail_rate_snapshot` REAL, `created_at` TEXT NOT NULL, `supersedes_id` INTEGER, `archived` INTEGER NOT NULL, `uid` TEXT NOT NULL DEFAULT '', `sync_updated_at` TEXT NOT NULL DEFAULT '')",
+        "fields": [
+          {
+            "fieldPath": "budgetId",
+            "columnName": "budget_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "periodStart",
+            "columnName": "period_start",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "periodEndExclusive",
+            "columnName": "period_end_exclusive",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "plannedLiters",
+            "columnName": "planned_liters",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "plannedAmount",
+            "columnName": "planned_amount",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "vendorRateSnapshot",
+            "columnName": "vendor_rate_snapshot",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "retailRateSnapshot",
+            "columnName": "retail_rate_snapshot",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "supersedesId",
+            "columnName": "supersedes_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "archived",
+            "columnName": "archived",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "syncUpdatedAt",
+            "columnName": "sync_updated_at",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "budget_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_budget_plans_category_period_start_archived",
+            "unique": false,
+            "columnNames": [
+              "category",
+              "period_start",
+              "archived"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_budget_plans_category_period_start_archived` ON `${TABLE_NAME}` (`category`, `period_start`, `archived`)"
+          },
+          {
+            "name": "index_budget_plans_supersedes_id",
+            "unique": false,
+            "columnNames": [
+              "supersedes_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_budget_plans_supersedes_id` ON `${TABLE_NAME}` (`supersedes_id`)"
+          },
+          {
+            "name": "index_budget_plans_uid",
+            "unique": true,
+            "columnNames": [
+              "uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_budget_plans_uid` ON `${TABLE_NAME}` (`uid`)"
+          }
+        ]
+      },
+      {
+        "tableName": "collections_targets",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`target_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `week_start` TEXT NOT NULL, `week_end_exclusive` TEXT NOT NULL, `target_amount` REAL NOT NULL, `created_at` TEXT NOT NULL, `supersedes_id` INTEGER, `archived` INTEGER NOT NULL, `uid` TEXT NOT NULL DEFAULT '', `sync_updated_at` TEXT NOT NULL DEFAULT '')",
+        "fields": [
+          {
+            "fieldPath": "targetId",
+            "columnName": "target_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "weekStart",
+            "columnName": "week_start",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "weekEndExclusive",
+            "columnName": "week_end_exclusive",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "targetAmount",
+            "columnName": "target_amount",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "supersedesId",
+            "columnName": "supersedes_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "archived",
+            "columnName": "archived",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "syncUpdatedAt",
+            "columnName": "sync_updated_at",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "target_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_collections_targets_week_start_archived",
+            "unique": false,
+            "columnNames": [
+              "week_start",
+              "archived"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_collections_targets_week_start_archived` ON `${TABLE_NAME}` (`week_start`, `archived`)"
+          },
+          {
+            "name": "index_collections_targets_supersedes_id",
+            "unique": false,
+            "columnNames": [
+              "supersedes_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_collections_targets_supersedes_id` ON `${TABLE_NAME}` (`supersedes_id`)"
+          },
+          {
+            "name": "index_collections_targets_uid",
+            "unique": true,
+            "columnNames": [
+              "uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_collections_targets_uid` ON `${TABLE_NAME}` (`uid`)"
+          }
+        ]
+      },
+      {
+        "tableName": "product_profiles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`product_id` INTEGER NOT NULL, `default_sale_rate` REAL, `inventory_tracking` INTEGER NOT NULL DEFAULT 1, `archived` INTEGER NOT NULL DEFAULT 0, `notes` TEXT, `created_at` TEXT NOT NULL, PRIMARY KEY(`product_id`), FOREIGN KEY(`product_id`) REFERENCES `products`(`product_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "productId",
+            "columnName": "product_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "defaultSaleRate",
+            "columnName": "default_sale_rate",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "inventoryTracking",
+            "columnName": "inventory_tracking",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          },
+          {
+            "fieldPath": "archived",
+            "columnName": "archived",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "product_id"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "products",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "product_id"
+            ],
+            "referencedColumns": [
+              "product_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "customer_profiles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`account_id` INTEGER NOT NULL, `phone` TEXT, `area_route` TEXT, `address` TEXT, `notes` TEXT, `credit_limit` REAL, `daily_quota` REAL, `active` INTEGER NOT NULL DEFAULT 1, `created_at` TEXT NOT NULL, PRIMARY KEY(`account_id`), FOREIGN KEY(`account_id`) REFERENCES `accounts`(`account_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "accountId",
+            "columnName": "account_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "phone",
+            "columnName": "phone",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "areaRoute",
+            "columnName": "area_route",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "address",
+            "columnName": "address",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "creditLimit",
+            "columnName": "credit_limit",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "dailyQuota",
+            "columnName": "daily_quota",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "active",
+            "columnName": "active",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "account_id"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "accounts",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "account_id"
+            ],
+            "referencedColumns": [
+              "account_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "vendor_profiles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`account_id` INTEGER NOT NULL, `phone` TEXT, `location` TEXT, `notes` TEXT, `active` INTEGER NOT NULL DEFAULT 1, `created_at` TEXT NOT NULL, PRIMARY KEY(`account_id`), FOREIGN KEY(`account_id`) REFERENCES `accounts`(`account_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "accountId",
+            "columnName": "account_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "phone",
+            "columnName": "phone",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "location",
+            "columnName": "location",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "active",
+            "columnName": "active",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "account_id"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "accounts",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "account_id"
+            ],
+            "referencedColumns": [
+              "account_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "employee_profiles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`account_id` INTEGER NOT NULL, `role` TEXT, `phone` TEXT, `reference_salary` REAL, `salary_period` TEXT, `join_date` TEXT, `active` INTEGER NOT NULL DEFAULT 1, `created_at` TEXT NOT NULL, PRIMARY KEY(`account_id`), FOREIGN KEY(`account_id`) REFERENCES `accounts`(`account_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "accountId",
+            "columnName": "account_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "role",
+            "columnName": "role",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "phone",
+            "columnName": "phone",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "referenceSalary",
+            "columnName": "reference_salary",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "salaryPeriod",
+            "columnName": "salary_period",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "joinDate",
+            "columnName": "join_date",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "active",
+            "columnName": "active",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "account_id"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "accounts",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "account_id"
+            ],
+            "referencedColumns": [
+              "account_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "attendance_records",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`attendance_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `employee_account_id` INTEGER NOT NULL, `business_date` TEXT NOT NULL, `status` TEXT NOT NULL, `notes` TEXT, `created_at` TEXT NOT NULL, `supersedes_id` INTEGER, `archived` INTEGER NOT NULL DEFAULT 0, `uid` TEXT NOT NULL DEFAULT '', `sync_updated_at` TEXT NOT NULL DEFAULT '', FOREIGN KEY(`employee_account_id`) REFERENCES `accounts`(`account_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`supersedes_id`) REFERENCES `attendance_records`(`attendance_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "attendanceId",
+            "columnName": "attendance_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "employeeAccountId",
+            "columnName": "employee_account_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "businessDate",
+            "columnName": "business_date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "supersedesId",
+            "columnName": "supersedes_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "archived",
+            "columnName": "archived",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "syncUpdatedAt",
+            "columnName": "sync_updated_at",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "attendance_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_attendance_records_employee_account_id_business_date_archived",
+            "unique": false,
+            "columnNames": [
+              "employee_account_id",
+              "business_date",
+              "archived"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_attendance_records_employee_account_id_business_date_archived` ON `${TABLE_NAME}` (`employee_account_id`, `business_date`, `archived`)"
+          },
+          {
+            "name": "index_attendance_records_supersedes_id",
+            "unique": false,
+            "columnNames": [
+              "supersedes_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_attendance_records_supersedes_id` ON `${TABLE_NAME}` (`supersedes_id`)"
+          },
+          {
+            "name": "index_attendance_records_uid",
+            "unique": true,
+            "columnNames": [
+              "uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_attendance_records_uid` ON `${TABLE_NAME}` (`uid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "accounts",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "employee_account_id"
+            ],
+            "referencedColumns": [
+              "account_id"
+            ]
+          },
+          {
+            "table": "attendance_records",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "supersedes_id"
+            ],
+            "referencedColumns": [
+              "attendance_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "deliveries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`delivery_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `customer_account_id` INTEGER NOT NULL, `product_id` INTEGER NOT NULL, `quantity` REAL NOT NULL, `route` TEXT, `business_date` TEXT NOT NULL, `sale_event_id` INTEGER, `notes` TEXT, `created_at` TEXT NOT NULL, `archived` INTEGER NOT NULL DEFAULT 0, `uid` TEXT NOT NULL DEFAULT '', `sync_updated_at` TEXT NOT NULL DEFAULT '', FOREIGN KEY(`customer_account_id`) REFERENCES `accounts`(`account_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`product_id`) REFERENCES `products`(`product_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`sale_event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "deliveryId",
+            "columnName": "delivery_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "customerAccountId",
+            "columnName": "customer_account_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productId",
+            "columnName": "product_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "route",
+            "columnName": "route",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "businessDate",
+            "columnName": "business_date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "saleEventId",
+            "columnName": "sale_event_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "archived",
+            "columnName": "archived",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "syncUpdatedAt",
+            "columnName": "sync_updated_at",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "delivery_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_deliveries_customer_account_id_business_date",
+            "unique": false,
+            "columnNames": [
+              "customer_account_id",
+              "business_date"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_deliveries_customer_account_id_business_date` ON `${TABLE_NAME}` (`customer_account_id`, `business_date`)"
+          },
+          {
+            "name": "index_deliveries_product_id",
+            "unique": false,
+            "columnNames": [
+              "product_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_deliveries_product_id` ON `${TABLE_NAME}` (`product_id`)"
+          },
+          {
+            "name": "index_deliveries_sale_event_id",
+            "unique": true,
+            "columnNames": [
+              "sale_event_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_deliveries_sale_event_id` ON `${TABLE_NAME}` (`sale_event_id`)"
+          },
+          {
+            "name": "index_deliveries_archived",
+            "unique": false,
+            "columnNames": [
+              "archived"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_deliveries_archived` ON `${TABLE_NAME}` (`archived`)"
+          },
+          {
+            "name": "index_deliveries_uid",
+            "unique": true,
+            "columnNames": [
+              "uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_deliveries_uid` ON `${TABLE_NAME}` (`uid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "accounts",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "customer_account_id"
+            ],
+            "referencedColumns": [
+              "account_id"
+            ]
+          },
+          {
+            "table": "products",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "product_id"
+            ],
+            "referencedColumns": [
+              "product_id"
+            ]
+          },
+          {
+            "table": "events",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "sale_event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "delivery_status_history",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`status_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `delivery_id` INTEGER NOT NULL, `status` TEXT NOT NULL, `occurred_at` TEXT NOT NULL, `notes` TEXT, `uid` TEXT NOT NULL DEFAULT '', FOREIGN KEY(`delivery_id`) REFERENCES `deliveries`(`delivery_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "statusId",
+            "columnName": "status_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deliveryId",
+            "columnName": "delivery_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "occurredAt",
+            "columnName": "occurred_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "status_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_delivery_status_history_delivery_id_status_id",
+            "unique": false,
+            "columnNames": [
+              "delivery_id",
+              "status_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_delivery_status_history_delivery_id_status_id` ON `${TABLE_NAME}` (`delivery_id`, `status_id`)"
+          },
+          {
+            "name": "index_delivery_status_history_uid",
+            "unique": true,
+            "columnNames": [
+              "uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_delivery_status_history_uid` ON `${TABLE_NAME}` (`uid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "deliveries",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "delivery_id"
+            ],
+            "referencedColumns": [
+              "delivery_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "spoilage_details",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` INTEGER NOT NULL, `product_id` INTEGER NOT NULL, `quantity` REAL NOT NULL, `reason` TEXT NOT NULL, PRIMARY KEY(`event_id`), FOREIGN KEY(`event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`product_id`) REFERENCES `products`(`product_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productId",
+            "columnName": "product_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reason",
+            "columnName": "reason",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "event_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_spoilage_details_product_id",
+            "unique": false,
+            "columnNames": [
+              "product_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_spoilage_details_product_id` ON `${TABLE_NAME}` (`product_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "events",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          },
+          {
+            "table": "products",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "product_id"
+            ],
+            "referencedColumns": [
+              "product_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "physical_cash_counts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`count_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `account_id` INTEGER NOT NULL, `business_date` TEXT NOT NULL, `counted_amount` REAL NOT NULL, `counted_at` TEXT NOT NULL, `notes` TEXT, `uid` TEXT NOT NULL DEFAULT '', FOREIGN KEY(`account_id`) REFERENCES `accounts`(`account_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "countId",
+            "columnName": "count_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accountId",
+            "columnName": "account_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "businessDate",
+            "columnName": "business_date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "countedAmount",
+            "columnName": "counted_amount",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "countedAt",
+            "columnName": "counted_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "count_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_physical_cash_counts_account_id_business_date_counted_at",
+            "unique": false,
+            "columnNames": [
+              "account_id",
+              "business_date",
+              "counted_at"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_physical_cash_counts_account_id_business_date_counted_at` ON `${TABLE_NAME}` (`account_id`, `business_date`, `counted_at`)"
+          },
+          {
+            "name": "index_physical_cash_counts_uid",
+            "unique": true,
+            "columnNames": [
+              "uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_physical_cash_counts_uid` ON `${TABLE_NAME}` (`uid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "accounts",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "account_id"
+            ],
+            "referencedColumns": [
+              "account_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "expense_category_profiles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`account_id` INTEGER NOT NULL, `display_name` TEXT NOT NULL, `active` INTEGER NOT NULL DEFAULT 1, `created_at` TEXT NOT NULL, PRIMARY KEY(`account_id`), FOREIGN KEY(`account_id`) REFERENCES `accounts`(`account_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "accountId",
+            "columnName": "account_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayName",
+            "columnName": "display_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "active",
+            "columnName": "active",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "account_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_expense_category_profiles_display_name",
+            "unique": true,
+            "columnNames": [
+              "display_name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_expense_category_profiles_display_name` ON `${TABLE_NAME}` (`display_name`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "accounts",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "account_id"
+            ],
+            "referencedColumns": [
+              "account_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "store_profile",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`store_profile_id` INTEGER NOT NULL, `store_name` TEXT NOT NULL, `currency_code` TEXT NOT NULL, `phone` TEXT, `address` TEXT, `updated_at` TEXT NOT NULL, PRIMARY KEY(`store_profile_id`))",
+        "fields": [
+          {
+            "fieldPath": "storeProfileId",
+            "columnName": "store_profile_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "storeName",
+            "columnName": "store_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currencyCode",
+            "columnName": "currency_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "phone",
+            "columnName": "phone",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "address",
+            "columnName": "address",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "store_profile_id"
+          ]
+        }
+      },
+      {
+        "tableName": "opening_batches",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` INTEGER NOT NULL, PRIMARY KEY(`event_id`), FOREIGN KEY(`event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "event_id"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "events",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "opening_inventory_entries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` INTEGER NOT NULL, `product_id` INTEGER NOT NULL, `quantity` REAL NOT NULL, PRIMARY KEY(`event_id`, `product_id`), FOREIGN KEY(`event_id`) REFERENCES `opening_batches`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`product_id`) REFERENCES `products`(`product_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productId",
+            "columnName": "product_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "event_id",
+            "product_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_opening_inventory_entries_product_id",
+            "unique": false,
+            "columnNames": [
+              "product_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_opening_inventory_entries_product_id` ON `${TABLE_NAME}` (`product_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "opening_batches",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          },
+          {
+            "table": "products",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "product_id"
+            ],
+            "referencedColumns": [
+              "product_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "opening_account_entries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` INTEGER NOT NULL, `account_id` INTEGER NOT NULL, `balance` REAL NOT NULL, PRIMARY KEY(`event_id`, `account_id`), FOREIGN KEY(`event_id`) REFERENCES `opening_batches`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`account_id`) REFERENCES `accounts`(`account_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accountId",
+            "columnName": "account_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "balance",
+            "columnName": "balance",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "event_id",
+            "account_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_opening_account_entries_account_id",
+            "unique": false,
+            "columnNames": [
+              "account_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_opening_account_entries_account_id` ON `${TABLE_NAME}` (`account_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "opening_batches",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          },
+          {
+            "table": "accounts",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "account_id"
+            ],
+            "referencedColumns": [
+              "account_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "daily_close_actions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`action_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `business_date` TEXT NOT NULL, `action` TEXT NOT NULL, `physical_cash_count_id` INTEGER, `actor_name` TEXT NOT NULL, `actor_role` TEXT NOT NULL, `actor_user_id` INTEGER, `reason` TEXT, `created_at` TEXT NOT NULL, `supersedes_action_id` INTEGER, `uid` TEXT NOT NULL DEFAULT '', `money_rounding_version` INTEGER NOT NULL DEFAULT 2, FOREIGN KEY(`physical_cash_count_id`) REFERENCES `physical_cash_counts`(`count_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`supersedes_action_id`) REFERENCES `daily_close_actions`(`action_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`actor_user_id`) REFERENCES `app_users`(`user_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "actionId",
+            "columnName": "action_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "businessDate",
+            "columnName": "business_date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "action",
+            "columnName": "action",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "physicalCashCountId",
+            "columnName": "physical_cash_count_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "actorName",
+            "columnName": "actor_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actorRole",
+            "columnName": "actor_role",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actorUserId",
+            "columnName": "actor_user_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "reason",
+            "columnName": "reason",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "supersedesActionId",
+            "columnName": "supersedes_action_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "moneyRoundingVersion",
+            "columnName": "money_rounding_version",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "2"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "action_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_daily_close_actions_business_date",
+            "unique": false,
+            "columnNames": [
+              "business_date"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_daily_close_actions_business_date` ON `${TABLE_NAME}` (`business_date`)"
+          },
+          {
+            "name": "index_daily_close_actions_physical_cash_count_id",
+            "unique": true,
+            "columnNames": [
+              "physical_cash_count_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_daily_close_actions_physical_cash_count_id` ON `${TABLE_NAME}` (`physical_cash_count_id`)"
+          },
+          {
+            "name": "index_daily_close_actions_supersedes_action_id",
+            "unique": true,
+            "columnNames": [
+              "supersedes_action_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_daily_close_actions_supersedes_action_id` ON `${TABLE_NAME}` (`supersedes_action_id`)"
+          },
+          {
+            "name": "index_daily_close_actions_actor_user_id",
+            "unique": false,
+            "columnNames": [
+              "actor_user_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_daily_close_actions_actor_user_id` ON `${TABLE_NAME}` (`actor_user_id`)"
+          },
+          {
+            "name": "index_daily_close_actions_uid",
+            "unique": true,
+            "columnNames": [
+              "uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_daily_close_actions_uid` ON `${TABLE_NAME}` (`uid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "physical_cash_counts",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "physical_cash_count_id"
+            ],
+            "referencedColumns": [
+              "count_id"
+            ]
+          },
+          {
+            "table": "daily_close_actions",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "supersedes_action_id"
+            ],
+            "referencedColumns": [
+              "action_id"
+            ]
+          },
+          {
+            "table": "app_users",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "actor_user_id"
+            ],
+            "referencedColumns": [
+              "user_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "app_users",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`user_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `login_name` TEXT NOT NULL, `display_name` TEXT NOT NULL, `role` TEXT NOT NULL, `employee_account_id` INTEGER, `status` TEXT NOT NULL, `credential_setup_required` INTEGER NOT NULL, `created_at` TEXT NOT NULL, `created_by_user_id` INTEGER, `updated_at` TEXT NOT NULL, `disabled_at` TEXT, `disabled_by_user_id` INTEGER, FOREIGN KEY(`employee_account_id`) REFERENCES `employee_profiles`(`account_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`created_by_user_id`) REFERENCES `app_users`(`user_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`disabled_by_user_id`) REFERENCES `app_users`(`user_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "userId",
+            "columnName": "user_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "loginName",
+            "columnName": "login_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayName",
+            "columnName": "display_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "role",
+            "columnName": "role",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "employeeAccountId",
+            "columnName": "employee_account_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "credentialSetupRequired",
+            "columnName": "credential_setup_required",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdByUserId",
+            "columnName": "created_by_user_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "disabledAt",
+            "columnName": "disabled_at",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "disabledByUserId",
+            "columnName": "disabled_by_user_id",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "user_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_app_users_login_name",
+            "unique": true,
+            "columnNames": [
+              "login_name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_app_users_login_name` ON `${TABLE_NAME}` (`login_name`)"
+          },
+          {
+            "name": "index_app_users_employee_account_id",
+            "unique": true,
+            "columnNames": [
+              "employee_account_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_app_users_employee_account_id` ON `${TABLE_NAME}` (`employee_account_id`)"
+          },
+          {
+            "name": "index_app_users_created_by_user_id",
+            "unique": false,
+            "columnNames": [
+              "created_by_user_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_app_users_created_by_user_id` ON `${TABLE_NAME}` (`created_by_user_id`)"
+          },
+          {
+            "name": "index_app_users_disabled_by_user_id",
+            "unique": false,
+            "columnNames": [
+              "disabled_by_user_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_app_users_disabled_by_user_id` ON `${TABLE_NAME}` (`disabled_by_user_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "employee_profiles",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "employee_account_id"
+            ],
+            "referencedColumns": [
+              "account_id"
+            ]
+          },
+          {
+            "table": "app_users",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "created_by_user_id"
+            ],
+            "referencedColumns": [
+              "user_id"
+            ]
+          },
+          {
+            "table": "app_users",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "disabled_by_user_id"
+            ],
+            "referencedColumns": [
+              "user_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "user_credentials",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`user_id` INTEGER NOT NULL, `algorithm` TEXT NOT NULL, `salt` BLOB NOT NULL, `verifier` BLOB NOT NULL, `memory_kib` INTEGER NOT NULL, `iterations` INTEGER NOT NULL, `parallelism` INTEGER NOT NULL, `changed_at` TEXT NOT NULL, `must_change` INTEGER NOT NULL, `failed_attempt_count` INTEGER NOT NULL, `last_failed_at_epoch_ms` INTEGER, `locked_until_epoch_ms` INTEGER, PRIMARY KEY(`user_id`), FOREIGN KEY(`user_id`) REFERENCES `app_users`(`user_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "userId",
+            "columnName": "user_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "algorithm",
+            "columnName": "algorithm",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "salt",
+            "columnName": "salt",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "verifier",
+            "columnName": "verifier",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memoryKib",
+            "columnName": "memory_kib",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "iterations",
+            "columnName": "iterations",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parallelism",
+            "columnName": "parallelism",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "changedAt",
+            "columnName": "changed_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mustChange",
+            "columnName": "must_change",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "failedAttemptCount",
+            "columnName": "failed_attempt_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastFailedAtEpochMs",
+            "columnName": "last_failed_at_epoch_ms",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "lockedUntilEpochMs",
+            "columnName": "locked_until_epoch_ms",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "user_id"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "app_users",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "user_id"
+            ],
+            "referencedColumns": [
+              "user_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "saved_recovery_codes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`recovery_code_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `user_id` INTEGER NOT NULL, `salt` BLOB NOT NULL, `verifier` BLOB NOT NULL, `created_at` TEXT NOT NULL, `used_at` TEXT, `failed_attempt_count` INTEGER NOT NULL, `locked_until_epoch_ms` INTEGER, FOREIGN KEY(`user_id`) REFERENCES `app_users`(`user_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "recoveryCodeId",
+            "columnName": "recovery_code_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "user_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "salt",
+            "columnName": "salt",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "verifier",
+            "columnName": "verifier",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "usedAt",
+            "columnName": "used_at",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "failedAttemptCount",
+            "columnName": "failed_attempt_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lockedUntilEpochMs",
+            "columnName": "locked_until_epoch_ms",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "recovery_code_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_saved_recovery_codes_user_id",
+            "unique": false,
+            "columnNames": [
+              "user_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_saved_recovery_codes_user_id` ON `${TABLE_NAME}` (`user_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "app_users",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "user_id"
+            ],
+            "referencedColumns": [
+              "user_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "security_audit_entries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`audit_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `occurred_at` TEXT NOT NULL, `action` TEXT NOT NULL, `result` TEXT NOT NULL, `reason_code` TEXT, `actor_user_id` INTEGER, `actor_name_snapshot` TEXT, `actor_role_snapshot` TEXT, `target_user_id` INTEGER, `details` TEXT, FOREIGN KEY(`actor_user_id`) REFERENCES `app_users`(`user_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`target_user_id`) REFERENCES `app_users`(`user_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "auditId",
+            "columnName": "audit_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "occurredAt",
+            "columnName": "occurred_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "action",
+            "columnName": "action",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "result",
+            "columnName": "result",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reasonCode",
+            "columnName": "reason_code",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "actorUserId",
+            "columnName": "actor_user_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "actorNameSnapshot",
+            "columnName": "actor_name_snapshot",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "actorRoleSnapshot",
+            "columnName": "actor_role_snapshot",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "targetUserId",
+            "columnName": "target_user_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "details",
+            "columnName": "details",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "audit_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_security_audit_entries_occurred_at",
+            "unique": false,
+            "columnNames": [
+              "occurred_at"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_security_audit_entries_occurred_at` ON `${TABLE_NAME}` (`occurred_at`)"
+          },
+          {
+            "name": "index_security_audit_entries_actor_user_id",
+            "unique": false,
+            "columnNames": [
+              "actor_user_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_security_audit_entries_actor_user_id` ON `${TABLE_NAME}` (`actor_user_id`)"
+          },
+          {
+            "name": "index_security_audit_entries_target_user_id",
+            "unique": false,
+            "columnNames": [
+              "target_user_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_security_audit_entries_target_user_id` ON `${TABLE_NAME}` (`target_user_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "app_users",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "actor_user_id"
+            ],
+            "referencedColumns": [
+              "user_id"
+            ]
+          },
+          {
+            "table": "app_users",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "target_user_id"
+            ],
+            "referencedColumns": [
+              "user_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "event_actor_links",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` INTEGER NOT NULL, `actor_user_id` INTEGER, `actor_name_snapshot` TEXT NOT NULL, `actor_role_snapshot` TEXT NOT NULL, `attributed_at` TEXT NOT NULL, PRIMARY KEY(`event_id`), FOREIGN KEY(`event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`actor_user_id`) REFERENCES `app_users`(`user_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actorUserId",
+            "columnName": "actor_user_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "actorNameSnapshot",
+            "columnName": "actor_name_snapshot",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actorRoleSnapshot",
+            "columnName": "actor_role_snapshot",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "attributedAt",
+            "columnName": "attributed_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "event_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_event_actor_links_actor_user_id",
+            "unique": false,
+            "columnNames": [
+              "actor_user_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_event_actor_links_actor_user_id` ON `${TABLE_NAME}` (`actor_user_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "events",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          },
+          {
+            "table": "app_users",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "actor_user_id"
+            ],
+            "referencedColumns": [
+              "user_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "costing_policy_versions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`policy_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `calendar_month` TEXT NOT NULL, `normal_capacity_kg` TEXT NOT NULL, `review_reason` TEXT NOT NULL, `notes` TEXT, `approved_at` TEXT NOT NULL, `approved_by_user_id` INTEGER NOT NULL, `supersedes_policy_id` INTEGER, FOREIGN KEY(`approved_by_user_id`) REFERENCES `app_users`(`user_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`supersedes_policy_id`) REFERENCES `costing_policy_versions`(`policy_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "policyId",
+            "columnName": "policy_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "calendarMonth",
+            "columnName": "calendar_month",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "normalCapacityKg",
+            "columnName": "normal_capacity_kg",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reviewReason",
+            "columnName": "review_reason",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "approvedAt",
+            "columnName": "approved_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "approvedByUserId",
+            "columnName": "approved_by_user_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "supersedesPolicyId",
+            "columnName": "supersedes_policy_id",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "policy_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_costing_policy_versions_calendar_month",
+            "unique": false,
+            "columnNames": [
+              "calendar_month"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_costing_policy_versions_calendar_month` ON `${TABLE_NAME}` (`calendar_month`)"
+          },
+          {
+            "name": "index_costing_policy_versions_approved_by_user_id",
+            "unique": false,
+            "columnNames": [
+              "approved_by_user_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_costing_policy_versions_approved_by_user_id` ON `${TABLE_NAME}` (`approved_by_user_id`)"
+          },
+          {
+            "name": "index_costing_policy_versions_supersedes_policy_id",
+            "unique": true,
+            "columnNames": [
+              "supersedes_policy_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_costing_policy_versions_supersedes_policy_id` ON `${TABLE_NAME}` (`supersedes_policy_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "app_users",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "approved_by_user_id"
+            ],
+            "referencedColumns": [
+              "user_id"
+            ]
+          },
+          {
+            "table": "costing_policy_versions",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "supersedes_policy_id"
+            ],
+            "referencedColumns": [
+              "policy_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "costing_policy_components",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`policy_id` INTEGER NOT NULL, `component_code` TEXT NOT NULL, `source_amount_paisa` INTEGER NOT NULL, `basis_quantity_kg` TEXT NOT NULL, PRIMARY KEY(`policy_id`, `component_code`), FOREIGN KEY(`policy_id`) REFERENCES `costing_policy_versions`(`policy_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "policyId",
+            "columnName": "policy_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "componentCode",
+            "columnName": "component_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceAmountPaisa",
+            "columnName": "source_amount_paisa",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "basisQuantityKg",
+            "columnName": "basis_quantity_kg",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "policy_id",
+            "component_code"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "costing_policy_versions",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "policy_id"
+            ],
+            "referencedColumns": [
+              "policy_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "inventory_cost_basis_entries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`basis_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `opening_event_id` INTEGER NOT NULL, `product_id` INTEGER NOT NULL, `quantity` TEXT NOT NULL, `total_cost_paisa` INTEGER NOT NULL, `basis_kind` TEXT NOT NULL, `evidence_notes` TEXT, `created_at` TEXT NOT NULL, `created_by_user_id` INTEGER NOT NULL, `supersedes_basis_id` INTEGER, FOREIGN KEY(`opening_event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`product_id`) REFERENCES `products`(`product_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`created_by_user_id`) REFERENCES `app_users`(`user_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`supersedes_basis_id`) REFERENCES `inventory_cost_basis_entries`(`basis_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "basisId",
+            "columnName": "basis_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "openingEventId",
+            "columnName": "opening_event_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productId",
+            "columnName": "product_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalCostPaisa",
+            "columnName": "total_cost_paisa",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "basisKind",
+            "columnName": "basis_kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "evidenceNotes",
+            "columnName": "evidence_notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdByUserId",
+            "columnName": "created_by_user_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "supersedesBasisId",
+            "columnName": "supersedes_basis_id",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "basis_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_inventory_cost_basis_entries_opening_event_id_product_id",
+            "unique": false,
+            "columnNames": [
+              "opening_event_id",
+              "product_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_inventory_cost_basis_entries_opening_event_id_product_id` ON `${TABLE_NAME}` (`opening_event_id`, `product_id`)"
+          },
+          {
+            "name": "index_inventory_cost_basis_entries_product_id",
+            "unique": false,
+            "columnNames": [
+              "product_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_inventory_cost_basis_entries_product_id` ON `${TABLE_NAME}` (`product_id`)"
+          },
+          {
+            "name": "index_inventory_cost_basis_entries_created_by_user_id",
+            "unique": false,
+            "columnNames": [
+              "created_by_user_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_inventory_cost_basis_entries_created_by_user_id` ON `${TABLE_NAME}` (`created_by_user_id`)"
+          },
+          {
+            "name": "index_inventory_cost_basis_entries_supersedes_basis_id",
+            "unique": true,
+            "columnNames": [
+              "supersedes_basis_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_inventory_cost_basis_entries_supersedes_basis_id` ON `${TABLE_NAME}` (`supersedes_basis_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "events",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "opening_event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          },
+          {
+            "table": "products",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "product_id"
+            ],
+            "referencedColumns": [
+              "product_id"
+            ]
+          },
+          {
+            "table": "app_users",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "created_by_user_id"
+            ],
+            "referencedColumns": [
+              "user_id"
+            ]
+          },
+          {
+            "table": "inventory_cost_basis_entries",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "supersedes_basis_id"
+            ],
+            "referencedColumns": [
+              "basis_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "yield_policy_versions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`yield_policy_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sample_start_date` TEXT NOT NULL, `sample_end_date` TEXT NOT NULL, `accepted_batch_count` INTEGER NOT NULL, `median_yield_ratio` TEXT NOT NULL, `mad_yield_ratio` TEXT NOT NULL, `lower_alert_limit` TEXT NOT NULL, `upper_alert_limit` TEXT NOT NULL, `effective_from` TEXT NOT NULL, `approved_at` TEXT NOT NULL, `approved_by_user_id` INTEGER NOT NULL, `supersedes_yield_policy_id` INTEGER, FOREIGN KEY(`approved_by_user_id`) REFERENCES `app_users`(`user_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`supersedes_yield_policy_id`) REFERENCES `yield_policy_versions`(`yield_policy_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "yieldPolicyId",
+            "columnName": "yield_policy_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sampleStartDate",
+            "columnName": "sample_start_date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sampleEndDate",
+            "columnName": "sample_end_date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "acceptedBatchCount",
+            "columnName": "accepted_batch_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "medianYieldRatio",
+            "columnName": "median_yield_ratio",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "madYieldRatio",
+            "columnName": "mad_yield_ratio",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lowerAlertLimit",
+            "columnName": "lower_alert_limit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "upperAlertLimit",
+            "columnName": "upper_alert_limit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "effectiveFrom",
+            "columnName": "effective_from",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "approvedAt",
+            "columnName": "approved_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "approvedByUserId",
+            "columnName": "approved_by_user_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "supersedesYieldPolicyId",
+            "columnName": "supersedes_yield_policy_id",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "yield_policy_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_yield_policy_versions_effective_from",
+            "unique": false,
+            "columnNames": [
+              "effective_from"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_yield_policy_versions_effective_from` ON `${TABLE_NAME}` (`effective_from`)"
+          },
+          {
+            "name": "index_yield_policy_versions_approved_by_user_id",
+            "unique": false,
+            "columnNames": [
+              "approved_by_user_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_yield_policy_versions_approved_by_user_id` ON `${TABLE_NAME}` (`approved_by_user_id`)"
+          },
+          {
+            "name": "index_yield_policy_versions_supersedes_yield_policy_id",
+            "unique": true,
+            "columnNames": [
+              "supersedes_yield_policy_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_yield_policy_versions_supersedes_yield_policy_id` ON `${TABLE_NAME}` (`supersedes_yield_policy_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "app_users",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "approved_by_user_id"
+            ],
+            "referencedColumns": [
+              "user_id"
+            ]
+          },
+          {
+            "table": "yield_policy_versions",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "supersedes_yield_policy_id"
+            ],
+            "referencedColumns": [
+              "yield_policy_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "production_loss_assessments",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`assessment_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `production_event_id` INTEGER NOT NULL, `classification` TEXT NOT NULL, `abnormal_milk_liters` TEXT NOT NULL, `reason_code` TEXT NOT NULL, `notes` TEXT, `assessed_at` TEXT NOT NULL, `assessed_by_user_id` INTEGER NOT NULL, `supersedes_assessment_id` INTEGER, FOREIGN KEY(`production_event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`assessed_by_user_id`) REFERENCES `app_users`(`user_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`supersedes_assessment_id`) REFERENCES `production_loss_assessments`(`assessment_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "assessmentId",
+            "columnName": "assessment_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productionEventId",
+            "columnName": "production_event_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "classification",
+            "columnName": "classification",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "abnormalMilkLiters",
+            "columnName": "abnormal_milk_liters",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reasonCode",
+            "columnName": "reason_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "assessedAt",
+            "columnName": "assessed_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assessedByUserId",
+            "columnName": "assessed_by_user_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "supersedesAssessmentId",
+            "columnName": "supersedes_assessment_id",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "assessment_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_production_loss_assessments_production_event_id",
+            "unique": false,
+            "columnNames": [
+              "production_event_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_production_loss_assessments_production_event_id` ON `${TABLE_NAME}` (`production_event_id`)"
+          },
+          {
+            "name": "index_production_loss_assessments_assessed_by_user_id",
+            "unique": false,
+            "columnNames": [
+              "assessed_by_user_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_production_loss_assessments_assessed_by_user_id` ON `${TABLE_NAME}` (`assessed_by_user_id`)"
+          },
+          {
+            "name": "index_production_loss_assessments_supersedes_assessment_id",
+            "unique": true,
+            "columnNames": [
+              "supersedes_assessment_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_production_loss_assessments_supersedes_assessment_id` ON `${TABLE_NAME}` (`supersedes_assessment_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "events",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "production_event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          },
+          {
+            "table": "app_users",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "assessed_by_user_id"
+            ],
+            "referencedColumns": [
+              "user_id"
+            ]
+          },
+          {
+            "table": "production_loss_assessments",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "supersedes_assessment_id"
+            ],
+            "referencedColumns": [
+              "assessment_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "inventory_cost_movements",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`movement_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `source_event_id` INTEGER NOT NULL, `product_id` INTEGER NOT NULL, `movement_role` TEXT NOT NULL, `movement_kind` TEXT NOT NULL, `sequence_number` INTEGER NOT NULL, `occurred_at` TEXT NOT NULL, `created_at` TEXT NOT NULL, `quantity_in` TEXT, `quantity_out` TEXT, `cost_in_paisa` INTEGER, `cost_out_paisa` INTEGER, `running_quantity` TEXT NOT NULL, `running_cost_paisa` INTEGER, `coverage_code` TEXT NOT NULL, `applied_policy_id` INTEGER, `applied_yield_policy_id` INTEGER, `applied_assessment_id` INTEGER, `applied_basis_id` INTEGER, FOREIGN KEY(`source_event_id`) REFERENCES `events`(`event_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`product_id`) REFERENCES `products`(`product_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "movementId",
+            "columnName": "movement_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceEventId",
+            "columnName": "source_event_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productId",
+            "columnName": "product_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "movementRole",
+            "columnName": "movement_role",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "movementKind",
+            "columnName": "movement_kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sequenceNumber",
+            "columnName": "sequence_number",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "occurredAt",
+            "columnName": "occurred_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantityIn",
+            "columnName": "quantity_in",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "quantityOut",
+            "columnName": "quantity_out",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "costInPaisa",
+            "columnName": "cost_in_paisa",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "costOutPaisa",
+            "columnName": "cost_out_paisa",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "runningQuantity",
+            "columnName": "running_quantity",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "runningCostPaisa",
+            "columnName": "running_cost_paisa",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "coverageCode",
+            "columnName": "coverage_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "appliedPolicyId",
+            "columnName": "applied_policy_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "appliedYieldPolicyId",
+            "columnName": "applied_yield_policy_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "appliedAssessmentId",
+            "columnName": "applied_assessment_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "appliedBasisId",
+            "columnName": "applied_basis_id",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "movement_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_inventory_cost_movements_source_event_id_product_id_movement_role",
+            "unique": true,
+            "columnNames": [
+              "source_event_id",
+              "product_id",
+              "movement_role"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_inventory_cost_movements_source_event_id_product_id_movement_role` ON `${TABLE_NAME}` (`source_event_id`, `product_id`, `movement_role`)"
+          },
+          {
+            "name": "index_inventory_cost_movements_product_id_sequence_number",
+            "unique": false,
+            "columnNames": [
+              "product_id",
+              "sequence_number"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_inventory_cost_movements_product_id_sequence_number` ON `${TABLE_NAME}` (`product_id`, `sequence_number`)"
+          },
+          {
+            "name": "index_inventory_cost_movements_occurred_at",
+            "unique": false,
+            "columnNames": [
+              "occurred_at"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_inventory_cost_movements_occurred_at` ON `${TABLE_NAME}` (`occurred_at`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "events",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "source_event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          },
+          {
+            "table": "products",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "product_id"
+            ],
+            "referencedColumns": [
+              "product_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "cost_projection_state",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`state_id` INTEGER NOT NULL, `engine_version` INTEGER NOT NULL, `source_event_count` INTEGER NOT NULL, `source_max_event_id` INTEGER NOT NULL, `source_max_policy_id` INTEGER NOT NULL, `source_max_basis_id` INTEGER NOT NULL, `source_max_yield_policy_id` INTEGER NOT NULL, `source_max_assessment_id` INTEGER NOT NULL, `rebuilt_at` TEXT NOT NULL, `coverage_code` TEXT NOT NULL, PRIMARY KEY(`state_id`))",
+        "fields": [
+          {
+            "fieldPath": "stateId",
+            "columnName": "state_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "engineVersion",
+            "columnName": "engine_version",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceEventCount",
+            "columnName": "source_event_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceMaxEventId",
+            "columnName": "source_max_event_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceMaxPolicyId",
+            "columnName": "source_max_policy_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceMaxBasisId",
+            "columnName": "source_max_basis_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceMaxYieldPolicyId",
+            "columnName": "source_max_yield_policy_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceMaxAssessmentId",
+            "columnName": "source_max_assessment_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rebuiltAt",
+            "columnName": "rebuilt_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "coverageCode",
+            "columnName": "coverage_code",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "state_id"
+          ]
+        }
+      },
+      {
+        "tableName": "account_installation_binding",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`binding_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `environment` TEXT NOT NULL, `business_id` TEXT NOT NULL, `shop_id` TEXT NOT NULL, `shop_name_snapshot` TEXT NOT NULL, `status` TEXT NOT NULL, `verified_at_epoch_ms` INTEGER, `contract_version` TEXT, `created_at` TEXT NOT NULL, `updated_at` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "bindingId",
+            "columnName": "binding_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "environment",
+            "columnName": "environment",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "businessId",
+            "columnName": "business_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shopId",
+            "columnName": "shop_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shopNameSnapshot",
+            "columnName": "shop_name_snapshot",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "verifiedAtEpochMs",
+            "columnName": "verified_at_epoch_ms",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "contractVersion",
+            "columnName": "contract_version",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "binding_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_account_installation_binding_environment_business_id_shop_id",
+            "unique": true,
+            "columnNames": [
+              "environment",
+              "business_id",
+              "shop_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_account_installation_binding_environment_business_id_shop_id` ON `${TABLE_NAME}` (`environment`, `business_id`, `shop_id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "server_identity_links",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`local_user_id` INTEGER NOT NULL, `server_staff_id` TEXT NOT NULL, `business_id` TEXT NOT NULL, `username_snapshot` TEXT, `role_snapshot` TEXT, `status` TEXT NOT NULL, `verified_at_epoch_ms` INTEGER, `server_changed_at_epoch_ms` INTEGER, `last_error_code` TEXT, PRIMARY KEY(`local_user_id`), FOREIGN KEY(`local_user_id`) REFERENCES `app_users`(`user_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "localUserId",
+            "columnName": "local_user_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serverStaffId",
+            "columnName": "server_staff_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "businessId",
+            "columnName": "business_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "usernameSnapshot",
+            "columnName": "username_snapshot",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "roleSnapshot",
+            "columnName": "role_snapshot",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "verifiedAtEpochMs",
+            "columnName": "verified_at_epoch_ms",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "serverChangedAtEpochMs",
+            "columnName": "server_changed_at_epoch_ms",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "lastErrorCode",
+            "columnName": "last_error_code",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "local_user_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_server_identity_links_server_staff_id",
+            "unique": true,
+            "columnNames": [
+              "server_staff_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_server_identity_links_server_staff_id` ON `${TABLE_NAME}` (`server_staff_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "app_users",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "local_user_id"
+            ],
+            "referencedColumns": [
+              "user_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "server_shop_snapshots",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`snapshot_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `server_shop_id` TEXT NOT NULL, `shop_name_snapshot` TEXT NOT NULL, `observed_at_epoch_ms` INTEGER NOT NULL, `local_user_id` INTEGER NOT NULL, FOREIGN KEY(`local_user_id`) REFERENCES `app_users`(`user_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "snapshotId",
+            "columnName": "snapshot_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serverShopId",
+            "columnName": "server_shop_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shopNameSnapshot",
+            "columnName": "shop_name_snapshot",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "observedAtEpochMs",
+            "columnName": "observed_at_epoch_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "localUserId",
+            "columnName": "local_user_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "snapshot_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_server_shop_snapshots_server_shop_id_local_user_id",
+            "unique": true,
+            "columnNames": [
+              "server_shop_id",
+              "local_user_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_server_shop_snapshots_server_shop_id_local_user_id` ON `${TABLE_NAME}` (`server_shop_id`, `local_user_id`)"
+          },
+          {
+            "name": "index_server_shop_snapshots_local_user_id",
+            "unique": false,
+            "columnNames": [
+              "local_user_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_server_shop_snapshots_local_user_id` ON `${TABLE_NAME}` (`local_user_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "app_users",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "local_user_id"
+            ],
+            "referencedColumns": [
+              "user_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "sync_outbox",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`outbox_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `table_name` TEXT NOT NULL, `row_uid` TEXT NOT NULL, `enqueued_at` TEXT NOT NULL, `held` INTEGER NOT NULL DEFAULT 0)",
+        "fields": [
+          {
+            "fieldPath": "outboxId",
+            "columnName": "outbox_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tableName",
+            "columnName": "table_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rowUid",
+            "columnName": "row_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "enqueuedAt",
+            "columnName": "enqueued_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "held",
+            "columnName": "held",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "outbox_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_sync_outbox_table_name_row_uid",
+            "unique": true,
+            "columnNames": [
+              "table_name",
+              "row_uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_sync_outbox_table_name_row_uid` ON `${TABLE_NAME}` (`table_name`, `row_uid`)"
+          }
+        ]
+      },
+      {
+        "tableName": "sync_pull_state",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`state_id` INTEGER NOT NULL, `last_server_seq` INTEGER NOT NULL, `updated_at` TEXT NOT NULL, PRIMARY KEY(`state_id`))",
+        "fields": [
+          {
+            "fieldPath": "stateId",
+            "columnName": "state_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastServerSeq",
+            "columnName": "last_server_seq",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "state_id"
+          ]
+        }
+      },
+      {
+        "tableName": "sync_parked_rows",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`table_name` TEXT NOT NULL, `row_uid` TEXT NOT NULL, `payload_json` TEXT NOT NULL, `server_seq` INTEGER NOT NULL, `retry_count` INTEGER NOT NULL, `parked_at` TEXT NOT NULL, PRIMARY KEY(`table_name`, `row_uid`))",
+        "fields": [
+          {
+            "fieldPath": "tableName",
+            "columnName": "table_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rowUid",
+            "columnName": "row_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "payloadJson",
+            "columnName": "payload_json",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serverSeq",
+            "columnName": "server_seq",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "retryCount",
+            "columnName": "retry_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parkedAt",
+            "columnName": "parked_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "table_name",
+            "row_uid"
+          ]
+        }
+      },
+      {
+        "tableName": "sync_rebaseline_holds",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`table_name` TEXT NOT NULL, `row_uid` TEXT NOT NULL, `payload_json` TEXT NOT NULL, `origin_device` TEXT, `server_seq` INTEGER NOT NULL, `held_at` TEXT NOT NULL, PRIMARY KEY(`table_name`, `row_uid`))",
+        "fields": [
+          {
+            "fieldPath": "tableName",
+            "columnName": "table_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rowUid",
+            "columnName": "row_uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "payloadJson",
+            "columnName": "payload_json",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "originDevice",
+            "columnName": "origin_device",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "serverSeq",
+            "columnName": "server_seq",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "heldAt",
+            "columnName": "held_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "table_name",
+            "row_uid"
+          ]
+        }
+      }
+    ],
+    "views": [
+      {
+        "viewName": "current_stock",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT\n            p.product_id,\n            p.name,\n            p.unit,\n            COALESCE(SUM(il.quantity), 0) AS quantity_on_hand\n        FROM products p\n        LEFT JOIN inventory_log il ON il.product_id = p.product_id\n        GROUP BY p.product_id, p.name, p.unit"
+      },
+      {
+        "viewName": "account_balances",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS WITH raw_balances AS (\n            SELECT a.account_id, a.name, a.type, a.category, SUM(fl.amount) AS money_raw\n            FROM accounts a LEFT JOIN financial_log fl ON fl.account_id = a.account_id\n            GROUP BY a.account_id, a.name, a.type, a.category\n            LIMIT -1 OFFSET 0\n        )\n        SELECT account_id, name, type, category, (\nWITH\nmoney_input AS (SELECT COALESCE(money_raw, 0.0) AS value),\nmoney_text AS (\n SELECT value,\n CASE WHEN CAST(printf('%!.15g', value) AS REAL) = value THEN printf('%!.15g', value)\n      WHEN CAST(printf('%!.16g', value) AS REAL) = value THEN printf('%!.16g', value)\n      ELSE printf('%!.17g', value) END AS decimal_text\n FROM money_input\n),\nmoney_unsigned AS (\n SELECT value, CASE WHEN value < 0 THEN -1 ELSE 1 END AS sign,\n CASE WHEN substr(decimal_text, 1, 1) = '-' THEN substr(decimal_text, 2)\n      ELSE decimal_text END AS text FROM money_text\n),\nmoney_parts AS (\n SELECT value, sign,\n CASE WHEN instr(text, 'e') > 0 THEN substr(text, 1, instr(text, 'e') - 1) ELSE text END AS mantissa,\n CASE WHEN instr(text, 'e') > 0 THEN CAST(substr(text, instr(text, 'e') + 1) AS INTEGER) ELSE 0 END AS exponent\n FROM money_unsigned\n),\nmoney_digits AS (\n SELECT value, sign, replace(mantissa, '.', '') AS digits,\n CASE WHEN instr(mantissa, '.') > 0 THEN instr(mantissa, '.') - 1 ELSE length(mantissa) END + exponent + 2 AS cut\n FROM money_parts\n),\nmoney_split AS (\n SELECT value, sign,\n CASE WHEN cut <= 0 THEN '0'\n      WHEN cut > 19 THEN 'overflow'\n      ELSE substr(digits, 1, cut) || substr('0000000000000000000', 1, max(0, cut - length(digits))) END AS kept,\n CASE WHEN cut < 0 THEN 0\n      WHEN substr(digits, cut + 1, 1) >= '5' THEN 1 ELSE 0 END AS carry\n FROM money_digits\n),\nmoney_integer AS (\n SELECT value, sign, kept, carry, ltrim(kept, '0') AS significant FROM money_split\n)\nSELECT CASE\n WHEN kept = 'overflow' OR length(significant) > 19\n      OR (length(significant) = 19 AND significant >= '9223372036854775807') THEN value\n ELSE (CAST(kept AS INTEGER) + carry) * sign / 100.0 END\nFROM money_integer\n) AS balance FROM raw_balances"
+      },
+      {
+        "viewName": "purchase_calculation_audit",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT\n            e.event_id,\n            e.raw_liters,\n            e.fat_percentage,\n            e.lr_reading,\n            e.milk_rate_used,\n            e.delivery_fee_used,\n            e.ts_standard_used,\n            (0.25 * e.lr_reading) + (0.22 * e.fat_percentage) + 0.72 AS expected_snf_percentage,\n            e.fat_percentage + ((0.25 * e.lr_reading) + (0.22 * e.fat_percentage) + 0.72) AS expected_ts_percentage,\n            e.raw_liters * (\n                (\n                    e.fat_percentage +\n                    ((0.25 * e.lr_reading) + (0.22 * e.fat_percentage) + 0.72)\n                ) / e.ts_standard_used\n            ) AS expected_adjusted_liters,\n            (\n                e.raw_liters * (\n                    (\n                        e.fat_percentage +\n                        ((0.25 * e.lr_reading) + (0.22 * e.fat_percentage) + 0.72)\n                    ) / e.ts_standard_used\n                ) * e.milk_rate_used\n            ) + (e.raw_liters * e.delivery_fee_used) AS expected_amount_owed\n        FROM events e\n        WHERE e.event_type = 'PURCHASE_RECEIPT'"
+      },
+      {
+        "viewName": "sale_calculation_audit",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT\n            e.event_id,\n            e.sale_quantity,\n            e.sale_value,\n            e.unit_rate,\n            e.surcharge_applied,\n            ROUND(e.sale_quantity * e.unit_rate, 2) AS expected_value_from_quantity,\n            ROUND(e.sale_value / e.unit_rate, 4) AS expected_quantity_from_value,\n            ROUND(e.sale_value + e.surcharge_applied, 2) AS expected_total\n        FROM events e\n        WHERE e.event_type = 'SALE'"
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '04767247b9547d6db9837bf6f7d3906e')"
+    ]
+  }
+}

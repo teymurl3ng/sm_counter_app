@@ -1,0 +1,125 @@
+{
+  "baseline": "985c0939683c00c63f6df2a7256bb983fa396b17",
+  "checkpoint": "local storage/permissions/Room migration/backup accepted; transport and UI remain pending",
+  "roomSchema": 18,
+  "backupSchema": 13,
+  "backupFormat": 5,
+  "uniqueAffectedDeviceChecks": 15,
+  "latestResults": {
+    "com.saaf.milkshop.CreditMetadataStorageTest#flagsKeepConcurrentSetsAndFailedMultiClearRollsBack": {
+      "code": 0,
+      "evidence": "storage-first-results.json"
+    },
+    "com.saaf.milkshop.CreditMetadataStorageTest#migrationPreservesLedgerAndClassifiesOnlyOriginalCreditSales": {
+      "code": 0,
+      "evidence": "storage-first-results.json"
+    },
+    "com.saaf.milkshop.CreditMetadataStorageTest#encryptedRoundTripKeepsCreditHistoryAndHoldsPendingWithoutReenabling": {
+      "code": 0,
+      "evidence": "storage-gate-results.json"
+    },
+    "com.saaf.milkshop.CreditMetadataStorageTest#ownerProposalsStayPendingAndOtherRolesAndExpiredSessionsCannotWrite": {
+      "code": 0,
+      "evidence": "storage-first-results.json"
+    },
+    "com.saaf.milkshop.CreditMetadataStorageTest#recordedAgreementKeepsAcceptedRevisionAndRefusesForeignOrMissingFacts": {
+      "code": 0,
+      "evidence": "storage-first-results.json"
+    },
+    "com.saaf.milkshop.CreditMetadataStorageTest#acceptedRevisionsRejectStaleHeadsIdentityChangesAndSqlMutation": {
+      "code": 0,
+      "evidence": "storage-first-results.json"
+    },
+    "com.saaf.milkshop.CreditMetadataStorageTest#saleLegacyEvidenceIsAtomicAndCannotBeRewrittenByFutureTerms": {
+      "code": 0,
+      "evidence": "storage-first-results.json"
+    },
+    "com.saaf.milkshop.CreditMetadataStorageTest#malformedNewBackupFailsWithoutReplacingExistingBusinessAndOldBackupGetsExplicitLegacy": {
+      "code": 0,
+      "evidence": "storage-first-results.json"
+    },
+    "com.saaf.milkshop.CreditBasicsFacadeTest#correctionsAndZeroDeltaAncestorPreserveAgeAndCustomerDetail": {
+      "code": 0,
+      "evidence": "storage-first-results.json"
+    },
+    "com.saaf.milkshop.CreditBasicsFacadeTest#surchargeCrossingAndChangedSnapshotRequireFreshAcknowledgement": {
+      "code": 0,
+      "evidence": "storage-first-results.json"
+    },
+    "com.saaf.milkshop.CreditBasicsFacadeTest#fractionalAggregateUsesCanonicalProjectionInsteadOfRoundedOperands": {
+      "code": 0,
+      "evidence": "storage-first-results.json"
+    },
+    "com.saaf.milkshop.Phase9BackupRestoreTest#fullBackupRestore_preservesPhase3NativeExtensionState": {
+      "code": 0,
+      "evidence": "storage-first-results.json"
+    },
+    "com.saaf.milkshop.Phase9BackupRestoreTest#localSnapshot_isCreated_andContainsExpectedMetadata": {
+      "code": 0,
+      "evidence": "storage-first-results.json"
+    },
+    "com.saaf.milkshop.OwnerFundsReceiptTest#ordinaryAndEncryptedBackupPreserveReceiptFacts": {
+      "code": 0,
+      "evidence": "storage-first-results.json"
+    },
+    "com.saaf.milkshop.Phase8SaleOperationsTest#cashierRecordsQuantitySaleToCashWithNativeDefaultSurchargeAndSummaries": {
+      "code": 0,
+      "evidence": "storage-first-results.json"
+    }
+  },
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "notificationPermission": "denied for isolated package",
+  "finalQaApkSha256": "3df0ee9cf20f2ebc9bb83b905f2e2a188c43cc91acc4bbf1d01efe9bf9b7aa6f",
+  "sourceFiles": [
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/BackupManager.kt",
+      "sha256": "e6b02b29cb60ee590981b70bc3f97c6fbd946556a3eb8005acb6a9a2d9447ebd"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/BackupRestoreEngine.kt",
+      "sha256": "7a54a1bcb9ee0d9d060525e26d31d833e9af473af787605ab75332405ae5ca2b"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/CreditMetadataBackup.kt",
+      "sha256": "6424a855941dbaae69d28adcfd297fba7f1c761bb7f2437f9fc4c1edfb414705"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/data/MilkShopDatabase.kt",
+      "sha256": "6fa31018d75e4ea054c663c0fbb1ef7faac27ee16de6e7edfca2b0e67d563f2d"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/data/CreditMetadata.kt",
+      "sha256": "ca6afc3fd9fe9b7d2df925a5ae654c4585259d66348826a55ca660e8ba100756"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/data/CreditMetadataMigrationSql.kt",
+      "sha256": "f18131bf197a2a3679497e58e25f861bae348ee23ef1222e97f7874f3055d4cd"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/Sale.kt",
+      "sha256": "0ff392fa4db805b73426068c317b00db8573f6ce8e3922de292e687fb485cd55"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/CreditMetadataStore.kt",
+      "sha256": "5823de150434cecc59fe723e6ddd1d643e4a89998d8c913ab8cc5cd8364a86d2"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/CreditReviewService.kt",
+      "sha256": "c5e3142d13ccf815b99fd4480bb97430a54e6c859846da98ff389c2ac6a7bfd5"
+    },
+    {
+      "path": "phase18/app/src/androidTest/java/com/saaf/milkshop/CreditMetadataStorageTest.kt",
+      "sha256": "c607d9ae14a3743242880d7ae37d931e8380a2c873f5fbeceba384ee36fcf028"
+    },
+    {
+      "path": "phase18/app/schemas/com.saaf.milkshop.data.MilkShopDatabase/18.json",
+      "sha256": "526d08f9a66c0cdaf015e3a01dfe19d902f3ade35f265a01337b8c55780f202d"
+    }
+  ],
+  "ordinaryAppUpdated": false,
+  "serverMutations": false,
+  "serverQueriesThisRun": false,
+  "advancedTermsEnabled": false,
+  "visualQaRun": false
+}

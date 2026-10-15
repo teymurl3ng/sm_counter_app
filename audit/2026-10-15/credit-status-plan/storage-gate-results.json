@@ -1,0 +1,21 @@
+{
+  "label": "storage-gate",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.CreditMetadataStorageTest#encryptedRoundTripKeepsCreditHistoryAndHoldsPendingWithoutReenabling"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.CreditMetadataStorageTest",
+      "test": "encryptedRoundTripKeepsCreditHistoryAndHoldsPendingWithoutReenabling",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 1,
+  "expected": 1,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "3df0ee9cf20f2ebc9bb83b905f2e2a188c43cc91acc4bbf1d01efe9bf9b7aa6f"
+}

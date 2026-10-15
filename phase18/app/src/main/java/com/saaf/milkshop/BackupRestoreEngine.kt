@@ -65,6 +65,7 @@ internal class BackupRestoreEngine(
                     SyncMigrationSql.triggerNames.forEach { executeSQL("DROP TRIGGER IF EXISTS $it") }
                 }
                 if (selection.business) {
+                    CreditMetadataBackup.clearForRestore(database) { executeSQL(it) }
                     Phase3CostingMigrationSql.immutableTriggerNames.forEach { executeSQL("DROP TRIGGER IF EXISTS $it") }
                     if (includeSecurity) {
                         executeSQL("DROP TRIGGER IF EXISTS prevent_app_user_delete")
@@ -166,6 +167,7 @@ internal class BackupRestoreEngine(
                     backupDao.insertSettings(readSettings(data.optJSONArray("settings")))
                     backupDao.insertProductProfiles(readProductProfiles(data.optJSONArray("product_profiles")))
                     backupDao.insertCustomerProfiles(readCustomerProfiles(data.optJSONArray("customer_profiles")))
+                    CreditMetadataBackup.restore(database, data, json.getJSONObject("metadata").getInt("schema_version")) { executeSQL(it) }
                     backupDao.insertVendorProfiles(readVendorProfiles(data.optJSONArray("vendor_profiles")))
                     backupDao.insertEmployeeProfiles(readEmployeeProfiles(data.optJSONArray("employee_profiles")))
 

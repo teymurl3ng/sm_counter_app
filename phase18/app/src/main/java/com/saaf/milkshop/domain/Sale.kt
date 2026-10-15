@@ -121,6 +121,10 @@ class SaleService(
                 )
             )
 
+            if (input.payment is SalePayment.OnCredit) {
+                CreditMetadataStore(database).recordLegacySale(eventId, input.payment.customerAccountId)
+            }
+
             SaleResult(
                 eventId = eventId,
                 quantity = quantity,

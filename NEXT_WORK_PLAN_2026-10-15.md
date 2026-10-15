@@ -77,6 +77,8 @@ This is the current reading order for unfinished work. It replaces the sequence 
 
 ### 5. Add clear bills and manual reminders
 
+**Pinned plan:** [Baseline, research, judgment and three bounded pieces](audit/2026-10-15/statements-plan/PLAN.md). ✅ Planning complete; implementation pending. Build statement snapshot/preview, PDF/image sharing, then manual drafts/truthful local history. No scheduling, cloud migration or real customer sending belongs to this phase.
+
 **Goal:** give a customer a readable statement and deliberately prepare a reminder.
 
 - Generate a previewable PDF and image statement from authoritative records, with shop/customer, activity, payments and outstanding totals.

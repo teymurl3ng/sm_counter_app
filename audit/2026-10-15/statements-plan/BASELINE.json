@@ -1,0 +1,17 @@
+{
+  "baselineCommit": "a596cd8e663415ae8d56ecf6a9d762cf37a838d9",
+  "planningOnly": true,
+  "sourceSha256": {
+    "phase18/app/src/main/java/com/saaf/milkshop/application/owner/NativeOwnerCustomersFacade.kt": "c337a699e9632e275a1f233995454cf5f0ed9b1c2db678fe4e7019365274e4cf",
+    "phase18/app/src/main/java/com/saaf/milkshop/application/owner/NativeOwnerRecordsFacade.kt": "d52a255514f01564d15aad95cb4a6ea2594ba6f3af0151f256ab319c3ca65453",
+    "phase18/app/src/main/java/com/saaf/milkshop/application/readmodels/HybridFinancialReadService.kt": "dc3ec75cc1b1d2be87acec62c3d6ca4fe2b2443b500541d0c686fa0ba1bbecb0",
+    "phase18/app/src/main/java/com/saaf/milkshop/domain/AccountLedger.kt": "74c301fd780ee7c693052f6e04cfabb25942193f8ac58310d5e9e381a6bffbf5",
+    "phase18/app/src/main/java/com/saaf/milkshop/data/Daos.kt": "c0b08caca65fb03b99b98610914c2e12bd99c177402dd1142f79451c73ba6e5d",
+    "phase18/app/src/main/java/com/saaf/milkshop/domain/StoreIdentity.kt": "bb65592f4e149a1c4088bd9264ca8da8d0f5f4716481650a912da679d6d4805c",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCustomersController.kt": "9b71e305982ffc22f45e1451752071e850775a3301480a20995723083196fb45",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt": "7f6f8d4e47d1d8c741a4faef4451d358dc30711ce7edb45e97ff8b7c8b6b4d60",
+    "phase18/app/src/main/AndroidManifest.xml": "18192f3b34795cf35a0c14a2310c0ba826e88a4dd4e0d0de8f1fca1f727eed05"
+  },
+  "judgmentHook": "Fixed reminder executed; not independent code validation.",
+  "researchLimits": "Official Zoho indexed search excerpt used after direct retrieval failed; Android and WhatsApp official references checked. No claim of universal industry or legal standard."
+}

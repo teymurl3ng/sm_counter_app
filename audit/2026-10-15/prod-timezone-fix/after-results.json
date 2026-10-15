@@ -1,0 +1,45 @@
+{
+  "label": "after",
+  "methods": [
+    "refresh_nullTimezoneFallsBackToShopZone",
+    "refresh_absentTimezonesKeepExistingBusinessZone",
+    "refresh_explicitTimezoneStillTakesPrecedence",
+    "signIn_allowed_carriesIdentityAndAnchorsTime",
+    "signIn_disabledStaff_andNoStaffProfile_classifyDefinitively",
+    "signIn_unknownOutcomes_neverBecomeIdentityDecisions"
+  ],
+  "tests": [
+    {
+      "test": "refresh_absentTimezonesKeepExistingBusinessZone",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "signIn_allowed_carriesIdentityAndAnchorsTime",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "refresh_nullTimezoneFallsBackToShopZone",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "refresh_explicitTimezoneStillTakesPrecedence",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "signIn_unknownOutcomes_neverBecomeIdentityDecisions",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "test": "signIn_disabledStaff_andNoStaffProfile_classifyDefinitively",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 6,
+  "target": "com.saaf.milkshop.qa.tests"
+}

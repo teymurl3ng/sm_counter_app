@@ -1,0 +1,15 @@
+{
+  "label": "before",
+  "methods": [
+    "refresh_nullTimezoneFallsBackToShopZone"
+  ],
+  "tests": [
+    {
+      "test": "refresh_nullTimezoneFallsBackToShopZone",
+      "code": -2,
+      "stack": "org.junit.ComparisonFailure: expected:<[Asia/Karachi]> but was:<[null]>"
+    }
+  ],
+  "passed": 0,
+  "target": "com.saaf.milkshop.qa.tests"
+}

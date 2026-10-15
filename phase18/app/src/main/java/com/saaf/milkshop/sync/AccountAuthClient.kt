@@ -249,8 +249,8 @@ class AccountAuthClient(
                     shopId = shopId,
                     shopName = shop.optString("shop_name").takeIf { it.isNotEmpty() }
                         ?: shop.optString("name").takeIf { it.isNotEmpty() },
-                    timezone = shop.optString("shop_timezone").takeIf { it.isNotEmpty() }
-                        ?: shop.optString("timezone").takeIf { it.isNotEmpty() },
+                    timezone = shop.timezoneOrNull("shop_timezone")
+                        ?: shop.timezoneOrNull("timezone"),
                 )
             }
         } ?: emptyList()
@@ -267,9 +267,16 @@ class AccountAuthClient(
             // The frozen profile fields carry no top-level timezone (DEV probe
             // P2); a per-shop timezone is accepted, else the zone stays unset
             // until the server contract adds one (sync Phase 5 amendment).
-            shopTimezone = profile.optString("shop_timezone").takeIf { it.isNotEmpty() }
+            shopTimezone = profile.timezoneOrNull("shop_timezone")
                 ?: shops.firstOrNull()?.timezone,
         )
+    }
+
+    private fun JSONObject.timezoneOrNull(name: String): String? {
+        // Android optString turns JSON null into the nonempty string "null".
+        // Keep absent server zones absent so a real shop zone/cache can win.
+        if (isNull(name)) return null
+        return optString(name).takeIf { it.isNotEmpty() }
     }
 
     private data class TokenSet(

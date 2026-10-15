@@ -169,6 +169,42 @@ class SyncTransportTest {
     }
 
     @Test
+    fun refresh_nullTimezoneFallsBackToShopZone() = runBlocking {
+        val profile = JSONObject(profileBody()).put("shop_timezone", JSONObject.NULL)
+        profile.getJSONArray("shops").getJSONObject(0).put("shop_timezone", JSONObject.NULL)
+        val http = FakeSyncHttp()
+        http.route(tokenBody = tokenBody(), profileBody = profile.toString())
+        val result = AccountAuthClient(http, config).refresh("fixture-refresh") as AccountAuthResult.Allowed
+        assertEquals("Asia/Karachi", result.shops.single().timezone)
+        assertEquals("Asia/Karachi", result.shopTimezone)
+    }
+
+    @Test
+    fun refresh_absentTimezonesKeepExistingBusinessZone() = runBlocking {
+        val original = com.saaf.milkshop.sync.BusinessClock.currentZone()
+        val profile = JSONObject(profileBody()).put("shop_timezone", JSONObject.NULL)
+        profile.getJSONArray("shops").getJSONObject(0)
+            .put("shop_timezone", JSONObject.NULL).put("timezone", JSONObject.NULL)
+        val http = FakeSyncHttp()
+        http.route(tokenBody = tokenBody(), profileBody = profile.toString())
+        val result = AccountAuthClient(http, config).refresh("fixture-refresh") as AccountAuthResult.Allowed
+        assertNull(result.shops.single().timezone)
+        assertNull(result.shopTimezone)
+        result.shopTimezone?.let(com.saaf.milkshop.sync.BusinessClock::setZone)
+        assertEquals(original, com.saaf.milkshop.sync.BusinessClock.currentZone())
+    }
+
+    @Test
+    fun refresh_explicitTimezoneStillTakesPrecedence() = runBlocking {
+        val profile = JSONObject(profileBody()).put("shop_timezone", "Europe/London")
+        val http = FakeSyncHttp()
+        http.route(tokenBody = tokenBody(), profileBody = profile.toString())
+        val result = AccountAuthClient(http, config).refresh("fixture-refresh") as AccountAuthResult.Allowed
+        assertEquals("Europe/London", result.shopTimezone)
+        assertEquals("Asia/Karachi", result.shops.single().timezone)
+    }
+
+    @Test
     fun signIn_invalidCredentials_isTheOnlyCredentialVerdict() = runBlocking {
         val http = FakeSyncHttp()
         http.route(tokenStatus = 400, tokenBody = """{"error_code":"invalid_credentials"}""")

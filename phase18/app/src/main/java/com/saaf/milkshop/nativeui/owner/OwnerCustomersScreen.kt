@@ -113,6 +113,7 @@ fun OwnerCustomersScreen(
     showHeader: Boolean = true,
     modifier: Modifier = Modifier,
     onCreditAction: (com.saaf.milkshop.application.owner.CustomerCreditCommand) -> Unit = {},
+    loadStatement: CustomerStatementLoader = { _, _ -> error("Statement loading is unavailable.") },
 ) {
     val snapshot = OwnerCustomersScreenSnapshot(
         identity = identity,
@@ -160,6 +161,7 @@ fun OwnerCustomersScreen(
             onBackFromEdit = onBackFromEdit,
             onUpdateCustomer = onUpdateCustomer,
             onCreditAction = onCreditAction,
+            loadStatement = loadStatement,
             hostedScaffold = hostedScaffold,
             showHeader = pane.showHeader,
             modifier = modifier,
@@ -194,6 +196,7 @@ private fun OwnerCustomersScreenPane(
     showHeader: Boolean = true,
     modifier: Modifier = Modifier,
     onCreditAction: (com.saaf.milkshop.application.owner.CustomerCreditCommand) -> Unit = {},
+    loadStatement: CustomerStatementLoader = { _, _ -> error("Statement loading is unavailable.") },
 ) {
     if (customerCreateOpen) {
         OwnerCustomersCreateScreen(
@@ -236,6 +239,7 @@ private fun OwnerCustomersScreenPane(
             onBack = onBackFromDetail,
             onOpenEdit = onOpenEdit,
             onCreditAction = onCreditAction,
+            loadStatement = loadStatement,
             creditBusy = customerUpdating,
             hostedScaffold = hostedScaffold,
             modifier = modifier,
@@ -778,8 +782,11 @@ private fun OwnerCustomersDetailScreen(
     modifier: Modifier,
     onCreditAction: (com.saaf.milkshop.application.owner.CustomerCreditCommand)->Unit,
     creditBusy: Boolean,
+    loadStatement: CustomerStatementLoader,
 ) {
-    BackHandler(onBack = onBack)
+    var statementOpen by rememberSaveable(identity.userId, detail.row.accountId) { mutableStateOf(false) }
+    val panes = androidx.compose.runtime.saveable.rememberSaveableStateHolder()
+    BackHandler(onBack = { if(statementOpen) statementOpen=false else onBack() })
     val row = detail.row
     hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
         Column(
@@ -795,44 +802,14 @@ private fun OwnerCustomersDetailScreen(
                 businessDate = context.businessDate,
                 postingOpen = context.postingOpen,
             )
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Text(
-                    row.name,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.testTag(NativeUiTags.OwnerCustomersDetailName),
-                )
-                NativeInformationSection {
-                    NativeInformationFact("Status", row.statusLabel)
-                    NativeInformationFact("Balance", row.balanceLabel, emphasized = true)
-                    row.phone?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Phone", it) }
-                    row.areaRoute?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Area / route", it) }
-                    detail.address?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Address", it, prose = true) }
-                    detail.creditLimitLabel?.let { NativeInformationFact("Credit limit", it, emphasized = true) }
-                    detail.creditAge?.let { NativeInformationFact("Unpaid age", it.description, prose = true) }
-                    detail.dailyQuotaLabel?.let { NativeInformationFact("Daily quota", it) }
-                    detail.notes?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Notes", it, prose = true) }
+            com.saaf.milkshop.nativeui.common.NativeSectionTransition(
+                targetState=statementOpen,modifier=Modifier.weight(1f),contentKey={it},
+            ) { showingStatement ->
+                panes.SaveableStateProvider(showingStatement.toString()) {
+                if(showingStatement) CustomerStatementScreen(row.accountId,row.name,loadStatement) {statementOpen=false}
+                else CustomerDetailOverview(detail,identity.role.wireValue=="owner",creditBusy,error,
+                    onOpenStatement={statementOpen=true},onEdit=onOpenEdit,onCreditAction=onCreditAction)
                 }
-                CustomerCreditPanel(detail,identity.role.wireValue=="owner",creditBusy,onCreditAction)
-                error?.let {
-                    Text(
-                        it,
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.testTag(NativeUiTags.OwnerCustomersError),
-                    )
-                }
-                Button(
-                    onClick = hapticAction(onOpenEdit),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag(NativeUiTags.OwnerCustomersDetailEdit),
-                ) { Text("Edit customer") }
             }
         }
     }

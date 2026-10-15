@@ -104,6 +104,9 @@ class NativeOwnerCustomersFacade(
         return customers.create(name)
     }
 
+    suspend fun loadStatement(sessionHandle: String, accountId: Long, period: CustomerStatementPeriod): CustomerStatement =
+        CustomerStatementReader(database, security).load(sessionHandle, accountId, period)
+
     /**
      * Rename then save profile (auth once). Deactivate is [CustomerProfileInput.active] = false.
      */

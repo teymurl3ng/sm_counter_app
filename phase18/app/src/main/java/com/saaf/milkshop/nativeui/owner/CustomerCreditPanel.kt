@@ -26,6 +26,14 @@ internal fun CustomerCreditStatusText(view: CustomerCreditView) {
 @Composable
 internal fun CustomerCreditPanel(detail: NativeOwnerCustomerDetail, owner: Boolean, busy: Boolean,
     onAction: (CustomerCreditCommand)->Unit) {
+    CustomerCreditBody(detail, owner, busy, CustomerCreditContent.All, onAction)
+}
+
+internal enum class CustomerCreditContent { All, Summary, Management }
+
+@Composable
+internal fun CustomerCreditBody(detail: NativeOwnerCustomerDetail, owner: Boolean, busy: Boolean,
+    content: CustomerCreditContent, onAction: (CustomerCreditCommand)->Unit) {
     val credit=detail.row.credit?:return
     var dialog by rememberSaveable(detail.row.accountId) { mutableStateOf("") }
     var reason by rememberSaveable { mutableStateOf("") }
@@ -36,14 +44,19 @@ internal fun CustomerCreditPanel(detail: NativeOwnerCustomerDetail, owner: Boole
     var pendingUid by rememberSaveable { mutableStateOf("") }
     var showLedger by rememberSaveable(detail.row.accountId) { mutableStateOf(false) }
     var showAudit by rememberSaveable(detail.row.accountId) { mutableStateOf(false) }
-    NativeInformationSection(Modifier.fillMaxWidth().testTag("credit-detail")) {
+    CreditInformationSection(content,Modifier.fillMaxWidth().testTag("credit-detail")) {
+        if(content != CustomerCreditContent.Management) {
         Text("Current credit",style=MaterialTheme.typography.titleMedium)
+        NativeInformationFact("Balance", detail.row.balanceLabel, emphasized = true)
         CustomerCreditStatusText(credit)
         Text(credit.explanation,style=MaterialTheme.typography.bodyMedium)
+        }
         NativeInformationFact("Future sale terms",credit.term.label)
-        if(credit.status.usesLegacyWeekly) Text("Older sales use the recorded 7-day default.",style=MaterialTheme.typography.bodyMedium)
-        Text("Current debt only; this is not a lifetime reliability score. Sunday bills do not change payment deadlines.",style=MaterialTheme.typography.bodySmall)
-        if(owner) {
+        if(content != CustomerCreditContent.Summary) {
+            if(credit.status.usesLegacyWeekly) Text("Older sales use the recorded 7-day default.",style=MaterialTheme.typography.bodyMedium)
+            Text("Current debt only; this is not a lifetime reliability score. Sunday bills do not change payment deadlines.",style=MaterialTheme.typography.bodyMedium)
+        }
+        if(owner && content != CustomerCreditContent.Summary) {
             if(!credit.enabled) {
                 Text("Sync and enable credit terms after every posting phone is updated. Existing credit posting stays on its recorded default.")
                 OutlinedButton(onClick=hapticAction { dialog="enable" },enabled=!busy,
@@ -62,9 +75,12 @@ internal fun CustomerCreditPanel(detail: NativeOwnerCustomerDetail, owner: Boole
                 },enabled=!busy,modifier=Modifier.fillMaxWidth().testTag("credit-clear-flag")) { Text("Clear reviewed flags") }
             }
         }
-        if(busy) LinearProgressIndicator(Modifier.fillMaxWidth().testTag("credit-saving"))
+        if(content == CustomerCreditContent.Summary) Box(Modifier.fillMaxWidth().height(4.dp)) {
+            if(busy) LinearProgressIndicator(Modifier.fillMaxWidth().testTag("credit-saving"))
+        } else if(busy) LinearProgressIndicator(Modifier.fillMaxWidth().testTag("credit-saving"))
     }
-    if(credit.pending.isNotEmpty()) NativeInformationSection(Modifier.fillMaxWidth().testTag("credit-pending")) {
+    if(content == CustomerCreditContent.Summary) return
+    if(credit.pending.isNotEmpty()) CreditInformationSection(content,Modifier.fillMaxWidth().testTag("credit-pending")) {
         Text("Changes awaiting sync",style=MaterialTheme.typography.titleMedium)
         for(change in credit.pending) {
             Text("${change.description} · ${if(change.held) "Held for Owner review" else "Pending server acceptance"}")
@@ -75,6 +91,7 @@ internal fun CustomerCreditPanel(detail: NativeOwnerCustomerDetail, owner: Boole
         }
         Text("Pending actions do not replace accepted terms or flags. Sync, then refresh this customer.",style=MaterialTheme.typography.bodySmall)
     }
+    if(content == CustomerCreditContent.All) {
     TextButton(onClick=hapticAction { showLedger=!showLedger },modifier=Modifier.testTag("credit-history")) {
         Text(if(showLedger) "Close account history" else "Account history")
     }
@@ -87,7 +104,8 @@ internal fun CustomerCreditPanel(detail: NativeOwnerCustomerDetail, owner: Boole
         if(detail.ledger?.entries.isNullOrEmpty()) Text("No ledger movements yet.")
     }
     TextButton(onClick=hapticAction { showAudit=!showAudit },modifier=Modifier.testTag("credit-audit")) { Text(if(showAudit) "Close review history" else "Terms and review history") }
-    if(showAudit) NativeInformationSection(Modifier.fillMaxWidth().testTag("credit-audit-history")) {
+    }
+    if(showAudit || content == CustomerCreditContent.Management) CreditInformationSection(content,Modifier.fillMaxWidth().testTag("credit-audit-history")) {
         Text("Owner review actions and accepted payment terms.",style=MaterialTheme.typography.bodySmall)
         credit.history.sortedDescending().forEach { Text(it,style=MaterialTheme.typography.bodyMedium) }
         if(credit.history.isEmpty()) Text("No terms changes or review actions.")
@@ -133,4 +151,10 @@ internal fun CustomerCreditPanel(detail: NativeOwnerCustomerDetail, owner: Boole
         },enabled=valid && !busy,modifier=Modifier.testTag("credit-confirm")) { Text(if(dialog=="enable") "All posting phones are updated" else "Confirm") } },
             dismissButton={ TextButton(onClick=hapticAction { dialog="" },enabled=!busy) { Text("Cancel") } })
     }
+}
+
+@Composable
+private fun CreditInformationSection(mode: CustomerCreditContent,modifier: Modifier,content: @Composable ColumnScope.()->Unit) {
+    if(mode==CustomerCreditContent.Management) Column(modifier,verticalArrangement=Arrangement.spacedBy(12.dp),content=content)
+    else NativeInformationSection(modifier,content)
 }

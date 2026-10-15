@@ -610,6 +610,7 @@ fun OwnerPreviewHost(
                     onBackFromCustomerEdit = ownerMoreViewModel::clearCustomerEdit,
                     onUpdateCustomer = ownerMoreViewModel::updateCustomer,
                     onCustomerCreditAction = ownerMoreViewModel::customerCreditAction,
+                    loadCustomerStatement = ownerMoreViewModel::loadCustomerStatement,
                     onRetrySuppliers = ownerMoreViewModel::refreshSuppliers,
                     onOpenSupplier = ownerMoreViewModel::openSupplierDetail,
                     onBackFromSupplierDetail = ownerMoreViewModel::clearSupplierDetail,

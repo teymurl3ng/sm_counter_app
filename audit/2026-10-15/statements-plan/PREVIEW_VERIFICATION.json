@@ -1,0 +1,50 @@
+{
+  "baselineCommit": "646c219",
+  "scope": "Phase5 piece1 only: statement snapshot/preview and local customer-detail regrouping",
+  "uniqueAffectedMethods": 13,
+  "firstPassed": 12,
+  "finalTouchedPassed": 11,
+  "strengthenedGeometryPassed": 2,
+  "appApkSha256": "ab26214ecd67eba005aedde4310424a72217fe5fd076cd413e23d9a2228772f8",
+  "target": "com.saaf.milkshop.qa.tests",
+  "device": "A06",
+  "sourceSha256": {
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/CustomerStatementTest.kt": "5cc30bd14409f796fe204b1901ac5bea23aed232df4a5dcdbe1d8f7674c13b83",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/CustomerStatementUiTest.kt": "aeb0bc5acfd8939d413a604c26f7b19f2d53893326215e677407060968358f4f",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerCustomersScreenContractTest.kt": "c4dafcbbc678f18c894cb219bb6d1e2e4543774d6fb4ad6216fd899ce200267e",
+    "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerStatement.kt": "c6c1eab42d15c4a0c05fb28c753b199d16a3a7b433518d4fdd6fad5aeae15122",
+    "phase18/app/src/main/java/com/saaf/milkshop/application/owner/NativeOwnerCustomersFacade.kt": "965d8f7aef2dafbc3b49575f780755977d573b55c504f8fa7386741c9c8db47c",
+    "phase18/app/src/main/java/com/saaf/milkshop/data/CustomerStatementRows.kt": "6ccc95ab3392303db2fc5cb3f44cbe03ad27b8a4e9e9c0bc70a77d25a527afa6",
+    "phase18/app/src/main/java/com/saaf/milkshop/data/Daos.kt": "28856d553c7dfd02a1aa819477f01b38f43a67e0721ee1d3b0aac1da328151b3",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt": "052627d647822b746c91a4e33a436af41e01c90c0d7f6c1d1aa8c01af303e51d",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerStatementScreen.kt": "0792cbe47805a3b88ca5a2c3cc077bf47573f7d5318215b14acbba7cd56515f7",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/NativeOwnerMoreViewModel.kt": "2444f836e3fe0a85c48b13873cba60f527e36baa4d64150825188f5faceb959e",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCustomersController.kt": "892b7ea30b4c29a20e224f356f84a0a59f52910f82307564614338741e59fc49",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCustomersScreen.kt": "ba439871e1bd0a7a3698ae17a91e080e96ff51fa8cebffce69cf5b96038324b6",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerMoreScreen.kt": "9935cb99a3504ab289647096935ed02e01b59e6b8fc2ca269312cd60fec7e25d",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerPreviewHost.kt": "6535957ea653d7f4d97e7aa6a6a9e3a1cb5c784b22e7b1bece05833df58a3fb0"
+  },
+  "visualReview": {
+    "lightDefault": "Final synthetic paper, money, pager and body/nav separation inspected",
+    "dark200Percent": "Final synthetic scalable paper, wrapped amounts/text and unchanged host inspected",
+    "capturesCommitted": false
+  },
+  "unchangedScope": [
+    "No ordinary app install/data clear/live transaction",
+    "No cloud/schema/sync mutation",
+    "No messages or exports",
+    "No new dependencies/shared chrome styles"
+  ],
+  "limitations": [
+    "Measured shared PDF/PNG pagination and product visual treatment remain piece2; current 8-row native preview is provisional grouping",
+    "Manual drafts and observable local history remain piece3",
+    "Private/human release acceptance remains phase1"
+  ],
+  "attempts": [
+    "Initial compile omitted wiring after helper relative-path error; corrected at repository root",
+    "Initial synthetic test build used unavailable account lookup; corrected to existing reader",
+    "Initial12/12 passed; visual review aligned pager and removed redundant disabled buttons on one-page output",
+    "Final11/11 touched methods passed; two UI checks then strengthened for title/footer equality and both passed without app implementation changes"
+  ],
+  "judgment": "Hook is a fixed reminder, not a validator. Implementation independently inspected against ledger/correction/rounding and UI contracts."
+}

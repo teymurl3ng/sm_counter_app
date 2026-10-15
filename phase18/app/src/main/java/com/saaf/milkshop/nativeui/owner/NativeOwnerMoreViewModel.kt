@@ -182,6 +182,9 @@ class NativeOwnerMoreViewModel internal constructor(
 
     fun openCustomers() = customersController.openCustomers()
 
+    suspend fun loadCustomerStatement(accountId: Long, period: com.saaf.milkshop.application.owner.CustomerStatementPeriod) =
+        customersController.loadStatement(accountId, period)
+
     fun refreshCustomers() = customersController.refreshCustomers()
 
     fun openCustomerDetail(accountId: Long) = customersController.openCustomerDetail(accountId)

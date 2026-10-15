@@ -77,7 +77,7 @@ This is the current reading order for unfinished work. It replaces the sequence 
 
 ### 5. Add clear bills and manual reminders
 
-**Pinned plan:** [Baseline, research, judgment and three bounded pieces](audit/2026-10-15/statements-plan/PLAN.md). ✅ Planning complete; implementation pending. Build statement snapshot/preview, PDF/image sharing, then manual drafts/truthful local history. No scheduling, cloud migration or real customer sending belongs to this phase.
+**Pinned plan:** [Baseline, research, judgment and three bounded pieces](audit/2026-10-15/statements-plan/PLAN.md). ✅ Planning complete. ✅ ~~Statement snapshot/preview and customer-detail fit~~ accepted with13 unique affected A06 methods; [result](audit/2026-10-15/statements-plan/PREVIEW_RESULT.md). PDF/image sharing and manual drafts/truthful local history remain pending. No scheduling, cloud migration or real customer sending belongs to this phase.
 
 **UI fit:** [Placement/reflow plan](audit/2026-10-15/statements-plan/UI_FIT.md) and [clickable study](audit/2026-10-15/statements-plan/UI_PREVIEW.html): locally regroup customer detail, add one Statements & reminders entry, and keep Statement/Reminder in the existing Customers host. Same native design material/components; no new tab or global redesign.
 
@@ -143,7 +143,7 @@ These items have not been cancelled. They are deliberately unscheduled or condit
 - [x] ✅ ~~2. Persistent Owner attention for held sync entries.~~ Accepted at local Owner scope; audit-only conflict policy remains a separate retained B8 boundary. [Result](audit/2026-10-15/sync-attention-plan/RESULT.md).
 - [x] ✅ ~~3. Credit basics: aging, customer search and advisory warning.~~ [Result](audit/2026-10-15/credit-basics-plan/RESULT.md). Delivered in signed 0.5.0; private/human acceptance remains phase 1.
 - [x] ✅ ~~4. Customer payment terms, credit categories, overrides and history.~~ Implementation, affected checks, two-phone recovery and PROD/signed rollout complete. [Finish result](audit/2026-10-15/credit-status-plan/FINISH_RESULT.md).
-- [ ] 5. Statements, sharing and manual reminders.
+- [ ] 5. Statements, sharing and manual reminders — ✅ ~~snapshot/preview and customer-detail fit~~; PDF/image sharing and manual message preparation remain.
 - [ ] 6. Owner reminder automation and a separately recorded automatic-SMS decision.
 
 Use this six-phase progress list in future completion reports. The old [seven-batch plan](audit/2026-10-11/remaining-work-plan/FINISH_BATCHES.md) remains the historical acceptance record; its open parts map to phase 1 here, and its completed parts are not reopened.

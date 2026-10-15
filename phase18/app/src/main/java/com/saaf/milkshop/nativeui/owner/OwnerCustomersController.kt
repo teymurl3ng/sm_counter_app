@@ -144,6 +144,22 @@ internal class OwnerCustomersController(
         )
     }
 
+    suspend fun loadStatement(accountId: Long, period: com.saaf.milkshop.application.owner.CustomerStatementPeriod): com.saaf.milkshop.application.owner.CustomerStatement {
+        val token = runtime.captureSession() ?: error("Sign in again to prepare a statement.")
+        fun selected(): Boolean = runtime.isCurrent(token) && runtime.ready()?.let {
+            it.destination == NativeOwnerMoreDestination.Customers && it.customerDetail?.row?.accountId == accountId && !it.customerEditOpen
+        } == true
+        check(selected()) { "Open this customer again before preparing a statement." }
+        return try {
+            val result = withContext(Dispatchers.IO) { facade.loadStatement(token.handle, accountId, period) }
+            check(selected()) { "The selected customer or session changed. Open the customer again." }
+            result
+        } catch (error: com.saaf.milkshop.domain.SecurityFailure.SessionExpired) {
+            if (runtime.isCurrent(token)) runtime.endSession()
+            throw error
+        }
+    }
+
     fun openCustomerCreate() {
         val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.Customers) return

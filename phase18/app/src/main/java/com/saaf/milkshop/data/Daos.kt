@@ -67,6 +67,33 @@ interface InventoryLogDao {
 
 @Dao
 interface FinancialLogDao {
+    @Query("WITH raw_total AS (SELECT SUM(fl.amount) AS money_raw FROM financial_log fl INNER JOIN events e ON e.event_id=fl.event_id WHERE fl.account_id=:accountId AND e.occurred_at < :endExclusive LIMIT -1 OFFSET 0) SELECT " + CanonicalMoneySql.ROUND_VALUE + " FROM raw_total")
+    suspend fun statementBalanceBefore(accountId: Long, endExclusive: String): Double
+
+    @Query("""
+        WITH running AS (
+            SELECT e.event_id AS eventId, e.event_uid AS eventUid, e.occurred_at AS occurredAt,
+                e.event_type AS eventType, e.corrects_event_id AS correctsEventId,
+                fl.amount AS movementAmount, fl.log_id AS logId,
+                SUM(fl.amount) OVER (ORDER BY e.occurred_at,e.event_id,fl.log_id ROWS UNBOUNDED PRECEDING) AS money_raw
+            FROM financial_log fl INNER JOIN events e ON e.event_id=fl.event_id
+            WHERE fl.account_id=:accountId AND e.occurred_at < :endExclusive
+        )
+        SELECT eventId,eventUid,occurredAt,eventType,correctsEventId,movementAmount,
+        """ + CanonicalMoneySql.ROUND_VALUE + """ AS balanceAfter
+        FROM running WHERE occurredAt >= :startInclusive ORDER BY occurredAt,eventId,logId LIMIT 10001
+    """)
+    suspend fun statementMovements(accountId: Long, startInclusive: String, endExclusive: String): List<CustomerStatementMovementRow>
+
+    @Query("""
+        SELECT il.event_id AS eventId,p.name AS productName,p.unit,il.quantity
+        FROM inventory_log il JOIN products p ON p.product_id=il.product_id JOIN events e ON e.event_id=il.event_id
+        WHERE e.occurred_at >= :startInclusive AND e.occurred_at < :endExclusive AND e.event_type='SALE'
+        AND EXISTS(SELECT 1 FROM financial_log fl WHERE fl.event_id=e.event_id AND fl.account_id=:accountId)
+        ORDER BY e.event_id,il.log_id
+    """)
+    suspend fun statementProducts(accountId: Long, startInclusive: String, endExclusive: String): List<CustomerStatementProductRow>
+
     @Query("SELECT COALESCE(SUM(amount), 0.0) FROM financial_log WHERE account_id = :accountId")
     suspend fun rawAccountBalance(accountId: Long): Double
 

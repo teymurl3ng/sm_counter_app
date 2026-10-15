@@ -234,6 +234,7 @@ fun OwnerMoreScreen(
     modifier: Modifier = Modifier,
     syncAttention: OwnerSyncAttention? = null,
     onCustomerCreditAction: (com.saaf.milkshop.application.owner.CustomerCreditCommand) -> Unit = {},
+    loadCustomerStatement: suspend (Long, com.saaf.milkshop.application.owner.CustomerStatementPeriod) -> com.saaf.milkshop.application.owner.CustomerStatement = { _, _ -> error("Statement loading is unavailable.") },
 ) {
     NativeSectionTransition(
         targetState = state,
@@ -365,6 +366,7 @@ fun OwnerMoreScreen(
                 onBackFromEdit = onBackFromCustomerEdit,
                 onUpdateCustomer = onUpdateCustomer,
                 onCreditAction = onCustomerCreditAction,
+                loadStatement = loadCustomerStatement,
                 hostedScaffold = hostedScaffold,
                 modifier = modifier,
             )

@@ -1,0 +1,98 @@
+{
+  "label": "preview-first",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.CustomerStatementTest#openingSalesCorrectionsAndPaymentReconcileWithoutWriting",
+    "com.saaf.milkshop.CustomerStatementTest#fractionalRowsUseCumulativePaisaAndDoNotLoseTheAggregate",
+    "com.saaf.milkshop.CustomerStatementTest#advanceHistoricalPeriodsAndInvalidDatesStayDistinct",
+    "com.saaf.milkshop.CustomerStatementTest#customerAndSessionPermissionsAreRechecked",
+    "com.saaf.milkshop.CustomerStatementUiTest#detailDisclosuresRetainPendingAttentionAndExistingOwnerActions",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementLightPreviewAndReturnKeepChromeAndDisclosure",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure",
+    "com.saaf.milkshop.CustomerStatementUiTest#periodFailureRetainsPreviousSnapshotAndAllowsRevert",
+    "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest#detailShowsFactsAndEdit",
+    "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest#longCustomerDetailReflowsInDarkExtraLargeText",
+    "com.saaf.milkshop.CreditFinishUiTest#lightTermsReviewAndHistoryKeepChromeStable",
+    "com.saaf.milkshop.CreditFinishUiTest#darkLargeTextTermsReviewAndHistoryKeepChromeStable"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.CustomerStatementTest",
+      "test": "advanceHistoricalPeriodsAndInvalidDatesStayDistinct",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementTest",
+      "test": "openingSalesCorrectionsAndPaymentReconcileWithoutWriting",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementTest",
+      "test": "customerAndSessionPermissionsAreRechecked",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementTest",
+      "test": "fractionalRowsUseCumulativePaisaAndDoNotLoseTheAggregate",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "periodFailureRetainsPreviousSnapshotAndAllowsRevert",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "detailDisclosuresRetainPendingAttentionAndExistingOwnerActions",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementLightPreviewAndReturnKeepChromeAndDisclosure",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest",
+      "test": "detailShowsFactsAndEdit",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest",
+      "test": "longCustomerDetailReflowsInDarkExtraLargeText",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditFinishUiTest",
+      "test": "lightTermsReviewAndHistoryKeepChromeStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditFinishUiTest",
+      "test": "darkLargeTextTermsReviewAndHistoryKeepChromeStable",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 12,
+  "expected": 12,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "50122a01abce0e9e352db6ca03643e62c3bcf48c591f8207e549aab9c8085e8c"
+}

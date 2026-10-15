@@ -1,0 +1,92 @@
+[
+  {
+    "phone": "A06",
+    "serial": "R8VXA02SNKH",
+    "before": {
+      "versionName": [
+        "0.4.3"
+      ],
+      "versionCode": [
+        "7"
+      ],
+      "uid": [
+        "11498"
+      ],
+      "firstInstall": [
+        "2026-10-10 19:31:03"
+      ],
+      "lastUpdate": [
+        "2026-10-15 12:25:06"
+      ]
+    },
+    "operation": "install -r --user 0; no uninstall/data clear",
+    "after": {
+      "versionName": [
+        "0.5.0"
+      ],
+      "versionCode": [
+        "8"
+      ],
+      "uid": [
+        "11498"
+      ],
+      "firstInstall": [
+        "2026-10-10 19:31:03"
+      ],
+      "lastUpdate": [
+        "2026-10-15 23:07:55"
+      ]
+    },
+    "apkHashMatches": true,
+    "sameInstallationAndUid": true,
+    "launched": true,
+    "limitation": "No private sign-in or live business transaction performed; human/private handover remains phase 1."
+  },
+  {
+    "phone": "S24",
+    "serial": "RFCX116CYYX",
+    "before": {
+      "versionName": [
+        "0.4.2"
+      ],
+      "versionCode": [
+        "6"
+      ],
+      "uid": [
+        "10743"
+      ],
+      "firstInstall": [
+        "2026-10-14 15:54:25",
+        "1970-01-01 05:00:00",
+        "1970-01-01 05:00:00"
+      ],
+      "lastUpdate": [
+        "2026-10-14 18:49:25"
+      ]
+    },
+    "operation": "install -r --user 0; no uninstall/data clear",
+    "after": {
+      "versionName": [
+        "0.5.0"
+      ],
+      "versionCode": [
+        "8"
+      ],
+      "uid": [
+        "10743"
+      ],
+      "firstInstall": [
+        "2026-10-14 15:54:25",
+        "1970-01-01 05:00:00",
+        "1970-01-01 05:00:00"
+      ],
+      "lastUpdate": [
+        "2026-10-15 23:08:01"
+      ]
+    },
+    "apkHashMatches": true,
+    "sameInstallationAndUid": true,
+    "launched": true,
+    "limitation": "No private sign-in or live business transaction performed; human/private handover remains phase 1."
+  }
+]

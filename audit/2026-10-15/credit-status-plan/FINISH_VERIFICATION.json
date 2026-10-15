@@ -270,6 +270,11 @@
     "Security restore correctly refused configured target; recovery fixture now uses a fresh separate QA database. Existing security guard unchanged.",
     "Final nine comparisons pass; every attempt retired created Auth and deactivated its exact QA shop; existing DEV hashes match."
   ],
-  "rolloutStatus": "PROD migration blocked by automatic approval review; exact production approval required. Signed release preparation continues.",
-  "ordinaryPhoneOperationBeforeRelease": "No ordinary data operation; isolated physical story verified unchanged package provenance on both phones."
+  "rolloutStatus": "Accepted: exact owner approval; PROD migration 20261015180731; 39 rollback checks; signed 0.5.0/code8 installed and verified on both phones.",
+  "ordinaryPhoneOperationBeforeRelease": "No ordinary data operation; isolated physical story verified unchanged package provenance on both phones.",
+  "rolloutEvidence": "PROD_ROLLOUT.json",
+  "releaseEvidence": [
+    "RELEASE_MANIFEST.json",
+    "RELEASE_INSTALLS.json"
+  ]
 }

@@ -16,7 +16,7 @@ def adb(serial,*args):
 def info(serial):
     raw=adb(serial,'shell','dumpsys','package',PACKAGE)
     return {key:re.findall(pattern,raw) for key,pattern in {'versionName':r'versionName=(.*)','versionCode':r'versionCode=(\d+)',
-        'uid':r'userId=(\d+)','firstInstall':r'firstInstallTime=(.*)','lastUpdate':r'lastUpdateTime=(.*)'}.items()}
+        'uid':r'(?:userId|appId)=(\d+)','firstInstall':r'firstInstallTime=(.*)','lastUpdate':r'lastUpdateTime=(.*)'}.items()}
 for name,serial in [('A06','R8VXA02SNKH'),('S24','RFCX116CYYX')]:
     before=info(serial)
     assert before['firstInstall'] and before['uid'],'Ordinary app must already exist; no fresh-install claim'

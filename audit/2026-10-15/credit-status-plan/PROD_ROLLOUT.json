@@ -1,18 +1,234 @@
 {
+  "status": "Accepted; exact owner approval received and migration applied",
   "project": "tlsuxbghuhlqntkgtrxt",
   "name": "saafmilk-prod",
-  "status": "Awaiting exact approval after automatic-review rejection; no PROD mutation applied",
   "migration": "credit_metadata_v1",
   "source": "supabase/migrations/20261015120815_credit_metadata_v1.sql",
+  "remoteVersion": "20261015180731",
+  "devRemoteVersion": "20261015120815",
+  "approval": "Owner explicitly approved this exact PROD migration after automatic-review rejection.",
   "before": {
     "auth": 3,
     "sync": 36,
     "shops": 2,
     "staff": 8,
     "businesses": 1,
-    "sync_push_md5": "cc681db1a8a41e61971876750b908da8",
-    "credit_installed": false
+    "sync_push_md5": "cc681db1a8a41e61971876750b908da8"
   },
-  "approvalRequired": "Apply the reviewed private schema/four authenticated RPCs/shared sync_push agreement validator to PROD, without activating any real shop or rewriting financial records.",
-  "rejection": "Persistent production schema/shared sync_push change requires explicit approval of this exact action."
+  "after": {
+    "auth": 3,
+    "sync": 36,
+    "shops": 2,
+    "staff": 8,
+    "businesses": 1,
+    "contracts": 0,
+    "credit_records": 0,
+    "credit_heads": 0,
+    "sync_hash": "4c4b708b425dbf947a413bfc8e47130d",
+    "rpc_acl": [
+      {
+        "anon": false,
+        "name": "credit_contract_enable_v1",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "authenticated": true
+      },
+      {
+        "anon": false,
+        "name": "credit_contract_status_v1",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "authenticated": true
+      },
+      {
+        "anon": false,
+        "name": "credit_metadata_pull_v1",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "authenticated": true
+      },
+      {
+        "anon": false,
+        "name": "credit_metadata_push_v1",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "authenticated": true
+      }
+    ],
+    "private_tables": [
+      {
+        "rls": true,
+        "anon": false,
+        "name": "contracts",
+        "authenticated": false
+      },
+      {
+        "rls": true,
+        "anon": false,
+        "name": "records",
+        "authenticated": false
+      },
+      {
+        "rls": true,
+        "anon": false,
+        "name": "heads",
+        "authenticated": false
+      }
+    ]
+  },
+  "protocol": {
+    "checks": [
+      "activation requires explicit upgrade confirmation",
+      "activation retry is idempotent",
+      "admin master-data access does not grant owner credit edits",
+      "agreement cannot hide another financial destination",
+      "anonymous has no RPC execution grant",
+      "authenticated cannot directly read private metadata",
+      "bad agreement rolls back earlier global batch sale",
+      "cashier cannot activate",
+      "cashier cannot write terms or flags",
+      "cashier may post original sale with valid agreement",
+      "cashier may read assigned shop metadata",
+      "changed revision identity rejected",
+      "clear references observed set only",
+      "clear retry idempotent",
+      "concurrent sets accepted as distinct history",
+      "contracted sale retry accepted",
+      "explicit owner activation",
+      "fractional term rejected",
+      "future preference advances accepted head",
+      "identical legacy retry still accepted after activation",
+      "inactive server owner loses access despite existing identity",
+      "inactive shop remains inactive",
+      "legacy originals explicitly classified in separate feed",
+      "legacy sale accepted before activation",
+      "metadata batch failure rolls back earlier operations",
+      "metadata customer must resolve in the same shop",
+      "missing accepted revision refused",
+      "no automatic activation or metadata leak",
+      "offline sale may retain historically accepted agreement",
+      "old client new credit sale refused after activation",
+      "old feed excludes metadata types",
+      "owner cannot access unrelated business",
+      "owner monthly revision accepted with server stamp",
+      "paid-now sale unchanged",
+      "revision retry idempotent",
+      "sale and monthly agreement accepted atomically",
+      "same sale cannot acknowledge a changed agreement",
+      "stale revision rejected without head overwrite",
+      "unknown clear dependency refused"
+    ],
+    "passed": 39
+  },
+  "fixtureTransaction": "BEGIN; protocol-fixtures.sql; ROLLBACK; no synthetic rows persist",
+  "onlyReviewedFunctionChanges": true,
+  "functionProof": "Removing only the two reviewed anchored patches reproduces the saved original function exactly after trim/newline normalization.",
+  "syncPushMd5": "ad67add533d3ae35d1782c7dfa194562",
+  "advisors": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "count": 12,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy",
+      "creditFindings": [
+        {
+          "detail": "Table \\`credit_private.contracts\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "name": "contracts",
+            "type": "table",
+            "schema": "credit_private"
+          },
+          "observed_at": "2026-10-15T18:08:06.393Z"
+        },
+        {
+          "detail": "Table \\`credit_private.heads\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "name": "heads",
+            "type": "table",
+            "schema": "credit_private"
+          },
+          "observed_at": "2026-10-15T18:08:06.393Z"
+        },
+        {
+          "detail": "Table \\`credit_private.records\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "name": "records",
+            "type": "table",
+            "schema": "credit_private"
+          },
+          "observed_at": "2026-10-15T18:08:06.393Z"
+        }
+      ]
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN",
+      "count": 23,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable",
+      "creditFindings": [
+        {
+          "detail": "Function `public.credit_contract_enable_v1(shop uuid, posting_phones_updated boolean)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/credit_contract_enable_v1`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "name": "credit_contract_enable_v1",
+            "schema": "public",
+            "language": "plpgsql",
+            "arguments": "shop uuid, posting_phones_updated boolean",
+            "security_definer": true
+          },
+          "observed_at": "2026-10-15T18:08:06.393Z"
+        },
+        {
+          "detail": "Function `public.credit_contract_status_v1(shop uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/credit_contract_status_v1`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "name": "credit_contract_status_v1",
+            "schema": "public",
+            "language": "plpgsql",
+            "arguments": "shop uuid",
+            "security_definer": true
+          },
+          "observed_at": "2026-10-15T18:08:06.393Z"
+        },
+        {
+          "detail": "Function `public.credit_metadata_pull_v1(shop uuid, since_seq bigint, max_rows integer)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/credit_metadata_pull_v1`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "name": "credit_metadata_pull_v1",
+            "schema": "public",
+            "language": "plpgsql",
+            "arguments": "shop uuid, since_seq bigint, max_rows integer",
+            "security_definer": true
+          },
+          "observed_at": "2026-10-15T18:08:06.393Z"
+        },
+        {
+          "detail": "Function `public.credit_metadata_push_v1(shop uuid, operations jsonb)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/credit_metadata_push_v1`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "name": "credit_metadata_push_v1",
+            "schema": "public",
+            "language": "plpgsql",
+            "arguments": "shop uuid, operations jsonb",
+            "security_definer": true
+          },
+          "observed_at": "2026-10-15T18:08:06.393Z"
+        }
+      ]
+    },
+    {
+      "name": "auth_leaked_password_protection",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection",
+      "creditFindings": []
+    }
+  ],
+  "advisoryAssessment": "Three private credit tables deliberately deny direct clients and use RLS without policies. Four authenticated SECURITY DEFINER RPCs intentionally authorize current server staff/shop/Owner before access, with fixed empty search_path and anon revoked. Focused permission tests pass. Existing public RPC/RLS notices and disabled leaked-password protection remain outside this phase.",
+  "attempts": [
+    "Read-only verification initially referenced nonexistent sync_records.id; failed without mutation and corrected to row JSON ordering. No before/after row-hash equality claimed for that probe."
+  ],
+  "activation": "No real shop activated; deliberate authenticated Owner activation follows posting-phone updates and sync.",
+  "release": "Signed 0.5.0/code8 installed on A06 and S24; RELEASE_MANIFEST.json and RELEASE_INSTALLS.json.",
+  "limitations": "Private sign-in/live transaction and human custody acceptance remain phase 1."
 }

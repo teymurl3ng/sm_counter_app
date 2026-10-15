@@ -1,8 +1,8 @@
 # New plan: unfinished work only
 
-Date: 15 October 2026. Status: phases 2 and 3 implemented and accepted at their bounded local QA scope; phases 1 and 4–6 remain open.
+Date: 15 October 2026. Status: phases 2, 3 and 4 complete at their documented technical scopes; phases 1, 5 and 6 remain open.
 
-**Execution update:** Phase 2's named local Owner held-entry attention patch is implemented and accepted with 17 unique affected A06 QA checks and inspected synthetic captures. ✅ ~~Phase 2 implementation and focused acceptance.~~ [Result](audit/2026-10-15/sync-attention-plan/RESULT.md). Other phases retain their status. The earlier planning-only status describes the initial plan; no new ordinary signed release was installed by this execution. B8 audit-only conflict attention remains partial.
+**Execution update:** Phases 2–4 are complete at their documented scopes, including signed 0.5.0/code8 on both phones and the approved phase 4 production migration. Human/private handover remains phase 1; statements and reminders remain phases 5–6. B8 audit-only conflict attention remains a separate partial boundary.
 
 **Per-phase working rule:** Before each phase is implemented, record its source baseline, targeted primary-source research, independent judgment, exact inclusions/exclusions and affected acceptance checks. This is the owner's 15 October instruction. Planning/research does not count as implementation completion. The first pinned brief is [phase 2's plan](audit/2026-10-15/sync-attention-plan/PLAN.md).
 
@@ -14,7 +14,7 @@ This is the current reading order for unfinished work. It replaces the sequence 
 
 **Goal:** finish the remaining release participation without restarting accepted engineering.
 
-- Install the matching signed 0.4.3 patch on S24 when connected. A06 installation, Owner login, live PROD sync and sampled retained records are already accepted.
+- [x] ✅ ~~Install matching signed updates on A06 and S24.~~ Both now run 0.5.0/code8 with verified APK hashes, retained installations and native launch. Earlier A06 private login/live sync/sampled records were accepted on 0.4.3; private acceptance of the latest version remains below.
 - Complete the prepared human/staff checks: actual private phone-security unlock, readability, motion/vibration, uncoached shop-day tasks and next supported date observation.
 - Confirm independent recovery-secret/signing-backup custody, complete the outstanding recovered-backup acceptance, and hand over the intended staff/device setup using the existing instructions.
 
@@ -59,7 +59,7 @@ This is the current reading order for unfinished work. It replaces the sequence 
 
 ### 4. Show which credit customers need attention
 
-**Implementation update:** [Phase 4 baseline, research and scoped proposal](audit/2026-10-15/credit-status-plan/PLAN.md). The owner clarified seven days per sale, Sunday bills as a separate practice, and per-customer monthly/custom terms, then authorized implementation. ✅ ~~Term/status/flag calculations and frozen data contract~~ pass 17 affected JVM checks; [checkpoint](audit/2026-10-15/credit-status-plan/CHECKPOINT_1.md). ✅ ~~Local storage/permissions/migration/backup~~ are accepted at [checkpoint 2](audit/2026-10-15/credit-status-plan/CHECKPOINT_2.md). ✅ ~~DEV server protocol~~ passes 39 focused SQL checks before and after migration; [checkpoint 3](audit/2026-10-15/credit-status-plan/CHECKPOINT_3.md). No existing shop activated; PROD and ordinary app untouched. ✅ ~~Android transport/contracted posting and restore revalidation~~ now pass 23 unique affected A06 methods; [checkpoint 4](audit/2026-10-15/credit-status-plan/CHECKPOINT_4.md). ✅ ~~Existing screens/pending review and real DEV two-phone/restore acceptance~~ are complete with 18 local methods and nine hosted comparisons; [finish result](audit/2026-10-15/credit-status-plan/FINISH_RESULT.md). Exact PROD migration approval is required after automatic-review rejection; compatible signed delivery is being prepared. Phase 4 remains open for rollout.
+**Implementation update:** ✅ ~~Phase 4 rules, data/storage/permissions/backup, DEV protocol, Android transport, Customer/Sale/history screens, pending review, focused QA, real two-phone recovery and PROD/signed rollout.~~ [Finish result](audit/2026-10-15/credit-status-plan/FINISH_RESULT.md). PROD has 39 passing rolled-back checks after exact approval; both ordinary phones have signed0.5.0/code8. No real shop activated. Human/private handover stays phase1.
 
 **Goal:** make payment status clear in customer lists and history.
 
@@ -137,8 +137,8 @@ These items have not been cancelled. They are deliberately unscheduled or condit
 
 - [ ] 1. Existing handover and human acceptance — remaining participation only.
 - [x] ✅ ~~2. Persistent Owner attention for held sync entries.~~ Accepted at local Owner scope; audit-only conflict policy remains a separate retained B8 boundary. [Result](audit/2026-10-15/sync-attention-plan/RESULT.md).
-- [x] ✅ ~~3. Credit basics: aging, customer search and advisory warning.~~ [Result](audit/2026-10-15/credit-basics-plan/RESULT.md). Ordinary-app delivery remains phase 1.
-- [ ] 4. Customer payment terms, credit categories, overrides and history — in progress: ✅ ~~calculations/data contract, local storage/permissions/migration/backup, DEV server protocol and Android transport/contracted posting~~; ✅ ~~screens/pending review and real two-phone/restore acceptance~~ are complete; exact PROD approval and signed rollout remain. [Finish result](audit/2026-10-15/credit-status-plan/FINISH_RESULT.md).
+- [x] ✅ ~~3. Credit basics: aging, customer search and advisory warning.~~ [Result](audit/2026-10-15/credit-basics-plan/RESULT.md). Delivered in signed 0.5.0; private/human acceptance remains phase 1.
+- [x] ✅ ~~4. Customer payment terms, credit categories, overrides and history.~~ Implementation, affected checks, two-phone recovery and PROD/signed rollout complete. [Finish result](audit/2026-10-15/credit-status-plan/FINISH_RESULT.md).
 - [ ] 5. Statements, sharing and manual reminders.
 - [ ] 6. Owner reminder automation and a separately recorded automatic-SMS decision.
 

@@ -1,0 +1,33 @@
+{
+  "versionName": "0.5.0",
+  "versionCode": 8,
+  "package": "com.saaf.milkshop",
+  "sourceCommit": "ba7fc3dec7298489c96a6ce014600aa03b6d50c6",
+  "apk": "phase18/app/build/outputs/apk/release/app-release.apk",
+  "apkSha256": "c86c6b672649606d827c36bd3743a963f892d3cb099d0dcb395e127ec23d56a9",
+  "certificateSha256": "9c9e03d7969d79018e2880b79b8d9ec46c43ab50eaf30512ee3fb989bc6abfa1",
+  "sourceSha256": {
+    "phase18/app/build.gradle.kts": "0384796ec441a8e7f6624b6379178390b72e586a6b1ac43bbec8f4f7de639f15",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/CreditBasicsFacadeTest.kt": "cbc43c515abc373081d93ffc2b2104143229413a3c4c0370cf5500f8699b448d",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/CreditBasicsUiTest.kt": "be0849adf80d22db15db03dbea76296268a54d1a195e78380c0d32016460931c",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/CreditFinishTest.kt": "4ba8791cb8934a9d890502173938621a16e37964fd3f6e9cd3f0a7a9a10ddf19",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/CreditFinishUiTest.kt": "9bb915fd6ca5908b9a8b2b0fe8483f144b2d9d317b04270ea782435accef9167",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/PhysicalCreditProbe.kt": "45a74103f8ac6bdb1d0cfa15bff364f7a8a73fbe65d8444856efeba8c7df8b5f",
+    "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerCreditView.kt": "032702b88e67cf24c505fd29c382668b6c81da74511096359ccb245eb0c1ef9a",
+    "phase18/app/src/main/java/com/saaf/milkshop/application/owner/NativeOwnerCustomersFacade.kt": "c337a699e9632e275a1f233995454cf5f0ed9b1c2db678fe4e7019365274e4cf",
+    "phase18/app/src/main/java/com/saaf/milkshop/application/owner/NativeOwnerSyncFacade.kt": "efc1e375976804f8222d0d667a32c63f6018ab150d73dd7146f0d6c3795a8a8a",
+    "phase18/app/src/main/java/com/saaf/milkshop/application/sale/NativeSaleCredit.kt": "9251ab4e22343fd7c14a610ee985ea1cd044d7531db637833fd49b4a18868c4d",
+    "phase18/app/src/main/java/com/saaf/milkshop/application/sale/NativeSaleFacade.kt": "f492c294ccf9c42460192d75a1074cd10df26f1af7037ccd279136a2d0a38fcf",
+    "phase18/app/src/main/java/com/saaf/milkshop/domain/CreditReviewService.kt": "ef0a251c209c86ed6907790fb797a9c8d3bc99014aac13c91024f74680a16320",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt": "7f6f8d4e47d1d8c741a4faef4451d358dc30711ce7edb45e97ff8b7c8b6b4d60",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/NativeOwnerMoreViewModel.kt": "9d4f8529dcf7e9fd3433540cf2316a05ad3edf29cc9bf8c92066cded8e53c76e",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCustomersController.kt": "9b71e305982ffc22f45e1451752071e850775a3301480a20995723083196fb45",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCustomersScreen.kt": "d7774744570e93a93f6e06832114128e3d7b885d19f008632d3ce766d3095e68",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerMoreScreen.kt": "22f0783238c2ea951ac613539452082795dfd5bdd52c9abe5ca0c837fa843edd",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerPreviewHost.kt": "b528c8af2a787fd6f82bba87198b25621170645b1725ae87a6085d11422d1618",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/sale/CreditSummaryContent.kt": "49fb92f99537df9dfc48300c697dde79ea43a1e8dccaf2c9db7ebcb70575773e",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/CreditMetadataClient.kt": "53b83f89137c5439e6862003150e36a35dea9889ae6eae79b13f251ae6aad5e6",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/SyncRuntime.kt": "6eb76d9a98451eda22dfed610e1bd815ee850cc38e7597781b55104004818039"
+  },
+  "verification": "Signed APK verified by apksigner; production package/version verified by aapt; source hashes match accepted scope."
+}

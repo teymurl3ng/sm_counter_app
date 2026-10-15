@@ -32,6 +32,11 @@ class NativeSaleStateRegressionTest {
     private val receipt = NativeSaleReceipt(42, 1.2345678, 19000)
     private val records = AtomicInteger()
     private var pendingLoad: CompletableDeferred<NativeSaleContext>? = null
+    private var pendingPreview: CompletableDeferred<NativeSaleCreditSummary?>? = null
+    private var requireWarning = false
+    private val previews = AtomicInteger()
+    private val credit = NativeSaleCreditSummary(7, "Customer", 80000, 90000, 99000, 19000,
+        com.saaf.milkshop.domain.CreditAge(true, 4), false, "reviewed")
     private lateinit var pendingRecord: CompletableDeferred<NativeSaleSubmission>
     private lateinit var db: MilkShopDatabase
     private lateinit var vm: NativeSaleViewModel
@@ -41,7 +46,14 @@ class NativeSaleStateRegressionTest {
         pendingRecord = CompletableDeferred()
         val port = object : NativeSaleOperations {
             override suspend fun load(sessionHandle: String, date: LocalDate) = pendingLoad?.await() ?: context
+            override suspend fun previewCredit(sessionHandle: String, request: NativeSaleRequest, date: LocalDate): NativeSaleCreditSummary? {
+                previews.incrementAndGet()
+                return pendingPreview?.await() ?: credit.copy(customerId = request.customerAccountId!!)
+            }
             override suspend fun record(sessionHandle: String, request: NativeSaleRequest, date: LocalDate): NativeSaleSubmission {
+                if (requireWarning && request.creditAcknowledgment != credit.warningKey) {
+                    throw CreditWarningRequired(NativeSaleCreditWarning(request, credit))
+                }
                 records.incrementAndGet(); return pendingRecord.await()
             }
         }
@@ -58,6 +70,42 @@ class NativeSaleStateRegressionTest {
         pendingRecord.complete(NativeSaleSubmission(receipt, context))
         compose.waitUntil(5000) { (vm.state.value as? NativeSaleState.Ready)?.receipt != null }
         assertEquals(receipt.quantity.toString(), (vm.state.value as NativeSaleState.Ready).deliveryFollowUp!!.quantity)
+    }
+    @Test fun warningCancelDoesNotPostAndContinueGuardsDuplicateTap() {
+        requireWarning = true
+        pendingPreview = CompletableDeferred()
+        compose.runOnIdle { vm.previewCredit(request); vm.record(request) }
+        compose.waitUntil(5000) { (vm.state.value as? NativeSaleState.Ready)?.creditWarning != null }
+        assertEquals(0, records.get())
+        assertFalse((vm.state.value as NativeSaleState.Ready).creditLoading)
+        assertEquals(credit, (vm.state.value as NativeSaleState.Ready).creditSummary)
+        compose.runOnIdle { vm.clearFeedback() }
+        assertNull((vm.state.value as NativeSaleState.Ready).creditWarning)
+        compose.runOnIdle { vm.record(request) }
+        compose.waitUntil(5000) { (vm.state.value as? NativeSaleState.Ready)?.creditWarning != null }
+        compose.runOnIdle {
+            vm.record(request.copy(creditAcknowledgment = credit.warningKey))
+            vm.record(request.copy(creditAcknowledgment = credit.warningKey))
+        }
+        compose.waitUntil(5000) { records.get() == 1 }
+        pendingRecord.complete(NativeSaleSubmission(receipt, context))
+        compose.waitUntil(5000) { (vm.state.value as? NativeSaleState.Ready)?.receipt == receipt }
+        assertEquals(1, records.get())
+    }
+    @Test fun supersededPreviewAndReopenedSessionCannotLeakCustomerDetail() {
+        val old = CompletableDeferred<NativeSaleCreditSummary?>()
+        pendingPreview = old
+        compose.runOnIdle { vm.previewCredit(request) }
+        compose.waitUntil(5000) { previews.get() == 1 }
+        pendingPreview = null
+        compose.runOnIdle { vm.previewCredit(request.copy(customerAccountId = 8)) }
+        compose.waitUntil(5000) { (vm.state.value as? NativeSaleState.Ready)?.creditSummary?.customerId == 8L }
+        old.complete(credit)
+        compose.runOnIdle { assertEquals(8L, (vm.state.value as NativeSaleState.Ready).creditSummary!!.customerId) }
+        compose.runOnIdle { vm.close(); vm.open("another-session") }
+        compose.waitUntil(5000) { vm.state.value is NativeSaleState.Ready }
+        assertNull((vm.state.value as NativeSaleState.Ready).creditSummary)
+        assertFalse((vm.state.value as NativeSaleState.Ready).creditLoading)
     }
     @Test fun finishingRefreshCannotReopenSaveGateOrEraseReceipt() {
         pendingLoad = CompletableDeferred()

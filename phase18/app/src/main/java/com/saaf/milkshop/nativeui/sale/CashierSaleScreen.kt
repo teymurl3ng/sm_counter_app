@@ -76,6 +76,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -158,6 +159,7 @@ fun CashierSaleScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onRegisterGuard: (EntryLeaveGuard?) -> Unit = {},
+    onPreviewCredit: (NativeSaleRequest?) -> Unit = {},
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
     LaunchedEffect(state is NativeSaleState.Ready) {
@@ -187,6 +189,7 @@ fun CashierSaleScreen(
                 state = state,
                 onClearFeedback = onClearFeedback,
                 onRecordSale = onRecordSale,
+                onPreviewCredit = onPreviewCredit,
                 onSendAsDelivery = onSendAsDelivery,
                 onStartNextSale = onStartNextSale,
                 leaveGuard = leaveGuard,
@@ -251,6 +254,7 @@ internal fun SaleEntryContent(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     showHeader: Boolean = true,
+    onPreviewCredit: (NativeSaleRequest?) -> Unit = {},
 ) {
     val context = state.context
     var selectedProductId by rememberSaveable { mutableStateOf<Long?>(null) }
@@ -312,7 +316,13 @@ internal fun SaleEntryContent(
     val quantity = if (entryMode == EntryMode.Quantity) enteredNumber else {
         if (rate > 0.0) enteredNumber / rate else 0.0
     }
-    val total = if (entryMode == EntryMode.Amount) enteredNumber else enteredNumber * rate
+    val previewAmounts = runCatching {
+        com.saaf.milkshop.domain.SaleAmounts.calculate(rate,
+            enteredNumber.takeIf { entryMode == EntryMode.Quantity },
+            enteredNumber.takeIf { entryMode == EntryMode.Amount },
+            if (surchargeEnabled) surchargeText.toDoubleOrNull() ?: context.defaultSurchargeRs else 0.0)
+    }.getOrNull()
+    val total = previewAmounts?.total ?: 0.0
     val quantityText = formatQuantity(quantity)
     val totalText = formatAmount(total)
     val paymentSummary = when (payment) {
@@ -320,12 +330,31 @@ internal fun SaleEntryContent(
         PaymentChoice.CustomerAccount -> selectedCustomer?.name
             ?: stringResource(R.string.native_customer_account)
     }
-    val canRecord = context.postingOpen && product != null && quantity > 0.0 && activeRatePaisa > 0L && !state.saving &&
+    val canRecord = context.postingOpen && product != null && quantity > 0.0 && activeRatePaisa > 0L && !state.saving && previewAmounts != null &&
         (!wholesale || wholesaleRatePaisa != null) &&
         when (payment) {
             PaymentChoice.PaidNow -> paidNowAccount != null
             PaymentChoice.CustomerAccount -> selectedCustomer != null
         }
+
+    val draftRequest = product?.let { selected -> NativeSaleRequest(
+        productId = selected.productId,
+        entryMode = if (entryMode == EntryMode.Quantity) NativeSaleEntryMode.QUANTITY else NativeSaleEntryMode.AMOUNT,
+        enteredValue = enteredNumber,
+        paymentKind = if (payment == PaymentChoice.PaidNow) NativeSalePaymentKind.PAID_NOW else NativeSalePaymentKind.CUSTOMER_ACCOUNT,
+        paymentAccountId = paidNowAccount?.accountId,
+        customerAccountId = selectedCustomer?.accountId,
+        notes = saleNote.trim().takeIf { it.isNotEmpty() },
+        wholesale = wholesale, wholesaleRatePaisa = wholesaleRatePaisa,
+        surchargeEnabled = surchargeEnabled,
+        surchargeAmountRs = surchargeText.toDoubleOrNull()?.takeIf { surchargeEnabled }) }
+    val creditPreviewRequest = draftRequest?.takeIf {
+        payment == PaymentChoice.CustomerAccount && selectedCustomer != null && activeRatePaisa > 0 &&
+            enteredNumber.isFinite() && enteredNumber >= 0 && (!wholesale || wholesaleRatePaisa != null) && state.receipt == null
+    }
+    LaunchedEffect(creditPreviewRequest, activeRatePaisa, context.businessDate, context.defaultSurchargeRs) {
+        onPreviewCredit(creditPreviewRequest)
+    }
 
     // Keep the recorded draft while showing its receipt. Next sale explicitly
     // clears the draft; the outgoing receipt retains its own presentation
@@ -539,6 +568,10 @@ internal fun SaleEntryContent(
                 }
                 Spacer(Modifier.height(8.dp))
                 // H7: Delivery Surcharge — first-class input per spec §7.
+                if (payment == PaymentChoice.CustomerAccount && selectedCustomer != null) {
+                    Spacer(Modifier.height(8.dp))
+                    CreditSummaryContent(state.creditSummary?.takeIf { it.customerId == selectedCustomer.accountId }, state.creditLoading)
+                }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(stringResource(R.string.native_sale_surcharge_label))
@@ -645,31 +678,7 @@ internal fun SaleEntryContent(
                     buttonTag = NativeUiTags.CashierRecordSale,
                     onRecordSale = {
                         focusManager.clearFocus()
-                        val selectedProduct = product ?: return@ReviewDock
-                        onRecordSale(
-                            NativeSaleRequest(
-                                productId = selectedProduct.productId,
-                                entryMode = if (entryMode == EntryMode.Quantity) {
-                                    NativeSaleEntryMode.QUANTITY
-                                } else {
-                                    NativeSaleEntryMode.AMOUNT
-                                },
-                                enteredValue = enteredNumber,
-                                paymentKind = if (payment == PaymentChoice.PaidNow) {
-                                    NativeSalePaymentKind.PAID_NOW
-                                } else {
-                                    NativeSalePaymentKind.CUSTOMER_ACCOUNT
-                                },
-                                paymentAccountId = paidNowAccount?.accountId,
-                                customerAccountId = selectedCustomer?.accountId,
-                                notes = saleNote.trim().takeIf { it.isNotEmpty() },
-                                wholesale = wholesale,
-                                wholesaleRatePaisa = wholesaleRatePaisa,
-                                surchargeEnabled = surchargeEnabled,
-                                surchargeAmountRs = surchargeText.toDoubleOrNull()
-                                    ?.takeIf { surchargeEnabled },
-                            ),
-                        )
+                        draftRequest?.let(onRecordSale)
                     },
                 )
                 Spacer(Modifier.height(12.dp))
@@ -677,6 +686,36 @@ internal fun SaleEntryContent(
             }
         }
         }
+
+    state.creditWarning?.let { warning ->
+        val summary = warning.summary
+        AlertDialog(
+            modifier = Modifier.testTag(NativeUiTags.SaleCreditWarning),
+            onDismissRequest = onClearFeedback,
+            title = { Text(if (summary.checkUnavailable) "Credit check unavailable" else "Above credit limit") },
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(summary.customerName, style = MaterialTheme.typography.titleMedium)
+                    Text("This sale has not been saved.")
+                    Text("Current balance: ${creditBalanceText(summary.balancePaisa)}")
+                    Text("This sale: PKR ${formatAmount(summary.saleTotalPaisa / 100.0)}")
+                    Text("After sale: ${creditBalanceText(summary.projectedBalancePaisa)}")
+                    Text("Credit limit: ${if (summary.checkUnavailable) "Unavailable" else creditBalanceText(summary.limitPaisa)}")
+                    Text("You can go back or record this credit sale deliberately. Based on records on this phone.")
+                }
+            },
+            confirmButton = {
+                TextButton(enabled = !state.saving,
+                    modifier = Modifier.testTag(NativeUiTags.SaleCreditWarningContinue),
+                    onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                        onRecordSale(warning.request.copy(creditAcknowledgment = summary.warningKey))
+                    }) { Text("Record credit sale") }
+            },
+            dismissButton = {
+                TextButton(onClick = com.saaf.milkshop.nativeui.common.hapticAction(onClearFeedback),
+                    modifier = Modifier.testTag(NativeUiTags.SaleCreditWarningBack)) { Text("Back") }
+            })
+    }
 
     if (showCustomerPicker) {
         CustomerAccountDialog(
@@ -890,7 +929,7 @@ private fun formatQuantity(value: Double): String =
         if (formatted.endsWith('.')) "${formatted}0" else formatted
     }
 
-private fun formatAmount(value: Double): String = when {
+internal fun formatAmount(value: Double): String = when {
     value % 1.0 == 0.0 -> "%,.0f".format(Locale.US, value)
     else -> "%,.2f".format(Locale.US, value)
 }
@@ -1434,10 +1473,29 @@ private fun CustomerAccountDialog(
     onSelect: (NativeSaleAccount) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val pickerFocus = LocalFocusManager.current
+    var query by rememberSaveable { mutableStateOf("") }
+    val trimmed = query.trim()
+    val digits = trimmed.filter(Char::isDigit)
+    val nameCounts = remember(customers) {
+        customers.groupingBy { it.name.trim().lowercase(Locale.ROOT) }.eachCount()
+    }
+    val matches = customers.filter { customer ->
+        trimmed.isBlank() || customer.name.contains(trimmed, ignoreCase = true) ||
+            (digits.isNotBlank() && trimmed.none(Char::isLetter) && customer.phone?.filter(Char::isDigit)?.contains(digits) == true)
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.native_choose_customer_account)) },
         text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedTextField(query, onValueChange = { query = it }, singleLine = true,
+                label = { Text("Search name or phone") },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { pickerFocus.clearFocus() }),
+                trailingIcon = { if (query.isNotEmpty()) TextButton(onClick = { query = "" },
+                    modifier = Modifier.testTag(NativeUiTags.SaleCreditSearchClear)) { Text("Clear") } },
+                modifier = Modifier.fillMaxWidth().testTag(NativeUiTags.SaleCreditSearch))
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -1449,7 +1507,8 @@ private fun CustomerAccountDialog(
                 if (customers.isEmpty()) {
                     item { Text("No active customer accounts are available.") }
                 }
-                items(customers, key = { it.accountId }) { customer ->
+                if (customers.isNotEmpty() && matches.isEmpty()) item { Text("No customers match that search.") }
+                items(matches, key = { it.accountId }) { customer ->
                     Surface(
                         color = Color.Transparent,
                         modifier = Modifier
@@ -1470,10 +1529,16 @@ private fun CustomerAccountDialog(
                                 onClick = null,
                             )
                             Spacer(Modifier.width(8.dp))
-                            Text(customer.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                            Column(Modifier.weight(1f)) {
+                                Text(customer.name, style = MaterialTheme.typography.titleMedium)
+                                Text(listOfNotNull(customer.phone?.takeIf { it.isNotBlank() }, customer.areaRoute?.takeIf { it.isNotBlank() },
+                                    "Customer #${customer.accountId}".takeIf { (nameCounts[customer.name.trim().lowercase(Locale.ROOT)] ?: 0) > 1 }).joinToString(" · ")
+                                    .ifBlank { "Customer #${customer.accountId}" }, style = MaterialTheme.typography.bodySmall)
+                            }
                         }
                     }
                 }
+            }
             }
         },
         confirmButton = {

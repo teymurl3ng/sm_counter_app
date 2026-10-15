@@ -1,0 +1,164 @@
+{
+  "phase": 3,
+  "status": "bounded local source and isolated QA accepted",
+  "baseline": "bd12a550de381d11e8788d614ce359f13355dae9",
+  "unitTests": {
+    "class": "CreditAgingCalculatorTest",
+    "passed": 6
+  },
+  "uniqueDeviceChecks": 28,
+  "latestDeviceResults": {
+    "com.saaf.milkshop.CreditBasicsFacadeTest#correctionsAndZeroDeltaAncestorPreserveAgeAndCustomerDetail": {
+      "code": 0,
+      "evidence": "first-results.json"
+    },
+    "com.saaf.milkshop.CreditBasicsFacadeTest#unavailableAgeDoesNotDisableValidLimitCheck": {
+      "code": 0,
+      "evidence": "repaired-results.json"
+    },
+    "com.saaf.milkshop.CreditBasicsFacadeTest#interveningCollectionCanRemoveWarningAndAdvanceOffsetsNewSale": {
+      "code": 0,
+      "evidence": "first-results.json"
+    },
+    "com.saaf.milkshop.CreditBasicsFacadeTest#archivedCustomerAndExpiredSessionCannotUseAcknowledgement": {
+      "code": 0,
+      "evidence": "first-results.json"
+    },
+    "com.saaf.milkshop.CreditBasicsFacadeTest#surchargeCrossingAndChangedSnapshotRequireFreshAcknowledgement": {
+      "code": 0,
+      "evidence": "first-results.json"
+    },
+    "com.saaf.milkshop.CreditBasicsFacadeTest#fractionalAggregateUsesCanonicalProjectionInsteadOfRoundedOperands": {
+      "code": 0,
+      "evidence": "first-results.json"
+    },
+    "com.saaf.milkshop.CreditBasicsFacadeTest#invalidLimitRequiresUnavailableCheckConfirmationAndStillPostsOnlyOnce": {
+      "code": 0,
+      "evidence": "first-results.json"
+    },
+    "com.saaf.milkshop.CreditBasicsFacadeTest#nullZeroAndEqualLimitsAreDistinctAndUnacknowledgedWarningDoesNotWrite": {
+      "code": 0,
+      "evidence": "first-results.json"
+    },
+    "com.saaf.milkshop.CreditBasicsUiTest#creditDarkDoubleTextSummaryAndWarningKeepChromeStable": {
+      "code": 0,
+      "evidence": "visual-final-results.json"
+    },
+    "com.saaf.milkshop.CreditBasicsUiTest#creditLightDefaultSummaryAndWarningKeepChromeStable": {
+      "code": 0,
+      "evidence": "visual-final-results.json"
+    },
+    "com.saaf.milkshop.CreditBasicsUiTest#searchNamePhoneNoMatchClearAndCancelPreserveSelection": {
+      "code": 0,
+      "evidence": "visual-final-results.json"
+    },
+    "com.saaf.milkshop.CreditBasicsUiTest#reviewTotalIncludesSurchargeForPaidNow": {
+      "code": 0,
+      "evidence": "visual-final-results.json"
+    },
+    "com.saaf.milkshop.NativeSaleStateRegressionTest#oldSaveCannotPublishIntoReopenedSameSessionHandle": {
+      "code": 0,
+      "evidence": "state-final-results.json"
+    },
+    "com.saaf.milkshop.NativeSaleStateRegressionTest#warningCancelDoesNotPostAndContinueGuardsDuplicateTap": {
+      "code": 0,
+      "evidence": "state-final-results.json"
+    },
+    "com.saaf.milkshop.NativeSaleStateRegressionTest#supersededPreviewAndReopenedSessionCannotLeakCustomerDetail": {
+      "code": 0,
+      "evidence": "state-final-results.json"
+    },
+    "com.saaf.milkshop.NativeSaleStateRegressionTest#finishingRefreshCannotReopenSaveGateOrEraseReceipt": {
+      "code": 0,
+      "evidence": "state-final-results.json"
+    },
+    "com.saaf.milkshop.NativeSaleHardeningContractTest#closedBusinessDayExplainsTheBlockAndDisablesRecord": {
+      "code": 0,
+      "evidence": "first-results.json"
+    },
+    "com.saaf.milkshop.NativeSaleHardeningContractTest#surchargeEditedAmountWinsOverDefault": {
+      "code": 0,
+      "evidence": "first-results.json"
+    },
+    "com.saaf.milkshop.NativeSaleHardeningContractTest#surchargeTogglePrefillsDefaultAndCarriesIntoRequest": {
+      "code": 0,
+      "evidence": "first-results.json"
+    },
+    "com.saaf.milkshop.NativeSaleHardeningContractTest#longCustomerListScrollsToTheLastAccountAndSelectsIt": {
+      "code": 0,
+      "evidence": "visual-final-results.json"
+    },
+    "com.saaf.milkshop.NativeSaleScreenContractTest#saleFollowUpCreatesBornLinkedDelivery": {
+      "code": 0,
+      "evidence": "first-results.json"
+    },
+    "com.saaf.milkshop.NativeSaleScreenContractTest#saleWholesaleRateAndNoteStayEditable": {
+      "code": 0,
+      "evidence": "first-results.json"
+    },
+    "com.saaf.milkshop.NativeSaleScreenContractTest#saleChequeNextReturnsToForm": {
+      "code": 0,
+      "evidence": "first-results.json"
+    },
+    "com.saaf.milkshop.NativeSaleScreenContractTest#salePaymentPickerCancelsAndChangesDestination": {
+      "code": 0,
+      "evidence": "first-results.json"
+    },
+    "com.saaf.milkshop.Phase8AccountLedgerTest#customerLedgerReturnsCanonicalMovementsRunningBalancesAndPlainName": {
+      "code": 0,
+      "evidence": "first-results.json"
+    },
+    "com.saaf.milkshop.Phase8SaleOperationsTest#cashierRecordsQuantitySaleToCashWithNativeDefaultSurchargeAndSummaries": {
+      "code": 0,
+      "evidence": "first-results.json"
+    },
+    "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest#detailShowsFactsAndEdit": {
+      "code": 0,
+      "evidence": "repaired-results.json"
+    },
+    "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest#longCustomerDetailReflowsInDarkExtraLargeText": {
+      "code": 0,
+      "evidence": "repaired-results.json"
+    }
+  },
+  "finalQaApkSha256": "08cccea3f0c568e976999d427147689faf29b18e7a2f130e68807025de4f6ae9",
+  "target": "com.saaf.milkshop.qa.tests",
+  "device": "A06",
+  "ordinaryAppUpdated": false,
+  "cloudMutations": false,
+  "schemaChanged": false,
+  "visualInspection": {
+    "captures": [
+      {
+        "file": "search-selected.png",
+        "sha256": "ffa8175d06a1ba5e92b119bfa71978bd4779a747e8989492877fad0f42426d4e",
+        "stored": "ignored synthetic local capture"
+      },
+      {
+        "file": "summary-1.0-false.png",
+        "sha256": "013594bdbef6d35ce300f35a958581ae586d660009a7b60dfb19d54f2f89f6df",
+        "stored": "ignored synthetic local capture"
+      },
+      {
+        "file": "summary-2.0-true.png",
+        "sha256": "3bac5dbbdbffce8500edb00e42fa4e8f302f1a89e33ef40768f57ca42b9c70a7",
+        "stored": "ignored synthetic local capture"
+      },
+      {
+        "file": "warning-1.0-false.png",
+        "sha256": "8478ba006f55665667c1ce1836db002552a2d6aec5e4a903d5fa30d43a5f9be0",
+        "stored": "ignored synthetic local capture"
+      },
+      {
+        "file": "warning-2.0-true.png",
+        "sha256": "a363953b49ad4d3fdf11517b4831984a60a2692e0a9d84559e94e89072f4b016",
+        "stored": "ignored synthetic local capture"
+      }
+    ],
+    "bodyFontScales": [
+      1,
+      2
+    ],
+    "dialogFontScale": "platform density, not system-wide 200% acceptance"
+  }
+}

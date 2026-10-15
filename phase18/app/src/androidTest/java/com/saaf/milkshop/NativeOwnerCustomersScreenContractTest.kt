@@ -87,6 +87,7 @@ class NativeOwnerCustomersScreenContractTest {
         )
         composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersDetail).assertIsDisplayed()
         composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersDetailName).assertIsDisplayed()
+        composeRule.onNodeWithText("Oldest unpaid sale: 5 days.").performScrollTo().assertIsDisplayed()
         saveScreenshot("customer-detail-light")
         composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersDetailEdit)
             .performScrollTo()
@@ -123,6 +124,7 @@ class NativeOwnerCustomersScreenContractTest {
         assertCompleteText(customer.balanceLabel)
         saveScreenshot("customer-detail-dark-200")
         assertCompleteText(detail.address!!)
+        assertCompleteText("Oldest unpaid sale: 5 days.")
         composeRule.onNodeWithTag(NativeUiTags.OwnerCustomersDetailEdit).performScrollTo().performClick()
         assertTrue(edited)
     }
@@ -355,5 +357,6 @@ class NativeOwnerCustomersScreenContractTest {
         active = true,
         creditLimitLabel = "PKR 12,000.00",
         dailyQuotaLabel = "25.00 L / day",
+        creditAge = com.saaf.milkshop.domain.CreditAge(true, 5),
     )
 }

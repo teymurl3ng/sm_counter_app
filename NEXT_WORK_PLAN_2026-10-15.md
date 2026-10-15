@@ -1,6 +1,6 @@
 # New plan: unfinished work only
 
-Date: 15 October 2026. Status: proposed delivery plan; implementation has not started.
+Date: 15 October 2026. Status: phases 2 and 3 implemented and accepted at their bounded local QA scope; phases 1 and 4–6 remain open.
 
 **Execution update:** Phase 2's named local Owner held-entry attention patch is implemented and accepted with 17 unique affected A06 QA checks and inspected synthetic captures. ✅ ~~Phase 2 implementation and focused acceptance.~~ [Result](audit/2026-10-15/sync-attention-plan/RESULT.md). Other phases retain their status. The earlier planning-only status describes the initial plan; no new ordinary signed release was installed by this execution. B8 audit-only conflict attention remains partial.
 
@@ -42,7 +42,7 @@ This is the current reading order for unfinished work. It replaces the sequence 
 
 ### 3. Build Credit basics
 
-**Pinned plan:** [Phase 3 baseline, research, judgment and acceptance](audit/2026-10-15/credit-basics-plan/PLAN.md). ✅ ~~Phase 3 planning.~~ Implementation remains pending. The warning must include surcharge, treat correction deltas correctly, preserve aggregate rounding and use an explicitly revalidated advisory confirmation. Weekly category cutoffs remain phase 4.
+**Pinned plan:** [Phase 3 baseline, research, judgment and acceptance](audit/2026-10-15/credit-basics-plan/PLAN.md). ✅ ~~Phase 3 planning.~~ ✅ ~~Phase 3 implementation and affected acceptance.~~ [Result](audit/2026-10-15/credit-basics-plan/RESULT.md). The implemented warning includes surcharge, groups correction deltas, preserves aggregate rounding and revalidates advisory confirmation before posting. Weekly category cutoffs remain phase 4.
 
 **Goal:** find the right customer quickly, understand unpaid debt, and get a clear credit-limit warning.
 
@@ -129,13 +129,13 @@ These items have not been cancelled. They are deliberately unscheduled or condit
 - Before coding, pin that phase's files/behaviors, acceptance examples and affected tests. Clarify any business rule needed for that phase only.
 - After its checks pass, stop, report the result and cross out the completed phase. Do not broaden testing without a concrete new failure or change.
 - Record unrelated discoveries in a later note. Do not add them to the active phase or silently add more phases.
-- No schema/cloud mutation, build, installation, customer contact or feature implementation was performed for this planning update.
+- The original planning pass performed no implementation. Later phase results record their exact source/QA scope; no cloud mutation or customer contact belongs to phases 2–3.
 
 ## Progress
 
 - [ ] 1. Existing handover and human acceptance — remaining participation only.
 - [x] ✅ ~~2. Persistent Owner attention for held sync entries.~~ Accepted at local Owner scope; audit-only conflict policy remains a separate retained B8 boundary. [Result](audit/2026-10-15/sync-attention-plan/RESULT.md).
-- [ ] 3. Credit basics: aging, customer search and advisory warning.
+- [x] ✅ ~~3. Credit basics: aging, customer search and advisory warning.~~ [Result](audit/2026-10-15/credit-basics-plan/RESULT.md). Ordinary-app delivery remains phase 1.
 - [ ] 4. Weekly credit categories, overrides and history.
 - [ ] 5. Statements, sharing and manual reminders.
 - [ ] 6. Owner reminder automation and a separately recorded automatic-SMS decision.

@@ -61,18 +61,6 @@ class SaleService(
                 ?: error("Product ${input.productId} does not exist")
             requireActiveProduct(database, product.productId)
 
-            val quantity: Double
-            val value: Double
-            if (input.quantity != null) {
-                require(input.quantity > 0.0) { "Quantity must be greater than zero" }
-                quantity = input.quantity
-                value = quantity * input.unitRate
-            } else {
-                require(input.value!! > 0.0) { "Value must be greater than zero" }
-                value = input.value
-                quantity = value / input.unitRate
-            }
-
             val surcharge = if (!input.surchargeEnabled) {
                 0.0
             } else {
@@ -81,7 +69,10 @@ class SaleService(
             }
             require(surcharge >= 0.0) { "Surcharge cannot be negative" }
 
-            val total = value + surcharge
+            val amounts = SaleAmounts.calculate(input.unitRate, input.quantity, input.value, surcharge)
+            val quantity = amounts.quantity
+            val value = amounts.value
+            val total = amounts.total
 
             when (val payment = input.payment) {
                 is SalePayment.Account -> {

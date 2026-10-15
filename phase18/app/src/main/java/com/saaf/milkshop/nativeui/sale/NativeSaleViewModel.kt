@@ -8,6 +8,9 @@ import com.saaf.milkshop.application.sale.NativeSaleOperations
 import com.saaf.milkshop.application.sale.NativeSaleReceipt
 import com.saaf.milkshop.application.sale.NativeSaleRequest
 import com.saaf.milkshop.application.sale.NativeSalePaymentKind
+import com.saaf.milkshop.application.sale.NativeSaleCreditSummary
+import com.saaf.milkshop.application.sale.NativeSaleCreditWarning
+import com.saaf.milkshop.application.sale.CreditWarningRequired
 import com.saaf.milkshop.application.operations.NativeDeliveriesFacade
 import com.saaf.milkshop.domain.SecurityFailure
 import com.saaf.milkshop.nativeui.SessionRequestGate
@@ -50,6 +53,10 @@ sealed interface NativeSaleState {
         val deliveryFollowUp: NativeSaleDeliveryFollowUp? = null,
         val error: String? = null,
         val refreshing: Boolean = false,
+        val creditSummary: NativeSaleCreditSummary? = null,
+        val creditLoading: Boolean = false,
+        val creditError: Boolean = false,
+        val creditWarning: NativeSaleCreditWarning? = null,
     ) : NativeSaleState
     data class LoadFailure(val message: String) : NativeSaleState
 }
@@ -64,6 +71,8 @@ class NativeSaleViewModel(
     private var sessionHandle: String? = null
     private var sessionGeneration = 0L
     private val loadGate = SessionRequestGate()
+    private var creditJob: kotlinx.coroutines.Job? = null
+    private var creditRequestId = 0L
     val state: StateFlow<NativeSaleState> = _state.asStateFlow()
 
     init {
@@ -82,6 +91,9 @@ class NativeSaleViewModel(
             return
         }
         sessionGeneration += 1
+        creditJob?.cancel()
+        creditRequestId++
+        _state.value = NativeSaleState.Idle
         sessionHandle = nextSessionHandle
         refresh()
     }
@@ -204,7 +216,9 @@ class NativeSaleViewModel(
         val generation = sessionGeneration
         val current = _state.value as? NativeSaleState.Ready ?: return
         if (current.saving) return
-        _state.value = current.copy(saving = true, receipt = null, error = null)
+        creditJob?.cancel()
+        creditRequestId++
+        _state.value = current.copy(saving = true, receipt = null, error = null, creditWarning = null, creditLoading = false)
         scope.launch {
             try {
                 val submission = withContext(Dispatchers.IO) { facade.record(session, request) }
@@ -223,6 +237,12 @@ class NativeSaleViewModel(
             } catch (error: Throwable) {
                 if (error is CancellationException) throw error
                 if (generation != sessionGeneration || sessionHandle != session) return@launch
+                if (error is CreditWarningRequired) {
+                    val latest = _state.value as? NativeSaleState.Ready ?: return@launch
+                    _state.value = latest.copy(saving = false, creditWarning = error.warning,
+                        creditSummary = error.warning.summary, creditLoading = false, creditError = false)
+                    return@launch
+                }
                 if (error is SecurityFailure.SessionExpired) {
                     sessionHandle = null
                     _state.value = NativeSaleState.Idle
@@ -259,7 +279,7 @@ class NativeSaleViewModel(
 
     fun clearFeedback() {
         val current = _state.value as? NativeSaleState.Ready ?: return
-        _state.value = current.copy(receipt = null, error = null)
+        _state.value = current.copy(receipt = null, error = null, creditWarning = null)
     }
 
     /**
@@ -274,10 +294,43 @@ class NativeSaleViewModel(
     }
 
     fun close() {
+        creditJob?.cancel()
+        creditRequestId++
         sessionGeneration += 1
         loadGate.invalidate()
         sessionHandle = null
         _state.value = NativeSaleState.Idle
+    }
+
+    /** Selected-customer detail only; superseded keystrokes/session results cannot overwrite a new draft. */
+    fun previewCredit(request: NativeSaleRequest?) {
+        creditJob?.cancel()
+        val requestId = ++creditRequestId
+        val session = sessionHandle ?: return
+        val generation = sessionGeneration
+        val current = _state.value as? NativeSaleState.Ready ?: return
+        _state.value = current.copy(creditSummary = null, creditLoading = request != null, creditError = false)
+        if (request == null) return
+        creditJob = scope.launch {
+            try {
+                kotlinx.coroutines.delay(150)
+                val summary = withContext(Dispatchers.IO) { facade.previewCredit(session, request) }
+                if (generation != sessionGeneration || sessionHandle != session || requestId != creditRequestId) return@launch
+                val latest = _state.value as? NativeSaleState.Ready ?: return@launch
+                _state.value = latest.copy(creditSummary = summary, creditLoading = false, creditError = summary == null)
+            } catch (cancelled: CancellationException) { throw cancelled }
+              catch (error: Exception) {
+                if (generation != sessionGeneration || sessionHandle != session || requestId != creditRequestId) return@launch
+                if (error is SecurityFailure.SessionExpired) {
+                    sessionHandle = null
+                    _state.value = NativeSaleState.Idle
+                    onSessionExpired()
+                } else {
+                    val latest = _state.value as? NativeSaleState.Ready ?: return@launch
+                    _state.value = latest.copy(creditLoading = false, creditError = true)
+                }
+            }
+        }
     }
 
     override fun onCleared() {

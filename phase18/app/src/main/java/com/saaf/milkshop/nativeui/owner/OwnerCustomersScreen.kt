@@ -792,6 +792,7 @@ private fun OwnerCustomersDetailScreen(
                     row.areaRoute?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Area / route", it) }
                     detail.address?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Address", it, prose = true) }
                     detail.creditLimitLabel?.let { NativeInformationFact("Credit limit", it, emphasized = true) }
+                    detail.creditAge?.let { NativeInformationFact("Unpaid age", it.description, prose = true) }
                     detail.dailyQuotaLabel?.let { NativeInformationFact("Daily quota", it) }
                     detail.notes?.takeIf { it.isNotBlank() }?.let { NativeInformationFact("Notes", it, prose = true) }
                 }

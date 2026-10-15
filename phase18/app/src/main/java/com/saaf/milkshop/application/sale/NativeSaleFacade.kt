@@ -1,6 +1,7 @@
 package com.saaf.milkshop.application.sale
 
 import androidx.room3.withWriteTransaction
+import androidx.room3.withReadTransaction
 import com.saaf.milkshop.application.commands.OperationsBridgeCommandService
 import com.saaf.milkshop.application.readmodels.HybridReadModelService
 import com.saaf.milkshop.application.readmodels.money as moneyToPaisa
@@ -10,6 +11,11 @@ import com.saaf.milkshop.domain.SalePayment
 import com.saaf.milkshop.domain.UserSecurityService
 import java.time.LocalDate
 import com.saaf.milkshop.sync.BusinessClock
+import com.saaf.milkshop.domain.SaleAmounts
+import com.saaf.milkshop.domain.CustomerCreditAgeService
+import com.saaf.milkshop.domain.CreditAge
+import kotlinx.coroutines.CancellationException
+import java.security.MessageDigest
 
 data class NativeSaleProduct(
     val productId: Long,
@@ -24,6 +30,8 @@ data class NativeSaleAccount(
     val name: String,
     /** Current balance for Cash/Bank payment accounts; null for customers. */
     val balancePaisa: Long? = null,
+    val phone: String? = null,
+    val areaRoute: String? = null,
 )
 
 data class NativeSaleContext(
@@ -58,6 +66,8 @@ data class NativeSaleRequest(
     /** H7: Delivery Surcharge (spec §7) — optional toggle, editable amount. */
     val surchargeEnabled: Boolean = false,
     val surchargeAmountRs: Double? = null,
+    /** Transient acknowledgement of one reviewed local snapshot; never stored or synced. */
+    val creditAcknowledgment: String? = null,
 )
 
 data class NativeSaleReceipt(
@@ -72,6 +82,7 @@ data class NativeSaleSubmission(
 )
 
 interface NativeSaleOperations {
+    suspend fun previewCredit(sessionHandle: String, request: NativeSaleRequest, date: LocalDate = BusinessClock.today()): NativeSaleCreditSummary? = null
     suspend fun load(sessionHandle: String, date: LocalDate = BusinessClock.today()): NativeSaleContext
     suspend fun record(sessionHandle: String, request: NativeSaleRequest, date: LocalDate = BusinessClock.today()): NativeSaleSubmission
 }
@@ -92,6 +103,7 @@ class NativeSaleFacade(
         val cashier = reads.cashierSummary(sessionHandle, businessDate, endDate)
         val stockByProduct = dashboard.stock.associateBy { it.productId }
         val profiles = database.productProfileDao().all().associateBy { it.productId }
+        val customerProfiles = database.customerProfileDao().all().associateBy { it.accountId }
         val products = references.products.map { product ->
             // Catalog prices belong to the stable product ID, never a name prefix.
             // Keep the two original settings as fallback for legacy seeded items.
@@ -124,7 +136,8 @@ class NativeSaleFacade(
             businessDate = businessDate,
             postingOpen = !database.dailyCloseDao().isPostingClosed(businessDate),
             products = products,
-            customers = references.customers.map { NativeSaleAccount(it.accountId, it.name) },
+            customers = references.customers.map { NativeSaleAccount(it.accountId, it.name,
+                phone = customerProfiles[it.accountId]?.phone, areaRoute = customerProfiles[it.accountId]?.areaRoute) },
             paymentAccounts = accounts,
             defaultPaymentAccountId = defaultAccount?.accountId,
             defaultPaymentAccountBalancePaisa = defaultBalance,
@@ -140,55 +153,63 @@ class NativeSaleFacade(
         request: NativeSaleRequest,
         date: LocalDate,
     ): NativeSaleSubmission {
+        security.requirePermission(sessionHandle, com.saaf.milkshop.domain.AppPermission.SALE_AND_COLLECTION)
         require(request.enteredValue.isFinite() && request.enteredValue > 0.0) {
             "Enter a sale quantity or amount greater than zero."
         }
-        val context = load(sessionHandle, date)
-        val product = context.products.singleOrNull { it.productId == request.productId }
-            ?: throw IllegalArgumentException("Choose an active product.")
-        require(product.ratePaisaPerUnit > 0L || request.wholesale) {
-            "Set a sale price for ${product.name} in Products before selling it."
-        }
-        val payment = when (request.paymentKind) {
-            NativeSalePaymentKind.PAID_NOW -> {
-                val accountId = request.paymentAccountId
-                    ?: throw IllegalArgumentException("Choose a payment account.")
-                if (context.paymentAccounts.none { it.accountId == accountId }) {
-                    throw IllegalArgumentException("Choose a valid payment account.")
-                }
-                SalePayment.Account(accountId)
-            }
-            NativeSalePaymentKind.CUSTOMER_ACCOUNT -> {
-                val customerId = request.customerAccountId
-                    ?: throw IllegalArgumentException("Choose a customer account.")
-                if (context.customers.none { it.accountId == customerId }) {
-                    throw IllegalArgumentException("Choose an active customer.")
-                }
-                SalePayment.OnCredit(customerId)
-            }
-        }
-        if (request.wholesale) {
-            val rate = request.wholesaleRatePaisa
-            require(rate != null && rate > 0L) {
-                "Enter a wholesale rate greater than zero."
-            }
-        }
-        // Four-value channel convention shared with the hybrid client:
-        // retail / credit-retail / wholesale / credit-wholesale.
-        val channel = when {
-            request.wholesale && request.paymentKind == NativeSalePaymentKind.CUSTOMER_ACCOUNT -> "credit-wholesale"
-            request.wholesale -> "wholesale"
-            request.paymentKind == NativeSalePaymentKind.CUSTOMER_ACCOUNT -> "credit-retail"
-            else -> "retail"
-        }
-        val unitRatePaisa = if (request.wholesale) {
-            request.wholesaleRatePaisa ?: product.ratePaisaPerUnit
-        } else {
-            product.ratePaisaPerUnit
-        }
-        // The mutation, required evidence and receipt reads commit together.
-        // A read/authorization failure cannot report failure after saving.
         return database.withWriteTransaction {
+            val context = load(sessionHandle, date)
+            require(context.postingOpen) { "The business day is closed. Reopen it before recording a sale." }
+            val product = context.products.singleOrNull { it.productId == request.productId }
+                ?: throw IllegalArgumentException("Choose an active product.")
+            require(product.ratePaisaPerUnit > 0L || request.wholesale) {
+                "Set a sale price for ${product.name} in Products before selling it."
+            }
+            val payment = when (request.paymentKind) {
+                NativeSalePaymentKind.PAID_NOW -> {
+                    val accountId = request.paymentAccountId
+                        ?: throw IllegalArgumentException("Choose a payment account.")
+                    if (context.paymentAccounts.none { it.accountId == accountId }) {
+                        throw IllegalArgumentException("Choose a valid payment account.")
+                    }
+                    SalePayment.Account(accountId)
+                }
+                NativeSalePaymentKind.CUSTOMER_ACCOUNT -> {
+                    val customerId = request.customerAccountId
+                        ?: throw IllegalArgumentException("Choose a customer account.")
+                    if (context.customers.none { it.accountId == customerId }) {
+                        throw IllegalArgumentException("Choose an active customer.")
+                    }
+                    SalePayment.OnCredit(customerId)
+                }
+            }
+            if (request.wholesale) {
+                val rate = request.wholesaleRatePaisa
+                require(rate != null && rate > 0L) {
+                    "Enter a wholesale rate greater than zero."
+                }
+            }
+            // Four-value channel convention shared with the hybrid client:
+            // retail / credit-retail / wholesale / credit-wholesale.
+            val channel = when {
+                request.wholesale && request.paymentKind == NativeSalePaymentKind.CUSTOMER_ACCOUNT -> "credit-wholesale"
+                request.wholesale -> "wholesale"
+                request.paymentKind == NativeSalePaymentKind.CUSTOMER_ACCOUNT -> "credit-retail"
+                else -> "retail"
+            }
+            val unitRatePaisa = if (request.wholesale) {
+                request.wholesaleRatePaisa ?: product.ratePaisaPerUnit
+            } else {
+                product.ratePaisaPerUnit
+            }
+            // The mutation, required evidence and receipt reads commit together.
+            // A read/authorization failure cannot report failure after saving.
+            if (request.paymentKind == NativeSalePaymentKind.CUSTOMER_ACCOUNT) {
+                val credit = creditSummary(context, request, date)
+                if (credit.warningKey != null && credit.warningKey != request.creditAcknowledgment) {
+                    throw CreditWarningRequired(NativeSaleCreditWarning(request.copy(creditAcknowledgment = null), credit))
+                }
+            }
             val result = commands.recordSale(
                 sessionHandle,
                 SaleInput(
@@ -213,6 +234,49 @@ class NativeSaleFacade(
                 refreshedContext = load(sessionHandle, date),
             )
         }
+    }
+
+    override suspend fun previewCredit(sessionHandle: String, request: NativeSaleRequest, date: LocalDate): NativeSaleCreditSummary =
+        database.withReadTransaction {
+            security.requirePermission(sessionHandle, com.saaf.milkshop.domain.AppPermission.SALE_AND_COLLECTION)
+            creditSummary(load(sessionHandle, date), request, date)
+        }
+
+    private suspend fun creditSummary(context: NativeSaleContext, request: NativeSaleRequest, date: LocalDate): NativeSaleCreditSummary {
+        val customer = context.customers.singleOrNull { it.accountId == request.customerAccountId }
+            ?: throw IllegalArgumentException("Choose an active customer.")
+        val product = context.products.singleOrNull { it.productId == request.productId }
+            ?: throw IllegalArgumentException("Choose an active product.")
+        val rate = if (request.wholesale) requireNotNull(request.wholesaleRatePaisa) / 100.0 else product.ratePaisaPerUnit / 100.0
+        val surcharge = if (request.surchargeEnabled) request.surchargeAmountRs ?: context.defaultSurchargeRs else 0.0
+        val amounts = if (request.enteredValue == 0.0) SaleAmounts(0.0, 0.0, 0.0) else SaleAmounts.calculate(rate,
+            request.enteredValue.takeIf { request.entryMode == NativeSaleEntryMode.QUANTITY },
+            request.enteredValue.takeIf { request.entryMode == NativeSaleEntryMode.AMOUNT }, surcharge)
+        var balance: Long? = null
+        var limit: Long? = null
+        var projected: Long? = null
+        var raw: Double? = null
+        var rawLimit: Double? = null
+        var unavailable = false
+        try {
+            rawLimit = database.customerProfileDao().findByAccountId(customer.accountId)?.creditLimit
+            require(rawLimit == null || (rawLimit.isFinite() && rawLimit >= 0))
+            limit = rawLimit?.let(::moneyToPaisa)
+            balance = moneyToPaisa(requireNotNull(database.readModelDao().accountBalance(customer.accountId)).balance)
+            raw = database.financialLogDao().rawAccountBalance(customer.accountId)
+            require(raw.isFinite())
+            projected = moneyToPaisa(database.financialLogDao().projectedAccountBalance(customer.accountId, amounts.total))
+        } catch (cancelled: CancellationException) { throw cancelled }
+          catch (_: Exception) { unavailable = true }
+        val age = balance?.let { CustomerCreditAgeService(database).load(customer.accountId, it, date) } ?: CreditAge(false)
+        val needsWarning = unavailable || (request.enteredValue > 0 && limit != null && projected != null && projected > limit)
+        val key = if (!needsWarning) null else {
+            val snapshot = listOf(customer.accountId, customer.name, date, raw?.toBits(), rawLimit?.toBits(),
+                projected, unavailable, rate.toBits(), amounts.total.toBits(), request.copy(creditAcknowledgment = null)).joinToString("|")
+            MessageDigest.getInstance("SHA-256").digest(snapshot.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
+        }
+        return NativeSaleCreditSummary(customer.accountId, customer.name, balance, limit, projected,
+            moneyToPaisa(amounts.total), age, unavailable, key)
     }
 
 }

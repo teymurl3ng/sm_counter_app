@@ -1,0 +1,97 @@
+{
+  "baseline": "bd12a550de381d11e8788d614ce359f13355dae9",
+  "files": [
+    {
+      "path": "phase18/app/src/androidTest/java/com/saaf/milkshop/CreditBasicsFacadeTest.kt",
+      "sha256": "c4e044a48a6edd365667c428eaa12ebe7062794f154fbbda78c6cb2bc1dee682"
+    },
+    {
+      "path": "phase18/app/src/androidTest/java/com/saaf/milkshop/CreditBasicsUiTest.kt",
+      "sha256": "a72263e7b3d8a2e7fc339f7b03a6e832ff7fa7402bb914f5421124a6add31781"
+    },
+    {
+      "path": "phase18/app/src/androidTest/java/com/saaf/milkshop/NativeOwnerCustomersScreenContractTest.kt",
+      "sha256": "9c8ff64e67397236a45a305af9c4dc458e4f3363b3249b8f44e85bb5099cca49"
+    },
+    {
+      "path": "phase18/app/src/androidTest/java/com/saaf/milkshop/NativeSaleStateRegressionTest.kt",
+      "sha256": "d407847025f66cd3ab93a40c7261e662c3e1ee6f61f890917fff909abd937311"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/NativeOwnerCustomersFacade.kt",
+      "sha256": "7ba228ee63a72e35a54e2881bdbc7b0052fc8c4bb28bf280ac4c0a3b2baa81bb"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/application/sale/NativeSaleCredit.kt",
+      "sha256": "f2f67d03e6d17c807545497f45a73db8dbd188480cd363cee321554e27a93acd"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/application/sale/NativeSaleFacade.kt",
+      "sha256": "7a7b02a030363c335e82059daf79e5a0367bd68e0c8a39cede00ee353a2ec81b"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/data/AccountLedgerReadModels.kt",
+      "sha256": "4b8e5d9d2de43f2ef76cd0930bfbc36c1e077f7ea754bad9e7994a630e00e218"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/data/Daos.kt",
+      "sha256": "c0b08caca65fb03b99b98610914c2e12bd99c177402dd1142f79451c73ba6e5d"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/CustomerCreditAging.kt",
+      "sha256": "f21fad6afab97d8d0baf1d16b0dfa12caec9f8db63ea794c5ce5190d3f6a98ff"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/Sale.kt",
+      "sha256": "c1ecdef034b1840630ba0bbd2029581f21453ba438902bacdef21edfc22c4256"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/SaleAmounts.kt",
+      "sha256": "07eaf2ac8520e1dc224a0633da36305bc7068487f0b202c4e08c30360300b532"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/NativeUiTags.kt",
+      "sha256": "9daa139d3a0a9d532df5996db02ee28e41cd9ce9ad18a731698edfc8b49125ea"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/manager/ManagerPreviewHost.kt",
+      "sha256": "0cb7cf42c78e1317e7fd9bbe8c94bd05c26372da0b824870006c7d7c590ce831"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/manager/ManagerSaleEntryScreen.kt",
+      "sha256": "1704651f2773e4d49003709cd4dfb86b8f976c2e1ff0389cd581f4fda1c05bfa"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCustomersScreen.kt",
+      "sha256": "7ce27855b5a04c4d4b20748368b557aa7cc700b3bfec13de6bcdc9a3dbac626f"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerPreviewHost.kt",
+      "sha256": "3ece55d9d65278384727c063600832a7e3d45bb20b5eca02425fddbed4f05b55"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerSaleEntryScreen.kt",
+      "sha256": "7695869e563515656e582b7cff00d7f58f1641e356788ee801cacb8de9ed1e1a"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/sale/CashierPreviewHost.kt",
+      "sha256": "a41f3411085b4465a32fc4dd474b03b5172fe50a5a56355f68527808a4ff4ab1"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/sale/CashierSaleScreen.kt",
+      "sha256": "5dce6d55494ed577747ee47ad71281873219937fc76786d2ec3f370f759c4cfd"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/sale/CreditSummaryContent.kt",
+      "sha256": "e14b5b7ecb0863baa5291df3bab449d1522eec48f68b04ae7d91bd3c3ba7f9b5"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/sale/NativeSaleViewModel.kt",
+      "sha256": "0a113ab30c2a146b2a3a22590de65ee19cab62a921e3a7b6033a1b4172047d49"
+    },
+    {
+      "path": "phase18/app/src/test/java/com/saaf/milkshop/CreditAgingCalculatorTest.kt",
+      "sha256": "368f50cdce3f1f93d1faf9906a3e379e98b687116e0e01745ab9c6a83a120f39"
+    }
+  ]
+}

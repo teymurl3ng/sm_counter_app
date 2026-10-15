@@ -1,0 +1,63 @@
+{
+  "label": "repaired",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.CreditBasicsFacadeTest#unavailableAgeDoesNotDisableValidLimitCheck",
+    "com.saaf.milkshop.CreditBasicsUiTest#searchNamePhoneNoMatchClearAndCancelPreserveSelection",
+    "com.saaf.milkshop.CreditBasicsUiTest#creditLightDefaultSummaryAndWarningKeepChromeStable",
+    "com.saaf.milkshop.CreditBasicsUiTest#creditDarkDoubleTextSummaryAndWarningKeepChromeStable",
+    "com.saaf.milkshop.CreditBasicsUiTest#reviewTotalIncludesSurchargeForPaidNow",
+    "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest#detailShowsFactsAndEdit",
+    "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest#longCustomerDetailReflowsInDarkExtraLargeText"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.CreditBasicsFacadeTest",
+      "test": "unavailableAgeDoesNotDisableValidLimitCheck",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsUiTest",
+      "test": "creditDarkDoubleTextSummaryAndWarningKeepChromeStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsUiTest",
+      "test": "creditLightDefaultSummaryAndWarningKeepChromeStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsUiTest",
+      "test": "searchNamePhoneNoMatchClearAndCancelPreserveSelection",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsUiTest",
+      "test": "reviewTotalIncludesSurchargeForPaidNow",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest",
+      "test": "detailShowsFactsAndEdit",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerCustomersScreenContractTest",
+      "test": "longCustomerDetailReflowsInDarkExtraLargeText",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 7,
+  "expected": 7,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "340474c0cc7c19e6cd10180cb4f571e3799a50293782db014880cab10ae282e0"
+}

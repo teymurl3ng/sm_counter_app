@@ -1,6 +1,6 @@
 # Recovered later plans: decisions and bounded delivery
 
-**Execution update:** ✅ ~~Owner/local persisted-hold attention (phase 2's bounded patch).~~ Accepted in [the result](audit/2026-10-15/sync-attention-plan/RESULT.md). S1/B8 remains partial for audit-only conflict attention; no cross-phone/unattended monitoring claim is made. Credit L1–L4 and identity S2 remain unimplemented. Use the six-phase plan for current progress; older planning-only wording below is historical.
+**Execution update:** ✅ ~~Owner/local persisted-hold attention (phase 2's bounded patch).~~ Accepted in [the result](audit/2026-10-15/sync-attention-plan/RESULT.md). S1/B8 remains partial for audit-only conflict attention; no cross-phone/unattended monitoring claim is made. ✅ ~~Credit L1 basics~~ are accepted in [phase 3 result](audit/2026-10-15/credit-basics-plan/RESULT.md). Credit L2–L4 and identity S2 remain unimplemented; ordinary-app delivery remains separate. Use the six-phase plan for current progress; older planning-only wording below is historical.
 
 Date: 15 October 2026. Status: planning only. This is a follow-on roadmap, separate from the seven finish batches. No feature implementation, new test run, phone operation, migration, deployment or message sending is authorized by this document. The user's current request authorizes reconciling and planning the recovered work.
 
@@ -18,7 +18,7 @@ The original [Credit blueprint](PHASE14_9_CREDIT_REMINDERS_BLUEPRINT.md) explici
 
 | Older wording | Current treatment |
 |---|---|
-| Rename Customer account to Credit | Completed. Customer search is a different, still unfinished subpart. |
+| Rename Customer account to Credit | Completed. Customer search is now also accepted in phase 3/L1. |
 | Dynamic products and configurable shop name | Completed at the supported dairy/catalog scope. Arbitrary retail costing is a separate expansion. |
 | Capsule/list readability, settings grouping, menu typography, night hierarchy, shared header/keyboard and PIN repairs | Completed at their recorded scopes; human acceptance remains in finish batch 4. Old suggestions later covered by those passes are superseded, not fresh redesign jobs. |
 | Product/customer/vendor/employee profile sync and planning sync | Completed, including named two-phone evidence. Do not restart from the old October 8–11 descriptions. |
@@ -68,7 +68,9 @@ Landscape and full enterprise/statutory accounting parity are intentional exclus
 
 Finish existing acceptance/handover separately. For the next feature work, select **L1 only**, then stop and review. L1–L4 are delivery slices of the old Phase 14.9 commitment; they do not renumber the reserved historical Phase 15/16 or add batches to the current seven-batch finish plan.
 
-### L1 — Make credit amounts and warnings useful
+### ✅ ~~L1 — Make credit amounts and warnings useful~~
+
+Implemented and accepted with affected isolated QA; see [phase 3 result](audit/2026-10-15/credit-basics-plan/RESULT.md). The scope below remains its historical brief, not a new pending task.
 
 **User outcome:** find a customer quickly, see how much remains unpaid and its age, and receive a clear warning before going beyond the customer's limit.
 

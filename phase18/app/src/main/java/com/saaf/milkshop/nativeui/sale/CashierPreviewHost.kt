@@ -330,6 +330,7 @@ fun CashierPreviewHost(
                 onRetry = saleViewModel::refresh,
                 onClearFeedback = saleViewModel::clearFeedback,
                 onRecordSale = saleViewModel::record,
+                onPreviewCredit = saleViewModel::previewCredit,
                     onSendAsDelivery = saleViewModel::sendAsDelivery,
                     onStartNextSale = saleViewModel::startNextSale,
                 onNavigate = navigateCashier,

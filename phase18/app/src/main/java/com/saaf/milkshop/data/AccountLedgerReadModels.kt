@@ -19,4 +19,5 @@ data class AccountLedgerMovementRow(
     val superseded: Boolean,
     val movementAmount: Double,
     val notes: String?,
+    val eventUid: String = "",
 )

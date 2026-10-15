@@ -67,6 +67,12 @@ interface InventoryLogDao {
 
 @Dao
 interface FinancialLogDao {
+    @Query("SELECT COALESCE(SUM(amount), 0.0) FROM financial_log WHERE account_id = :accountId")
+    suspend fun rawAccountBalance(accountId: Long): Double
+
+    @Query("WITH proposed AS (SELECT COALESCE(SUM(amount), 0.0) + :movement AS money_raw FROM financial_log WHERE account_id = :accountId LIMIT -1 OFFSET 0) SELECT " + CanonicalMoneySql.ROUND_VALUE + " FROM proposed")
+    suspend fun projectedAccountBalance(accountId: Long, movement: Double): Double
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(entry: FinancialLogEntity): Long
 
@@ -88,7 +94,8 @@ interface FinancialLogDao {
                 WHERE child.corrects_event_id = e.event_id
             ) THEN 1 ELSE 0 END AS superseded,
             fl.amount AS movementAmount,
-            e.notes AS notes
+            e.notes AS notes,
+            e.event_uid AS eventUid
         FROM financial_log fl
         INNER JOIN events e ON e.event_id = fl.event_id
         WHERE fl.account_id = :accountId

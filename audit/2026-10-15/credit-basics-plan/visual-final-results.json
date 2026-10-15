@@ -1,0 +1,49 @@
+{
+  "label": "visual-final",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.CreditBasicsUiTest#searchNamePhoneNoMatchClearAndCancelPreserveSelection",
+    "com.saaf.milkshop.CreditBasicsUiTest#creditLightDefaultSummaryAndWarningKeepChromeStable",
+    "com.saaf.milkshop.CreditBasicsUiTest#creditDarkDoubleTextSummaryAndWarningKeepChromeStable",
+    "com.saaf.milkshop.CreditBasicsUiTest#reviewTotalIncludesSurchargeForPaidNow",
+    "com.saaf.milkshop.NativeSaleHardeningContractTest#longCustomerListScrollsToTheLastAccountAndSelectsIt"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.CreditBasicsUiTest",
+      "test": "creditDarkDoubleTextSummaryAndWarningKeepChromeStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsUiTest",
+      "test": "creditLightDefaultSummaryAndWarningKeepChromeStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsUiTest",
+      "test": "searchNamePhoneNoMatchClearAndCancelPreserveSelection",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsUiTest",
+      "test": "reviewTotalIncludesSurchargeForPaidNow",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+      "test": "longCustomerListScrollsToTheLastAccountAndSelectsIt",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 5,
+  "expected": 5,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "f94141036d229bf2903013032d10d94cd62e62cb942abb1e2a12d18db050a5ce"
+}

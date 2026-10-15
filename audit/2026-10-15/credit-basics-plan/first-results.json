@@ -1,0 +1,196 @@
+{
+  "label": "first",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.CreditBasicsFacadeTest#nullZeroAndEqualLimitsAreDistinctAndUnacknowledgedWarningDoesNotWrite",
+    "com.saaf.milkshop.CreditBasicsFacadeTest#surchargeCrossingAndChangedSnapshotRequireFreshAcknowledgement",
+    "com.saaf.milkshop.CreditBasicsFacadeTest#interveningCollectionCanRemoveWarningAndAdvanceOffsetsNewSale",
+    "com.saaf.milkshop.CreditBasicsFacadeTest#fractionalAggregateUsesCanonicalProjectionInsteadOfRoundedOperands",
+    "com.saaf.milkshop.CreditBasicsFacadeTest#correctionsAndZeroDeltaAncestorPreserveAgeAndCustomerDetail",
+    "com.saaf.milkshop.CreditBasicsFacadeTest#unsupportedAgeDoesNotDisableValidLimitCheck",
+    "com.saaf.milkshop.CreditBasicsFacadeTest#invalidLimitRequiresUnavailableCheckConfirmationAndStillPostsOnlyOnce",
+    "com.saaf.milkshop.CreditBasicsFacadeTest#archivedCustomerAndExpiredSessionCannotUseAcknowledgement",
+    "com.saaf.milkshop.CreditBasicsUiTest#searchNamePhoneNoMatchClearAndCancelPreserveSelection",
+    "com.saaf.milkshop.CreditBasicsUiTest#creditLightDefaultSummaryAndWarningKeepChromeStable",
+    "com.saaf.milkshop.CreditBasicsUiTest#creditDarkDoubleTextSummaryAndWarningKeepChromeStable",
+    "com.saaf.milkshop.CreditBasicsUiTest#reviewTotalIncludesSurchargeForPaidNow",
+    "com.saaf.milkshop.NativeSaleStateRegressionTest#warningCancelDoesNotPostAndContinueGuardsDuplicateTap",
+    "com.saaf.milkshop.NativeSaleStateRegressionTest#supersededPreviewAndReopenedSessionCannotLeakCustomerDetail",
+    "com.saaf.milkshop.NativeSaleStateRegressionTest#finishingRefreshCannotReopenSaveGateOrEraseReceipt",
+    "com.saaf.milkshop.NativeSaleStateRegressionTest#oldSaveCannotPublishIntoReopenedSameSessionHandle",
+    "com.saaf.milkshop.NativeSaleHardeningContractTest#closedBusinessDayExplainsTheBlockAndDisablesRecord",
+    "com.saaf.milkshop.NativeSaleHardeningContractTest#longCustomerListScrollsToTheLastAccountAndSelectsIt",
+    "com.saaf.milkshop.NativeSaleHardeningContractTest#surchargeTogglePrefillsDefaultAndCarriesIntoRequest",
+    "com.saaf.milkshop.NativeSaleHardeningContractTest#surchargeEditedAmountWinsOverDefault",
+    "com.saaf.milkshop.NativeSaleScreenContractTest#salePaymentPickerCancelsAndChangesDestination",
+    "com.saaf.milkshop.NativeSaleScreenContractTest#saleWholesaleRateAndNoteStayEditable",
+    "com.saaf.milkshop.NativeSaleScreenContractTest#saleFollowUpCreatesBornLinkedDelivery",
+    "com.saaf.milkshop.NativeSaleScreenContractTest#saleChequeNextReturnsToForm",
+    "com.saaf.milkshop.Phase8AccountLedgerTest#customerLedgerReturnsCanonicalMovementsRunningBalancesAndPlainName",
+    "com.saaf.milkshop.Phase8SaleOperationsTest#cashierRecordsQuantitySaleToCashWithNativeDefaultSurchargeAndSummaries"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.CreditBasicsFacadeTest",
+      "test": "correctionsAndZeroDeltaAncestorPreserveAgeAndCustomerDetail",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsFacadeTest",
+      "test": "unsupportedAgeDoesNotDisableValidLimitCheck",
+      "code": -2,
+      "stack": "android.database.SQLException: Error code: 1811, message: Invalid event type"
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsFacadeTest",
+      "test": "interveningCollectionCanRemoveWarningAndAdvanceOffsetsNewSale",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsFacadeTest",
+      "test": "archivedCustomerAndExpiredSessionCannotUseAcknowledgement",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsFacadeTest",
+      "test": "surchargeCrossingAndChangedSnapshotRequireFreshAcknowledgement",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsFacadeTest",
+      "test": "fractionalAggregateUsesCanonicalProjectionInsteadOfRoundedOperands",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsFacadeTest",
+      "test": "invalidLimitRequiresUnavailableCheckConfirmationAndStillPostsOnlyOnce",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsFacadeTest",
+      "test": "nullZeroAndEqualLimitsAreDistinctAndUnacknowledgedWarningDoesNotWrite",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsUiTest",
+      "test": "creditDarkDoubleTextSummaryAndWarningKeepChromeStable",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Failed to capture a node to bitmap."
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsUiTest",
+      "test": "creditLightDefaultSummaryAndWarningKeepChromeStable",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Failed to capture a node to bitmap."
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsUiTest",
+      "test": "searchNamePhoneNoMatchClearAndCancelPreserveSelection",
+      "code": -2,
+      "stack": "androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 5000 ms"
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsUiTest",
+      "test": "reviewTotalIncludesSurchargeForPaidNow",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Failed: assertExists."
+    },
+    {
+      "class": "com.saaf.milkshop.NativeSaleStateRegressionTest",
+      "test": "oldSaveCannotPublishIntoReopenedSameSessionHandle",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeSaleStateRegressionTest",
+      "test": "warningCancelDoesNotPostAndContinueGuardsDuplicateTap",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeSaleStateRegressionTest",
+      "test": "supersededPreviewAndReopenedSessionCannotLeakCustomerDetail",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeSaleStateRegressionTest",
+      "test": "finishingRefreshCannotReopenSaveGateOrEraseReceipt",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+      "test": "closedBusinessDayExplainsTheBlockAndDisablesRecord",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+      "test": "surchargeEditedAmountWinsOverDefault",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+      "test": "surchargeTogglePrefillsDefaultAndCarriesIntoRequest",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeSaleHardeningContractTest",
+      "test": "longCustomerListScrollsToTheLastAccountAndSelectsIt",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeSaleScreenContractTest",
+      "test": "saleFollowUpCreatesBornLinkedDelivery",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeSaleScreenContractTest",
+      "test": "saleWholesaleRateAndNoteStayEditable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeSaleScreenContractTest",
+      "test": "saleChequeNextReturnsToForm",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeSaleScreenContractTest",
+      "test": "salePaymentPickerCancelsAndChangesDestination",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.Phase8AccountLedgerTest",
+      "test": "customerLedgerReturnsCanonicalMovementsRunningBalancesAndPlainName",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.Phase8SaleOperationsTest",
+      "test": "cashierRecordsQuantitySaleToCashWithNativeDefaultSurchargeAndSummaries",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 21,
+  "expected": 26,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "340474c0cc7c19e6cd10180cb4f571e3799a50293782db014880cab10ae282e0"
+}

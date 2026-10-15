@@ -1,6 +1,6 @@
 # Phase 3: Credit basics — pinned implementation brief
 
-Date: 15 October 2026. Source baseline: `ddd481dbf04b9fe353a9bb86388e1dcd4fdbdedd`. Status: **baseline, targeted research and judgment complete; implementation not started**. Parent: [six-phase plan](../../../NEXT_WORK_PLAN_2026-10-15.md). Original commitment: [Phase 14.9](../../../PHASE14_9_CREDIT_REMINDERS_BLUEPRINT.md).
+Date: 15 October 2026. Source baseline: `ddd481dbf04b9fe353a9bb86388e1dcd4fdbdedd`. Status: **implemented and accepted at the bounded local QA scope**. [Result](RESULT.md). Parent: [six-phase plan](../../../NEXT_WORK_PLAN_2026-10-15.md). Original commitment: [Phase 14.9](../../../PHASE14_9_CREDIT_REMINDERS_BLUEPRINT.md).
 
 ## One outcome, three bounded parts
 
@@ -88,10 +88,10 @@ All amounts below are synthetic PKR; as-of date is 15 October 2026 unless specif
 ## Implementation order and exact stopping points
 
 - [x] ✅ ~~Baseline, relevant primary-source research and independent judgment.~~
-- [ ] Credit calculation/read boundary and independent synthetic oracle checks. No UI or mutation yet.
-- [ ] Existing customer search and selected-customer summary, plus the small Owner detail summary. No warning bypass/new navigation.
-- [ ] Authoritative surcharge-inclusive preview and advisory warning/revalidation in the current save path.
-- [ ] Affected checks and one isolated phone walkthrough; result/plan reconciliation.
+- [x] ✅ ~~Credit calculation/read boundary and independent synthetic oracle checks.~~
+- [x] ✅ ~~Existing customer search and selected-customer summary, plus the small Owner detail summary.~~
+- [x] ✅ ~~Authoritative surcharge-inclusive preview and advisory warning/revalidation in the current save path.~~
+- [x] ✅ ~~Affected checks and one isolated phone walkthrough; result/plan reconciliation.~~
 
 Expected source boundaries: a small `domain/CustomerCreditAging` read-only calculation/read service; `data/Daos.kt`/ledger read DTOs for required UID/ancestry/aggregate reads; a narrowly shared sale amount helper if required; `NativeSaleFacade`, `NativeSaleViewModel`, `CashierSaleScreen`; `NativeOwnerCustomersFacade`, customer detail state/UI; the necessary strings/tags. Reuse existing permissions, transaction gate and canonical money SQL. No schema migration, stored balance/age/score, server SQL, new dependency/provider, release version bump or ordinary-app update is included.
 
@@ -105,4 +105,4 @@ Reuse selected existing methods from `Phase8AccountLedgerTest`, `Phase8SaleOpera
 
 ## Completion rule
 
-Cross out phase 3 only after calculation/search/summary/warning and their affected acceptance are actually complete. This planning document crosses only the first planning substep. Preserve phases 1 and 4–6 as pending; phase 2's accepted held-entry patch stays credited. Newly observed unrelated issues go in a later note, not this phase.
+Cross out phase 3 only after calculation/search/summary/warning and their affected acceptance are actually complete. All five scoped substeps are now complete; the result records acceptance and delivery limits. Preserve phases 1 and 4–6 as pending; phase 2's accepted held-entry patch stays credited. Newly observed unrelated issues go in a later note, not this phase.

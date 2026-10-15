@@ -40,6 +40,7 @@ fun ManagerSaleEntryScreen(
     onRegisterGuard: (EntryLeaveGuard?) -> Unit = {},
     mgrScaffold: MgrScaffold,
     modifier: Modifier = Modifier,
+    onPreviewCredit: (NativeSaleRequest?) -> Unit = {},
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
     DisposableEffect(leaveGuard) {
@@ -83,6 +84,7 @@ fun ManagerSaleEntryScreen(
                     state = state,
                     onClearFeedback = onClearFeedback,
                     onRecordSale = onRecordSale,
+                onPreviewCredit = onPreviewCredit,
                     onSendAsDelivery = onSendAsDelivery,
                     onStartNextSale = onStartNextSale,
                     leaveGuard = leaveGuard,

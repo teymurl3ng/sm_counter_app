@@ -27,6 +27,7 @@ data class NativeOwnerCustomerDetail(
     val active: Boolean,
     val creditLimitLabel: String?,
     val dailyQuotaLabel: String?,
+    val creditAge: com.saaf.milkshop.domain.CreditAge? = null,
 )
 
 data class NativeOwnerCustomersSnapshot(
@@ -72,6 +73,8 @@ class NativeOwnerCustomersFacade(
             areaRoute = profile?.areaRoute,
         )
         return NativeOwnerCustomerDetail(
+            creditAge = com.saaf.milkshop.domain.CustomerCreditAgeService(database).load(accountId,
+                com.saaf.milkshop.application.readmodels.money(info.balance), com.saaf.milkshop.sync.BusinessClock.today()),
             row = row,
             address = profile?.address,
             notes = profile?.notes,

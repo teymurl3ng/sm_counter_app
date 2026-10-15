@@ -1,0 +1,42 @@
+{
+  "label": "state-final",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.NativeSaleStateRegressionTest#warningCancelDoesNotPostAndContinueGuardsDuplicateTap",
+    "com.saaf.milkshop.NativeSaleStateRegressionTest#supersededPreviewAndReopenedSessionCannotLeakCustomerDetail",
+    "com.saaf.milkshop.NativeSaleStateRegressionTest#finishingRefreshCannotReopenSaveGateOrEraseReceipt",
+    "com.saaf.milkshop.NativeSaleStateRegressionTest#oldSaveCannotPublishIntoReopenedSameSessionHandle"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.NativeSaleStateRegressionTest",
+      "test": "oldSaveCannotPublishIntoReopenedSameSessionHandle",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeSaleStateRegressionTest",
+      "test": "warningCancelDoesNotPostAndContinueGuardsDuplicateTap",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeSaleStateRegressionTest",
+      "test": "supersededPreviewAndReopenedSessionCannotLeakCustomerDetail",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeSaleStateRegressionTest",
+      "test": "finishingRefreshCannotReopenSaveGateOrEraseReceipt",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 4,
+  "expected": 4,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "08cccea3f0c568e976999d427147689faf29b18e7a2f130e68807025de4f6ae9"
+}

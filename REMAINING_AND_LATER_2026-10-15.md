@@ -1,6 +1,6 @@
 # Remaining finish work and recovered later plans — 15 October 2026
 
-**Follow-on execution:** ✅ ~~Persistent local Owner attention for held sync entries.~~ The bounded phase 2 patch is accepted with 17 unique affected isolated A06 checks; [result and limits](audit/2026-10-15/sync-attention-plan/RESULT.md). Audit-only conflict attention remains partial, and Credit/identity/other later features were not started. Ordinary signed release delivery and human/custody participation keep their existing boundaries. The planning-only notes below describe the earlier inventory stage.
+**Follow-on execution:** ✅ ~~Persistent local Owner attention for held sync entries.~~ The bounded phase 2 patch is accepted with 17 unique affected isolated A06 checks; [result and limits](audit/2026-10-15/sync-attention-plan/RESULT.md). Audit-only conflict attention remains partial, and Credit basics (T1 aging, T3 advisory warning, T4 customer search) are also accepted in [phase 3](audit/2026-10-15/credit-basics-plan/RESULT.md); the broader Credit categories/history/statements/reminders and identity remain pending. Ordinary signed release delivery and human/custody participation keep their existing boundaries. The planning-only notes below describe the earlier inventory stage.
 
 **Current unfinished-work plan:** [Six bounded phases](NEXT_WORK_PLAN_2026-10-15.md) now provide the active reading/progress order: remaining handover, persistent sync attention, Credit basics, weekly categories/history, statements/manual reminders, then owner reminder automation with a separate automatic-SMS decision. Completed work is not repeated; optional/conditional areas remain visible in the unscheduled backlog. Planning only.
 
@@ -49,14 +49,14 @@ The original inventory did not restart tests. The subsequent explicit request au
 
 ## Recovered firm future feature: Credit and reminders
 
-The [Phase 14.9 blueprint](PHASE14_9_CREDIT_REMINDERS_BLUEPRINT.md) records the owner's 2 October decision: **“MUST-DO — we will do it one day.”** The payment-reliability system remains unbuilt. One subpart is already complete: the sale wording is now **Credit**, **Choose customer**, **Required for a credit sale**. The old statement that all thirteen tasks remain untouched is inaccurate.
+The [Phase 14.9 blueprint](PHASE14_9_CREDIT_REMINDERS_BLUEPRINT.md) records the owner's 2 October decision: **“MUST-DO — we will do it one day.”** The full payment-reliability system remains partial: phase 3/L1 basics are implemented; categories/history/statements/reminders remain pending. One subpart is already complete: the sale wording is now **Credit**, **Choose customer**, **Required for a credit sale**. The old statement that all thirteen tasks remain untouched is inaccurate.
 
 | Blueprint task | Remaining scope / current evidence |
 |---|---|
-| T1 — aging | Calculate unpaid credit by age, with collections paying the oldest sale first. No due-date fields in the recorded design. |
+| T1 — aging | ✅ ~~Implemented and accepted in phase 3/L1.~~ Original scope: calculate unpaid credit by age, with collections paying the oldest sale first. No due-date fields in the recorded design. |
 | T2 — tiers and flags | Computed Good / Watch / Late / Bad categories, plus a manual Bad override in a separate table. |
-| T3 — limit warning | Warn when a credit sale exceeds the customer's advisory limit; do not block the sale. The limit field exists, but the inspected native sale path does not implement this warning. |
-| T4 — wording and picker | Wording DONE; searchable customer picker still pending. The inspected Sale dialog lists names without search. Collection already has a reusable search pattern; product search is a different feature. |
+| T3 — limit warning | Warn when a credit sale exceeds the customer's advisory limit; do not block the sale. ✅ ~~Native advisory warning implemented and accepted in phase 3/L1, including stale-snapshot revalidation.~~ |
+| T4 — wording and picker | ✅ ~~Wording and searchable Sale customer picker completed.~~ Phase 3 adds name/phone search, stable selection and duplicate-name references. |
 | T5 — list treatment | Credit-specific tier/status presentation. Completed general list styling does not constitute this feature. |
 | T6 — product-mix logos | Credit/bill product-mix visual treatment; retained blueprint scope, not required for ordinary catalog use. |
 | T7 — history | Credit detail/history with aging and payment reliability. Existing ordinary ledger/history is reusable, not wholly missing. |

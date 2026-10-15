@@ -1,5 +1,7 @@
 # PHASE 14.9 — CREDIT & REMINDERS BLUEPRINT
 
+**15 October controlling updates:** Phase 3/L1 aging, advisory limits and customer search are implemented/accepted in `f186c3f`; the old missing-work descriptions below are historical. The owner now specifies seven days per sale, Sunday bills as a separate practice, and per-customer monthly/custom payment periods. [Phase 4 planning](audit/2026-10-15/credit-status-plan/PLAN.md) proposes immutable sale terms plus auditable overrides and the required bounded schema/sync/backup work. The old claim that customer profile updates do not flow down is superseded by the current `applyAccountProfile` implementation. Phase 4 is planning only; no sending or migration ran.
+
 Status: PLANNED (not started). Owner: "MUST-DO — we will do it one day" (2026-10-02).
 
 15 October business input: the owner confirmed **weekly settlement** for regular credit customers. The [follow-on delivery plan](LATER_FEATURE_PLAN_2026-10-15.md) records the seven-day cycle; exact category boundaries, grace and fixed-weekday versus rolling-age interpretation remain to be defined. This adds no due-date fields and does not start implementation.

@@ -6,7 +6,7 @@ Date: 15 October 2026. Status: planning only. This is a follow-on roadmap, separ
 
 **Current delivery sequence:** Use [the unfinished-work plan](NEXT_WORK_PLAN_2026-10-15.md) for the six-phase progress list and recommended order. This document retains the detailed recovered decisions and L1–L4/S1/S2 boundaries; its earlier L1-first recommendation below is superseded by that sequence. No feature has been implemented by either planning pass.
 
-**Confirmed business input — weekly settlement:** On 15 October the owner selected weekly settlement for regular credit customers. Use a seven-day settlement cycle when designing age warnings and reminders. This does not establish a fixed settlement weekday, a rolling seven-day deadline for each sale, a grace period or the Good/Watch/Late/Bad boundaries. Define those distinctions in L2 before enabling category labels or scheduled customer actions; retain the ledger-FIFO/no-due-date-field direction.
+**Confirmed business input — payment terms:** The owner clarified seven calendar days from each sale, with Sunday bill sending a separate manual practice. Individual customers must support monthly/custom periods. [Phase 4 proposal](audit/2026-10-15/credit-status-plan/PLAN.md) defines future-sale term snapshots, explicit calendar-month versus 30-day choices, and proposed status bands. The original no-editable-due-date direction is retained; contractual metadata now requires scoped schema/sync/backup work. Categories and exact monthly semantics remain proposals until reviewed.
 
 ## What the old list actually means
 

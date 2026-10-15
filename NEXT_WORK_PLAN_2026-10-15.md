@@ -59,10 +59,12 @@ This is the current reading order for unfinished work. It replaces the sequence 
 
 ### 4. Show which credit customers need attention
 
+**Planning update:** [Phase 4 baseline, research and scoped proposal](audit/2026-10-15/credit-status-plan/PLAN.md). The owner clarified seven days per sale, Sunday bills as a separate practice, and per-customer monthly/custom terms. Plan future-sale term snapshots and current-status categories; cutoff/monthly choices remain proposals. No implementation has started.
+
 **Goal:** make payment status clear in customer lists and history.
 
-- Define Good/Watch/Late/Bad rules around the confirmed **weekly settlement** cycle.
-- Decide fixed settlement weekday versus rolling sale age, grace and category boundaries before enabling labels. Weekly settlement alone does not answer these questions.
+- Define Good/Watch/Late/Bad around each sale’s agreed payment period: seven-day default, per-customer monthly/custom terms. Retain the agreed terms on each sale; do not silently change historical deadlines.
+- Seven days runs from each sale; Sunday is the usual bill-sending day, not a common deadline. Confirm the proposed category bands and explicit calendar-month/30-day distinction before enabling labels.
 - Show status with words and a visual cue; provide Late/Bad views or filters in existing navigation.
 - Add the original manual Bad override with authorized set/clear actions and history. Extend the existing customer ledger with an aging explanation.
 - Include compatibility, two-phone sync and backup/restore for any new metadata.
@@ -136,7 +138,7 @@ These items have not been cancelled. They are deliberately unscheduled or condit
 - [ ] 1. Existing handover and human acceptance — remaining participation only.
 - [x] ✅ ~~2. Persistent Owner attention for held sync entries.~~ Accepted at local Owner scope; audit-only conflict policy remains a separate retained B8 boundary. [Result](audit/2026-10-15/sync-attention-plan/RESULT.md).
 - [x] ✅ ~~3. Credit basics: aging, customer search and advisory warning.~~ [Result](audit/2026-10-15/credit-basics-plan/RESULT.md). Ordinary-app delivery remains phase 1.
-- [ ] 4. Weekly credit categories, overrides and history.
+- [ ] 4. Customer payment terms, credit categories, overrides and history — [scoped proposal ready](audit/2026-10-15/credit-status-plan/PLAN.md); implementation pending.
 - [ ] 5. Statements, sharing and manual reminders.
 - [ ] 6. Owner reminder automation and a separately recorded automatic-SMS decision.
 

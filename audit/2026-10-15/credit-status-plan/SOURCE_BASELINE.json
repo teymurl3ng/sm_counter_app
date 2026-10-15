@@ -1,0 +1,42 @@
+{
+  "sourceBaseline": "f186c3fcbbfb751e3e8d61117fe667f717efa976",
+  "mode": "read-only source baseline; no live data read",
+  "files": [
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/domain/CustomerCreditAging.kt",
+      "sha256": "f21fad6afab97d8d0baf1d16b0dfa12caec9f8db63ea794c5ce5190d3f6a98ff"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/NativeOwnerCustomersFacade.kt",
+      "sha256": "7ba228ee63a72e35a54e2881bdbc7b0052fc8c4bb28bf280ac4c0a3b2baa81bb"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/NativeOwnerRecordsFacade.kt",
+      "sha256": "d52a255514f01564d15aad95cb4a6ea2594ba6f3af0151f256ab319c3ca65453"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCustomersScreen.kt",
+      "sha256": "7ce27855b5a04c4d4b20748368b557aa7cc700b3bfec13de6bcdc9a3dbac626f"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/sync/SyncApplyEngine.kt",
+      "sha256": "cb4d1ff302b3b651b30158d38689e41fe6e4bea46753d99fa4d27e5f5448276a"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/sync/SyncEnvelopeFactory.kt",
+      "sha256": "20ddda56e48ad5f37d071ca526ee03a6ba0e8426b6fda612b18d4ebfc9844321"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/BackupManager.kt",
+      "sha256": "bbcf3d3ea4df6eb4ccee593e1dfe066160aeaeee7356fe8fbf0e32d283436d49"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/BackupRestoreEngine.kt",
+      "sha256": "ea97f3c0e2d9f801c8474bda21f6945a09dacccfa63efa45e0d96b01c96eb96f"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/data/MilkShopDatabase.kt",
+      "sha256": "0a75bb565b52700d57e5f79a49f928451c55fe39117e45b8cbce42cb77fecef3"
+    }
+  ]
+}

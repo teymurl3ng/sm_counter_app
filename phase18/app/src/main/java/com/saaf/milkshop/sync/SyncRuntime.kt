@@ -88,9 +88,38 @@ class SyncRuntime(
             return SyncPushEngine.DrainOutcome.RetryLater(0)
         }
 
+        when (val credit = exchangeCredit(config,binding,statusOnly=true)) {
+            is CreditMetadataSync.Outcome.Retry -> return SyncPushEngine.DrainOutcome.RetryLater(0)
+            is CreditMetadataSync.Outcome.Halted -> return creditHalted(credit.code,0)
+            CreditMetadataSync.Outcome.Done -> Unit
+        }
         val outcome = engineDrainLocked(config, binding)
+        if (outcome is SyncPushEngine.DrainOutcome.Drained) {
+            when (val credit = exchangeCredit(config,binding)) {
+                is CreditMetadataSync.Outcome.Retry -> return SyncPushEngine.DrainOutcome.RetryLater(outcome.pushed)
+                is CreditMetadataSync.Outcome.Halted -> return creditHalted(credit.code,outcome.pushed)
+                CreditMetadataSync.Outcome.Done -> Unit
+            }
+        }
         refreshLinkVerificationIfDue()
         return outcome
+    }
+
+    private suspend fun exchangeCredit(config: SyncServerConfig, binding: SyncShopBinding,
+        statusOnly: Boolean = false): CreditMetadataSync.Outcome {
+        val client = CreditMetadataClient(http,config,tokenStore)
+        return CreditMetadataSync(database).exchange(binding.shopId, { name,body ->
+            var response = client.call(name,body)
+            if (response is CreditRpcResult.Retry && response.reason == "unauthorized" && refreshSession(config)) {
+                response = client.call(name,body)
+            }
+            response
+        },statusOnly)
+    }
+
+    private suspend fun creditHalted(code: String, pushed: Int): SyncPushEngine.DrainOutcome.Halted {
+        runCatching { SyncNotifier(context).pushHalted(code,"Credit changes need Owner review") }
+        return SyncPushEngine.DrainOutcome.Halted(code,pushed)
     }
 
     private suspend fun engineDrainLocked(
@@ -223,6 +252,18 @@ class SyncRuntime(
                     return@exclusive SyncPullSummary.RetryLater("planning_catchup_${catchup.reason}")
                 is SyncPlanningCatchup.Outcome.Done -> Unit
             }
+            val config = SyncServerConfigStore.load(context) ?: return@exclusive SyncPullSummary.NotEnrolled
+            val binding = SyncShopBindingStore.load(context) ?: return@exclusive SyncPullSummary.NotEnrolled
+            when (val credit = exchangeCredit(config,binding)) {
+                is CreditMetadataSync.Outcome.Retry -> return@exclusive SyncPullSummary.RetryLater(credit.reason)
+                is CreditMetadataSync.Outcome.Halted -> {
+                    creditHalted(credit.code,0)
+                    return@exclusive SyncPullSummary.RetryLater(credit.code)
+                }
+                CreditMetadataSync.Outcome.Done -> Unit
+            }
+            // Metadata may have supplied a revision needed by an atomically parked sale.
+            SyncApplyEngine(database).apply(emptyList())
             refreshLinkVerificationIfDue()
         }
         summary

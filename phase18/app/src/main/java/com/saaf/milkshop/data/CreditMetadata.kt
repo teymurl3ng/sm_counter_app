@@ -91,6 +91,7 @@ interface CreditMetadataDao {
     @Upsert suspend fun saveHead(row: CreditTermHeadEntity)
     @Upsert suspend fun saveState(row: CreditMetadataSyncStateEntity)
     @Query("DELETE FROM credit_metadata_pending WHERE operation_uid = :uid") suspend fun deletePending(uid: String)
+    @Query("UPDATE credit_metadata_pending SET held = :held WHERE operation_uid = :uid") suspend fun setHeld(uid: String, held: Boolean)
     @Query("DELETE FROM credit_metadata_pending") suspend fun clearPending()
     @Query("DELETE FROM credit_metadata_sync_state") suspend fun clearState()
     @Query("DELETE FROM credit_term_heads") suspend fun clearHeads()

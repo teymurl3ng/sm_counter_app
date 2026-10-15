@@ -39,7 +39,7 @@ internal class CreditMetadataStore(private val db: MilkShopDatabase) {
         val event = requireNotNull(db.syncEnvelopeDao().eventsByUid(listOf(row.rootSaleUid)).singleOrNull()) { "Credit sale is missing." }
         require(event.eventType == "SALE" && event.correctsEventId == null) { "Agreement must belong to a root sale." }
         val movements = db.financialLogDao().findByEventId(event.eventId)
-        require(movements.isNotEmpty() && movements.all { it.accountId == customer.accountId } && movements.sumOf { it.amount } > 0) {
+        require(movements.isNotEmpty() && movements.all { it.accountId == customer.accountId && it.amount.isFinite() && it.amount > 0 } ) {
             "Agreement does not match the sale customer."
         }
         require(row.contractVersion == 1)
@@ -81,12 +81,20 @@ internal class CreditMetadataStore(private val db: MilkShopDatabase) {
             else -> CreditTermEvidence.Unavailable
         } }
 
-    /** Until compatible transport is ready, normal credit sales retain explicit legacy terms. */
-    suspend fun recordLegacySale(eventId: Long, customerAccountId: Long) {
-        check(dao.state()?.enabled != true) { "Credit contract posting is not connected yet." }
+    /** Called inside the sale transaction: the accepted cached revision is the agreed term. */
+    suspend fun recordSale(eventId: Long, customerAccountId: Long) {
         val event = requireNotNull(db.eventDao().findById(eventId))
         val customer = requireNotNull(db.accountDao().findById(customerAccountId))
-        applyAgreement(CreditSaleAgreementEntity(event.eventUid, customer.uid, LEGACY, "NET_DAYS", 7, DEFAULT_REVISION))
+        val state = dao.state()
+        if (state?.enabled != true) {
+            applyAgreement(CreditSaleAgreementEntity(event.eventUid, customer.uid, LEGACY, "NET_DAYS", 7, DEFAULT_REVISION))
+            return
+        }
+        check(state.contractVersion == 1) { "Sync this installation before recording agreed credit terms." }
+        db.serverAccountDao().findBinding()?.let { check(it.shopId == state.shopUid) { "Credit shop binding differs." } }
+        val revision = dao.head(customer.uid)?.let { requireNotNull(dao.revision(it.revisionUid)) }
+        applyAgreement(CreditSaleAgreementEntity(event.eventUid, customer.uid, RECORDED,
+            revision?.termKind ?: "NET_DAYS", revision?.termValue ?: 7, revision?.revisionUid ?: DEFAULT_REVISION))
     }
 
     companion object {

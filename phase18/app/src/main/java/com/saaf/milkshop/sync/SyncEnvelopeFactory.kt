@@ -82,6 +82,13 @@ class SyncEnvelopeFactory(private val database: MilkShopDatabase) {
                             return@forEach
                         }
                         val payload = eventJson(event).apply {
+                            database.creditMetadataDao().agreement(event.eventUid)?.let { agreement ->
+                                if (agreement.evidence == com.saaf.milkshop.domain.CreditMetadataStore.RECORDED) {
+                                    check(event.eventType == "SALE" && event.correctsEventId == null)
+                                    put("credit_contract_version",agreement.contractVersion)
+                                    put("credit_agreement",CreditMetadataWire.agreement(agreement))
+                                }
+                            }
                             if (event.eventType in setOf("OWNER_DRAWING", "OWNER_FUNDS_IN")) {
                                 val truth = com.saaf.milkshop.domain.OwnerFundsTruth(database).resolve(event)
                                 val rootUid = dao.eventsByIds(listOf(truth.withdrawalRootEventId)).single().eventUid

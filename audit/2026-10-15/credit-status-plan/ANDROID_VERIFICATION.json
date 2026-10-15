@@ -1,0 +1,177 @@
+{
+  "sourceBaseline": "5eb97531b477a13fa1514b552e31066eb3f43879",
+  "uniqueAffectedMethods": 23,
+  "initialPassed": 20,
+  "fixtureRetestPassed": 3,
+  "finalMethods": [
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "flagQueueSendsSetBeforeClearAndOnlyAcknowledgesExactBodies",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "incomingAgreementParksWholeSaleThenReplaysWithRevisionAndNoEchoOrDuplicate",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "monthlySaleSnapshotsAcceptedTermsAndLaterChangesDoNotRewriteEnvelope",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "staleProposalAndChangedAcknowledgmentStayQueuedWithoutPromotingHead",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "changedAcceptedTermsRequireFreshAdvisoryAcknowledgment",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "unconfirmedRestoredRevisionAndDisappearedContractCannotReenablePosting",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "lostAcknowledgmentIsRecoveredFromFeedAndNeverPublishesRestoredHeldWork",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "runtimeRefreshesOnceAndUnknownRefreshKeepsRequiredContractAndTokens",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "unavailableContractRollsBackSaleWhilePaidNowAndInactiveLegacyStillWork",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "restoreReconcilesRemoteClearAndPreservesUnseenConcurrentFlag",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "httpClientUsesCurrentBearerAndDistinguishesUnknownFromRefusal",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "malformedOrForeignFeedNeverAdvancesPastRefusedRecordAndDependencyRetries",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataStorageTest",
+      "test": "encryptedRoundTripKeepsCreditHistoryAndHoldsPendingWithoutReenabling",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataStorageTest",
+      "test": "recordedAgreementKeepsAcceptedRevisionAndRefusesForeignOrMissingFacts",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataStorageTest",
+      "test": "saleLegacyEvidenceIsAtomicAndCannotBeRewrittenByFutureTerms",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditBasicsFacadeTest",
+      "test": "surchargeCrossingAndChangedSnapshotRequireFreshAcknowledgement",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.SyncRuntimeRecoveryRegressionTest",
+      "test": "profileProofCannotRenewAnotherIdentityAndAuditFailureCannotPartiallyRenewBinding",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.SyncRuntimeRecoveryRegressionTest",
+      "test": "offlineDisabledMalformedAndWrongShopNeverRenewGrace",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.SyncRuntimeRecoveryRegressionTest",
+      "test": "unfinishedRestoreIdentityCannotUseOldStoredTokens",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.SyncRuntimeRecoveryRegressionTest",
+      "test": "failedPartialRebaselineNeverPushesAndRestartsFromZero",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.SyncTransportTest",
+      "test": "envelopeFactory_embedsChildrenAndProfiles",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.SyncPushEngineTest",
+      "test": "permanentFailure_haltsAtHead_andResumesAfterFix",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.SyncPushEngineTest",
+      "test": "transientFailure_leavesQueueIntactForRetry",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "scope": "Isolated A06 Room + fake HTTP/client/runtime checks; not hosted JWT or two-phone acceptance",
+  "packageProvenanceEqual": true,
+  "ordinaryDataOperationPerformed": false,
+  "s24OperationPerformed": false,
+  "prodOrDevCloudOperationPerformed": false,
+  "sourceSha256": {
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/CreditMetadataStorageTest.kt": "629c8f2465fb2f129e6c4f569b3134fb54971610a7ecc1d2bc17e23d947ffad7",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/CreditMetadataTransportTest.kt": "95962af163e72f67956f1bfbc6b96e92b9351bdf745702cb81a49f7e1357d047",
+    "phase18/app/src/main/java/com/saaf/milkshop/application/sale/NativeSaleFacade.kt": "c86ed2de88ada42c6af6700da0e885d4350aa119a256e85a9c05febc733353c9",
+    "phase18/app/src/main/java/com/saaf/milkshop/data/CreditMetadata.kt": "a78d954ab256f7ff4bc38ddda0c493b651a4995b613628f140fd217707d8f116",
+    "phase18/app/src/main/java/com/saaf/milkshop/domain/CreditMetadataStore.kt": "ffd9ba0073c354fb81be173e3c625950e0ea1ebfb8e887a822b4dadd5681f1bb",
+    "phase18/app/src/main/java/com/saaf/milkshop/domain/Sale.kt": "c7cbd7c20f03abf2ab77ba62e354db4d03caadf3a0db543cc25c37a9a26c5498",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/CreditMetadataClient.kt": "6a3bfc08fdb6c03fbba47692b5361955c8aa30bce3537c0bee22d9557c541654",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/CreditMetadataSync.kt": "93d918c4bfe407b1b51bd341770453567b2fdf08323e03357d545bb0b45c2223",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/CreditMetadataWire.kt": "742715ab4e08ccefb71cf51489e5f1f1f9d681fd0161dd5dbeff2db7bf44cb55",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/SyncApplyEngine.kt": "b6c9e22c055296c470e1e490febd3c8159d4d538d5abc754b5699a1e543a8121",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/SyncEnvelopeFactory.kt": "3628bef0fabf5cd035823781276331556e283cb524c8a75e13f8d7cf9e27dfaa",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/SyncRuntime.kt": "1901bab942578724c3789cf90596324fd2982005591c2db2eebdcc0e4d112f89"
+  },
+  "appApkSha256": "c12d9e5eb7613da07603f34c904287d099f312e1f26c8a961812c7ab3cc5e6ca",
+  "testApkSha256": "4183a0af80e2bc5f082ef5b0016a949e8693d2fbe01c067467bb78eb13a756b0",
+  "attempts": [
+    "Initial main compilation: explicit Unit transaction type required; fixed before APK build.",
+    "First 23 methods: 20 pass; new fixtures used an invalid cash-retail channel, replayed a feed record behind its cursor, and omitted receiver stock.",
+    "Only those three fixtures changed/rebuilt/retested; all three pass. No production logic changes after first functional run."
+  ],
+  "limits": [
+    "No ordinary signed app delivery, new screen or activation path.",
+    "Restored unaccepted metadata remains held; explicit Owner review presentation is part of the planned screen checkpoint.",
+    "Real DEV two-phone convergence and production rollout remain pending."
+  ]
+}

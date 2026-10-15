@@ -127,6 +127,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         return try {
             val result = applyOne(record, execute)
             if ((record.tableName == "daily_close_actions" ||
+                (record.tableName == "events" && (record.payload.has("credit_agreement") || record.payload.has("credit_contract_version"))) ||
                 (record.tableName == "events" && record.payload.optString("event_type") in setOf("OWNER_DRAWING", "OWNER_FUNDS_IN")))
                 && result in listOf(PerRecord.APPLIED, PerRecord.UPDATED, PerRecord.PRESENT)) {
                 // A verified current body supersedes an older retained refusal of this UID.
@@ -144,6 +145,9 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
             if (failure is kotlinx.coroutines.CancellationException || failure is AuditPersistenceFailure) throw failure
             if (record.tableName == "daily_close_actions") {
                 return park(record, "daily_close_refused: ${failure.message ?: failure.javaClass.simpleName}")
+            }
+            if (record.tableName == "events" && (record.payload.has("credit_agreement") || record.payload.has("credit_contract_version"))) {
+                return park(record, "credit_agreement_refused: ${failure.message ?: failure.javaClass.simpleName}")
             }
             if (record.tableName == "events" && (record.payload.optString("event_type") in setOf("OWNER_DRAWING", "OWNER_FUNDS_IN")
                     || record.payload.has("owner_funds_contract_version") || record.payload.has("owner_funds_details"))) {
@@ -330,6 +334,12 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         val uid = record.rowUid
         val payload = record.payload
         val existing = database.syncEnvelopeDao().eventsByUid(listOf(uid)).firstOrNull()
+        val creditAgreement = if (payload.has("credit_agreement") || payload.has("credit_contract_version")) {
+            require(CreditMetadataWire.long(payload,"credit_contract_version") == 1L)
+            CreditMetadataWire.agreement(payload.getJSONObject("credit_agreement")).also {
+                require(it.rootSaleUid == uid && it.evidence == com.saaf.milkshop.domain.CreditMetadataStore.RECORDED)
+            }
+        } else null
 
         val correctsUid = payload.optNullableString("corrects_event_uid")
         var correctsLocalId: Long? = null
@@ -491,6 +501,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
             if (inventoryRows.isEmpty() && financialRows.isEmpty() && spoilageRows.isEmpty()
                 && (ownerDetail == null || storedOwnerDetail != null)) {
                 val repaired = persistEventDetails(existing.eventId, openingObject != null, openingInventory, openingAccounts, actor)
+                creditAgreement?.let { com.saaf.milkshop.domain.CreditMetadataStore(database).applyAgreement(it) }
                 return if (repaired) PerRecord.UPDATED else PerRecord.PRESENT
             }
         }
@@ -524,6 +535,7 @@ class SyncApplyEngine(private val database: MilkShopDatabase) {
         }
 
         persistEventDetails(eventId, openingObject != null, openingInventory, openingAccounts, actor)
+        creditAgreement?.let { com.saaf.milkshop.domain.CreditMetadataStore(database).applyAgreement(it) }
         return PerRecord.APPLIED
     }
 

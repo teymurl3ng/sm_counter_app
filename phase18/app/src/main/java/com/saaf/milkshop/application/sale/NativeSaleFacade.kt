@@ -270,9 +270,14 @@ class NativeSaleFacade(
           catch (_: Exception) { unavailable = true }
         val age = balance?.let { CustomerCreditAgeService(database).load(customer.accountId, it, date) } ?: CreditAge(false)
         val needsWarning = unavailable || (request.enteredValue > 0 && limit != null && projected != null && projected > limit)
+        val creditState = database.creditMetadataDao().state()
+        val customerUid = requireNotNull(database.accountDao().findById(customer.accountId)).uid
+        val termRevision = database.creditMetadataDao().head(customerUid)?.let { database.creditMetadataDao().revision(it.revisionUid) }
         val key = if (!needsWarning) null else {
             val snapshot = listOf(customer.accountId, customer.name, date, raw?.toBits(), rawLimit?.toBits(),
-                projected, unavailable, rate.toBits(), amounts.total.toBits(), request.copy(creditAcknowledgment = null)).joinToString("|")
+                projected, unavailable, rate.toBits(), amounts.total.toBits(), creditState?.shopUid, creditState?.enabled,
+                creditState?.contractVersion, termRevision?.revisionUid, termRevision?.termKind, termRevision?.termValue,
+                request.copy(creditAcknowledgment = null)).joinToString("|")
             MessageDigest.getInstance("SHA-256").digest(snapshot.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
         }
         return NativeSaleCreditSummary(customer.accountId, customer.name, balance, limit, projected,

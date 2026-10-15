@@ -122,7 +122,7 @@ class SaleService(
             )
 
             if (input.payment is SalePayment.OnCredit) {
-                CreditMetadataStore(database).recordLegacySale(eventId, input.payment.customerAccountId)
+                CreditMetadataStore(database).recordSale(eventId, input.payment.customerAccountId)
             }
 
             SaleResult(

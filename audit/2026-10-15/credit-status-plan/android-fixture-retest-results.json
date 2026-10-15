@@ -1,0 +1,35 @@
+{
+  "label": "android-fixture-retest",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.CreditMetadataTransportTest#unavailableContractRollsBackSaleWhilePaidNowAndInactiveLegacyStillWork",
+    "com.saaf.milkshop.CreditMetadataTransportTest#lostAcknowledgmentIsRecoveredFromFeedAndNeverPublishesRestoredHeldWork",
+    "com.saaf.milkshop.CreditMetadataTransportTest#incomingAgreementParksWholeSaleThenReplaysWithRevisionAndNoEchoOrDuplicate"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "incomingAgreementParksWholeSaleThenReplaysWithRevisionAndNoEchoOrDuplicate",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "lostAcknowledgmentIsRecoveredFromFeedAndNeverPublishesRestoredHeldWork",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataTransportTest",
+      "test": "unavailableContractRollsBackSaleWhilePaidNowAndInactiveLegacyStillWork",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 3,
+  "expected": 3,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "c12d9e5eb7613da07603f34c904287d099f312e1f26c8a961812c7ab3cc5e6ca"
+}

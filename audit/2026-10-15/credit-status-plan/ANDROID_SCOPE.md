@@ -1,0 +1,11 @@
+# Android transport and contracted posting scope
+
+Baseline `5eb97531b477a13fa1514b552e31066eb3f43879`, 15 October 2026. Complete only the existing phase-4 data-path checkpoint. No new screens, PROD migration, shop activation, real financial writes or ordinary-app installation.
+
+Implement a strict codec and authenticated RPC client using the existing HTTP/session seam; independent metadata cursor, dependency-safe transactional apply, immutable acknowledgments, restore-held reconciliation and retained refusals. Missing RPC support leaves ordinary inactive shops working; a previously required contract cannot silently revert. Reuse the process sync gate and one-refresh policy. Capture accepted terms inside Sale's transaction, serialize only recorded root agreements, apply incoming agreements with the event savepoint and retry missing dependencies. Include accepted term/revision in the advisory-warning snapshot.
+
+Use the existing schema 18, metadata queue and server RPCs; no generic sync redesign or new identity. Restore-held proposals absent from the server remain held for later explicit Owner review. A refused proposal is retained and audited with a stable error; it never changes the accepted head. Do not silently publish restored work or replace immutable history. Existing customer controls/review presentation follow in the planned screen checkpoint.
+
+Research refreshed official [Supabase database functions](https://supabase.com/docs/guides/database/functions) and [changelog](https://supabase.com/changelog), retaining the current POST RPC convention and authenticated authorization boundary. No library/toolchain upgrade or DDL is needed. The fixed independent-judgment reminder does not validate code; implementation and affected tests must establish the result.
+
+Focused acceptance: monthly/default atomic posting and envelope; missing capability rollback; term change invalidates warning; strict malformed/type/shop/cursor refusal; metadata retry/CAS/ack identity; flags/dependencies and restored held work; root agreement before revision parks then replays without duplicate finance; existing paid-now/legacy behavior and runtime one-refresh/unknown-refresh retention. Use only the isolated QA app and affected selected methods. Two-phone hosted convergence and final UI remain separately pending; do not claim either from fake HTTP tests.

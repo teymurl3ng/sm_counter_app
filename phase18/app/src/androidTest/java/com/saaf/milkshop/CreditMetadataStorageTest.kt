@@ -107,7 +107,8 @@ class CreditMetadataStorageTest {
         assertTrue(runCatching { CreditMetadataStore(db).applyAgreement(CreditSaleAgreementEntity(root, uid, "RECORDED", "CALENDAR_MONTHS", 1, "future-monthly")) }.isFailure)
         val count = db.eventDao().count()
         val stock = db.backupDataDao().inventoryLogs()
-        ready() // Contracted posting remains deliberately disabled until protocol integration.
+        ready()
+        db.creditMetadataDao().saveState(db.creditMetadataDao().state()!!.copy(contractVersion = 0)) // Not caught up after restore.
         assertTrue(runCatching { sale() }.isFailure)
         assertEquals(count, db.eventDao().count())
         assertEquals(stock, db.backupDataDao().inventoryLogs())

@@ -1,0 +1,28 @@
+{
+  "label": "a-settings",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#invalidPolicyCannotSaveAndDirtyExitCanBeKeptOrDiscarded",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#failedLoadAndFailedSaveRetainFeedbackAndCanRetry"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "failedLoadAndFailedSaveRetainFeedbackAndCanRetry",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Failed to perform IME action."
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "invalidPolicyCannotSaveAndDirtyExitCanBeKeptOrDiscarded",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Failed to perform IME action."
+    }
+  ],
+  "passed": 0,
+  "expected": 2,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "3d15c170932d76319ea4bc622ad37a617c439ee997e83adc27bc75d9c43b4502"
+}

@@ -1,0 +1,42 @@
+{
+  "label": "a-corrected",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpReaderTest#canonicalFactsExcludePrivateNotesAndReflectPaymentsWithoutWrites",
+    "com.saaf.milkshop.FollowUpReaderTest#cashierAndExpiredSessionCannotReadFollowUps",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#invalidPolicyCannotSaveAndDirtyExitCanBeKeptOrDiscarded",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#customerMonthlyAndCustomValidationDoesNotEditPaymentTerms"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpReaderTest",
+      "test": "cashierAndExpiredSessionCannotReadFollowUps",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReaderTest",
+      "test": "canonicalFactsExcludePrivateNotesAndReflectPaymentsWithoutWrites",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "customerMonthlyAndCustomValidationDoesNotEditPaymentTerms",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "invalidPolicyCannotSaveAndDirtyExitCanBeKeptOrDiscarded",
+      "code": -2,
+      "stack": "androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 10000 ms"
+    }
+  ],
+  "passed": 3,
+  "expected": 4,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "3d15c170932d76319ea4bc622ad37a617c439ee997e83adc27bc75d9c43b4502"
+}

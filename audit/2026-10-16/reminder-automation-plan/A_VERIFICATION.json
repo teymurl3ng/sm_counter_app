@@ -1,0 +1,155 @@
+{
+  "baseline": "6b0d666",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "uniqueAffectedMethods": 13,
+  "latestResults": [
+    {
+      "class": "com.saaf.milkshop.FollowUpRulesTest",
+      "test": "invalidFactsAndQuietHourBoundariesAreExplicit",
+      "code": 0,
+      "stack": null,
+      "run": "a-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpRulesTest",
+      "test": "sundayStatementsNeverReplaceAgreedDueDates",
+      "code": 0,
+      "stack": null,
+      "run": "a-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpRulesTest",
+      "test": "reviewsMergeReasonsSuppressRepeatsAndKeepStableCycleIdentity",
+      "code": 0,
+      "stack": null,
+      "run": "a-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpRulesTest",
+      "test": "monthlyClampingAndAnchoredIntervalsSurviveMissedRunsAndLeapYears",
+      "code": 0,
+      "stack": null,
+      "run": "a-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpRulesTest",
+      "test": "paymentPauseSnoozeActivationAndUnknownDebtStayTruthful",
+      "code": 0,
+      "stack": null,
+      "run": "a-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "lightListReviewAndSettingsRetainChromeAndManualFallback",
+      "code": 0,
+      "stack": null,
+      "run": "a-feedback"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "customerMonthlyAndCustomValidationDoesNotEditPaymentTerms",
+      "code": 0,
+      "stack": null,
+      "run": "a-feedback"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "offlineLeadershipKeepsReviewAvailableWithoutSavingSharedState",
+      "code": 0,
+      "stack": null,
+      "run": "a-feedback"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "failedLoadAndFailedSaveRetainFeedbackAndCanRetry",
+      "code": 0,
+      "stack": null,
+      "run": "a-feedback"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "invalidPolicyCannotSaveAndDirtyExitCanBeKeptOrDiscarded",
+      "code": 0,
+      "stack": null,
+      "run": "a-feedback"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "darkLargeTextListReviewAndSettingsRetainChromeAndManualFallback",
+      "code": 0,
+      "stack": null,
+      "run": "a-feedback"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReaderTest",
+      "test": "cashierAndExpiredSessionCannotReadFollowUps",
+      "code": 0,
+      "stack": null,
+      "run": "a-corrected"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReaderTest",
+      "test": "canonicalFactsExcludePrivateNotesAndReflectPaymentsWithoutWrites",
+      "code": 0,
+      "stack": null,
+      "run": "a-corrected"
+    }
+  ],
+  "sourceSha256": {
+    "phase18/app/src/main/java/com/saaf/milkshop/domain/CustomerFollowUps.kt": "7ad2984b372e6b28ac32c2d302d034affe385b5f7262e4688273e4c48a7ae66c",
+    "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerFollowUpReader.kt": "f0ed33be95aa3a62bf94e8a2d6aadade194bc9d372ff5840498f02540515f1a4",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt": "ebe3e8e7007315f2f8ad116eede7a47d599185c614184e6157934e63f3d595a8",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/FollowUpReaderTest.kt": "469fcc136662db2b67f72a3bf9040acff2c73d402724610736359efcccff19d1",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/FollowUpRulesTest.kt": "cbfc7846e945916b5e5c072b6048e8f39e418651afa65f816543ec52fcae52fa",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/FollowUpWorkspaceUiTest.kt": "4e4d064b75399f4309b663f94fff3d77c18976c5932d84184d2a8d823a8c79e8"
+  },
+  "localArtifactSha256": {
+    "audit/2026-10-16/reminder-automation-plan/a-corrected-build-console.txt": "50c7c574d95d4b6f7a4d91aff702073ee2b83b81974abe507ac7d0f9669e9165",
+    "audit/2026-10-16/reminder-automation-plan/a-corrected-console.txt": "f2625ddb0097f2fc1c0eaf686f5c9297ea4d516f035ff442e2d67e244fa0939b",
+    "audit/2026-10-16/reminder-automation-plan/a-done-build-console.txt": "f90ef5c419da2eab1cb707a18ba6fd96fb8d84c39355b9bc8345b02fe01e0472",
+    "audit/2026-10-16/reminder-automation-plan/a-done-console.txt": "15692f020e81446149a27cb960d43e2dc33c65168e5b97db7c491fd3bdc160f2",
+    "audit/2026-10-16/reminder-automation-plan/a-feedback-build-console.txt": "48f704a44940e19e90c73e75e6b088d169b1a0caad9118f9a2ca2f1413f746e3",
+    "audit/2026-10-16/reminder-automation-plan/a-feedback-console.txt": "d61318ab64f39daaa117ee799e346a63de3aaee1d0a2ce75b6723b85398d146f",
+    "audit/2026-10-16/reminder-automation-plan/a-final-build-console.txt": "3d16bba358f190ac4b7a39ddcb3bbf7a300204ca62a54d12552db093baa35cf8",
+    "audit/2026-10-16/reminder-automation-plan/a-final-ui-console.txt": "4209377ffcd99a88d852b720a4f911d4db4855330d7d89fc9c8af43ecce54d54",
+    "audit/2026-10-16/reminder-automation-plan/a-first-console.txt": "2ff2b34651bbb3ef7c3c8faa5c4bcb8fb8201eb2965ccd777fec3c7961781a52",
+    "audit/2026-10-16/reminder-automation-plan/a-main-build-console.txt": "ef8c19c9509da59302080e3d61d437086044e294959cceaae0a792afd4e2d067",
+    "audit/2026-10-16/reminder-automation-plan/a-settings-build-console.txt": "6e6cacc94dd2e70a2545f8aac4bae34598772c2c249b907568c2a7c7f45bd60e",
+    "audit/2026-10-16/reminder-automation-plan/a-settings-console.txt": "1d76353eddba58b6623a016a385ba5f99facdb60488605351fb2c711cb83bba6",
+    "audit/2026-10-16/reminder-automation-plan/a-test-build-console.txt": "d846774c334a7c7dc5099e02f66917eabc67f3fb0b538713f50d63ef909ba7ba",
+    "audit/2026-10-16/reminder-automation-plan/a-corrected-captures/monthly-preference.png": "f6bd4b0f2f16020ccc47b68b1880813456827970090df68d94500dc6287fc595",
+    "audit/2026-10-16/reminder-automation-plan/a-corrected-captures/policy-save.png": "0235b85e21e1fa0fb4c5d0536920417d3eb662a6ce7f4476e86d9f97601ebd29",
+    "audit/2026-10-16/reminder-automation-plan/a-done-captures/policy-save.png": "c2d6ad37c83310941edae845b57f3669497fcc2dc968b07c5201947130c25912",
+    "audit/2026-10-16/reminder-automation-plan/a-feedback-captures/list-1.0-false.png": "d87bedcc341ca83978923a9b32757f20497e24205729ab665bb40b17d946c208",
+    "audit/2026-10-16/reminder-automation-plan/a-feedback-captures/list-2.0-true.png": "d178ea62984010b810ca39f1cac1e39a0f781bf08385dc9aa2e33efa5e67d7a7",
+    "audit/2026-10-16/reminder-automation-plan/a-feedback-captures/monthly-preference.png": "399a3bc1ec2aa42688e4b37896e76d148b6016696986a67ece040c26844dbd93",
+    "audit/2026-10-16/reminder-automation-plan/a-feedback-captures/policy-save.png": "cd9fc6f576a32023c00b001a30f3c04e9a27546c5af5e24808c487742b5541d9",
+    "audit/2026-10-16/reminder-automation-plan/a-feedback-captures/review-1.0-false.png": "2710a26967b2cd0f7821b2386484524c1acf1cb135a01da9b43ff2c36cf16fe7",
+    "audit/2026-10-16/reminder-automation-plan/a-feedback-captures/review-2.0-true.png": "55d0375d50ca577c7f969bbd74a7e76ca322f633be831111b07a1bc7cd7cf9f8",
+    "audit/2026-10-16/reminder-automation-plan/a-feedback-captures/settings-1.0-false.png": "53becdabb76bdfad2641509bae0f6fbea5fbdb3c3afe7ea7c0529e9f15fe779a",
+    "audit/2026-10-16/reminder-automation-plan/a-feedback-captures/settings-2.0-true.png": "8195052b2c7319d3de9e9dda987359e3717cf0cb46233ada45d8167624d0de43",
+    "audit/2026-10-16/reminder-automation-plan/a-final-ui-captures/list-1.0-false.png": "a0393aec8025fcabb0cf4867940fbfd57f0622ed5805527c4d901b7fe74ad506",
+    "audit/2026-10-16/reminder-automation-plan/a-final-ui-captures/list-2.0-true.png": "f24bf48e80e472ffa5d2f758e64be7fcc8705380bf569be66c5f0a571f73115c",
+    "audit/2026-10-16/reminder-automation-plan/a-final-ui-captures/monthly-preference.png": "c24fd4b722ab9bcb19167b42e5c21131db81923f8a26ce31a3a0a228a87518d4",
+    "audit/2026-10-16/reminder-automation-plan/a-final-ui-captures/policy-save.png": "944c7698a3a918436f1b34086ec2d2926f3eeae63c069e5dbba10977ad4744a2",
+    "audit/2026-10-16/reminder-automation-plan/a-final-ui-captures/review-1.0-false.png": "2dbae5b4f1bb8af38ef2806490e97971b5626d9501e504885cb3c5fbb24626df",
+    "audit/2026-10-16/reminder-automation-plan/a-final-ui-captures/review-2.0-true.png": "d1d3829fd4fd7070be8626e50224f4552e8e87ffdcf9c1b8e198b5cc91116504",
+    "audit/2026-10-16/reminder-automation-plan/a-final-ui-captures/settings-1.0-false.png": "afff4351c876734cab4bf2eacce93aee78648f1f235658a7c22e8ee0c8ff990b",
+    "audit/2026-10-16/reminder-automation-plan/a-final-ui-captures/settings-2.0-true.png": "e3ec9c050adc6beafb10286a4e60b62d3e78a54c21d8f5aae68a89c5adbe5eac",
+    "audit/2026-10-16/reminder-automation-plan/a-first-captures/list-1.0-false.png": "9eba9ecf49d5ca89566151d9cf4756f27e784fdd2c54c960e0bb8f7701d65561",
+    "audit/2026-10-16/reminder-automation-plan/a-first-captures/list-2.0-true.png": "38185b90287333c063b481fe1d8b12476f08a79714332f24f5945be50db7acca",
+    "audit/2026-10-16/reminder-automation-plan/a-first-captures/monthly-preference.png": "9d5dc76c0fd8635b5e3d328212931f9b5a6cf44ebdaa5853ef682634f44cb5e4",
+    "audit/2026-10-16/reminder-automation-plan/a-first-captures/review-1.0-false.png": "c8be9417671feee1fd8ef356f000d20cdff7adf095dcf45cbe6cf7c40b362bb8",
+    "audit/2026-10-16/reminder-automation-plan/a-first-captures/review-2.0-true.png": "25a49c048e564a95af5faa2187028024cccae1f8935c84457fc8a923859ce7cf",
+    "audit/2026-10-16/reminder-automation-plan/a-first-captures/settings-1.0-false.png": "a55dbf2a02da7faff746bd839bc275907dbda4225e856587cdbf56e11c34ec2d",
+    "audit/2026-10-16/reminder-automation-plan/a-first-captures/settings-2.0-true.png": "1e48420eeb16bcd4734f62a5644b5a37ba6af3a89d0eef19b5756a8ad482c061",
+    "phase18/app/build/outputs/apk/debug/app-debug.apk": "05076d3188ae047ae118fb4bba9d34affbe0797d15a1670efd41c49080cbc4e8",
+    "phase18/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk": "72fc01e0232498e7d35d4f08e19f954656b8038ad579c77f0d3ce66937de0ee2"
+  },
+  "ordinaryAppModified": false,
+  "cloudChanged": false,
+  "actualSending": false,
+  "fullSuite": false,
+  "qualification": "13 unique latest passing methods across scoped runs. Final shared UI changes reran all six UI methods, 6/6; calculator/reader source unchanged since its passing checks. No final whole-selection rerun claimed."
+}

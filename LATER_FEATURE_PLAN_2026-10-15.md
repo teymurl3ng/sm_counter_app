@@ -116,7 +116,7 @@ Scope:
 
 ### L4 — Remind the owner reliably, then decide automatic SMS
 
-**16 October planning update:** [Research, finite plan and UI](audit/2026-10-16/reminder-automation-plan/PLAN.md) and [independent judgment](audit/2026-10-16/reminder-automation-plan/JUDGMENT.md) are complete. No implementation. Follow-ups aggregate by customer; statement cadence is separate from payment terms; coordinated handoffs use shared metadata. Two bounded builds and one explicit SMS route/activation decision remain. No provider or automatic customer sending has been enabled.
+**16 October planning update:** [Research, finite plan and UI](audit/2026-10-16/reminder-automation-plan/PLAN.md) and [independent judgment](audit/2026-10-16/reminder-automation-plan/JUDGMENT.md) are complete. ✅ ~~A rules/read model/injected native UI foundation~~ is accepted with 13 unique affected passing methods across scoped A06 runs; [result](audit/2026-10-16/reminder-automation-plan/A_RESULT.md). No ordinary route until B. Follow-ups aggregate by customer; statement cadence is separate from payment terms; coordinated handoffs use shared metadata. B shared coordination/scheduling and the explicit C SMS route/activation decision remain. No provider or automatic customer sending has been enabled.
 
 **User outcome:** the owner can discover customers needing a reminder without manually inspecting every account.
 

@@ -1,0 +1,28 @@
+{
+  "label": "a-done",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#invalidPolicyCannotSaveAndDirtyExitCanBeKeptOrDiscarded",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#failedLoadAndFailedSaveRetainFeedbackAndCanRetry"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "failedLoadAndFailedSaveRetainFeedbackAndCanRetry",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "invalidPolicyCannotSaveAndDirtyExitCanBeKeptOrDiscarded",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 2,
+  "expected": 2,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "f33096fcdcb2519db2d30bd6cec88fd55c54ef95b5954a5b74bf5c2cc8e9a3d6"
+}

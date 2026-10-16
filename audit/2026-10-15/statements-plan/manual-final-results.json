@@ -1,0 +1,42 @@
+{
+  "label": "manual-final",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.CustomerReminderUiTest#lightReviewHandoffHasStableChromeAndTruthfulHistory",
+    "com.saaf.milkshop.CustomerReminderUiTest#darkLargeTextReviewHandoffHasStableChromeAndTruthfulHistory",
+    "com.saaf.milkshop.CustomerReminderUiTest#settledAdvanceAndExpiredAccessNeverOpenComposer",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementReminderAndHistoryKeepOneHostAndReturnToCustomer"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.CustomerReminderUiTest",
+      "test": "lightReviewHandoffHasStableChromeAndTruthfulHistory",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerReminderUiTest",
+      "test": "settledAdvanceAndExpiredAccessNeverOpenComposer",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerReminderUiTest",
+      "test": "darkLargeTextReviewHandoffHasStableChromeAndTruthfulHistory",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementReminderAndHistoryKeepOneHostAndReturnToCustomer",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 4,
+  "expected": 4,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "3ac872c921c1df7727b7f069b5de13ca5b929bb73af9049abf76d7b53a21a29b"
+}

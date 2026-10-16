@@ -1,0 +1,161 @@
+{
+  "label": "manual-first",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.CustomerCommunicationTest#reminderUsesCurrentBalanceAndKnownOverdueWithoutLeakingPrivateFacts",
+    "com.saaf.milkshop.CustomerCommunicationTest#explicitPhoneAndUnicodeMessagesAreEncodedForOneRecipientOnly",
+    "com.saaf.milkshop.CustomerCommunicationTest#historyIsMinimalIdempotentCustomerBoundedAndBackupCompatible",
+    "com.saaf.milkshop.CustomerCommunicationTest#permissionsAndActionVocabularyAreEnforced",
+    "com.saaf.milkshop.CustomerReminderUiTest#lightReviewHandoffHasStableChromeAndTruthfulHistory",
+    "com.saaf.milkshop.CustomerReminderUiTest#darkLargeTextReviewHandoffHasStableChromeAndTruthfulHistory",
+    "com.saaf.milkshop.CustomerReminderUiTest#changedBalanceAndPhoneRequireFreshReviewBeforeAnyLaunch",
+    "com.saaf.milkshop.CustomerReminderUiTest#missingPhoneOverrideKeyboardAndDiscardStayInsideTheDraft",
+    "com.saaf.milkshop.CustomerReminderUiTest#unavailableWhatsAppAllowsDeliberateSmsAndGuardsBusyTaps",
+    "com.saaf.milkshop.CustomerReminderUiTest#settledAdvanceAndExpiredAccessNeverOpenComposer",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementReminderAndHistoryKeepOneHostAndReturnToCustomer",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementLightPreviewAndReturnKeepChromeAndDisclosure",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure",
+    "com.saaf.milkshop.CustomerStatementUiTest#periodFailureRetainsPreviousSnapshotAndAllowsRevert",
+    "com.saaf.milkshop.CustomerStatementUiTest#multiplePagesAndRefreshClampToNewContent",
+    "com.saaf.milkshop.StatementSharingUiTest#observableShareHistoryDoesNotTurnPostLaunchAuditFailureIntoHandoffFailure",
+    "com.saaf.milkshop.StatementSharingUiTest#lightChooserHandoffHasTruthfulFeedbackAndStableChrome",
+    "com.saaf.milkshop.StatementSharingUiTest#darkLargeTextChooserHandoffHasTruthfulFeedbackAndStableChrome",
+    "com.saaf.milkshop.StatementSharingUiTest#cancelDoesNotExportAndMissingHandlerReportsFailure",
+    "com.saaf.milkshop.StatementSharingUiTest#changedFactsBeforeOrAfterRenderingRequireReviewInsteadOfSharing",
+    "com.saaf.milkshop.StatementSharingUiTest#nativeChooserCanBeDismissedWithoutSending"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.CustomerCommunicationTest",
+      "test": "reminderUsesCurrentBalanceAndKnownOverdueWithoutLeakingPrivateFacts",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerCommunicationTest",
+      "test": "historyIsMinimalIdempotentCustomerBoundedAndBackupCompatible",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerCommunicationTest",
+      "test": "permissionsAndActionVocabularyAreEnforced",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerCommunicationTest",
+      "test": "explicitPhoneAndUnicodeMessagesAreEncodedForOneRecipientOnly",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerReminderUiTest",
+      "test": "lightReviewHandoffHasStableChromeAndTruthfulHistory",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerReminderUiTest",
+      "test": "missingPhoneOverrideKeyboardAndDiscardStayInsideTheDraft",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerReminderUiTest",
+      "test": "settledAdvanceAndExpiredAccessNeverOpenComposer",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Failed to assert the following: (Text + InputText + EditableText contains 'Settled' (ignoreCase: false))"
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerReminderUiTest",
+      "test": "darkLargeTextReviewHandoffHasStableChromeAndTruthfulHistory",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerReminderUiTest",
+      "test": "changedBalanceAndPhoneRequireFreshReviewBeforeAnyLaunch",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerReminderUiTest",
+      "test": "unavailableWhatsAppAllowsDeliberateSmsAndGuardsBusyTaps",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "periodFailureRetainsPreviousSnapshotAndAllowsRevert",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementReminderAndHistoryKeepOneHostAndReturnToCustomer",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "multiplePagesAndRefreshClampToNewContent",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementLightPreviewAndReturnKeepChromeAndDisclosure",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "changedFactsBeforeOrAfterRenderingRequireReviewInsteadOfSharing",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "darkLargeTextChooserHandoffHasTruthfulFeedbackAndStableChrome",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "lightChooserHandoffHasTruthfulFeedbackAndStableChrome",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "cancelDoesNotExportAndMissingHandlerReportsFailure",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "observableShareHistoryDoesNotTurnPostLaunchAuditFailureIntoHandoffFailure",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "nativeChooserCanBeDismissedWithoutSending",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 20,
+  "expected": 21,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "3ac872c921c1df7727b7f069b5de13ca5b929bb73af9049abf76d7b53a21a29b"
+}

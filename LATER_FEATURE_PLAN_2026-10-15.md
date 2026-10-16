@@ -1,6 +1,6 @@
 # Recovered later plans: decisions and bounded delivery
 
-**Execution update:** ✅ ~~Phase2 local held-entry attention, phase3 Credit basics and phase4 customer terms/status/review history.~~ Phase4 implementation, focused local/DEV two-phone recovery, PROD migration and signed0.5.0/code8 installation on A06/S24 are accepted; [finish result](audit/2026-10-15/credit-status-plan/FINISH_RESULT.md). S1/B8 audit-only conflict attention remains partial; no real shop activated. L3/phase5 statement snapshot/preview and customer-detail fit are now accepted at [piece1](audit/2026-10-15/statements-plan/PREVIEW_RESULT.md); ✅ ~~PDF/image sharing~~ is accepted at [piece 2](audit/2026-10-15/statements-plan/EXPORT_RESULT.md); its manual-draft/history piece remains. L4 reminder automation and identity S2 remain unimplemented. Phase1 human/private handover remains separate. Use the six-phase plan for current progress; older planning-only wording below is historical.
+**Execution update:** ✅ ~~Phase2 local held-entry attention, phase3 Credit basics and phase4 customer terms/status/review history.~~ Phase4 implementation, focused local/DEV two-phone recovery, PROD migration and signed0.5.0/code8 installation on A06/S24 are accepted; [finish result](audit/2026-10-15/credit-status-plan/FINISH_RESULT.md). S1/B8 audit-only conflict attention remains partial; no real shop activated. L3/phase5 statement snapshot/preview and customer-detail fit are now accepted at [piece1](audit/2026-10-15/statements-plan/PREVIEW_RESULT.md); ✅ ~~PDF/image sharing~~ is accepted at [piece 2](audit/2026-10-15/statements-plan/EXPORT_RESULT.md); ✅ ~~Manual draft/history~~ is accepted at [piece 3](audit/2026-10-15/statements-plan/MANUAL_RESULT.md). All L3/phase5 implementation and isolated QA is complete; ordinary signed delivery belongs to phase1. L4 reminder automation and identity S2 remain unimplemented. Phase1 human/private handover remains separate. Use the six-phase plan for current progress; older planning-only wording below is historical.
 
 Date: 15 October 2026. Status: planning only. This is a follow-on roadmap, separate from the seven finish batches. No feature implementation, new test run, phone operation, migration, deployment or message sending is authorized by this document. The user's current request authorizes reconciling and planning the recovered work.
 
@@ -152,7 +152,7 @@ The owner confirmed weekly settlement. Exact category thresholds and fixed-weekd
 
 - [x] ✅ ~~L1 Credit amounts, customer search and limit warning.~~ Phase 3 result in the controlling six-phase plan.
 - [x] ✅ ~~L2 Categories, manual override and attention views.~~ Phase 4 result in the controlling six-phase plan.
-- [ ] L3 — ✅ ~~Statement preview and PDF/image sharing.~~ Manual reminder and truthful local history remain.
+- [x] ✅ ~~L3 statement preview, PDF/image sharing, manual reminders and truthful local history.~~ Phase 5 implementation/isolated QA complete; ordinary signed delivery/human acceptance remains phase 1.
 - [ ] L4 Owner reminder automation; automatic-SMS decision recorded separately.
 - [x] ✅ ~~S1 persistent attention for local held entries.~~ Phase 2 scope complete; B8 audit-only conflict attention stays a separate partial boundary.
 - [ ] S2 Staff/device identity — separate design brief, implementation not yet scoped.

@@ -1,8 +1,8 @@
 # New plan: unfinished work only
 
-Date: 15 October 2026. Status: phases 2, 3 and 4 complete at their documented technical scopes; phases 1, 5 and 6 remain open.
+Date: 15 October 2026. Status: phases 2, 3, 4 and 5 complete at their documented technical scopes; phases 1 and 6 remain open.
 
-**Execution update:** Phases 2–4 are complete at their documented scopes, including signed 0.5.0/code8 on both phones and the approved phase 4 production migration. Human/private handover remains phase 1; statements and reminders remain phases 5–6. B8 audit-only conflict attention remains a separate partial boundary.
+**Execution update:** Phases 2–5 are complete at their documented implementation/affected-QA scopes. Signed 0.5.0/code8 on both phones includes phases 2–4; phase 5 is in source and the isolated QA build, awaiting ordinary signed delivery under phase 1. Human/private handover remains phase 1; reminder automation/automatic-SMS decision remains phase 6. B8 audit-only conflict attention remains a separate partial boundary.
 
 **Per-phase working rule:** Before each phase is implemented, record its source baseline, targeted primary-source research, independent judgment, exact inclusions/exclusions and affected acceptance checks. This is the owner's 15 October instruction. Planning/research does not count as implementation completion. The first pinned brief is [phase 2's plan](audit/2026-10-15/sync-attention-plan/PLAN.md).
 
@@ -15,6 +15,7 @@ This is the current reading order for unfinished work. It replaces the sequence 
 **Goal:** finish the remaining release participation without restarting accepted engineering.
 
 - [x] ✅ ~~Install matching signed updates on A06 and S24.~~ Both now run 0.5.0/code8 with verified APK hashes, retained installations and native launch. Earlier A06 private login/live sync/sampled records were accepted on 0.4.3; private acceptance of the latest version remains below.
+- Deliver the accepted phase 5 features as the next signed ordinary update before final human acceptance; this is the existing handover delivery gate, not a new phase.
 - Complete the prepared human/staff checks: actual private phone-security unlock, readability, motion/vibration, uncoached shop-day tasks and next supported date observation.
 - Confirm independent recovery-secret/signing-backup custody, complete the outstanding recovered-backup acceptance, and hand over the intended staff/device setup using the existing instructions.
 
@@ -77,7 +78,7 @@ This is the current reading order for unfinished work. It replaces the sequence 
 
 ### 5. Add clear bills and manual reminders
 
-**Pinned plan:** [Baseline, research, judgment and three bounded pieces](audit/2026-10-15/statements-plan/PLAN.md). ✅ Planning complete. ✅ ~~Statement snapshot/preview and customer-detail fit~~ accepted with13 unique affected A06 methods; [result](audit/2026-10-15/statements-plan/PREVIEW_RESULT.md). ✅ ~~PDF/image sharing~~ is accepted at [piece 2](audit/2026-10-15/statements-plan/EXPORT_RESULT.md), with 15 unique affected methods across scoped runs. Manual drafts/truthful local history remain pending. No scheduling, cloud migration or real customer sending belongs to this phase.
+**Pinned plan:** [Baseline, research, judgment and three bounded pieces](audit/2026-10-15/statements-plan/PLAN.md). ✅ Planning complete. ✅ ~~Statement snapshot/preview and customer-detail fit~~ accepted with13 unique affected A06 methods; [result](audit/2026-10-15/statements-plan/PREVIEW_RESULT.md). ✅ ~~PDF/image sharing~~ is accepted at [piece 2](audit/2026-10-15/statements-plan/EXPORT_RESULT.md), with 15 unique affected methods across scoped runs. ✅ ~~Manual drafts/truthful local history~~ is accepted at [piece 3](audit/2026-10-15/statements-plan/MANUAL_RESULT.md), with 21 unique affected methods. Phase 5 is complete at implementation/isolated-QA scope; ordinary signed delivery remains phase 1. No scheduling, cloud migration or real customer sending belongs to this phase.
 
 **UI fit:** [Placement/reflow plan](audit/2026-10-15/statements-plan/UI_FIT.md) and [clickable study](audit/2026-10-15/statements-plan/UI_PREVIEW.html): locally regroup customer detail, add one Statements & reminders entry, and keep Statement/Reminder in the existing Customers host. Same native design material/components; no new tab or global redesign.
 
@@ -143,7 +144,7 @@ These items have not been cancelled. They are deliberately unscheduled or condit
 - [x] ✅ ~~2. Persistent Owner attention for held sync entries.~~ Accepted at local Owner scope; audit-only conflict policy remains a separate retained B8 boundary. [Result](audit/2026-10-15/sync-attention-plan/RESULT.md).
 - [x] ✅ ~~3. Credit basics: aging, customer search and advisory warning.~~ [Result](audit/2026-10-15/credit-basics-plan/RESULT.md). Delivered in signed 0.5.0; private/human acceptance remains phase 1.
 - [x] ✅ ~~4. Customer payment terms, credit categories, overrides and history.~~ Implementation, affected checks, two-phone recovery and PROD/signed rollout complete. [Finish result](audit/2026-10-15/credit-status-plan/FINISH_RESULT.md).
-- [ ] 5. Statements, sharing and manual reminders — ✅ ~~snapshot/preview and customer-detail fit~~; PDF/image sharing and manual message preparation remain.
+- [x] ✅ ~~5. Statement preview, PDF/image sharing, manual WhatsApp/SMS drafts and observable local history.~~ [Final result](audit/2026-10-15/statements-plan/MANUAL_RESULT.md). Implementation/isolated QA complete; ordinary signed delivery/human acceptance remains phase 1.
 - [ ] 6. Owner reminder automation and a separately recorded automatic-SMS decision.
 
 Use this six-phase progress list in future completion reports. The old [seven-batch plan](audit/2026-10-11/remaining-work-plan/FINISH_BATCHES.md) remains the historical acceptance record; its open parts map to phase 1 here, and its completed parts are not reopened.

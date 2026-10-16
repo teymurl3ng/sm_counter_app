@@ -24,6 +24,7 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import com.saaf.milkshop.nativeui.common.*
 import com.saaf.milkshop.nativeui.theme.*
 import com.saaf.milkshop.statements.*
+import com.saaf.milkshop.application.owner.*
 import kotlinx.coroutines.*
 
 @Composable
@@ -59,7 +60,8 @@ internal fun StatementPageView(document: StatementDocument,page: Int,engine: Sta
 /** No send/delivery inference: success means only that Android accepted the chooser launch. */
 @Composable
 internal fun StatementShareControls(document: StatementDocument,engine: StatementDocumentEngine,enabled: Boolean,
-    load: CustomerStatementLoader,onRefresh: ()->Unit,onBusy: (Boolean)->Unit={},launcher: ((Intent)->Unit)?=null) {
+    load: CustomerStatementLoader,onRefresh: ()->Unit,onBusy: (Boolean)->Unit={},launcher: ((Intent)->Unit)?=null,
+    record: suspend (CustomerCommunicationAction)->Unit={}) {
     val context=LocalContext.current
     val store=remember(context.applicationContext) {StatementExportStore(context)}
     val scope=rememberCoroutineScope()
@@ -94,6 +96,9 @@ internal fun StatementShareControls(document: StatementDocument,engine: Statemen
     },confirmButton={TextButton(enabled=enabled && !busy,onClick=hapticAction {
         if(busy || !enabled) return@hapticAction
         val selectedFormat=format;val selectedDocument=document;val serial=++generation
+        val operation=java.util.UUID.randomUUID().toString()
+        fun action(event: CommunicationEvent)=CustomerCommunicationAction(operation,selectedDocument.statement.customerUid,"statement",selectedFormat.label,
+            "${selectedDocument.statement.period.start}/${selectedDocument.statement.period.endInclusive}",event)
         busy=true;onBusy(true);notice=null
         job=scope.launch {
             var export: StatementExport?=null;var opened=false
@@ -105,6 +110,7 @@ internal fun StatementShareControls(document: StatementDocument,engine: Statemen
                 }
                 export=store.export(selectedDocument,selectedFormat,engine)
                 ensureActive()
+                record(action(CommunicationEvent.PREPARED))
                 val current=load(selectedDocument.statement.customerId,selectedDocument.statement.period)
                 if(!sameFacts(current)) {
                     notice="Records changed. Review the refreshed statement before sharing.";dialog=false;onRefresh();return@launch
@@ -114,9 +120,18 @@ internal fun StatementShareControls(document: StatementDocument,engine: Statemen
                 val chooser=Intent.createChooser(send,"Share statement").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 (launcher ?: {intent: Intent->context.startActivity(intent)})(chooser)
                 opened=true;dialog=false;notice="Share menu opened. Sending is managed in the other app."
+                try {record(action(CommunicationEvent.CHOOSER_OPENED))}
+                catch(cancelled: CancellationException) {throw cancelled}
+                catch(historyError: Exception) {notice+=" Local history could not be saved."}
             } catch(cancelled: CancellationException) {throw cancelled}
-            catch(missing: ActivityNotFoundException) {dialog=false;notice="No sharing app is available for this format. Enable a suitable app and try again."}
-            catch(error: Exception) {dialog=false;notice=error.message?.takeIf {it.isNotBlank()} ?: "Statement sharing failed. Refresh and try again."}
+            catch(error: Exception) {
+                dialog=false
+                notice=if(error is ActivityNotFoundException) "No sharing app is available for this format. Enable a suitable app and try again."
+                    else error.message?.takeIf {it.isNotBlank()} ?: "Statement sharing failed. Refresh and try again."
+                if(!opened) try {record(action(CommunicationEvent.HANDOFF_FAILED))}
+                catch(cancelled: CancellationException) {throw cancelled}
+                catch(historyError: Exception) {notice+=" Local history could not be saved."}
+            }
             finally {
                 withContext(NonCancellable+Dispatchers.IO) {export?.let {if(opened) it.close() else it.discard()}}
                 if(generation==serial) {busy=false;onBusy(false)}

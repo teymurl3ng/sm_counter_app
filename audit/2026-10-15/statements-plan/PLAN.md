@@ -1,8 +1,8 @@
 # Phase 5: customer statements and deliberate manual reminders
 
-15 October 2026. Baseline `a596cd8e663415ae8d56ecf6a9d762cf37a838d9`. Planning/research/judgment complete. Pieces 1–2 are implemented and accepted at their affected local QA scopes; piece 3 remains pending. This is phase 5/L3 of the existing six-phase plan. No new phase is added.
+15 October 2026. Baseline `a596cd8e663415ae8d56ecf6a9d762cf37a838d9`. Planning/research/judgment complete. All three pieces are implemented and accepted at their documented affected local QA scopes. Signed ordinary delivery/human acceptance remains phase 1; automation remains phase 6. This is phase 5/L3 of the existing six-phase plan. No new phase is added.
 
-**UI fit supplement:** [Exact placement, design-resource reuse, navigation, reflow and feedback](UI_FIT.md), with an [interactive layout study](UI_PREVIEW.html). This is the controlling layout brief: customer detail is locally regrouped first; a single Statements & reminders entry opens dedicated Statement/Reminder body panes inside the existing role host. The first implementation piece includes that presentation extraction, not a new global design pass. Native acceptance for customer fit, statement preview and export/share is recorded in PREVIEW_RESULT.md and EXPORT_RESULT.md; reminder review remains pending.
+**UI fit supplement:** [Exact placement, design-resource reuse, navigation, reflow and feedback](UI_FIT.md), with an [interactive layout study](UI_PREVIEW.html). This is the controlling layout brief: customer detail is locally regrouped first; a single Statements & reminders entry opens dedicated Statement/Reminder body panes inside the existing role host. The first implementation piece includes that presentation extraction, not a new global design pass. Native acceptance for customer fit, statement preview and export/share is recorded in PREVIEW_RESULT.md and EXPORT_RESULT.md; manual reminder review/history is accepted in MANUAL_RESULT.md.
 
 ## Plain-English outcome
 
@@ -74,4 +74,6 @@ Stop after these three pieces and affected checks. Record unrelated findings for
 - [x] ✅ Baseline, primary-source research, independent judgment and scoped acceptance.
 - [x] ✅ ~~1. Statement snapshot and preview, including customer-detail fit.~~ [Result](PREVIEW_RESULT.md),13 unique affected A06 methods.
 - [x] ✅ ~~2. PDF/image output and sharing.~~ [Result](EXPORT_RESULT.md), 15 unique affected methods across initial/final scoped runs.
-- [ ] 3. Manual message preparation and observable local history.
+- [x] ✅ ~~3. Manual message preparation and observable local history.~~ [Result](MANUAL_RESULT.md), 21 unique affected methods across scoped runs.
+
+✅ ~~Phase 5 implementation and affected isolated QA complete.~~ No ordinary release or actual sending is claimed.

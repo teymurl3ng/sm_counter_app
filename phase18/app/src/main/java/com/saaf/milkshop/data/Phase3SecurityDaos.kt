@@ -59,6 +59,11 @@ interface SavedRecoveryCodeDao {
 
 @Dao
 interface SecurityAuditDao {
+    @Query("SELECT * FROM security_audit_entries WHERE action = 'customer_communication_v1' AND reason_code = :customerUid ORDER BY audit_id DESC LIMIT 50")
+    suspend fun customerCommunications(customerUid: String): List<SecurityAuditEntryEntity>
+
+    @Query("SELECT EXISTS(SELECT 1 FROM security_audit_entries WHERE action = 'customer_communication_v1' AND details = :details)")
+    suspend fun hasCommunicationAction(details: String): Boolean
 
     /** H8: dates absorbed (sealed) by the given day's close, in seal order. */
     @Query(

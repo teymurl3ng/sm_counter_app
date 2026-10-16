@@ -113,6 +113,7 @@ fun OwnerCustomersScreen(
     showHeader: Boolean = true,
     modifier: Modifier = Modifier,
     onCreditAction: (com.saaf.milkshop.application.owner.CustomerCreditCommand) -> Unit = {},
+    communication: CustomerCommunicationAccess = CustomerCommunicationAccess(),
     loadStatement: CustomerStatementLoader = { _, _ -> error("Statement loading is unavailable.") },
 ) {
     val snapshot = OwnerCustomersScreenSnapshot(
@@ -162,6 +163,7 @@ fun OwnerCustomersScreen(
             onUpdateCustomer = onUpdateCustomer,
             onCreditAction = onCreditAction,
             loadStatement = loadStatement,
+            communication = communication,
             hostedScaffold = hostedScaffold,
             showHeader = pane.showHeader,
             modifier = modifier,
@@ -196,6 +198,7 @@ private fun OwnerCustomersScreenPane(
     showHeader: Boolean = true,
     modifier: Modifier = Modifier,
     onCreditAction: (com.saaf.milkshop.application.owner.CustomerCreditCommand) -> Unit = {},
+    communication: CustomerCommunicationAccess = CustomerCommunicationAccess(),
     loadStatement: CustomerStatementLoader = { _, _ -> error("Statement loading is unavailable.") },
 ) {
     if (customerCreateOpen) {
@@ -240,6 +243,7 @@ private fun OwnerCustomersScreenPane(
             onOpenEdit = onOpenEdit,
             onCreditAction = onCreditAction,
             loadStatement = loadStatement,
+            communication = communication,
             creditBusy = customerUpdating,
             hostedScaffold = hostedScaffold,
             modifier = modifier,
@@ -783,12 +787,16 @@ private fun OwnerCustomersDetailScreen(
     onCreditAction: (com.saaf.milkshop.application.owner.CustomerCreditCommand)->Unit,
     creditBusy: Boolean,
     loadStatement: CustomerStatementLoader,
+    communication: CustomerCommunicationAccess,
 ) {
-    var statementOpen by rememberSaveable(identity.userId, detail.row.accountId) { mutableStateOf(false) }
+    var task by rememberSaveable(identity.userId, detail.row.accountId) { mutableStateOf("detail") }
+    var paneGuard by androidx.compose.runtime.remember { mutableStateOf<EntryLeaveGuard?>(null) }
+    val publishGuard=com.saaf.milkshop.nativeui.common.rememberPaneGuardRegistration({paneGuard},{paneGuard=it})
     val panes = androidx.compose.runtime.saveable.rememberSaveableStateHolder()
-    BackHandler(onBack = { if(statementOpen) statementOpen=false else onBack() })
+    fun back() {val leave={task=if(task=="reminder" || task=="history") "statement" else "detail";if(task=="detail") Unit};paneGuard?.requestLeave(leave) ?: leave()}
+    BackHandler(onBack = {if(task=="detail") onBack() else back()})
     val row = detail.row
-    hostedScaffold(snackbarHostState, modifier, { it() }) { padding ->
+    hostedScaffold(snackbarHostState, modifier, { action->paneGuard?.requestLeave(action) ?: action() }) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
@@ -803,12 +811,17 @@ private fun OwnerCustomersDetailScreen(
                 postingOpen = context.postingOpen,
             )
             com.saaf.milkshop.nativeui.common.NativeSectionTransition(
-                targetState=statementOpen,modifier=Modifier.weight(1f),contentKey={it},
-            ) { showingStatement ->
-                panes.SaveableStateProvider(showingStatement.toString()) {
-                if(showingStatement) CustomerStatementScreen(row.accountId,row.name,loadStatement) {statementOpen=false}
-                else CustomerDetailOverview(detail,identity.role.wireValue=="owner",creditBusy,error,
-                    onOpenStatement={statementOpen=true},onEdit=onOpenEdit,onCreditAction=onCreditAction)
+                targetState=task,modifier=Modifier.weight(1f),contentKey={it},
+            ) { showing ->
+                panes.SaveableStateProvider(showing) {
+                when(showing) {
+                    "statement"->CustomerStatementScreen(row.accountId,row.name,loadStatement,communication=communication,
+                        onReminder={task="reminder"},onHistory={task="history"}) {task="detail"}
+                    "reminder"->CustomerReminderScreen(row.accountId,communication,{task="statement"},onOpenEdit,publishGuard)
+                    "history"->CustomerPreparationHistory(row.accountId,communication) {task="statement"}
+                    else->CustomerDetailOverview(detail,identity.role.wireValue=="owner",creditBusy,error,
+                        onOpenStatement={task="statement"},onEdit=onOpenEdit,onCreditAction=onCreditAction)
+                }
                 }
             }
         }

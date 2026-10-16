@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-16",
+  "baseline": "6ffe8a8814602068bcb9979576ed50e3d2d602fe",
+  "piece": "phase5-piece3-only",
+  "phase5ImplementationAndIsolatedQaComplete": true,
+  "uniqueAffectedMethodsPassing": 21,
+  "runs": [
+    {
+      "label": "manual-first",
+      "passed": 20,
+      "expected": 21,
+      "qaApkSha256": "3ac872c921c1df7727b7f069b5de13ca5b929bb73af9049abf76d7b53a21a29b"
+    },
+    {
+      "label": "manual-final",
+      "passed": 4,
+      "expected": 4,
+      "qaApkSha256": "3ac872c921c1df7727b7f069b5de13ca5b929bb73af9049abf76d7b53a21a29b"
+    },
+    {
+      "label": "manual-history-final",
+      "passed": 1,
+      "expected": 1,
+      "qaApkSha256": "6288ed547b2652c7ca593a06c1f1a9a050d016a8b0ebdfc2ef9f671607611082"
+    }
+  ],
+  "firstFailure": "Exact text assertion expected Settled; actual correct text was Settled. No payment reminder is needed. Assertion corrected; no runtime fix required.",
+  "lastRuntimeChange": "History date labels only; followed by the single affected dark/200%-host navigation/history test.",
+  "qaTarget": "com.saaf.milkshop.qa.tests",
+  "device": "A06",
+  "ordinaryAppInstalledOrCleared": false,
+  "cloudOrSchemaChanged": false,
+  "realMessageSent": false,
+  "qaAppApkSha256": "6288ed547b2652c7ca593a06c1f1a9a050d016a8b0ebdfc2ef9f671607611082",
+  "qaTestApkSha256": "fe172b88cb59d853518918058584859990073d7f11dd5fe75f53a8324f60ef47",
+  "sources": {
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/CustomerCommunicationTest.kt": "ceb70ec7af7728ab1942871049b4bef48e09b1d2a10473da7bf0d5791438bac8",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/CustomerReminderUiTest.kt": "89dd9edd637f33012c86397cfaa445872fd3554d5f8df3486fb7a1fa24c1cacc",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/CustomerStatementUiTest.kt": "d41eb0a8f3e9ffa9fe298bdaaf4e91e2a3e25e37f8c19655ff771920a7bbc18b",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/StatementSharingUiTest.kt": "a7d59521954e44ac30bfac81d4930919a827eec803ab14de27318198813187c5",
+    "phase18/app/src/main/AndroidManifest.xml": "791b17b7810bc5fa675d59a3fb33ba4650d8bd659be09a59c28fb8dd1409b6b6",
+    "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerCommunication.kt": "7fe34f2890ed2a754b6ef0589760a9c08809225795d6889dc5a00e4ea0be7b9c",
+    "phase18/app/src/main/java/com/saaf/milkshop/application/owner/NativeOwnerCustomersFacade.kt": "b039a57d9bcdd0efef9ab37c97ae4cf41185f19182262fa1e70ffbbbbf531079",
+    "phase18/app/src/main/java/com/saaf/milkshop/data/Phase3SecurityDaos.kt": "a1eb941a2a76c7256f9a1411e67cfe18c22bb6e18144de837d21bf95a72e974e",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt": "2771ad4fc5f78d45e052f215b31b6340ffc9decc531a3ad93c77301f2a48dbe4",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerStatementScreen.kt": "8b86822b3b1a5282bb70844f5d5519112187194f4f10af56072e03a675c31722",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/NativeOwnerMoreViewModel.kt": "3da3e4363cb23364bc7238402d266926582cbea03a7e2837b78db59e68d49247",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCustomersController.kt": "c7536e38f7df7fa9c1ed2232a174641a2a7d1a337eac1ba1095e1aa397309060",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCustomersScreen.kt": "802e34acb1bcfd02deb0c703738cbba2cff77331a4fffe5c7a164391a406286f",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerMoreScreen.kt": "7c8b5912bae2940aaa7389bf6e5612fd236b841ef6a0fb44a8525636958e1d43",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerPreviewHost.kt": "5541a767f8ccd447b87952faa7c032601f9f5459af3ef4d61eba5252ef0a3e6f",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/StatementExportUi.kt": "96815a1605d8eccc3cc381f93fc06c6de52b0de9c83dd8561f6cbca746d94a21",
+    "phase18/app/src/main/java/com/saaf/milkshop/statements/ReminderIntents.kt": "65eacbfb1cea43c9847a6af0d96212c3ff35250edc2d025525cf54e7c7092099"
+  },
+  "localSyntheticCaptures": {
+    "manual-first-captures/message-1.0-false.png": "9379b92be1afd1c45da585e42532da9330f236018fd2223e043c983a556c575e",
+    "manual-first-captures/message-2.0-true.png": "9c77ae496222864dbc39a94176e80fdc6442e0336d9ebd733f0356048cf098ce",
+    "manual-first-captures/opened-1.0-false.png": "373ca89aad455001202d7b4ec8c7182bafb65a295e3630e8dc57d3f52f79a7ca",
+    "manual-first-captures/opened-2.0-true.png": "0f24949356eedf0104963fc59ce9296867299ff5ad6dee12c677219d55e0b36c",
+    "manual-first-captures/override-keyboard.png": "0e7c57e3f7a2501c54d0e2cf85a8d7c29d83662008c4a3760c2e52a0f41b7a3f",
+    "manual-first-captures/recipient-1.0-false.png": "9379b92be1afd1c45da585e42532da9330f236018fd2223e043c983a556c575e",
+    "manual-first-captures/recipient-2.0-true.png": "c609a578569e179cb9b1d292c35df28af6d31c3661502fc7866ca85c7afcf4c1",
+    "manual-final-captures/message-1.0-false.png": "d87d75419906a0971d8a01d441b9f6c0f24448b4c074f83c7676143e14633244",
+    "manual-final-captures/message-2.0-true.png": "987057da3d90ad820ac33cc06f5a24463b5746689efbce95972d5eed84bba067",
+    "manual-final-captures/opened-1.0-false.png": "43d6c43ebc7dcd2d304d63c0102593ae9ae002a3992a5be5f7af03443fae43e0",
+    "manual-final-captures/opened-2.0-true.png": "20ba8c29c2e26f53b48351da9ebda28936be6f4adedb09e61aa0023172aabac3",
+    "manual-final-captures/recipient-1.0-false.png": "d87d75419906a0971d8a01d441b9f6c0f24448b4c074f83c7676143e14633244",
+    "manual-final-captures/recipient-2.0-true.png": "7bc2bf84ff07e4e5409600394f4cc808df22cffa416b70e1889ead5b7327a998",
+    "manual-final-captures/top-1.0-false.png": "5eb3d934e8b58f15002083e3c7d7cf660258f30cb82e7b741c45410a6cb44d56",
+    "manual-final-captures/top-2.0-true.png": "2fa5c715619e179dabd5be24c4695506f3522ef8468051d8efe603eadb6f24f0",
+    "manual-history-final-captures/preparation-history.png": "14b097fe012084d6c0736f1e0f6fc0202b8fc9a698bb5ed8f4a6a6b8385a1448"
+  },
+  "visualReview": "Reminder light/default and dark/200%-host top/message/opened, actual A06 phone keyboard, and final dark/large-text history inspected. Wrapping/scrolling/actions remain usable and shared title/footer bounds pass. Existing 200% footer-label truncation remains LATER.md.",
+  "limits": [
+    "All WhatsApp/SMS launches intercepted by synthetic test handlers; URI construction tested independently. No real recipient contacted.",
+    "Host Compose density simulation does not certify all device-wide font settings or external receivers.",
+    "Backup proof is the existing audit-codec roundtrip, not a new whole-app physical restore run.",
+    "Ordinary signed delivery/human acceptance remains phase1; automation and automatic-SMS decision remain phase6."
+  ]
+}

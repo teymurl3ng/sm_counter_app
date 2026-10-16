@@ -108,7 +108,8 @@ private fun CustomerDetailDisclosure(title: String,key: String,selected: String,
 /** The snapshot is immutable; period/retry changes cancel older work before it can publish. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun CustomerStatementScreen(customerId: Long,customerName: String,load: CustomerStatementLoader,shareLauncher: ((android.content.Intent)->Unit)?=null,onBack: ()->Unit) {
+internal fun CustomerStatementScreen(customerId: Long,customerName: String,load: CustomerStatementLoader,shareLauncher: ((android.content.Intent)->Unit)?=null,
+    communication: CustomerCommunicationAccess=CustomerCommunicationAccess(),onReminder: ()->Unit={},onHistory: ()->Unit={},onBack: ()->Unit) {
     val context=LocalContext.current
     val engine=remember(context.applicationContext) {StatementDocumentEngine(context)}
     val today=BusinessClock.today()
@@ -177,7 +178,9 @@ internal fun CustomerStatementScreen(customerId: Long,customerName: String,load:
             val generated=Instant.parse(statement.generatedAt).atZone(java.time.ZoneId.systemDefault())
                 .format(java.time.format.DateTimeFormatter.ofPattern("d MMM uuuu, HH:mm"))
             Text("Prepared $generated. This snapshot reflects local records for the selected period. Product names are current catalog labels.",style=nativeSupportingTextStyle())
-            StatementShareControls(currentDocument,engine,usable,load,onRefresh={retry++},onBusy={sharing=it},launcher=shareLauncher)
+            StatementShareControls(currentDocument,engine,usable,load,onRefresh={retry++},onBusy={sharing=it},launcher=shareLauncher,record={communication.record(customerId,it)})
+            OutlinedButton(onClick=hapticAction(onReminder),enabled=!loading && !sharing,modifier=Modifier.fillMaxWidth().testTag("statement-prepare-reminder")) {Text("Prepare reminder")}
+            TextButton(onClick=hapticAction(onHistory),enabled=!sharing,modifier=Modifier.fillMaxWidth().testTag("statement-preparation-history")) {Text("Preparation history")}
             OutlinedButton(onClick=hapticAction { retry++ },enabled=!loading && !sharing,modifier=Modifier.fillMaxWidth().testTag("statement-refresh")) { Text("Refresh statement") }
         }
     }

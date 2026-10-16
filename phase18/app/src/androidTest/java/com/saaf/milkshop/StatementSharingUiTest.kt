@@ -34,7 +34,7 @@ class StatementSharingUiTest {
     private val fixture=statementExportFixture(20)
     private val launched=AtomicReference<Intent?>()
     private val refreshes=AtomicInteger()
-    private fun show(scale: Float=1f,dark: Boolean=false,load: CustomerStatementLoader={_,_->fixture},launch: ((Intent)->Unit)?={launched.set(it)}) {
+    private fun show(scale: Float=1f,dark: Boolean=false,load: CustomerStatementLoader={_,_->fixture},launch: ((Intent)->Unit)?={launched.set(it)},record: suspend (CustomerCommunicationAction)->Unit={}) {
         val engine=StatementDocumentEngine(context);val document=engine.plan(fixture)
         rule.setContent {
             val density=LocalDensity.current
@@ -44,12 +44,24 @@ class StatementSharingUiTest {
                         CashierScreenHeader("Customers","Synthetic shop","Owner","2026-10-16",true)
                         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp)) {
                             Text("Synthetic statement")
-                            StatementShareControls(document,engine,true,load,{refreshes.incrementAndGet()},launcher=launch)
+                            StatementShareControls(document,engine,true,load,{refreshes.incrementAndGet()},launcher=launch,record=record)
                         }
                     }})
                 }
             }
         }
+    }
+    @Test fun observableShareHistoryDoesNotTurnPostLaunchAuditFailureIntoHandoffFailure() {
+        val actions=java.util.concurrent.CopyOnWriteArrayList<CustomerCommunicationAction>()
+        show(record={actions.add(it);if(it.event==CommunicationEvent.CHOOSER_OPENED) error("Synthetic audit failure")})
+        rule.onNodeWithTag("statement-share").performClick()
+        rule.onNodeWithTag("statement-open-share-menu").performClick()
+        rule.waitUntil(20000) {actions.size==2 && launched.get()!=null}
+        rule.onNodeWithTag("statement-share-notice").performScrollTo().assertTextEquals("Share menu opened. Sending is managed in the other app. Local history could not be saved.")
+        assertEquals(listOf(CommunicationEvent.PREPARED,CommunicationEvent.CHOOSER_OPENED),actions.map {it.event})
+        assertEquals(1,actions.map {it.operationId}.distinct().size)
+        assertEquals("statement",actions.first().kind)
+        assertFalse(actions.toString().contains("Amina"))
     }
     @Test fun lightChooserHandoffHasTruthfulFeedbackAndStableChrome()=handoff(1f,false)
     @Test fun darkLargeTextChooserHandoffHasTruthfulFeedbackAndStableChrome()=handoff(2f,true)

@@ -32,7 +32,7 @@ class CustomerStatementUiTest {
     private fun statement(period: CustomerStatementPeriod)=CustomerStatement(7,"synthetic-customer",row.name,"Configured shop",null,"Market Road","PKR",period,
         "2026-10-16T00:00:00Z",10000,30000,listOf(
             CustomerStatementLine(period.start.toString(),"ref-sale","Sale","Milk 2 L",20000,30000,false)))
-    private fun show(scale: Float=1f,dark: Boolean=false,load: CustomerStatementLoader={_,p->statement(p)}) {
+    private fun show(scale: Float=1f,dark: Boolean=false,load: CustomerStatementLoader={_,p->statement(p)},communication: CustomerCommunicationAccess=CustomerCommunicationAccess()) {
         rule.setContent {
             val density=LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(density.density,scale)) {
@@ -40,10 +40,33 @@ class CustomerStatementUiTest {
                     NativeSignedInIdentity(1,"owner","Owner",AppRole.OWNER,RolePermissions.permissions(AppRole.OWNER)),
                     NativeOwnerMoreContext(BusinessClock.today().toString(),true,"Configured shop"),listOf(row),false,detail,false,false,false,false,null,
                     onBackToMenu={},onRetry={},onOpenCustomer={},onBackFromDetail={},onOpenCreate={},onBackFromCreate={},onCreateCustomer={},
-                    onOpenEdit={},onBackFromEdit={},onUpdateCustomer={_,_->},loadStatement=load,
+                    onOpenEdit={},onBackFromEdit={},onUpdateCustomer={_,_->},loadStatement=load,communication=communication,
                     hostedScaffold={snackbar,mod,wrap,content->OwnerScaffold(snackbar,OwnerSection.More,{next->wrap{}},mod,content=content)}) }
             }
         }
+    }
+    @Test fun statementReminderAndHistoryKeepOneHostAndReturnToCustomer() {
+        val facts=CustomerReminder(7,"synthetic-customer",row.name,"Configured shop","+923001234567",30000,"2026-10-16")
+        show(2f,true,communication=CustomerCommunicationAccess(reminder={facts},history={listOf(CustomerCommunicationHistory("2026-10-16T00:00:00Z","reminder","SMS","2026-10-16",CommunicationEvent.PREPARED))}))
+        val title=rule.onNodeWithText("Customers",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot
+        val nav=rule.onNodeWithTag(NativeUiTags.OwnerNavMore).fetchSemanticsNode().boundsInRoot
+        rule.onNodeWithTag("customer-statement-entry").performScrollTo().performClick()
+        rule.waitUntil(10000) {rule.onAllNodesWithTag("statement-prepare-reminder").fetchSemanticsNodes().isNotEmpty()}
+        rule.onNodeWithTag("statement-prepare-reminder").performScrollTo().performClick()
+        rule.waitUntil(10000) {rule.onAllNodesWithTag("reminder-message").fetchSemanticsNodes().isNotEmpty()}
+        rule.onNodeWithTag("reminder-message").performScrollTo().assertTextEquals(facts.message!!)
+        assertEquals(title,rule.onNodeWithText("Customers",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot)
+        assertEquals(nav,rule.onNodeWithTag(NativeUiTags.OwnerNavMore).fetchSemanticsNode().boundsInRoot)
+        rule.onNodeWithText("Back to statement").performScrollTo().performClick()
+        rule.onNodeWithTag("statement-preparation-history").performScrollTo().performClick()
+        rule.waitUntil(10000) {rule.onAllNodesWithText("Draft prepared").fetchSemanticsNodes().isNotEmpty()}
+        rule.onNodeWithText("Draft prepared").performScrollTo().assertIsDisplayed()
+        capture("preparation-history")
+        assertEquals(title,rule.onNodeWithText("Customers",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot)
+        assertEquals(nav,rule.onNodeWithTag(NativeUiTags.OwnerNavMore).fetchSemanticsNode().boundsInRoot)
+        rule.onNodeWithText("Back to statement").performScrollTo().performClick()
+        rule.onNodeWithText("Back to customer").performScrollTo().performClick()
+        rule.onNodeWithTag("customer-statement-entry").performScrollTo().assertIsDisplayed()
     }
     @Test fun detailDisclosuresRetainPendingAttentionAndExistingOwnerActions() {
         show()

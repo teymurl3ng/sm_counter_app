@@ -160,6 +160,25 @@ internal class OwnerCustomersController(
         }
     }
 
+    private suspend fun <T> customerCommunication(accountId: Long,work: suspend (String)->T): T {
+        val token=runtime.captureSession() ?: error("Sign in again to use customer communication.")
+        fun selected()=runtime.isCurrent(token) && runtime.ready()?.let {
+            it.destination==NativeOwnerMoreDestination.Customers && it.customerDetail?.row?.accountId==accountId && !it.customerEditOpen
+        }==true
+        check(selected()) {"Open this customer again before continuing."}
+        return try {
+            val result=withContext(Dispatchers.IO) {work(token.handle)}
+            check(selected()) {"The selected customer or session changed. Open the customer again."}
+            result
+        } catch(error: com.saaf.milkshop.domain.SecurityFailure.SessionExpired) {
+            if(runtime.isCurrent(token)) runtime.endSession()
+            throw error
+        }
+    }
+    suspend fun loadReminder(accountId: Long)=customerCommunication(accountId) {facade.loadReminder(it,accountId)}
+    suspend fun recordCommunication(accountId: Long,action: com.saaf.milkshop.application.owner.CustomerCommunicationAction)=customerCommunication(accountId) {facade.recordCommunication(it,accountId,action)}
+    suspend fun communicationHistory(accountId: Long)=customerCommunication(accountId) {facade.communicationHistory(it,accountId)}
+
     fun openCustomerCreate() {
         val current = runtime.state.value as? NativeOwnerMoreState.Ready ?: return
         if (current.destination != NativeOwnerMoreDestination.Customers) return

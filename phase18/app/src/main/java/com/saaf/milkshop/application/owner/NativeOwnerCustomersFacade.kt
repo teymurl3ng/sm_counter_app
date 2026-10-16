@@ -107,6 +107,10 @@ class NativeOwnerCustomersFacade(
     suspend fun loadStatement(sessionHandle: String, accountId: Long, period: CustomerStatementPeriod): CustomerStatement =
         CustomerStatementReader(database, security).load(sessionHandle, accountId, period)
 
+    suspend fun loadReminder(session: String,accountId: Long)=CustomerCommunicationService(database,security).reminder(session,accountId)
+    suspend fun recordCommunication(session: String,accountId: Long,action: CustomerCommunicationAction)=CustomerCommunicationService(database,security).record(session,accountId,action)
+    suspend fun communicationHistory(session: String,accountId: Long)=CustomerCommunicationService(database,security).history(session,accountId)
+
     /**
      * Rename then save profile (auth once). Deactivate is [CustomerProfileInput.active] = false.
      */

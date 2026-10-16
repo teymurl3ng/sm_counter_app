@@ -1,0 +1,31 @@
+{
+  "CustomerCommunicationTest": [
+    "reminderUsesCurrentBalanceAndKnownOverdueWithoutLeakingPrivateFacts",
+    "explicitPhoneAndUnicodeMessagesAreEncodedForOneRecipientOnly",
+    "historyIsMinimalIdempotentCustomerBoundedAndBackupCompatible",
+    "permissionsAndActionVocabularyAreEnforced"
+  ],
+  "CustomerReminderUiTest": [
+    "lightReviewHandoffHasStableChromeAndTruthfulHistory",
+    "darkLargeTextReviewHandoffHasStableChromeAndTruthfulHistory",
+    "changedBalanceAndPhoneRequireFreshReviewBeforeAnyLaunch",
+    "missingPhoneOverrideKeyboardAndDiscardStayInsideTheDraft",
+    "unavailableWhatsAppAllowsDeliberateSmsAndGuardsBusyTaps",
+    "settledAdvanceAndExpiredAccessNeverOpenComposer"
+  ],
+  "CustomerStatementUiTest": [
+    "statementReminderAndHistoryKeepOneHostAndReturnToCustomer",
+    "statementLightPreviewAndReturnKeepChromeAndDisclosure",
+    "statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure",
+    "periodFailureRetainsPreviousSnapshotAndAllowsRevert",
+    "multiplePagesAndRefreshClampToNewContent"
+  ],
+  "StatementSharingUiTest": [
+    "observableShareHistoryDoesNotTurnPostLaunchAuditFailureIntoHandoffFailure",
+    "lightChooserHandoffHasTruthfulFeedbackAndStableChrome",
+    "darkLargeTextChooserHandoffHasTruthfulFeedbackAndStableChrome",
+    "cancelDoesNotExportAndMissingHandlerReportsFailure",
+    "changedFactsBeforeOrAfterRenderingRequireReviewInsteadOfSharing",
+    "nativeChooserCanBeDismissedWithoutSending"
+  ]
+}

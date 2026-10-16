@@ -32,7 +32,8 @@ data class CustomerCommunicationAccess(
 
 @Composable
 internal fun CustomerReminderScreen(customerId: Long,access: CustomerCommunicationAccess,onBack: ()->Unit,
-    onEdit: ()->Unit,publishGuard: (EntryLeaveGuard?)->Unit={},launcher: ((ReminderChannel,String,String)->Unit)?=null) {
+    onEdit: ()->Unit,publishGuard: (EntryLeaveGuard?)->Unit={},launcher: ((ReminderChannel,String,String)->Unit)?=null,
+    backLabel: String="Back to statement") {
     val context=LocalContext.current
     val scope=rememberCoroutineScope()
     val guard=rememberEntryLeaveGuard()
@@ -82,7 +83,7 @@ internal fun CustomerReminderScreen(customerId: Long,access: CustomerCommunicati
     }
     Column(Modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState()).padding(horizontal=16.dp,vertical=12.dp)
         .testTag("customer-reminder"),verticalArrangement=Arrangement.spacedBy(16.dp)) {
-        TextButton(onClick=hapticAction {guard.requestLeave(onBack)},modifier=Modifier.heightIn(min=48.dp)) {Text("Back to statement")}
+        TextButton(onClick=hapticAction {guard.requestLeave(onBack)},modifier=Modifier.heightIn(min=48.dp)) {Text(backLabel)}
         Text("Prepare reminder",style=MaterialTheme.typography.titleLarge)
         Box(Modifier.fillMaxWidth().height(4.dp)) {if(loading || busy) LinearProgressIndicator(Modifier.fillMaxWidth())}
         current?.let {facts->

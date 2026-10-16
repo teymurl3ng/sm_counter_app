@@ -25,4 +25,5 @@ internal data class OwnerMoreDependencies(
     val securityHistory: NativeOwnerSecurityHistoryFacade,
     val backup: NativeOwnerBackupFacade,
     val sync: NativeOwnerSyncFacade,
+    val createFollowUps: ((String,()->Unit)->CustomerFollowUpAccess)? = null,
 )

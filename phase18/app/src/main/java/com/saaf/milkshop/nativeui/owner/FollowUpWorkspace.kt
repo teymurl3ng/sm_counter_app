@@ -47,7 +47,7 @@ internal data class FollowUpWorkspaceAccess(val load: suspend ()->FollowUpWorksp
 /** Bound presentation; ordinary navigation waits for B's shared external-handoff gate. */
 @Composable
 internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,onStatement: (Long)->Unit,onReminder: (Long)->Unit,
-    publishGuard: (EntryLeaveGuard?)->Unit={}) {
+    publishGuard: (EntryLeaveGuard?)->Unit={},openingCustomer: Boolean=false) {
     var snapshot by remember(access) {mutableStateOf<FollowUpWorkspaceSnapshot?>(null)}
     var error by remember {mutableStateOf<String?>(null)}
     var notice by remember {mutableStateOf<String?>(null)}
@@ -62,7 +62,7 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
     val scope=rememberCoroutineScope()
     val guard=rememberEntryLeaveGuard()
     DisposableEffect(guard) {publishGuard(guard);onDispose {publishGuard(null)}}
-    fun leave(action: ()->Unit) {if(!busy) guard.requestLeave(action)}
+    fun leave(action: ()->Unit) {if(!busy&&!openingCustomer) guard.requestLeave(action)}
     fun back()=leave {when(page) {"list"->onBack();"schedule"->page="review";else->page="list"}}
     ActivePaneBackHandler(onBack={back()})
     LaunchedEffect(access,retry) {
@@ -106,10 +106,10 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
     LaunchedEffect(error) {if(error!=null) scroll.animateScrollTo(0)}
     Column(Modifier.fillMaxSize().imePadding().verticalScroll(scroll).padding(16.dp).testTag("followup-workspace"),
         verticalArrangement=Arrangement.spacedBy(16.dp)) {
-        TextButton(onClick=hapticAction {back()},enabled=!busy) {Text(if(page=="list") "Back to customers" else "Back")}
+        TextButton(onClick=hapticAction {back()},enabled=!busy&&!openingCustomer) {Text(if(page=="list") "Back to customers" else "Back")}
         NativeInformationHeading(when(page) {"settings"->"Follow-up settings";"review"->"Review follow-up";"schedule"->"Statement schedule";else->"Follow-ups"},
             actionLabel=if(page=="list") "Settings" else null,actionTag="followup-settings",onAction=if(page=="list") ({leave {page="settings"}}) else null)
-        Box(Modifier.fillMaxWidth().height(4.dp)) {if(busy) LinearProgressIndicator(Modifier.fillMaxWidth().testTag("followup-progress"))}
+        Box(Modifier.fillMaxWidth().height(4.dp)) {if(busy||openingCustomer) LinearProgressIndicator(Modifier.fillMaxWidth().testTag("followup-progress"))}
         error?.let {Text(it,color=MaterialTheme.colorScheme.error,modifier=Modifier.testTag("followup-error").semantics {liveRegion=LiveRegionMode.Polite})}
         notice?.let {Text(it,modifier=Modifier.testTag("followup-notice").semantics {liveRegion=LiveRegionMode.Polite})}
         val state=snapshot
@@ -120,7 +120,7 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
                 TextButton(onClick=hapticAction {recover(pending.uid,false)},enabled=!busy && state.online,modifier=Modifier.testTag("followup-check-save")) {Text("Check save result")}
                 TextButton(onClick=hapticAction {setAside=pending.uid},enabled=!busy,modifier=Modifier.testTag("followup-set-aside")) {Text("Set aside local request")}
             }}
-            val editingBlocked=busy || state.unfinished.isNotEmpty()
+            val editingBlocked=busy || openingCustomer || state.unfinished.isNotEmpty()
             val rows=CustomerFollowUps.ordered(state.customers.mapNotNull {customer->CustomerFollowUps.evaluate(customer,state.policy,
                 state.preferences[customer.uid],state.acknowledgments[customer.uid] ?: FollowUpAcknowledgment(),state.today)})
             when(page) {
@@ -156,7 +156,7 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
                         Text(if(query.isNotBlank()) "No customers match this search." else "No follow-ups need review.")
                         Text("Next shop statement review: ${CustomerFollowUps.next(state.policy.statementSchedule,maxOf(state.today,state.policy.effectiveFrom.minusDays(1)))}",style=nativeSupportingTextStyle())
                     }
-                    shown.forEach {row->Column(Modifier.nativeListItem(NativeListStyle.Entity).clickable(enabled=!busy,onClick=hapticAction {selected=row.customer.uid;page="review"})
+                    shown.forEach {row->Column(Modifier.nativeListItem(NativeListStyle.Entity).clickable(enabled=!busy&&!openingCustomer,onClick=hapticAction {selected=row.customer.uid;page="review"})
                         .nativeListItemContent(NativeListStyle.Entity).testTag("followup-row-${row.customer.accountId}"),verticalArrangement=Arrangement.spacedBy(6.dp)) {
                         Text(row.customer.name,style=nativeValueTextStyle())
                         Text(statementMoney(row.customer.balancePaisa),style=nativeMetricTextStyle(),color=nativeVisualColors.metric)
@@ -257,7 +257,7 @@ private fun FollowUpPolicyEditor(state: FollowUpWorkspaceSnapshot,busy: Boolean,
         if(it.enabled) {phonesUpdated=false;primary=state.primaryDevice=="Not selected";confirm=FollowUpCommand.Policy(it)} else onSave(FollowUpCommand.Policy(it))
     }},enabled=canEdit && proposed!=null,modifier=Modifier.fillMaxWidth().testTag("followup-save-policy")) {Text("Save settings")}
     if(confirm!=null) AlertDialog(onDismissRequest={confirm=null},title={Text("Confirm follow-up settings")},text={Column(Modifier.heightIn(max=360.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(12.dp)) {
-        Text("One device receives owner alerts. In coordinated mode, opening customer messages requires a connection. The app cannot see payments on another offline device.")
+        Text("One device receives owner alerts. Synced devices need a connection to check message settings before opening a customer message, including when follow-ups are off. Drafts and statements remain available offline. The app cannot see payments on another offline device.")
         Row(verticalAlignment=Alignment.CenterVertically) {Checkbox(phonesUpdated,{phonesUpdated=it},modifier=Modifier.testTag("followup-confirm-updated"));Text("All posting devices have the compatible update",Modifier.weight(1f))}
         Row(verticalAlignment=Alignment.CenterVertically) {Checkbox(primary,{primary=it},modifier=Modifier.testTag("followup-confirm-primary"));Text("Use this device for owner alerts",Modifier.weight(1f))}
     }},confirmButton={TextButton(onClick=hapticAction {val proposal=requireNotNull(confirm);confirm=null;onSave(proposal.copy(makePrimary=primary,phonesUpdated=phonesUpdated))},

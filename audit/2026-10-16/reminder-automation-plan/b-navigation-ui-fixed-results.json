@@ -1,0 +1,70 @@
+{
+  "label": "b-navigation-ui-fixed",
+  "device": "S24",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpNavigationUiTest#ownerReturnPathsRetainReviewAndChrome",
+    "com.saaf.milkshop.FollowUpNavigationUiTest#managerAndAdminUseTheirOwnChromeAndGuards",
+    "com.saaf.milkshop.FollowUpNavigationUiTest#darkLargeReviewAndStatementReturn",
+    "com.saaf.milkshop.FollowUpNavigationUiTest#directCustomerReminderUsesSharedHook",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementReminderAndHistoryKeepOneHostAndReturnToCustomer",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementLightPreviewAndReturnKeepChromeAndDisclosure",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure",
+    "com.saaf.milkshop.CreditFinishUiTest#customerFiltersIncludeSettledOwnerFlagsAndSearchWithoutChangingRows"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationUiTest",
+      "test": "darkLargeReviewAndStatementReturn",
+      "code": -2,
+      "stack": "androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 10000 ms"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationUiTest",
+      "test": "ownerReturnPathsRetainReviewAndChrome",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationUiTest",
+      "test": "managerAndAdminUseTheirOwnChromeAndGuards",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationUiTest",
+      "test": "directCustomerReminderUsesSharedHook",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Action performScrollTo() failed."
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementReminderAndHistoryKeepOneHostAndReturnToCustomer",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementLightPreviewAndReturnKeepChromeAndDisclosure",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditFinishUiTest",
+      "test": "customerFiltersIncludeSettledOwnerFlagsAndSearchWithoutChangingRows",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 6,
+  "expected": 8,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "eea91a85ef1d2e60915b904d7ee86c062fe840fa643a71794777c93f4eb27323"
+}

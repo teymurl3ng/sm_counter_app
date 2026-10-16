@@ -213,6 +213,8 @@ dependencies {
     androidTestImplementation(libs.androidx.work.testing)
     androidTestImplementation(composeBom)
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    // Compose's older transitive Espresso uses removed InputManager reflection on API 37.
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

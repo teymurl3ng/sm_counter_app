@@ -37,6 +37,8 @@ import androidx.compose.runtime.Composable
 import com.saaf.milkshop.nativeui.common.hapticAction
 import com.saaf.milkshop.nativeui.common.nativeListItem
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -115,7 +117,34 @@ fun OwnerCustomersScreen(
     onCreditAction: (com.saaf.milkshop.application.owner.CustomerCreditCommand) -> Unit = {},
     communication: CustomerCommunicationAccess = CustomerCommunicationAccess(),
     loadStatement: CustomerStatementLoader = { _, _ -> error("Statement loading is unavailable.") },
+    followUps: CustomerFollowUpAccess? = null,
+    registerGuard: (EntryLeaveGuard?)->Unit = {},
 ) {
+    var followUpOpen by rememberSaveable(identity.userId) {mutableStateOf(false)}
+    var followUpCustomer by rememberSaveable(identity.userId) {mutableStateOf<Long?>(null)}
+    var followUpTask by rememberSaveable(identity.userId) {mutableStateOf("detail")}
+    var guard by remember {mutableStateOf<EntryLeaveGuard?>(null)}
+    val publish=com.saaf.milkshop.nativeui.common.rememberPaneGuardRegistration({guard}) {guard=it;registerGuard(it)}
+    val saved=androidx.compose.runtime.saveable.rememberSaveableStateHolder()
+    LaunchedEffect(customerDetail?.row?.accountId,followUpCustomer,customersLoading,customersError) {
+        if(followUpCustomer!=null&&!customersLoading) {
+            if(customerDetail?.row?.accountId==followUpCustomer) followUpOpen=false
+            else if(customersError!=null) followUpCustomer=null
+        }
+    }
+    if(followUpOpen&&followUps!=null) {
+        hostedScaffold(snackbarHostState,modifier,{action->guard?.requestLeave(action) ?: action()}) {padding->
+            Column(Modifier.fillMaxSize().padding(padding)) {
+                CashierScreenHeader("Customers",context.shopName,formatCashierRoleLabel(identity.role.wireValue),context.businessDate,context.postingOpen)
+                customersError?.let {Text(it,color=MaterialTheme.colorScheme.error,modifier=Modifier.padding(horizontal=16.dp))}
+                saved.SaveableStateProvider("followups") {FollowUpWorkspace(followUps.workspace,
+                    onBack={followUpOpen=false},onStatement={id->followUpCustomer=id;followUpTask="statement";onOpenCustomer(id)},
+                    onReminder={id->followUpCustomer=id;followUpTask="reminder";onOpenCustomer(id)},publishGuard=publish,
+                    openingCustomer=followUpCustomer!=null&&(customersLoading||customerDetail?.row?.accountId!=followUpCustomer))}
+            }
+        }
+        return
+    }
     val snapshot = OwnerCustomersScreenSnapshot(
         identity = identity,
         context = context,
@@ -129,6 +158,7 @@ fun OwnerCustomersScreen(
         customersError = customersError,
         showHeader = showHeader,
     )
+    saved.SaveableStateProvider("customers") {
     com.saaf.milkshop.nativeui.common.NativeSectionTransition(
         targetState = snapshot,
         contentKey = { pane -> when {
@@ -154,7 +184,9 @@ fun OwnerCustomersScreen(
             onBackToMenu = onBackToMenu,
             onRetry = onRetry,
             onOpenCustomer = onOpenCustomer,
-            onBackFromDetail = onBackFromDetail,
+            onBackFromDetail = {if(followUpCustomer==pane.customerDetail?.row?.accountId&&followUpCustomer!=null) {
+                followUpCustomer=null;followUpTask="detail";followUpOpen=true
+            };onBackFromDetail()},
             onOpenCreate = onOpenCreate,
             onBackFromCreate = onBackFromCreate,
             onCreateCustomer = onCreateCustomer,
@@ -167,7 +199,14 @@ fun OwnerCustomersScreen(
             hostedScaffold = hostedScaffold,
             showHeader = pane.showHeader,
             modifier = modifier,
+            followUpEntry = followUps?.let {access->{
+                val attention by access.attention.collectAsState(com.saaf.milkshop.sync.FollowUpAttention())
+                FollowUpAttentionEntry(attention) {followUpCustomer=null;followUpTask="detail";followUpOpen=true}
+            }},
+            initialTask = if(followUpCustomer==pane.customerDetail?.row?.accountId&&followUpCustomer!=null) followUpTask else "detail",
+            registerGuard = publish,
         )
+    }
     }
 }
 
@@ -200,6 +239,9 @@ private fun OwnerCustomersScreenPane(
     onCreditAction: (com.saaf.milkshop.application.owner.CustomerCreditCommand) -> Unit = {},
     communication: CustomerCommunicationAccess = CustomerCommunicationAccess(),
     loadStatement: CustomerStatementLoader = { _, _ -> error("Statement loading is unavailable.") },
+    followUpEntry: (@Composable ()->Unit)? = null,
+    initialTask: String = "detail",
+    registerGuard: (EntryLeaveGuard?)->Unit = {},
 ) {
     if (customerCreateOpen) {
         OwnerCustomersCreateScreen(
@@ -247,6 +289,8 @@ private fun OwnerCustomersScreenPane(
             creditBusy = customerUpdating,
             hostedScaffold = hostedScaffold,
             modifier = modifier,
+            initialTask = initialTask,
+            registerGuard = registerGuard,
         )
         return
     }
@@ -304,66 +348,31 @@ private fun OwnerCustomersScreenPane(
                     }
                 }
                 else -> {
-                    Column(Modifier.fillMaxSize()) {
-                        OutlinedTextField(query,{query=it},label={ Text("Search customers") },singleLine=true,
-                            modifier=Modifier.fillMaxWidth().padding(horizontal=16.dp).testTag("credit-customer-search"))
-                        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal=16.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-                            listOf("All","Watch","Late","Bad","Needs review").forEach { filter ->
-                                androidx.compose.material3.FilterChip(selected=creditFilter==filter,onClick=hapticAction { creditFilter=filter },
-                                    label={ Text(filter) },modifier=Modifier.testTag("credit-filter-$filter"))
-                            }
-                        }
-
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp, vertical = 4.dp),
-                            horizontalArrangement = Arrangement.End,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            TextButton(
-                                onClick = hapticAction(onOpenCreate),
-                                modifier = Modifier.testTag(NativeUiTags.OwnerCustomersCreateOpen),
-                            ) { Text("Add customer") }
-                        }
-                        customersError?.let {
-                            Text(
-                                it,
-                                color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp)
-                                    .testTag(NativeUiTags.OwnerCustomersError),
-                            )
-                        }
-                        if (filteredCustomers.isEmpty()) {
-                            Box(
-                                Modifier
-                                    .fillMaxSize()
-                                    .padding(24.dp)
-                                    .testTag(NativeUiTags.OwnerCustomersEmpty),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Text(
-                                    if(customers.isEmpty()) "No customers yet." else "No customers match this filter.",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        } else {
-                            LazyColumn(
-                                Modifier
-                                    .fillMaxSize()
-                                    .padding(horizontal = 16.dp)
-                                    .testTag(NativeUiTags.OwnerCustomersList),
-                            ) {
-                                items(filteredCustomers, key = { it.accountId }) { customer ->
-                                    OwnerCustomerRow(
-                                        customer = customer,
-                                        onClick = com.saaf.milkshop.nativeui.common.hapticAction { onOpenCustomer(customer.accountId) },
-                                    )
+                    LazyColumn(Modifier.fillMaxSize().padding(horizontal=16.dp).testTag(NativeUiTags.OwnerCustomersList),
+                        verticalArrangement=Arrangement.spacedBy(8.dp)) {
+                        item("customer-controls") {
+                            Column(verticalArrangement=Arrangement.spacedBy(8.dp)) {
+                                followUpEntry?.invoke()
+                                OutlinedTextField(query,{query=it},label={Text("Search customers")},singleLine=true,
+                                    modifier=Modifier.fillMaxWidth().testTag("credit-customer-search"))
+                                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                                    listOf("All","Watch","Late","Bad","Needs review").forEach {filter->
+                                        androidx.compose.material3.FilterChip(creditFilter==filter,onClick=hapticAction {creditFilter=filter},
+                                            label={Text(filter)},modifier=Modifier.testTag("credit-filter-$filter"))
+                                    }
                                 }
+                                Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.End) {
+                                    TextButton(onClick=hapticAction(onOpenCreate),modifier=Modifier.testTag(NativeUiTags.OwnerCustomersCreateOpen)) {Text("Add customer")}
+                                }
+                                customersError?.let {Text(it,color=MaterialTheme.colorScheme.error,modifier=Modifier.testTag(NativeUiTags.OwnerCustomersError))}
                             }
                         }
+                        if(filteredCustomers.isEmpty()) item("empty") {
+                            Box(Modifier.fillMaxWidth().padding(24.dp).testTag(NativeUiTags.OwnerCustomersEmpty),contentAlignment=Alignment.Center) {
+                                Text(if(customers.isEmpty()) "No customers yet." else "No customers match this filter.",style=MaterialTheme.typography.bodyLarge,color=MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+                        items(filteredCustomers,key={it.accountId}) {customer->OwnerCustomerRow(customer,hapticAction {onOpenCustomer(customer.accountId)})}
                     }
                 }
             }
@@ -788,13 +797,15 @@ private fun OwnerCustomersDetailScreen(
     creditBusy: Boolean,
     loadStatement: CustomerStatementLoader,
     communication: CustomerCommunicationAccess,
+    initialTask: String = "detail",
+    registerGuard: (EntryLeaveGuard?)->Unit = {},
 ) {
-    var task by rememberSaveable(identity.userId, detail.row.accountId) { mutableStateOf("detail") }
+    var task by rememberSaveable(identity.userId, detail.row.accountId, initialTask) { mutableStateOf(initialTask) }
     var paneGuard by androidx.compose.runtime.remember { mutableStateOf<EntryLeaveGuard?>(null) }
-    val publishGuard=com.saaf.milkshop.nativeui.common.rememberPaneGuardRegistration({paneGuard},{paneGuard=it})
+    val publishGuard=com.saaf.milkshop.nativeui.common.rememberPaneGuardRegistration({paneGuard},{paneGuard=it;registerGuard(it)})
     val panes = androidx.compose.runtime.saveable.rememberSaveableStateHolder()
-    fun back() {val leave={task=if(task=="reminder" || task=="history") "statement" else "detail";if(task=="detail") Unit};paneGuard?.requestLeave(leave) ?: leave()}
-    BackHandler(onBack = {if(task=="detail") onBack() else back()})
+    fun back() {val leave={if(task==initialTask) onBack() else task=if(task=="reminder"||task=="history") "statement" else initialTask};paneGuard?.requestLeave(leave) ?: leave()}
+    BackHandler(onBack = {back()})
     val row = detail.row
     hostedScaffold(snackbarHostState, modifier, { action->paneGuard?.requestLeave(action) ?: action() }) { padding ->
         Column(
@@ -816,8 +827,8 @@ private fun OwnerCustomersDetailScreen(
                 panes.SaveableStateProvider(showing) {
                 when(showing) {
                     "statement"->CustomerStatementScreen(row.accountId,row.name,loadStatement,communication=communication,
-                        onReminder={task="reminder"},onHistory={task="history"}) {task="detail"}
-                    "reminder"->CustomerReminderScreen(row.accountId,communication,{task="statement"},onOpenEdit,publishGuard)
+                        onReminder={task="reminder"},onHistory={task="history"},backLabel=if(initialTask=="statement") "Back to follow-up" else "Back to customer") {back()}
+                    "reminder"->CustomerReminderScreen(row.accountId,communication,{back()},onOpenEdit,publishGuard,backLabel=if(initialTask=="reminder") "Back to follow-up" else "Back to statement")
                     "history"->CustomerPreparationHistory(row.accountId,communication) {task="statement"}
                     else->CustomerDetailOverview(detail,identity.role.wireValue=="owner",creditBusy,error,
                         onOpenStatement={task="statement"},onEdit=onOpenEdit,onCreditAction=onCreditAction)

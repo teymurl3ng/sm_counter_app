@@ -109,7 +109,7 @@ private fun CustomerDetailDisclosure(title: String,key: String,selected: String,
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CustomerStatementScreen(customerId: Long,customerName: String,load: CustomerStatementLoader,shareLauncher: ((android.content.Intent)->Unit)?=null,
-    communication: CustomerCommunicationAccess=CustomerCommunicationAccess(),onReminder: ()->Unit={},onHistory: ()->Unit={},onBack: ()->Unit) {
+    communication: CustomerCommunicationAccess=CustomerCommunicationAccess(),onReminder: ()->Unit={},onHistory: ()->Unit={},backLabel: String="Back to customer",onBack: ()->Unit) {
     val context=LocalContext.current
     val engine=remember(context.applicationContext) {StatementDocumentEngine(context)}
     val today=BusinessClock.today()
@@ -140,7 +140,7 @@ internal fun CustomerStatementScreen(customerId: Long,customerName: String,load:
     }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal=16.dp,vertical=12.dp)
         .testTag("customer-statement"),verticalArrangement=Arrangement.spacedBy(16.dp)) {
-        TextButton(onClick=hapticAction(onBack),contentPadding=PaddingValues(0.dp),modifier=Modifier.heightIn(min=48.dp)) { Text("Back to customer") }
+        TextButton(onClick=hapticAction(onBack),contentPadding=PaddingValues(0.dp),modifier=Modifier.heightIn(min=48.dp)) { Text(backLabel) }
         Column { Text("Statement",style=MaterialTheme.typography.titleLarge); Text(customerName,style=nativeSupportingTextStyle()) }
         NativeInformationSection {
             NativeInformationHeading("Period",actionLabel="Change",actionTag="statement-period",onAction={if(!sharing) choosePeriod=true})

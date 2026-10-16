@@ -1,0 +1,148 @@
+{
+  "date": "2026-10-16",
+  "baseline": "fef70de",
+  "uniqueMethods": 21,
+  "latestPassed": 21,
+  "latest": {
+    "com.saaf.milkshop.FollowUpNavigationTest#connectedModeNeverFallsBackOnUnknown": {
+      "passed": true,
+      "evidence": "b-navigation-data-results.json",
+      "apkSha256": "b0b7c9ddf4dc6c3ed92054f9148091dfa93e961c61fe647ce8e005eabfd69b73"
+    },
+    "com.saaf.milkshop.FollowUpNavigationTest#modeIsRecheckedBeforeEveryOpen": {
+      "passed": true,
+      "evidence": "b-navigation-data-results.json",
+      "apkSha256": "b0b7c9ddf4dc6c3ed92054f9148091dfa93e961c61fe647ce8e005eabfd69b73"
+    },
+    "com.saaf.milkshop.FollowUpNavigationTest#restoredRequestCannotBecomeStandalone": {
+      "passed": true,
+      "evidence": "b-navigation-data-results.json",
+      "apkSha256": "b0b7c9ddf4dc6c3ed92054f9148091dfa93e961c61fe647ce8e005eabfd69b73"
+    },
+    "com.saaf.milkshop.FollowUpNavigationTest#standaloneRetainsManualWithoutRpc": {
+      "passed": true,
+      "evidence": "b-navigation-data-results.json",
+      "apkSha256": "b0b7c9ddf4dc6c3ed92054f9148091dfa93e961c61fe647ce8e005eabfd69b73"
+    },
+    "com.saaf.milkshop.FollowUpNavigationTest#boundWorkspaceRejectsChangedSession": {
+      "passed": true,
+      "evidence": "b-navigation-corrected-results.json",
+      "apkSha256": "bc9947a7b63fdc9fc9b40acd1eaa8aaaf645f9bca70e6983b6682b3741746a38"
+    },
+    "com.saaf.milkshop.FollowUpHandoffTest#busyForeignClaimNeverLaunch": {
+      "passed": true,
+      "evidence": "b-navigation-data-results.json",
+      "apkSha256": "b0b7c9ddf4dc6c3ed92054f9148091dfa93e961c61fe647ce8e005eabfd69b73"
+    },
+    "com.saaf.milkshop.FollowUpHandoffTest#changedFactsStaleHeadsOrPauseNeverLaunch": {
+      "passed": true,
+      "evidence": "b-navigation-data-results.json",
+      "apkSha256": "b0b7c9ddf4dc6c3ed92054f9148091dfa93e961c61fe647ce8e005eabfd69b73"
+    },
+    "com.saaf.milkshop.FollowUpHandoffTest#cancellationOrFailedHandlerLeavesStartedUncertainty": {
+      "passed": true,
+      "evidence": "b-navigation-data-results.json",
+      "apkSha256": "b0b7c9ddf4dc6c3ed92054f9148091dfa93e961c61fe647ce8e005eabfd69b73"
+    },
+    "com.saaf.milkshop.FollowUpHandoffTest#explicitResolutionPinsAttemptRoleAndRevisions": {
+      "passed": true,
+      "evidence": "b-navigation-data-results.json",
+      "apkSha256": "b0b7c9ddf4dc6c3ed92054f9148091dfa93e961c61fe647ce8e005eabfd69b73"
+    },
+    "com.saaf.milkshop.FollowUpHandoffTest#currentStartSingleLaunchNoFinancialWrites": {
+      "passed": true,
+      "evidence": "b-navigation-data-results.json",
+      "apkSha256": "b0b7c9ddf4dc6c3ed92054f9148091dfa93e961c61fe647ce8e005eabfd69b73"
+    },
+    "com.saaf.milkshop.FollowUpHandoffTest#restoredRequestsStayOriginalAndRecoveryNeverLaunches": {
+      "passed": true,
+      "evidence": "b-navigation-data-results.json",
+      "apkSha256": "b0b7c9ddf4dc6c3ed92054f9148091dfa93e961c61fe647ce8e005eabfd69b73"
+    },
+    "com.saaf.milkshop.FollowUpHandoffTest#lostAcquireOrStartNeverReplays": {
+      "passed": true,
+      "evidence": "b-navigation-data-results.json",
+      "apkSha256": "b0b7c9ddf4dc6c3ed92054f9148091dfa93e961c61fe647ce8e005eabfd69b73"
+    },
+    "com.saaf.milkshop.FollowUpHandoffTest#expiredSessionAndBindingChangeCannotLaunch": {
+      "passed": true,
+      "evidence": "b-navigation-data-results.json",
+      "apkSha256": "b0b7c9ddf4dc6c3ed92054f9148091dfa93e961c61fe647ce8e005eabfd69b73"
+    },
+    "com.saaf.milkshop.FollowUpNavigationUiTest#darkLargeReviewAndStatementReturn": {
+      "passed": true,
+      "evidence": "b-navigation-corrected-results.json",
+      "apkSha256": "bc9947a7b63fdc9fc9b40acd1eaa8aaaf645f9bca70e6983b6682b3741746a38"
+    },
+    "com.saaf.milkshop.FollowUpNavigationUiTest#ownerReturnPathsRetainReviewAndChrome": {
+      "passed": true,
+      "evidence": "b-navigation-ui-fixed-results.json",
+      "apkSha256": "eea91a85ef1d2e60915b904d7ee86c062fe840fa643a71794777c93f4eb27323"
+    },
+    "com.saaf.milkshop.FollowUpNavigationUiTest#managerAndAdminUseTheirOwnChromeAndGuards": {
+      "passed": true,
+      "evidence": "b-navigation-ui-fixed-results.json",
+      "apkSha256": "eea91a85ef1d2e60915b904d7ee86c062fe840fa643a71794777c93f4eb27323"
+    },
+    "com.saaf.milkshop.FollowUpNavigationUiTest#directCustomerReminderUsesSharedHook": {
+      "passed": true,
+      "evidence": "b-navigation-corrected-results.json",
+      "apkSha256": "bc9947a7b63fdc9fc9b40acd1eaa8aaaf645f9bca70e6983b6682b3741746a38"
+    },
+    "com.saaf.milkshop.CustomerStatementUiTest#statementReminderAndHistoryKeepOneHostAndReturnToCustomer": {
+      "passed": true,
+      "evidence": "b-navigation-ui-fixed-results.json",
+      "apkSha256": "eea91a85ef1d2e60915b904d7ee86c062fe840fa643a71794777c93f4eb27323"
+    },
+    "com.saaf.milkshop.CustomerStatementUiTest#statementLightPreviewAndReturnKeepChromeAndDisclosure": {
+      "passed": true,
+      "evidence": "b-navigation-ui-fixed-results.json",
+      "apkSha256": "eea91a85ef1d2e60915b904d7ee86c062fe840fa643a71794777c93f4eb27323"
+    },
+    "com.saaf.milkshop.CustomerStatementUiTest#statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure": {
+      "passed": true,
+      "evidence": "b-navigation-ui-fixed-results.json",
+      "apkSha256": "eea91a85ef1d2e60915b904d7ee86c062fe840fa643a71794777c93f4eb27323"
+    },
+    "com.saaf.milkshop.CreditFinishUiTest#customerFiltersIncludeSettledOwnerFlagsAndSearchWithoutChangingRows": {
+      "passed": true,
+      "evidence": "b-navigation-ui-fixed-results.json",
+      "apkSha256": "eea91a85ef1d2e60915b904d7ee86c062fe840fa643a71794777c93f4eb27323"
+    }
+  },
+  "runs": {
+    "b-navigation-data": {
+      "expected": 13,
+      "passed": 13,
+      "apkSha256": "b0b7c9ddf4dc6c3ed92054f9148091dfa93e961c61fe647ce8e005eabfd69b73"
+    },
+    "b-navigation-ui": {
+      "expected": 8,
+      "passed": 0,
+      "apkSha256": "eea91a85ef1d2e60915b904d7ee86c062fe840fa643a71794777c93f4eb27323"
+    },
+    "b-navigation-ui-fixed": {
+      "expected": 8,
+      "passed": 6,
+      "apkSha256": "eea91a85ef1d2e60915b904d7ee86c062fe840fa643a71794777c93f4eb27323"
+    },
+    "b-navigation-corrected": {
+      "expected": 3,
+      "passed": 3,
+      "apkSha256": "bc9947a7b63fdc9fc9b40acd1eaa8aaaf645f9bca70e6983b6682b3741746a38"
+    }
+  },
+  "screenshots": {
+    "b-navigation-ui-fixed-captures\\owner-review-return.png": "282171de33725c069f856c0cfc472214a38b843264ffa3725fac310d4c465db5",
+    "b-navigation-corrected-captures\\dark-large-review-return.png": "1378485b6481d6a34ad30fa3cb41cf01334b244e58819fdf2b25cfda686f005f"
+  },
+  "provenance": "Data13 passed before a UI-only pending-customer guard. Initial UI8 failed in Espresso3.5.0 before screen work; pinned test-only3.7.0 then passed6/8. Corrected invalid statement fixture plus wait and checked both supported WhatsApp editions; only failedUI2 and touched factory1 reran, passing3/3. Each result retains its actual APK hash; no all-runs-identical claim.",
+  "scope": {
+    "deviceSdk": 37,
+    "ordinaryAppTouched": false,
+    "cloudChanged": false,
+    "realCustomerContact": false,
+    "physicalTwoPhoneConcurrencyProven": false,
+    "notificationLifecycleActivated": false
+  }
+}

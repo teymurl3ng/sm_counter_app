@@ -1,0 +1,33 @@
+{
+  "FollowUpNavigationTest": [
+    "standaloneRetainsManualWithoutRpc",
+    "connectedModeNeverFallsBackOnUnknown",
+    "modeIsRecheckedBeforeEveryOpen",
+    "boundWorkspaceRejectsChangedSession",
+    "restoredRequestCannotBecomeStandalone"
+  ],
+  "FollowUpHandoffTest": [
+    "currentStartSingleLaunchNoFinancialWrites",
+    "changedFactsStaleHeadsOrPauseNeverLaunch",
+    "busyForeignClaimNeverLaunch",
+    "lostAcquireOrStartNeverReplays",
+    "restoredRequestsStayOriginalAndRecoveryNeverLaunches",
+    "cancellationOrFailedHandlerLeavesStartedUncertainty",
+    "explicitResolutionPinsAttemptRoleAndRevisions",
+    "expiredSessionAndBindingChangeCannotLaunch"
+  ],
+  "FollowUpNavigationUiTest": [
+    "ownerReturnPathsRetainReviewAndChrome",
+    "managerAndAdminUseTheirOwnChromeAndGuards",
+    "darkLargeReviewAndStatementReturn",
+    "directCustomerReminderUsesSharedHook"
+  ],
+  "CustomerStatementUiTest": [
+    "statementReminderAndHistoryKeepOneHostAndReturnToCustomer",
+    "statementLightPreviewAndReturnKeepChromeAndDisclosure",
+    "statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure"
+  ],
+  "CreditFinishUiTest": [
+    "customerFiltersIncludeSettledOwnerFlagsAndSearchWithoutChangingRows"
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "label": "b-navigation-data",
+  "device": "S24",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpNavigationTest#standaloneRetainsManualWithoutRpc",
+    "com.saaf.milkshop.FollowUpNavigationTest#connectedModeNeverFallsBackOnUnknown",
+    "com.saaf.milkshop.FollowUpNavigationTest#modeIsRecheckedBeforeEveryOpen",
+    "com.saaf.milkshop.FollowUpNavigationTest#boundWorkspaceRejectsChangedSession",
+    "com.saaf.milkshop.FollowUpNavigationTest#restoredRequestCannotBecomeStandalone",
+    "com.saaf.milkshop.FollowUpHandoffTest#currentStartSingleLaunchNoFinancialWrites",
+    "com.saaf.milkshop.FollowUpHandoffTest#changedFactsStaleHeadsOrPauseNeverLaunch",
+    "com.saaf.milkshop.FollowUpHandoffTest#busyForeignClaimNeverLaunch",
+    "com.saaf.milkshop.FollowUpHandoffTest#lostAcquireOrStartNeverReplays",
+    "com.saaf.milkshop.FollowUpHandoffTest#restoredRequestsStayOriginalAndRecoveryNeverLaunches",
+    "com.saaf.milkshop.FollowUpHandoffTest#cancellationOrFailedHandlerLeavesStartedUncertainty",
+    "com.saaf.milkshop.FollowUpHandoffTest#explicitResolutionPinsAttemptRoleAndRevisions",
+    "com.saaf.milkshop.FollowUpHandoffTest#expiredSessionAndBindingChangeCannotLaunch"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationTest",
+      "test": "connectedModeNeverFallsBackOnUnknown",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationTest",
+      "test": "modeIsRecheckedBeforeEveryOpen",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationTest",
+      "test": "restoredRequestCannotBecomeStandalone",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationTest",
+      "test": "standaloneRetainsManualWithoutRpc",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationTest",
+      "test": "boundWorkspaceRejectsChangedSession",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpHandoffTest",
+      "test": "busyForeignClaimNeverLaunch",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpHandoffTest",
+      "test": "changedFactsStaleHeadsOrPauseNeverLaunch",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpHandoffTest",
+      "test": "cancellationOrFailedHandlerLeavesStartedUncertainty",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpHandoffTest",
+      "test": "explicitResolutionPinsAttemptRoleAndRevisions",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpHandoffTest",
+      "test": "currentStartSingleLaunchNoFinancialWrites",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpHandoffTest",
+      "test": "restoredRequestsStayOriginalAndRecoveryNeverLaunches",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpHandoffTest",
+      "test": "lostAcquireOrStartNeverReplays",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpHandoffTest",
+      "test": "expiredSessionAndBindingChangeCannotLaunch",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 13,
+  "expected": 13,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "b0b7c9ddf4dc6c3ed92054f9148091dfa93e961c61fe647ce8e005eabfd69b73"
+}

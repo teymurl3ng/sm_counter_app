@@ -123,6 +123,11 @@ fun AdminPeopleScreen(
     onUpdateEmployee: (String, EmployeeProfileInput) -> Unit,
     admScaffold: AdmScaffold,
     modifier: Modifier = Modifier,
+    customerCommunication: com.saaf.milkshop.nativeui.owner.CustomerCommunicationAccess = com.saaf.milkshop.nativeui.owner.CustomerCommunicationAccess(),
+    customerFollowUps: com.saaf.milkshop.nativeui.owner.CustomerFollowUpAccess? = null,
+    loadCustomerStatement: com.saaf.milkshop.nativeui.owner.CustomerStatementLoader = {_,_->error("Statement loading is unavailable.")},
+    onCustomerCreditAction: (com.saaf.milkshop.application.owner.CustomerCreditCommand)->Unit = {},
+    registerCustomerGuard: (com.saaf.milkshop.nativeui.common.EntryLeaveGuard?)->Unit = {},
 ) {
     val adminPeopleShell: HostedScaffold = { snackbar, mod, _, content ->
         admScaffold(snackbar, mod, content)
@@ -252,6 +257,11 @@ fun AdminPeopleScreen(
                     onOpenEdit = onOpenCustomerEdit,
                     onBackFromEdit = onBackFromCustomerEdit,
                     onUpdateCustomer = onUpdateCustomer,
+                    communication = customerCommunication,
+                    followUps = customerFollowUps,
+                    loadStatement = loadCustomerStatement,
+                    onCreditAction = onCustomerCreditAction,
+                    registerGuard = registerCustomerGuard,
                     hostedScaffold = adminPeopleShell,
                     modifier = modifier,
                 )

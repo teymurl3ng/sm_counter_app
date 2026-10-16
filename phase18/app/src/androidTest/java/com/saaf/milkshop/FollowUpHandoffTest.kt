@@ -14,27 +14,28 @@ import java.time.*
 import java.util.UUID
 
 /** Real local authorization/Room/journal/runtime, synthetic RPC responses; no hosted concurrency claim. */
-class FollowUpHandoffTest {
-    private val context=InstrumentationRegistry.getInstrumentation().targetContext
-    private lateinit var db: MilkShopDatabase
-    private lateinit var security: UserSecurityService
-    private lateinit var session: String
-    private lateinit var runtime: SyncRuntime
+open class FollowUpHandoffTest {
+    protected val context=InstrumentationRegistry.getInstrumentation().targetContext
+    protected lateinit var db: MilkShopDatabase
+    protected lateinit var security: UserSecurityService
+    protected lateinit var session: String
+    protected lateinit var runtime: SyncRuntime
     private lateinit var access: CustomerSharedHandoffAccess
     private lateinit var uid: String
-    private var customer=0L
+    protected var customer=0L
     private val shop="40000000-0000-4000-8000-000000000001"
     private val staff="40000000-0000-4000-8000-000000000002"
     private val revision="40000000-0000-4000-8000-000000000003"
     private val customerRevision="40000000-0000-4000-8000-000000000004"
     private val now=Instant.parse("2026-10-18T07:00:00Z")
     private val day=LocalDate.parse("2026-10-18")
+    protected var snapshotUnavailable=false
     private var metadata=1L
     private var paused=false
-    private var enabled=true
+    protected var enabled=true
     private var remoteCredit=4L
     private var claim: JSONObject?=null
-    private var lose: String?=null
+    protected var lose: String?=null
     private var refuse: String?=null
     private var launches=0
     private val sent=mutableListOf<JSONObject>()
@@ -63,7 +64,7 @@ class FollowUpHandoffTest {
     private fun started(actor: String=staff,install: String=installation)=preparing(actor=actor,install=install)
         .put("phase","HANDOFF_STARTED").put("lease_until",JSONObject.NULL).put("started_at",now.minusSeconds(86400*30).toString()).put("channel","SMS")
     private suspend fun http(request: SyncHttpRequest): SyncHttpResponse {
-        if(request.url.endsWith("followup_snapshot_v1")) return SyncHttpResponse(200,snapshot().toString().toByteArray())
+        if(request.url.endsWith("followup_snapshot_v1")) return if(snapshotUnavailable) SyncHttpResponse(503,null) else SyncHttpResponse(200,snapshot().toString().toByteArray())
         check(request.url.endsWith("followup_command_v1")) {"Unexpected network call"}
         val body=JSONObject(request.body!!.toString(Charsets.UTF_8));sent+=JSONObject(body.toString())
         val command=body.getString("command_uid");val p=body.getJSONObject("operation");val kind=FollowUpWire.operation(p)
@@ -116,7 +117,7 @@ class FollowUpHandoffTest {
         SyncRebaselineStore(context).clear();TrustedTime.resetForTest(context);db.close()
     }
     private suspend fun reminder()=CustomerCommunicationService(db,security).reminder(session,customer,day)
-    private suspend fun open(channel: String="SMS",facts: CustomerReminder?=null,launch: suspend ()->Unit={launches++})=
+    protected suspend fun open(channel: String="SMS",facts: CustomerReminder?=null,launch: suspend ()->Unit={launches++})=
         access.open(customer,facts ?: reminder(),"+923001234567",channel,launch)
     private fun kinds()=sent.map {it.getJSONObject("operation").getString("kind")}
     @Test fun currentStartSingleLaunchNoFinancialWrites(): Unit=runBlocking {

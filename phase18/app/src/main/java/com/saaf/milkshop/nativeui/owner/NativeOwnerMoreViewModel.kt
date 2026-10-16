@@ -185,7 +185,16 @@ class NativeOwnerMoreViewModel internal constructor(
     suspend fun loadCustomerStatement(accountId: Long, period: com.saaf.milkshop.application.owner.CustomerStatementPeriod) =
         customersController.loadStatement(accountId, period)
 
-    fun customerCommunications()=CustomerCommunicationAccess(customersController::loadReminder,customersController::recordCommunication,customersController::communicationHistory)
+    private var followUpBundle: Pair<OwnerSessionToken,CustomerFollowUpAccess>?=null
+    fun customerFollowUps(): CustomerFollowUpAccess? {
+        val token=runtime.captureSession() ?: return null
+        followUpBundle?.takeIf {it.first==token}?.let {return it.second}
+        return dependencies.createFollowUps?.invoke(token.handle) {
+            check(runtime.isCurrent(token)&&runtime.ready()?.destination==NativeOwnerMoreDestination.Customers) {"Open Customers again before continuing."}
+        }?.also {followUpBundle=token to it}
+    }
+    fun customerCommunications()=CustomerCommunicationAccess(customersController::loadReminder,customersController::recordCommunication,customersController::communicationHistory,
+        sharedHandoff=customerFollowUps()?.handoff)
 
     fun refreshCustomers() = customersController.refreshCustomers()
 
@@ -530,6 +539,7 @@ class NativeOwnerMoreViewModel internal constructor(
         private val securityHistoryFacade: NativeOwnerSecurityHistoryFacade,
         private val backupFacade: NativeOwnerBackupFacade,
         private val syncFacade: NativeOwnerSyncFacade,
+        private val createFollowUps: ((String,()->Unit)->CustomerFollowUpAccess)? = null,
         private val onSessionExpired: () -> Unit,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
@@ -548,6 +558,7 @@ class NativeOwnerMoreViewModel internal constructor(
                     securityHistory = securityHistoryFacade,
                     backup = backupFacade,
                     sync = syncFacade,
+                    createFollowUps = createFollowUps,
                 ),
                 onSessionExpired = onSessionExpired,
             ) as T

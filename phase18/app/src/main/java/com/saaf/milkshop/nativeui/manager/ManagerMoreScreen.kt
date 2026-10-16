@@ -147,6 +147,11 @@ fun ManagerMoreScreen(
     onSignOut: () -> Unit,
     mgrScaffold: MgrScaffold,
     modifier: Modifier = Modifier,
+    customerCommunication: com.saaf.milkshop.nativeui.owner.CustomerCommunicationAccess = com.saaf.milkshop.nativeui.owner.CustomerCommunicationAccess(),
+    customerFollowUps: com.saaf.milkshop.nativeui.owner.CustomerFollowUpAccess? = null,
+    loadCustomerStatement: com.saaf.milkshop.nativeui.owner.CustomerStatementLoader = {_,_->error("Statement loading is unavailable.")},
+    onCustomerCreditAction: (com.saaf.milkshop.application.owner.CustomerCreditCommand)->Unit = {},
+    registerCustomerGuard: (com.saaf.milkshop.nativeui.common.EntryLeaveGuard?)->Unit = {},
 ) {
     val managerShell: HostedScaffold = { snackbar, mod, _, content ->
         mgrScaffold(snackbar, mod, content)
@@ -289,6 +294,11 @@ fun ManagerMoreScreen(
                     onOpenEdit = onOpenCustomerEdit,
                     onBackFromEdit = onBackFromCustomerEdit,
                     onUpdateCustomer = onUpdateCustomer,
+                    communication = customerCommunication,
+                    followUps = customerFollowUps,
+                    loadStatement = loadCustomerStatement,
+                    onCreditAction = onCustomerCreditAction,
+                    registerGuard = registerCustomerGuard,
                     hostedScaffold = managerShell,
                     showHeader = false,
                     modifier = modifier,

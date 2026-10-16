@@ -1,0 +1,70 @@
+{
+  "label": "b-navigation-ui",
+  "device": "S24",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpNavigationUiTest#ownerReturnPathsRetainReviewAndChrome",
+    "com.saaf.milkshop.FollowUpNavigationUiTest#managerAndAdminUseTheirOwnChromeAndGuards",
+    "com.saaf.milkshop.FollowUpNavigationUiTest#darkLargeReviewAndStatementReturn",
+    "com.saaf.milkshop.FollowUpNavigationUiTest#directCustomerReminderUsesSharedHook",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementReminderAndHistoryKeepOneHostAndReturnToCustomer",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementLightPreviewAndReturnKeepChromeAndDisclosure",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure",
+    "com.saaf.milkshop.CreditFinishUiTest#customerFiltersIncludeSettledOwnerFlagsAndSearchWithoutChangingRows"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationUiTest",
+      "test": "darkLargeReviewAndStatementReturn",
+      "code": -2,
+      "stack": "java.lang.RuntimeException: java.util.concurrent.ExecutionException: java.lang.RuntimeException: java.lang.NoSuchMethodException: android.hardware.input.InputManager.getInstance []"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationUiTest",
+      "test": "ownerReturnPathsRetainReviewAndChrome",
+      "code": -2,
+      "stack": "java.lang.RuntimeException: java.util.concurrent.ExecutionException: java.lang.RuntimeException: java.lang.NoSuchMethodException: android.hardware.input.InputManager.getInstance []"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationUiTest",
+      "test": "managerAndAdminUseTheirOwnChromeAndGuards",
+      "code": -2,
+      "stack": "java.lang.RuntimeException: java.util.concurrent.ExecutionException: java.lang.RuntimeException: java.lang.NoSuchMethodException: android.hardware.input.InputManager.getInstance []"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationUiTest",
+      "test": "directCustomerReminderUsesSharedHook",
+      "code": -2,
+      "stack": "java.lang.RuntimeException: java.util.concurrent.ExecutionException: java.lang.RuntimeException: java.lang.NoSuchMethodException: android.hardware.input.InputManager.getInstance []"
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementReminderAndHistoryKeepOneHostAndReturnToCustomer",
+      "code": -2,
+      "stack": "java.lang.RuntimeException: java.util.concurrent.ExecutionException: java.lang.RuntimeException: java.lang.NoSuchMethodException: android.hardware.input.InputManager.getInstance []"
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementLightPreviewAndReturnKeepChromeAndDisclosure",
+      "code": -2,
+      "stack": "java.lang.RuntimeException: java.util.concurrent.ExecutionException: java.lang.RuntimeException: java.lang.NoSuchMethodException: android.hardware.input.InputManager.getInstance []"
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure",
+      "code": -2,
+      "stack": "java.lang.RuntimeException: java.util.concurrent.ExecutionException: java.lang.RuntimeException: java.lang.NoSuchMethodException: android.hardware.input.InputManager.getInstance []"
+    },
+    {
+      "class": "com.saaf.milkshop.CreditFinishUiTest",
+      "test": "customerFiltersIncludeSettledOwnerFlagsAndSearchWithoutChangingRows",
+      "code": -2,
+      "stack": "java.lang.RuntimeException: java.util.concurrent.ExecutionException: java.lang.RuntimeException: java.lang.NoSuchMethodException: android.hardware.input.InputManager.getInstance []"
+    }
+  ],
+  "passed": 0,
+  "expected": 8,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "eea91a85ef1d2e60915b904d7ee86c062fe840fa643a71794777c93f4eb27323"
+}

@@ -354,6 +354,8 @@ class NativePreviewActivity : FragmentActivity() {
             securityHistoryFacade = ownerSecurityHistoryFacade,
             backupFacade = ownerBackupFacade,
             syncFacade = ownerSyncFacade,
+            createFollowUps = {session,validate->com.saaf.milkshop.nativeui.owner.customerFollowUpAccess(applicationState,
+                applicationState.database,applicationState.userSecurity,applicationState.syncRuntime,session,validate)},
             onSessionExpired = authenticationViewModel::leaveAuthenticatedArea,
         )
     }

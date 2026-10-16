@@ -1,0 +1,35 @@
+{
+  "label": "b-navigation-corrected",
+  "device": "S24",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpNavigationTest#boundWorkspaceRejectsChangedSession",
+    "com.saaf.milkshop.FollowUpNavigationUiTest#darkLargeReviewAndStatementReturn",
+    "com.saaf.milkshop.FollowUpNavigationUiTest#directCustomerReminderUsesSharedHook"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationTest",
+      "test": "boundWorkspaceRejectsChangedSession",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationUiTest",
+      "test": "darkLargeReviewAndStatementReturn",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationUiTest",
+      "test": "directCustomerReminderUsesSharedHook",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 3,
+  "expected": 3,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "bc9947a7b63fdc9fc9b40acd1eaa8aaaf645f9bca70e6983b6682b3741746a38"
+}

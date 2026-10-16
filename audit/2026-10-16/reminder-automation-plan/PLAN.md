@@ -42,6 +42,17 @@ Restore uses cached metadata only as a cache. Fetch current server revisions bef
 
 ## Automatic SMS: recorded decision, not a silent omission
 
+### Devices without a SIM
+
+The initial plan's provider route already avoids dependence on the operator device's SIM, but it did not explicitly cover Wi-Fi-only tablets in the manual fallback. This supplement closes that gap without adding another build piece or a tablet layout redesign. A tablet can review accounts, prepare statements/drafts and receive ordinary app notifications without telephony. It may be the primary owner-notification device; that assignment does not make it an SMS-sending device.
+
+- **WhatsApp:** a configured linked WhatsApp tablet app can use its internet connection without a SIM in the tablet. Check the actual app handoff and handle an unlinked/unavailable app honestly; installation alone is not proof of setup, message acceptance or delivery. No browser fallback is called a successful WhatsApp composer.
+- **SMS:** the presence of an SMS composer does not prove that this device can send cellular SMS. Some messaging apps may relay through a linked phone; allow their deliberate composer path and describe it as a handoff, not a verified cellular route. Do not blanket-disable composition solely because local telephony is absent, and do not request broad phone/SIM access just to guess availability. A future direct-SIM sender would need telephony capability, a usable explicitly selected subscription, permission and carrier checks; the manual app does not silently become that sender.
+- **No working composer:** retain the reviewed draft with a useful explanation and the existing PDF/image Android share action. Offer continuing this customer's review on the connected shop phone through the same shared follow-up state, where facts/recipient must be refreshed and confirmed. Do not imply an automatic tablet-to-phone SMS relay, transfer the private one-draft override silently, or mark the message sent. Missing-handler wording must not insist on SMS as the only fallback when it may also be unavailable.
+- **Unattended SMS:** a selected server/provider route can dispatch independently of tablet SIM hardware. Initiating/reviewing it needs the internet/server contract; it does not promise offline sending or a message that was never accepted by the server. If the dedicated-SIM alternative is chosen, name the separate phone explicitly; the tablet is only an operator client.
+
+Include no-telephony/no-composer and linked-app handoff fixtures inside A/B's existing affected acceptance. A physical tablet/large-screen layout remains a separate retained presentation scope; capability/fallback correctness must not wait for that redesign. No silent channel switching, new gateway service, automatic personal-phone pairing or additional provider purchase belongs to this correction.
+
 | Route | Assessment for this scale | Decision |
 |---|---|---|
 | Existing SMS/WhatsApp composer | Low setup; operator reviews recipient and current facts; cannot prove sending. | Keep as the working route during owner automation. |

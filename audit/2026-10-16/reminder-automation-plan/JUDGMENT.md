@@ -35,3 +35,9 @@ Still unknown: this shop's message volume/budget, a provider's accepted sender/A
 Proceed with **piece A only** after the owner reviews this plan: deterministic eligibility/cycle rules and the planned native surfaces, behind the unfinished feature boundary. Piece B needs the exact small metadata contract, role/failure cases and affected tests pinned before edits; deploy DEV first and obtain exact production approval later. Piece C is a decision gate, not a disguised claim of automated SMS implementation.
 
 No reason was found to reopen phases 2–5 or run a whole-app audit. The existing footer-label observation stays in its existing LATER note. New findings do not create a fourth active piece. Planning and judgment are complete; implementation and the final sending-route decision are not.
+
+## Post-plan SIM/tablet correction
+
+The provider architecture already covered an operator without a SIM, but the initial manual fallback was incomplete. Rechecked the actual ReminderIntents implementation: SMS simply opens ACTION_SENDTO; WhatsApp failure currently suggests SMS without establishing that SMS is usable. This is an observed limitation in fallback wording/capability handling, not proof that all tablets fail. The phase 6 plan now distinguishes no telephony, no handler, an installed but unconfigured app, linked messaging, and provider dispatch.
+
+Ran the fixed judgment hook again after this supplement (tablet-judgment-hook.json). Independent conclusion: do not reject all SMS composers on a no-SIM device because a linked app may work; equally, do not imply that opening one proves sending. Keep internet WhatsApp, existing statement sharing and continuing the shared review on the shop phone as explicit options. No new automatic phone relay or tablet layout project is warranted. Provider sending remains conditional and unimplemented. This is a correction inside existing A/B acceptance, not another phase.

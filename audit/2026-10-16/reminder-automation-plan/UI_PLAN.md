@@ -60,6 +60,8 @@ Three coherent information groups, not a long plain-text option list:
 2. **Review schedule:** Sunday default statement review, overdue follow-up interval and shop timezone. Explain **Statement timing does not change payment deadlines**. Customer overrides are edited with the customer, not in a second global list of everyone.
 3. **Customer contact:** current mode **Review and send manually**. Automatic SMS is **Not configured** until piece C records a viable route; do not ship a toggle that implies working unattended sending. Shared follow-up activity is a quiet secondary entry here. Keep phase 5 Preparation history labeled local; do not relabel/import it as shared sending history.
 
+**Wi-Fi-only device fallback:** do not equate Primary notification device with SMS sender. WhatsApp may work as a linked tablet app; SMS may open a linked messaging app without local telephony. Label each as an external handoff, never guaranteed sending. If a handler fails, preserve the draft and offer the available other channel, existing statement sharing, or continuing the shared customer review on the shop phone. Do not always prescribe SMS when WhatsApp fails. Do not add an automatic relay/pairing screen or a new tablet navigation/layout in this scope. A one-draft recipient override stays private to the device/draft and must be reentered/confirmed if continuing elsewhere.
+
 ## Geometry and feedback rules
 
 - Existing NativeListStyle dimensions/padding own each surface once: 16dp page gutters, normal native section/entity insets, 12–16dp within groups and 24dp between different tasks. Do not nest another capsule around every line or put action text against its border.

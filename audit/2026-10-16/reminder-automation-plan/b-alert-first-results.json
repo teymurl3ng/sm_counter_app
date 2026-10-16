@@ -1,0 +1,91 @@
+{
+  "label": "b-alert-first",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpAlertTest#quietBoundariesAndMissedDaysUseCurrentShopDate",
+    "com.saaf.milkshop.FollowUpAlertTest#pausedSnoozedAndSettledNeverReserve",
+    "com.saaf.milkshop.FollowUpAlertTest#onlyCurrentPrimaryActorMayAlert",
+    "com.saaf.milkshop.FollowUpAlertTest#deniedPermissionKeepsPersistentAttention",
+    "com.saaf.milkshop.FollowUpAlertTest#firstGrantAndRestartNeverRealert",
+    "com.saaf.milkshop.FollowUpAlertTest#unknownAndRestoredDigestNeverPost",
+    "com.saaf.milkshop.FollowUpAlertTest#staleLedgerAndRevocationNeverPublishCurrentCount",
+    "com.saaf.milkshop.FollowUpAlertTest#backgroundRefreshNeedsNoLocalSessionAndCannotRetarget",
+    "com.saaf.milkshop.FollowUpAlertTest#attentionRestartAndFailureKeepStaleCount",
+    "com.saaf.milkshop.FollowUpAlertTest#workerRetryCancellationAndScheduleConstraints",
+    "com.saaf.milkshop.FollowUpAlertTest#notificationPrivacyAndPermissionChannelChecks",
+    "com.saaf.milkshop.FollowUpAttentionUiTest#normalAttentionRetainsChromeAcrossZeroAndStaleUpdates",
+    "com.saaf.milkshop.FollowUpAttentionUiTest#darkLargeAttentionRetainsChromeAcrossZeroAndStaleUpdates",
+    "com.saaf.milkshop.FollowUpReaderTest#canonicalFactsExcludePrivateNotesAndReflectPaymentsWithoutWrites",
+    "com.saaf.milkshop.FollowUpReaderTest#cashierAndExpiredSessionCannotReadFollowUps",
+    "com.saaf.milkshop.FollowUpDataTest#runtimeRefreshesOnceAndChecksLocalRole",
+    "com.saaf.milkshop.FollowUpDataTest#runtimeUnknownRefreshPreservesTokens"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "onlyCurrentPrimaryActorMayAlert",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "attentionRestartAndFailureKeepStaleCount",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "pausedSnoozedAndSettledNeverReserve",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "unknownAndRestoredDigestNeverPost",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "quietBoundariesAndMissedDaysUseCurrentShopDate",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "workerRetryCancellationAndScheduleConstraints",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "deniedPermissionKeepsPersistentAttention",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "backgroundRefreshNeedsNoLocalSessionAndCannotRetarget",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "firstGrantAndRestartNeverRealert",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "staleLedgerAndRevocationNeverPublishCurrentCount",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 10,
+  "expected": 17,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "a3817295535ec454a910cc6b18f98ca6ec9731d3eb94d9c3427df73bb3e0b843"
+}

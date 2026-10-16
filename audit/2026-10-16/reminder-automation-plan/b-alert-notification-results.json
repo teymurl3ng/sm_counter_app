@@ -1,0 +1,21 @@
+{
+  "label": "b-alert-notification",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpAlertTest#notificationPrivacyAndPermissionChannelChecks"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "notificationPrivacyAndPermissionChannelChecks",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 1,
+  "expected": 1,
+  "notificationPermission": "granted only for isolated notifier; revoked after instrumentation",
+  "realShopPackageModified": false,
+  "appApkSha256": "a3817295535ec454a910cc6b18f98ca6ec9731d3eb94d9c3427df73bb3e0b843"
+}

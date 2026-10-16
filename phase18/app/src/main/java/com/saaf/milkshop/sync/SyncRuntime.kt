@@ -98,6 +98,42 @@ class SyncRuntime(
         FollowUpDataStore(database).cached(followUpBinding(localSession))
     }
 
+    /** Badge reads keep the same local role/session/binding checks as the full workspace. */
+    internal fun followUpAttention(localSession: String,store: FollowUpAttentionStore): kotlinx.coroutines.flow.Flow<FollowUpAttention> = kotlinx.coroutines.flow.flow {
+        val binding=withFollowUpSession(localSession) {it.binding}
+        store.observe(binding.key).collect {state->
+            withFollowUpSession(localSession) {check(it.binding==binding) {"Open follow-ups again for the connected shop."}}
+            emit(state.copy(stale=state.stale||!TrustedTime.isAnchored()||state.checkedOn!=BusinessClock.today().toString()))
+        }
+    }
+
+    /** No local session is created: the fresh RPC checks actual membership and Owner-enabled policy. */
+    internal suspend fun detectFollowUps(attention: FollowUpAttentionStore,alerts: FollowUpAlertSink): FollowUpDetection = SyncOperationGate.exclusive {
+        if(!isEnrolled()) {alerts.cancel();return@exclusive FollowUpDetection.STOPPED}
+        val config=requireNotNull(SyncServerConfigStore.load(context))
+        val shop=requireNotNull(SyncShopBindingStore.load(context))
+        check(config.environment==shop.environment)
+        val binding=FollowUpBinding(config.environment,config.baseUrl,shop.shopId,shop.staffId,SyncIdentity.warmUp(context))
+        fun current()=SyncServerConfigStore.load(context)==config&&SyncShopBindingStore.load(context)==shop&&
+            !SyncRebaselineStore(context).needsFreshIdentity&&SyncIdentity.warmUp(context)==binding.installation
+        val client=FollowUpClient(http,config,tokenStore)
+        val guardedAlerts=object: FollowUpAlertSink {
+            override fun allowed()=current()&&alerts.allowed()
+            override fun post() {if(current()&&alerts.allowed()) alerts.post()}
+            override fun cancel() {if(current()) alerts.cancel()}
+        }
+        FollowUpDetector(database,attention,guardedAlerts).check(binding) {name,body->
+            if(!current()) FollowUpRpcResult.Refused("followup_not_authorized") else {
+                var result=client.call(name,body)
+                if(result is FollowUpRpcResult.Retry&&result.code=="unauthorized") {
+                    result=if(refreshSession(config)&&current()) client.call(name,body)
+                        else if(tokenStore.load()==null||!current()) FollowUpRpcResult.Refused("followup_not_authorized") else result
+                }
+                if(current()) result else FollowUpRpcResult.Refused("followup_not_authorized")
+            }
+        }
+    }
+
     private suspend fun followUpBinding(localSession: String): FollowUpBinding {
         val security=followUpSecurity ?: (context.applicationContext as com.saaf.milkshop.MilkShopApplication).userSecurity
         val actor=security.requirePermission(localSession,com.saaf.milkshop.domain.AppPermission.VIEW_FULL_FINANCIAL)

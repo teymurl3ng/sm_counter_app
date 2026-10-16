@@ -1,0 +1,63 @@
+{
+  "label": "b-alert-remaining",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpAlertTest#notificationPrivacyAndPermissionChannelChecks",
+    "com.saaf.milkshop.FollowUpAttentionUiTest#normalAttentionRetainsChromeAcrossZeroAndStaleUpdates",
+    "com.saaf.milkshop.FollowUpAttentionUiTest#darkLargeAttentionRetainsChromeAcrossZeroAndStaleUpdates",
+    "com.saaf.milkshop.FollowUpReaderTest#canonicalFactsExcludePrivateNotesAndReflectPaymentsWithoutWrites",
+    "com.saaf.milkshop.FollowUpReaderTest#cashierAndExpiredSessionCannotReadFollowUps",
+    "com.saaf.milkshop.FollowUpDataTest#runtimeRefreshesOnceAndChecksLocalRole",
+    "com.saaf.milkshop.FollowUpDataTest#runtimeUnknownRefreshPreservesTokens"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "notificationPrivacyAndPermissionChannelChecks",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAttentionUiTest",
+      "test": "normalAttentionRetainsChromeAcrossZeroAndStaleUpdates",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Failed to assert the following: (Text + EditableText = [2 customers need review])"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAttentionUiTest",
+      "test": "darkLargeAttentionRetainsChromeAcrossZeroAndStaleUpdates",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Failed to assert the following: (Text + EditableText = [2 customers need review])"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReaderTest",
+      "test": "cashierAndExpiredSessionCannotReadFollowUps",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReaderTest",
+      "test": "canonicalFactsExcludePrivateNotesAndReflectPaymentsWithoutWrites",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "runtimeRefreshesOnceAndChecksLocalRole",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "runtimeUnknownRefreshPreservesTokens",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 5,
+  "expected": 7,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "a3817295535ec454a910cc6b18f98ca6ec9731d3eb94d9c3427df73bb3e0b843"
+}

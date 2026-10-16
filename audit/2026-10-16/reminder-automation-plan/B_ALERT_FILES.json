@@ -1,0 +1,113 @@
+{
+  "files": [
+    {
+      "path": "CURRENT_BASELINE.md",
+      "sha256": "d3f514a5b75095e1eb25be1606ec30565c709380d6aa61bfdd999509fe5ccc89"
+    },
+    {
+      "path": "NEXT_WORK_PLAN_2026-10-15.md",
+      "sha256": "5175f81d09cbde616f21f35c4f75da8b7dc06b3cab23e5d7e9c5248fbdef4abd"
+    },
+    {
+      "path": "LATER_FEATURE_PLAN_2026-10-15.md",
+      "sha256": "37b25dbf23df2bd4461032d608de7795bef98253870a64c0e273a99b16842c71"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerFollowUpReader.kt",
+      "sha256": "f7d9d6f0fa572e22c8de0ccf4ee0cc4b28131ed583e029928937472dce548174"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/sync/SyncRuntime.kt",
+      "sha256": "4260eb08ed688973a93fbe6b1455ca432181142dc126a0baf78954d7c608928f"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/sync/FollowUpDetector.kt",
+      "sha256": "cc5c7829fe5319cb1ef8c581c4e10ea3ba21b065a8d62adc02efcfa5887ce616"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/sync/FollowUpAttentionStore.kt",
+      "sha256": "0791359aecf5614b1a72c131295fe1dbe1821274ac267f0a2ee0cf9df0d1f016"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/sync/FollowUpNotifier.kt",
+      "sha256": "15e72726d313be2e6002ad6b832f22a7328108d6a52ff83301f00a8c39800b97"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/sync/FollowUpWorker.kt",
+      "sha256": "4681646851442ca354f14266b5a87d42ea60b0c2c9f9a74337042a1423ced993"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpAttentionEntry.kt",
+      "sha256": "0647ca42ea029cc66b5a6899e6d7dd28d94e24b8e5b8b898965aa37359b3f182"
+    },
+    {
+      "path": "phase18/app/src/androidTest/java/com/saaf/milkshop/FollowUpAlertTest.kt",
+      "sha256": "e27ca7e510427e861903292a301a2129d08db0c085445775b56065c834424c46"
+    },
+    {
+      "path": "phase18/app/src/androidTest/java/com/saaf/milkshop/FollowUpAttentionUiTest.kt",
+      "sha256": "19e604313379b0b72f9ae1bbd3900ad3109bb52bfb7d8944ca7c5abb7b049989"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/PLAN.md",
+      "sha256": "142b5988312c46c4acc7e9279c475b51972fb5c6c6fd9ab6e3a7fdf866442197"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/B_RESULT.md",
+      "sha256": "aa4c8142d97c67a53601e26dac5471e293c1beb530c828464edf47d9d8f9474b"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/B_ALERT_SCOPE.md",
+      "sha256": "1688465a2703c0772bd1fe6416eb7b650ae85a05014a1ea0c58a3ab5a149b43f"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/B_ALERT_RESULT.md",
+      "sha256": "1f66bcdce49ecd6f5e1aeed6572cd2c3c9f4fa16207fdf0476206201ea020fa6"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/B_ALERT_VERIFICATION.json",
+      "sha256": "45c49530c788bcc8bc8f614bb841075d29f93b42e5f9580a31687ac52c355c24"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/b-alert-hook.json",
+      "sha256": "7363f1239ad0809fc3246ea42ed630a565df0cb379fe977818e6e039d1826a65"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/b-alert-finish-hook.json",
+      "sha256": "7363f1239ad0809fc3246ea42ed630a565df0cb379fe977818e6e039d1826a65"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/b-alert-selection.json",
+      "sha256": "d489e77ded8f6b7ca15027b69bf266bc07d79eb4bd4b1524e9eedd1e3d98b192"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/run-b-alert.py",
+      "sha256": "0cc847c8aed72d0e443204e2292544713c6230310f91367731deba017ff95f91"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/finish-b-alert.py",
+      "sha256": "a062f8f97f73afecd826de284c8f231ff014ab56ff6a3adb74286e6ff352dadc"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/b-alert-first-results.json",
+      "sha256": "e8c84c54c9f0b808b20bfd755d86f69af8e7a4ff7562163550a61c03ee814e2e"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/b-alert-remaining-results.json",
+      "sha256": "e2072af21cb8b48f9ca5a6c5b177c0552eba9df087666d2b1611394bc0c4ef1f"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/b-alert-notification-results.json",
+      "sha256": "bacaf11e7ed5b72e1d846880d553d761409b2c3f3391180d140e9f654589468a"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/b-alert-ui-results.json",
+      "sha256": "4f6f1b790b9521e42b38372ef6a2d3dd16dd014eb781dedb8dad72e2b12b9f18"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/b-alert-ui-final-results.json",
+      "sha256": "f478c3bd2f71d8fe0dfe88c4a1524512dc877604b8e360c3b359944b9f093e05"
+    }
+  ],
+  "excludes": "Raw logs, device captures, APKs and historical untracked artifacts"
+}

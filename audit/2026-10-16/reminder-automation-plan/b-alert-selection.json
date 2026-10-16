@@ -1,0 +1,27 @@
+{
+  "FollowUpAlertTest": [
+    "quietBoundariesAndMissedDaysUseCurrentShopDate",
+    "pausedSnoozedAndSettledNeverReserve",
+    "onlyCurrentPrimaryActorMayAlert",
+    "deniedPermissionKeepsPersistentAttention",
+    "firstGrantAndRestartNeverRealert",
+    "unknownAndRestoredDigestNeverPost",
+    "staleLedgerAndRevocationNeverPublishCurrentCount",
+    "backgroundRefreshNeedsNoLocalSessionAndCannotRetarget",
+    "attentionRestartAndFailureKeepStaleCount",
+    "workerRetryCancellationAndScheduleConstraints",
+    "notificationPrivacyAndPermissionChannelChecks"
+  ],
+  "FollowUpAttentionUiTest": [
+    "normalAttentionRetainsChromeAcrossZeroAndStaleUpdates",
+    "darkLargeAttentionRetainsChromeAcrossZeroAndStaleUpdates"
+  ],
+  "FollowUpReaderTest": [
+    "canonicalFactsExcludePrivateNotesAndReflectPaymentsWithoutWrites",
+    "cashierAndExpiredSessionCannotReadFollowUps"
+  ],
+  "FollowUpDataTest": [
+    "runtimeRefreshesOnceAndChecksLocalRole",
+    "runtimeUnknownRefreshPreservesTokens"
+  ]
+}

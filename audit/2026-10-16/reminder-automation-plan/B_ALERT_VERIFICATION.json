@@ -1,0 +1,149 @@
+{
+  "baseline": "1b94d2c",
+  "uniqueAffectedMethods": 17,
+  "latestResults": [
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "onlyCurrentPrimaryActorMayAlert",
+      "code": 0,
+      "stack": null,
+      "run": "b-alert-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "attentionRestartAndFailureKeepStaleCount",
+      "code": 0,
+      "stack": null,
+      "run": "b-alert-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "pausedSnoozedAndSettledNeverReserve",
+      "code": 0,
+      "stack": null,
+      "run": "b-alert-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "unknownAndRestoredDigestNeverPost",
+      "code": 0,
+      "stack": null,
+      "run": "b-alert-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "quietBoundariesAndMissedDaysUseCurrentShopDate",
+      "code": 0,
+      "stack": null,
+      "run": "b-alert-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "workerRetryCancellationAndScheduleConstraints",
+      "code": 0,
+      "stack": null,
+      "run": "b-alert-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "deniedPermissionKeepsPersistentAttention",
+      "code": 0,
+      "stack": null,
+      "run": "b-alert-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "backgroundRefreshNeedsNoLocalSessionAndCannotRetarget",
+      "code": 0,
+      "stack": null,
+      "run": "b-alert-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "firstGrantAndRestartNeverRealert",
+      "code": 0,
+      "stack": null,
+      "run": "b-alert-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "staleLedgerAndRevocationNeverPublishCurrentCount",
+      "code": 0,
+      "stack": null,
+      "run": "b-alert-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "notificationPrivacyAndPermissionChannelChecks",
+      "code": 0,
+      "stack": null,
+      "run": "b-alert-notification"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAttentionUiTest",
+      "test": "normalAttentionRetainsChromeAcrossZeroAndStaleUpdates",
+      "code": 0,
+      "stack": null,
+      "run": "b-alert-ui-final"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAttentionUiTest",
+      "test": "darkLargeAttentionRetainsChromeAcrossZeroAndStaleUpdates",
+      "code": 0,
+      "stack": null,
+      "run": "b-alert-ui-final"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReaderTest",
+      "test": "cashierAndExpiredSessionCannotReadFollowUps",
+      "code": 0,
+      "stack": null,
+      "run": "b-alert-remaining"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReaderTest",
+      "test": "canonicalFactsExcludePrivateNotesAndReflectPaymentsWithoutWrites",
+      "code": 0,
+      "stack": null,
+      "run": "b-alert-remaining"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "runtimeRefreshesOnceAndChecksLocalRole",
+      "code": 0,
+      "stack": null,
+      "run": "b-alert-remaining"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "runtimeUnknownRefreshPreservesTokens",
+      "code": 0,
+      "stack": null,
+      "run": "b-alert-remaining"
+    }
+  ],
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "appApkSha256": "a3817295535ec454a910cc6b18f98ca6ec9731d3eb94d9c3427df73bb3e0b843",
+  "ordinaryAppModified": false,
+  "cloudModified": false,
+  "ordinaryActivation": false,
+  "physicalPeriodicTimingOrConcurrencyEstablished": false,
+  "permissionBranches": "Denied in remaining run; allowed platform post and blocked channel in separate notification run; QA permission revoked afterward",
+  "initialProcessExit": {
+    "reason": 8,
+    "label": "PERMISSION CHANGE",
+    "description": "permissions revoked",
+    "source": "device dumpsys activity exit-info for isolated target"
+  },
+  "captures": [
+    {
+      "file": "entry-1.0-false.png",
+      "sha256": "9184247bc61e21959be030c520fb918bacd6d3f18fe6319366538b514a092b81"
+    },
+    {
+      "file": "entry-2.0-true.png",
+      "sha256": "73d9686b099d44f2337c637119b11947d12250faadf69e4114381eb1bf684ff3"
+    }
+  ]
+}

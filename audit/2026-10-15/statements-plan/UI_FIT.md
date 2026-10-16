@@ -1,6 +1,6 @@
 # Phase 5 UI fit: customer workspace, statement and manual reminder
 
-15 October 2026. Source baseline `3dd5468`. This supplements the phase 5 functional plan before implementation. The initial brief identified the destination but did not sufficiently plan its information hierarchy; this document closes that gap. App code was unchanged in the original planning pass. **16 October execution:** the first bounded UI/snapshot piece is now accepted; [result](PREVIEW_RESULT.md). Export and message review remain pending. [Interactive layout study](UI_PREVIEW.html) uses synthetic facts and the existing bundled Manrope files. It is a browser planning aid, not Android layout/animation acceptance.
+15 October 2026. Source baseline `3dd5468`. This supplements the phase 5 functional plan before implementation. The initial brief identified the destination but did not sufficiently plan its information hierarchy; this document closes that gap. App code was unchanged in the original planning pass. **16 October execution:** the first bounded UI/snapshot piece is now accepted; [result](PREVIEW_RESULT.md). The second export/share piece is now accepted in [EXPORT_RESULT.md](EXPORT_RESULT.md); message review remains pending. One measured page renderer supplies preview/PDF/PNG, with a scalable native text disclosure and the planned format-choice dialog. [Interactive layout study](UI_PREVIEW.html) uses synthetic facts and the existing bundled Manrope files. It is a browser planning aid, not Android layout/animation acceptance.
 
 ## Evidence and design authority
 

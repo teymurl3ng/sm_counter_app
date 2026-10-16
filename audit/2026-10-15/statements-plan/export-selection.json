@@ -1,0 +1,23 @@
+{
+  "StatementDocumentTest": [
+    "measuredPlanKeepsEveryEntryAndRejectsUnsafeSizeOrTotals",
+    "pdfAndPngUseIdenticalPagesAndProduceReadableSamples",
+    "cacheCleanupKeepsFreshAndActiveAndDeletesOnlyAgedOwnedExports",
+    "providerGrantsOnlySelectedFilesAndRejectsSiblingAndOutsidePaths",
+    "cancelledGenerationReleasesItsLeaseAndDoesNotLeavePartialFiles",
+    "cancellationWhileReturningCompletedExportDiscardsUnclaimedLease"
+  ],
+  "StatementSharingUiTest": [
+    "lightChooserHandoffHasTruthfulFeedbackAndStableChrome",
+    "darkLargeTextChooserHandoffHasTruthfulFeedbackAndStableChrome",
+    "cancelDoesNotExportAndMissingHandlerReportsFailure",
+    "changedFactsBeforeOrAfterRenderingRequireReviewInsteadOfSharing",
+    "nativeChooserCanBeDismissedWithoutSending"
+  ],
+  "CustomerStatementUiTest": [
+    "statementLightPreviewAndReturnKeepChromeAndDisclosure",
+    "statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure",
+    "periodFailureRetainsPreviousSnapshotAndAllowsRevert",
+    "multiplePagesAndRefreshClampToNewContent"
+  ]
+}

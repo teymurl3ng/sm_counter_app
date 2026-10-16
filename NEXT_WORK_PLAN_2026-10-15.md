@@ -77,7 +77,7 @@ This is the current reading order for unfinished work. It replaces the sequence 
 
 ### 5. Add clear bills and manual reminders
 
-**Pinned plan:** [Baseline, research, judgment and three bounded pieces](audit/2026-10-15/statements-plan/PLAN.md). ✅ Planning complete. ✅ ~~Statement snapshot/preview and customer-detail fit~~ accepted with13 unique affected A06 methods; [result](audit/2026-10-15/statements-plan/PREVIEW_RESULT.md). PDF/image sharing and manual drafts/truthful local history remain pending. No scheduling, cloud migration or real customer sending belongs to this phase.
+**Pinned plan:** [Baseline, research, judgment and three bounded pieces](audit/2026-10-15/statements-plan/PLAN.md). ✅ Planning complete. ✅ ~~Statement snapshot/preview and customer-detail fit~~ accepted with13 unique affected A06 methods; [result](audit/2026-10-15/statements-plan/PREVIEW_RESULT.md). ✅ ~~PDF/image sharing~~ is accepted at [piece 2](audit/2026-10-15/statements-plan/EXPORT_RESULT.md), with 15 unique affected methods across scoped runs. Manual drafts/truthful local history remain pending. No scheduling, cloud migration or real customer sending belongs to this phase.
 
 **UI fit:** [Placement/reflow plan](audit/2026-10-15/statements-plan/UI_FIT.md) and [clickable study](audit/2026-10-15/statements-plan/UI_PREVIEW.html): locally regroup customer detail, add one Statements & reminders entry, and keep Statement/Reminder in the existing Customers host. Same native design material/components; no new tab or global redesign.
 

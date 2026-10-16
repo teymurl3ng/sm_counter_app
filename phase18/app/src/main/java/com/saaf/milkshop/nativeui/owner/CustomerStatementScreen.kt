@@ -16,6 +16,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +26,10 @@ import com.saaf.milkshop.nativeui.common.*
 import com.saaf.milkshop.nativeui.theme.*
 import com.saaf.milkshop.sync.BusinessClock
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import com.saaf.milkshop.statements.StatementDocument
+import com.saaf.milkshop.statements.StatementDocumentEngine
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -103,13 +108,17 @@ private fun CustomerDetailDisclosure(title: String,key: String,selected: String,
 /** The snapshot is immutable; period/retry changes cancel older work before it can publish. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun CustomerStatementScreen(customerId: Long,customerName: String,load: CustomerStatementLoader,onBack: ()->Unit) {
+internal fun CustomerStatementScreen(customerId: Long,customerName: String,load: CustomerStatementLoader,shareLauncher: ((android.content.Intent)->Unit)?=null,onBack: ()->Unit) {
+    val context=LocalContext.current
+    val engine=remember(context.applicationContext) {StatementDocumentEngine(context)}
     val today=BusinessClock.today()
     var start by rememberSaveable(customerId) { mutableStateOf(today.minusDays(6).toString()) }
     var end by rememberSaveable(customerId) { mutableStateOf(today.toString()) }
     val period=CustomerStatementPeriod(LocalDate.parse(start),LocalDate.parse(end))
     var retry by remember { mutableIntStateOf(0) }
     var snapshot by remember(customerId) { mutableStateOf<CustomerStatement?>(null) }
+    var document by remember(customerId) { mutableStateOf<StatementDocument?>(null) }
+    var sharing by remember { mutableStateOf(false) }
     var loading by remember(customerId) { mutableStateOf(true) }
     var error by remember(customerId) { mutableStateOf<String?>(null) }
     var choosePeriod by remember { mutableStateOf(false) }
@@ -120,8 +129,9 @@ internal fun CustomerStatementScreen(customerId: Long,customerName: String,load:
         try {
             val next=load(customerId,period)
             require(next.customerId==customerId && next.period==period) { "The statement does not match this customer and period. Try again." }
-            snapshot=next
-            page=page.coerceIn(0,maxOf(0,(next.lines.size-1)/8))
+            val planned=withContext(Dispatchers.Default) {engine.plan(next)}
+            snapshot=next;document=planned
+            page=page.coerceIn(0,planned.pages.lastIndex)
         }
         catch(cancelled: CancellationException) { throw cancelled }
         catch(failure: Exception) { error=failure.message?.takeIf { it.isNotBlank() } ?: "Statement could not load. Try again." }
@@ -132,12 +142,12 @@ internal fun CustomerStatementScreen(customerId: Long,customerName: String,load:
         TextButton(onClick=hapticAction(onBack),contentPadding=PaddingValues(0.dp),modifier=Modifier.heightIn(min=48.dp)) { Text("Back to customer") }
         Column { Text("Statement",style=MaterialTheme.typography.titleLarge); Text(customerName,style=nativeSupportingTextStyle()) }
         NativeInformationSection {
-            NativeInformationHeading("Period",actionLabel="Change",actionTag="statement-period",onAction={choosePeriod=true})
+            NativeInformationHeading("Period",actionLabel="Change",actionTag="statement-period",onAction={if(!sharing) choosePeriod=true})
             Text(period.label,style=nativeValueTextStyle())
         }
         Box(Modifier.fillMaxWidth().heightIn(min=240.dp)) {
-            val current=snapshot
-            if(current != null) CustomerStatementPage(current,page,Modifier.alpha(if(loading || current.period!=period) .5f else 1f))
+            val current=document
+            if(current != null) key(current,page) { StatementPageView(current,page,engine,Modifier.alpha(if(loading || current.statement.period!=period) .5f else 1f)) }
             else Text(if(loading) "Preparing statement…" else "No statement prepared.",Modifier.padding(16.dp))
             if(loading) LinearProgressIndicator(Modifier.fillMaxWidth().testTag("statement-loading"))
         }
@@ -151,12 +161,14 @@ internal fun CustomerStatementScreen(customerId: Long,customerName: String,load:
                 }
             }
         }
-        snapshot?.takeIf { !loading && error==null && it.period==period }?.let { statement ->
-            val pages=maxOf(1,(statement.lines.size+7)/8)
+        document?.let { currentDocument ->
+            val statement=currentDocument.statement
+            val usable=!loading && error==null && statement.period==period
+            val pages=currentDocument.pages.size
             val controls: @Composable ()->Unit = {
-                TextButton(onClick=hapticAction { page-- },enabled=page>0,modifier=Modifier.testTag("statement-previous")) { Text("Previous") }
+                TextButton(onClick=hapticAction { page-- },enabled=usable && !sharing && page>0,modifier=Modifier.testTag("statement-previous")) { Text("Previous") }
                 Text("Page ${page+1} of $pages",style=nativeSupportingTextStyle())
-                TextButton(onClick=hapticAction { page++ },enabled=page<pages-1,modifier=Modifier.testTag("statement-next")) { Text("Next") }
+                TextButton(onClick=hapticAction { page++ },enabled=usable && !sharing && page<pages-1,modifier=Modifier.testTag("statement-next")) { Text("Next") }
             }
             if(pages==1) Text("Page 1 of 1",style=nativeSupportingTextStyle())
             else if(LocalDensity.current.fontScale>=1.5f) Column(Modifier.fillMaxWidth(),content={controls()})
@@ -165,7 +177,8 @@ internal fun CustomerStatementScreen(customerId: Long,customerName: String,load:
             val generated=Instant.parse(statement.generatedAt).atZone(java.time.ZoneId.systemDefault())
                 .format(java.time.format.DateTimeFormatter.ofPattern("d MMM uuuu, HH:mm"))
             Text("Prepared $generated. This snapshot reflects local records for the selected period. Product names are current catalog labels.",style=nativeSupportingTextStyle())
-            OutlinedButton(onClick=hapticAction { retry++ },modifier=Modifier.fillMaxWidth().testTag("statement-refresh")) { Text("Refresh statement") }
+            StatementShareControls(currentDocument,engine,usable,load,onRefresh={retry++},onBusy={sharing=it},launcher=shareLauncher)
+            OutlinedButton(onClick=hapticAction { retry++ },enabled=!loading && !sharing,modifier=Modifier.fillMaxWidth().testTag("statement-refresh")) { Text("Refresh statement") }
         }
     }
     if(choosePeriod) AlertDialog(onDismissRequest={choosePeriod=false},title={Text("Statement period")},text={
@@ -187,37 +200,6 @@ internal fun CustomerStatementScreen(customerId: Long,customerName: String,load:
         },enabled=range.selectedStartDateMillis!=null && range.selectedEndDateMillis!=null) {Text("Use period")} },
             dismissButton={TextButton(onClick=hapticAction {custom=false}) {Text("Cancel")}}) {
             DateRangePicker(range,modifier=Modifier.heightIn(max=480.dp))
-        }
-    }
-}
-
-/** Text-native paper preview: accessible and scalable instead of an unreadable page thumbnail. */
-@Composable
-private fun CustomerStatementPage(statement: CustomerStatement,page: Int,modifier: Modifier) {
-    val rows=statement.lines.drop(page*8).take(8)
-    val opening=if(page==0) statement.openingPaisa else statement.lines.getOrNull(page*8-1)?.balancePaisa ?: statement.openingPaisa
-    val last=rows.lastOrNull()?.balancePaisa ?: statement.closingPaisa
-    Column(modifier.fillMaxWidth().background(SaafSurface).border(1.dp,Color(0xFFC9C3B3)).padding(16.dp)
-        .testTag("statement-paper"),verticalArrangement=Arrangement.spacedBy(12.dp)) {
-        CompositionLocalProvider(LocalContentColor provides SaafInk) {
-            Text(statement.shopName,style=nativeSectionTextStyle())
-            statement.shopPhone?.let { Text(it,style=MaterialTheme.typography.bodyMedium) }
-            statement.shopAddress?.let { Text(it,style=MaterialTheme.typography.bodyMedium) }
-            Text("Customer statement",style=nativeSectionTextStyle())
-            Text(statement.customerName,style=nativeValueTextStyle())
-            Text(statement.period.label,style=MaterialTheme.typography.bodyMedium)
-            Text("${if(page==0) "Opening balance" else "Brought forward"}: ${statementMoney(opening)}",style=MaterialTheme.typography.bodyLarge)
-            HorizontalDivider(color=Color(0xFFC9C3B3))
-            rows.forEach { row ->
-                Text("${row.date} · ${row.description}",style=nativeSectionTextStyle())
-                row.productText?.let { Text(it,style=MaterialTheme.typography.bodyMedium) }
-                Text("${if(row.movementPaisa>0) "+" else ""}${statementMoney(row.movementPaisa)}",style=nativeMetricTextStyle())
-                Text("Balance ${statementMoney(row.balancePaisa)} · Ref ${row.reference}",style=MaterialTheme.typography.bodyMedium)
-                HorizontalDivider(color=Color(0xFFC9C3B3))
-            }
-            if(statement.lines.isEmpty()) Text("No activity in this period.")
-            Text("${if((page+1)*8>=statement.lines.size) statement.closingLabel else "Carried forward"}: ${statementMoney(last)}",style=nativeMetricTextStyle())
-            if(rows.any {it.roundingAdjusted}) Text("Movements reflect changes in the rounded running balance, so displayed amounts reconcile to the balance.",style=MaterialTheme.typography.bodyMedium)
         }
     }
 }

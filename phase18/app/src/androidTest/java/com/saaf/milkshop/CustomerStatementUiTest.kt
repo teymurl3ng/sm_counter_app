@@ -67,7 +67,9 @@ class CustomerStatementUiTest {
         rule.onNodeWithTag("customer-statement-entry").performScrollTo().performClick()
         rule.waitUntil(10000) {rule.onAllNodesWithTag("statement-paper").fetchSemanticsNodes().isNotEmpty()}
         rule.onNodeWithText("Back to customer").performScrollTo()
+        rule.waitUntil(10000) {rule.onAllNodesWithContentDescription("Statement page 1 of 1").fetchSemanticsNodes().isNotEmpty()}
         capture("statement-top-$scale-$dark")
+        rule.onNodeWithTag("statement-read-text").performScrollTo().performClick()
         rule.onNodeWithText("Customer statement").performScrollTo().assertIsDisplayed()
         rule.onNodeWithTag("statement-refresh").performScrollTo().assertIsDisplayed()
         assertEquals(nav,rule.onNodeWithTag(NativeUiTags.OwnerNavMore).fetchSemanticsNode().boundsInRoot)
@@ -102,7 +104,8 @@ class CustomerStatementUiTest {
         rule.onNodeWithTag("customer-statement-entry").performScrollTo().performClick()
         rule.waitUntil(10000) {rule.onAllNodesWithTag("statement-paper").fetchSemanticsNodes().isNotEmpty()}
         rule.onNodeWithTag("statement-next").performScrollTo().performClick()
-        rule.onNodeWithText("Page 2 of 2").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithText("Page 2 of",substring=true).performScrollTo().assertIsDisplayed()
+        rule.onNodeWithTag("statement-read-text").performScrollTo().performClick()
         rule.onNodeWithText("Sale 9",substring=true).performScrollTo().assertIsDisplayed()
         rule.onNodeWithTag("statement-refresh").performScrollTo().performClick()
         rule.waitUntil(10000) {rule.onAllNodesWithText("Page 1 of 1").fetchSemanticsNodes().isNotEmpty()}

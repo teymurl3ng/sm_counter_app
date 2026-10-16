@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-16",
+  "baseline": "842a1e12968604091143fd07275f92de366ff27e",
+  "piece": "phase5-piece2-only",
+  "uniqueAffectedMethodsPassing": 15,
+  "finalAffectedRun": "11/11 document and sharing methods; four preview methods retained from initial pass",
+  "initialFailure": "Long-name rejection assertion was false: safe measured wrapping fitted. Corrected test accepts safe wrapping and rejects excessive measured header.",
+  "fix": "Cancellation across completed export IO return now discards the unclaimed lease; deterministic regression passes.",
+  "qaTarget": "com.saaf.milkshop.qa.tests",
+  "device": "A06",
+  "ordinaryAppInstalledOrCleared": false,
+  "cloudChanged": false,
+  "messageSent": false,
+  "qaAppApkSha256": "41a86a4830ba1647a0663e181ad4948f6d34bcbe9debf79b554663f71da0dbd8",
+  "qaTestApkSha256": "4bb403c7dea1f58cd1eab28e03dfaa8db4a0dc74b9e07c4462ce29726e31c54d",
+  "sources": {
+    "phase18/app/src/main/AndroidManifest.xml": "53ceb8fb4062dd1eb667481392a8a4c4792525c5356d8ff4ce0f898ad7d2a63f",
+    "phase18/app/src/main/java/com/saaf/milkshop/MilkShopApplication.kt": "b5b3ab0c5f8391426113cc9f89e279d7d72bda50429731348b9a876ed38f4499",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerStatementScreen.kt": "ac1c812e44c63d935c2a612d54a9494fae131e9667d5436e5e07833524ad839a",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/StatementExportUi.kt": "f64d92c4933b94974d11e77839a65d77e14b0e45ca3a77ba74da11fb5157ecde",
+    "phase18/app/src/main/java/com/saaf/milkshop/statements/StatementDocument.kt": "9f6a130ae394a8e20e73c03a324172f6bd7221c5959ae87b60d65c808435f60e",
+    "phase18/app/src/main/java/com/saaf/milkshop/statements/StatementSharing.kt": "dd7b2d72c674d00c93ca3bbb741f311ca2da91af1b1dc983562b1455e696ee7c",
+    "phase18/app/src/main/res/xml/statement_paths.xml": "afa66b370f068036b8e2f7847dad5ecbea5ed6e5eeb7592e6694a91d5cc5b4a3",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/CustomerStatementUiTest.kt": "db166c0b5b22d422156f7ca90a01060f9137edf7da1963135443f0d23cb138ae",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/StatementDocumentTest.kt": "69cbc46373be736090dd092654949ade7aa0184e780f3b3ec0287cea8a5d5207",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/StatementSharingUiTest.kt": "ac6deb738c2521d917a0a80715e3e8ad2685db4ab97b56fadc7b7429590baa0c"
+  },
+  "postBuildSourceChange": "Removed one extra trailing blank line in CustomerStatementScreen.kt; no behavioral changes after final build.",
+  "localSyntheticSamples": {
+    "multi-page-1.png": "345ad62de8a0937219a10a9e0f8fadb91eb1554e5ce18a505550c9e5628fb5c7",
+    "multi-page-4.png": "86554e0489b518be835cf7852fa81b2dacb98ac01beeecd09b3cc1841534b6d3",
+    "multi-pdf-page-1.png": "02b968cbd98687f918392a1a23c562eedb47d74b0256eacfb1bde29274b60f35",
+    "multi-pdf-page-4.png": "c363eb8d47afa9ba0ed09c89d7cf77df0dc84f3b7253f2fe761b847463fbf14c",
+    "multi.pdf": "4e505b2b6d6457d05c6ed0ed9c93202e820cbf0cb9e5c6d5d96d76e70e79e929",
+    "short-page-1.png": "9f9b6110f4b0fb4643b0ac5e4e62464736b96a863a139e7b6c247bc92b2f17ce",
+    "short-pdf-page-1.png": "f27e38c27b93d615e059ef13e63c2c42e8612684f2c56dfb899fd354263ecc04",
+    "short.pdf": "5c0b4a4fef6c5bda287eb0addb8d185c32ee1477aadc5165d8878093aa5eb750"
+  },
+  "localSyntheticUiCaptures": {
+    "format-1.0-false.png": "923c3f1b04a167b7d428a624fe4ed303da1d2241e3e1fc49f19c3869349f6656",
+    "format-2.0-true.png": "dec4b3fb17e9862bb4b4f5907303dc91a1c7c83723e14d85ea25b71e5f0f522f",
+    "share-1.0-false.png": "739a3184fba8865ebdd1b8da9df1154babd47a61fbc4a7a3165186cdd53dbe85",
+    "share-2.0-true.png": "cec431bc7ed104800e0ff346110e7ba785e40b31fb7705be47a07469a2f76c02"
+  },
+  "visualReview": "Android PDF-rendered short and multi-page first/last pages compared with direct PNG output; final dialog/status inspected in light/default and dark/200%-host fixtures. No clipping/overlap in inspected document pages. Binary samples/captures not committed.",
+  "limit": "Host density override is not certification of every device-wide font setting or external receiver; no real sending. Manual draft/history remains piece3."
+}

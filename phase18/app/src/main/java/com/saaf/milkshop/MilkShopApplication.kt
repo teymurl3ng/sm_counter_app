@@ -42,6 +42,7 @@ class MilkShopApplication : Application() {
             SyncScheduler.warmUp(this)
         }
         timeTrustScope.launch {
+            runCatching { com.saaf.milkshop.statements.StatementExportStore(applicationContext).cleanup() }
             runCatching { TimeTrustMonitor.check(applicationContext, database) }
             // Enrolled devices push before pulling: a local edit reaches the
             // server before any pull can overwrite it (C1 decision record,

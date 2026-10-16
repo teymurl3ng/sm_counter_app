@@ -1,0 +1,91 @@
+{
+  "label": "export-final",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.StatementDocumentTest#measuredPlanKeepsEveryEntryAndRejectsUnsafeSizeOrTotals",
+    "com.saaf.milkshop.StatementDocumentTest#pdfAndPngUseIdenticalPagesAndProduceReadableSamples",
+    "com.saaf.milkshop.StatementDocumentTest#cacheCleanupKeepsFreshAndActiveAndDeletesOnlyAgedOwnedExports",
+    "com.saaf.milkshop.StatementDocumentTest#providerGrantsOnlySelectedFilesAndRejectsSiblingAndOutsidePaths",
+    "com.saaf.milkshop.StatementDocumentTest#cancelledGenerationReleasesItsLeaseAndDoesNotLeavePartialFiles",
+    "com.saaf.milkshop.StatementDocumentTest#cancellationWhileReturningCompletedExportDiscardsUnclaimedLease",
+    "com.saaf.milkshop.StatementSharingUiTest#lightChooserHandoffHasTruthfulFeedbackAndStableChrome",
+    "com.saaf.milkshop.StatementSharingUiTest#darkLargeTextChooserHandoffHasTruthfulFeedbackAndStableChrome",
+    "com.saaf.milkshop.StatementSharingUiTest#cancelDoesNotExportAndMissingHandlerReportsFailure",
+    "com.saaf.milkshop.StatementSharingUiTest#changedFactsBeforeOrAfterRenderingRequireReviewInsteadOfSharing",
+    "com.saaf.milkshop.StatementSharingUiTest#nativeChooserCanBeDismissedWithoutSending"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.StatementDocumentTest",
+      "test": "pdfAndPngUseIdenticalPagesAndProduceReadableSamples",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementDocumentTest",
+      "test": "cancelledGenerationReleasesItsLeaseAndDoesNotLeavePartialFiles",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementDocumentTest",
+      "test": "providerGrantsOnlySelectedFilesAndRejectsSiblingAndOutsidePaths",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementDocumentTest",
+      "test": "cancellationWhileReturningCompletedExportDiscardsUnclaimedLease",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementDocumentTest",
+      "test": "measuredPlanKeepsEveryEntryAndRejectsUnsafeSizeOrTotals",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementDocumentTest",
+      "test": "cacheCleanupKeepsFreshAndActiveAndDeletesOnlyAgedOwnedExports",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "changedFactsBeforeOrAfterRenderingRequireReviewInsteadOfSharing",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "darkLargeTextChooserHandoffHasTruthfulFeedbackAndStableChrome",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "lightChooserHandoffHasTruthfulFeedbackAndStableChrome",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "cancelDoesNotExportAndMissingHandlerReportsFailure",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "nativeChooserCanBeDismissedWithoutSending",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 11,
+  "expected": 11,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "41a86a4830ba1647a0663e181ad4948f6d34bcbe9debf79b554663f71da0dbd8"
+}

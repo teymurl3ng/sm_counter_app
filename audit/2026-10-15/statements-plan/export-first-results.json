@@ -1,0 +1,112 @@
+{
+  "label": "export-first",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.StatementDocumentTest#measuredPlanKeepsEveryEntryAndRejectsUnsafeSizeOrTotals",
+    "com.saaf.milkshop.StatementDocumentTest#pdfAndPngUseIdenticalPagesAndProduceReadableSamples",
+    "com.saaf.milkshop.StatementDocumentTest#cacheCleanupKeepsFreshAndActiveAndDeletesOnlyAgedOwnedExports",
+    "com.saaf.milkshop.StatementDocumentTest#providerGrantsOnlySelectedFilesAndRejectsSiblingAndOutsidePaths",
+    "com.saaf.milkshop.StatementDocumentTest#cancelledGenerationReleasesItsLeaseAndDoesNotLeavePartialFiles",
+    "com.saaf.milkshop.StatementSharingUiTest#lightChooserHandoffHasTruthfulFeedbackAndStableChrome",
+    "com.saaf.milkshop.StatementSharingUiTest#darkLargeTextChooserHandoffHasTruthfulFeedbackAndStableChrome",
+    "com.saaf.milkshop.StatementSharingUiTest#cancelDoesNotExportAndMissingHandlerReportsFailure",
+    "com.saaf.milkshop.StatementSharingUiTest#changedFactsBeforeOrAfterRenderingRequireReviewInsteadOfSharing",
+    "com.saaf.milkshop.StatementSharingUiTest#nativeChooserCanBeDismissedWithoutSending",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementLightPreviewAndReturnKeepChromeAndDisclosure",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure",
+    "com.saaf.milkshop.CustomerStatementUiTest#periodFailureRetainsPreviousSnapshotAndAllowsRevert",
+    "com.saaf.milkshop.CustomerStatementUiTest#multiplePagesAndRefreshClampToNewContent"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.StatementDocumentTest",
+      "test": "pdfAndPngUseIdenticalPagesAndProduceReadableSamples",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementDocumentTest",
+      "test": "cancelledGenerationReleasesItsLeaseAndDoesNotLeavePartialFiles",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementDocumentTest",
+      "test": "providerGrantsOnlySelectedFilesAndRejectsSiblingAndOutsidePaths",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementDocumentTest",
+      "test": "measuredPlanKeepsEveryEntryAndRejectsUnsafeSizeOrTotals",
+      "code": -2,
+      "stack": "java.lang.AssertionError"
+    },
+    {
+      "class": "com.saaf.milkshop.StatementDocumentTest",
+      "test": "cacheCleanupKeepsFreshAndActiveAndDeletesOnlyAgedOwnedExports",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "changedFactsBeforeOrAfterRenderingRequireReviewInsteadOfSharing",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "darkLargeTextChooserHandoffHasTruthfulFeedbackAndStableChrome",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "lightChooserHandoffHasTruthfulFeedbackAndStableChrome",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "cancelDoesNotExportAndMissingHandlerReportsFailure",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "nativeChooserCanBeDismissedWithoutSending",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "periodFailureRetainsPreviousSnapshotAndAllowsRevert",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "multiplePagesAndRefreshClampToNewContent",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementLightPreviewAndReturnKeepChromeAndDisclosure",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 13,
+  "expected": 14,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "1347d0865102d0b3c3a3bdff06476dcb473e087b2131c5d24b3240aca41e46f8"
+}

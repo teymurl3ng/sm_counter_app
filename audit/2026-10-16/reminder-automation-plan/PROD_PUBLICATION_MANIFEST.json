@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-17",
+  "sourceBaseline": "cc60170",
+  "project": {
+    "name": "saafmilk-prod",
+    "ref": "tlsuxbghuhlqntkgtrxt"
+  },
+  "state": "PREPARED_NOT_APPLIED",
+  "migrations": [
+    {
+      "name": "customer_followups_v1",
+      "path": "supabase/migrations/20261016110904_customer_followups_v1.sql",
+      "sha256": "792b278a921b8eed61759823c60236edc140d635dcce4cc013f947930e32e283"
+    },
+    {
+      "name": "followup_actor_indexes",
+      "path": "supabase/migrations/20261016112511_followup_actor_indexes.sql",
+      "sha256": "5f4b8102c79c99d7fbe0769e6ab30077ae17dbaae34dce97fcaaffc19ae3ed26"
+    }
+  ],
+  "deployedDevFunctionBodiesMatch": {
+    "followup_private.actor": "cc5bd89518941983ee4754069410f7a4f62a52569736aca0ff5df0eefb53721c",
+    "followup_private.zone": "c95609263bb6137e171ca2b8d0b88152ba508083a273387428b5a31049474196",
+    "followup_private.heads": "ea44a012a5bc159b4b5ecdee74c98b9e8345ce9e4c2cf6ec532db258bca97f41",
+    "followup_private.assert_customer": "a09b07dd9303a7d3df90595df1d5ed76d32d6a650e88aea3d8b42af14b9f3580",
+    "followup_private.assert_schedule": "8bf8f2697a83bc5dd917c5f5a632cd7ac5a43c8168bb982a956728b3af16d092",
+    "public.followup_snapshot_v1": "4b60d6a44ab3433973f7f591ad12675884cef941c0388129d269aed164edb265",
+    "public.followup_command_v1": "9560c9be0ca8d79989bd7dcb8aff7e1f2aa67c56a1729c18a83d777d1ffa756c"
+  },
+  "prerequisiteColumnsAndFunctionsMatch": true,
+  "devInventory": {
+    "privateTables": 6,
+    "totalIndexes": 16,
+    "explicitIndexes": 8,
+    "authenticatedRpcs": 2
+  },
+  "checks": {
+    "path": "audit\\2026-10-16\\reminder-automation-plan\\prod-contract-checks.sql",
+    "sha256": "1c0d7dca6333f94d6c86e90e729e62d33e775c1464575c963a98e10df10ce446",
+    "expected": 72,
+    "originalBodyUnchangedApartFromPreFixtureTimeGuard": true,
+    "transaction": "BEGIN/ROLLBACK"
+  },
+  "protectedExistingRowHashes": {
+    "shops": "1b193578bcfe048ca7ff7930ae08af74",
+    "staff": "110722413ad1128d77205c03dc5f2f3c",
+    "businesses": "28ba0a959f56cff25907937b898dde0e",
+    "sync_records": "5df82d0b6006f8818f84c93ae45384ef",
+    "credit_contracts": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "activation": false,
+  "financialRewrite": false,
+  "ordinaryApkInstall": false,
+  "customerContact": false,
+  "approvalIncludes": "Apply exactly the two named migrations in order, then run scoped rolled-back synthetic contract/permission checks, compare deployed objects and protected row hashes, and review relevant advisor deltas. No shop opt-in or ordinary install."
+}

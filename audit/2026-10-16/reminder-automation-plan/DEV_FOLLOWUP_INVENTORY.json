@@ -1,0 +1,513 @@
+{
+  "tables": [
+    {
+      "rls": true,
+      "table": "actions",
+      "columns": [
+        {
+          "name": "seq",
+          "type": "bigint",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "shop_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "command_uid",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "actor_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "installation",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "customer_uid",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "attempt_uid",
+          "type": "uuid",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "cycle",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "accepted_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "not_null": true
+        }
+      ],
+      "anon_access": false,
+      "constraints": [
+        "FOREIGN KEY (actor_id) REFERENCES staff(id)",
+        "PRIMARY KEY (seq)",
+        "UNIQUE (shop_id, command_uid)",
+        "FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE"
+      ],
+      "authenticated_access": false
+    },
+    {
+      "rls": true,
+      "table": "claims",
+      "columns": [
+        {
+          "name": "shop_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "customer_uid",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "attempt_uid",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "actor_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "installation",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "cycle",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "phase",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "lease_until",
+          "type": "timestamp with time zone",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "started_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "channel",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        }
+      ],
+      "anon_access": false,
+      "constraints": [
+        "FOREIGN KEY (actor_id) REFERENCES staff(id)",
+        "CHECK ((channel = ANY (ARRAY['WHATSAPP'::text, 'SMS'::text])))",
+        "CHECK ((((phase = 'PREPARING'::text) AND (lease_until IS NOT NULL) AND (started_at IS NULL) AND (channel IS NULL)) OR ((phase = 'HANDOFF_STARTED'::text) AND (lease_until IS NULL) AND (started_at IS NOT NULL) AND (channel IS NOT NULL))))",
+        "CHECK (((length(cycle) >= 1) AND (length(cycle) <= 1024)))",
+        "CHECK ((phase = ANY (ARRAY['PREPARING'::text, 'HANDOFF_STARTED'::text])))",
+        "PRIMARY KEY (shop_id, customer_uid)",
+        "UNIQUE (shop_id, attempt_uid)",
+        "FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE"
+      ],
+      "authenticated_access": false
+    },
+    {
+      "rls": true,
+      "table": "commands",
+      "columns": [
+        {
+          "name": "shop_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "command_uid",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "actor_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "installation",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "request",
+          "type": "jsonb",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "result",
+          "type": "jsonb",
+          "default": null,
+          "not_null": true
+        }
+      ],
+      "anon_access": false,
+      "constraints": [
+        "FOREIGN KEY (actor_id) REFERENCES staff(id)",
+        "PRIMARY KEY (shop_id, command_uid)",
+        "FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE"
+      ],
+      "authenticated_access": false
+    },
+    {
+      "rls": true,
+      "table": "customers",
+      "columns": [
+        {
+          "name": "shop_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "customer_uid",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "revision",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "schedule_revision",
+          "type": "uuid",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "effective_from",
+          "type": "date",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "schedule",
+          "type": "jsonb",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "paused",
+          "type": "boolean",
+          "default": "false",
+          "not_null": true
+        },
+        {
+          "name": "snoozed_until",
+          "type": "date",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "statement_cycle",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "reviewed_on",
+          "type": "date",
+          "default": null,
+          "not_null": false
+        }
+      ],
+      "anon_access": false,
+      "constraints": [
+        "CHECK (((schedule_revision IS NULL) = (effective_from IS NULL)))",
+        "CHECK (((length(customer_uid) >= 1) AND (length(customer_uid) <= 200)))",
+        "PRIMARY KEY (shop_id, customer_uid)",
+        "FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE",
+        "CHECK (((length(statement_cycle) >= 1) AND (length(statement_cycle) <= 1024)))"
+      ],
+      "authenticated_access": false
+    },
+    {
+      "rls": true,
+      "table": "digests",
+      "columns": [
+        {
+          "name": "shop_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "business_date",
+          "type": "date",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "installation",
+          "type": "text",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "actor_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "reserved_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "not_null": true
+        }
+      ],
+      "anon_access": false,
+      "constraints": [
+        "FOREIGN KEY (actor_id) REFERENCES staff(id)",
+        "PRIMARY KEY (shop_id, business_date)",
+        "FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE"
+      ],
+      "authenticated_access": false
+    },
+    {
+      "rls": true,
+      "table": "policies",
+      "columns": [
+        {
+          "name": "shop_id",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "revision",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "schedule_revision",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "effective_from",
+          "type": "date",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "weekday",
+          "type": "integer",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "repeat_days",
+          "type": "integer",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "preferred_time",
+          "type": "time without time zone",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "quiet_start",
+          "type": "time without time zone",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "quiet_end",
+          "type": "time without time zone",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "primary_installation",
+          "type": "text",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "primary_actor",
+          "type": "uuid",
+          "default": null,
+          "not_null": false
+        },
+        {
+          "name": "updated_by",
+          "type": "uuid",
+          "default": null,
+          "not_null": true
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "default": null,
+          "not_null": true
+        }
+      ],
+      "anon_access": false,
+      "constraints": [
+        "CHECK ((quiet_start <> quiet_end))",
+        "CHECK (((primary_installation IS NULL) = (primary_actor IS NULL)))",
+        "CHECK (((NOT enabled) OR (primary_installation IS NOT NULL)))",
+        "PRIMARY KEY (shop_id)",
+        "FOREIGN KEY (primary_actor) REFERENCES staff(id)",
+        "CHECK (((length(primary_installation) >= 1) AND (length(primary_installation) <= 200)))",
+        "CHECK (((repeat_days >= 1) AND (repeat_days <= 30)))",
+        "FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE",
+        "FOREIGN KEY (updated_by) REFERENCES staff(id)",
+        "CHECK (((weekday >= 1) AND (weekday <= 7)))"
+      ],
+      "authenticated_access": false
+    }
+  ],
+  "indexes": [
+    {
+      "name": "actions_pkey",
+      "definition": "CREATE UNIQUE INDEX actions_pkey ON followup_private.actions USING btree (seq)"
+    },
+    {
+      "name": "actions_shop_id_command_uid_key",
+      "definition": "CREATE UNIQUE INDEX actions_shop_id_command_uid_key ON followup_private.actions USING btree (shop_id, command_uid)"
+    },
+    {
+      "name": "claims_pkey",
+      "definition": "CREATE UNIQUE INDEX claims_pkey ON followup_private.claims USING btree (shop_id, customer_uid)"
+    },
+    {
+      "name": "claims_shop_id_attempt_uid_key",
+      "definition": "CREATE UNIQUE INDEX claims_shop_id_attempt_uid_key ON followup_private.claims USING btree (shop_id, attempt_uid)"
+    },
+    {
+      "name": "commands_pkey",
+      "definition": "CREATE UNIQUE INDEX commands_pkey ON followup_private.commands USING btree (shop_id, command_uid)"
+    },
+    {
+      "name": "customers_pkey",
+      "definition": "CREATE UNIQUE INDEX customers_pkey ON followup_private.customers USING btree (shop_id, customer_uid)"
+    },
+    {
+      "name": "digests_pkey",
+      "definition": "CREATE UNIQUE INDEX digests_pkey ON followup_private.digests USING btree (shop_id, business_date)"
+    },
+    {
+      "name": "followup_actions_actor",
+      "definition": "CREATE INDEX followup_actions_actor ON followup_private.actions USING btree (actor_id)"
+    },
+    {
+      "name": "followup_actions_shop_attempt",
+      "definition": "CREATE INDEX followup_actions_shop_attempt ON followup_private.actions USING btree (shop_id, attempt_uid) WHERE (attempt_uid IS NOT NULL)"
+    },
+    {
+      "name": "followup_actions_shop_seq",
+      "definition": "CREATE INDEX followup_actions_shop_seq ON followup_private.actions USING btree (shop_id, seq)"
+    },
+    {
+      "name": "followup_claims_actor",
+      "definition": "CREATE INDEX followup_claims_actor ON followup_private.claims USING btree (actor_id)"
+    },
+    {
+      "name": "followup_commands_actor",
+      "definition": "CREATE INDEX followup_commands_actor ON followup_private.commands USING btree (actor_id)"
+    },
+    {
+      "name": "followup_digests_actor",
+      "definition": "CREATE INDEX followup_digests_actor ON followup_private.digests USING btree (actor_id)"
+    },
+    {
+      "name": "followup_policies_primary_actor",
+      "definition": "CREATE INDEX followup_policies_primary_actor ON followup_private.policies USING btree (primary_actor)"
+    },
+    {
+      "name": "followup_policies_updated_by",
+      "definition": "CREATE INDEX followup_policies_updated_by ON followup_private.policies USING btree (updated_by)"
+    },
+    {
+      "name": "policies_pkey",
+      "definition": "CREATE UNIQUE INDEX policies_pkey ON followup_private.policies USING btree (shop_id)"
+    }
+  ],
+  "rpc_privileges": [
+    {
+      "anon": false,
+      "name": "followup_command_v1",
+      "config": [
+        "search_path=\"\""
+      ],
+      "definer": true,
+      "authenticated": true
+    },
+    {
+      "anon": false,
+      "name": "followup_snapshot_v1",
+      "config": [
+        "search_path=\"\""
+      ],
+      "definer": true,
+      "authenticated": true
+    }
+  ]
+}

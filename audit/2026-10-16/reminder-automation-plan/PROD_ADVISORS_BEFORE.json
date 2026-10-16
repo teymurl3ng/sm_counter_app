@@ -1,0 +1,596 @@
+{
+  "date": "2026-10-17",
+  "project": "tlsuxbghuhlqntkgtrxt",
+  "security": {
+    "result": {
+      "lints": [
+        {
+          "name": "rls_enabled_no_policy",
+          "title": "RLS Enabled No Policy",
+          "level": "INFO",
+          "facing": "EXTERNAL",
+          "categories": [
+            "SECURITY"
+          ],
+          "description": "Detects cases where row level security (RLS) has been enabled on a table but no RLS policies have been created.",
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy",
+          "count": 12,
+          "findings": [
+            {
+              "detail": "Table \\`credential_reset_private.participants\\` has RLS enabled, but no policies exist",
+              "metadata": {
+                "name": "participants",
+                "type": "table",
+                "schema": "credential_reset_private"
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Table \\`credential_reset_private.requests\\` has RLS enabled, but no policies exist",
+              "metadata": {
+                "name": "requests",
+                "type": "table",
+                "schema": "credential_reset_private"
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Table \\`credit_private.contracts\\` has RLS enabled, but no policies exist",
+              "metadata": {
+                "name": "contracts",
+                "type": "table",
+                "schema": "credit_private"
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Table \\`credit_private.heads\\` has RLS enabled, but no policies exist",
+              "metadata": {
+                "name": "heads",
+                "type": "table",
+                "schema": "credit_private"
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Table \\`credit_private.records\\` has RLS enabled, but no policies exist",
+              "metadata": {
+                "name": "records",
+                "type": "table",
+                "schema": "credit_private"
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Table \\`public.audit_log\\` has RLS enabled, but no policies exist",
+              "metadata": {
+                "name": "audit_log",
+                "type": "table",
+                "schema": "public"
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Table \\`public.auth_reconciliation\\` has RLS enabled, but no policies exist",
+              "metadata": {
+                "name": "auth_reconciliation",
+                "type": "table",
+                "schema": "public"
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Table \\`public.businesses\\` has RLS enabled, but no policies exist",
+              "metadata": {
+                "name": "businesses",
+                "type": "table",
+                "schema": "public"
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Table \\`public.roles\\` has RLS enabled, but no policies exist",
+              "metadata": {
+                "name": "roles",
+                "type": "table",
+                "schema": "public"
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Table \\`public.shops\\` has RLS enabled, but no policies exist",
+              "metadata": {
+                "name": "shops",
+                "type": "table",
+                "schema": "public"
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Table \\`public.staff\\` has RLS enabled, but no policies exist",
+              "metadata": {
+                "name": "staff",
+                "type": "table",
+                "schema": "public"
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Table \\`public.staff_shops\\` has RLS enabled, but no policies exist",
+              "metadata": {
+                "name": "staff_shops",
+                "type": "table",
+                "schema": "public"
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            }
+          ]
+        },
+        {
+          "name": "authenticated_security_definer_function_executable",
+          "title": "Signed-In Users Can Execute SECURITY DEFINER Function",
+          "level": "WARN",
+          "facing": "EXTERNAL",
+          "categories": [
+            "SECURITY"
+          ],
+          "description": "Detects `SECURITY DEFINER` functions that are callable by signed-in users. Revoke `EXECUTE`, switch the function to `SECURITY INVOKER`, or move it out of your exposed API schema if signed-in users should not call it.",
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable",
+          "count": 23,
+          "findings": [
+            {
+              "detail": "Function `public.admin_add_shop(p_name text)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/admin_add_shop`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "admin_add_shop",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_name text",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.admin_assign_shop(p_staff_id uuid, p_shop_id uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/admin_assign_shop`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "admin_assign_shop",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_staff_id uuid, p_shop_id uuid",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.admin_begin_credential_reset(p_staff_id uuid, p_request_id uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/admin_begin_credential_reset`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "admin_begin_credential_reset",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_staff_id uuid, p_request_id uuid",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.admin_create_staff_db(p_auth_user_id uuid, p_username text, p_display_name text, p_role text, p_shop_ids uuid[])` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/admin_create_staff_db`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "admin_create_staff_db",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_auth_user_id uuid, p_username text, p_display_name text, p_role text, p_shop_ids uuid[]",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.admin_disable_staff(p_staff_id uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/admin_disable_staff`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "admin_disable_staff",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_staff_id uuid",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.admin_enable_staff(p_staff_id uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/admin_enable_staff`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "admin_enable_staff",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_staff_id uuid",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.admin_get_shop(p_shop_id uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/admin_get_shop`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "admin_get_shop",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_shop_id uuid",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.admin_get_staff(p_staff_id uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/admin_get_staff`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "admin_get_staff",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_staff_id uuid",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.admin_list_activity(p_action text, p_target_username text, p_from timestamp with time zone, p_to timestamp with time zone, p_limit integer, p_offset integer)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/admin_list_activity`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "admin_list_activity",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_action text, p_target_username text, p_from timestamp with time zone, p_to timestamp with time zone, p_limit integer, p_offset integer",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.admin_list_shops(p_limit integer, p_offset integer)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/admin_list_shops`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "admin_list_shops",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_limit integer, p_offset integer",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.admin_list_staff(p_search text, p_role text, p_status text, p_shop_id uuid, p_limit integer, p_offset integer)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/admin_list_staff`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "admin_list_staff",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_search text, p_role text, p_status text, p_shop_id uuid, p_limit integer, p_offset integer",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.admin_overview()` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/admin_overview`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "admin_overview",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.admin_record_reset_credential_audit(p_staff_id uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/admin_record_reset_credential_audit`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "admin_record_reset_credential_audit",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_staff_id uuid",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.admin_set_role(p_staff_id uuid, p_new_role text)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/admin_set_role`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "admin_set_role",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_staff_id uuid, p_new_role text",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.admin_terminate_staff_db(p_staff_id uuid, p_confirm_username text)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/admin_terminate_staff_db`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "admin_terminate_staff_db",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_staff_id uuid, p_confirm_username text",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.admin_unassign_shop(p_staff_id uuid, p_shop_id uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/admin_unassign_shop`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "admin_unassign_shop",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "p_staff_id uuid, p_shop_id uuid",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.credit_contract_enable_v1(shop uuid, posting_phones_updated boolean)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/credit_contract_enable_v1`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "credit_contract_enable_v1",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "shop uuid, posting_phones_updated boolean",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.credit_contract_status_v1(shop uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/credit_contract_status_v1`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "credit_contract_status_v1",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "shop uuid",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.credit_metadata_pull_v1(shop uuid, since_seq bigint, max_rows integer)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/credit_metadata_pull_v1`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "credit_metadata_pull_v1",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "shop uuid, since_seq bigint, max_rows integer",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.credit_metadata_push_v1(shop uuid, operations jsonb)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/credit_metadata_push_v1`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "credit_metadata_push_v1",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "shop uuid, operations jsonb",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.my_profile()` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/my_profile`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "my_profile",
+                "schema": "public",
+                "language": "sql",
+                "arguments": "",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.sync_push(envelopes jsonb, device_id text, shop_id uuid, pull_cursor bigint)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/sync_push`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "sync_push",
+                "schema": "public",
+                "language": "plpgsql",
+                "arguments": "envelopes jsonb, device_id text, shop_id uuid, pull_cursor bigint",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            },
+            {
+              "detail": "Function `public.sync_staff_shop_ids()` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/sync_staff_shop_ids`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+              "metadata": {
+                "name": "sync_staff_shop_ids",
+                "schema": "public",
+                "language": "sql",
+                "arguments": "",
+                "security_definer": true
+              },
+              "observed_at": "2026-10-16T19:34:22.792Z"
+            }
+          ]
+        },
+        {
+          "name": "auth_leaked_password_protection",
+          "title": "Leaked Password Protection Disabled",
+          "level": "WARN",
+          "facing": "EXTERNAL",
+          "categories": [
+            "SECURITY"
+          ],
+          "description": "Leaked password protection is currently disabled.",
+          "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection",
+          "count": 1,
+          "findings": [
+            {
+              "detail": "Supabase Auth prevents the use of compromised passwords by checking against HaveIBeenPwned.org. Enable this feature to enhance security.",
+              "metadata": {
+                "type": "auth",
+                "entity": "Auth"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "performance": {
+    "result": {
+      "lints": [
+        {
+          "name": "unindexed_foreign_keys",
+          "title": "Unindexed foreign keys",
+          "level": "INFO",
+          "facing": "EXTERNAL",
+          "categories": [
+            "PERFORMANCE"
+          ],
+          "description": "Identifies foreign key constraints without a covering index, which can impact database performance.",
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys",
+          "count": 12,
+          "findings": [
+            {
+              "detail": "Table \\`credential_reset_private.requests\\` has a foreign key \\`requests_business_id_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+              "metadata": {
+                "name": "requests",
+                "type": "table",
+                "schema": "credential_reset_private",
+                "fkey_name": "requests_business_id_fkey",
+                "fkey_columns": [
+                  2
+                ]
+              },
+              "observed_at": "2026-10-16T19:34:22.926Z"
+            },
+            {
+              "detail": "Table \\`credential_reset_private.requests\\` has a foreign key \\`requests_caller_staff_id_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+              "metadata": {
+                "name": "requests",
+                "type": "table",
+                "schema": "credential_reset_private",
+                "fkey_name": "requests_caller_staff_id_fkey",
+                "fkey_columns": [
+                  6
+                ]
+              },
+              "observed_at": "2026-10-16T19:34:22.926Z"
+            },
+            {
+              "detail": "Table \\`credential_reset_private.requests\\` has a foreign key \\`requests_target_staff_id_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+              "metadata": {
+                "name": "requests",
+                "type": "table",
+                "schema": "credential_reset_private",
+                "fkey_name": "requests_target_staff_id_fkey",
+                "fkey_columns": [
+                  3
+                ]
+              },
+              "observed_at": "2026-10-16T19:34:22.926Z"
+            },
+            {
+              "detail": "Table \\`credit_private.contracts\\` has a foreign key \\`contracts_activated_by_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+              "metadata": {
+                "name": "contracts",
+                "type": "table",
+                "schema": "credit_private",
+                "fkey_name": "contracts_activated_by_fkey",
+                "fkey_columns": [
+                  3
+                ]
+              },
+              "observed_at": "2026-10-16T19:34:22.926Z"
+            },
+            {
+              "detail": "Table \\`credit_private.records\\` has a foreign key \\`records_accepted_by_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+              "metadata": {
+                "name": "records",
+                "type": "table",
+                "schema": "credit_private",
+                "fkey_name": "records_accepted_by_fkey",
+                "fkey_columns": [
+                  6
+                ]
+              },
+              "observed_at": "2026-10-16T19:34:22.926Z"
+            },
+            {
+              "detail": "Table \\`public.audit_log\\` has a foreign key \\`audit_log_performed_by_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+              "metadata": {
+                "name": "audit_log",
+                "type": "table",
+                "schema": "public",
+                "fkey_name": "audit_log_performed_by_fkey",
+                "fkey_columns": [
+                  7
+                ]
+              },
+              "observed_at": "2026-10-16T19:34:22.926Z"
+            },
+            {
+              "detail": "Table \\`public.auth_reconciliation\\` has a foreign key \\`auth_reconciliation_business_id_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+              "metadata": {
+                "name": "auth_reconciliation",
+                "type": "table",
+                "schema": "public",
+                "fkey_name": "auth_reconciliation_business_id_fkey",
+                "fkey_columns": [
+                  2
+                ]
+              },
+              "observed_at": "2026-10-16T19:34:22.926Z"
+            },
+            {
+              "detail": "Table \\`public.auth_reconciliation\\` has a foreign key \\`auth_reconciliation_performed_by_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+              "metadata": {
+                "name": "auth_reconciliation",
+                "type": "table",
+                "schema": "public",
+                "fkey_name": "auth_reconciliation_performed_by_fkey",
+                "fkey_columns": [
+                  16
+                ]
+              },
+              "observed_at": "2026-10-16T19:34:22.926Z"
+            },
+            {
+              "detail": "Table \\`public.staff\\` has a foreign key \\`staff_business_id_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+              "metadata": {
+                "name": "staff",
+                "type": "table",
+                "schema": "public",
+                "fkey_name": "staff_business_id_fkey",
+                "fkey_columns": [
+                  3
+                ]
+              },
+              "observed_at": "2026-10-16T19:34:22.926Z"
+            },
+            {
+              "detail": "Table \\`public.staff\\` has a foreign key \\`staff_role_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+              "metadata": {
+                "name": "staff",
+                "type": "table",
+                "schema": "public",
+                "fkey_name": "staff_role_fkey",
+                "fkey_columns": [
+                  6
+                ]
+              },
+              "observed_at": "2026-10-16T19:34:22.926Z"
+            },
+            {
+              "detail": "Table \\`public.staff_shops\\` has a foreign key \\`staff_shops_shop_id_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+              "metadata": {
+                "name": "staff_shops",
+                "type": "table",
+                "schema": "public",
+                "fkey_name": "staff_shops_shop_id_fkey",
+                "fkey_columns": [
+                  2
+                ]
+              },
+              "observed_at": "2026-10-16T19:34:22.926Z"
+            },
+            {
+              "detail": "Table \\`public.sync_records\\` has a foreign key \\`sync_records_business_id_fkey\\` without a covering index. This can lead to suboptimal query performance.",
+              "metadata": {
+                "name": "sync_records",
+                "type": "table",
+                "schema": "public",
+                "fkey_name": "sync_records_business_id_fkey",
+                "fkey_columns": [
+                  2
+                ]
+              },
+              "observed_at": "2026-10-16T19:34:22.926Z"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

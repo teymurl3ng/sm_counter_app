@@ -1,0 +1,365 @@
+{
+  "date": "2026-10-17",
+  "project": {
+    "id": "tlsuxbghuhlqntkgtrxt",
+    "ref": "tlsuxbghuhlqntkgtrxt",
+    "organization_id": "hlewlyngnpziytterocd",
+    "organization_slug": "hlewlyngnpziytterocd",
+    "name": "saafmilk-prod",
+    "region": "ap-northeast-1",
+    "status": "ACTIVE_HEALTHY",
+    "database": {
+      "host": "db.tlsuxbghuhlqntkgtrxt.supabase.co",
+      "version": "17.6.1.166",
+      "postgres_engine": "17",
+      "release_channel": "ga"
+    },
+    "created_at": "2026-09-20T07:18:18.852628Z"
+  },
+  "baseline": {
+    "shops": 2,
+    "staff": 8,
+    "auth_users": 3,
+    "businesses": 1,
+    "command_rpc": null,
+    "snapshot_rpc": null,
+    "sync_records": 36,
+    "shop_timezone": true,
+    "server_version": "17.6",
+    "followup_schema": null,
+    "credit_contracts": 0
+  },
+  "prerequisites": {
+    "columns": [
+      {
+        "type": "uuid",
+        "table": "contracts",
+        "column": "shop_id",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "contracts",
+        "column": "activated_at",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "contracts",
+        "column": "activated_by",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "bigint",
+        "table": "records",
+        "column": "server_seq",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "records",
+        "column": "shop_id",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "records",
+        "column": "kind",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "records",
+        "column": "uid",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "jsonb",
+        "table": "records",
+        "column": "payload",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "records",
+        "column": "accepted_by",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "records",
+        "column": "accepted_at",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "shops",
+        "column": "id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "shops",
+        "column": "business_id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "shops",
+        "column": "name",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "boolean",
+        "table": "shops",
+        "column": "active",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "shops",
+        "column": "created_at",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "shops",
+        "column": "shop_timezone",
+        "schema": "public",
+        "nullable": "YES"
+      },
+      {
+        "type": "uuid",
+        "table": "staff",
+        "column": "id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "staff",
+        "column": "auth_user_id",
+        "schema": "public",
+        "nullable": "YES"
+      },
+      {
+        "type": "uuid",
+        "table": "staff",
+        "column": "business_id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "staff",
+        "column": "username",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "staff",
+        "column": "display_name",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "staff",
+        "column": "role",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "boolean",
+        "table": "staff",
+        "column": "active",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "staff",
+        "column": "terminated_at",
+        "schema": "public",
+        "nullable": "YES"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "staff",
+        "column": "created_at",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "staff",
+        "column": "updated_at",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "bigint",
+        "table": "sync_records",
+        "column": "server_seq",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "sync_records",
+        "column": "business_id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "sync_records",
+        "column": "shop_id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "sync_records",
+        "column": "table_name",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "sync_records",
+        "column": "row_uid",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "jsonb",
+        "table": "sync_records",
+        "column": "payload",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "sync_records",
+        "column": "origin_device",
+        "schema": "public",
+        "nullable": "YES"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "sync_records",
+        "column": "received_at",
+        "schema": "public",
+        "nullable": "NO"
+      }
+    ],
+    "functions": [
+      {
+        "name": "sync_push",
+        "definition": "CREATE OR REPLACE FUNCTION public.sync_push(envelopes jsonb, device_id text DEFAULT NULL::text, shop_id uuid DEFAULT NULL::uuid, pull_cursor bigint DEFAULT NULL::bigint)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_staff       record;\n  v_shop        uuid;\n  v_env         jsonb;\n  v_table       text;\n  v_uid         text;\n  v_payload     jsonb;\n  v_parked_seq  bigint;\n  v_existing    public.sync_records%rowtype;\n  v_applied     int := 0;\n  v_conflicts   int := 0;\nbegin\n  select s.id, s.business_id, s.role, s.username into v_staff\n    from public.staff s\n   where s.auth_user_id = auth.uid() and s.active and s.terminated_at is null;\n  if not found then\n    return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n      'code', 'not_authorized', 'message', 'No active staff profile'));\n  end if;\n\n  -- erratum 1: nullif(shop_id,'') casts '' to the uuid param at plan time (22P02)\n  v_shop := shop_id;\n  if v_shop is null or v_shop not in (select public.sync_staff_shop_ids()) then\n    return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n      'code', 'shop_required', 'message',\n      'The request must name a shop this account may write to'));\n  end if;\n\n  if jsonb_typeof(envelopes) <> 'array' or jsonb_array_length(envelopes) > 500 then\n    return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n      'code', 'too_many_envelopes', 'message',\n      'Send between 0 and 500 envelopes per call'));\n  end if;\n\n  -- INVARIANT 1: seq order == commit order per shop\n  perform pg_advisory_xact_lock(hashtextextended(v_shop::text, 0));\n\n  for v_env in select * from jsonb_array_elements(envelopes) loop\n    v_table      := v_env->>'table';\n    v_uid        := v_env->>'uid';\n    v_payload    := v_env->'payload';\n    v_parked_seq := nullif(v_env->>'parked_seq', '')::bigint;\n\n    if v_table is null or v_uid is null\n       or jsonb_typeof(v_payload) <> 'object' then\n      return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n        'code', 'malformed_envelope', 'message',\n        'Every envelope needs table, uid and a payload object'));\n    end if;\n\n    if v_table not in (\n      'events', 'products', 'accounts', 'budget_plans', 'collections_targets',\n      'deliveries', 'attendance_records', 'delivery_status_history',\n      'daily_close_actions', 'physical_cash_counts', 'settings', 'store_profile'\n    ) then\n      return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n        'code', 'unknown_table', 'message', 'Unknown synced table: ' || v_table));\n    end if;\n\n    -- D8 (unchanged): corrections of recorded history from privileged sources only\n    if v_table = 'events'\n       and (v_payload->>'corrects_event_uid') is not null\n       and v_staff.role not in ('owner', 'admin') then\n      return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n        'code', 'correction_privilege_required', 'message',\n        'Correcting recorded history requires an owner or admin account'));\n    end if;\n\n    -- erratum 2: qualify columns (unqualified shop_id collides with the param, 42702)\n    select * into v_existing from public.sync_records\n     where public.sync_records.shop_id    = v_shop\n       and public.sync_records.table_name = v_table\n       and public.sync_records.row_uid    = v_uid;\n\n    if v_table = 'events' then\n      perform credit_private.validate_sale(v_shop, v_uid, v_payload, case when found then v_existing.payload else null end);\n    end if;\n\n    if v_existing.server_seq is not null then\n      -- INVARIANT 4: append-only tables are insert-only\n      if v_table in ('events', 'delivery_status_history',\n                     'daily_close_actions', 'physical_cash_counts') then\n        if public.sync_normalize_payload(v_existing.payload)\n           is distinct from public.sync_normalize_payload(v_payload) then\n          insert into public.audit_log (action, business_id, performed_by,\n                                        performed_by_username, detail)\n          values ('sync_append_only_refused', v_staff.business_id, v_staff.id,\n                  v_staff.username,\n                  jsonb_build_object('table', v_table, 'uid', v_uid,\n                                     'shop', v_shop, 'device', device_id));\n        end if;\n        continue;  -- insert-only: never update; NOT counted in 'applied' (erratum 4)\n      end if;\n\n      -- master-data role gate\n      if v_table in ('products', 'accounts', 'settings', 'store_profile')\n         and v_staff.role not in ('owner', 'admin') then\n        return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n          'code', 'master_data_privilege_required', 'message',\n          'Updating ' || v_table || ' requires an owner or admin account'));\n      end if;\n\n      -- INVARIANT 7: true-conflict audit, losing payload preserved\n      if public.sync_normalize_payload(v_existing.payload)\n         is distinct from public.sync_normalize_payload(v_payload)\n         and v_existing.origin_device is distinct from device_id\n         and (\n              (pull_cursor is not null and v_existing.server_seq > pull_cursor)\n              or (v_parked_seq is not null\n                  and v_existing.server_seq >= v_parked_seq)\n             ) then\n        insert into public.audit_log (action, business_id, performed_by,\n                                      performed_by_username, detail)\n        values ('sync_conflict', v_staff.business_id, v_staff.id,\n                v_staff.username,\n                jsonb_build_object(\n                  'table', v_table, 'uid', v_uid, 'shop', v_shop,\n                  'loser_payload', v_existing.payload,\n                  'loser_device',  v_existing.origin_device,\n                  'loser_seq',     v_existing.server_seq,\n                  'winner_device', device_id,\n                  'detected_by',   case when v_parked_seq is not null\n                                        then 'parked_seq' else 'pull_cursor' end));\n        v_conflicts := v_conflicts + 1;\n      end if;\n    end if;\n\n    -- INVARIANT 8: unchanged re-push is a complete no-op (WHERE fails -> nothing set)\n    -- erratum 3: constraint-name target (inference cols collide with the param)\n    insert into public.sync_records\n      (business_id, shop_id, table_name, row_uid, payload, origin_device)\n    values (\n      (select business_id from public.shops where id = v_shop),\n      v_shop, v_table, v_uid, v_payload, device_id)\n    on conflict on constraint sync_records_shop_table_uid do update\n      set payload       = excluded.payload,\n          origin_device = excluded.origin_device,\n          received_at   = now()\n      where public.sync_normalize_payload(public.sync_records.payload)\n            is distinct from public.sync_normalize_payload(excluded.payload);\n\n    v_applied := v_applied + 1;\n  end loop;\n\n  insert into public.audit_log (action, business_id, performed_by,\n                                performed_by_username, detail)\n  values ('sync_push', v_staff.business_id, v_staff.id, v_staff.username,\n          jsonb_build_object('envelopes', v_applied, 'conflicts', v_conflicts,\n                             'device', device_id, 'shop', v_shop));\n\n  return jsonb_build_object('ok', true, 'applied', v_applied,\n                            'conflicts', v_conflicts,\n                            'server_time_epoch_ms',\n                            (extract(epoch from now()) * 1000)::bigint);\nexception when sqlstate 'PT422' then\n  return jsonb_build_object('ok',false,'error',jsonb_build_object('code',SQLERRM));\nend\n$function$\n"
+      },
+      {
+        "name": "sync_staff_shop_ids",
+        "definition": "CREATE OR REPLACE FUNCTION public.sync_staff_shop_ids()\n RETURNS SETOF uuid\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  select sh.id\n  from public.staff s\n  join public.shops sh on sh.business_id = s.business_id and sh.active\n  where s.auth_user_id = auth.uid()\n    and s.active\n    and s.terminated_at is null\n    and (\n      s.role = 'owner'\n      or exists (\n        select 1 from public.staff_shops ss\n        where ss.staff_id = s.id and ss.shop_id = sh.id\n      )\n    )\n$function$\n"
+      }
+    ],
+    "table_hashes": {
+      "shops": "1b193578bcfe048ca7ff7930ae08af74",
+      "staff": "110722413ad1128d77205c03dc5f2f3c",
+      "businesses": "28ba0a959f56cff25907937b898dde0e",
+      "sync_records": "5df82d0b6006f8818f84c93ae45384ef",
+      "credit_contracts": "d41d8cd98f00b204e9800998ecf8427e"
+    }
+  },
+  "migrations": [
+    {
+      "version": "20260920082151",
+      "name": "phase_a_identity_v1"
+    },
+    {
+      "version": "20260920090710",
+      "name": "phase_a5_ping_search_path"
+    },
+    {
+      "version": "20260920090721",
+      "name": "phase_a5_ping_search_path"
+    },
+    {
+      "version": "20260923194929",
+      "name": "c1_admin_write"
+    },
+    {
+      "version": "20260923195132",
+      "name": "c1_1_admin_write_rpcs"
+    },
+    {
+      "version": "20260923195505",
+      "name": "c1_2_admin_auth_db_helpers"
+    },
+    {
+      "version": "20260923210638",
+      "name": "migration_c1_admin_write"
+    },
+    {
+      "version": "20260923210725",
+      "name": "migration_c1_1_admin_write_rpcs"
+    },
+    {
+      "version": "20260923210744",
+      "name": "migration_c1_2_admin_auth_db_helpers"
+    },
+    {
+      "version": "20260925120001",
+      "name": "c1_1_admin_write_rpcs"
+    },
+    {
+      "version": "20260925120002",
+      "name": "c1_2_admin_auth_db_helpers"
+    },
+    {
+      "version": "20260925120003",
+      "name": "c1_3_hardening"
+    },
+    {
+      "version": "20260925120004",
+      "name": "c1_4_reconciliation"
+    },
+    {
+      "version": "20260925120005",
+      "name": "c1_5_error_semantics"
+    },
+    {
+      "version": "20260929075332",
+      "name": "sync_prod_baseline_records_rpcs_rls"
+    },
+    {
+      "version": "20261010141548",
+      "name": "saaf_c1_6_sync_boundary"
+    },
+    {
+      "version": "20261014102635",
+      "name": "protected_credential_reset_guard"
+    },
+    {
+      "version": "20261015180731",
+      "name": "credit_metadata_v1"
+    }
+  ]
+}

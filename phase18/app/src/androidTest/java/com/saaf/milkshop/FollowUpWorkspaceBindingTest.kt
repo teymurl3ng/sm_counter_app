@@ -14,40 +14,42 @@ import java.time.*
 import java.util.UUID
 
 /** Real Room reader/runtime/journal with an injected transport; never a remote shop. */
-class FollowUpWorkspaceBindingTest {
-    private val context=InstrumentationRegistry.getInstrumentation().targetContext
-    private lateinit var db: MilkShopDatabase
-    private lateinit var security: UserSecurityService
-    private lateinit var session: String
-    private lateinit var runtime: SyncRuntime
-    private lateinit var workspace: FollowUpWorkspaceBinding
-    private var customer=0L
-    private lateinit var uid: String
-    private val shop="20000000-0000-4000-8000-000000000001"
-    private val staff="20000000-0000-4000-8000-000000000002"
+internal open class FollowUpWorkspaceBindingTest {
+    protected val context=InstrumentationRegistry.getInstrumentation().targetContext
+    protected lateinit var db: MilkShopDatabase
+    protected lateinit var security: UserSecurityService
+    protected lateinit var session: String
+    protected lateinit var runtime: SyncRuntime
+    protected lateinit var workspace: FollowUpWorkspaceBinding
+    protected var customer=0L
+    protected lateinit var uid: String
+    protected val shop="20000000-0000-4000-8000-000000000001"
+    protected val staff="20000000-0000-4000-8000-000000000002"
     private var edit="20000000-0000-4000-8000-000000000003"
     private val schedule="20000000-0000-4000-8000-000000000004"
-    private val today=LocalDate.parse("2026-10-18")
-    private val instant="2026-10-18T07:00:00Z"
-    private var metadata=1L
+    protected val today=LocalDate.parse("2026-10-18")
+    protected val instant="2026-10-18T07:00:00Z"
+    protected var metadata=1L
+    protected var claimRows=JSONArray()
+    protected var actionRows: JSONArray?=null
     private var repeat=7
     private var primary: String?=null
     private var customerState: JSONObject?=null
     private var offline=false
     private var revoke=false
     private var afterSnapshot: suspend ()->Unit={}
-    private val sent=mutableListOf<JSONObject>()
-    private var onCommand: (JSONObject)->JSONObject={request->accepted(request)}
-    private fun id()=UUID.randomUUID().toString()
-    private fun heads()=JSONObject().put("sync",10L).put("credit",4L).put("metadata",metadata)
+    protected val sent=mutableListOf<JSONObject>()
+    protected var onCommand: (JSONObject)->JSONObject={request->accepted(request)}
+    protected fun id()=UUID.randomUUID().toString()
+    protected fun heads()=JSONObject().put("sync",10L).put("credit",4L).put("metadata",metadata)
         .put("policy_revision",edit).put("business_date",today.toString())
     private fun policy()=JSONObject().put("revision",edit).put("schedule_revision",schedule).put("effective_from","2026-10-16")
         .put("enabled",true).put("weekday",7).put("repeat_days",repeat).put("preferred_time","10:00:00").put("quiet_start","20:00:00").put("quiet_end","09:00:00")
         .put("primary_installation",primary ?: "another-device").put("primary_actor",staff).put("updated_by",staff).put("updated_at",instant)
-    private fun snapshot()=JSONObject().put("ok",true).put("contract_version",1).put("shop_id",shop).put("shop_timezone","Asia/Karachi")
+    protected fun snapshot()=JSONObject().put("ok",true).put("contract_version",1).put("shop_id",shop).put("shop_timezone","Asia/Karachi")
         .put("server_time_epoch_ms",Instant.parse(instant).toEpochMilli()).put("heads",heads()).put("policy",policy())
-        .put("customers",JSONArray().apply {customerState?.let {put(it)}}).put("claims",JSONArray())
-        .put("actions",JSONArray().put(JSONObject().put("seq",metadata).put("command_uid",id()).put("kind","POLICY")
+        .put("customers",JSONArray().apply {customerState?.let {put(it)}}).put("claims",claimRows)
+        .put("actions",actionRows ?: JSONArray().put(JSONObject().put("seq",metadata).put("command_uid",id()).put("kind","POLICY")
             .put("actor_id",staff).put("installation","another-device").put("customer_uid",JSONObject.NULL).put("attempt_uid",JSONObject.NULL)
             .put("cycle",JSONObject.NULL).put("accepted_at",instant)))
     private fun customerRow()=JSONObject().put("customer_uid",uid).put("revision",id()).put("schedule_revision",JSONObject.NULL)
@@ -92,7 +94,7 @@ class FollowUpWorkspaceBindingTest {
         },followUpSecurity=security)
         workspace=bound(session)
     }
-    private fun bound(local: String)=FollowUpWorkspaceBinding(db,security,runtime,local)
+    protected fun bound(local: String)=FollowUpWorkspaceBinding(db,security,runtime,local)
     @After fun close() {
         SyncServerConfigStore.clear(context);SyncShopBindingStore.clear(context);SyncTokenStore(context).clear();SyncRebaselineStore(context).clear()
         TrustedTime.resetForTest(context);db.close()

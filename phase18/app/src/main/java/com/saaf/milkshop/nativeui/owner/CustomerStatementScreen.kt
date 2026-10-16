@@ -109,7 +109,8 @@ private fun CustomerDetailDisclosure(title: String,key: String,selected: String,
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CustomerStatementScreen(customerId: Long,customerName: String,load: CustomerStatementLoader,shareLauncher: ((android.content.Intent)->Unit)?=null,
-    communication: CustomerCommunicationAccess=CustomerCommunicationAccess(),onReminder: ()->Unit={},onHistory: ()->Unit={},backLabel: String="Back to customer",onBack: ()->Unit) {
+    communication: CustomerCommunicationAccess=CustomerCommunicationAccess(),onReminder: ()->Unit={},onHistory: ()->Unit={},
+    backLabel: String="Back to customer",onSchedule: (()->Unit)?=null,onBack: ()->Unit) {
     val context=LocalContext.current
     val engine=remember(context.applicationContext) {StatementDocumentEngine(context)}
     val today=BusinessClock.today()
@@ -162,6 +163,7 @@ internal fun CustomerStatementScreen(customerId: Long,customerName: String,load:
                 }
             }
         }
+        onSchedule?.let {open->TextButton(onClick=hapticAction(open),enabled=!sharing,modifier=Modifier.testTag("statement-followup-schedule")) {Text("Schedule & pause")}}
         document?.let { currentDocument ->
             val statement=currentDocument.statement
             val usable=!loading && error==null && statement.period==period

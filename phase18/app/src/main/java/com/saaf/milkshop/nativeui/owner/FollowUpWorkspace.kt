@@ -31,7 +31,13 @@ internal data class FollowUpWorkspaceSnapshot(val policy: FollowUpPolicy,val tod
     val preferences: Map<String,CustomerFollowUpPreference> = emptyMap(),val acknowledgments: Map<String,FollowUpAcknowledgment> = emptyMap(),
     val freshness: String="Sync needed",val online: Boolean=false,val owner: Boolean=false,val primaryDevice: String="Not selected",
     val notificationsAllowed: Boolean=false,val shopZone: String="Shop timezone",val hasMessageApp: Boolean=false,
-    val saveToken: String="",val reviewReady: Boolean=true,val unfinished: List<FollowUpUnfinishedSave> = emptyList())
+    val saveToken: String="",val reviewReady: Boolean=true,val unfinished: List<FollowUpUnfinishedSave> = emptyList(),
+    val activity: List<FollowUpActivityRow> = emptyList(),val requests: List<FollowUpRequestRow> = emptyList(),
+    val claims: List<FollowUpClaimRow> = emptyList(),val configured: Boolean=true)
+internal data class FollowUpActivityRow(val sequence: Long,val label: String,val customer: String?,val by: String,val at: String)
+internal data class FollowUpRequestRow(val uid: String,val label: String,val customer: String?,val restored: Boolean,
+    val sameBinding: Boolean,val canCheck: Boolean,val canSetAside: Boolean)
+internal data class FollowUpClaimRow(val attempt: String,val accountId: Long?,val customer: String,val phase: String,val canReview: Boolean)
 internal data class FollowUpUnfinishedSave(val uid: String,val kind: String)
 internal data class FollowUpWorkspaceSave(val snapshot: FollowUpWorkspaceSnapshot,val accepted: Boolean)
 internal sealed interface FollowUpCommand {
@@ -42,7 +48,8 @@ internal sealed interface FollowUpCommand {
 }
 internal data class FollowUpWorkspaceAccess(val load: suspend ()->FollowUpWorkspaceSnapshot,
     val command: suspend (FollowUpCommand,String)->FollowUpWorkspaceSave,
-    val recover: suspend (String,Boolean)->FollowUpWorkspaceSave = {_,_->error("Unfinished-save review is unavailable.")})
+    val recover: suspend (String,Boolean)->FollowUpWorkspaceSave = {_,_->error("Unfinished-save review is unavailable.")},
+    val reviewRequest: suspend (String,Boolean)->FollowUpWorkspaceSave = {_,_->error("Request review is unavailable.")})
 
 /** Bound presentation; ordinary navigation waits for B's shared external-handoff gate. */
 @Composable
@@ -63,7 +70,7 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
     val guard=rememberEntryLeaveGuard()
     DisposableEffect(guard) {publishGuard(guard);onDispose {publishGuard(null)}}
     fun leave(action: ()->Unit) {if(!busy&&!openingCustomer) guard.requestLeave(action)}
-    fun back()=leave {when(page) {"list"->onBack();"schedule"->page="review";else->page="list"}}
+    fun back()=leave {when(page) {"list"->onBack();"schedule"->page="review";"activity"->page="settings";else->page="list"}}
     ActivePaneBackHandler(onBack={back()})
     LaunchedEffect(access,retry) {
         busy=true;error=null
@@ -103,18 +110,33 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
         }
     }
     var setAside by remember {mutableStateOf<String?>(null)}
+    var reviewAside by remember {mutableStateOf<String?>(null)}
+    fun reviewRequest(uid: String,aside: Boolean) {
+        if(busy) return
+        busy=true;error=null;notice=null
+        scope.launch {
+            try {
+                val result=access.reviewRequest(uid,aside);snapshot=result.snapshot
+                notice=if(aside) "Local request set aside. Shared changes and message attempts are unchanged."
+                    else if(result.accepted) "Request result checked. No app was opened and no alert was posted."
+                    else "The request is still unfinished. Review the current shared state before trying again."
+            } catch(cancelled: CancellationException) {throw cancelled}
+            catch(failure: Exception) {error=failure.message ?: "The request could not be checked. Try again."}
+            finally {busy=false}
+        }
+    }
     LaunchedEffect(error) {if(error!=null) scroll.animateScrollTo(0)}
     Column(Modifier.fillMaxSize().imePadding().verticalScroll(scroll).padding(16.dp).testTag("followup-workspace"),
         verticalArrangement=Arrangement.spacedBy(16.dp)) {
         TextButton(onClick=hapticAction {back()},enabled=!busy&&!openingCustomer) {Text(if(page=="list") "Back to customers" else "Back")}
-        NativeInformationHeading(when(page) {"settings"->"Follow-up settings";"review"->"Review follow-up";"schedule"->"Statement schedule";else->"Follow-ups"},
+        NativeInformationHeading(when(page) {"settings"->"Follow-up settings";"activity"->"Shared follow-up activity";"review"->"Review follow-up";"schedule"->"Statement schedule";else->"Follow-ups"},
             actionLabel=if(page=="list") "Settings" else null,actionTag="followup-settings",onAction=if(page=="list") ({leave {page="settings"}}) else null)
         Box(Modifier.fillMaxWidth().height(4.dp)) {if(busy||openingCustomer) LinearProgressIndicator(Modifier.fillMaxWidth().testTag("followup-progress"))}
         error?.let {Text(it,color=MaterialTheme.colorScheme.error,modifier=Modifier.testTag("followup-error").semantics {liveRegion=LiveRegionMode.Polite})}
         notice?.let {Text(it,modifier=Modifier.testTag("followup-notice").semantics {liveRegion=LiveRegionMode.Polite})}
         val state=snapshot
         if(state!=null) {
-            state.unfinished.forEach {pending->NativeInformationSection {
+            if(page!="activity") state.unfinished.forEach {pending->NativeInformationSection {
                 Text("Unfinished follow-up save",style=nativeSectionTextStyle())
                 Text("${pending.kind.lowercase().replaceFirstChar {it.uppercase()}}: the server may already have accepted it. Checking uses the same request.",style=nativeSupportingTextStyle())
                 TextButton(onClick=hapticAction {recover(pending.uid,false)},enabled=!busy && state.online,modifier=Modifier.testTag("followup-check-save")) {Text("Check save result")}
@@ -124,7 +146,12 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
             val rows=CustomerFollowUps.ordered(state.customers.mapNotNull {customer->CustomerFollowUps.evaluate(customer,state.policy,
                 state.preferences[customer.uid],state.acknowledgments[customer.uid] ?: FollowUpAcknowledgment(),state.today)})
             when(page) {
-                "settings"->FollowUpPolicyEditor(state,editingBlocked,{guard.markDirty()}) {submit(it,"Follow-up settings saved.")}
+                "settings"->{
+                    FollowUpPolicyEditor(state,editingBlocked,{guard.markDirty()}) {submit(it,"Follow-up settings saved.")}
+                    OutlinedButton(onClick=hapticAction {leave {page="activity"}},enabled=!busy,
+                        modifier=Modifier.fillMaxWidth().testTag("followup-shared-activity")) {Text("Shared activity & request review")}
+                }
+                "activity"->FollowUpSharedReview(state,busy||openingCustomer||error!=null,{reviewRequest(it,false)},{reviewAside=it},onReminder)
                 "schedule"->{
                     val customer=state.customers.find {it.uid==selected}
                     if(customer!=null) FollowUpScheduleEditor(customer,state,editingBlocked,{guard.markDirty()}) {
@@ -171,6 +198,7 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
         } else if(!busy) Text("No current follow-up snapshot. Refresh to continue.")
         OutlinedButton(onClick=hapticAction {leave {retry++}},enabled=!busy,modifier=Modifier.fillMaxWidth().testTag("followup-refresh")) {Text("Refresh follow-ups")}
     }
+    reviewAside?.let {uid->FollowUpSetAsideDialog({reviewAside=null}) {reviewAside=null;reviewRequest(uid,true)}}
     if(setAside!=null) AlertDialog(onDismissRequest={setAside=null},title={Text("Set aside this local request?")},
         text={Column(Modifier.heightIn(max=360.dp).verticalScroll(rememberScrollState())) {Text("This only removes the unfinished request from this device. A change accepted by the server stays in place. Refresh to see its current state. It does not cancel or undo that change.")}},
         confirmButton={TextButton(onClick=hapticAction {val uid=requireNotNull(setAside);setAside=null;recover(uid,true)}) {Text("Set aside")}},
@@ -266,7 +294,7 @@ private fun FollowUpPolicyEditor(state: FollowUpWorkspaceSnapshot,busy: Boolean,
 }
 
 @Composable
-private fun FollowUpScheduleEditor(customer: FollowUpCustomer,state: FollowUpWorkspaceSnapshot,busy: Boolean,dirty: ()->Unit,onSave: (CustomerFollowUpPreference)->Unit) {
+internal fun FollowUpScheduleEditor(customer: FollowUpCustomer,state: FollowUpWorkspaceSnapshot,busy: Boolean,dirty: ()->Unit,onSave: (CustomerFollowUpPreference)->Unit) {
     val current=state.preferences[customer.uid]
     val key=current?.revision ?: "shop"
     var mode by rememberSaveable(key) {mutableStateOf(when {current?.paused==true->"Paused";current?.schedule is StatementReviewSchedule.Weekly->"Weekly";current?.schedule is StatementReviewSchedule.Monthly->"Monthly";current?.schedule is StatementReviewSchedule.Interval->"Custom interval";else->"Use shop schedule"})}
@@ -275,7 +303,8 @@ private fun FollowUpScheduleEditor(customer: FollowUpCustomer,state: FollowUpWor
     var days by rememberSaveable(key) {mutableStateOf(((current?.schedule as? StatementReviewSchedule.Interval)?.days ?: 7).toString())}
     var first by rememberSaveable(key) {mutableStateOf(((current?.schedule as? StatementReviewSchedule.Interval)?.firstDate ?: state.today).toString())}
     var choose by remember {mutableStateOf(false)}
-    val canEdit=state.online && !busy
+    val canEdit=state.online && state.configured && !busy
+    if(!state.configured) Text("Owner needs to save shop follow-up settings before a customer schedule can be saved.",style=nativeSupportingTextStyle())
     val proposed=runCatching {
         val schedule=when(mode) {"Weekly"->StatementReviewSchedule.Weekly(weekday);"Monthly"->StatementReviewSchedule.Monthly(monthly.toInt());"Custom interval"->StatementReviewSchedule.Interval(days.toInt(),LocalDate.parse(first));"Paused"->current?.schedule;else->null}
         CustomerFollowUpPreference(key,state.today,schedule,mode=="Paused",current?.snoozedUntil)

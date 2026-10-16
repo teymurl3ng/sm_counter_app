@@ -1,0 +1,28 @@
+{
+  "label": "b-review-offline",
+  "device": "S24",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpReviewUiTest#directScheduleForSettledCustomerKeepsReturnAndTerms",
+    "com.saaf.milkshop.FollowUpReviewUiTest#sharedActivityAndRecoveryNeverLaunch"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewUiTest",
+      "test": "directScheduleForSettledCustomerKeepsReturnAndTerms",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewUiTest",
+      "test": "sharedActivityAndRecoveryNeverLaunch",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 2,
+  "expected": 2,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "6c6c81477ea096c29e9e88826357592763e8c3dc06b1bca45e5c298c2138c75a"
+}

@@ -27,7 +27,8 @@ internal fun customerFollowUpAccess(context: Context,db: MilkShopDatabase,securi
         validateCurrent();val result=withContext(Dispatchers.IO) {work()};validateCurrent();return result
     }
     val workspace=FollowUpWorkspaceAccess(load={checked {binding.load()}},command={c,t->checked {binding.access.command(c,t)}},
-        recover={uid,setAside->checked {binding.access.recover(uid,setAside)}})
+        recover={uid,setAside->checked {binding.access.recover(uid,setAside)}},
+        reviewRequest={uid,setAside->checked {binding.access.reviewRequest(uid,setAside)}})
     val attention=flow {validateCurrent();runtime.followUpAttention(session,FollowUpAttentionStore(context)).collect {
         validateCurrent();emit(it)
     }}.catch {failure->if(failure is CancellationException) throw failure else emit(FollowUpAttention())}

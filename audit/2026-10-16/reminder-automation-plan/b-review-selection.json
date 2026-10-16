@@ -1,0 +1,36 @@
+{
+  "FollowUpReviewUiTest": [
+    "directScheduleForSettledCustomerKeepsReturnAndTerms",
+    "darkLargeScheduleKeepsDraftAndChrome",
+    "sharedActivityAndRecoveryNeverLaunch",
+    "foreignRestoreRequiresExplicitOwnerSetAside",
+    "sharedStartedClaimOpensReviewAndReturnsActivity"
+  ],
+  "FollowUpWorkspaceUiTest": [
+    "lightListReviewAndSettingsRetainChromeAndManualFallback",
+    "darkLargeTextListReviewAndSettingsRetainChromeAndManualFallback"
+  ],
+  "FollowUpNavigationUiTest": [
+    "ownerReturnPathsRetainReviewAndChrome",
+    "darkLargeReviewAndStatementReturn"
+  ],
+  "FollowUpReviewBindingTest": [
+    "activityMapsActorsAndNeverClaimsDelivery",
+    "journalSeparatesCurrentAndRestoredForeignBinding",
+    "digestRecoveryRetainsOriginalRequestWithoutNotification",
+    "foreignRequestCannotReplayAndNeedsOwnerToSetAside",
+    "sharedClaimReviewUsesExistingCustomerRoute",
+    "scheduleForSettledCustomerChangesNoFinancialTerms"
+  ],
+  "FollowUpWorkspaceBindingTest": [
+    "acceptedLoadUsesActualReaderAndServerSchedule",
+    "customerCommandsKeepFrozenRevisionsAndFinancialRecords",
+    "uncertainSaveRecoversOriginalIdAndNeverDuplicates",
+    "unavailableDataStaysStaleAndCannotSave"
+  ],
+  "FollowUpDataTest": [
+    "snapshotCodecRejectsCoercionAndConflictingFacts",
+    "cacheMapsScheduleVersionsWithoutFinancialWrites",
+    "restoredJournalIsHeldAndCacheIsNotRestored"
+  ]
+}

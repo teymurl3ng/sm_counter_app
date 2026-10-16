@@ -9,14 +9,14 @@ import org.json.JSONObject
 import java.time.*
 import java.util.UUID
 
-/** One instance per signed-in workspace. No ordinary route until B's handoff gate is complete. */
+/** One instance per signed-in workspace; all mutations recheck current authorization. */
 internal class FollowUpWorkspaceBinding(private val db: MilkShopDatabase,private val security: UserSecurityService,
     private val runtime: SyncRuntime,private val session: String,
     private val notificationsAllowed: ()->Boolean={false},private val hasMessageApp: ()->Boolean={false}) {
     private data class Basis(val token: String,val binding: FollowUpBinding,val remote: FollowUpRemoteSnapshot,
         val customers: List<FollowUpCustomer>,val online: Boolean,val reviewReady: Boolean)
     private var basis: Basis?=null
-    val access=FollowUpWorkspaceAccess(load=::load,command=::save,recover=::recover)
+    val access=FollowUpWorkspaceAccess(load=::load,command=::save,recover=::recover,reviewRequest=::reviewRequest)
     private val metadataKinds=setOf("POLICY","PREFERENCE","REVIEW","SNOOZE")
 
     suspend fun load(): FollowUpWorkspaceSnapshot=runtime.withFollowUpSession(session) { read(it) }
@@ -41,7 +41,9 @@ internal class FollowUpWorkspaceBinding(private val db: MilkShopDatabase,private
             freshness=if(!online) "Saved reminder state · Sync needed" else if(fresh) "Checked against shared records" else "Sync needed before reviewing customer work",
             online=online,owner=a.owner,primaryDevice=when(remote.primaryInstallation) {null->"Not selected";a.binding.installation->"This device";else->"Another device"},
             notificationsAllowed=notificationsAllowed(),shopZone=remote.zone?.id ?: "Shop timezone unavailable",hasMessageApp=hasMessageApp(),
-            saveToken=b.token,reviewReady=b.reviewReady,unfinished=pending)
+            saveToken=b.token,reviewReady=b.reviewReady,unfinished=pending,configured=remote.policy!=null,
+            activity=followUpActivity(remote,a.binding,customers),requests=followUpRequests(db.followUpDataDao().commands(),a,customers,online),
+            claims=followUpClaims(remote,a,customers))
     }
     private suspend fun facts(remote: FollowUpRemoteSnapshot,today: LocalDate)=db.withReadTransaction {
         val customers=CustomerFollowUpReader(db,security).load(session,today)
@@ -117,6 +119,26 @@ internal class FollowUpWorkspaceBinding(private val db: MilkShopDatabase,private
             FollowUpWorkspaceSave(read(a),true)
         } else {
             val result=FollowUpDataStore(db).execute(a.binding,uid,op,a.call)
+            FollowUpWorkspaceSave(read(a),result is FollowUpCommandOutcome.Accepted)
+        }
+    }
+    private suspend fun reviewRequest(uid: String,setAside: Boolean): FollowUpWorkspaceSave=runtime.withFollowUpSession(session) {a->
+        // New central review is online-only. A cached mode cannot authorize replay/foreign-restore removal.
+        val current=read(a)
+        check(current.online) {"Connect to check the current shared state before reviewing this request."}
+        val row=db.followUpDataDao().command(uid) ?: error("This request is no longer present. Refresh first.")
+        val same=row.bindingKey==a.binding.key
+        val operation=runCatching {JSONObject(row.operationJson).also {FollowUpWire.operation(it)}}.getOrNull()
+        val kind=operation?.getString("kind")
+        check(same||setAside&&a.owner) {"This request belongs to a different connection. It cannot be replayed here."}
+        check(kind!="POLICY"||a.owner) {"Only Owner can review a shop-settings request."}
+        a.validate()
+        if(setAside) {
+            db.followUpDataDao().complete(uid) // Local copy only; never releases a claim or confirms an outcome.
+            FollowUpWorkspaceSave(read(a),true)
+        } else {
+            val result=FollowUpDataStore(db).execute(a.binding,uid,requireNotNull(operation),a.call)
+            // Deliberately ignore every live side-effect grant. The durable existing row is recovery-only.
             FollowUpWorkspaceSave(read(a),result is FollowUpCommandOutcome.Accepted)
         }
     }

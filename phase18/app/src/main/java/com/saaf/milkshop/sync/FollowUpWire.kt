@@ -14,10 +14,13 @@ internal data class FollowUpBinding(val environment: String,val server: String,v
 internal data class FollowUpHeads(val sync: Long,val credit: Long,val metadata: Long,val policyRevision: String?,val date: LocalDate?)
 internal data class FollowUpRemoteClaim(val customerUid: String,val attemptUid: String,val actor: String,val installation: String,
     val cycle: String,val phase: String,val leaseUntil: Instant?,val startedAt: Instant?,val channel: String?)
+internal data class FollowUpRemoteAction(val sequence: Long,val kind: String,val actor: String,val installation: String,
+    val customerUid: String?,val attemptUid: String?,val acceptedAt: Instant)
 internal data class FollowUpRemoteSnapshot(val shop: String,val zone: ZoneId?,val serverTime: Long,val heads: FollowUpHeads,
     val policy: FollowUpPolicy?,val primaryInstallation: String?,val primaryActor: String?,
     val preferences: Map<String,CustomerFollowUpPreference>,val acknowledgments: Map<String,FollowUpAcknowledgment>,
-    val customerRevisions: Map<String,String>,val claims: List<FollowUpRemoteClaim>,val json: String)
+    val customerRevisions: Map<String,String>,val claims: List<FollowUpRemoteClaim>,val json: String,
+    val actions: List<FollowUpRemoteAction> = emptyList())
 internal data class FollowUpReceipt(val replayed: Boolean,val launch: Boolean,val notify: Boolean,val result: JSONObject)
 
 /** Protocol v1 accepts exact types and identities; no JSON coercion on contractual facts. */
@@ -94,15 +97,18 @@ internal object FollowUpWire {
             claims+=c
         }
         val actions=p.getJSONArray("actions");require(actions.length()<=100);var seq=0L
+        val activity=mutableListOf<FollowUpRemoteAction>()
         for(i in 0 until actions.length()) {
             val r=actions.getJSONObject(i)
             keys(r,"seq","command_uid","kind","actor_id","installation","customer_uid","attempt_uid","cycle","accepted_at")
             val next=integer(r,"seq");require(next>seq&&next<=h.metadata);seq=next
             uid(r,"command_uid");uid(r,"actor_id");installation(r,"installation");nullableText(r,"customer_uid");nullableUid(r,"attempt_uid");nullableText(r,"cycle",1024);Instant.parse(text(r,"accepted_at"))
             require(text(r,"kind") in kinds+setOf("REVIEWED","REPORTED_NOT_OPENED","RETRY_UNCERTAIN"))
+            activity+=FollowUpRemoteAction(next,text(r,"kind"),uid(r,"actor_id"),installation(r,"installation"),
+                nullableText(r,"customer_uid"),nullableUid(r,"attempt_uid"),Instant.parse(text(r,"accepted_at")))
         }
         require(seq==h.metadata)
-        return FollowUpRemoteSnapshot(shop,zone,now,h,model,primary,actor,prefs,acks,revisions,claims,p.toString())
+        return FollowUpRemoteSnapshot(shop,zone,now,h,model,primary,actor,prefs,acks,revisions,claims,p.toString(),activity)
     }
     private val kinds=setOf("POLICY","PREFERENCE","REVIEW","SNOOZE","ACQUIRE","RENEW","START","RELEASE","RESOLVE","DIGEST")
     fun operation(p: JSONObject): String {

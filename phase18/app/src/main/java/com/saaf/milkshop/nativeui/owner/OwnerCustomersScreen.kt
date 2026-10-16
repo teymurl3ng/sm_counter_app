@@ -205,6 +205,7 @@ fun OwnerCustomersScreen(
             }},
             initialTask = if(followUpCustomer==pane.customerDetail?.row?.accountId&&followUpCustomer!=null) followUpTask else "detail",
             registerGuard = publish,
+            scheduleAccess = followUps?.workspace,
         )
     }
     }
@@ -242,6 +243,7 @@ private fun OwnerCustomersScreenPane(
     followUpEntry: (@Composable ()->Unit)? = null,
     initialTask: String = "detail",
     registerGuard: (EntryLeaveGuard?)->Unit = {},
+    scheduleAccess: FollowUpWorkspaceAccess? = null,
 ) {
     if (customerCreateOpen) {
         OwnerCustomersCreateScreen(
@@ -291,6 +293,7 @@ private fun OwnerCustomersScreenPane(
             modifier = modifier,
             initialTask = initialTask,
             registerGuard = registerGuard,
+            scheduleAccess = scheduleAccess,
         )
         return
     }
@@ -799,12 +802,13 @@ private fun OwnerCustomersDetailScreen(
     communication: CustomerCommunicationAccess,
     initialTask: String = "detail",
     registerGuard: (EntryLeaveGuard?)->Unit = {},
+    scheduleAccess: FollowUpWorkspaceAccess? = null,
 ) {
     var task by rememberSaveable(identity.userId, detail.row.accountId, initialTask) { mutableStateOf(initialTask) }
     var paneGuard by androidx.compose.runtime.remember { mutableStateOf<EntryLeaveGuard?>(null) }
     val publishGuard=com.saaf.milkshop.nativeui.common.rememberPaneGuardRegistration({paneGuard},{paneGuard=it;registerGuard(it)})
     val panes = androidx.compose.runtime.saveable.rememberSaveableStateHolder()
-    fun back() {val leave={if(task==initialTask) onBack() else task=if(task=="reminder"||task=="history") "statement" else initialTask};paneGuard?.requestLeave(leave) ?: leave()}
+    fun back() {val leave={if(task==initialTask) onBack() else task=if(task=="reminder"||task=="history"||task=="schedule") "statement" else initialTask};paneGuard?.requestLeave(leave) ?: leave()}
     BackHandler(onBack = {back()})
     val row = detail.row
     hostedScaffold(snackbarHostState, modifier, { action->paneGuard?.requestLeave(action) ?: action() }) { padding ->
@@ -827,8 +831,9 @@ private fun OwnerCustomersDetailScreen(
                 panes.SaveableStateProvider(showing) {
                 when(showing) {
                     "statement"->CustomerStatementScreen(row.accountId,row.name,loadStatement,communication=communication,
-                        onReminder={task="reminder"},onHistory={task="history"},backLabel=if(initialTask=="statement") "Back to follow-up" else "Back to customer") {back()}
+                        onReminder={task="reminder"},onHistory={task="history"},onSchedule=scheduleAccess?.let {{task="schedule"}},backLabel=if(initialTask=="statement") "Back to follow-up" else "Back to customer") {back()}
                     "reminder"->CustomerReminderScreen(row.accountId,communication,{back()},onOpenEdit,publishGuard,backLabel=if(initialTask=="reminder") "Back to follow-up" else "Back to statement")
+                    "schedule"->scheduleAccess?.let {CustomerFollowUpScheduleScreen(row.accountId,it,{task="statement"},publishGuard)}
                     "history"->CustomerPreparationHistory(row.accountId,communication) {task="statement"}
                     else->CustomerDetailOverview(detail,identity.role.wireValue=="owner",creditBusy,error,
                         onOpenStatement={task="statement"},onEdit=onOpenEdit,onCreditAction=onCreditAction)

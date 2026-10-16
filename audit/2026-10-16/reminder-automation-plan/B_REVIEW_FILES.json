@@ -1,0 +1,17 @@
+{
+  "sha256": {
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/FollowUpWire.kt": "b6423a81cff9b9076fba1afd58d13e91b26e12e2473941f756a14fe848cd8fec",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerFollowUpAccess.kt": "0b37c946252b3ec87644e4f86d6c98ed6d515c509a92be0974e20e4ccb72f4c2",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerStatementScreen.kt": "f0f52e1c5c171f9cdafe7d93090abf24daaed67385327e36f7ac019a3635a6c1",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt": "ec7eea4bbf75749918c560faef4e408bff0e3ee09d5163394b041fc6bbaead87",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspaceBinding.kt": "4f97b8f618a6a5f6b3278ab15e642eca9088e5d360455348e2144fab5ae57249",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCustomersScreen.kt": "ed6f8a55d695edda9c0ca7b20571c9eada07e7e0319e86a0664a0750cdb65b6e",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpReviewModels.kt": "67633a64448df7bc8eb50449682137068e1647bb0265e0e42daf242638258011",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpSharedReview.kt": "8218f7f483f6d95d12ce7e249c5a80230397a9cf2e3a4cf8d8586bcc6ac74d06",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerFollowUpScheduleScreen.kt": "31d98c869210e36f678211383c5382818f0fb371ec473121746300151acff65c",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/FollowUpWorkspaceBindingTest.kt": "f119af275b571fe016d372b3259234102e264c3df0b2a3b0c74cf40e8ae6816d",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/FollowUpNavigationUiTest.kt": "f4e869e8c210fbb062adc09b7474282f12cf6e3299bde7602329f744bbd5cddf",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/FollowUpReviewBindingTest.kt": "dddf7254bd84387607127fa54902e4648004c492499938aec6e835dc42233f79",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/FollowUpReviewUiTest.kt": "8d2344f86f6ba7052fc3c28d7ffa69bc932a935512c569c1000f38ba29d23d83"
+  }
+}

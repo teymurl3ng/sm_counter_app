@@ -1,0 +1,149 @@
+{
+  "date": "2026-10-16",
+  "baseline": "b4fe77c",
+  "uniqueMethods": 22,
+  "latestPassed": 22,
+  "latest": {
+    "com.saaf.milkshop.FollowUpReviewUiTest#sharedStartedClaimOpensReviewAndReturnsActivity": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpReviewUiTest#directScheduleForSettledCustomerKeepsReturnAndTerms": {
+      "passed": true,
+      "evidence": "b-review-offline-results.json",
+      "apkSha256": "6c6c81477ea096c29e9e88826357592763e8c3dc06b1bca45e5c298c2138c75a"
+    },
+    "com.saaf.milkshop.FollowUpReviewUiTest#sharedActivityAndRecoveryNeverLaunch": {
+      "passed": true,
+      "evidence": "b-review-offline-results.json",
+      "apkSha256": "6c6c81477ea096c29e9e88826357592763e8c3dc06b1bca45e5c298c2138c75a"
+    },
+    "com.saaf.milkshop.FollowUpReviewUiTest#darkLargeScheduleKeepsDraftAndChrome": {
+      "passed": true,
+      "evidence": "b-review-corrected-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpReviewUiTest#foreignRestoreRequiresExplicitOwnerSetAside": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#lightListReviewAndSettingsRetainChromeAndManualFallback": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#darkLargeTextListReviewAndSettingsRetainChromeAndManualFallback": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpNavigationUiTest#darkLargeReviewAndStatementReturn": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpNavigationUiTest#ownerReturnPathsRetainReviewAndChrome": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpReviewBindingTest#sharedClaimReviewUsesExistingCustomerRoute": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpReviewBindingTest#activityMapsActorsAndNeverClaimsDelivery": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpReviewBindingTest#digestRecoveryRetainsOriginalRequestWithoutNotification": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpReviewBindingTest#journalSeparatesCurrentAndRestoredForeignBinding": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpReviewBindingTest#foreignRequestCannotReplayAndNeedsOwnerToSetAside": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpReviewBindingTest#scheduleForSettledCustomerChangesNoFinancialTerms": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#uncertainSaveRecoversOriginalIdAndNeverDuplicates": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#acceptedLoadUsesActualReaderAndServerSchedule": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#unavailableDataStaysStaleAndCannotSave": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#customerCommandsKeepFrozenRevisionsAndFinancialRecords": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpDataTest#restoredJournalIsHeldAndCacheIsNotRestored": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpDataTest#cacheMapsScheduleVersionsWithoutFinancialWrites": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "com.saaf.milkshop.FollowUpDataTest#snapshotCodecRejectsCoercionAndConflictingFacts": {
+      "passed": true,
+      "evidence": "b-review-first-results.json",
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    }
+  },
+  "runs": {
+    "b-review-first": {
+      "expected": 22,
+      "passed": 21,
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "b-review-corrected": {
+      "expected": 1,
+      "passed": 1,
+      "apkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+    },
+    "b-review-offline": {
+      "expected": 2,
+      "passed": 2,
+      "apkSha256": "6c6c81477ea096c29e9e88826357592763e8c3dc06b1bca45e5c298c2138c75a"
+    }
+  },
+  "visuallyReviewedCaptures": {
+    "b-review-offline-captures\\shared-restored-request.png": "59d1d07a1867f95cd9da86faf60b8926ab2dfdd417c388455f0494e5aee55ebd",
+    "b-review-corrected-captures\\schedule-dark-large-draft.png": "4859ff0a20a95be02271d554670f2e22ba4e4d2e6a572ada46272cf46f5b2546",
+    "b-review-offline-captures\\settled-schedule-return.png": "db084f49c99332f6b6cd1c4bffc7dfa95b00d448edde16d90567a14380b26e5c"
+  },
+  "provenance": "First22 passed21; dark schedule failure was a label+editable-text assertion although EditableText retained14. Corrected exact editable-text selector passed1/1 on identical production APK. Final two UI error-state disabling conditions and folded failed-refresh assertion rebuilt; only affected direct-schedule/shared-review methods reran2/2. Unchanged checks retain earlier APK provenance; no identical-final-APK full-run claim.",
+  "scope": {
+    "deviceSdk": 37,
+    "ordinaryAppTouched": false,
+    "cloudChanged": false,
+    "realCustomerContact": false,
+    "physicalTwoPhoneConcurrencyProven": false,
+    "notificationLifecycleActivated": false
+  }
+}

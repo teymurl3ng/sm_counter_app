@@ -1,0 +1,168 @@
+{
+  "label": "b-review-first",
+  "device": "S24",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpReviewUiTest#directScheduleForSettledCustomerKeepsReturnAndTerms",
+    "com.saaf.milkshop.FollowUpReviewUiTest#darkLargeScheduleKeepsDraftAndChrome",
+    "com.saaf.milkshop.FollowUpReviewUiTest#sharedActivityAndRecoveryNeverLaunch",
+    "com.saaf.milkshop.FollowUpReviewUiTest#foreignRestoreRequiresExplicitOwnerSetAside",
+    "com.saaf.milkshop.FollowUpReviewUiTest#sharedStartedClaimOpensReviewAndReturnsActivity",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#lightListReviewAndSettingsRetainChromeAndManualFallback",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#darkLargeTextListReviewAndSettingsRetainChromeAndManualFallback",
+    "com.saaf.milkshop.FollowUpNavigationUiTest#ownerReturnPathsRetainReviewAndChrome",
+    "com.saaf.milkshop.FollowUpNavigationUiTest#darkLargeReviewAndStatementReturn",
+    "com.saaf.milkshop.FollowUpReviewBindingTest#activityMapsActorsAndNeverClaimsDelivery",
+    "com.saaf.milkshop.FollowUpReviewBindingTest#journalSeparatesCurrentAndRestoredForeignBinding",
+    "com.saaf.milkshop.FollowUpReviewBindingTest#digestRecoveryRetainsOriginalRequestWithoutNotification",
+    "com.saaf.milkshop.FollowUpReviewBindingTest#foreignRequestCannotReplayAndNeedsOwnerToSetAside",
+    "com.saaf.milkshop.FollowUpReviewBindingTest#sharedClaimReviewUsesExistingCustomerRoute",
+    "com.saaf.milkshop.FollowUpReviewBindingTest#scheduleForSettledCustomerChangesNoFinancialTerms",
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#acceptedLoadUsesActualReaderAndServerSchedule",
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#customerCommandsKeepFrozenRevisionsAndFinancialRecords",
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#uncertainSaveRecoversOriginalIdAndNeverDuplicates",
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#unavailableDataStaysStaleAndCannotSave",
+    "com.saaf.milkshop.FollowUpDataTest#snapshotCodecRejectsCoercionAndConflictingFacts",
+    "com.saaf.milkshop.FollowUpDataTest#cacheMapsScheduleVersionsWithoutFinancialWrites",
+    "com.saaf.milkshop.FollowUpDataTest#restoredJournalIsHeldAndCacheIsNotRestored"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewUiTest",
+      "test": "sharedStartedClaimOpensReviewAndReturnsActivity",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewUiTest",
+      "test": "directScheduleForSettledCustomerKeepsReturnAndTerms",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewUiTest",
+      "test": "sharedActivityAndRecoveryNeverLaunch",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewUiTest",
+      "test": "darkLargeScheduleKeepsDraftAndChrome",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Failed to assert the following: (Text + EditableText = [14])"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewUiTest",
+      "test": "foreignRestoreRequiresExplicitOwnerSetAside",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "lightListReviewAndSettingsRetainChromeAndManualFallback",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "darkLargeTextListReviewAndSettingsRetainChromeAndManualFallback",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationUiTest",
+      "test": "darkLargeReviewAndStatementReturn",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationUiTest",
+      "test": "ownerReturnPathsRetainReviewAndChrome",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewBindingTest",
+      "test": "sharedClaimReviewUsesExistingCustomerRoute",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewBindingTest",
+      "test": "activityMapsActorsAndNeverClaimsDelivery",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewBindingTest",
+      "test": "digestRecoveryRetainsOriginalRequestWithoutNotification",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewBindingTest",
+      "test": "journalSeparatesCurrentAndRestoredForeignBinding",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewBindingTest",
+      "test": "foreignRequestCannotReplayAndNeedsOwnerToSetAside",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewBindingTest",
+      "test": "scheduleForSettledCustomerChangesNoFinancialTerms",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "uncertainSaveRecoversOriginalIdAndNeverDuplicates",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "acceptedLoadUsesActualReaderAndServerSchedule",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "unavailableDataStaysStaleAndCannotSave",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "customerCommandsKeepFrozenRevisionsAndFinancialRecords",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "restoredJournalIsHeldAndCacheIsNotRestored",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "cacheMapsScheduleVersionsWithoutFinancialWrites",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "snapshotCodecRejectsCoercionAndConflictingFacts",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 21,
+  "expected": 22,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+}

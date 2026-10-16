@@ -31,12 +31,12 @@ import java.time.LocalDate
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 
-class FollowUpNavigationUiTest {
+internal open class FollowUpNavigationUiTest {
     @get:Rule val rule=createAndroidComposeRule<ComponentActivity>()
-    private var role by mutableStateOf(AppRole.OWNER)
-    private val gates=AtomicInteger()
-    private val date=LocalDate.parse("2026-10-18")
-    private val row=NativeOwnerCustomerRow(7,"Northern community cafe امینہ","PKR 300.00","Active",null,null)
+    protected var role by mutableStateOf(AppRole.OWNER)
+    protected val gates=AtomicInteger()
+    protected val date=LocalDate.parse("2026-10-18")
+    protected val row=NativeOwnerCustomerRow(7,"Northern community cafe امینہ","PKR 300.00","Active",null,null)
     private val detail=NativeOwnerCustomerDetail(row,null,null,null,null,true,null,null)
     private val reminder=CustomerReminder(7,"fixture",row.name,"Configured shop",null,30000,date.toString())
     private val status=CustomerCreditStatus(CreditStatusKind.LATE,30000,3)
@@ -46,7 +46,8 @@ class FollowUpNavigationUiTest {
     private val workspace=FollowUpWorkspaceAccess(load={FollowUpWorkspaceSnapshot(FollowUpPolicy("fixture",date.minusDays(2),true),date,
         listOf(FollowUpCustomer(7,"fixture",row.name,null,true,30000,status)),online=true,owner=role==AppRole.OWNER,saveToken="fixture")},
         command={_,_->error("No saves in navigation fixture")})
-    private fun show(scale: Float=1f,dark: Boolean=false,initialRole: AppRole=AppRole.OWNER) {
+    protected fun show(scale: Float=1f,dark: Boolean=false,initialRole: AppRole=AppRole.OWNER,workspaceAccess: FollowUpWorkspaceAccess=workspace,
+        balancePaisa: Long=30000,handoff: CustomerSharedHandoffAccess=shared) {
         role=initialRole
         rule.activityRule.scenario.onActivity {it.enableEdgeToEdge();it.window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             WindowCompat.getInsetsController(it.window,it.window.decorView).apply {isAppearanceLightStatusBars=false;isAppearanceLightNavigationBars=!dark}}
@@ -57,15 +58,15 @@ class FollowUpNavigationUiTest {
                 var loading by remember {mutableStateOf(false)}
                 var request by remember {mutableStateOf<Long?>(null)}
                 var guard by remember {mutableStateOf<EntryLeaveGuard?>(null)}
-                LaunchedEffect(request) {if(request!=null) {loading=true;delay(100);selected=detail;loading=false}}
-                val bundle=remember {CustomerFollowUpAccess(workspace,flowOf(FollowUpAttention(1,false)),shared)}
+                LaunchedEffect(request) {if(request!=null) {loading=true;delay(100);selected=detail.copy(row=row.copy(balanceLabel=statementMoney(balancePaisa)));loading=false}}
+                val bundle=remember(workspaceAccess,handoff) {CustomerFollowUpAccess(workspaceAccess,flowOf(FollowUpAttention(1,false)),handoff)}
                 OwnerCustomersScreen(SnackbarHostState(),NativeSignedInIdentity(role.ordinal.toLong(),role.wireValue,"Staff",role,RolePermissions.permissions(role)),
-                    NativeOwnerMoreContext(date.toString(),true,"Configured shop"),listOf(row),loading,selected,false,false,false,false,null,
+                    NativeOwnerMoreContext(date.toString(),true,"Configured shop"),listOf(row.copy(balanceLabel=statementMoney(balancePaisa))),loading,selected,false,false,false,false,null,
                     onBackToMenu={},onRetry={},onOpenCustomer={request=it},onBackFromDetail={selected=null;request=null},onOpenCreate={},onBackFromCreate={},onCreateCustomer={},
                     onOpenEdit={},onBackFromEdit={},onUpdateCustomer={_,_->},followUps=bundle,registerGuard={guard=it},
-                    communication=CustomerCommunicationAccess(reminder={reminder},sharedHandoff=shared),loadStatement={_,p->
-                        CustomerStatement(7,"fixture",row.name,"Configured shop",null,null,"PKR",p,"2026-10-18T00:00:00Z",0,30000,
-                            listOf(CustomerStatementLine(p.start.toString(),"fixture-sale","Sale","Milk",30000,30000,false)))},
+                    communication=CustomerCommunicationAccess(reminder={reminder.copy(balancePaisa=balancePaisa)},sharedHandoff=handoff),loadStatement={_,p->
+                        CustomerStatement(7,"fixture",row.name,"Configured shop",null,null,"PKR",p,"2026-10-18T00:00:00Z",0,balancePaisa,
+                            if(balancePaisa==0L) emptyList() else listOf(CustomerStatementLine(p.start.toString(),"fixture-sale","Sale","Milk",balancePaisa,balancePaisa,false)))},
                     hostedScaffold={s,m,wrap,content->when(role) {
                         AppRole.ADMIN->AdminScaffold(s,AdminSection.People,{guard?.requestLeave {}},m,content)
                         AppRole.MANAGER->ManagerScaffold(s,ManagerSection.More,{guard?.requestLeave {}},m,content)
@@ -84,7 +85,7 @@ class FollowUpNavigationUiTest {
         rule.onNodeWithText("Prepare reminder").performScrollTo().performClick()
         rule.waitUntil(10000) {rule.onAllNodesWithTag("reminder-message").fetchSemanticsNodes().isNotEmpty()}
     }
-    private fun capture(name: String) {
+    protected fun capture(name: String) {
         rule.waitForIdle();val context=InstrumentationRegistry.getInstrumentation().targetContext
         val dir=File(context.getExternalFilesDir(null),"followup-navigation").apply {mkdirs()}
         assertTrue(UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).takeScreenshot(File(dir,"$name.png")))

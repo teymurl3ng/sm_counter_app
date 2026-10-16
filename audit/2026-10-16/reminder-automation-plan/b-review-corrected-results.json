@@ -1,0 +1,21 @@
+{
+  "label": "b-review-corrected",
+  "device": "S24",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpReviewUiTest#darkLargeScheduleKeepsDraftAndChrome"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewUiTest",
+      "test": "darkLargeScheduleKeepsDraftAndChrome",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 1,
+  "expected": 1,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "53e2fb669e9b3afdbc1a295201cdefe7c531f98f4929ae1ce5fa6711018d3691"
+}

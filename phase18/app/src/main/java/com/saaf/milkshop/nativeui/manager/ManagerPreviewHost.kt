@@ -102,6 +102,8 @@ fun ManagerPreviewHost(
     onLeaveToWelcome: () -> Unit,
     onLeaveToAccountPicker: () -> Unit,
     onShowNotice: (String) -> Unit,
+    followUpDestination: String? = null,
+    onFollowUpDestinationConsumed: (String)->Unit = {},
 ) {
     SaafTheme {
         var lastSession by rememberSaveable { mutableStateOf<String?>(null) }
@@ -255,6 +257,10 @@ fun ManagerPreviewHost(
         // Static chrome (Cashier pattern): one scaffold + one header at the
         // host, outside the pane transition — nav and header never reload.
         var activeEntryGuard by remember { mutableStateOf<EntryLeaveGuard?>(null) }
+        com.saaf.milkshop.nativeui.GuardedFollowUpDestination(followUpDestination,sessionHandle,activeEntryGuard,{
+            navigate(ManagerSection.More)
+            ownerMoreViewModel.requestFollowUps(sessionHandle) {action->activeEntryGuard?.requestLeave(action) ?: action()}
+        },onFollowUpDestinationConsumed)
         val guardedNavigate: (ManagerSection) -> Unit = { section ->
             val guard = activeEntryGuard
             if (guard != null) guard.requestLeave { navigate(section) } else navigate(section)

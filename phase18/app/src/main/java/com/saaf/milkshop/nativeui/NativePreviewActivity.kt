@@ -178,6 +178,7 @@ class NativePreviewActivity : FragmentActivity() {
     private lateinit var ownerBackupFacade: NativeOwnerBackupFacade
     private lateinit var ownerSyncFacade: NativeOwnerSyncFacade
     private var cloudAuthorization: HybridGoogleDriveAuthorization? = null
+    private var followUpDestination by mutableStateOf<String?>(null)
 
     private val authenticationViewModel by viewModels<NativeAuthenticationViewModel> {
         val app = application as MilkShopApplication
@@ -366,6 +367,8 @@ class NativePreviewActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         val app = application as MilkShopApplication
         applicationState = app
+        followUpDestination=savedInstanceState?.getString("followup_destination")
+        acceptFollowUpDestination(intent)
         authenticationFacade = NativeAuthenticationFacade(app.database, app.userSecurity)
         quickUnlockService = QuickUnlockService(
             database = app.database,
@@ -507,6 +510,8 @@ class NativePreviewActivity : FragmentActivity() {
                     ownerRecordsViewModel = ownerRecordsViewModel,
                     ownerMoreState = ownerMoreState,
                     ownerMoreViewModel = ownerMoreViewModel,
+                    followUpDestination = followUpDestination,
+                    onFollowUpDestinationConsumed = {if(followUpDestination==it) followUpDestination=null},
                     openOperatorOnStart = openOperator,
                     openOwnerOnStart = openOwner,
                     openManagerOnStart = openManager,
@@ -523,10 +528,25 @@ class NativePreviewActivity : FragmentActivity() {
         const val EXTRA_OPEN_ADMIN = "open_admin"
     }
 
+    private fun acceptFollowUpDestination(value: android.content.Intent?) {
+        if(isFollowUpDestination(value)) {
+            followUpDestination=java.util.UUID.randomUUID().toString()
+            value?.removeExtra(com.saaf.milkshop.sync.FollowUpNotifier.EXTRA_DESTINATION)
+        }
+    }
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent);setIntent(intent);acceptFollowUpDestination(intent)
+    }
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("followup_destination",followUpDestination)
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onStart() {
         super.onStart()
         if (::applicationState.isInitialized) {
             applicationState.nativeSessions.onForeground()
+            com.saaf.milkshop.sync.FollowUpIntegration.changed(applicationState)
             authenticationViewModel.validateAuthenticatedSession()
         }
     }
@@ -606,6 +626,8 @@ private fun NativeFoundationPreview(
     ownerRecordsViewModel: NativeOwnerRecordsViewModel,
     ownerMoreState: NativeOwnerMoreState,
     ownerMoreViewModel: NativeOwnerMoreViewModel,
+    followUpDestination: String? = null,
+    onFollowUpDestinationConsumed: (String)->Unit = {},
     openOperatorOnStart: Boolean = false,
     openOwnerOnStart: Boolean = false,
     openManagerOnStart: Boolean = false,
@@ -619,6 +641,9 @@ private fun NativeFoundationPreview(
                 PreviewDestination.Welcome
             },
         )
+    }
+    androidx.compose.runtime.LaunchedEffect(followUpDestination) {
+        if(followUpDestination!=null) destination=PreviewDestination.Access
     }
     var cashierSection by rememberSaveable { mutableStateOf(CashierSection.Sell) }
     var operationsSection by rememberSaveable { mutableStateOf(OperationsSection.Work) }
@@ -903,6 +928,12 @@ private fun NativeFoundationPreview(
     val showingManager = showingAuthenticated && authenticatedRole == AppRole.MANAGER
     val showingAdmin = showingAuthenticated && authenticatedRole == AppRole.ADMIN
     val showingCashier = showingAuthenticated && authenticatedRole == AppRole.CASHIER
+    androidx.compose.runtime.LaunchedEffect(followUpDestination,showingAuthenticated,authenticatedRole) {
+        if(followUpDestination!=null&&showingAuthenticated&&!canOpenFollowUpDestination(authenticatedRole)) {
+            onFollowUpDestinationConsumed(followUpDestination)
+            snackbarHostState.showSnackbar("Sign in as Owner, Admin or Manager to review credit follow-ups.")
+        }
+    }
 
     androidx.compose.runtime.LaunchedEffect(
         showingCashier,
@@ -986,6 +1017,8 @@ private fun NativeFoundationPreview(
                 val authenticated = authenticationState as? NativeAuthenticationState.Authenticated
                     ?: return@NativeSectionTransition
                 OwnerPreviewHost(
+                    followUpDestination = followUpDestination,
+                    onFollowUpDestinationConsumed = onFollowUpDestinationConsumed,
                     sessionHandle = authenticated.sessionHandle,
                     identity = authenticated.identity,
                     database = database,
@@ -1063,6 +1096,8 @@ private fun NativeFoundationPreview(
                 val authenticated = authenticationState as? NativeAuthenticationState.Authenticated
                     ?: return@NativeSectionTransition
                 ManagerPreviewHost(
+                    followUpDestination = followUpDestination,
+                    onFollowUpDestinationConsumed = onFollowUpDestinationConsumed,
                     sessionHandle = authenticated.sessionHandle,
                     identity = authenticated.identity,
                     snackbarHostState = snackbarHostState,
@@ -1100,6 +1135,8 @@ private fun NativeFoundationPreview(
                 val authenticated = authenticationState as? NativeAuthenticationState.Authenticated
                     ?: return@NativeSectionTransition
                 AdminPreviewHost(
+                    followUpDestination = followUpDestination,
+                    onFollowUpDestinationConsumed = onFollowUpDestinationConsumed,
                     sessionHandle = authenticated.sessionHandle,
                     identity = authenticated.identity,
                     snackbarHostState = snackbarHostState,

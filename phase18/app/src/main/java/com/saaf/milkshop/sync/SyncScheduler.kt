@@ -28,11 +28,13 @@ object SyncScheduler {
     /** Enrollment success switches the kicks on; unenroll switches them off. */
     fun setSchedulingEnabled(enabled: Boolean) {
         schedulingEnabled = enabled
+        appContext?.let(FollowUpIntegration::changed)
     }
 
     fun requestPush() {
         kickCount += 1
         lastKickEpochMs = System.currentTimeMillis()
+        if(!suppressedForTest) appContext?.let(FollowUpIntegration::changed)
         if (!schedulingEnabled || suppressedForTest) return
         val context = appContext ?: return
         runCatching { SyncPushWorker.schedule(context) }
@@ -47,4 +49,5 @@ object SyncScheduler {
         suppressedForTest = true
         schedulingEnabled = false
     }
+    internal fun isSuppressedForTest()=suppressedForTest
 }

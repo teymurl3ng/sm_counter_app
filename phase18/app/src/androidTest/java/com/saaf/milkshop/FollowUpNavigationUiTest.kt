@@ -47,7 +47,7 @@ internal open class FollowUpNavigationUiTest {
         listOf(FollowUpCustomer(7,"fixture",row.name,null,true,30000,status)),online=true,owner=role==AppRole.OWNER,saveToken="fixture")},
         command={_,_->error("No saves in navigation fixture")})
     protected fun show(scale: Float=1f,dark: Boolean=false,initialRole: AppRole=AppRole.OWNER,workspaceAccess: FollowUpWorkspaceAccess=workspace,
-        balancePaisa: Long=30000,handoff: CustomerSharedHandoffAccess=shared) {
+        balancePaisa: Long=30000,handoff: CustomerSharedHandoffAccess=shared,routeRequest: kotlinx.coroutines.flow.MutableStateFlow<String?>?=null) {
         role=initialRole
         rule.activityRule.scenario.onActivity {it.enableEdgeToEdge();it.window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             WindowCompat.getInsetsController(it.window,it.window.decorView).apply {isAppearanceLightStatusBars=false;isAppearanceLightNavigationBars=!dark}}
@@ -59,7 +59,10 @@ internal open class FollowUpNavigationUiTest {
                 var request by remember {mutableStateOf<Long?>(null)}
                 var guard by remember {mutableStateOf<EntryLeaveGuard?>(null)}
                 LaunchedEffect(request) {if(request!=null) {loading=true;delay(100);selected=detail.copy(row=row.copy(balanceLabel=statementMoney(balancePaisa)));loading=false}}
-                val bundle=remember(workspaceAccess,handoff) {CustomerFollowUpAccess(workspaceAccess,flowOf(FollowUpAttention(1,false)),handoff)}
+                val openRequest=remember {kotlinx.coroutines.flow.MutableStateFlow(false)}
+                val route by (routeRequest ?: remember {kotlinx.coroutines.flow.MutableStateFlow<String?>(null)}).collectAsState()
+                com.saaf.milkshop.nativeui.GuardedFollowUpDestination(route,"fixture",guard,{openRequest.value=true},{routeRequest?.value=null})
+                val bundle=remember(workspaceAccess,handoff) {CustomerFollowUpAccess(workspaceAccess,flowOf(FollowUpAttention(1,false)),handoff,openRequest) {openRequest.value=false}}
                 OwnerCustomersScreen(SnackbarHostState(),NativeSignedInIdentity(role.ordinal.toLong(),role.wireValue,"Staff",role,RolePermissions.permissions(role)),
                     NativeOwnerMoreContext(date.toString(),true,"Configured shop"),listOf(row.copy(balanceLabel=statementMoney(balancePaisa))),loading,selected,false,false,false,false,null,
                     onBackToMenu={},onRetry={},onOpenCustomer={request=it},onBackFromDetail={selected=null;request=null},onOpenCreate={},onBackFromCreate={},onCreateCustomer={},

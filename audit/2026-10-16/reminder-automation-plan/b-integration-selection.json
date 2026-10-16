@@ -1,0 +1,34 @@
+{
+  "FollowUpIntegrationTest": [
+    "workPlanning",
+    "invalidation",
+    "disconnectCleanup",
+    "checkedPolicy",
+    "destinationValidation",
+    "permissionDecisions"
+  ],
+  "FollowUpIntegrationUiTest": [
+    "contextualAction",
+    "guardedOpen",
+    "repeatedOpen"
+  ],
+  "FollowUpAlertTest": [
+    "deniedPermissionKeepsPersistentAttention",
+    "firstGrantAndRestartNeverRealert",
+    "backgroundRefreshNeedsNoLocalSessionAndCannotRetarget",
+    "workerRetryCancellationAndScheduleConstraints",
+    "notificationPrivacyAndPermissionChannelChecks"
+  ],
+  "FollowUpNavigationTest": [
+    "boundWorkspaceRejectsChangedSession",
+    "connectedModeNeverFallsBackOnUnknown"
+  ],
+  "FollowUpReviewUiTest": [
+    "darkLargeScheduleKeepsDraftAndChrome",
+    "sharedStartedClaimOpensReviewAndReturnsActivity"
+  ],
+  "FollowUpDataTest": [
+    "runtimeRefreshesOnceAndChecksLocalRole",
+    "runtimeUnknownRefreshPreservesTokens"
+  ]
+}

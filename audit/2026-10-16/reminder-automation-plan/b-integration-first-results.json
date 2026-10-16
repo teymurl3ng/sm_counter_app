@@ -1,0 +1,154 @@
+{
+  "label": "b-integration-first",
+  "device": "S24",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpIntegrationTest#workPlanning",
+    "com.saaf.milkshop.FollowUpIntegrationTest#invalidation",
+    "com.saaf.milkshop.FollowUpIntegrationTest#disconnectCleanup",
+    "com.saaf.milkshop.FollowUpIntegrationTest#checkedPolicy",
+    "com.saaf.milkshop.FollowUpIntegrationTest#destinationValidation",
+    "com.saaf.milkshop.FollowUpIntegrationTest#permissionDecisions",
+    "com.saaf.milkshop.FollowUpIntegrationUiTest#contextualAction",
+    "com.saaf.milkshop.FollowUpIntegrationUiTest#guardedOpen",
+    "com.saaf.milkshop.FollowUpIntegrationUiTest#repeatedOpen",
+    "com.saaf.milkshop.FollowUpAlertTest#deniedPermissionKeepsPersistentAttention",
+    "com.saaf.milkshop.FollowUpAlertTest#firstGrantAndRestartNeverRealert",
+    "com.saaf.milkshop.FollowUpAlertTest#backgroundRefreshNeedsNoLocalSessionAndCannotRetarget",
+    "com.saaf.milkshop.FollowUpAlertTest#workerRetryCancellationAndScheduleConstraints",
+    "com.saaf.milkshop.FollowUpAlertTest#notificationPrivacyAndPermissionChannelChecks",
+    "com.saaf.milkshop.FollowUpNavigationTest#boundWorkspaceRejectsChangedSession",
+    "com.saaf.milkshop.FollowUpNavigationTest#connectedModeNeverFallsBackOnUnknown",
+    "com.saaf.milkshop.FollowUpReviewUiTest#darkLargeScheduleKeepsDraftAndChrome",
+    "com.saaf.milkshop.FollowUpReviewUiTest#sharedStartedClaimOpensReviewAndReturnsActivity",
+    "com.saaf.milkshop.FollowUpDataTest#runtimeRefreshesOnceAndChecksLocalRole",
+    "com.saaf.milkshop.FollowUpDataTest#runtimeUnknownRefreshPreservesTokens"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpIntegrationTest",
+      "test": "checkedPolicy",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpIntegrationTest",
+      "test": "destinationValidation",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpIntegrationTest",
+      "test": "disconnectCleanup",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpIntegrationTest",
+      "test": "invalidation",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpIntegrationTest",
+      "test": "permissionDecisions",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpIntegrationTest",
+      "test": "workPlanning",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpIntegrationUiTest",
+      "test": "repeatedOpen",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpIntegrationUiTest",
+      "test": "contextualAction",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpIntegrationUiTest",
+      "test": "guardedOpen",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "workerRetryCancellationAndScheduleConstraints",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "deniedPermissionKeepsPersistentAttention",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "backgroundRefreshNeedsNoLocalSessionAndCannotRetarget",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "firstGrantAndRestartNeverRealert",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "notificationPrivacyAndPermissionChannelChecks",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationTest",
+      "test": "connectedModeNeverFallsBackOnUnknown",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpNavigationTest",
+      "test": "boundWorkspaceRejectsChangedSession",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewUiTest",
+      "test": "sharedStartedClaimOpensReviewAndReturnsActivity",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewUiTest",
+      "test": "darkLargeScheduleKeepsDraftAndChrome",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "runtimeRefreshesOnceAndChecksLocalRole",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "runtimeUnknownRefreshPreservesTokens",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 20,
+  "expected": 20,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "322ccd657ed7b4b94b75d53dd912a030375922bc20b30bf5eee4f5066f27d7c2"
+}

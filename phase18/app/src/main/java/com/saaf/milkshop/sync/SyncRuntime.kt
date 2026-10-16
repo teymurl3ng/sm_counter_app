@@ -62,9 +62,9 @@ class SyncRuntime(
         )
     }
 
-    suspend fun drainOnce(): SyncPushEngine.DrainOutcome = SyncOperationGate.exclusive {
+    suspend fun drainOnce(updateFollowUps: Boolean=true): SyncPushEngine.DrainOutcome = SyncOperationGate.exclusive {
         drainOnceLocked()
-    }
+    }.also {if(updateFollowUps) FollowUpIntegration.changed(context)}
 
     /** Explicit read path only; ordinary drain/pull never sends reminder commands. */
     internal suspend fun loadFollowUps(localSession: String): FollowUpLoad = withFollowUpSession(localSession) { access ->
@@ -111,7 +111,7 @@ class SyncRuntime(
 
     /** No local session is created: the fresh RPC checks actual membership and Owner-enabled policy. */
     internal suspend fun detectFollowUps(attention: FollowUpAttentionStore,alerts: FollowUpAlertSink): FollowUpDetection = SyncOperationGate.exclusive {
-        if(!isEnrolled()) {alerts.cancel();return@exclusive FollowUpDetection.STOPPED}
+        if(!isEnrolled()) {attention.invalidateAll(clear=true);alerts.cancel();FollowUpIntegration.checked(context,false);return@exclusive FollowUpDetection.STOPPED}
         val config=requireNotNull(SyncServerConfigStore.load(context))
         val shop=requireNotNull(SyncShopBindingStore.load(context))
         check(config.environment==shop.environment)
@@ -124,7 +124,7 @@ class SyncRuntime(
             override fun post() {if(current()&&alerts.allowed()) alerts.post()}
             override fun cancel() {if(current()) alerts.cancel()}
         }
-        FollowUpDetector(database,attention,guardedAlerts).check(binding) {name,body->
+        val outcome=FollowUpDetector(database,attention,guardedAlerts).check(binding) {name,body->
             if(!current()) FollowUpRpcResult.Refused("followup_not_authorized") else {
                 var result=client.call(name,body)
                 if(result is FollowUpRpcResult.Retry&&result.code=="unauthorized") {
@@ -134,6 +134,10 @@ class SyncRuntime(
                 if(current()) result else FollowUpRpcResult.Refused("followup_not_authorized")
             }
         }
+        if(current()) {
+            FollowUpIntegration.afterDetection(outcome) {FollowUpIntegration.checked(context,it)}
+        }
+        outcome
     }
 
     private suspend fun followUpBinding(localSession: String): FollowUpBinding {
@@ -333,7 +337,7 @@ class SyncRuntime(
      * before a pull can overwrite it; the apply engine's pending-edit guard
      * and parked rows cover the remaining windows.
      */
-    suspend fun pullOnce(): SyncPullSummary = SyncOperationGate.exclusive {
+    suspend fun pullOnce(updateFollowUps: Boolean=true): SyncPullSummary = SyncOperationGate.exclusive {
         val summary = pullOnce(originCollector = null)
         if (summary is SyncPullSummary.Done) {
             when (val catchup = catchUpProfilesIfPending()) {
@@ -361,7 +365,7 @@ class SyncRuntime(
             refreshLinkVerificationIfDue()
         }
         summary
-    }
+    }.also {if(updateFollowUps) FollowUpIntegration.changed(context)}
 
     /** One-time current-master replay for devices whose old pull cursor passed profile content. */
     private suspend fun catchUpProfilesIfPending(): SyncProfileCatchup.Outcome {

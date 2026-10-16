@@ -12,7 +12,8 @@ import kotlinx.coroutines.flow.*
 
 /** Opaque ordinary-screen bundle; authority stays in current-session readers/RPCs. */
 class CustomerFollowUpAccess internal constructor(internal val workspace: FollowUpWorkspaceAccess,
-    internal val attention: Flow<FollowUpAttention>,internal val handoff: CustomerSharedHandoffAccess)
+    internal val attention: Flow<FollowUpAttention>,internal val handoff: CustomerSharedHandoffAccess,
+    internal val openRequested: StateFlow<Boolean> = MutableStateFlow(false),internal val consumeOpen: ()->Unit = {})
 
 internal fun customerFollowUpAccess(context: Context,db: MilkShopDatabase,security: UserSecurityService,
     runtime: SyncRuntime,session: String,validateCurrent: ()->Unit): CustomerFollowUpAccess {
@@ -26,11 +27,17 @@ internal fun customerFollowUpAccess(context: Context,db: MilkShopDatabase,securi
     suspend fun <T> checked(work: suspend ()->T): T {
         validateCurrent();val result=withContext(Dispatchers.IO) {work()};validateCurrent();return result
     }
-    val workspace=FollowUpWorkspaceAccess(load={checked {binding.load()}},command={c,t->checked {binding.access.command(c,t)}},
-        recover={uid,setAside->checked {binding.access.recover(uid,setAside)}},
-        reviewRequest={uid,setAside->checked {binding.access.reviewRequest(uid,setAside)}})
+    suspend fun <T> changed(work: suspend ()->T): T = try {checked(work)} finally {FollowUpIntegration.changed(context)}
+    val workspace=FollowUpWorkspaceAccess(load={checked {binding.load()}},command={c,t->changed {binding.access.command(c,t)}},
+        recover={uid,setAside->changed {binding.access.recover(uid,setAside)}},
+        reviewRequest={uid,setAside->changed {binding.access.reviewRequest(uid,setAside)}})
     val attention=flow {validateCurrent();runtime.followUpAttention(session,FollowUpAttentionStore(context)).collect {
         validateCurrent();emit(it)
     }}.catch {failure->if(failure is CancellationException) throw failure else emit(FollowUpAttention())}
-    return CustomerFollowUpAccess(workspace,attention,CustomerReminderMode(context,db,security,runtime,session,validateCurrent).access)
+    val original=CustomerReminderMode(context,db,security,runtime,session,validateCurrent).access
+    val handoff=original.copy(open={id,facts,to,channel,launch->changed {original.open(id,facts,to,channel,launch)}},
+        recover={id,uid->changed {original.recover(id,uid)}},release={id,uid->changed {original.release(id,uid)}},
+        resolve={id,uid,outcome,confirmed->changed {original.resolve(id,uid,outcome,confirmed)}},
+        setAside={id,uid,confirmed->changed {original.setAside(id,uid,confirmed)}})
+    return CustomerFollowUpAccess(workspace,attention,handoff)
 }

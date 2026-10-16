@@ -54,6 +54,7 @@ object SyncShopBindingStore {
 
     fun clear(context: Context) {
         runCatching { file(context).delete() }
+        FollowUpIntegration.changed(context)
     }
 
     private fun file(context: Context): File =

@@ -1,0 +1,28 @@
+{
+  "label": "b-integration-guard",
+  "device": "S24",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpIntegrationUiTest#guardedOpen",
+    "com.saaf.milkshop.FollowUpIntegrationUiTest#repeatedOpen"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpIntegrationUiTest",
+      "test": "repeatedOpen",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpIntegrationUiTest",
+      "test": "guardedOpen",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 2,
+  "expected": 2,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "3fb123f0be05854651d192f64f97d02f636947073ec9fa0a387a5594527a8d78"
+}

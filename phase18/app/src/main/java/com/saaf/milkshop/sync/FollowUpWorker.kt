@@ -11,7 +11,7 @@ class FollowUpWorker internal constructor(context: Context,params: WorkerParamet
     constructor(context: Context,params: WorkerParameters): this(context,params,{
         val app=context.applicationContext as MilkShopApplication
         // Separate lock acquisitions: the detector must not recursively acquire the existing sync gate.
-        app.syncRuntime.drainOnce();app.syncRuntime.pullOnce()
+        app.syncRuntime.drainOnce(updateFollowUps=false);app.syncRuntime.pullOnce(updateFollowUps=false)
         app.syncRuntime.detectFollowUps(FollowUpAttentionStore(context),FollowUpNotifier(context))
     })
     override suspend fun doWork(): Result = try {
@@ -20,7 +20,7 @@ class FollowUpWorker internal constructor(context: Context,params: WorkerParamet
       catch(_: Exception) {Result.retry()}
 }
 
-/** Explicit integration only. Startup/resume/accepted-policy hooks stay closed until B's message gate. */
+/** Unique constrained checks; periodic timing is deliberately inexact. */
 internal object FollowUpScheduler {
     const val PERIODIC="credit_followup_periodic"
     const val KICK="credit_followup_check"
@@ -31,6 +31,11 @@ internal object FollowUpScheduler {
         val work=WorkManager.getInstance(context)
         if(enabled) work.enqueueUniquePeriodicWork(PERIODIC,ExistingPeriodicWorkPolicy.UPDATE,periodicRequest())
         else {work.cancelUniqueWork(PERIODIC);work.cancelUniqueWork(KICK);FollowUpNotifier(context).cancel()}
+    }
+    fun periodic(context: Context,enabled: Boolean) {
+        val work=WorkManager.getInstance(context)
+        if(enabled) work.enqueueUniquePeriodicWork(PERIODIC,ExistingPeriodicWorkPolicy.UPDATE,periodicRequest())
+        else {work.cancelUniqueWork(PERIODIC);FollowUpNotifier(context).cancel()}
     }
     fun kick(context: Context) {
         WorkManager.getInstance(context).enqueueUniqueWork(KICK,ExistingWorkPolicy.KEEP,

@@ -267,7 +267,7 @@ private fun FollowUpPolicyEditor(state: FollowUpWorkspaceSnapshot,busy: Boolean,
         OutlinedTextField(preferred,{preferred=it;dirty()},label={Text("Around (HH:mm)")},singleLine=true,enabled=canEdit,modifier=Modifier.fillMaxWidth())
         OutlinedTextField(start,{start=it;dirty()},label={Text("Quiet hours start (HH:mm)")},singleLine=true,enabled=canEdit,modifier=Modifier.fillMaxWidth())
         OutlinedTextField(end,{end=it;dirty()},label={Text("Quiet hours end (HH:mm)")},singleLine=true,enabled=canEdit,modifier=Modifier.fillMaxWidth())
-        Text(if(state.notificationsAllowed) "Android notifications allowed" else "Android notifications unavailable; the list remains usable.",style=nativeSupportingTextStyle())
+        FollowUpNotificationSettings()
     }
     NativeInformationSection {
         Text("Review schedule",style=nativeSectionTextStyle())

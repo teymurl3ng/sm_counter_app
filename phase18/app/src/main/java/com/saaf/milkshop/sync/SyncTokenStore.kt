@@ -68,6 +68,7 @@ class SyncTokenStore(context: Context) {
 
     fun clear() {
         runCatching { file(appContext).delete() }
+        FollowUpIntegration.changed(appContext)
     }
 
     private fun key(): SecretKey {

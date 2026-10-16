@@ -126,6 +126,13 @@ fun OwnerCustomersScreen(
     var guard by remember {mutableStateOf<EntryLeaveGuard?>(null)}
     val publish=com.saaf.milkshop.nativeui.common.rememberPaneGuardRegistration({guard}) {guard=it;registerGuard(it)}
     val saved=androidx.compose.runtime.saveable.rememberSaveableStateHolder()
+    val requested by (followUps?.openRequested ?: remember {kotlinx.coroutines.flow.MutableStateFlow(false)}).collectAsState()
+    LaunchedEffect(requested,followUps) {
+        if(requested&&followUps!=null) {
+            val open={followUpCustomer=null;followUpOpen=true;followUps.consumeOpen()}
+            guard?.requestLeave(open) ?: open()
+        }
+    }
     LaunchedEffect(customerDetail?.row?.accountId,followUpCustomer,customersLoading,customersError) {
         if(followUpCustomer!=null&&!customersLoading) {
             if(customerDetail?.row?.accountId==followUpCustomer) followUpOpen=false

@@ -1,0 +1,24 @@
+{
+  "sha256": {
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/NativePreviewActivity.kt": "71b2dadf417e29667df0c4c129a01e4593c2246a950b84128dac5b1051d8b312",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/FollowUpDestination.kt": "4419576b761c166fa27541fe32a0a025e37f7652739328b5984491ab9d939055",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/admin/AdminPreviewHost.kt": "26277e5c6900030e65a6ba378c83c46ad1c399e11c6292230144cbbd60047285",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/manager/ManagerPreviewHost.kt": "3b35d24a79d6d7ac2f1c1b1175815e35578204e7fb2ad41b61869e84e8731816",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerPreviewHost.kt": "103de7b28abe74bd8b19931433a4c6e0f08a63df3dd93c1b15de3d6a2ef460de",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerFollowUpAccess.kt": "f16912257f7d6c19bf7898d344e182cc401ce01799f956a69bb52a08f63c6a4b",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt": "df2de14830686f2774eef956a058132f2eb5fcae21ebb33ffd94fb125b29f65e",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpNotificationSettings.kt": "68d891f21a97c4aef8cf5eebe2c363e3e02dce1cedf566a5b3ddb6da316a70ae",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/NativeOwnerMoreViewModel.kt": "93b6922bfd0a39ffbbe40dae75a973de7a3be79569113ead973efea836e9b224",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCustomersScreen.kt": "9bbdc2bd6df654049b23fe1de7219c107c4a3eeadf6afb664f1d90be94d95ba6",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/FollowUpAttentionStore.kt": "dace0b4f5db2200820d8e6933baa06a6653b52c6dc8aa9d7eb1ebe5e56d82f7d",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/FollowUpWorker.kt": "c6bfff21fca06ccc258267796408701367272c9332ed0f928ee7988329b2c167",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/FollowUpIntegration.kt": "c31c3c1b5430b26e15305e0412996ea167635c4855c0ff90f4fd3e55a9e97f26",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/SyncRuntime.kt": "a60c702fecf4a7c0a605d03fdb70e76c9fc24e98b8718bc50da5f7300ac25af0",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/SyncScheduler.kt": "333aee8824c5852fa6f3ac5fcba2092e5b053ba978b4bbd531cef30496ab6861",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/SyncShopBinding.kt": "56ab46a675594bb801e8de08b98cbbc3ca2e71ca312282bcebdc34f49bfebe3e",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/SyncTokenStore.kt": "82049bde4d28420f0de8ce432a8b370972b0727e841214948ffffedd596ba9af",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/FollowUpNavigationUiTest.kt": "9da80a76eef4600363c810934f652f0df18a9a010f4eb3fbf8fb9df40ddfef77",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/FollowUpIntegrationTest.kt": "2ddc4b633b6852af2a502376c7bd885be37aa234e568cc4381b1726311601fb4",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/FollowUpIntegrationUiTest.kt": "e00c46093a17154d8ec7c58c403948611670ba384be912615829faea0dcfc74b"
+  }
+}

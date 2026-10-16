@@ -1,0 +1,21 @@
+{
+  "label": "b-integration-notification",
+  "device": "S24",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpAlertTest#notificationPrivacyAndPermissionChannelChecks"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpAlertTest",
+      "test": "notificationPrivacyAndPermissionChannelChecks",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 1,
+  "expected": 1,
+  "notificationPermission": "granted only for isolated notifier; revoked after instrumentation",
+  "realShopPackageModified": false,
+  "appApkSha256": "322ccd657ed7b4b94b75d53dd912a030375922bc20b30bf5eee4f5066f27d7c2"
+}

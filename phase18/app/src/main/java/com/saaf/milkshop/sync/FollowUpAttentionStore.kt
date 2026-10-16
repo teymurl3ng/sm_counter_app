@@ -39,6 +39,11 @@ internal class FollowUpAttentionStore(context: Context,private val root: File=Fi
     }
     fun stale(key: String)=update(key) {it.copy(stale=true)}
     fun clear(key: String)=update(key) {FollowUpAttention()}
+    internal fun invalidateAll(clear: Boolean=false) {
+        val keys=(root.listFiles()?.map {it.name.removeSuffix(".json")} ?: emptyList())+
+            states.keys.filter {File(it).parentFile==root}.map {File(it).name.removeSuffix(".json")}
+        keys.filter {it.matches(Regex("[a-f0-9]{64}"))}.distinct().forEach {if(clear) clear(it) else stale(it)}
+    }
     internal fun forgetMemoryForTest(key: String) {states.remove(file(key).absolutePath)}
     companion object {private val states=ConcurrentHashMap<String,MutableStateFlow<FollowUpAttention>>()}
 }

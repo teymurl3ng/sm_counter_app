@@ -95,6 +95,9 @@ class NativeOwnerMoreViewModel internal constructor(
     }
 
     fun close() {
+        pendingFollowUpSession=null
+        pendingFollowUpNavigate=null
+        followUpOpenRequested.value=false
         sessionHandle = null
         personalSecurityController.resetTransient()
         productsController.resetTransient()
@@ -135,7 +138,15 @@ class NativeOwnerMoreViewModel internal constructor(
                     security = security,
                     refreshing = false,
                 )
+                if(pendingFollowUpSession==token.handle) {
+                    pendingFollowUpSession=null
+                    val navigate=pendingFollowUpNavigate;pendingFollowUpNavigate=null
+                    navigate?.invoke {
+                        if(runtime.isCurrent(token)) {openCustomers();followUpOpenRequested.value=true}
+                    }
+                }
             } catch (error: Throwable) {
+                if(runtime.isCurrent(token)) {pendingFollowUpSession=null;pendingFollowUpNavigate=null}
                 if (previous != null && error !is SecurityFailure.SessionExpired) {
                     if (!runtime.isCurrent(token)) return@launch
                     _state.value = ((_state.value as? NativeOwnerMoreState.Ready) ?: previous).copy(
@@ -186,12 +197,21 @@ class NativeOwnerMoreViewModel internal constructor(
         customersController.loadStatement(accountId, period)
 
     private var followUpBundle: Pair<OwnerSessionToken,CustomerFollowUpAccess>?=null
+    private val followUpOpenRequested=MutableStateFlow(false)
+    private var pendingFollowUpSession: String?=null
+    private var pendingFollowUpNavigate: ((()->Unit)->Unit)?=null
+    fun requestFollowUps(session: String,navigate: (()->Unit)->Unit) {
+        pendingFollowUpSession=session
+        pendingFollowUpNavigate=navigate
+        open(session)
+    }
     fun customerFollowUps(): CustomerFollowUpAccess? {
         val token=runtime.captureSession() ?: return null
         followUpBundle?.takeIf {it.first==token}?.let {return it.second}
         return dependencies.createFollowUps?.invoke(token.handle) {
             check(runtime.isCurrent(token)&&runtime.ready()?.destination==NativeOwnerMoreDestination.Customers) {"Open Customers again before continuing."}
-        }?.also {followUpBundle=token to it}
+        }?.let {bundle->CustomerFollowUpAccess(bundle.workspace,bundle.attention,bundle.handoff,followUpOpenRequested) {followUpOpenRequested.value=false}}
+            ?.also {followUpBundle=token to it}
     }
     fun customerCommunications()=CustomerCommunicationAccess(customersController::loadReminder,customersController::recordCommunication,customersController::communicationHistory,
         sharedHandoff=customerFollowUps()?.handoff)

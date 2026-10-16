@@ -1,0 +1,7 @@
+{
+  "sha256": {
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/PhysicalFollowUpProbe.kt": "7b21c8fcbcb2f0e9b3c5e8774163afe7291190515b868a039c82e8c2395af3b4",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/FollowUpDestinationLiveUiTest.kt": "2982fbcf3384047ef5bf197a963c451ac7645035d3221537725d86dbcfd35f88"
+  },
+  "productSource": "No production source changed from ad0743a; only scoped acceptance harnesses added."
+}

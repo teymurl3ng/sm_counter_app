@@ -1,0 +1,26 @@
+{
+  "reason": "Pre-race snapshots were dated16October and both ACQUIRE HTTP calls ran after17October midnight; no acquire was accepted. Stale-day refusal is the supported explanation, but exact refusal code was not persisted before the fixture assertion. The concurrency attempt remains inconclusive.",
+  "httpEpochMillis": {
+    "owner": [
+      1792177211798,
+      1792177212164
+    ],
+    "counter": [
+      1792177211794,
+      1792177212424
+    ]
+  },
+  "latestPreRaceBusinessDates": [
+    "2026-10-16",
+    "2026-10-16",
+    "2026-10-16",
+    "2026-10-16"
+  ],
+  "preservedPassedStages": 18,
+  "serverReadback": {
+    "fixtureShopActive": false,
+    "acceptedAcquires": 0,
+    "claims": 0,
+    "activeFixtureIdentities": 0
+  }
+}

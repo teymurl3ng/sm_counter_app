@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-17",
+  "baseline": "ad0743a",
+  "initialPassedStages": 20,
+  "remainingPassedStages": 31,
+  "nativeActivityMethodsPassed": 1,
+  "productionApkSha256": "d261fca327abdfeb4da4fb92773984b1956a122d15a8739724e4e6f717b72242",
+  "concurrentRequestEvidence": {
+    "label": "overlapping-acquire",
+    "oneWinner": true,
+    "httpIntervals": [
+      {
+        "started": 1792177420258,
+        "finished": 1792177421989,
+        "clockUncertaintyMs": 34
+      },
+      {
+        "started": 1792177420233,
+        "finished": 1792177421344,
+        "clockUncertaintyMs": 67
+      }
+    ],
+    "overlap": true
+  },
+  "lostStartRecoveredInFreshProcess": true,
+  "externalCallbacks": 1,
+  "actualExternalAppsOpened": 0,
+  "dailyNotifyGrants": [
+    "NOTIFY",
+    "NONE"
+  ],
+  "captureReviewed": {
+    "b-acceptance-route-captures\\native-notification-route.png": "ad227fc992916c735cd7f1930ecdcf84c6ae3ab571bcc87a271c85a0ca89d9f4"
+  },
+  "initialBoundary": {
+    "reason": "Pre-race snapshots were dated16October and both ACQUIRE HTTP calls ran after17October midnight; no acquire was accepted. Stale-day refusal is the supported explanation, but exact refusal code was not persisted before the fixture assertion. The concurrency attempt remains inconclusive.",
+    "httpEpochMillis": {
+      "owner": [
+        1792177211798,
+        1792177212164
+      ],
+      "counter": [
+        1792177211794,
+        1792177212424
+      ]
+    },
+    "latestPreRaceBusinessDates": [
+      "2026-10-16",
+      "2026-10-16",
+      "2026-10-16",
+      "2026-10-16"
+    ],
+    "preservedPassedStages": 18,
+    "serverReadback": {
+      "fixtureShopActive": false,
+      "acceptedAcquires": 0,
+      "claims": 0,
+      "activeFixtureIdentities": 0
+    }
+  },
+  "scope": {
+    "twoPhysicalPhones": true,
+    "realDevHttpsAuthRpc": true,
+    "ordinaryAppChanged": false,
+    "prodChanged": false,
+    "schemaChanged": false,
+    "realCustomerContact": false,
+    "exactTimeDeliveryProven": false,
+    "deviceIdentityAttestationProven": false,
+    "nativeRouteUsesSyntheticLocalIdentity": true
+  }
+}

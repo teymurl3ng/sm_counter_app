@@ -1,0 +1,21 @@
+{
+  "label": "b-acceptance-route",
+  "device": "S24",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpDestinationLiveUiTest#coldAuthRecreationAndWarmTap"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpDestinationLiveUiTest",
+      "test": "coldAuthRecreationAndWarmTap",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 1,
+  "expected": 1,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "d261fca327abdfeb4da4fb92773984b1956a122d15a8739724e4e6f717b72242"
+}

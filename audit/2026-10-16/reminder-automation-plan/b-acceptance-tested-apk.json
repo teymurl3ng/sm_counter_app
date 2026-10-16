@@ -1,0 +1,5 @@
+{
+  "liveProbeTestApkSha256": "72a532aebfe22dfa33d843df6463ca82b2b90a8bd622111f05cd438bacd6044c",
+  "productApkSha256": "d261fca327abdfeb4da4fb92773984b1956a122d15a8739724e4e6f717b72242",
+  "note": "Recorded before replacing the test APK for native Activity QA. Final fixture preferredTime was simplified to00:00 after its documented synthetic POLICY adjustment; no product source changed."
+}

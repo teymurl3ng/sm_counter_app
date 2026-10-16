@@ -1,0 +1,1359 @@
+{
+  "run": "e08b4bcb439b",
+  "project": "tghzmofkkdsaasvnixps",
+  "shop": "e12db4eb-86ec-4145-8bcf-d43947a5c7f0",
+  "fixtureStaff": [
+    {
+      "id": "def824a3-7d4f-45b1-a149-ca79590d8a15",
+      "business_id": "c7e2030e-d21a-491f-a94e-2f1094b1d304",
+      "auth_user_id": "ec6ff76f-f6a7-4763-8317-a871da446520",
+      "username": "qa_followup_e08b4bcb439b_o",
+      "display_name": "Disposable Credit owner",
+      "role": "owner",
+      "active": true
+    },
+    {
+      "id": "ce710b77-3cfc-4714-8823-8d61155517d9",
+      "business_id": "c7e2030e-d21a-491f-a94e-2f1094b1d304",
+      "auth_user_id": "0cd6ddac-c4e0-4a76-b0d1-41bd6ebecfb8",
+      "username": "qa_followup_e08b4bcb439b_s",
+      "display_name": "Disposable Credit owner",
+      "role": "owner",
+      "active": true
+    }
+  ],
+  "steps": [
+    {
+      "run": "e08b4bcb439b",
+      "phone": "owner",
+      "stage": "init",
+      "httpStatuses": [],
+      "launches": 0,
+      "pid": 17335,
+      "deviceId": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "outbox": 25,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "counter",
+      "stage": "init",
+      "httpStatuses": [],
+      "launches": 0,
+      "pid": 20317,
+      "deviceId": "bbe58e5c2b4a4df09f281d6d6db18290",
+      "outbox": 19,
+      "pending": 0,
+      "balances": {
+        "Cash": 0,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0
+      },
+      "stock": {
+        "Milk": 0,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "owner",
+      "stage": "enroll",
+      "httpStatuses": [
+        "/auth/v1/token?grant_type=password:200",
+        "/rest/v1/rpc/my_profile:200"
+      ],
+      "launches": 0,
+      "pid": 17412,
+      "deviceId": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "outbox": 25,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "owner",
+      "stage": "exchange",
+      "drain": "Drained(pushed=25)",
+      "httpStatuses": [
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/sync_push:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200"
+      ],
+      "launches": 0,
+      "pid": 17490,
+      "deviceId": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "counter",
+      "stage": "enroll",
+      "httpStatuses": [
+        "/auth/v1/token?grant_type=password:200",
+        "/rest/v1/rpc/my_profile:200"
+      ],
+      "launches": 0,
+      "pid": 21230,
+      "deviceId": "bbe58e5c2b4a4df09f281d6d6db18290",
+      "outbox": 19,
+      "pending": 0,
+      "balances": {
+        "Cash": 0,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0
+      },
+      "stock": {
+        "Milk": 0,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "counter",
+      "stage": "exchange",
+      "drain": "Drained(pushed=19)",
+      "httpStatuses": [
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/sync_push:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200"
+      ],
+      "launches": 0,
+      "pid": 21441,
+      "deviceId": "bbe58e5c2b4a4df09f281d6d6db18290",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "owner",
+      "stage": "activate",
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_enable_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "launches": 0,
+      "pid": 17575,
+      "deviceId": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "counter",
+      "stage": "exchange",
+      "drain": "Drained(pushed=0)",
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200"
+      ],
+      "launches": 0,
+      "pid": 21763,
+      "deviceId": "bbe58e5c2b4a4df09f281d6d6db18290",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "owner",
+      "stage": "status",
+      "sharedHeads": {
+        "sync": 613,
+        "credit": 22,
+        "metadata": 0,
+        "policy_revision": null,
+        "business_date": "2026-10-17"
+      },
+      "claims": 0,
+      "actions": 0,
+      "customerUid": "u1_1ea8eaad569046fcb23cbb2a817a44d7",
+      "httpStatuses": [
+        "/rest/v1/rpc/followup_snapshot_v1:200"
+      ],
+      "launches": 0,
+      "pid": 17645,
+      "deviceId": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "counter",
+      "stage": "status",
+      "sharedHeads": {
+        "sync": 613,
+        "credit": 22,
+        "metadata": 0,
+        "policy_revision": null,
+        "business_date": "2026-10-17"
+      },
+      "claims": 0,
+      "actions": 0,
+      "customerUid": "u1_1ea8eaad569046fcb23cbb2a817a44d7",
+      "httpStatuses": [
+        "/rest/v1/rpc/followup_snapshot_v1:200"
+      ],
+      "launches": 0,
+      "pid": 21925,
+      "deviceId": "bbe58e5c2b4a4df09f281d6d6db18290",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "owner",
+      "stage": "policy",
+      "httpStatuses": [
+        "/rest/v1/rpc/followup_snapshot_v1:200",
+        "/rest/v1/rpc/followup_command_v1:200",
+        "/rest/v1/rpc/followup_snapshot_v1:200"
+      ],
+      "launches": 0,
+      "pid": 17714,
+      "deviceId": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "POLICY",
+        "started": 1792177380908,
+        "finished": 1792177381380
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "owner",
+      "stage": "schedule",
+      "httpStatuses": [
+        "/rest/v1/rpc/followup_snapshot_v1:200",
+        "/rest/v1/rpc/followup_command_v1:200",
+        "/rest/v1/rpc/followup_snapshot_v1:200"
+      ],
+      "launches": 0,
+      "pid": 17777,
+      "deviceId": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "PREFERENCE",
+        "started": 1792177388552,
+        "finished": 1792177388956
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "counter",
+      "stage": "race",
+      "raceAccepted": true,
+      "attempt": "4ceda36e-05b1-4184-84ac-75b6720c24ab",
+      "httpStatuses": [
+        "/rest/v1/rpc/followup_snapshot_v1:200",
+        "/rest/v1/rpc/followup_command_v1:200",
+        "/rest/v1/rpc/followup_snapshot_v1:200"
+      ],
+      "launches": 0,
+      "pid": 22067,
+      "deviceId": "bbe58e5c2b4a4df09f281d6d6db18290",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "ACQUIRE",
+        "started": 1792177419972,
+        "finished": 1792177421217
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "owner",
+      "stage": "race",
+      "raceAccepted": false,
+      "attempt": "47526284-c869-4038-b3d0-284d0818b419",
+      "refusal": "followup_refresh_required",
+      "httpStatuses": [
+        "/rest/v1/rpc/followup_snapshot_v1:200",
+        "/rest/v1/rpc/followup_command_v1:200",
+        "/rest/v1/rpc/followup_snapshot_v1:200"
+      ],
+      "launches": 0,
+      "pid": 17836,
+      "deviceId": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "ACQUIRE",
+        "started": 1792177420030,
+        "finished": 1792177421829
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "counter",
+      "stage": "release",
+      "httpStatuses": [
+        "/rest/v1/rpc/followup_snapshot_v1:200",
+        "/rest/v1/rpc/followup_command_v1:200"
+      ],
+      "launches": 0,
+      "pid": 22452,
+      "deviceId": "bbe58e5c2b4a4df09f281d6d6db18290",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "RELEASE",
+        "started": 1792177426656,
+        "finished": 1792177427054
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "owner",
+      "stage": "start_lost",
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/followup_snapshot_v1:200",
+        "/rest/v1/rpc/followup_command_v1:200",
+        "/rest/v1/rpc/followup_snapshot_v1:200"
+      ],
+      "launches": 0,
+      "pid": 18054,
+      "deviceId": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "outbox": 0,
+      "pending": 1,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "START",
+        "started": 1792177438146,
+        "finished": 1792177438416
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "owner",
+      "stage": "recover",
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/followup_snapshot_v1:200",
+        "/rest/v1/rpc/followup_command_v1:200",
+        "/rest/v1/rpc/followup_snapshot_v1:200"
+      ],
+      "launches": 0,
+      "pid": 18128,
+      "deviceId": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "START",
+        "started": 1792177447472,
+        "finished": 1792177447941
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "counter",
+      "stage": "blocked",
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/followup_snapshot_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/followup_snapshot_v1:200"
+      ],
+      "launches": 0,
+      "pid": 22599,
+      "deviceId": "bbe58e5c2b4a4df09f281d6d6db18290",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "RELEASE",
+        "started": 1792177426656,
+        "finished": 1792177427054
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "counter",
+      "stage": "resolve",
+      "httpStatuses": [
+        "/rest/v1/rpc/followup_snapshot_v1:200",
+        "/rest/v1/rpc/followup_command_v1:200"
+      ],
+      "launches": 0,
+      "pid": 22697,
+      "deviceId": "bbe58e5c2b4a4df09f281d6d6db18290",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "RESOLVE",
+        "started": 1792177460487,
+        "finished": 1792177460847
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "counter",
+      "stage": "open",
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/followup_snapshot_v1:200",
+        "/rest/v1/rpc/followup_command_v1:200",
+        "/rest/v1/rpc/followup_snapshot_v1:200",
+        "/rest/v1/rpc/followup_command_v1:200"
+      ],
+      "launches": 1,
+      "pid": 22770,
+      "deviceId": "bbe58e5c2b4a4df09f281d6d6db18290",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "START",
+        "started": 1792177467391,
+        "finished": 1792177467808
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "owner",
+      "stage": "blocked",
+      "httpStatuses": [
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/followup_snapshot_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/sync_pull:200",
+        "/rest/v1/rpc/credit_contract_status_v1:200",
+        "/rest/v1/rpc/credit_metadata_pull_v1:200",
+        "/rest/v1/rpc/followup_snapshot_v1:200"
+      ],
+      "launches": 0,
+      "pid": 18223,
+      "deviceId": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "START",
+        "started": 1792177447472,
+        "finished": 1792177447941
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "owner",
+      "stage": "resolve",
+      "httpStatuses": [
+        "/rest/v1/rpc/followup_snapshot_v1:200",
+        "/rest/v1/rpc/followup_command_v1:200"
+      ],
+      "launches": 0,
+      "pid": 18293,
+      "deviceId": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "RESOLVE",
+        "started": 1792177487144,
+        "finished": 1792177487568
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "owner",
+      "stage": "status",
+      "sharedHeads": {
+        "sync": 613,
+        "credit": 22,
+        "metadata": 48,
+        "policy_revision": "d6daed8c-62c1-4bf2-b842-0cfe446d7c6a",
+        "business_date": "2026-10-17"
+      },
+      "claims": 0,
+      "actions": 10,
+      "primary": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "customerUid": "u1_1ea8eaad569046fcb23cbb2a817a44d7",
+      "httpStatuses": [
+        "/rest/v1/rpc/followup_snapshot_v1:200"
+      ],
+      "launches": 0,
+      "pid": 18353,
+      "deviceId": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "RESOLVE",
+        "started": 1792177487144,
+        "finished": 1792177487568
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "counter",
+      "stage": "status",
+      "sharedHeads": {
+        "sync": 613,
+        "credit": 22,
+        "metadata": 48,
+        "policy_revision": "d6daed8c-62c1-4bf2-b842-0cfe446d7c6a",
+        "business_date": "2026-10-17"
+      },
+      "claims": 0,
+      "actions": 10,
+      "primary": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "customerUid": "u1_1ea8eaad569046fcb23cbb2a817a44d7",
+      "httpStatuses": [
+        "/rest/v1/rpc/followup_snapshot_v1:200"
+      ],
+      "launches": 0,
+      "pid": 22886,
+      "deviceId": "bbe58e5c2b4a4df09f281d6d6db18290",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "START",
+        "started": 1792177467391,
+        "finished": 1792177467808
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "owner",
+      "stage": "digest",
+      "notifyGrant": "NOTIFY",
+      "httpStatuses": [
+        "/rest/v1/rpc/followup_snapshot_v1:200",
+        "/rest/v1/rpc/followup_command_v1:200",
+        "/rest/v1/rpc/followup_command_v1:200"
+      ],
+      "launches": 0,
+      "pid": 18422,
+      "deviceId": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "DIGEST",
+        "started": 1792177505180,
+        "finished": 1792177505402
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "counter",
+      "stage": "transfer",
+      "httpStatuses": [
+        "/rest/v1/rpc/followup_snapshot_v1:200",
+        "/rest/v1/rpc/followup_command_v1:200",
+        "/rest/v1/rpc/followup_snapshot_v1:200"
+      ],
+      "launches": 0,
+      "pid": 22986,
+      "deviceId": "bbe58e5c2b4a4df09f281d6d6db18290",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "POLICY",
+        "started": 1792177508746,
+        "finished": 1792177509078
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "counter",
+      "stage": "digest",
+      "notifyGrant": "NONE",
+      "httpStatuses": [
+        "/rest/v1/rpc/followup_snapshot_v1:200",
+        "/rest/v1/rpc/followup_command_v1:200",
+        "/rest/v1/rpc/followup_command_v1:200"
+      ],
+      "launches": 0,
+      "pid": 23058,
+      "deviceId": "bbe58e5c2b4a4df09f281d6d6db18290",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "DIGEST",
+        "started": 1792177512863,
+        "finished": 1792177513078
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "owner",
+      "stage": "status",
+      "sharedHeads": {
+        "sync": 613,
+        "credit": 22,
+        "metadata": 52,
+        "policy_revision": "e4886e3e-cb16-4ccd-90d0-c06137d55a8c",
+        "business_date": "2026-10-17"
+      },
+      "claims": 0,
+      "actions": 14,
+      "primary": "bbe58e5c2b4a4df09f281d6d6db18290",
+      "customerUid": "u1_1ea8eaad569046fcb23cbb2a817a44d7",
+      "httpStatuses": [
+        "/rest/v1/rpc/followup_snapshot_v1:200"
+      ],
+      "launches": 0,
+      "pid": 18497,
+      "deviceId": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "DIGEST",
+        "started": 1792177505180,
+        "finished": 1792177505402
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "counter",
+      "stage": "status",
+      "sharedHeads": {
+        "sync": 613,
+        "credit": 22,
+        "metadata": 52,
+        "policy_revision": "e4886e3e-cb16-4ccd-90d0-c06137d55a8c",
+        "business_date": "2026-10-17"
+      },
+      "claims": 0,
+      "actions": 14,
+      "primary": "bbe58e5c2b4a4df09f281d6d6db18290",
+      "customerUid": "u1_1ea8eaad569046fcb23cbb2a817a44d7",
+      "httpStatuses": [
+        "/rest/v1/rpc/followup_snapshot_v1:200"
+      ],
+      "launches": 0,
+      "pid": 23135,
+      "deviceId": "bbe58e5c2b4a4df09f281d6d6db18290",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "DIGEST",
+        "started": 1792177512863,
+        "finished": 1792177513078
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "owner",
+      "stage": "cleanup",
+      "httpStatuses": [
+        "/auth/v1/logout?scope=local:204"
+      ],
+      "launches": 0,
+      "pid": 18566,
+      "deviceId": "5600c044b1c54b2ab1e849bdc4e381ae",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "DIGEST",
+        "started": 1792177505180,
+        "finished": 1792177505402
+      },
+      "dbFilename": "milk_shop.db"
+    },
+    {
+      "run": "e08b4bcb439b",
+      "phone": "counter",
+      "stage": "cleanup",
+      "httpStatuses": [
+        "/auth/v1/logout?scope=local:204"
+      ],
+      "launches": 0,
+      "pid": 23212,
+      "deviceId": "bbe58e5c2b4a4df09f281d6d6db18290",
+      "outbox": 0,
+      "pending": 0,
+      "balances": {
+        "Cash": 10000,
+        "JazzCash": 0,
+        "Bank": 0,
+        "Expense: Rent": 0,
+        "Expense: Electricity": 0,
+        "Expense: Internet": 0,
+        "Expense: Water": 0,
+        "Expense: Fuel": 0,
+        "Expense: Poly bags": 0,
+        "Expense: LPG": 0,
+        "Expense: Other": 0,
+        "Customer: Credit QA Customer": 100,
+        "Vendor: Credit QA Supplier": 17576.92
+      },
+      "stock": {
+        "Milk": 99,
+        "Yogurt": 0
+      },
+      "lastCommandHttp": {
+        "kind": "DIGEST",
+        "started": 1792177512863,
+        "finished": 1792177513078
+      },
+      "dbFilename": "milk_shop.db"
+    }
+  ],
+  "comparisons": [
+    {
+      "label": "baseline",
+      "tablesEqual": 20,
+      "sha256": "d7e12b57d6ee7a72a04a38e6f118f27aee54132a93d45b905b25a506821caf52"
+    },
+    {
+      "label": "handoff-loss-recovery",
+      "tablesEqual": 20,
+      "sha256": "d7e12b57d6ee7a72a04a38e6f118f27aee54132a93d45b905b25a506821caf52"
+    },
+    {
+      "label": "primary-transfer-daily-replay",
+      "tablesEqual": 20,
+      "sha256": "d7e12b57d6ee7a72a04a38e6f118f27aee54132a93d45b905b25a506821caf52"
+    },
+    {
+      "label": "overlapping-acquire",
+      "oneWinner": true,
+      "httpIntervals": [
+        {
+          "started": 1792177420258,
+          "finished": 1792177421989,
+          "clockUncertaintyMs": 34
+        },
+        {
+          "started": 1792177420233,
+          "finished": 1792177421344,
+          "clockUncertaintyMs": 67
+        }
+      ],
+      "overlap": true
+    }
+  ],
+  "failure": null
+}

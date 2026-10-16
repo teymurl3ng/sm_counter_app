@@ -1,0 +1,22 @@
+{
+  "baseline": "48bdabe",
+  "project": "tghzmofkkdsaasvnixps",
+  "rolledBackContractChecks": 72,
+  "concurrentOverlap": "not established; retained in planned two-phone B acceptance",
+  "ordinaryAndroidChanged": false,
+  "prodChanged": false,
+  "actualSending": false,
+  "existingDataRestored": true,
+  "sha256": {
+    "supabase/migrations/20261016110904_customer_followups_v1.sql": "792b278a921b8eed61759823c60236edc140d635dcce4cc013f947930e32e283",
+    "supabase/migrations/20261016112511_followup_actor_indexes.sql": "5f4b8102c79c99d7fbe0769e6ab30077ae17dbaae34dce97fcaaffc19ae3ed26",
+    "audit/2026-10-16/reminder-automation-plan/b-contract-checks.sql": "9afedd9fde5a5127c051d513796c62799e8d099ebc666841f651a1338fc80771",
+    "audit/2026-10-16/reminder-automation-plan/B_CONTRACT_CHECKS.json": "67970c35e75d6a841fc9734766db594168b97cb818bb8b373cb9b2bae46893c4",
+    "audit/2026-10-16/reminder-automation-plan/B_CONCURRENCY.json": "77249a9767984f01c78cb2a4dfa2cad733d21603f6905c19f1b3f1390eda52bf",
+    "audit/2026-10-16/reminder-automation-plan/B_CONCURRENCY_FIRST.json": "e7ec417b110a237a8a23cccd1e489276c7e66464d8447f70592440302ce44fcc",
+    "audit/2026-10-16/reminder-automation-plan/B_FIXTURE_CLEANUP.json": "bc660005b1d647fb36a1f5762286f86b30d1adcee49eeb1ef6e704f4fac5fef5",
+    "audit/2026-10-16/reminder-automation-plan/B_DEV_CLOSURE.json": "8b21a1265d6a20ee734a030a9e2380a91a528de2fbb819fc4da9a2e7cc6d0ade",
+    "audit/2026-10-16/reminder-automation-plan/B_ADVISOR_REVIEW.json": "4855d60fea1b09e7d4747292abf690989c60d816dd81e84ecf8a71e952107dc9",
+    "audit/2026-10-16/reminder-automation-plan/run-b-concurrency.mjs": "6b4d78c1797fcf5005ccd3f01b88e12e6185e6d0a3e89d238128c930654f005c"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "project": "tghzmofkkdsaasvnixps",
+  "run": "dac119e9354d",
+  "business": "f2a97974-c3a2-496e-b16b-e50812e02e58",
+  "shop": "da852571-009f-44e3-9276-e6abc33c7603",
+  "checks": [],
+  "failure": "Command '['node', 'C:\\\\Users\\\\Teymur\\\\AppData\\\\Roaming\\\\npm\\\\node_modules\\\\supabase\\\\dist\\\\supabase.js', 'db', 'query', '--linked', '--project-ref', 'tghzmofkkdsaasvnixps', '--output-format', 'json', '--file', 'C:\\\\Users\\\\Teymur\\\\AppData\\\\Local\\\\Temp\\\\followup-dev-ufom09ug\\\\query.sql']' timed out after 70 seconds; Cleanup/check failed: DEV SQL request failed: {\"_tag\":\"Error\",\"error\":{\"code\":\"LegacyDbQueryUnexpectedStatusError\",\"message\":\"unexpected status 400: {\\\"message\\\":\\\"Failed to run sql query: ERROR:  P0001: cannot remove the last active owner\\\\nCONTEXT:  PL/pgSQL function public.protect_last_active_owner() line 15 at RAISE\\\\n\\\"}\"}}\nInitialising login role...\n",
+  "baseline": {
+    "auth_user_ids": {
+      "count": 17,
+      "hash": "c7282b1edbeee42dfa3447af2c72371f"
+    },
+    "businesses": {
+      "count": 2,
+      "hash": "81a5f40896134f7a1e4fd85ad36e4bae"
+    },
+    "contracts": {
+      "count": 2,
+      "hash": "9e3884a5f20613c258a5992731795361"
+    },
+    "records": {
+      "count": 12,
+      "hash": "26da24a0ff24f4b9e5b2b5653755e941"
+    },
+    "shops": {
+      "count": 14,
+      "hash": "09ad816529b6d47fc49e7371f555e587"
+    },
+    "staff": {
+      "count": 71,
+      "hash": "c5078724e2df1ceacf93ce00ca5afbf3"
+    },
+    "sync_records": {
+      "count": 343,
+      "hash": "88c07bf70312fe17891226c4d1d72015"
+    }
+  },
+  "afterCleanup": null,
+  "existingDataIdentical": false,
+  "actualSending": false
+}

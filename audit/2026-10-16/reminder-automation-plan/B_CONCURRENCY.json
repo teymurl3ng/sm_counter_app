@@ -1,0 +1,70 @@
+{
+  "project": "tghzmofkkdsaasvnixps",
+  "business": "21e11060-62d1-49d8-bf09-3ceb74502eda",
+  "shop": "1b0ae0e5-3243-4cbf-a1b9-ce2ef8c08dbf",
+  "checks": [],
+  "failure": "Error: Concurrency assertion failed: two installations acquire only one customer [{\"response\":{\"ok\":true,\"heads\":{\"sync\":544,\"credit\":0,\"metadata\":34,\"business_date\":\"2026-10-16\",\"policy_revision\":\"9749ded4-3415-45d5-bc53-c0e25d25ceeb\"},\"result\":{\"phase\":\"PREPARING\",\"attempt_uid\":\"18740326-d645-4e1b-8ae6-7b01ad24c3e0\",\"lease_until\":\"2026-10-16T11:27:37.696341+00:00\"},\"replayed\":false,\"launch_authorized\":false,\"notify_authorized\":false},\"pid\":186297,\"began\":\"2026-10-16 11:22:37.689615+00\",\"ended\":\"2026-10-16 11:22:39.759821+00\"},{\"response\":{\"ok\":false,\"error\":{\"code\":\"followup_refresh_required\"}},\"pid\":186299,\"began\":\"2026-10-16 11:22:43.205992+00\",\"ended\":\"2026-10-16 11:22:45.271609+00\"}]",
+  "before": {
+    "shops": {
+      "hash": "09ad816529b6d47fc49e7371f555e587",
+      "count": 14
+    },
+    "staff": {
+      "hash": "c5078724e2df1ceacf93ce00ca5afbf3",
+      "count": 71
+    },
+    "records": {
+      "hash": "26da24a0ff24f4b9e5b2b5653755e941",
+      "count": 12
+    },
+    "contracts": {
+      "hash": "9e3884a5f20613c258a5992731795361",
+      "count": 2
+    },
+    "businesses": {
+      "hash": "81a5f40896134f7a1e4fd85ad36e4bae",
+      "count": 2
+    },
+    "sync_records": {
+      "hash": "88c07bf70312fe17891226c4d1d72015",
+      "count": 343
+    },
+    "auth_user_ids": {
+      "hash": "c7282b1edbeee42dfa3447af2c72371f",
+      "count": 17
+    }
+  },
+  "after": {
+    "shops": {
+      "hash": "09ad816529b6d47fc49e7371f555e587",
+      "count": 14
+    },
+    "staff": {
+      "hash": "c5078724e2df1ceacf93ce00ca5afbf3",
+      "count": 71
+    },
+    "records": {
+      "hash": "26da24a0ff24f4b9e5b2b5653755e941",
+      "count": 12
+    },
+    "contracts": {
+      "hash": "9e3884a5f20613c258a5992731795361",
+      "count": 2
+    },
+    "businesses": {
+      "hash": "81a5f40896134f7a1e4fd85ad36e4bae",
+      "count": 2
+    },
+    "sync_records": {
+      "hash": "88c07bf70312fe17891226c4d1d72015",
+      "count": 343
+    },
+    "auth_user_ids": {
+      "hash": "c7282b1edbeee42dfa3447af2c72371f",
+      "count": 17
+    }
+  },
+  "existingDataIdentical": true,
+  "actualSending": false,
+  "qualification": "Inconclusive overlap, not a passing concurrency check. Requests arrived sequentially; one grant and one stale refusal observed. Existing data restored. Planned physical two-phone concurrency/recovery acceptance remains in B."
+}

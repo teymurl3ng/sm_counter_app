@@ -1,0 +1,24 @@
+{
+  "claims": 0,
+  "actions": 0,
+  "digests": 0,
+  "commands": 0,
+  "migrations": [
+    {
+      "name": "customer_followups_v1",
+      "version": "20261016110904"
+    },
+    {
+      "name": "followup_actor_indexes",
+      "version": "20261016112511"
+    }
+  ],
+  "active_policies": 0,
+  "function_hashes": {
+    "followup_command_v1": "4dd75a4dda4ec37827acc934bf90832d",
+    "followup_snapshot_v1": "7e109c0221cb04f2d031094aec3e864e"
+  },
+  "owner_guard_enabled": true,
+  "customer_state_count": 0,
+  "remaining_fixture_shops": 0
+}

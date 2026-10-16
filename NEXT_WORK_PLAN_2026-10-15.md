@@ -132,6 +132,8 @@ These items have not been cancelled. They are deliberately unscheduled or condit
 | NRV, old affected feeds, TalkBack, physical power loss, provider hardening/monitoring and public-repo review | Original conditions remain in the detailed inventory. No action unless the relevant trigger/need is established. |
 | Costing tab selection at large text and old sign-in transition observation | Verify the specific observation first; no renewed whole-app design or animation crawl. |
 
+**Deferred wording pass (16 October):** the owner requested simpler clerk-facing language in the new reminder implementation. [Recorded examples and boundary](audit/2026-10-16/reminder-automation-plan/LATER.md). Keep it outside phase6 B's coordination scope; do not lose it or mark it done.
+
 ## Rules that keep the plan finite
 
 - Start one coding phase at a time. Phase 1 participation may continue alongside it; do not mark it complete on behalf of staff.
@@ -147,6 +149,6 @@ These items have not been cancelled. They are deliberately unscheduled or condit
 - [x] ✅ ~~3. Credit basics: aging, customer search and advisory warning.~~ [Result](audit/2026-10-15/credit-basics-plan/RESULT.md). Delivered in signed 0.5.0; private/human acceptance remains phase 1.
 - [x] ✅ ~~4. Customer payment terms, credit categories, overrides and history.~~ Implementation, affected checks, two-phone recovery and PROD/signed rollout complete. [Finish result](audit/2026-10-15/credit-status-plan/FINISH_RESULT.md).
 - [x] ✅ ~~5. Statement preview, PDF/image sharing, manual WhatsApp/SMS drafts and observable local history.~~ [Final result](audit/2026-10-15/statements-plan/MANUAL_RESULT.md). Implementation/isolated QA complete; ordinary signed delivery/human acceptance remains phase 1.
-- [ ] 6. Owner reminder automation and a separately recorded automatic-SMS decision — ✅ research, baseline, UI plan and independent judgment; ✅ ~~A rules/read model/injected UI foundation~~; B shared coordination/scheduling and C's final sending-route decision pending.
+- [ ] 6. Owner reminder automation and a separately recorded automatic-SMS decision — ✅ research, baseline, UI plan and independent judgment; ✅ ~~A rules/read model/injected UI foundation~~; ✅ ~~B DEV server-contract checkpoint~~ (72 rolled-back SQL checks); B app/cache/scheduling/handoff wiring and actual two-phone acceptance remain, then C's final sending-route decision. [Checkpoint](audit/2026-10-16/reminder-automation-plan/B_RESULT.md).
 
 Use this six-phase progress list in future completion reports. The old [seven-batch plan](audit/2026-10-11/remaining-work-plan/FINISH_BATCHES.md) remains the historical acceptance record; its open parts map to phase 1 here, and its completed parts are not reopened.

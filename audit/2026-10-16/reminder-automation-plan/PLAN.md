@@ -1,6 +1,6 @@
 # Phase 6: finite reminder-automation plan
 
-16 October 2026. Baseline `4fc8457`. [Research](RESEARCH.md) precedes this plan; [UI placement](UI_PLAN.md) is part of it. This is phase 6/L4 of the existing six-phase plan, not a new set of release phases. Implementation has not started. Defaults below are proposals for review, not business facts or vendor-mandated standards.
+16 October 2026. Baseline `4fc8457`. [Research](RESEARCH.md) precedes this plan; [UI placement](UI_PLAN.md) is part of it. This is phase 6/L4 of the existing six-phase plan, not a new set of release phases. Initial planning baseline; subsequent A/B progress is recorded below. Defaults below are proposals for review, not business facts or vendor-mandated standards.
 
 ## Outcome
 
@@ -85,7 +85,7 @@ If a provider is selected later, credentials stay server-side. Use one durable o
 - Customer/schedule changes and snooze leave header/footer/action geometry stable; names, full amounts and actions remain readable at 200% through vertical scrolling. A notification cannot bypass sign-in/role checks or expose customer debt on a lock screen.
 - Pin only calculator, affected reader/UI, coordination/RPC/transport, migration/backup and worker tests as each piece begins. No whole-app suite, real customer receiver, paid provider or unrelated audit. A new finding goes to LATER, not a fourth build piece.
 
-Progress: ✅ research; ✅ baseline and UI plan; ✅ [independent judgment after the hook](JUDGMENT.md). ✅ ~~A rules/read model/injected native UI foundation~~ is complete at [the affected QA scope](A_RESULT.md). B shared coordination/scheduling and C's final pilot/provider decision remain pending. No ordinary entry is enabled yet. The preferred conditional architecture is documented, not activated. Phase 1 delivery/human custody and the existing retained B8/identity work are not absorbed into phase 6.
+Progress: ✅ research; ✅ baseline and UI plan; ✅ [independent judgment after the hook](JUDGMENT.md). ✅ ~~A rules/read model/injected native UI foundation~~ is complete at [the affected QA scope](A_RESULT.md). ✅ ~~B DEV server contract checkpoint~~ is implemented with 72 passing rolled-back checks; [scope, evidence and remaining B](B_RESULT.md). B Android/cache/scheduling/handoff wiring and actual two-phone acceptance remain pending, as does C's final pilot/provider decision. No ordinary entry is enabled yet. The preferred conditional architecture is documented, not activated. Phase 1 delivery/human custody and the existing retained B8/identity work are not absorbed into phase 6.
 
 ### Existing shop number and sender identity
 

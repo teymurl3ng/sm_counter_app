@@ -1,0 +1,117 @@
+{
+  "project": "tghzmofkkdsaasvnixps",
+  "sourceBaseline": "48bdabe",
+  "verification": {
+    "checks": [
+      "acquire retry preserves attempt without external launch",
+      "Admin cannot change Owner policy",
+      "anonymous role denied both RPCs",
+      "another installation cannot renew the claim",
+      "another metadata edit requires a fresh review",
+      "assigned Admin may read current follow-ups",
+      "assigned leadership may change customer follow-up preference",
+      "cashier denied both RPCs",
+      "command UID cannot acquire a different meaning",
+      "credit capability is required before opt-in",
+      "custom cadence changes schedule revision",
+      "disabling cannot bypass an unresolved handoff",
+      "expired lease cannot start",
+      "expired preparation may be replaced by another installation",
+      "explicit posting-phone upgrade acknowledgment is required",
+      "explicit shared review records current shop date",
+      "first primary digest grants one notification attempt",
+      "future snooze accepted",
+      "inactive staff denied both RPCs",
+      "invalid customer cadence rejected: {\"day\": 32, \"kind\": \"MONTHLY\"}",
+      "invalid customer cadence rejected: {\"days\": 366, \"kind\": \"INTERVAL\", \"first_date\": \"2026-10-16\"}",
+      "invalid customer cadence rejected: {\"days\": 7, \"kind\": \"INTERVAL\", \"first_date\": \"2027-02-30\"}",
+      "invalid customer cadence rejected: {\"kind\": \"WEEKLY\", \"weekday\": 0}",
+      "invalid customer cadence rejected: {\"kind\": \"WEEKLY\", \"weekday\": 7, \"payment_terms\": 1}",
+      "invalid policy rejected: {\"balance\": 100}",
+      "invalid policy rejected: {\"preferred_time\": \"24:00\"}",
+      "invalid policy rejected: {\"quiet_end\": \"23:58\"}",
+      "invalid policy rejected: {\"repeat_days\": 31}",
+      "invalid policy rejected: {\"weekday\": \"7\"}",
+      "invalid policy rejected: {\"weekday\": 0}",
+      "lost digest response replay never authorizes another alert",
+      "lost policy response is idempotent",
+      "lost start response replay never authorizes another launch",
+      "migration creates no active shop policy",
+      "missed worker cannot replay an old business date",
+      "missing timezone refuses activation",
+      "missing timezone remains explicit",
+      "monthly customer schedule accepted separately from sale terms",
+      "new command on same shop date cannot reserve twice",
+      "new Credit head invalidates prepared facts",
+      "new synced collection head invalidates prepared facts",
+      "no eligible work creates no notification reservation",
+      "non-cadence setting preserves statement cycle revision",
+      "old attempt identity cannot be reused after resolution",
+      "old policy revision cannot overwrite accepted settings",
+      "old primary rejected after transfer",
+      "one preparation lease acquired",
+      "original accepted start grants one launch",
+      "original installation renews its live lease",
+      "Owner can explicitly resolve another installation without asserting delivery",
+      "Owner can explicitly transfer primary installation",
+      "Owner opt-in creates accepted policy without external action",
+      "pause preserves schedule and cycle identity",
+      "paused customer cannot acquire a handoff",
+      "preferred time cannot become permanently trapped in quiet hours",
+      "primary transfer does not create another daily alert",
+      "private schema denies direct access and all tables enable RLS",
+      "resuming preserves schedule revision",
+      "review acknowledges only the exact started cycle",
+      "review and notification commands make no financial writes",
+      "review cannot silently clear live preparation",
+      "RPC grants explicitly restrict anonymous callers",
+      "second installation cannot claim the same customer",
+      "snapshot contains no customer names or balances",
+      "snooze blocks a handoff before its business date",
+      "snooze must name a future shop date",
+      "stale customer edit cannot overwrite accepted preference",
+      "started handoff cannot expire or release as preparation",
+      "uncertain retry requires explicit acknowledgment",
+      "unknown customer is rejected",
+      "unknown handoff blocks a second attempt",
+      "unrelated business denied both RPCs"
+    ],
+    "passed": 72,
+    "rollback": true
+  },
+  "earlierFixtureFailures": [
+    {
+      "attempt": 1,
+      "error": {
+        "name": "HttpException",
+        "message": "Failed to run sql query: ERROR:  23514: new row for relation \"staff\" violates check constraint \"staff_username_check\"\nDETAIL:  Failing row contains (ec9aee37-c2b6-4318-aa01-e8bd05059d07, facea499-fb56-44d0-ac44-a9ea7a800fe3, fca0303f-5028-4f28-b89e-a80b4221b360, qa_f_facea499-fb56-44d0-ac44-a9ea7a800fe3, QA, owner, t, null, 2026-10-16 11:12:03.479586+00, 2026-10-16 11:12:03.479586+00).\n"
+      }
+    },
+    {
+      "attempt": 2,
+      "error": {
+        "name": "HttpException",
+        "message": "Failed to run sql query: ERROR:  42804: column \"payload\" is of type jsonb but expression is of type text\nLINE 69:  SELECT business,shop,'accounts','qa','{\"category\":\"Customer\",\"name\":\"PRIVATE CUSTOMER NAME\"}','fixture' FROM f_ctx UNION ALL\r\n                                               ^\nHINT:  You will need to rewrite or cast the expression.\n"
+      }
+    },
+    {
+      "attempt": 3,
+      "error": {
+        "name": "HttpException",
+        "message": "Failed to run sql query: ERROR:  P0001: Follow-up check failed: private schema denies direct access and all tables enable RLS\nCONTEXT:  PL/pgSQL function pg_temp_1.check_f(boolean,text) line 3 at RAISE\n"
+      }
+    },
+    {
+      "attempt": 4,
+      "error": {
+        "name": "HttpException",
+        "message": "Failed to run sql query: ERROR:  P0001: Follow-up check failed: acquire retry preserves attempt without external launch\nCONTEXT:  PL/pgSQL function pg_temp_37.check_f(boolean,text) line 3 at RAISE\nSQL statement \"SELECT pg_temp.check_f(b->'replayed'='true'::jsonb AND b->'launch_authorized'='false'::jsonb,'acquire retry preserves attempt without external launch')\"\nPL/pgSQL function inline_code_block line 65 at PERFORM\n"
+      }
+    }
+  ],
+  "migrationAttempts": [
+    "First connector request expired; readback confirmed no schema was applied.",
+    "Compilation attempt rejected unparenthesized CASE in IF; entire migration rolled back.",
+    "Parenthesized CASE compiled and additive migration applied successfully."
+  ]
+}

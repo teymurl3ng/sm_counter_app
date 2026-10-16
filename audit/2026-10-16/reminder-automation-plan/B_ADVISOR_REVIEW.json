@@ -1,0 +1,159 @@
+{
+  "project": "tghzmofkkdsaasvnixps",
+  "security": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy",
+      "findings": [
+        {
+          "detail": "Table \\`followup_private.actions\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "name": "actions",
+            "type": "table",
+            "schema": "followup_private"
+          },
+          "observed_at": "2026-10-16T11:14:17.066Z"
+        },
+        {
+          "detail": "Table \\`followup_private.claims\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "name": "claims",
+            "type": "table",
+            "schema": "followup_private"
+          },
+          "observed_at": "2026-10-16T11:14:17.066Z"
+        },
+        {
+          "detail": "Table \\`followup_private.commands\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "name": "commands",
+            "type": "table",
+            "schema": "followup_private"
+          },
+          "observed_at": "2026-10-16T11:14:17.066Z"
+        },
+        {
+          "detail": "Table \\`followup_private.customers\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "name": "customers",
+            "type": "table",
+            "schema": "followup_private"
+          },
+          "observed_at": "2026-10-16T11:14:17.066Z"
+        },
+        {
+          "detail": "Table \\`followup_private.digests\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "name": "digests",
+            "type": "table",
+            "schema": "followup_private"
+          },
+          "observed_at": "2026-10-16T11:14:17.066Z"
+        },
+        {
+          "detail": "Table \\`followup_private.policies\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "name": "policies",
+            "type": "table",
+            "schema": "followup_private"
+          },
+          "observed_at": "2026-10-16T11:14:17.066Z"
+        }
+      ]
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN",
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable",
+      "findings": [
+        {
+          "detail": "Function `public.followup_command_v1(shop uuid, installation text, command_uid uuid, operation jsonb)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/followup_command_v1`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "name": "followup_command_v1",
+            "schema": "public",
+            "language": "plpgsql",
+            "arguments": "shop uuid, installation text, command_uid uuid, operation jsonb",
+            "security_definer": true
+          },
+          "observed_at": "2026-10-16T11:14:17.066Z"
+        },
+        {
+          "detail": "Function `public.followup_snapshot_v1(shop uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/followup_snapshot_v1`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "name": "followup_snapshot_v1",
+            "schema": "public",
+            "language": "plpgsql",
+            "arguments": "shop uuid",
+            "security_definer": true
+          },
+          "observed_at": "2026-10-16T11:14:17.066Z"
+        }
+      ]
+    }
+  ],
+  "performanceAfterActorIndexes": [
+    {
+      "name": "unused_index",
+      "level": "INFO",
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index",
+      "findings": [
+        {
+          "detail": "Index \\`followup_actions_actor\\` on table \\`followup_private.actions\\` has not been used",
+          "metadata": {
+            "name": "actions",
+            "type": "table",
+            "schema": "followup_private"
+          },
+          "observed_at": "2026-10-16T11:26:03.302Z"
+        },
+        {
+          "detail": "Index \\`followup_claims_actor\\` on table \\`followup_private.claims\\` has not been used",
+          "metadata": {
+            "name": "claims",
+            "type": "table",
+            "schema": "followup_private"
+          },
+          "observed_at": "2026-10-16T11:26:03.302Z"
+        },
+        {
+          "detail": "Index \\`followup_commands_actor\\` on table \\`followup_private.commands\\` has not been used",
+          "metadata": {
+            "name": "commands",
+            "type": "table",
+            "schema": "followup_private"
+          },
+          "observed_at": "2026-10-16T11:26:03.302Z"
+        },
+        {
+          "detail": "Index \\`followup_digests_actor\\` on table \\`followup_private.digests\\` has not been used",
+          "metadata": {
+            "name": "digests",
+            "type": "table",
+            "schema": "followup_private"
+          },
+          "observed_at": "2026-10-16T11:26:03.302Z"
+        },
+        {
+          "detail": "Index \\`followup_policies_primary_actor\\` on table \\`followup_private.policies\\` has not been used",
+          "metadata": {
+            "name": "policies",
+            "type": "table",
+            "schema": "followup_private"
+          },
+          "observed_at": "2026-10-16T11:26:03.302Z"
+        },
+        {
+          "detail": "Index \\`followup_policies_updated_by\\` on table \\`followup_private.policies\\` has not been used",
+          "metadata": {
+            "name": "policies",
+            "type": "table",
+            "schema": "followup_private"
+          },
+          "observed_at": "2026-10-16T11:26:03.302Z"
+        }
+      ]
+    }
+  ],
+  "review": "Private RLS/no-policy and two authenticated definer entry points are intentional with no direct access, exact actor/shop checks, explicit grants and fixed search paths. New actor FKs are indexed; new unused-index INFO reflects no ordinary traffic. Unrelated advisories are outside scope."
+}

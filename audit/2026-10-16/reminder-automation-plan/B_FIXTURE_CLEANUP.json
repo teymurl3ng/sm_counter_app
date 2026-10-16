@@ -1,0 +1,42 @@
+{
+  "firstAttempt": {
+    "run": "dac119e9354d",
+    "business": "f2a97974-c3a2-496e-b16b-e50812e02e58",
+    "shop": "da852571-009f-44e3-9276-e6abc33c7603",
+    "cleanup": "Exact fixture identity checks; staff ACCESS EXCLUSIVE lock; last-owner trigger disabled only during deletion of the two disposable fixture owners, restored before commit. No other transaction could write staff during that interval. Synthetic business/shops/auth removed.",
+    "guardEnabledAfter": true
+  },
+  "originalBaselineRestored": true,
+  "secondAttemptCleanup": "Only new disposable shop/staff/auth removed; reused existing DEV business with active owners so no guard suspension.",
+  "fingerprint": {
+    "shops": {
+      "hash": "09ad816529b6d47fc49e7371f555e587",
+      "count": 14
+    },
+    "staff": {
+      "hash": "c5078724e2df1ceacf93ce00ca5afbf3",
+      "count": 71
+    },
+    "records": {
+      "hash": "26da24a0ff24f4b9e5b2b5653755e941",
+      "count": 12
+    },
+    "contracts": {
+      "hash": "9e3884a5f20613c258a5992731795361",
+      "count": 2
+    },
+    "businesses": {
+      "hash": "81a5f40896134f7a1e4fd85ad36e4bae",
+      "count": 2
+    },
+    "sync_records": {
+      "hash": "88c07bf70312fe17891226c4d1d72015",
+      "count": 343
+    },
+    "auth_user_ids": {
+      "hash": "c7282b1edbeee42dfa3447af2c72371f",
+      "count": 17
+    }
+  },
+  "noFixtureRowsRemain": true
+}

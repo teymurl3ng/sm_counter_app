@@ -217,7 +217,7 @@ class CreditMetadataStorageTest {
         assertEquals(before, db.backupDataDao().financialLogs())
         val old = JSONObject(bytes.toString(Charsets.UTF_8))
         old.getJSONObject("metadata").put("schema_version", 12)
-        listOf("credit_term_revisions", "credit_term_heads", "credit_sale_agreements", "credit_review_actions", "credit_metadata_pending", "credit_metadata_sync_state")
+        listOf("credit_term_revisions", "credit_term_heads", "credit_sale_agreements", "credit_review_actions", "credit_metadata_pending", "credit_metadata_sync_state", "followup_commands")
             .forEach { old.getJSONObject("data").remove(it) }
         val target = MilkShopDatabase.createInMemory()
         try {
@@ -226,7 +226,7 @@ class CreditMetadataStorageTest {
             assertNull(target.creditMetadataDao().state())
         } finally { target.close() }
         val newer = JSONObject(bytes.toString(Charsets.UTF_8))
-        newer.getJSONObject("metadata").put("schema_version", 14)
+        newer.getJSONObject("metadata").put("schema_version", BackupManager.CURRENT_SCHEMA_VERSION + 1)
         assertTrue(runCatching { manager.inspectCompleteSnapshotBytes(signed(newer), "newer-credit") }.isFailure)
     }
 

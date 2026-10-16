@@ -68,7 +68,7 @@ class BackupManager(
          * identity). Formats 3/4 restore via the legacy push-first path.
          */
         const val FORMAT_VERSION = 5
-        const val CURRENT_SCHEMA_VERSION = 13
+        const val CURRENT_SCHEMA_VERSION = 14
 
         /**
          * Oldest portable/local/cloud backup format this build can still
@@ -486,6 +486,7 @@ class BackupManager(
                 put("sync_outbox", JSONArray(database.syncOutboxDao().all().map(::syncOutboxJson)))
             }
             CreditMetadataBackup.write(database, this, includeSecurity)
+            FollowUpBackup.write(database, this, includeSecurity)
             put("preferences", preferencesJson())
             if (includeSecurity) {
                 put("app_users", JSONArray(dao.appUsers().map(::appUserJson)))

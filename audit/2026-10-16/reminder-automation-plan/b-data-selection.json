@@ -1,0 +1,19 @@
+{
+  "FollowUpDataTest": [
+    "migrationPreservesLedgerAndStartsEmpty",
+    "snapshotCodecRejectsCoercionAndConflictingFacts",
+    "cacheMapsScheduleVersionsWithoutFinancialWrites",
+    "refreshFailureAndRevocationNeverLeaveCurrentCache",
+    "unknownAndRecoveredCommandsNeverAuthorizeSideEffects",
+    "mismatchedAcknowledgmentRetainsOriginalRequest",
+    "bindingAndIdentityConflictsCannotRetargetCommands",
+    "restoredJournalIsHeldAndCacheIsNotRestored",
+    "malformedRestoreRollsBackAndLegacyBackupStillWorks",
+    "runtimeRefreshesOnceAndChecksLocalRole",
+    "runtimeUnknownRefreshPreservesTokens"
+  ],
+  "CreditMetadataStorageTest": [
+    "encryptedRoundTripKeepsCreditHistoryAndHoldsPendingWithoutReenabling",
+    "malformedNewBackupFailsWithoutReplacingExistingBusinessAndOldBackupGetsExplicitLegacy"
+  ]
+}

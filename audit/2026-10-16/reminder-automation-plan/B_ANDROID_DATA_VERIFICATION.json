@@ -1,0 +1,103 @@
+{
+  "baseline": "36da8f0",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "uniqueAffectedMethods": 13,
+  "latestResults": [
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "migrationPreservesLedgerAndStartsEmpty",
+      "code": 0,
+      "stack": null,
+      "run": "b-data-corrected"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "runtimeRefreshesOnceAndChecksLocalRole",
+      "code": 0,
+      "stack": null,
+      "run": "b-data-corrected"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "malformedRestoreRollsBackAndLegacyBackupStillWorks",
+      "code": 0,
+      "stack": null,
+      "run": "b-data-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "restoredJournalIsHeldAndCacheIsNotRestored",
+      "code": 0,
+      "stack": null,
+      "run": "b-data-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "runtimeUnknownRefreshPreservesTokens",
+      "code": 0,
+      "stack": null,
+      "run": "b-data-corrected"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "cacheMapsScheduleVersionsWithoutFinancialWrites",
+      "code": 0,
+      "stack": null,
+      "run": "b-data-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "bindingAndIdentityConflictsCannotRetargetCommands",
+      "code": 0,
+      "stack": null,
+      "run": "b-data-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "mismatchedAcknowledgmentRetainsOriginalRequest",
+      "code": 0,
+      "stack": null,
+      "run": "b-data-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "snapshotCodecRejectsCoercionAndConflictingFacts",
+      "code": 0,
+      "stack": null,
+      "run": "b-data-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "refreshFailureAndRevocationNeverLeaveCurrentCache",
+      "code": 0,
+      "stack": null,
+      "run": "b-data-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "unknownAndRecoveredCommandsNeverAuthorizeSideEffects",
+      "code": 0,
+      "stack": null,
+      "run": "b-data-first"
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataStorageTest",
+      "test": "encryptedRoundTripKeepsCreditHistoryAndHoldsPendingWithoutReenabling",
+      "code": 0,
+      "stack": null,
+      "run": "b-data-first"
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataStorageTest",
+      "test": "malformedNewBackupFailsWithoutReplacingExistingBusinessAndOldBackupGetsExplicitLegacy",
+      "code": 0,
+      "stack": null,
+      "run": "b-data-first"
+    }
+  ],
+  "ordinaryAppChanged": false,
+  "cloudChanged": false,
+  "physicalConcurrencyEstablished": false,
+  "scope": "B Android data only; no ordinary route, scheduler or external side effect"
+}

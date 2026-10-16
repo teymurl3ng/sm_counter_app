@@ -17,6 +17,7 @@ class SyncRuntime(
     private val context: Context,
     private val database: MilkShopDatabase,
     private val http: SyncHttp = UrlConnectionSyncHttp(),
+    private val followUpSecurity: com.saaf.milkshop.domain.UserSecurityService? = null,
 ) {
 
     private val tokenStore = SyncTokenStore(context)
@@ -63,6 +64,35 @@ class SyncRuntime(
 
     suspend fun drainOnce(): SyncPushEngine.DrainOutcome = SyncOperationGate.exclusive {
         drainOnceLocked()
+    }
+
+    /** Explicit read path only; ordinary drain/pull never sends reminder commands. */
+    internal suspend fun loadFollowUps(localSession: String): FollowUpLoad = SyncOperationGate.exclusive {
+        val binding=followUpBinding(localSession)
+        val config=requireNotNull(SyncServerConfigStore.load(context))
+        val client=FollowUpClient(http,config,tokenStore)
+        FollowUpDataStore(database).refresh(binding) { name,body ->
+            var result=client.call(name,body)
+            if(result is FollowUpRpcResult.Retry&&result.code=="unauthorized") {
+                result=if(refreshSession(config)) client.call(name,body)
+                    else if(tokenStore.load()==null) FollowUpRpcResult.Refused("followup_not_authorized") else result
+            }
+            result
+        }
+    }
+
+    internal suspend fun cachedFollowUps(localSession: String): CachedFollowUp? = SyncOperationGate.exclusive {
+        FollowUpDataStore(database).cached(followUpBinding(localSession))
+    }
+
+    private suspend fun followUpBinding(localSession: String): FollowUpBinding {
+        val security=followUpSecurity ?: (context.applicationContext as com.saaf.milkshop.MilkShopApplication).userSecurity
+        val actor=security.requirePermission(localSession,com.saaf.milkshop.domain.AppPermission.VIEW_FULL_FINANCIAL)
+        check(com.saaf.milkshop.domain.AppRole.parse(actor.role) in setOf(com.saaf.milkshop.domain.AppRole.OWNER,com.saaf.milkshop.domain.AppRole.MANAGER,com.saaf.milkshop.domain.AppRole.ADMIN))
+        check(isEnrolled()) { "Shop sync is not connected." }
+        val config=requireNotNull(SyncServerConfigStore.load(context));val binding=requireNotNull(SyncShopBindingStore.load(context))
+        check(config.environment==binding.environment)
+        return FollowUpBinding(config.environment,config.baseUrl,binding.shopId,binding.staffId,SyncIdentity.warmUp(context))
     }
 
     /** Local Owner authorization is enforced by the customer command facade; server rechecks actual Owner. */

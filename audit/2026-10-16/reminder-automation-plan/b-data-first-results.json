@@ -1,0 +1,105 @@
+{
+  "label": "b-data-first",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpDataTest#migrationPreservesLedgerAndStartsEmpty",
+    "com.saaf.milkshop.FollowUpDataTest#snapshotCodecRejectsCoercionAndConflictingFacts",
+    "com.saaf.milkshop.FollowUpDataTest#cacheMapsScheduleVersionsWithoutFinancialWrites",
+    "com.saaf.milkshop.FollowUpDataTest#refreshFailureAndRevocationNeverLeaveCurrentCache",
+    "com.saaf.milkshop.FollowUpDataTest#unknownAndRecoveredCommandsNeverAuthorizeSideEffects",
+    "com.saaf.milkshop.FollowUpDataTest#mismatchedAcknowledgmentRetainsOriginalRequest",
+    "com.saaf.milkshop.FollowUpDataTest#bindingAndIdentityConflictsCannotRetargetCommands",
+    "com.saaf.milkshop.FollowUpDataTest#restoredJournalIsHeldAndCacheIsNotRestored",
+    "com.saaf.milkshop.FollowUpDataTest#malformedRestoreRollsBackAndLegacyBackupStillWorks",
+    "com.saaf.milkshop.FollowUpDataTest#runtimeRefreshesOnceAndChecksLocalRole",
+    "com.saaf.milkshop.FollowUpDataTest#runtimeUnknownRefreshPreservesTokens",
+    "com.saaf.milkshop.CreditMetadataStorageTest#encryptedRoundTripKeepsCreditHistoryAndHoldsPendingWithoutReenabling",
+    "com.saaf.milkshop.CreditMetadataStorageTest#malformedNewBackupFailsWithoutReplacingExistingBusinessAndOldBackupGetsExplicitLegacy"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "migrationPreservesLedgerAndStartsEmpty",
+      "code": -2,
+      "stack": "android.database.SQLException: Error code: 1299, message: NOT NULL constraint failed: events.surcharge_applied"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "runtimeRefreshesOnceAndChecksLocalRole",
+      "code": -2,
+      "stack": "com.saaf.milkshop.domain.SecurityFailure$SessionExpired: Your session expired. Sign in again."
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "malformedRestoreRollsBackAndLegacyBackupStillWorks",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "restoredJournalIsHeldAndCacheIsNotRestored",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "runtimeUnknownRefreshPreservesTokens",
+      "code": -2,
+      "stack": "com.saaf.milkshop.domain.SecurityFailure$SessionExpired: Your session expired. Sign in again."
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "cacheMapsScheduleVersionsWithoutFinancialWrites",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "bindingAndIdentityConflictsCannotRetargetCommands",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "mismatchedAcknowledgmentRetainsOriginalRequest",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "snapshotCodecRejectsCoercionAndConflictingFacts",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "refreshFailureAndRevocationNeverLeaveCurrentCache",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "unknownAndRecoveredCommandsNeverAuthorizeSideEffects",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataStorageTest",
+      "test": "encryptedRoundTripKeepsCreditHistoryAndHoldsPendingWithoutReenabling",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditMetadataStorageTest",
+      "test": "malformedNewBackupFailsWithoutReplacingExistingBusinessAndOldBackupGetsExplicitLegacy",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 10,
+  "expected": 13,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "66d4e032978e3f60d15aa23f7acac143c63318033e1e4b102a3efc8a287585a9"
+}

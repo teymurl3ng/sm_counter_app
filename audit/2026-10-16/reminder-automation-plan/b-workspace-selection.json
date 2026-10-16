@@ -1,0 +1,26 @@
+{
+  "FollowUpWorkspaceBindingTest": [
+    "acceptedLoadUsesActualReaderAndServerSchedule",
+    "policyAndPrimaryRequireExplicitOwnerConfirmation",
+    "customerCommandsKeepFrozenRevisionsAndFinancialRecords",
+    "staleViewOrLocalFinancialChangesCannotSubmitReview",
+    "uncertainSaveRecoversOriginalIdAndNeverDuplicates",
+    "abandonedMetadataDoesNotUndoRemoteStateOrHandleExternalRequests",
+    "bindingChangeAndLogoutCannotPublishOrRetarget",
+    "unavailableDataStaysStaleAndCannotSave"
+  ],
+  "FollowUpWorkspaceUiTest": [
+    "lightListReviewAndSettingsRetainChromeAndManualFallback",
+    "darkLargeTextListReviewAndSettingsRetainChromeAndManualFallback",
+    "invalidPolicyCannotSaveAndDirtyExitCanBeKeptOrDiscarded",
+    "customerMonthlyAndCustomValidationDoesNotEditPaymentTerms",
+    "failedLoadAndFailedSaveRetainFeedbackAndCanRetry",
+    "offlineLeadershipKeepsReviewAvailableWithoutSavingSharedState",
+    "primaryTransferRequiresExplicitCompatibleDeviceConfirmation",
+    "unfinishedSaveBlocksEditsAndSetAsideExplainsServerOutcome"
+  ],
+  "FollowUpDataTest": [
+    "runtimeRefreshesOnceAndChecksLocalRole",
+    "runtimeUnknownRefreshPreservesTokens"
+  ]
+}

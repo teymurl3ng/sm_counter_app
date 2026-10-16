@@ -1,0 +1,140 @@
+{
+  "label": "b-workspace-first",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#acceptedLoadUsesActualReaderAndServerSchedule",
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#policyAndPrimaryRequireExplicitOwnerConfirmation",
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#customerCommandsKeepFrozenRevisionsAndFinancialRecords",
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#staleViewOrLocalFinancialChangesCannotSubmitReview",
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#uncertainSaveRecoversOriginalIdAndNeverDuplicates",
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#abandonedMetadataDoesNotUndoRemoteStateOrHandleExternalRequests",
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#bindingChangeAndLogoutCannotPublishOrRetarget",
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#unavailableDataStaysStaleAndCannotSave",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#lightListReviewAndSettingsRetainChromeAndManualFallback",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#darkLargeTextListReviewAndSettingsRetainChromeAndManualFallback",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#invalidPolicyCannotSaveAndDirtyExitCanBeKeptOrDiscarded",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#customerMonthlyAndCustomValidationDoesNotEditPaymentTerms",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#failedLoadAndFailedSaveRetainFeedbackAndCanRetry",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#offlineLeadershipKeepsReviewAvailableWithoutSavingSharedState",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#primaryTransferRequiresExplicitCompatibleDeviceConfirmation",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#unfinishedSaveBlocksEditsAndSetAsideExplainsServerOutcome",
+    "com.saaf.milkshop.FollowUpDataTest#runtimeRefreshesOnceAndChecksLocalRole",
+    "com.saaf.milkshop.FollowUpDataTest#runtimeUnknownRefreshPreservesTokens"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "abandonedMetadataDoesNotUndoRemoteStateOrHandleExternalRequests",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "policyAndPrimaryRequireExplicitOwnerConfirmation",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "staleViewOrLocalFinancialChangesCannotSubmitReview",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "uncertainSaveRecoversOriginalIdAndNeverDuplicates",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "bindingChangeAndLogoutCannotPublishOrRetarget",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "acceptedLoadUsesActualReaderAndServerSchedule",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "unavailableDataStaysStaleAndCannotSave",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "customerCommandsKeepFrozenRevisionsAndFinancialRecords",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "lightListReviewAndSettingsRetainChromeAndManualFallback",
+      "code": -2,
+      "stack": "java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "customerMonthlyAndCustomValidationDoesNotEditPaymentTerms",
+      "code": -2,
+      "stack": "java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "primaryTransferRequiresExplicitCompatibleDeviceConfirmation",
+      "code": -2,
+      "stack": "java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "offlineLeadershipKeepsReviewAvailableWithoutSavingSharedState",
+      "code": -2,
+      "stack": "java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "failedLoadAndFailedSaveRetainFeedbackAndCanRetry",
+      "code": -2,
+      "stack": "java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "unfinishedSaveBlocksEditsAndSetAsideExplainsServerOutcome",
+      "code": -2,
+      "stack": "java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "invalidPolicyCannotSaveAndDirtyExitCanBeKeptOrDiscarded",
+      "code": -2,
+      "stack": "java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "darkLargeTextListReviewAndSettingsRetainChromeAndManualFallback",
+      "code": -2,
+      "stack": "java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "runtimeRefreshesOnceAndChecksLocalRole",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "runtimeUnknownRefreshPreservesTokens",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 10,
+  "expected": 18,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "fe9e7eea40822651321677f43bf011e222beb495f2f087b972fa3101d9619cf7"
+}

@@ -38,9 +38,11 @@ class FollowUpWorkspaceUiTest {
         online=true,owner=true,freshness="Checked against local records",primaryDevice="Owner tablet",shopZone="Asia/Karachi")
     private val commands=CopyOnWriteArrayList<FollowUpCommand>()
     private val opens=CopyOnWriteArrayList<Long>()
-    private fun show(scale: Float=1f,dark: Boolean=false,failLoadOnce: Boolean=false,failSave: Boolean=false) {
+    private val recoveries=CopyOnWriteArrayList<Pair<String,Boolean>>()
+    private fun show(scale: Float=1f,dark: Boolean=false,failLoadOnce: Boolean=false,failSave: Boolean=false,unfinishedSave: Boolean=false) {
         rule.activityRule.scenario.onActivity {
             it.enableEdgeToEdge()
+            it.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             it.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
             WindowCompat.getInsetsController(it.window,it.window.decorView).apply {
                 isAppearanceLightStatusBars=false
@@ -48,16 +50,21 @@ class FollowUpWorkspaceUiTest {
             }
         }
         val loads=AtomicInteger()
-        val access=FollowUpWorkspaceAccess(load={if(failLoadOnce && loads.incrementAndGet()==1) error("Synthetic connection unavailable") else state},command={command->
+        val access=FollowUpWorkspaceAccess(load={if(failLoadOnce && loads.incrementAndGet()==1) error("Synthetic connection unavailable") else state},command={command,_->
             commands.add(command)
             if(failSave) error("Synthetic save failed")
+            if(unfinishedSave) {
+                state=state.copy(policy=state.policy.copy(revision="changed-on-server",repeatDays=25),unfinished=listOf(FollowUpUnfinishedSave("synthetic-id","POLICY")))
+                FollowUpWorkspaceSave(state,false)
+            } else {
             state=when(command) {
                 is FollowUpCommand.Policy->state.copy(policy=command.value.copy(revision="v2"))
                 is FollowUpCommand.Preference->state.copy(preferences=state.preferences+(command.customerUid to command.value.copy(revision="pref-v2")))
                 is FollowUpCommand.Reviewed->state.copy(acknowledgments=state.acknowledgments+(command.customerUid to FollowUpAcknowledgment(command.expectedCycle,command.on)))
                 is FollowUpCommand.Snooze->state.copy(preferences=state.preferences+(command.customerUid to CustomerFollowUpPreference("pref-snooze",today,snoozedUntil=command.until)))
-            };state
-        })
+            };FollowUpWorkspaceSave(state,true)
+            }
+        },recover={uid,setAside->recoveries.add(uid to setAside);state=state.copy(unfinished=emptyList());FollowUpWorkspaceSave(state,true)})
         rule.setContent {
             val density=LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(density.density,scale)) {SaafTheme(darkTheme=dark) {
@@ -118,6 +125,8 @@ class FollowUpWorkspaceUiTest {
         rule.onNodeWithTag("followup-save-policy").performScrollTo().assertIsEnabled()
         rule.waitForIdle()
         rule.onNodeWithTag("followup-save-policy").performClick()
+        rule.onNodeWithTag("followup-confirm-updated").performClick()
+        rule.onNodeWithTag("followup-confirm-policy").performClick()
         capture("policy-save")
         rule.waitUntil(10000) {commands.size==1};assertEquals(10,(commands.single() as FollowUpCommand.Policy).value.repeatDays)
         rule.onNodeWithTag("followup-notice").assertIsDisplayed().assertTextEquals("Follow-up settings saved.")
@@ -155,6 +164,8 @@ class FollowUpWorkspaceUiTest {
         rule.onNodeWithTag("followup-repeat").performImeAction()
         rule.waitUntil(10000) {androidx.core.view.ViewCompat.getRootWindowInsets(rule.activity.window.decorView)?.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())!=true}
         rule.onNodeWithTag("followup-save-policy").performScrollTo().performClick()
+        rule.onNodeWithTag("followup-confirm-updated").performClick()
+        rule.onNodeWithTag("followup-confirm-policy").performClick()
         rule.waitUntil(10000) {rule.onAllNodesWithText("Synthetic save failed").fetchSemanticsNodes().isNotEmpty()}
         rule.waitForIdle()
         rule.onNodeWithTag("followup-error").assertIsDisplayed()
@@ -171,5 +182,38 @@ class FollowUpWorkspaceUiTest {
         rule.onNodeWithTag("followup-enabled").performScrollTo().assertIsNotEnabled()
         rule.onNodeWithTag("followup-save-policy").performScrollTo().assertIsNotEnabled()
         assertTrue(commands.isEmpty())
+    }
+    @Test fun primaryTransferRequiresExplicitCompatibleDeviceConfirmation() {
+        show(2f,true);rule.onNodeWithTag("followup-settings").performScrollTo().performClick()
+        rule.onNodeWithTag("followup-primary").performScrollTo().performClick()
+        rule.onNodeWithTag("followup-confirm-policy").assertIsNotEnabled()
+        assertTrue(commands.isEmpty())
+        rule.onNodeWithTag("followup-confirm-updated").performScrollTo().performClick()
+        rule.onNodeWithTag("followup-confirm-primary").performScrollTo().assertIsDisplayed()
+        capture("primary-confirmation-dark-2x")
+        rule.onNodeWithTag("followup-confirm-policy").assertIsEnabled().performClick()
+        rule.waitUntil(10000) {commands.size==1}
+        val command=commands.single() as FollowUpCommand.Policy
+        assertTrue(command.makePrimary);assertTrue(command.phonesUpdated)
+        rule.onNodeWithTag("followup-notice").assertTextEquals("Follow-up settings saved.")
+    }
+    @Test fun unfinishedSaveBlocksEditsAndSetAsideExplainsServerOutcome() {
+        show(2f,true,unfinishedSave=true);rule.onNodeWithTag("followup-settings").performScrollTo().performClick()
+        rule.onNodeWithTag("followup-repeat").performScrollTo().performTextReplacement("10")
+        rule.onNodeWithTag("followup-repeat").performImeAction()
+        rule.waitUntil(10000) {androidx.core.view.ViewCompat.getRootWindowInsets(rule.activity.window.decorView)?.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())!=true}
+        rule.onNodeWithTag("followup-save-policy").performScrollTo().performClick()
+        rule.onNodeWithTag("followup-confirm-updated").performScrollTo().performClick()
+        rule.onNodeWithTag("followup-confirm-policy").performClick()
+        rule.waitUntil(10000) {rule.onAllNodesWithTag("followup-check-save").fetchSemanticsNodes().isNotEmpty()}
+        rule.onNodeWithTag("followup-repeat").performScrollTo().assertTextContains("10")
+        rule.onNodeWithTag("followup-save-policy").performScrollTo().assertIsNotEnabled()
+        rule.onNodeWithTag("followup-set-aside").performScrollTo().performClick()
+        rule.onNodeWithText("Keep request").performClick();assertTrue(recoveries.isEmpty())
+        rule.onNodeWithTag("followup-set-aside").performClick();rule.onNodeWithText("Set aside",useUnmergedTree=true).performClick()
+        rule.waitUntil(10000) {recoveries.size==1}
+        assertEquals("synthetic-id" to true,recoveries.single());assertEquals(1,commands.size)
+        rule.onNodeWithTag("followup-notice").assertTextEquals("Local unfinished save set aside. This does not undo a server change.")
+        rule.onNodeWithTag("followup-check-save").assertDoesNotExist()
     }
 }

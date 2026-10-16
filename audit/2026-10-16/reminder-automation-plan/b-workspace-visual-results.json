@@ -1,0 +1,70 @@
+{
+  "label": "b-workspace-visual",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#lightListReviewAndSettingsRetainChromeAndManualFallback",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#darkLargeTextListReviewAndSettingsRetainChromeAndManualFallback",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#invalidPolicyCannotSaveAndDirtyExitCanBeKeptOrDiscarded",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#customerMonthlyAndCustomValidationDoesNotEditPaymentTerms",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#failedLoadAndFailedSaveRetainFeedbackAndCanRetry",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#offlineLeadershipKeepsReviewAvailableWithoutSavingSharedState",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#primaryTransferRequiresExplicitCompatibleDeviceConfirmation",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#unfinishedSaveBlocksEditsAndSetAsideExplainsServerOutcome"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "lightListReviewAndSettingsRetainChromeAndManualFallback",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "customerMonthlyAndCustomValidationDoesNotEditPaymentTerms",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "primaryTransferRequiresExplicitCompatibleDeviceConfirmation",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "offlineLeadershipKeepsReviewAvailableWithoutSavingSharedState",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "failedLoadAndFailedSaveRetainFeedbackAndCanRetry",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "unfinishedSaveBlocksEditsAndSetAsideExplainsServerOutcome",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "invalidPolicyCannotSaveAndDirtyExitCanBeKeptOrDiscarded",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "darkLargeTextListReviewAndSettingsRetainChromeAndManualFallback",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 8,
+  "expected": 8,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "505b550d96bea606868afca43dc2091b47602090b5da0ec319352c9b1608036e"
+}

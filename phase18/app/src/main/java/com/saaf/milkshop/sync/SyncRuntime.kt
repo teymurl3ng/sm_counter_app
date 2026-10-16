@@ -67,11 +67,17 @@ class SyncRuntime(
     }
 
     /** Explicit read path only; ordinary drain/pull never sends reminder commands. */
-    internal suspend fun loadFollowUps(localSession: String): FollowUpLoad = SyncOperationGate.exclusive {
+    internal suspend fun loadFollowUps(localSession: String): FollowUpLoad = withFollowUpSession(localSession) { access ->
+        FollowUpDataStore(database).refresh(access.binding,access.call)
+    }
+
+    /** The bound workspace owns no credentials and cannot reuse an earlier local session. */
+    internal suspend fun <T> withFollowUpSession(localSession: String,work: suspend (FollowUpSessionAccess)->T): T = SyncOperationGate.exclusive {
         val binding=followUpBinding(localSession)
         val config=requireNotNull(SyncServerConfigStore.load(context))
         val client=FollowUpClient(http,config,tokenStore)
-        FollowUpDataStore(database).refresh(binding) { name,body ->
+        val call: suspend (String,org.json.JSONObject)->FollowUpRpcResult = { name,body ->
+            check(followUpBinding(localSession)==binding) { "The connected shop changed. Open follow-ups again." }
             var result=client.call(name,body)
             if(result is FollowUpRpcResult.Retry&&result.code=="unauthorized") {
                 result=if(refreshSession(config)) client.call(name,body)
@@ -79,6 +85,13 @@ class SyncRuntime(
             }
             result
         }
+        val security=followUpSecurity ?: (context.applicationContext as com.saaf.milkshop.MilkShopApplication).userSecurity
+        val owner=security.requirePermission(localSession,com.saaf.milkshop.domain.AppPermission.VIEW_FULL_FINANCIAL).role=="owner"
+        val result=work(FollowUpSessionAccess(binding,owner,call))
+        // Definitive server revocation may clear tokens; the unavailable result still needs to reach the screen.
+        security.requirePermission(localSession,com.saaf.milkshop.domain.AppPermission.VIEW_FULL_FINANCIAL)
+        check(SyncServerConfigStore.load(context)==config&&SyncShopBindingStore.load(context)?.let {it.shopId==binding.shop&&it.staffId==binding.staff}==true) { "The connected shop changed. Open follow-ups again." }
+        result
     }
 
     internal suspend fun cachedFollowUps(localSession: String): CachedFollowUp? = SyncOperationGate.exclusive {

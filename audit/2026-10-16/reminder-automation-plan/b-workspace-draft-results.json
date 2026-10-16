@@ -1,0 +1,28 @@
+{
+  "label": "b-workspace-draft",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#failedLoadAndFailedSaveRetainFeedbackAndCanRetry",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#unfinishedSaveBlocksEditsAndSetAsideExplainsServerOutcome"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "failedLoadAndFailedSaveRetainFeedbackAndCanRetry",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "unfinishedSaveBlocksEditsAndSetAsideExplainsServerOutcome",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 2,
+  "expected": 2,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "135c6786f8ac4b4cf852b49635146d47576970efc248acc6e6ba855265e09b39"
+}

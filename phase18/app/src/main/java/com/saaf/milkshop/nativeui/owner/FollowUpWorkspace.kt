@@ -30,21 +30,25 @@ import java.time.LocalTime
 internal data class FollowUpWorkspaceSnapshot(val policy: FollowUpPolicy,val today: LocalDate,val customers: List<FollowUpCustomer>,
     val preferences: Map<String,CustomerFollowUpPreference> = emptyMap(),val acknowledgments: Map<String,FollowUpAcknowledgment> = emptyMap(),
     val freshness: String="Sync needed",val online: Boolean=false,val owner: Boolean=false,val primaryDevice: String="Not selected",
-    val notificationsAllowed: Boolean=false,val shopZone: String="Shop timezone",val hasMessageApp: Boolean=false)
+    val notificationsAllowed: Boolean=false,val shopZone: String="Shop timezone",val hasMessageApp: Boolean=false,
+    val saveToken: String="",val reviewReady: Boolean=true,val unfinished: List<FollowUpUnfinishedSave> = emptyList())
+internal data class FollowUpUnfinishedSave(val uid: String,val kind: String)
+internal data class FollowUpWorkspaceSave(val snapshot: FollowUpWorkspaceSnapshot,val accepted: Boolean)
 internal sealed interface FollowUpCommand {
-    data class Policy(val value: FollowUpPolicy): FollowUpCommand
+    data class Policy(val value: FollowUpPolicy,val makePrimary: Boolean=false,val phonesUpdated: Boolean=false): FollowUpCommand
     data class Preference(val customerUid: String,val value: CustomerFollowUpPreference): FollowUpCommand
     data class Reviewed(val customerUid: String,val expectedCycle: String?,val on: LocalDate): FollowUpCommand
     data class Snooze(val customerUid: String,val until: LocalDate): FollowUpCommand
 }
 internal data class FollowUpWorkspaceAccess(val load: suspend ()->FollowUpWorkspaceSnapshot,
-    val command: suspend (FollowUpCommand)->FollowUpWorkspaceSnapshot)
+    val command: suspend (FollowUpCommand,String)->FollowUpWorkspaceSave,
+    val recover: suspend (String,Boolean)->FollowUpWorkspaceSave = {_,_->error("Unfinished-save review is unavailable.")})
 
-/** Presentation foundation. Only injected QA hosts use this until B supplies durable coordination. */
+/** Bound presentation; ordinary navigation waits for B's shared external-handoff gate. */
 @Composable
 internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,onStatement: (Long)->Unit,onReminder: (Long)->Unit,
     publishGuard: (EntryLeaveGuard?)->Unit={}) {
-    var snapshot by remember {mutableStateOf<FollowUpWorkspaceSnapshot?>(null)}
+    var snapshot by remember(access) {mutableStateOf<FollowUpWorkspaceSnapshot?>(null)}
     var error by remember {mutableStateOf<String?>(null)}
     var notice by remember {mutableStateOf<String?>(null)}
     var busy by remember {mutableStateOf(true)}
@@ -61,7 +65,7 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
     fun leave(action: ()->Unit) {if(!busy) guard.requestLeave(action)}
     fun back()=leave {when(page) {"list"->onBack();"schedule"->page="review";else->page="list"}}
     ActivePaneBackHandler(onBack={back()})
-    LaunchedEffect(retry) {
+    LaunchedEffect(access,retry) {
         busy=true;error=null
         try {snapshot=access.load()} catch(cancelled: CancellationException) {throw cancelled}
         catch(failure: Exception) {error=failure.message ?: "Follow-ups could not refresh. Try again."} finally {busy=false}
@@ -70,12 +74,35 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
         if(busy) return
         busy=true;error=null;notice=null
         scope.launch {
-            try {snapshot=access.command(command);guard.clear();page="list";notice=success}
+            try {
+                val previous=requireNotNull(snapshot)
+                val result=access.command(command,previous.saveToken)
+                // A conflicting server revision must not replace the operator's failed draft.
+                snapshot=if(result.accepted) result.snapshot else previous.copy(unfinished=result.snapshot.unfinished,
+                    online=result.snapshot.online,reviewReady=false,saveToken=result.snapshot.saveToken,
+                    freshness="Shared state may have changed · Check the unfinished save")
+                if(result.accepted) {guard.clear();page="list";notice=success}
+                else error="The save is unfinished. Check its result before making another change."
+            }
             catch(cancelled: CancellationException) {throw cancelled}
             catch(failure: Exception) {error=failure.message ?: "Could not save. Check the connection and try again."}
             finally {busy=false}
         }
     }
+    fun recover(uid: String,setAside: Boolean) {
+        if(busy) return
+        busy=true;error=null;notice=null
+        scope.launch {
+            try {
+                val result=access.recover(uid,setAside);snapshot=result.snapshot
+                if(result.accepted) {guard.clear();page="list";notice=if(setAside) "Local unfinished save set aside. This does not undo a server change." else "Save result checked. Current shared settings are shown."}
+                else error="The save result is still unresolved. Refresh or set aside only this local request."
+            } catch(cancelled: CancellationException) {throw cancelled}
+            catch(failure: Exception) {error=failure.message ?: "Could not check the save. Try again."}
+            finally {busy=false}
+        }
+    }
+    var setAside by remember {mutableStateOf<String?>(null)}
     LaunchedEffect(error) {if(error!=null) scroll.animateScrollTo(0)}
     Column(Modifier.fillMaxSize().imePadding().verticalScroll(scroll).padding(16.dp).testTag("followup-workspace"),
         verticalArrangement=Arrangement.spacedBy(16.dp)) {
@@ -87,20 +114,27 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
         notice?.let {Text(it,modifier=Modifier.testTag("followup-notice").semantics {liveRegion=LiveRegionMode.Polite})}
         val state=snapshot
         if(state!=null) {
+            state.unfinished.forEach {pending->NativeInformationSection {
+                Text("Unfinished follow-up save",style=nativeSectionTextStyle())
+                Text("${pending.kind.lowercase().replaceFirstChar {it.uppercase()}}: the server may already have accepted it. Checking uses the same request.",style=nativeSupportingTextStyle())
+                TextButton(onClick=hapticAction {recover(pending.uid,false)},enabled=!busy && state.online,modifier=Modifier.testTag("followup-check-save")) {Text("Check save result")}
+                TextButton(onClick=hapticAction {setAside=pending.uid},enabled=!busy,modifier=Modifier.testTag("followup-set-aside")) {Text("Set aside local request")}
+            }}
+            val editingBlocked=busy || state.unfinished.isNotEmpty()
             val rows=CustomerFollowUps.ordered(state.customers.mapNotNull {customer->CustomerFollowUps.evaluate(customer,state.policy,
                 state.preferences[customer.uid],state.acknowledgments[customer.uid] ?: FollowUpAcknowledgment(),state.today)})
             when(page) {
-                "settings"->FollowUpPolicyEditor(state,busy,{guard.markDirty()}) {submit(FollowUpCommand.Policy(it),"Follow-up settings saved.")}
+                "settings"->FollowUpPolicyEditor(state,editingBlocked,{guard.markDirty()}) {submit(it,"Follow-up settings saved.")}
                 "schedule"->{
                     val customer=state.customers.find {it.uid==selected}
-                    if(customer!=null) FollowUpScheduleEditor(customer,state,busy,{guard.markDirty()}) {
+                    if(customer!=null) FollowUpScheduleEditor(customer,state,editingBlocked,{guard.markDirty()}) {
                         submit(FollowUpCommand.Preference(customer.uid,it),"Statement schedule saved. Payment terms are unchanged.")
                     } else Text("Customer is no longer available. Return and refresh.")
                 }
                 "review"->{
                     val row=rows.find {it.customer.uid==selected}
                     if(row==null) NativeInformationSection {Text("This customer no longer needs follow-up.");Text("The current balance, schedule or review state changed.")}
-                    else FollowUpReview(row,state,busy || error!=null,
+                    else FollowUpReview(row,state,editingBlocked || error!=null,
                         {onStatement(row.customer.accountId)},{onReminder(row.customer.accountId)},{page="schedule"},
                         {submit(FollowUpCommand.Reviewed(row.customer.uid,row.statementCycle,state.today),"Marked reviewed. This does not confirm sending or payment.")},
                         {date->submit(FollowUpCommand.Snooze(row.customer.uid,date),"Snoozed until $date. Payment terms are unchanged.")})
@@ -137,6 +171,10 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
         } else if(!busy) Text("No current follow-up snapshot. Refresh to continue.")
         OutlinedButton(onClick=hapticAction {leave {retry++}},enabled=!busy,modifier=Modifier.fillMaxWidth().testTag("followup-refresh")) {Text("Refresh follow-ups")}
     }
+    if(setAside!=null) AlertDialog(onDismissRequest={setAside=null},title={Text("Set aside this local request?")},
+        text={Column(Modifier.heightIn(max=360.dp).verticalScroll(rememberScrollState())) {Text("This only removes the unfinished request from this device. A change accepted by the server stays in place. Refresh to see its current state. It does not cancel or undo that change.")}},
+        confirmButton={TextButton(onClick=hapticAction {val uid=requireNotNull(setAside);setAside=null;recover(uid,true)}) {Text("Set aside")}},
+        dismissButton={TextButton(onClick=hapticAction {setAside=null}) {Text("Keep request")}})
     if(guard.discardConfirmationOpen) AlertDialog(onDismissRequest=guard::keepEditing,title={Text("Leave without saving?")},
         text={Text("Your follow-up setting changes will be discarded.")},confirmButton={TextButton(onClick=hapticAction(guard::confirmDiscard)) {Text("Discard changes")}},
         dismissButton={TextButton(onClick=hapticAction(guard::keepEditing)) {Text("Keep editing")}})
@@ -165,17 +203,17 @@ private fun FollowUpReview(row: CustomerFollowUp,state: FollowUpWorkspaceSnapsho
     }
     if(!state.online) Text("Connect before a coordinated message handoff. You can still review the draft and statement.",style=nativeSupportingTextStyle())
     TextButton(onClick=hapticAction(onSchedule),enabled=!busy,modifier=Modifier.testTag("followup-schedule")) {Text("Schedule & pause")}
-    TextButton(onClick=hapticAction(onReviewed),enabled=!busy && state.online,modifier=Modifier.testTag("followup-reviewed")) {Text("Mark reviewed")}
+    TextButton(onClick=hapticAction(onReviewed),enabled=!busy && state.online && state.reviewReady,modifier=Modifier.testTag("followup-reviewed")) {Text("Mark reviewed")}
     Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-        TextButton(onClick=hapticAction {onSnooze(state.today.plusDays(1))},enabled=!busy && state.online) {Text("Tomorrow")}
-        TextButton(onClick=hapticAction {onSnooze(state.today.plusDays(7))},enabled=!busy && state.online) {Text("Next week")}
+        TextButton(onClick=hapticAction {onSnooze(state.today.plusDays(1))},enabled=!busy && state.online && state.reviewReady) {Text("Tomorrow")}
+        TextButton(onClick=hapticAction {onSnooze(state.today.plusDays(7))},enabled=!busy && state.online && state.reviewReady) {Text("Next week")}
     }
-    TextButton(onClick=hapticAction {choose=true},enabled=!busy && state.online) {Text("Choose snooze date")}
+    TextButton(onClick=hapticAction {choose=true},enabled=!busy && state.online && state.reviewReady) {Text("Choose snooze date")}
     if(choose) FollowUpDateDialog(state.today.plusDays(1),state.today.plusDays(1),{choose=false}) {choose=false;onSnooze(it)}
 }
 
 @Composable
-private fun FollowUpPolicyEditor(state: FollowUpWorkspaceSnapshot,busy: Boolean,dirty: ()->Unit,onSave: (FollowUpPolicy)->Unit) {
+private fun FollowUpPolicyEditor(state: FollowUpWorkspaceSnapshot,busy: Boolean,dirty: ()->Unit,onSave: (FollowUpCommand.Policy)->Unit) {
     val current=state.policy
     var enabled by rememberSaveable(current.revision) {mutableStateOf(current.enabled)}
     var repeat by rememberSaveable(current.revision) {mutableStateOf(current.repeatDays.toString())}
@@ -183,13 +221,19 @@ private fun FollowUpPolicyEditor(state: FollowUpWorkspaceSnapshot,busy: Boolean,
     var preferred by rememberSaveable(current.revision) {mutableStateOf(current.preferredTime.toString())}
     var start by rememberSaveable(current.revision) {mutableStateOf(current.quietStart.toString())}
     var end by rememberSaveable(current.revision) {mutableStateOf(current.quietEnd.toString())}
+    var confirm by remember {mutableStateOf<FollowUpCommand.Policy?>(null)}
+    var phonesUpdated by remember {mutableStateOf(false)}
+    var primary by remember {mutableStateOf(false)}
     val canEdit=state.owner && state.online && !busy
     val proposed=runCatching {current.copy(enabled=enabled,repeatDays=repeat.toInt(),statementSchedule=StatementReviewSchedule.Weekly(weekday),
-        preferredTime=LocalTime.parse(preferred),quietStart=LocalTime.parse(start),quietEnd=LocalTime.parse(end))}.getOrNull()
+        preferredTime=LocalTime.parse(preferred),quietStart=LocalTime.parse(start),quietEnd=LocalTime.parse(end))
+        .also {require(!it.isQuiet(it.preferredTime));require(it.preferredTime.second==0&&it.quietStart.second==0&&it.quietEnd.second==0)}}.getOrNull()
     NativeInformationSection {
         Text("Owner attention",style=nativeSectionTextStyle())
         Row(verticalAlignment=Alignment.CenterVertically) {Switch(enabled,onCheckedChange={enabled=it;dirty()},enabled=canEdit,modifier=Modifier.testTag("followup-enabled"));Text("Automatic follow-ups",Modifier.weight(1f))}
         NativeInformationFact("Notification device",state.primaryDevice)
+        TextButton(onClick=hapticAction {phonesUpdated=false;primary=true;confirm=FollowUpCommand.Policy(requireNotNull(proposed),makePrimary=true)},enabled=canEdit && proposed!=null,
+            modifier=Modifier.testTag("followup-primary")) {Text("Use this device for notifications")}
         NativeInformationFact("Timezone",state.shopZone)
         Text("Notifications may run late. Customer records stay inside the app.",style=nativeSupportingTextStyle())
         OutlinedTextField(preferred,{preferred=it;dirty()},label={Text("Around (HH:mm)")},singleLine=true,enabled=canEdit,modifier=Modifier.fillMaxWidth())
@@ -209,7 +253,16 @@ private fun FollowUpPolicyEditor(state: FollowUpWorkspaceSnapshot,busy: Boolean,
     if(proposed==null) Text("Use a 1–30 day interval, valid HH:mm times and different quiet-hour endpoints.",color=MaterialTheme.colorScheme.error)
     if(!state.owner) Text("Only Owner can change the shop policy.")
     else if(!state.online) Text("Connect to save shared settings.")
-    Button(onClick=hapticAction {proposed?.let(onSave)},enabled=canEdit && proposed!=null,modifier=Modifier.fillMaxWidth().testTag("followup-save-policy")) {Text("Save settings")}
+    Button(onClick=hapticAction {proposed?.let {
+        if(it.enabled) {phonesUpdated=false;primary=state.primaryDevice=="Not selected";confirm=FollowUpCommand.Policy(it)} else onSave(FollowUpCommand.Policy(it))
+    }},enabled=canEdit && proposed!=null,modifier=Modifier.fillMaxWidth().testTag("followup-save-policy")) {Text("Save settings")}
+    if(confirm!=null) AlertDialog(onDismissRequest={confirm=null},title={Text("Confirm follow-up settings")},text={Column(Modifier.heightIn(max=360.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+        Text("One device receives owner alerts. In coordinated mode, opening customer messages requires a connection. The app cannot see payments on another offline device.")
+        Row(verticalAlignment=Alignment.CenterVertically) {Checkbox(phonesUpdated,{phonesUpdated=it},modifier=Modifier.testTag("followup-confirm-updated"));Text("All posting devices have the compatible update",Modifier.weight(1f))}
+        Row(verticalAlignment=Alignment.CenterVertically) {Checkbox(primary,{primary=it},modifier=Modifier.testTag("followup-confirm-primary"));Text("Use this device for owner alerts",Modifier.weight(1f))}
+    }},confirmButton={TextButton(onClick=hapticAction {val proposal=requireNotNull(confirm);confirm=null;onSave(proposal.copy(makePrimary=primary,phonesUpdated=phonesUpdated))},
+        enabled=phonesUpdated && (state.primaryDevice!="Not selected" || primary),modifier=Modifier.testTag("followup-confirm-policy")) {Text("Confirm settings")}},
+        dismissButton={TextButton(onClick=hapticAction {confirm=null}) {Text("Keep editing")}})
 }
 
 @Composable

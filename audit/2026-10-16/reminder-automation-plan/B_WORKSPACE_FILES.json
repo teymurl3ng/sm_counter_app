@@ -1,0 +1,93 @@
+{
+  "files": [
+    {
+      "path": "CURRENT_BASELINE.md",
+      "sha256": "ac7d77853f446cd267f235f827fc2e53191b64d346af9e934d3e5f89338c76b1"
+    },
+    {
+      "path": "NEXT_WORK_PLAN_2026-10-15.md",
+      "sha256": "feda227c87bcf66d4043a54ed4768c98373ecfdb6a26da4b52394b5827983dcb"
+    },
+    {
+      "path": "LATER_FEATURE_PLAN_2026-10-15.md",
+      "sha256": "591b37f9daeb5c7e9d210bbf1d436f63c993d96a067292c067493b0a08a2f926"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/sync/SyncRuntime.kt",
+      "sha256": "0153fd8480ea9116d47e9c9f14d9ee15278b60b6a0e70c7ae675416bf0b8c98e"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/sync/FollowUpSessionAccess.kt",
+      "sha256": "08f986ab9d1322633db83ed36c31f33d87d8f68579eed5175d375634d07d417e"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "sha256": "8b4da4381ce753d055b4ab71ce731bc7c4cf12986a3217865686a2436a56925c"
+    },
+    {
+      "path": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspaceBinding.kt",
+      "sha256": "0b86089be1ce1b0d604080e32b21bd262e308f1273f043ba9a5b92a4150b9a84"
+    },
+    {
+      "path": "phase18/app/src/androidTest/java/com/saaf/milkshop/FollowUpWorkspaceUiTest.kt",
+      "sha256": "300862ec4969272577740eb89edd4fa7c6dba97e570d29047b2026bc1047fd89"
+    },
+    {
+      "path": "phase18/app/src/androidTest/java/com/saaf/milkshop/FollowUpWorkspaceBindingTest.kt",
+      "sha256": "acddf408f4a127f5a263505029b931890c51dfeaf0a99b4e70f05e7d7baee994"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/PLAN.md",
+      "sha256": "e9e54783d4a591b9b5758cec6b7d96baa535282c007dd0dce26e54cc3c873952"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/B_RESULT.md",
+      "sha256": "09c20e34f0810cf7775e47cb40b1c2b5658d10a4e26460154d3f5b5d965d8e5f"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/B_WORKSPACE_SCOPE.md",
+      "sha256": "bec458800df8918290b6864d9b127febd0adbba3b7b1f84017e21f6aae29a3be"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/B_WORKSPACE_RESULT.md",
+      "sha256": "156b1817201c79a9fd34a43053d3bfa73f7bef57bce3134e8de556e51616b11a"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/B_WORKSPACE_VERIFICATION.json",
+      "sha256": "25ea91eb9b32093108de8c80bbf9bc12df6800c415affdcfa745697a3804e1ed"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/b-workspace-hook.json",
+      "sha256": "7363f1239ad0809fc3246ea42ed630a565df0cb379fe977818e6e039d1826a65"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/b-workspace-finish-hook.json",
+      "sha256": "7363f1239ad0809fc3246ea42ed630a565df0cb379fe977818e6e039d1826a65"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/b-workspace-first-results.json",
+      "sha256": "7274fa6d5b75b2d13e8016590d4cddd2de0a77777c116b22c6e72b04d03ec324"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/b-workspace-visual-results.json",
+      "sha256": "dd6cb319a2c8382c74ee9609090b87142a9b008727d162e53b812e8abdd50bae"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/b-workspace-selection.json",
+      "sha256": "190d17097db65f571480fc7f2f76d086e802f959e4554b617aece23f9e620f90"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/run-b-workspace.py",
+      "sha256": "cca96175423c955786b979aa2b322f6b32d93f82a5c37c922266eb42c5788b06"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/finish-b-workspace.py",
+      "sha256": "0499bcbd06c25f0e1f7244db2b867255f153debe5babf69d18776f108e83addb"
+    },
+    {
+      "path": "audit/2026-10-16/reminder-automation-plan/b-workspace-draft-results.json",
+      "sha256": "16925d177ae6e1d97be2b03fbd950d5fbefca849001d31e190dc139fcaf86fde"
+    }
+  ],
+  "excludes": "Raw device/console logs, screenshots, APKs and historical untracked artifacts"
+}

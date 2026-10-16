@@ -1,0 +1,184 @@
+{
+  "baseline": "eac65d4",
+  "uniqueAffectedMethods": 18,
+  "latestResults": [
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "abandonedMetadataDoesNotUndoRemoteStateOrHandleExternalRequests",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "policyAndPrimaryRequireExplicitOwnerConfirmation",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "staleViewOrLocalFinancialChangesCannotSubmitReview",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "uncertainSaveRecoversOriginalIdAndNeverDuplicates",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "bindingChangeAndLogoutCannotPublishOrRetarget",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "acceptedLoadUsesActualReaderAndServerSchedule",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "unavailableDataStaysStaleAndCannotSave",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "customerCommandsKeepFrozenRevisionsAndFinancialRecords",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "lightListReviewAndSettingsRetainChromeAndManualFallback",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-visual"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "customerMonthlyAndCustomValidationDoesNotEditPaymentTerms",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-visual"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "primaryTransferRequiresExplicitCompatibleDeviceConfirmation",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-visual"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "offlineLeadershipKeepsReviewAvailableWithoutSavingSharedState",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-visual"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "failedLoadAndFailedSaveRetainFeedbackAndCanRetry",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-draft"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "unfinishedSaveBlocksEditsAndSetAsideExplainsServerOutcome",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-draft"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "invalidPolicyCannotSaveAndDirtyExitCanBeKeptOrDiscarded",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-visual"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "darkLargeTextListReviewAndSettingsRetainChromeAndManualFallback",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-visual"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "runtimeRefreshesOnceAndChecksLocalRole",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-first"
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpDataTest",
+      "test": "runtimeUnknownRefreshPreservesTokens",
+      "code": 0,
+      "stack": null,
+      "run": "b-workspace-first"
+    }
+  ],
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "ordinaryAppModified": false,
+  "cloudModified": false,
+  "transport": "Injected around actual client, Room reader, session wrapper and request journal",
+  "ordinaryRouteEnabled": false,
+  "physicalConcurrencyEstablished": false,
+  "localSyntheticCaptures": [
+    {
+      "file": "list-1.0-false.png",
+      "sha256": "6339f3ee44b916ac8c041328dc2177d63b86a8ad593bcb0e54879beee2e277fe"
+    },
+    {
+      "file": "list-2.0-true.png",
+      "sha256": "77e0a0920ba97e0721b371b7fcf6aa3b3995dbeb7e91426b27e5606d7308b44a"
+    },
+    {
+      "file": "monthly-preference.png",
+      "sha256": "448ef47d46d04474f03f248234f867224e768752acaba33ffaca18e93291c207"
+    },
+    {
+      "file": "policy-save.png",
+      "sha256": "a0f549691abab828c0fe2c19759fca432eac9aa26db80d0696fd295929d37040"
+    },
+    {
+      "file": "primary-confirmation-dark-2x.png",
+      "sha256": "8ff2c0ad2b96a8026c6140f4de119485eb58f47c4a963d121224ceed68c53447"
+    },
+    {
+      "file": "review-1.0-false.png",
+      "sha256": "a2e02bc68ea5a2bb957edb61e70bf3eaa50f2583f0e9fdb343eebca00cd51745"
+    },
+    {
+      "file": "review-2.0-true.png",
+      "sha256": "1b13cc74ceaf8886a56e25a3f6873f1dbcae2c087edb0b9c9a2c6ce5300fc2cf"
+    },
+    {
+      "file": "settings-1.0-false.png",
+      "sha256": "c897441a930b69d9f0f05ac9a3dca82b65dfddb149f53b2f4bd363ca4f568dd1"
+    },
+    {
+      "file": "settings-2.0-true.png",
+      "sha256": "8049edec49065f643393e778c2be7aebcc56cad784b590cc3136e469169af710"
+    }
+  ],
+  "visualReview": [
+    "primary-confirmation-dark-2x.png",
+    "list-1.0-false.png",
+    "settings-2.0-true.png"
+  ],
+  "initialVisualBlocker": "Confirmed sleeping keyguard; owner privately unlocked before eight passing UI reruns",
+  "finalDraftRerun": "2/2; conflicting shared revision preserves repeat10 instead of replacing it with server repeat25"
+}

@@ -1,0 +1,37 @@
+# B shared message-gate result
+
+16 October 2026. Baseline e4453c9. Completes the [message adapter and reminder-screen hook](B_HANDOFF_SCOPE.md) inside existing B. Ordinary mode/factory/navigation wiring remains the next B gate. No ordinary install, cloud/schema mutation, live-shop activation, provider integration or real customer contact.
+
+## Behavior
+
+The current-session adapter synchronizes outside the existing process gate, then loads a fresh authenticated shared snapshot and canonical current customer reminder. Local leadership/session access, accepted financial/Credit heads and pending/held/parked work are checked. An inactive or settled customer, paused/snoozed preference, disabled policy, changed facts, pending request or live competing preparation blocks a new message.
+
+ACQUIRE commits the original request before transport. The adapter refreshes and checks the exact owned, unexpired preparation plus unchanged financial/date/policy/customer basis before START. Only a live first-acceptance START grant permits the one external launch callback inside that operation. It rechecks current session/binding, cancellation and local facts before consuming that callback. No reusable launch permit escapes. Both SMS and WhatsApp use this hook when it is supplied; a denial cannot fall through to the legacy launcher.
+
+An unknown, restored or replayed request cannot open an app. Explicit recovery uses the original UUID/body/binding. Owned preparation cancellation is separate from resolving HANDOFF_STARTED, which has no automatic expiry. Exact-attempt resolution requires a deliberate outcome and acknowledgment; a foreign attempt requires Owner locally and actual Owner on the server. These are operator reports, never proof of sending, delivery or payment. Cancellation or an unavailable messaging app leaves durable uncertainty; switching channels alone cannot bypass review.
+
+A refused unfinished request can be explicitly set aside locally after a fresh shared read and confirmation. This removes no server claim, grants no launch and does not undo server acceptance. Exact current binding/customer/request checks prevent retargeting a restored request. The next open always rereads shared state and must acquire a fresh claim. Without this bounded escape, an expired/refused START could leave an unrecoverable local request blocking the workflow indefinitely.
+
+The reminder screen keeps draft review available when the shared check fails, while disabling message opening. It reuses current cards, typography, progress slot, scrolling and confirmation patterns. PDF/image sharing remains a separate manual chooser with no fixed recipient/channel; it is not misrecorded as coordinated WhatsApp or sending. The unhooked standalone phase5 flow remains unchanged until ordinary mode integration selects the correct access explicitly. Technical-wording cleanup stays deferred.
+
+## Focused verification
+
+Seventeen unique affected methods have latest passing results: eight actual Room/runtime/security/journal adapter methods and nine reminder UI methods (the six existing ones plus three shared-hook methods). [Combined evidence](B_HANDOFF_VERIFICATION.json). Main/test builds succeed; later changes corrected only a test fixture. The corrected and visual runs use production APK SHA256 `da6e9407c157adbe04b376089f9beb659637a31854588b7d8d2ed99f5e7af922`.
+
+The first Android run finished17 methods with16 passed and1 failed. Its host output writer then hit a PermissionError because PowerShell held the same console path open. Preserved Android TestRunner per-method start/finish/failure records and its final17/1/0 summary establish the [first result](b-handoff-first-results.json); it is explicitly log-derived, not fabricated instrumentation stdout. The driver now uses a separate raw instrumentation filename.
+
+The failed changed-records fixture expected ACQUIRE while its earlier profile edit was still queued for sync. The gate correctly refused earlier. Clearing only that synthetic queue between the two independent scenarios lets it test mutation after preparation; the [one-method retry passes](b-handoff-corrected-results.json). The [three new UI methods pass again](b-handoff-visual-results.json) to retain their visual captures after the disposable package reset. No whole suite was run.
+
+Viewed the light opened/fallback states and dark200% review dialog. Content has readable card insets; the dialog body scrolls and confirmation requires both outcome and acknowledgment. The already-deferred large-text footer abbreviations remain outside this scope. Existing normal/dark chrome, private phone override/keyboard/discard, changed balance/phone, settled/advance/expired access and deliberate standalone fallback checks pass. Financial rows/events remain unchanged by adapter operations; shared requests contain neither phone nor message body. Only `com.saaf.milkshop.qa.tests` was installed/reset. Raw logs, images and APKs remain local; structured results/source and capture hashes are retained.
+
+## Research and independent judgment
+
+Current Android [common-intent guidance](https://developer.android.com/guide/components/intents-common#Messaging) supports SMS composition through ACTION_SENDTO/smsto and handling unavailable apps. [Lifecycle coroutine guidance](https://developer.android.com/topic/libraries/architecture/coroutines#lifecycle-aware) supports cancellation when the owning screen leaves. A successful activity launch cannot establish sending. Reused the accepted native UI material and inspected the actual v1 SQL, client replay checks, durable journal and runtime authorization rather than treating prior reports or passing fixtures as proof.
+
+The finish hook is a reminder, not independent approval. A lease is sufficient only before a composer might open; automatic release after START could cause duplicate contact. Consuming the first grant inside one validated operation narrows the stale-authorization window without claiming atomicity between a database and an external app. Removing local bookkeeping is safe only because it cannot grant a launch and every new open must pass fresh shared checks.
+
+The adapter deliberately allows review with a present but disabled policy. This is defensive separation of review from new-message eligibility: the normal SQL policy-save path already refuses disabling while a started claim exists. The disabled-policy synthetic fixture is not evidence that a normal operator can perform that forbidden transition. Likewise, synthetic transport tests do not prove hosted simultaneous acquisition, actual external-app behavior, ordinary mode selection or routed notification taps. No guarantee covers contact outside this workflow or another phone's unuploaded payment.
+
+## Remaining in the same plan
+
+B ordinary integration still needs explicit standalone/coordinated mode selection and all reminder factories, normal Customers/workspace/statement return paths, shared activity/restore presentation, contextual notification permission, authenticated notification destination and scheduler/count lifecycle/invalidation wiring. Then run the retained affected DEV/two-phone acceptance, obtain exact PROD approval and deliver through phase1. C remains the automatic-SMS route/cost/activation decision. No extra phase is added; phase1 human/private acceptance and the deferred wording/identity/B8 boundaries remain separate.

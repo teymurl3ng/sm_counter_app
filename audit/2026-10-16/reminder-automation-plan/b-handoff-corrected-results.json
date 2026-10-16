@@ -1,0 +1,21 @@
+{
+  "label": "b-handoff-corrected",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpHandoffTest#changedFactsStaleHeadsOrPauseNeverLaunch"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpHandoffTest",
+      "test": "changedFactsStaleHeadsOrPauseNeverLaunch",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 1,
+  "expected": 1,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "da6e9407c157adbe04b376089f9beb659637a31854588b7d8d2ed99f5e7af922"
+}

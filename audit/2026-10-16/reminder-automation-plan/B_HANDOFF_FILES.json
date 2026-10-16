@@ -1,0 +1,10 @@
+{
+  "sha256": {
+    "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt": "ac12383ba83f8a92db0ac80d744deb803d9a699d972808a273dbf69bb43c4665",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt": "ef23ef6e69f0df9a023a585ede0b7ec480a6cb081e534b4718cf0cd5ea300889",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/FollowUpSessionAccess.kt": "96068e470aef8b9a14c6550af5d7d064760dbb7b9fa35a58cea9508a528c62ac",
+    "phase18/app/src/main/java/com/saaf/milkshop/sync/SyncRuntime.kt": "9ce83a0c8fd0fbc00ad86357d08c9fbf02f30f363bd6827a2973eae905db98f3",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/FollowUpHandoffTest.kt": "27004bef676817fe241fca4298aed586354818aabd3fa4f51ca0c7be5fb784e2",
+    "phase18/app/src/androidTest/java/com/saaf/milkshop/CustomerReminderUiTest.kt": "2128a5504c92e02085a97d653b487f155a45bfc753b960fb1d7d985e55e48fd5"
+  }
+}

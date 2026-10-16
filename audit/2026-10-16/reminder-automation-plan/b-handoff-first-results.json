@@ -1,0 +1,81 @@
+{
+  "label": "b-handoff-first",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "evidence": "Android TestRunner per-method started/finished/failure log and final run summary; host stdout writer failed on a locked path",
+  "rawLogSha256": "7e38146a24294979c576a3a4a78ef98588f373dcf786f6a6cf443034a6276f7a",
+  "expected": 17,
+  "passed": 16,
+  "tests": [
+    {
+      "method": "com.saaf.milkshop.FollowUpHandoffTest#busyForeignClaimNeverLaunch",
+      "outcome": "passed"
+    },
+    {
+      "method": "com.saaf.milkshop.FollowUpHandoffTest#changedFactsStaleHeadsOrPauseNeverLaunch",
+      "outcome": "failed"
+    },
+    {
+      "method": "com.saaf.milkshop.FollowUpHandoffTest#cancellationOrFailedHandlerLeavesStartedUncertainty",
+      "outcome": "passed"
+    },
+    {
+      "method": "com.saaf.milkshop.FollowUpHandoffTest#explicitResolutionPinsAttemptRoleAndRevisions",
+      "outcome": "passed"
+    },
+    {
+      "method": "com.saaf.milkshop.FollowUpHandoffTest#currentStartSingleLaunchNoFinancialWrites",
+      "outcome": "passed"
+    },
+    {
+      "method": "com.saaf.milkshop.FollowUpHandoffTest#restoredRequestsStayOriginalAndRecoveryNeverLaunches",
+      "outcome": "passed"
+    },
+    {
+      "method": "com.saaf.milkshop.FollowUpHandoffTest#lostAcquireOrStartNeverReplays",
+      "outcome": "passed"
+    },
+    {
+      "method": "com.saaf.milkshop.FollowUpHandoffTest#expiredSessionAndBindingChangeCannotLaunch",
+      "outcome": "passed"
+    },
+    {
+      "method": "com.saaf.milkshop.CustomerReminderUiTest#sharedUncertaintyRequiresExactConfirmedResolution",
+      "outcome": "passed"
+    },
+    {
+      "method": "com.saaf.milkshop.CustomerReminderUiTest#lightReviewHandoffHasStableChromeAndTruthfulHistory",
+      "outcome": "passed"
+    },
+    {
+      "method": "com.saaf.milkshop.CustomerReminderUiTest#missingPhoneOverrideKeyboardAndDiscardStayInsideTheDraft",
+      "outcome": "passed"
+    },
+    {
+      "method": "com.saaf.milkshop.CustomerReminderUiTest#settledAdvanceAndExpiredAccessNeverOpenComposer",
+      "outcome": "passed"
+    },
+    {
+      "method": "com.saaf.milkshop.CustomerReminderUiTest#sharedMissingHandlerNeverSilentlySwitchesChannel",
+      "outcome": "passed"
+    },
+    {
+      "method": "com.saaf.milkshop.CustomerReminderUiTest#sharedGateOwnsLaunchForBothChannels",
+      "outcome": "passed"
+    },
+    {
+      "method": "com.saaf.milkshop.CustomerReminderUiTest#darkLargeTextReviewHandoffHasStableChromeAndTruthfulHistory",
+      "outcome": "passed"
+    },
+    {
+      "method": "com.saaf.milkshop.CustomerReminderUiTest#changedBalanceAndPhoneRequireFreshReviewBeforeAnyLaunch",
+      "outcome": "passed"
+    },
+    {
+      "method": "com.saaf.milkshop.CustomerReminderUiTest#unavailableWhatsAppAllowsDeliberateSmsAndGuardsBusyTaps",
+      "outcome": "passed"
+    }
+  ],
+  "hostFailure": "PermissionError writing raw output to the same file as PowerShell redirection; corrected driver uses a separate instrumentation filename",
+  "realShopPackageModified": false
+}

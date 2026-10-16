@@ -1,0 +1,35 @@
+{
+  "label": "b-handoff-visual",
+  "device": "A06",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.CustomerReminderUiTest#sharedGateOwnsLaunchForBothChannels",
+    "com.saaf.milkshop.CustomerReminderUiTest#sharedUncertaintyRequiresExactConfirmedResolution",
+    "com.saaf.milkshop.CustomerReminderUiTest#sharedMissingHandlerNeverSilentlySwitchesChannel"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.CustomerReminderUiTest",
+      "test": "sharedUncertaintyRequiresExactConfirmedResolution",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerReminderUiTest",
+      "test": "sharedMissingHandlerNeverSilentlySwitchesChannel",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerReminderUiTest",
+      "test": "sharedGateOwnsLaunchForBothChannels",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 3,
+  "expected": 3,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "da6e9407c157adbe04b376089f9beb659637a31854588b7d8d2ed99f5e7af922"
+}

@@ -2,6 +2,7 @@ package com.saaf.milkshop
 
 import android.content.ActivityNotFoundException
 import androidx.activity.ComponentActivity
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -13,6 +14,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.Density
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowCompat
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import com.saaf.milkshop.application.owner.*
@@ -35,8 +37,17 @@ class CustomerReminderUiTest {
     private val fixture=CustomerReminder(7,"synthetic-customer","Northern community cafe & delivery counter امینہ","Configured shop","+923001234567",15000,"2026-10-16",10000)
     private val events=CopyOnWriteArrayList<CustomerCommunicationAction>()
     private val launches=CopyOnWriteArrayList<Triple<ReminderChannel,String,String>>()
+    @Before fun setup() {rule.activityRule.scenario.onActivity {
+        it.enableEdgeToEdge()
+        it.window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        it.window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }}
     private fun show(scale: Float=1f,dark: Boolean=false,load: suspend (Long)->CustomerReminder={fixture},
+        shared: CustomerSharedHandoffAccess?=null,
         launch: (ReminderChannel,String,String)->Unit={c,p,m->launches.add(Triple(c,p,m))}) {
+        rule.activityRule.scenario.onActivity {WindowCompat.getInsetsController(it.window,it.window.decorView).apply {
+            isAppearanceLightStatusBars=false;isAppearanceLightNavigationBars=!dark
+        }}
         rule.setContent {
             val density=LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(density.density,scale)) {SaafTheme(darkTheme=dark) {
@@ -48,7 +59,7 @@ class CustomerReminderUiTest {
                         CashierScreenHeader("Customers","Configured shop","Owner","2026-10-16",true)
                         Box(Modifier.weight(1f)) {
                             if(visible) saved.SaveableStateProvider("reminder") {CustomerReminderScreen(7,
-                                CustomerCommunicationAccess(reminder=load,record={_,a->events.add(a)}),{visible=false},{visible=false},{guard=it},launch)}
+                                CustomerCommunicationAccess(reminder=load,record={_,a->events.add(a)},sharedHandoff=shared),{visible=false},{visible=false},{guard=it},launch)}
                             else TextButton(onClick={visible=true}) {Text("Reopen reminder")}
                         }
                     }
@@ -142,5 +153,80 @@ class CustomerReminderUiTest {
         rule.onNodeWithText("Refresh current balance").performScrollTo().performClick()
         rule.waitUntil(10000) {rule.onAllNodesWithText("Sign in again.").fetchSemanticsNodes().isNotEmpty()}
         rule.onNodeWithTag("reminder-open").assertIsNotEnabled();assertTrue(launches.isEmpty())
+    }
+    private fun review(outcome: String) {
+        rule.onNodeWithTag("reminder-review-handoff").performScrollTo().performClick()
+        rule.onNodeWithTag("reminder-resolution-confirm").assertIsNotEnabled()
+        rule.onNodeWithTag("reminder-resolution-$outcome").performScrollTo().performClick()
+        rule.onNodeWithTag("reminder-resolution-confirm").assertIsNotEnabled()
+        rule.onNodeWithTag("reminder-resolution-ack").performScrollTo().performClick()
+        rule.onNodeWithTag("reminder-resolution-confirm").performClick()
+        rule.waitForIdle()
+    }
+    @Test fun sharedGateOwnsLaunchForBothChannels() {
+        var state=CustomerSharedHandoffState()
+        val channels=CopyOnWriteArrayList<String>()
+        val shared=CustomerSharedHandoffAccess(load={state},open={id,facts,phone,channel,launch->
+            assertEquals(7L,id);assertEquals(fixture,facts);assertEquals(fixture.phone,phone)
+            channels+=channel;launch();state=CustomerSharedHandoffState("attempt-$channel","HANDOFF_STARTED",canResolve=true,blockedReason="Review this attempt");state
+        },recover={_,_->error("Unexpected recovery")},release={_,_->error("Unexpected release")},resolve={id,attempt,outcome,ack->
+            assertEquals(7L,id);assertEquals(state.attemptUid,attempt);assertEquals("RETRY_UNCERTAIN",outcome);assertTrue(ack)
+            state=CustomerSharedHandoffState();state
+        })
+        show(shared=shared)
+        confirm();open();rule.waitUntil(10000) {launches.size==1}
+        rule.onNodeWithTag("reminder-open").assertIsNotEnabled()
+        review("RETRY_UNCERTAIN")
+        rule.onNodeWithText("SMS",useUnmergedTree=true).performScrollTo().performClick()
+        confirm();open();rule.waitUntil(10000) {launches.size==2}
+        assertEquals(listOf("WhatsApp","SMS"),channels.toList())
+        assertEquals(listOf(ReminderChannel.WhatsApp,ReminderChannel.SMS),launches.map {it.first})
+        rule.onNodeWithTag("reminder-open").assertIsNotEnabled();capture("shared-opened-light")
+    }
+    @Test fun sharedUncertaintyRequiresExactConfirmedResolution() {
+        val attempt="pinned-attempt";val calls=CopyOnWriteArrayList<String>()
+        var state=CustomerSharedHandoffState(attempt,"HANDOFF_STARTED",canResolve=true,
+            pending=listOf(CustomerSharedRequest("original-request","START")),blockedReason="Check unfinished request")
+        val shared=CustomerSharedHandoffAccess(load={state},open={_,_,_,_,_->error("Recovery must never open")},recover={id,request->
+            assertEquals(7L,id);assertEquals("original-request",request);calls+="recover"
+            state
+        },release={_,_->error("Unexpected release")},resolve={id,exact,outcome,ack->
+            assertEquals(7L,id);assertEquals(attempt,exact);assertEquals("REVIEWED",outcome);assertTrue(ack);calls+="resolve"
+            state=CustomerSharedHandoffState();state
+        },setAside={id,request,ack->
+            assertEquals(7L,id);assertEquals("original-request",request);assertTrue(ack);calls+="set-aside"
+            state=state.copy(pending=emptyList(),blockedReason="Review this attempt");state
+        })
+        show(scale=2f,dark=true,shared=shared)
+        rule.onNodeWithTag("reminder-review-handoff").performScrollTo().assertIsNotEnabled()
+        rule.onNodeWithTag("reminder-check-request").performScrollTo().performClick()
+        rule.waitUntil(10000) {calls.size==1};rule.waitForIdle()
+        rule.onNodeWithTag("reminder-set-aside").performScrollTo().performClick()
+        rule.onNodeWithText("Keep request").performClick();assertEquals(listOf("recover"),calls.toList())
+        rule.onNodeWithTag("reminder-set-aside").performScrollTo().performClick()
+        rule.onNodeWithTag("reminder-set-aside-confirm").performClick()
+        rule.waitUntil(10000) {calls.size==2};rule.waitForIdle()
+        rule.onNodeWithTag("reminder-review-handoff").performScrollTo().performClick()
+        rule.onNodeWithTag("reminder-resolution-confirm").assertIsNotEnabled()
+        rule.onNodeWithTag("reminder-resolution-ack").performScrollTo();capture("shared-review-dark-large")
+        rule.onNodeWithText("Keep unresolved").performClick();assertEquals(listOf("recover","set-aside"),calls.toList())
+        review("REVIEWED");rule.waitUntil(10000) {calls.size==3}
+        assertTrue(launches.isEmpty());assertTrue(events.isEmpty())
+        rule.onNodeWithTag("reminder-open").performScrollTo().assertIsNotEnabled()
+    }
+    @Test fun sharedMissingHandlerNeverSilentlySwitchesChannel() {
+        var state=CustomerSharedHandoffState();val calls=AtomicInteger()
+        val shared=CustomerSharedHandoffAccess(load={state},open={_,_,_,channel,launch->
+            assertEquals("WhatsApp",channel);calls.incrementAndGet()
+            state=CustomerSharedHandoffState("failed-attempt","HANDOFF_STARTED",canResolve=true,blockedReason="Review this attempt")
+            launch();state
+        },recover={_,_->error("Unexpected recovery")},release={_,_->error("Unexpected release")},resolve={_,_,_,_->error("Must require an explicit review")})
+        show(shared=shared,launch={_,_,_->throw ActivityNotFoundException("Synthetic missing handler")})
+        confirm();open();rule.waitUntil(10000) {events.any {it.event==CommunicationEvent.HANDOFF_FAILED}}
+        rule.onNodeWithTag("reminder-notice").performScrollTo().assertTextEquals("No composer opened. Review this handoff before trying another channel. Keep the draft or share the statement manually.")
+        rule.onNodeWithText("SMS",useUnmergedTree=true).performScrollTo().performClick()
+        rule.onNodeWithTag("reminder-open").performScrollTo().assertIsNotEnabled()
+        rule.onNodeWithTag("reminder-review-handoff").performScrollTo().assertIsEnabled()
+        assertEquals(1,calls.get());assertTrue(launches.isEmpty());capture("shared-missing-handler-light")
     }
 }

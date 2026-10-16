@@ -1,0 +1,23 @@
+{
+  "FollowUpHandoffTest": [
+    "currentStartSingleLaunchNoFinancialWrites",
+    "changedFactsStaleHeadsOrPauseNeverLaunch",
+    "busyForeignClaimNeverLaunch",
+    "lostAcquireOrStartNeverReplays",
+    "restoredRequestsStayOriginalAndRecoveryNeverLaunches",
+    "cancellationOrFailedHandlerLeavesStartedUncertainty",
+    "explicitResolutionPinsAttemptRoleAndRevisions",
+    "expiredSessionAndBindingChangeCannotLaunch"
+  ],
+  "CustomerReminderUiTest": [
+    "lightReviewHandoffHasStableChromeAndTruthfulHistory",
+    "darkLargeTextReviewHandoffHasStableChromeAndTruthfulHistory",
+    "changedBalanceAndPhoneRequireFreshReviewBeforeAnyLaunch",
+    "missingPhoneOverrideKeyboardAndDiscardStayInsideTheDraft",
+    "unavailableWhatsAppAllowsDeliberateSmsAndGuardsBusyTaps",
+    "settledAdvanceAndExpiredAccessNeverOpenComposer",
+    "sharedGateOwnsLaunchForBothChannels",
+    "sharedUncertaintyRequiresExactConfirmedResolution",
+    "sharedMissingHandlerNeverSilentlySwitchesChannel"
+  ]
+}

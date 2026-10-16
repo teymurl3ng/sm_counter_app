@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-16",
+  "baseline": "e4453c9",
+  "uniqueMethods": 17,
+  "latestPassed": 17,
+  "latest": {
+    "com.saaf.milkshop.FollowUpHandoffTest#busyForeignClaimNeverLaunch": {
+      "outcome": "passed",
+      "evidence": "b-handoff-first-results.json"
+    },
+    "com.saaf.milkshop.FollowUpHandoffTest#changedFactsStaleHeadsOrPauseNeverLaunch": {
+      "outcome": "passed",
+      "evidence": "b-handoff-corrected-results.json"
+    },
+    "com.saaf.milkshop.FollowUpHandoffTest#cancellationOrFailedHandlerLeavesStartedUncertainty": {
+      "outcome": "passed",
+      "evidence": "b-handoff-first-results.json"
+    },
+    "com.saaf.milkshop.FollowUpHandoffTest#explicitResolutionPinsAttemptRoleAndRevisions": {
+      "outcome": "passed",
+      "evidence": "b-handoff-first-results.json"
+    },
+    "com.saaf.milkshop.FollowUpHandoffTest#currentStartSingleLaunchNoFinancialWrites": {
+      "outcome": "passed",
+      "evidence": "b-handoff-first-results.json"
+    },
+    "com.saaf.milkshop.FollowUpHandoffTest#restoredRequestsStayOriginalAndRecoveryNeverLaunches": {
+      "outcome": "passed",
+      "evidence": "b-handoff-first-results.json"
+    },
+    "com.saaf.milkshop.FollowUpHandoffTest#lostAcquireOrStartNeverReplays": {
+      "outcome": "passed",
+      "evidence": "b-handoff-first-results.json"
+    },
+    "com.saaf.milkshop.FollowUpHandoffTest#expiredSessionAndBindingChangeCannotLaunch": {
+      "outcome": "passed",
+      "evidence": "b-handoff-first-results.json"
+    },
+    "com.saaf.milkshop.CustomerReminderUiTest#sharedUncertaintyRequiresExactConfirmedResolution": {
+      "outcome": "passed",
+      "evidence": "b-handoff-visual-results.json"
+    },
+    "com.saaf.milkshop.CustomerReminderUiTest#lightReviewHandoffHasStableChromeAndTruthfulHistory": {
+      "outcome": "passed",
+      "evidence": "b-handoff-first-results.json"
+    },
+    "com.saaf.milkshop.CustomerReminderUiTest#missingPhoneOverrideKeyboardAndDiscardStayInsideTheDraft": {
+      "outcome": "passed",
+      "evidence": "b-handoff-first-results.json"
+    },
+    "com.saaf.milkshop.CustomerReminderUiTest#settledAdvanceAndExpiredAccessNeverOpenComposer": {
+      "outcome": "passed",
+      "evidence": "b-handoff-first-results.json"
+    },
+    "com.saaf.milkshop.CustomerReminderUiTest#sharedMissingHandlerNeverSilentlySwitchesChannel": {
+      "outcome": "passed",
+      "evidence": "b-handoff-visual-results.json"
+    },
+    "com.saaf.milkshop.CustomerReminderUiTest#sharedGateOwnsLaunchForBothChannels": {
+      "outcome": "passed",
+      "evidence": "b-handoff-visual-results.json"
+    },
+    "com.saaf.milkshop.CustomerReminderUiTest#darkLargeTextReviewHandoffHasStableChromeAndTruthfulHistory": {
+      "outcome": "passed",
+      "evidence": "b-handoff-first-results.json"
+    },
+    "com.saaf.milkshop.CustomerReminderUiTest#changedBalanceAndPhoneRequireFreshReviewBeforeAnyLaunch": {
+      "outcome": "passed",
+      "evidence": "b-handoff-first-results.json"
+    },
+    "com.saaf.milkshop.CustomerReminderUiTest#unavailableWhatsAppAllowsDeliberateSmsAndGuardsBusyTaps": {
+      "outcome": "passed",
+      "evidence": "b-handoff-first-results.json"
+    }
+  },
+  "appApkSha256": "da6e9407c157adbe04b376089f9beb659637a31854588b7d8d2ed99f5e7af922",
+  "firstRunResultSource": "Android TestRunner per-method started/finished/failure log and final run summary; host stdout writer failed on a locked path",
+  "builds": [
+    "b-handoff-test-build-console.txt",
+    "b-handoff-fixture-build-console.txt"
+  ],
+  "screenshots": {
+    "shared-missing-handler-light.png": "ea1e52acb4e1e7f3ef2933c2fe79991c23cb886d6204e0615534995861e33d50",
+    "shared-opened-light.png": "298078521dfa0c49d8494d432da8600b386771641e8348cf6d4027c55bdfc201",
+    "shared-review-dark-large.png": "288e877bb96e735bb78ecd1857ac4f1dce146cfcdacc9704abf4991e5bfea42d"
+  },
+  "scope": {
+    "syntheticTransport": true,
+    "realRoomRuntimeSecurity": true,
+    "ordinaryAppTouched": false,
+    "cloudChanged": false,
+    "realCustomerContact": false,
+    "physicalTwoPhoneConcurrencyProven": false,
+    "ordinaryActivation": false
+  }
+}

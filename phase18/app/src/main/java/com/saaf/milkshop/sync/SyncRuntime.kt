@@ -87,7 +87,9 @@ class SyncRuntime(
         }
         val security=followUpSecurity ?: (context.applicationContext as com.saaf.milkshop.MilkShopApplication).userSecurity
         val owner=security.requirePermission(localSession,com.saaf.milkshop.domain.AppPermission.VIEW_FULL_FINANCIAL).role=="owner"
-        val result=work(FollowUpSessionAccess(binding,owner,call))
+        val result=work(FollowUpSessionAccess(binding,owner,call,validate={
+            check(followUpBinding(localSession)==binding) {"The connected shop changed. Open follow-ups again."}
+        }))
         // Definitive server revocation may clear tokens; the unavailable result still needs to reach the screen.
         security.requirePermission(localSession,com.saaf.milkshop.domain.AppPermission.VIEW_FULL_FINANCIAL)
         check(SyncServerConfigStore.load(context)==config&&SyncShopBindingStore.load(context)?.let {it.shopId==binding.shop&&it.staffId==binding.staff}==true) { "The connected shop changed. Open follow-ups again." }

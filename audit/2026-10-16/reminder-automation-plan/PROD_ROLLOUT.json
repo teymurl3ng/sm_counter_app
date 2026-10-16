@@ -1,0 +1,1352 @@
+{
+  "date": "2026-10-17",
+  "project": "tlsuxbghuhlqntkgtrxt",
+  "approvedPackageCommit": "7129418",
+  "state": "APPLIED_VERIFIED",
+  "before": {
+    "counts": {
+      "shops": 2,
+      "staff": 8,
+      "auth_users": 3,
+      "businesses": 1,
+      "sync_records": 36,
+      "credit_contracts": 0
+    },
+    "columns": [
+      {
+        "type": "uuid",
+        "table": "contracts",
+        "column": "shop_id",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "contracts",
+        "column": "activated_at",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "contracts",
+        "column": "activated_by",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "bigint",
+        "table": "records",
+        "column": "server_seq",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "records",
+        "column": "shop_id",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "records",
+        "column": "kind",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "records",
+        "column": "uid",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "jsonb",
+        "table": "records",
+        "column": "payload",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "records",
+        "column": "accepted_by",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "records",
+        "column": "accepted_at",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "shops",
+        "column": "id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "shops",
+        "column": "business_id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "shops",
+        "column": "name",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "boolean",
+        "table": "shops",
+        "column": "active",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "shops",
+        "column": "created_at",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "shops",
+        "column": "shop_timezone",
+        "schema": "public",
+        "nullable": "YES"
+      },
+      {
+        "type": "uuid",
+        "table": "staff",
+        "column": "id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "staff",
+        "column": "auth_user_id",
+        "schema": "public",
+        "nullable": "YES"
+      },
+      {
+        "type": "uuid",
+        "table": "staff",
+        "column": "business_id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "staff",
+        "column": "username",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "staff",
+        "column": "display_name",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "staff",
+        "column": "role",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "boolean",
+        "table": "staff",
+        "column": "active",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "staff",
+        "column": "terminated_at",
+        "schema": "public",
+        "nullable": "YES"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "staff",
+        "column": "created_at",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "staff",
+        "column": "updated_at",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "bigint",
+        "table": "sync_records",
+        "column": "server_seq",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "sync_records",
+        "column": "business_id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "sync_records",
+        "column": "shop_id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "sync_records",
+        "column": "table_name",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "sync_records",
+        "column": "row_uid",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "jsonb",
+        "table": "sync_records",
+        "column": "payload",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "sync_records",
+        "column": "origin_device",
+        "schema": "public",
+        "nullable": "YES"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "sync_records",
+        "column": "received_at",
+        "schema": "public",
+        "nullable": "NO"
+      }
+    ],
+    "functions": [
+      {
+        "name": "sync_push",
+        "definition": "CREATE OR REPLACE FUNCTION public.sync_push(envelopes jsonb, device_id text DEFAULT NULL::text, shop_id uuid DEFAULT NULL::uuid, pull_cursor bigint DEFAULT NULL::bigint)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_staff       record;\n  v_shop        uuid;\n  v_env         jsonb;\n  v_table       text;\n  v_uid         text;\n  v_payload     jsonb;\n  v_parked_seq  bigint;\n  v_existing    public.sync_records%rowtype;\n  v_applied     int := 0;\n  v_conflicts   int := 0;\nbegin\n  select s.id, s.business_id, s.role, s.username into v_staff\n    from public.staff s\n   where s.auth_user_id = auth.uid() and s.active and s.terminated_at is null;\n  if not found then\n    return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n      'code', 'not_authorized', 'message', 'No active staff profile'));\n  end if;\n\n  -- erratum 1: nullif(shop_id,'') casts '' to the uuid param at plan time (22P02)\n  v_shop := shop_id;\n  if v_shop is null or v_shop not in (select public.sync_staff_shop_ids()) then\n    return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n      'code', 'shop_required', 'message',\n      'The request must name a shop this account may write to'));\n  end if;\n\n  if jsonb_typeof(envelopes) <> 'array' or jsonb_array_length(envelopes) > 500 then\n    return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n      'code', 'too_many_envelopes', 'message',\n      'Send between 0 and 500 envelopes per call'));\n  end if;\n\n  -- INVARIANT 1: seq order == commit order per shop\n  perform pg_advisory_xact_lock(hashtextextended(v_shop::text, 0));\n\n  for v_env in select * from jsonb_array_elements(envelopes) loop\n    v_table      := v_env->>'table';\n    v_uid        := v_env->>'uid';\n    v_payload    := v_env->'payload';\n    v_parked_seq := nullif(v_env->>'parked_seq', '')::bigint;\n\n    if v_table is null or v_uid is null\n       or jsonb_typeof(v_payload) <> 'object' then\n      return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n        'code', 'malformed_envelope', 'message',\n        'Every envelope needs table, uid and a payload object'));\n    end if;\n\n    if v_table not in (\n      'events', 'products', 'accounts', 'budget_plans', 'collections_targets',\n      'deliveries', 'attendance_records', 'delivery_status_history',\n      'daily_close_actions', 'physical_cash_counts', 'settings', 'store_profile'\n    ) then\n      return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n        'code', 'unknown_table', 'message', 'Unknown synced table: ' || v_table));\n    end if;\n\n    -- D8 (unchanged): corrections of recorded history from privileged sources only\n    if v_table = 'events'\n       and (v_payload->>'corrects_event_uid') is not null\n       and v_staff.role not in ('owner', 'admin') then\n      return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n        'code', 'correction_privilege_required', 'message',\n        'Correcting recorded history requires an owner or admin account'));\n    end if;\n\n    -- erratum 2: qualify columns (unqualified shop_id collides with the param, 42702)\n    select * into v_existing from public.sync_records\n     where public.sync_records.shop_id    = v_shop\n       and public.sync_records.table_name = v_table\n       and public.sync_records.row_uid    = v_uid;\n\n    if v_table = 'events' then\n      perform credit_private.validate_sale(v_shop, v_uid, v_payload, case when found then v_existing.payload else null end);\n    end if;\n\n    if v_existing.server_seq is not null then\n      -- INVARIANT 4: append-only tables are insert-only\n      if v_table in ('events', 'delivery_status_history',\n                     'daily_close_actions', 'physical_cash_counts') then\n        if public.sync_normalize_payload(v_existing.payload)\n           is distinct from public.sync_normalize_payload(v_payload) then\n          insert into public.audit_log (action, business_id, performed_by,\n                                        performed_by_username, detail)\n          values ('sync_append_only_refused', v_staff.business_id, v_staff.id,\n                  v_staff.username,\n                  jsonb_build_object('table', v_table, 'uid', v_uid,\n                                     'shop', v_shop, 'device', device_id));\n        end if;\n        continue;  -- insert-only: never update; NOT counted in 'applied' (erratum 4)\n      end if;\n\n      -- master-data role gate\n      if v_table in ('products', 'accounts', 'settings', 'store_profile')\n         and v_staff.role not in ('owner', 'admin') then\n        return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n          'code', 'master_data_privilege_required', 'message',\n          'Updating ' || v_table || ' requires an owner or admin account'));\n      end if;\n\n      -- INVARIANT 7: true-conflict audit, losing payload preserved\n      if public.sync_normalize_payload(v_existing.payload)\n         is distinct from public.sync_normalize_payload(v_payload)\n         and v_existing.origin_device is distinct from device_id\n         and (\n              (pull_cursor is not null and v_existing.server_seq > pull_cursor)\n              or (v_parked_seq is not null\n                  and v_existing.server_seq >= v_parked_seq)\n             ) then\n        insert into public.audit_log (action, business_id, performed_by,\n                                      performed_by_username, detail)\n        values ('sync_conflict', v_staff.business_id, v_staff.id,\n                v_staff.username,\n                jsonb_build_object(\n                  'table', v_table, 'uid', v_uid, 'shop', v_shop,\n                  'loser_payload', v_existing.payload,\n                  'loser_device',  v_existing.origin_device,\n                  'loser_seq',     v_existing.server_seq,\n                  'winner_device', device_id,\n                  'detected_by',   case when v_parked_seq is not null\n                                        then 'parked_seq' else 'pull_cursor' end));\n        v_conflicts := v_conflicts + 1;\n      end if;\n    end if;\n\n    -- INVARIANT 8: unchanged re-push is a complete no-op (WHERE fails -> nothing set)\n    -- erratum 3: constraint-name target (inference cols collide with the param)\n    insert into public.sync_records\n      (business_id, shop_id, table_name, row_uid, payload, origin_device)\n    values (\n      (select business_id from public.shops where id = v_shop),\n      v_shop, v_table, v_uid, v_payload, device_id)\n    on conflict on constraint sync_records_shop_table_uid do update\n      set payload       = excluded.payload,\n          origin_device = excluded.origin_device,\n          received_at   = now()\n      where public.sync_normalize_payload(public.sync_records.payload)\n            is distinct from public.sync_normalize_payload(excluded.payload);\n\n    v_applied := v_applied + 1;\n  end loop;\n\n  insert into public.audit_log (action, business_id, performed_by,\n                                performed_by_username, detail)\n  values ('sync_push', v_staff.business_id, v_staff.id, v_staff.username,\n          jsonb_build_object('envelopes', v_applied, 'conflicts', v_conflicts,\n                             'device', device_id, 'shop', v_shop));\n\n  return jsonb_build_object('ok', true, 'applied', v_applied,\n                            'conflicts', v_conflicts,\n                            'server_time_epoch_ms',\n                            (extract(epoch from now()) * 1000)::bigint);\nexception when sqlstate 'PT422' then\n  return jsonb_build_object('ok',false,'error',jsonb_build_object('code',SQLERRM));\nend\n$function$\n"
+      },
+      {
+        "name": "sync_staff_shop_ids",
+        "definition": "CREATE OR REPLACE FUNCTION public.sync_staff_shop_ids()\n RETURNS SETOF uuid\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  select sh.id\n  from public.staff s\n  join public.shops sh on sh.business_id = s.business_id and sh.active\n  where s.auth_user_id = auth.uid()\n    and s.active\n    and s.terminated_at is null\n    and (\n      s.role = 'owner'\n      or exists (\n        select 1 from public.staff_shops ss\n        where ss.staff_id = s.id and ss.shop_id = sh.id\n      )\n    )\n$function$\n"
+      }
+    ],
+    "shop_time": "2026-10-17 00:54:41",
+    "rpc_absent": true,
+    "table_hashes": {
+      "shops": "1b193578bcfe048ca7ff7930ae08af74",
+      "staff": "110722413ad1128d77205c03dc5f2f3c",
+      "businesses": "28ba0a959f56cff25907937b898dde0e",
+      "sync_records": "5df82d0b6006f8818f84c93ae45384ef",
+      "credit_contracts": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "schema_absent": true,
+    "long_transactions": 0
+  },
+  "after": {
+    "counts": {
+      "shops": 2,
+      "staff": 8,
+      "auth_users": 3,
+      "businesses": 1,
+      "sync_records": 36,
+      "credit_contracts": 0
+    },
+    "columns": [
+      {
+        "type": "uuid",
+        "table": "contracts",
+        "column": "shop_id",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "contracts",
+        "column": "activated_at",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "contracts",
+        "column": "activated_by",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "bigint",
+        "table": "records",
+        "column": "server_seq",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "records",
+        "column": "shop_id",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "records",
+        "column": "kind",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "records",
+        "column": "uid",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "jsonb",
+        "table": "records",
+        "column": "payload",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "records",
+        "column": "accepted_by",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "records",
+        "column": "accepted_at",
+        "schema": "credit_private",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "shops",
+        "column": "id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "shops",
+        "column": "business_id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "shops",
+        "column": "name",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "boolean",
+        "table": "shops",
+        "column": "active",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "shops",
+        "column": "created_at",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "shops",
+        "column": "shop_timezone",
+        "schema": "public",
+        "nullable": "YES"
+      },
+      {
+        "type": "uuid",
+        "table": "staff",
+        "column": "id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "staff",
+        "column": "auth_user_id",
+        "schema": "public",
+        "nullable": "YES"
+      },
+      {
+        "type": "uuid",
+        "table": "staff",
+        "column": "business_id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "staff",
+        "column": "username",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "staff",
+        "column": "display_name",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "staff",
+        "column": "role",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "boolean",
+        "table": "staff",
+        "column": "active",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "staff",
+        "column": "terminated_at",
+        "schema": "public",
+        "nullable": "YES"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "staff",
+        "column": "created_at",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "staff",
+        "column": "updated_at",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "bigint",
+        "table": "sync_records",
+        "column": "server_seq",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "sync_records",
+        "column": "business_id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "uuid",
+        "table": "sync_records",
+        "column": "shop_id",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "sync_records",
+        "column": "table_name",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "sync_records",
+        "column": "row_uid",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "jsonb",
+        "table": "sync_records",
+        "column": "payload",
+        "schema": "public",
+        "nullable": "NO"
+      },
+      {
+        "type": "text",
+        "table": "sync_records",
+        "column": "origin_device",
+        "schema": "public",
+        "nullable": "YES"
+      },
+      {
+        "type": "timestamp with time zone",
+        "table": "sync_records",
+        "column": "received_at",
+        "schema": "public",
+        "nullable": "NO"
+      }
+    ],
+    "functions": [
+      {
+        "name": "sync_push",
+        "definition": "CREATE OR REPLACE FUNCTION public.sync_push(envelopes jsonb, device_id text DEFAULT NULL::text, shop_id uuid DEFAULT NULL::uuid, pull_cursor bigint DEFAULT NULL::bigint)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_staff       record;\n  v_shop        uuid;\n  v_env         jsonb;\n  v_table       text;\n  v_uid         text;\n  v_payload     jsonb;\n  v_parked_seq  bigint;\n  v_existing    public.sync_records%rowtype;\n  v_applied     int := 0;\n  v_conflicts   int := 0;\nbegin\n  select s.id, s.business_id, s.role, s.username into v_staff\n    from public.staff s\n   where s.auth_user_id = auth.uid() and s.active and s.terminated_at is null;\n  if not found then\n    return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n      'code', 'not_authorized', 'message', 'No active staff profile'));\n  end if;\n\n  -- erratum 1: nullif(shop_id,'') casts '' to the uuid param at plan time (22P02)\n  v_shop := shop_id;\n  if v_shop is null or v_shop not in (select public.sync_staff_shop_ids()) then\n    return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n      'code', 'shop_required', 'message',\n      'The request must name a shop this account may write to'));\n  end if;\n\n  if jsonb_typeof(envelopes) <> 'array' or jsonb_array_length(envelopes) > 500 then\n    return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n      'code', 'too_many_envelopes', 'message',\n      'Send between 0 and 500 envelopes per call'));\n  end if;\n\n  -- INVARIANT 1: seq order == commit order per shop\n  perform pg_advisory_xact_lock(hashtextextended(v_shop::text, 0));\n\n  for v_env in select * from jsonb_array_elements(envelopes) loop\n    v_table      := v_env->>'table';\n    v_uid        := v_env->>'uid';\n    v_payload    := v_env->'payload';\n    v_parked_seq := nullif(v_env->>'parked_seq', '')::bigint;\n\n    if v_table is null or v_uid is null\n       or jsonb_typeof(v_payload) <> 'object' then\n      return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n        'code', 'malformed_envelope', 'message',\n        'Every envelope needs table, uid and a payload object'));\n    end if;\n\n    if v_table not in (\n      'events', 'products', 'accounts', 'budget_plans', 'collections_targets',\n      'deliveries', 'attendance_records', 'delivery_status_history',\n      'daily_close_actions', 'physical_cash_counts', 'settings', 'store_profile'\n    ) then\n      return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n        'code', 'unknown_table', 'message', 'Unknown synced table: ' || v_table));\n    end if;\n\n    -- D8 (unchanged): corrections of recorded history from privileged sources only\n    if v_table = 'events'\n       and (v_payload->>'corrects_event_uid') is not null\n       and v_staff.role not in ('owner', 'admin') then\n      return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n        'code', 'correction_privilege_required', 'message',\n        'Correcting recorded history requires an owner or admin account'));\n    end if;\n\n    -- erratum 2: qualify columns (unqualified shop_id collides with the param, 42702)\n    select * into v_existing from public.sync_records\n     where public.sync_records.shop_id    = v_shop\n       and public.sync_records.table_name = v_table\n       and public.sync_records.row_uid    = v_uid;\n\n    if v_table = 'events' then\n      perform credit_private.validate_sale(v_shop, v_uid, v_payload, case when found then v_existing.payload else null end);\n    end if;\n\n    if v_existing.server_seq is not null then\n      -- INVARIANT 4: append-only tables are insert-only\n      if v_table in ('events', 'delivery_status_history',\n                     'daily_close_actions', 'physical_cash_counts') then\n        if public.sync_normalize_payload(v_existing.payload)\n           is distinct from public.sync_normalize_payload(v_payload) then\n          insert into public.audit_log (action, business_id, performed_by,\n                                        performed_by_username, detail)\n          values ('sync_append_only_refused', v_staff.business_id, v_staff.id,\n                  v_staff.username,\n                  jsonb_build_object('table', v_table, 'uid', v_uid,\n                                     'shop', v_shop, 'device', device_id));\n        end if;\n        continue;  -- insert-only: never update; NOT counted in 'applied' (erratum 4)\n      end if;\n\n      -- master-data role gate\n      if v_table in ('products', 'accounts', 'settings', 'store_profile')\n         and v_staff.role not in ('owner', 'admin') then\n        return jsonb_build_object('ok', false, 'error', jsonb_build_object(\n          'code', 'master_data_privilege_required', 'message',\n          'Updating ' || v_table || ' requires an owner or admin account'));\n      end if;\n\n      -- INVARIANT 7: true-conflict audit, losing payload preserved\n      if public.sync_normalize_payload(v_existing.payload)\n         is distinct from public.sync_normalize_payload(v_payload)\n         and v_existing.origin_device is distinct from device_id\n         and (\n              (pull_cursor is not null and v_existing.server_seq > pull_cursor)\n              or (v_parked_seq is not null\n                  and v_existing.server_seq >= v_parked_seq)\n             ) then\n        insert into public.audit_log (action, business_id, performed_by,\n                                      performed_by_username, detail)\n        values ('sync_conflict', v_staff.business_id, v_staff.id,\n                v_staff.username,\n                jsonb_build_object(\n                  'table', v_table, 'uid', v_uid, 'shop', v_shop,\n                  'loser_payload', v_existing.payload,\n                  'loser_device',  v_existing.origin_device,\n                  'loser_seq',     v_existing.server_seq,\n                  'winner_device', device_id,\n                  'detected_by',   case when v_parked_seq is not null\n                                        then 'parked_seq' else 'pull_cursor' end));\n        v_conflicts := v_conflicts + 1;\n      end if;\n    end if;\n\n    -- INVARIANT 8: unchanged re-push is a complete no-op (WHERE fails -> nothing set)\n    -- erratum 3: constraint-name target (inference cols collide with the param)\n    insert into public.sync_records\n      (business_id, shop_id, table_name, row_uid, payload, origin_device)\n    values (\n      (select business_id from public.shops where id = v_shop),\n      v_shop, v_table, v_uid, v_payload, device_id)\n    on conflict on constraint sync_records_shop_table_uid do update\n      set payload       = excluded.payload,\n          origin_device = excluded.origin_device,\n          received_at   = now()\n      where public.sync_normalize_payload(public.sync_records.payload)\n            is distinct from public.sync_normalize_payload(excluded.payload);\n\n    v_applied := v_applied + 1;\n  end loop;\n\n  insert into public.audit_log (action, business_id, performed_by,\n                                performed_by_username, detail)\n  values ('sync_push', v_staff.business_id, v_staff.id, v_staff.username,\n          jsonb_build_object('envelopes', v_applied, 'conflicts', v_conflicts,\n                             'device', device_id, 'shop', v_shop));\n\n  return jsonb_build_object('ok', true, 'applied', v_applied,\n                            'conflicts', v_conflicts,\n                            'server_time_epoch_ms',\n                            (extract(epoch from now()) * 1000)::bigint);\nexception when sqlstate 'PT422' then\n  return jsonb_build_object('ok',false,'error',jsonb_build_object('code',SQLERRM));\nend\n$function$\n"
+      },
+      {
+        "name": "sync_staff_shop_ids",
+        "definition": "CREATE OR REPLACE FUNCTION public.sync_staff_shop_ids()\n RETURNS SETOF uuid\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  select sh.id\n  from public.staff s\n  join public.shops sh on sh.business_id = s.business_id and sh.active\n  where s.auth_user_id = auth.uid()\n    and s.active\n    and s.terminated_at is null\n    and (\n      s.role = 'owner'\n      or exists (\n        select 1 from public.staff_shops ss\n        where ss.staff_id = s.id and ss.shop_id = sh.id\n      )\n    )\n$function$\n"
+      }
+    ],
+    "shop_time": "2026-10-17 00:55:28",
+    "rpc_absent": false,
+    "table_hashes": {
+      "shops": "1b193578bcfe048ca7ff7930ae08af74",
+      "staff": "110722413ad1128d77205c03dc5f2f3c",
+      "businesses": "28ba0a959f56cff25907937b898dde0e",
+      "sync_records": "5df82d0b6006f8818f84c93ae45384ef",
+      "credit_contracts": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "schema_absent": false,
+    "long_transactions": 0
+  },
+  "inventory": {
+    "tables": [
+      {
+        "rls": true,
+        "table": "actions",
+        "columns": [
+          {
+            "name": "seq",
+            "type": "bigint",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "shop_id",
+            "type": "uuid",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "command_uid",
+            "type": "uuid",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "kind",
+            "type": "text",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "actor_id",
+            "type": "uuid",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "installation",
+            "type": "text",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "customer_uid",
+            "type": "text",
+            "default": null,
+            "not_null": false
+          },
+          {
+            "name": "attempt_uid",
+            "type": "uuid",
+            "default": null,
+            "not_null": false
+          },
+          {
+            "name": "cycle",
+            "type": "text",
+            "default": null,
+            "not_null": false
+          },
+          {
+            "name": "accepted_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "not_null": true
+          }
+        ],
+        "anon_access": false,
+        "constraints": [
+          "FOREIGN KEY (actor_id) REFERENCES staff(id)",
+          "PRIMARY KEY (seq)",
+          "UNIQUE (shop_id, command_uid)",
+          "FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE"
+        ],
+        "authenticated_access": false
+      },
+      {
+        "rls": true,
+        "table": "claims",
+        "columns": [
+          {
+            "name": "shop_id",
+            "type": "uuid",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "customer_uid",
+            "type": "text",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "attempt_uid",
+            "type": "uuid",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "actor_id",
+            "type": "uuid",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "installation",
+            "type": "text",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "cycle",
+            "type": "text",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "phase",
+            "type": "text",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "lease_until",
+            "type": "timestamp with time zone",
+            "default": null,
+            "not_null": false
+          },
+          {
+            "name": "started_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "not_null": false
+          },
+          {
+            "name": "channel",
+            "type": "text",
+            "default": null,
+            "not_null": false
+          }
+        ],
+        "anon_access": false,
+        "constraints": [
+          "FOREIGN KEY (actor_id) REFERENCES staff(id)",
+          "CHECK ((channel = ANY (ARRAY['WHATSAPP'::text, 'SMS'::text])))",
+          "CHECK ((((phase = 'PREPARING'::text) AND (lease_until IS NOT NULL) AND (started_at IS NULL) AND (channel IS NULL)) OR ((phase = 'HANDOFF_STARTED'::text) AND (lease_until IS NULL) AND (started_at IS NOT NULL) AND (channel IS NOT NULL))))",
+          "CHECK (((length(cycle) >= 1) AND (length(cycle) <= 1024)))",
+          "CHECK ((phase = ANY (ARRAY['PREPARING'::text, 'HANDOFF_STARTED'::text])))",
+          "PRIMARY KEY (shop_id, customer_uid)",
+          "UNIQUE (shop_id, attempt_uid)",
+          "FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE"
+        ],
+        "authenticated_access": false
+      },
+      {
+        "rls": true,
+        "table": "commands",
+        "columns": [
+          {
+            "name": "shop_id",
+            "type": "uuid",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "command_uid",
+            "type": "uuid",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "actor_id",
+            "type": "uuid",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "installation",
+            "type": "text",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "request",
+            "type": "jsonb",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "result",
+            "type": "jsonb",
+            "default": null,
+            "not_null": true
+          }
+        ],
+        "anon_access": false,
+        "constraints": [
+          "FOREIGN KEY (actor_id) REFERENCES staff(id)",
+          "PRIMARY KEY (shop_id, command_uid)",
+          "FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE"
+        ],
+        "authenticated_access": false
+      },
+      {
+        "rls": true,
+        "table": "customers",
+        "columns": [
+          {
+            "name": "shop_id",
+            "type": "uuid",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "customer_uid",
+            "type": "text",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "revision",
+            "type": "uuid",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "schedule_revision",
+            "type": "uuid",
+            "default": null,
+            "not_null": false
+          },
+          {
+            "name": "effective_from",
+            "type": "date",
+            "default": null,
+            "not_null": false
+          },
+          {
+            "name": "schedule",
+            "type": "jsonb",
+            "default": null,
+            "not_null": false
+          },
+          {
+            "name": "paused",
+            "type": "boolean",
+            "default": "false",
+            "not_null": true
+          },
+          {
+            "name": "snoozed_until",
+            "type": "date",
+            "default": null,
+            "not_null": false
+          },
+          {
+            "name": "statement_cycle",
+            "type": "text",
+            "default": null,
+            "not_null": false
+          },
+          {
+            "name": "reviewed_on",
+            "type": "date",
+            "default": null,
+            "not_null": false
+          }
+        ],
+        "anon_access": false,
+        "constraints": [
+          "CHECK (((schedule_revision IS NULL) = (effective_from IS NULL)))",
+          "CHECK (((length(customer_uid) >= 1) AND (length(customer_uid) <= 200)))",
+          "PRIMARY KEY (shop_id, customer_uid)",
+          "FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE",
+          "CHECK (((length(statement_cycle) >= 1) AND (length(statement_cycle) <= 1024)))"
+        ],
+        "authenticated_access": false
+      },
+      {
+        "rls": true,
+        "table": "digests",
+        "columns": [
+          {
+            "name": "shop_id",
+            "type": "uuid",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "business_date",
+            "type": "date",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "installation",
+            "type": "text",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "actor_id",
+            "type": "uuid",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "reserved_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "not_null": true
+          }
+        ],
+        "anon_access": false,
+        "constraints": [
+          "FOREIGN KEY (actor_id) REFERENCES staff(id)",
+          "PRIMARY KEY (shop_id, business_date)",
+          "FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE"
+        ],
+        "authenticated_access": false
+      },
+      {
+        "rls": true,
+        "table": "policies",
+        "columns": [
+          {
+            "name": "shop_id",
+            "type": "uuid",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "revision",
+            "type": "uuid",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "schedule_revision",
+            "type": "uuid",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "effective_from",
+            "type": "date",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "enabled",
+            "type": "boolean",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "weekday",
+            "type": "integer",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "repeat_days",
+            "type": "integer",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "preferred_time",
+            "type": "time without time zone",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "quiet_start",
+            "type": "time without time zone",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "quiet_end",
+            "type": "time without time zone",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "primary_installation",
+            "type": "text",
+            "default": null,
+            "not_null": false
+          },
+          {
+            "name": "primary_actor",
+            "type": "uuid",
+            "default": null,
+            "not_null": false
+          },
+          {
+            "name": "updated_by",
+            "type": "uuid",
+            "default": null,
+            "not_null": true
+          },
+          {
+            "name": "updated_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "not_null": true
+          }
+        ],
+        "anon_access": false,
+        "constraints": [
+          "CHECK ((quiet_start <> quiet_end))",
+          "CHECK (((primary_installation IS NULL) = (primary_actor IS NULL)))",
+          "CHECK (((NOT enabled) OR (primary_installation IS NOT NULL)))",
+          "PRIMARY KEY (shop_id)",
+          "FOREIGN KEY (primary_actor) REFERENCES staff(id)",
+          "CHECK (((length(primary_installation) >= 1) AND (length(primary_installation) <= 200)))",
+          "CHECK (((repeat_days >= 1) AND (repeat_days <= 30)))",
+          "FOREIGN KEY (shop_id) REFERENCES shops(id) ON DELETE CASCADE",
+          "FOREIGN KEY (updated_by) REFERENCES staff(id)",
+          "CHECK (((weekday >= 1) AND (weekday <= 7)))"
+        ],
+        "authenticated_access": false
+      }
+    ],
+    "indexes": [
+      {
+        "name": "actions_pkey",
+        "definition": "CREATE UNIQUE INDEX actions_pkey ON followup_private.actions USING btree (seq)"
+      },
+      {
+        "name": "actions_shop_id_command_uid_key",
+        "definition": "CREATE UNIQUE INDEX actions_shop_id_command_uid_key ON followup_private.actions USING btree (shop_id, command_uid)"
+      },
+      {
+        "name": "claims_pkey",
+        "definition": "CREATE UNIQUE INDEX claims_pkey ON followup_private.claims USING btree (shop_id, customer_uid)"
+      },
+      {
+        "name": "claims_shop_id_attempt_uid_key",
+        "definition": "CREATE UNIQUE INDEX claims_shop_id_attempt_uid_key ON followup_private.claims USING btree (shop_id, attempt_uid)"
+      },
+      {
+        "name": "commands_pkey",
+        "definition": "CREATE UNIQUE INDEX commands_pkey ON followup_private.commands USING btree (shop_id, command_uid)"
+      },
+      {
+        "name": "customers_pkey",
+        "definition": "CREATE UNIQUE INDEX customers_pkey ON followup_private.customers USING btree (shop_id, customer_uid)"
+      },
+      {
+        "name": "digests_pkey",
+        "definition": "CREATE UNIQUE INDEX digests_pkey ON followup_private.digests USING btree (shop_id, business_date)"
+      },
+      {
+        "name": "followup_actions_actor",
+        "definition": "CREATE INDEX followup_actions_actor ON followup_private.actions USING btree (actor_id)"
+      },
+      {
+        "name": "followup_actions_shop_attempt",
+        "definition": "CREATE INDEX followup_actions_shop_attempt ON followup_private.actions USING btree (shop_id, attempt_uid) WHERE (attempt_uid IS NOT NULL)"
+      },
+      {
+        "name": "followup_actions_shop_seq",
+        "definition": "CREATE INDEX followup_actions_shop_seq ON followup_private.actions USING btree (shop_id, seq)"
+      },
+      {
+        "name": "followup_claims_actor",
+        "definition": "CREATE INDEX followup_claims_actor ON followup_private.claims USING btree (actor_id)"
+      },
+      {
+        "name": "followup_commands_actor",
+        "definition": "CREATE INDEX followup_commands_actor ON followup_private.commands USING btree (actor_id)"
+      },
+      {
+        "name": "followup_digests_actor",
+        "definition": "CREATE INDEX followup_digests_actor ON followup_private.digests USING btree (actor_id)"
+      },
+      {
+        "name": "followup_policies_primary_actor",
+        "definition": "CREATE INDEX followup_policies_primary_actor ON followup_private.policies USING btree (primary_actor)"
+      },
+      {
+        "name": "followup_policies_updated_by",
+        "definition": "CREATE INDEX followup_policies_updated_by ON followup_private.policies USING btree (updated_by)"
+      },
+      {
+        "name": "policies_pkey",
+        "definition": "CREATE UNIQUE INDEX policies_pkey ON followup_private.policies USING btree (shop_id)"
+      }
+    ],
+    "rpc_privileges": [
+      {
+        "anon": false,
+        "name": "followup_command_v1",
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "authenticated": true
+      },
+      {
+        "anon": false,
+        "name": "followup_snapshot_v1",
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "authenticated": true
+      }
+    ]
+  },
+  "definitions": [
+    {
+      "proname": "actor",
+      "nspname": "followup_private",
+      "definition": "CREATE OR REPLACE FUNCTION followup_private.actor(p_shop uuid, p_owner boolean DEFAULT false)\n RETURNS uuid\n LANGUAGE plpgsql\n STABLE\n SET search_path TO ''\nAS $function$\nDECLARE v_actor public.staff%rowtype;\nBEGIN\n  SELECT * INTO v_actor FROM public.staff WHERE auth_user_id=auth.uid() AND active AND terminated_at IS NULL;\n  IF NOT FOUND OR p_shop IS NULL OR v_actor.role NOT IN ('owner','admin','manager')\n    OR (p_owner AND v_actor.role<>'owner')\n    OR NOT EXISTS(SELECT 1 FROM public.sync_staff_shop_ids() s WHERE s=p_shop) THEN\n    RAISE SQLSTATE 'PT403' USING MESSAGE='followup_not_authorized';\n  END IF;\n  RETURN v_actor.id;\nEND $function$\n"
+    },
+    {
+      "proname": "assert_customer",
+      "nspname": "followup_private",
+      "definition": "CREATE OR REPLACE FUNCTION followup_private.assert_customer(p_shop uuid, p_uid text)\n RETURNS void\n LANGUAGE plpgsql\n STABLE\n SET search_path TO ''\nAS $function$\nBEGIN\n  IF p_uid IS NULL OR length(p_uid) NOT BETWEEN 1 AND 200 OR NOT EXISTS(SELECT 1 FROM public.sync_records\n    WHERE shop_id=p_shop AND table_name='accounts' AND row_uid=p_uid AND payload->>'category'='Customer') THEN\n    RAISE SQLSTATE 'PT422' USING MESSAGE='followup_customer_missing';\n  END IF;\nEND $function$\n"
+    },
+    {
+      "proname": "assert_schedule",
+      "nspname": "followup_private",
+      "definition": "CREATE OR REPLACE FUNCTION followup_private.assert_schedule(p jsonb)\n RETURNS void\n LANGUAGE plpgsql\n IMMUTABLE\n SET search_path TO ''\nAS $function$\nBEGIN\n  IF p='null'::jsonb THEN RETURN; END IF;\n  IF jsonb_typeof(p) IS DISTINCT FROM 'object' OR p->>'kind' IS NULL THEN\n    RAISE SQLSTATE 'PT422' USING MESSAGE='followup_invalid_schedule';\n  END IF;\n  IF p->>'kind'='WEEKLY' AND p-ARRAY['kind','weekday']='{}'::jsonb\n    AND jsonb_typeof(p->'weekday')='number' AND p->>'weekday' ~ '^[1-7]$' THEN RETURN;\n  ELSIF p->>'kind'='MONTHLY' AND p-ARRAY['kind','day']='{}'::jsonb\n    AND jsonb_typeof(p->'day')='number' AND p->>'day' ~ '^([0-9]|[12][0-9]|3[01])$' THEN RETURN;\n  ELSIF p->>'kind'='INTERVAL' AND p-ARRAY['kind','days','first_date']='{}'::jsonb\n    AND jsonb_typeof(p->'days')='number' AND p->>'days' ~ '^[1-9][0-9]{0,2}$'\n    AND (p->>'days')::int<=365 AND jsonb_typeof(p->'first_date')='string'\n    AND p->>'first_date' ~ '^\\d{4}-\\d{2}-\\d{2}$' THEN\n    PERFORM (p->>'first_date')::date; RETURN;\n  END IF;\n  RAISE SQLSTATE 'PT422' USING MESSAGE='followup_invalid_schedule';\nEND $function$\n"
+    },
+    {
+      "proname": "heads",
+      "nspname": "followup_private",
+      "definition": "CREATE OR REPLACE FUNCTION followup_private.heads(p_shop uuid, p_day date)\n RETURNS jsonb\n LANGUAGE sql\n STABLE\n SET search_path TO ''\nAS $function$\n  SELECT jsonb_build_object('sync',coalesce((SELECT max(server_seq) FROM public.sync_records WHERE shop_id=p_shop),0),\n    'credit',coalesce((SELECT max(server_seq) FROM credit_private.records WHERE shop_id=p_shop),0),\n    'metadata',coalesce((SELECT max(seq) FROM followup_private.actions WHERE shop_id=p_shop),0),\n    'policy_revision',(SELECT revision FROM followup_private.policies WHERE shop_id=p_shop),'business_date',p_day)\n$function$\n"
+    },
+    {
+      "proname": "zone",
+      "nspname": "followup_private",
+      "definition": "CREATE OR REPLACE FUNCTION followup_private.zone(p_shop uuid)\n RETURNS text\n LANGUAGE plpgsql\n STABLE\n SET search_path TO ''\nAS $function$\nDECLARE v_zone text;\nBEGIN\n  SELECT shop_timezone INTO v_zone FROM public.shops WHERE id=p_shop;\n  IF v_zone IS NULL OR NOT EXISTS(SELECT 1 FROM pg_catalog.pg_timezone_names WHERE name=v_zone) THEN\n    RAISE SQLSTATE 'PT422' USING MESSAGE='followup_shop_timezone_required';\n  END IF;\n  RETURN v_zone;\nEND $function$\n"
+    },
+    {
+      "proname": "followup_command_v1",
+      "nspname": "public",
+      "definition": "CREATE OR REPLACE FUNCTION public.followup_command_v1(shop uuid, installation text, command_uid uuid, operation jsonb)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nDECLARE v_actor uuid; v_role text; v_now timestamptz; v_day date; v_zone text; v_time time;\n  v_kind text; v_uid text; v_attempt uuid; v_cycle text; v_value jsonb; v_allowed text[];\n  v_policy followup_private.policies%rowtype; v_customer followup_private.customers%rowtype;\n  v_claim followup_private.claims%rowtype; v_old followup_private.commands%rowtype;\n  v_result jsonb; v_revision uuid; v_schedule_revision uuid; v_effective date;\n  v_primary text; v_primary_actor uuid; v_until date; v_notify boolean:=false; v_launch boolean:=false;\nBEGIN\n  v_actor:=followup_private.actor(shop);\n  IF installation IS NULL OR installation !~ '^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$' OR command_uid IS NULL\n    OR jsonb_typeof(operation) IS DISTINCT FROM 'object' OR octet_length(operation::text)>16384 THEN\n    RAISE SQLSTATE 'PT422' USING MESSAGE='followup_invalid_command';\n  END IF;\n  v_kind:=operation->>'kind';\n  v_allowed:=CASE v_kind\n    WHEN 'POLICY' THEN ARRAY['kind','expected_revision','value','make_primary','phones_updated']\n    WHEN 'PREFERENCE' THEN ARRAY['kind','customer_uid','expected_customer_revision','value']\n    WHEN 'REVIEW' THEN ARRAY['kind','customer_uid','expected_customer_revision','expected_heads','cycle']\n    WHEN 'SNOOZE' THEN ARRAY['kind','customer_uid','expected_customer_revision','expected_heads','until']\n    WHEN 'ACQUIRE' THEN ARRAY['kind','customer_uid','expected_heads','expected_customer_revision','attempt_uid','cycle']\n    WHEN 'RENEW' THEN ARRAY['kind','customer_uid','attempt_uid']\n    WHEN 'START' THEN ARRAY['kind','customer_uid','expected_heads','expected_customer_revision','attempt_uid','channel']\n    WHEN 'RELEASE' THEN ARRAY['kind','customer_uid','attempt_uid']\n    WHEN 'RESOLVE' THEN ARRAY['kind','customer_uid','attempt_uid','outcome','acknowledge_uncertainty','expected_heads','expected_customer_revision']\n    WHEN 'DIGEST' THEN ARRAY['kind','expected_heads','has_work'] END;\n  IF v_allowed IS NULL OR operation-v_allowed<>'{}'::jsonb THEN RAISE SQLSTATE 'PT422' USING MESSAGE='followup_invalid_command'; END IF;\n  IF v_kind='POLICY' THEN PERFORM followup_private.actor(shop,true); END IF;\n  PERFORM pg_advisory_xact_lock(hashtextextended(shop::text,0));\n  v_actor:=followup_private.actor(shop,v_kind='POLICY');\n  SELECT role INTO v_role FROM public.staff WHERE id=v_actor;\n  SELECT * INTO v_old FROM followup_private.commands c WHERE c.shop_id=shop AND c.command_uid=followup_command_v1.command_uid;\n  IF FOUND THEN\n    IF v_old.actor_id<>v_actor OR v_old.installation<>installation OR v_old.request<>operation THEN\n      RAISE SQLSTATE 'PT409' USING MESSAGE='followup_command_identity_conflict';\n    END IF;\n    -- Persisted START/DIGEST results are recoverable state, never a second side-effect grant.\n    RETURN jsonb_build_object('ok',true,'replayed',true,'launch_authorized',false,'notify_authorized',false,'result',v_old.result);\n  END IF;\n  v_now:=clock_timestamp(); v_zone:=followup_private.zone(shop);\n  v_day:=(v_now AT TIME ZONE v_zone)::date; v_time:=(v_now AT TIME ZONE v_zone)::time;\n  SELECT * INTO v_policy FROM followup_private.policies WHERE shop_id=shop;\n  IF v_kind<>'POLICY' AND v_policy.shop_id IS NULL THEN RAISE SQLSTATE 'PT409' USING MESSAGE='followup_policy_required'; END IF;\n  IF v_kind IN ('ACQUIRE','START','DIGEST') AND NOT v_policy.enabled THEN RAISE SQLSTATE 'PT409' USING MESSAGE='followup_disabled'; END IF;\n  IF v_kind IN ('ACQUIRE','START','DIGEST','REVIEW','SNOOZE','RESOLVE')\n    AND operation->'expected_heads' IS DISTINCT FROM followup_private.heads(shop,v_day) THEN\n    RAISE SQLSTATE 'PT409' USING MESSAGE='followup_refresh_required';\n  END IF;\n  v_uid:=operation->>'customer_uid';\n  IF v_kind NOT IN ('POLICY','DIGEST') THEN\n    PERFORM followup_private.assert_customer(shop,v_uid);\n    SELECT * INTO v_customer FROM followup_private.customers WHERE shop_id=shop AND customer_uid=v_uid;\n    SELECT * INTO v_claim FROM followup_private.claims WHERE shop_id=shop AND customer_uid=v_uid;\n    IF v_kind IN ('PREFERENCE','REVIEW','SNOOZE','ACQUIRE','START','RESOLVE') AND\n      operation->'expected_customer_revision' IS DISTINCT FROM coalesce(to_jsonb(v_customer.revision),'null'::jsonb) THEN\n      RAISE SQLSTATE 'PT409' USING MESSAGE='followup_customer_changed';\n    END IF;\n  END IF;\n  IF v_kind IN ('ACQUIRE','START') AND (coalesce(v_customer.paused,false) OR v_customer.snoozed_until>v_day) THEN\n    RAISE SQLSTATE 'PT409' USING MESSAGE='followup_customer_postponed';\n  END IF;\n  IF v_kind IN ('RENEW','START','RELEASE','RESOLVE','ACQUIRE') THEN\n    IF jsonb_typeof(operation->'attempt_uid') IS DISTINCT FROM 'string' THEN RAISE SQLSTATE 'PT422' USING MESSAGE='followup_invalid_attempt'; END IF;\n    v_attempt:=(operation->>'attempt_uid')::uuid;\n  END IF;\n  v_cycle:=operation->>'cycle';\n  IF v_kind IN ('ACQUIRE','REVIEW') AND (jsonb_typeof(operation->'cycle') IS DISTINCT FROM 'string' OR length(v_cycle) NOT BETWEEN 1 AND 1024) THEN\n    RAISE SQLSTATE 'PT422' USING MESSAGE='followup_invalid_cycle';\n  END IF;\n  v_revision:=gen_random_uuid();\n  IF v_kind='POLICY' THEN\n    IF operation->'expected_revision' IS DISTINCT FROM coalesce(to_jsonb(v_policy.revision),'null'::jsonb) THEN\n      RAISE SQLSTATE 'PT409' USING MESSAGE='followup_policy_changed';\n    END IF;\n    v_value:=operation->'value';\n    IF jsonb_typeof(v_value) IS DISTINCT FROM 'object' OR v_value-ARRAY['enabled','weekday','repeat_days','preferred_time','quiet_start','quiet_end']<>'{}'::jsonb\n      OR jsonb_typeof(v_value->'enabled') IS DISTINCT FROM 'boolean'\n      OR jsonb_typeof(v_value->'weekday') IS DISTINCT FROM 'number' OR (v_value->>'weekday') !~ '^[1-7]$'\n      OR jsonb_typeof(v_value->'repeat_days') IS DISTINCT FROM 'number' OR (v_value->>'repeat_days') !~ '^([1-9]|[12][0-9]|30)$'\n      OR jsonb_typeof(v_value->'preferred_time') IS DISTINCT FROM 'string' OR (v_value->>'preferred_time') !~ '^([01][0-9]|2[0-3]):[0-5][0-9]$'\n      OR jsonb_typeof(v_value->'quiet_start') IS DISTINCT FROM 'string' OR (v_value->>'quiet_start') !~ '^([01][0-9]|2[0-3]):[0-5][0-9]$'\n      OR jsonb_typeof(v_value->'quiet_end') IS DISTINCT FROM 'string' OR (v_value->>'quiet_end') !~ '^([01][0-9]|2[0-3]):[0-5][0-9]$'\n      OR v_value->>'quiet_start'=v_value->>'quiet_end' OR jsonb_typeof(operation->'make_primary') IS DISTINCT FROM 'boolean'\n      OR jsonb_typeof(operation->'phones_updated') IS DISTINCT FROM 'boolean' THEN\n      RAISE SQLSTATE 'PT422' USING MESSAGE='followup_invalid_policy';\n    END IF;\n    IF (CASE WHEN (v_value->>'quiet_start')::time<(v_value->>'quiet_end')::time\n      THEN (v_value->>'preferred_time')::time>=(v_value->>'quiet_start')::time AND (v_value->>'preferred_time')::time<(v_value->>'quiet_end')::time\n      ELSE (v_value->>'preferred_time')::time>=(v_value->>'quiet_start')::time OR (v_value->>'preferred_time')::time<(v_value->>'quiet_end')::time END) THEN\n      RAISE SQLSTATE 'PT422' USING MESSAGE='followup_choose_time_outside_quiet_hours';\n    END IF;\n    IF (v_value->>'enabled')::boolean AND (operation->'phones_updated' IS DISTINCT FROM 'true'::jsonb\n      OR NOT EXISTS(SELECT 1 FROM credit_private.contracts WHERE shop_id=shop)) THEN\n      RAISE SQLSTATE 'PT422' USING MESSAGE='followup_upgrade_confirmation_required';\n    END IF;\n    IF NOT (v_value->>'enabled')::boolean AND EXISTS(SELECT 1 FROM followup_private.claims WHERE shop_id=shop AND phase='HANDOFF_STARTED') THEN\n      RAISE SQLSTATE 'PT409' USING MESSAGE='followup_resolve_handoff_first';\n    END IF;\n    v_primary:=CASE WHEN (operation->>'make_primary')::boolean THEN installation ELSE v_policy.primary_installation END;\n    v_primary_actor:=CASE WHEN (operation->>'make_primary')::boolean THEN v_actor ELSE v_policy.primary_actor END;\n    IF (v_value->>'enabled')::boolean AND v_primary IS NULL THEN RAISE SQLSTATE 'PT422' USING MESSAGE='followup_primary_required'; END IF;\n    v_schedule_revision:=coalesce(v_policy.schedule_revision,gen_random_uuid());\n    v_effective:=coalesce(v_policy.effective_from,v_day);\n    IF v_policy.weekday IS DISTINCT FROM (v_value->>'weekday')::int OR\n      (NOT coalesce(v_policy.enabled,false) AND (v_value->>'enabled')::boolean) THEN\n      v_schedule_revision:=gen_random_uuid(); v_effective:=v_day;\n    END IF;\n    INSERT INTO followup_private.policies VALUES(shop,v_revision,v_schedule_revision,v_effective,(v_value->>'enabled')::boolean,\n      (v_value->>'weekday')::int,(v_value->>'repeat_days')::int,(v_value->>'preferred_time')::time,\n      (v_value->>'quiet_start')::time,(v_value->>'quiet_end')::time,v_primary,v_primary_actor,v_actor,v_now)\n    ON CONFLICT(shop_id) DO UPDATE SET revision=excluded.revision,schedule_revision=excluded.schedule_revision,effective_from=excluded.effective_from,\n      enabled=excluded.enabled,weekday=excluded.weekday,repeat_days=excluded.repeat_days,preferred_time=excluded.preferred_time,\n      quiet_start=excluded.quiet_start,quiet_end=excluded.quiet_end,primary_installation=excluded.primary_installation,\n      primary_actor=excluded.primary_actor,updated_by=excluded.updated_by,updated_at=excluded.updated_at;\n    v_result:=jsonb_build_object('revision',v_revision,'schedule_revision',v_schedule_revision);\n  ELSIF v_kind='PREFERENCE' THEN\n    v_value:=operation->'value';\n    IF jsonb_typeof(v_value) IS DISTINCT FROM 'object' OR v_value-ARRAY['schedule','paused']<>'{}'::jsonb\n      OR NOT v_value ? 'schedule' OR jsonb_typeof(v_value->'paused') IS DISTINCT FROM 'boolean' THEN\n      RAISE SQLSTATE 'PT422' USING MESSAGE='followup_invalid_preference';\n    END IF;\n    PERFORM followup_private.assert_schedule(v_value->'schedule');\n    v_schedule_revision:=v_customer.schedule_revision; v_effective:=v_customer.effective_from;\n    IF (v_value->'schedule') IS DISTINCT FROM coalesce(v_customer.schedule,'null'::jsonb) THEN\n      v_schedule_revision:=gen_random_uuid(); v_effective:=v_day;\n    END IF;\n    INSERT INTO followup_private.customers(shop_id,customer_uid,revision,schedule_revision,effective_from,schedule,paused)\n      VALUES(shop,v_uid,v_revision,v_schedule_revision,v_effective,nullif(v_value->'schedule','null'::jsonb),(v_value->>'paused')::boolean)\n    ON CONFLICT(shop_id,customer_uid) DO UPDATE SET revision=excluded.revision,schedule_revision=excluded.schedule_revision,\n      effective_from=excluded.effective_from,schedule=excluded.schedule,paused=excluded.paused;\n    v_result:=jsonb_build_object('revision',v_revision,'schedule_revision',v_schedule_revision);\n  ELSIF v_kind IN ('REVIEW','SNOOZE') THEN\n    IF v_claim.phase='HANDOFF_STARTED' OR v_claim.lease_until>v_now THEN RAISE SQLSTATE 'PT409' USING MESSAGE='followup_claim_busy'; END IF;\n    IF v_kind='SNOOZE' THEN\n      IF jsonb_typeof(operation->'until') IS DISTINCT FROM 'string' OR operation->>'until' !~ '^\\d{4}-\\d{2}-\\d{2}$' THEN\n        RAISE SQLSTATE 'PT422' USING MESSAGE='followup_invalid_snooze';\n      END IF;\n      v_until:=(operation->>'until')::date;\n      IF v_until<=v_day OR v_until>v_day+365 THEN RAISE SQLSTATE 'PT422' USING MESSAGE='followup_invalid_snooze'; END IF;\n    END IF;\n    INSERT INTO followup_private.customers(shop_id,customer_uid,revision,snoozed_until,statement_cycle,reviewed_on)\n      VALUES(shop,v_uid,v_revision,v_until,CASE WHEN v_kind='REVIEW' THEN v_cycle END,CASE WHEN v_kind='REVIEW' THEN v_day END)\n    ON CONFLICT(shop_id,customer_uid) DO UPDATE SET revision=excluded.revision,\n      snoozed_until=CASE WHEN v_kind='SNOOZE' THEN excluded.snoozed_until ELSE followup_private.customers.snoozed_until END,\n      statement_cycle=CASE WHEN v_kind='REVIEW' THEN excluded.statement_cycle ELSE followup_private.customers.statement_cycle END,\n      reviewed_on=CASE WHEN v_kind='REVIEW' THEN excluded.reviewed_on ELSE followup_private.customers.reviewed_on END;\n    DELETE FROM followup_private.claims WHERE shop_id=shop AND customer_uid=v_uid;\n    v_result:=jsonb_build_object('revision',v_revision,'reviewed_on',CASE WHEN v_kind='REVIEW' THEN v_day END,'snoozed_until',v_until);\n  ELSIF v_kind='ACQUIRE' THEN\n    IF v_claim.phase='HANDOFF_STARTED' OR v_claim.lease_until>v_now THEN RAISE SQLSTATE 'PT409' USING MESSAGE='followup_claim_busy'; END IF;\n    IF EXISTS(SELECT 1 FROM followup_private.actions WHERE shop_id=shop AND attempt_uid=v_attempt AND kind='ACQUIRE') THEN\n      RAISE SQLSTATE 'PT409' USING MESSAGE='followup_identity_conflict';\n    END IF;\n    INSERT INTO followup_private.claims(shop_id,customer_uid,attempt_uid,actor_id,installation,cycle,phase,lease_until)\n      VALUES(shop,v_uid,v_attempt,v_actor,installation,v_cycle,'PREPARING',v_now+interval '5 minutes')\n    ON CONFLICT(shop_id,customer_uid) DO UPDATE SET attempt_uid=excluded.attempt_uid,actor_id=excluded.actor_id,\n      installation=excluded.installation,cycle=excluded.cycle,phase='PREPARING',lease_until=excluded.lease_until,started_at=NULL,channel=NULL;\n    v_result:=jsonb_build_object('attempt_uid',v_attempt,'phase','PREPARING','lease_until',v_now+interval '5 minutes');\n  ELSIF v_kind IN ('RENEW','START','RELEASE') THEN\n    IF v_claim.attempt_uid IS DISTINCT FROM v_attempt OR v_claim.actor_id IS DISTINCT FROM v_actor\n      OR v_claim.installation IS DISTINCT FROM installation OR v_claim.phase<>'PREPARING' OR v_claim.lease_until<=v_now THEN\n      RAISE SQLSTATE 'PT409' USING MESSAGE='followup_preparation_lost';\n    END IF;\n    IF v_kind='START' THEN\n      IF jsonb_typeof(operation->'channel') IS DISTINCT FROM 'string' OR operation->>'channel' NOT IN ('WHATSAPP','SMS') THEN\n        RAISE SQLSTATE 'PT422' USING MESSAGE='followup_invalid_channel';\n      END IF;\n      UPDATE followup_private.claims SET phase='HANDOFF_STARTED',lease_until=NULL,started_at=v_now,channel=operation->>'channel'\n        WHERE shop_id=shop AND customer_uid=v_uid;\n      v_launch:=true;\n    ELSIF v_kind='RENEW' THEN\n      UPDATE followup_private.claims SET lease_until=v_now+interval '5 minutes' WHERE shop_id=shop AND customer_uid=v_uid;\n    ELSE\n      DELETE FROM followup_private.claims WHERE shop_id=shop AND customer_uid=v_uid;\n    END IF;\n    v_result:=jsonb_build_object('attempt_uid',v_attempt,'phase',CASE v_kind WHEN 'START' THEN 'HANDOFF_STARTED' WHEN 'RENEW' THEN 'PREPARING' ELSE 'RELEASED' END);\n  ELSIF v_kind='RESOLVE' THEN\n    IF v_claim.attempt_uid IS DISTINCT FROM v_attempt OR v_claim.phase IS DISTINCT FROM 'HANDOFF_STARTED' THEN\n      RAISE SQLSTATE 'PT409' USING MESSAGE='followup_attempt_changed';\n    END IF;\n    IF (v_claim.actor_id<>v_actor OR v_claim.installation<>installation) AND v_role<>'owner' THEN\n      RAISE SQLSTATE 'PT403' USING MESSAGE='followup_owner_resolution_required';\n    END IF;\n    IF operation->'acknowledge_uncertainty' IS DISTINCT FROM 'true'::jsonb OR jsonb_typeof(operation->'outcome') IS DISTINCT FROM 'string'\n      OR operation->>'outcome' NOT IN ('REVIEWED','REPORTED_NOT_OPENED','RETRY_UNCERTAIN') THEN\n      RAISE SQLSTATE 'PT422' USING MESSAGE='followup_resolution_confirmation_required';\n    END IF;\n    IF operation->>'outcome'='REVIEWED' THEN\n      INSERT INTO followup_private.customers(shop_id,customer_uid,revision,statement_cycle,reviewed_on)\n        VALUES(shop,v_uid,v_revision,v_claim.cycle,v_day)\n      ON CONFLICT(shop_id,customer_uid) DO UPDATE SET revision=excluded.revision,statement_cycle=excluded.statement_cycle,reviewed_on=excluded.reviewed_on;\n    END IF;\n    DELETE FROM followup_private.claims WHERE shop_id=shop AND customer_uid=v_uid;\n    v_cycle:=v_claim.cycle;\n    v_result:=jsonb_build_object('attempt_uid',v_attempt,'operator_report',operation->>'outcome');\n  ELSIF v_kind='DIGEST' THEN\n    IF v_policy.primary_installation IS DISTINCT FROM installation OR v_policy.primary_actor IS DISTINCT FROM v_actor THEN\n      RAISE SQLSTATE 'PT403' USING MESSAGE='followup_primary_required';\n    END IF;\n    IF operation->'has_work' IS DISTINCT FROM 'true'::jsonb OR v_time<v_policy.preferred_time OR\n      (CASE WHEN v_policy.quiet_start<v_policy.quiet_end THEN v_time>=v_policy.quiet_start AND v_time<v_policy.quiet_end\n        ELSE v_time>=v_policy.quiet_start OR v_time<v_policy.quiet_end END) THEN\n      RAISE SQLSTATE 'PT409' USING MESSAGE='followup_digest_deferred';\n    END IF;\n    INSERT INTO followup_private.digests VALUES(shop,v_day,installation,v_actor,v_now) ON CONFLICT DO NOTHING;\n    v_notify:=FOUND;\n    v_result:=jsonb_build_object('business_date',v_day,'reserved',v_notify);\n  END IF;\n  INSERT INTO followup_private.actions(shop_id,command_uid,kind,actor_id,installation,customer_uid,attempt_uid,cycle,accepted_at)\n    VALUES(shop,command_uid,CASE WHEN v_kind='RESOLVE' THEN operation->>'outcome' ELSE v_kind END,v_actor,installation,v_uid,v_attempt,v_cycle,v_now);\n  INSERT INTO followup_private.commands VALUES(shop,command_uid,v_actor,installation,operation,v_result);\n  RETURN jsonb_build_object('ok',true,'replayed',false,'launch_authorized',v_launch,'notify_authorized',v_notify,\n    'result',v_result,'heads',followup_private.heads(shop,v_day));\nEXCEPTION WHEN SQLSTATE 'PT409' OR SQLSTATE 'PT422' THEN\n  RETURN jsonb_build_object('ok',false,'error',jsonb_build_object('code',SQLERRM));\nWHEN invalid_text_representation OR invalid_datetime_format OR datetime_field_overflow OR numeric_value_out_of_range THEN\n  RETURN jsonb_build_object('ok',false,'error',jsonb_build_object('code','followup_invalid_value'));\nWHEN unique_violation THEN\n  RETURN jsonb_build_object('ok',false,'error',jsonb_build_object('code','followup_identity_conflict'));\nEND $function$\n"
+    },
+    {
+      "proname": "followup_snapshot_v1",
+      "nspname": "public",
+      "definition": "CREATE OR REPLACE FUNCTION public.followup_snapshot_v1(shop uuid)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nDECLARE v_zone text; v_day date;\nBEGIN\n  PERFORM followup_private.actor(shop);\n  PERFORM pg_advisory_xact_lock(hashtextextended(shop::text,0));\n  PERFORM followup_private.actor(shop);\n  SELECT shop_timezone INTO v_zone FROM public.shops WHERE id=shop;\n  IF EXISTS(SELECT 1 FROM pg_catalog.pg_timezone_names WHERE name=v_zone) THEN\n    v_day:=(clock_timestamp() AT TIME ZONE v_zone)::date;\n  END IF;\n  RETURN jsonb_build_object('ok',true,'contract_version',1,'shop_id',shop,'shop_timezone',v_zone,\n    'heads',followup_private.heads(shop,v_day),'server_time_epoch_ms',(extract(epoch FROM clock_timestamp())*1000)::bigint,\n    'policy',(SELECT to_jsonb(p)-'shop_id' FROM followup_private.policies p WHERE shop_id=shop),\n    'customers',coalesce((SELECT jsonb_agg(to_jsonb(c)-'shop_id' ORDER BY customer_uid) FROM followup_private.customers c WHERE shop_id=shop),'[]'::jsonb),\n    'claims',coalesce((SELECT jsonb_agg(to_jsonb(c)-'shop_id' ORDER BY customer_uid) FROM followup_private.claims c WHERE shop_id=shop),'[]'::jsonb),\n    'actions',coalesce((SELECT jsonb_agg(to_jsonb(a)-'shop_id' ORDER BY seq) FROM\n      (SELECT * FROM followup_private.actions WHERE shop_id=shop ORDER BY seq DESC LIMIT 100) a),'[]'::jsonb));\nEND $function$\n"
+    }
+  ],
+  "checks": {
+    "checks": [
+      "acquire retry preserves attempt without external launch",
+      "Admin cannot change Owner policy",
+      "anonymous role denied both RPCs",
+      "another installation cannot renew the claim",
+      "another metadata edit requires a fresh review",
+      "assigned Admin may read current follow-ups",
+      "assigned leadership may change customer follow-up preference",
+      "cashier denied both RPCs",
+      "command UID cannot acquire a different meaning",
+      "credit capability is required before opt-in",
+      "custom cadence changes schedule revision",
+      "disabling cannot bypass an unresolved handoff",
+      "expired lease cannot start",
+      "expired preparation may be replaced by another installation",
+      "explicit posting-phone upgrade acknowledgment is required",
+      "explicit shared review records current shop date",
+      "first primary digest grants one notification attempt",
+      "future snooze accepted",
+      "inactive staff denied both RPCs",
+      "invalid customer cadence rejected: {\"day\": 32, \"kind\": \"MONTHLY\"}",
+      "invalid customer cadence rejected: {\"days\": 366, \"kind\": \"INTERVAL\", \"first_date\": \"2026-10-16\"}",
+      "invalid customer cadence rejected: {\"days\": 7, \"kind\": \"INTERVAL\", \"first_date\": \"2027-02-30\"}",
+      "invalid customer cadence rejected: {\"kind\": \"WEEKLY\", \"weekday\": 0}",
+      "invalid customer cadence rejected: {\"kind\": \"WEEKLY\", \"weekday\": 7, \"payment_terms\": 1}",
+      "invalid policy rejected: {\"balance\": 100}",
+      "invalid policy rejected: {\"preferred_time\": \"24:00\"}",
+      "invalid policy rejected: {\"quiet_end\": \"23:58\"}",
+      "invalid policy rejected: {\"repeat_days\": 31}",
+      "invalid policy rejected: {\"weekday\": \"7\"}",
+      "invalid policy rejected: {\"weekday\": 0}",
+      "lost digest response replay never authorizes another alert",
+      "lost policy response is idempotent",
+      "lost start response replay never authorizes another launch",
+      "migration creates no active shop policy",
+      "missed worker cannot replay an old business date",
+      "missing timezone refuses activation",
+      "missing timezone remains explicit",
+      "monthly customer schedule accepted separately from sale terms",
+      "new command on same shop date cannot reserve twice",
+      "new Credit head invalidates prepared facts",
+      "new synced collection head invalidates prepared facts",
+      "no eligible work creates no notification reservation",
+      "non-cadence setting preserves statement cycle revision",
+      "old attempt identity cannot be reused after resolution",
+      "old policy revision cannot overwrite accepted settings",
+      "old primary rejected after transfer",
+      "one preparation lease acquired",
+      "original accepted start grants one launch",
+      "original installation renews its live lease",
+      "Owner can explicitly resolve another installation without asserting delivery",
+      "Owner can explicitly transfer primary installation",
+      "Owner opt-in creates accepted policy without external action",
+      "pause preserves schedule and cycle identity",
+      "paused customer cannot acquire a handoff",
+      "preferred time cannot become permanently trapped in quiet hours",
+      "primary transfer does not create another daily alert",
+      "private schema denies direct access and all tables enable RLS",
+      "resuming preserves schedule revision",
+      "review acknowledges only the exact started cycle",
+      "review and notification commands make no financial writes",
+      "review cannot silently clear live preparation",
+      "RPC grants explicitly restrict anonymous callers",
+      "second installation cannot claim the same customer",
+      "snapshot contains no customer names or balances",
+      "snooze blocks a handoff before its business date",
+      "snooze must name a future shop date",
+      "stale customer edit cannot overwrite accepted preference",
+      "started handoff cannot expire or release as preparation",
+      "uncertain retry requires explicit acknowledgment",
+      "unknown customer is rejected",
+      "unknown handoff blocks a second attempt",
+      "unrelated business denied both RPCs"
+    ],
+    "passed": 72,
+    "rollback": true
+  },
+  "closure": {
+    "claims": 0,
+    "actions": 0,
+    "digests": 0,
+    "commands": 0,
+    "policies": 0,
+    "customers": 0,
+    "auth_id_fingerprint": "de5541ea7b0323acd102360393ef4c58",
+    "protected_owner_guard": true
+  },
+  "migrations": [
+    {
+      "version": "20260920082151",
+      "name": "phase_a_identity_v1"
+    },
+    {
+      "version": "20260920090710",
+      "name": "phase_a5_ping_search_path"
+    },
+    {
+      "version": "20260920090721",
+      "name": "phase_a5_ping_search_path"
+    },
+    {
+      "version": "20260923194929",
+      "name": "c1_admin_write"
+    },
+    {
+      "version": "20260923195132",
+      "name": "c1_1_admin_write_rpcs"
+    },
+    {
+      "version": "20260923195505",
+      "name": "c1_2_admin_auth_db_helpers"
+    },
+    {
+      "version": "20260923210638",
+      "name": "migration_c1_admin_write"
+    },
+    {
+      "version": "20260923210725",
+      "name": "migration_c1_1_admin_write_rpcs"
+    },
+    {
+      "version": "20260923210744",
+      "name": "migration_c1_2_admin_auth_db_helpers"
+    },
+    {
+      "version": "20260925120001",
+      "name": "c1_1_admin_write_rpcs"
+    },
+    {
+      "version": "20260925120002",
+      "name": "c1_2_admin_auth_db_helpers"
+    },
+    {
+      "version": "20260925120003",
+      "name": "c1_3_hardening"
+    },
+    {
+      "version": "20260925120004",
+      "name": "c1_4_reconciliation"
+    },
+    {
+      "version": "20260925120005",
+      "name": "c1_5_error_semantics"
+    },
+    {
+      "version": "20260929075332",
+      "name": "sync_prod_baseline_records_rpcs_rls"
+    },
+    {
+      "version": "20261010141548",
+      "name": "saaf_c1_6_sync_boundary"
+    },
+    {
+      "version": "20261014102635",
+      "name": "protected_credential_reset_guard"
+    },
+    {
+      "version": "20261015180731",
+      "name": "credit_metadata_v1"
+    },
+    {
+      "version": "20261016195451",
+      "name": "customer_followups_v1"
+    },
+    {
+      "version": "20261016195459",
+      "name": "followup_actor_indexes"
+    }
+  ],
+  "advisorDelta": {
+    "security": {
+      "beforeCount": 3,
+      "afterCount": 3,
+      "newLints": []
+    },
+    "performance": {
+      "beforeCount": 1,
+      "afterCount": 2,
+      "newLints": [
+        {
+          "name": "unused_index",
+          "title": "Unused Index",
+          "level": "INFO",
+          "facing": "EXTERNAL",
+          "categories": [
+            "PERFORMANCE"
+          ],
+          "description": "Detects if an index has never been used and may be a candidate for removal.",
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index",
+          "count": 6,
+          "findings": [
+            {
+              "detail": "Index \\`followup_actions_actor\\` on table \\`followup_private.actions\\` has not been used",
+              "metadata": {
+                "name": "actions",
+                "type": "table",
+                "schema": "followup_private"
+              },
+              "observed_at": "2026-10-16T19:55:41.650Z"
+            },
+            {
+              "detail": "Index \\`followup_claims_actor\\` on table \\`followup_private.claims\\` has not been used",
+              "metadata": {
+                "name": "claims",
+                "type": "table",
+                "schema": "followup_private"
+              },
+              "observed_at": "2026-10-16T19:55:41.650Z"
+            },
+            {
+              "detail": "Index \\`followup_commands_actor\\` on table \\`followup_private.commands\\` has not been used",
+              "metadata": {
+                "name": "commands",
+                "type": "table",
+                "schema": "followup_private"
+              },
+              "observed_at": "2026-10-16T19:55:41.650Z"
+            },
+            {
+              "detail": "Index \\`followup_digests_actor\\` on table \\`followup_private.digests\\` has not been used",
+              "metadata": {
+                "name": "digests",
+                "type": "table",
+                "schema": "followup_private"
+              },
+              "observed_at": "2026-10-16T19:55:41.650Z"
+            },
+            {
+              "detail": "Index \\`followup_policies_primary_actor\\` on table \\`followup_private.policies\\` has not been used",
+              "metadata": {
+                "name": "policies",
+                "type": "table",
+                "schema": "followup_private"
+              },
+              "observed_at": "2026-10-16T19:55:41.650Z"
+            },
+            {
+              "detail": "Index \\`followup_policies_updated_by\\` on table \\`followup_private.policies\\` has not been used",
+              "metadata": {
+                "name": "policies",
+                "type": "table",
+                "schema": "followup_private"
+              },
+              "observed_at": "2026-10-16T19:55:41.650Z"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "ordinaryAppInstalled": false,
+  "shopActivated": false,
+  "customerContact": false
+}

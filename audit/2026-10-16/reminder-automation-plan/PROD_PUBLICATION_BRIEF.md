@@ -1,5 +1,7 @@
 # Exact reminder contract publication — prepared, awaiting approval
 
+**Historical preparation brief:** the user subsequently approved this exact package and publication is complete; [current result](PROD_PUBLICATION_RESULT.md).
+
 17 October 2026; source baseline `cc60170`. Destination: **saafmilk-prod (`tlsuxbghuhlqntkgtrxt`)**. This package prepares publication only. No migration, synthetic fixture or ordinary app update has been applied to PROD. [Exact source/check manifest](PROD_PUBLICATION_MANIFEST.json).
 
 ## Change

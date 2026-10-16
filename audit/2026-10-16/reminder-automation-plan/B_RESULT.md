@@ -1,5 +1,7 @@
 # B server-contract checkpoint
 
+**17 October publication update:** ✅ ~~Exact approved PROD reminder publication and72 rolled-back checks~~ are complete. [Result](PROD_PUBLICATION_RESULT.md). B server/client implementation and bounded technical acceptance/publication are complete; signed ordinary delivery remains phase1 and C remains the automatic-SMS decision. All earlier "PROD approval pending" statements below are historical.
+
 **17 October current acceptance:** ✅ ~~B implementation and bounded real DEV/two-phone coordination/recovery plus actual native Activity notification routing~~ are accepted. [Result](B_ACCEPTANCE_RESULT.md). The earlier sequential concurrency attempt below remains historical/inconclusive; the new calibrated overlapping-HTTP run establishes one winner at its stated two-client scope. Exact PROD publication approval and signed ordinary delivery under phase1 remain, followed by C. No real shop was activated.
 
 16 October 2026. Source baseline `48bdabe`. This completes B's DEV contract checkpoint; B as a whole remains open. [Frozen scope](B_SCOPE.md). No ordinary Android entry, scheduler, PROD change, installation or customer sending is claimed.

@@ -51,14 +51,14 @@ internal fun CustomerCreditBody(detail: NativeOwnerCustomerDetail, owner: Boolea
         CustomerCreditStatusText(credit)
         Text(credit.explanation,style=MaterialTheme.typography.bodyMedium)
         }
-        NativeInformationFact("Future sale terms",credit.term.label)
+        NativeInformationFact("Terms for new sales",credit.term.label)
         if(content != CustomerCreditContent.Summary) {
             if(credit.status.usesLegacyWeekly) Text("Older sales use the recorded 7-day default.",style=MaterialTheme.typography.bodyMedium)
-            Text("Current debt only; this is not a lifetime reliability score. Sunday bills do not change payment deadlines.",style=MaterialTheme.typography.bodyMedium)
+            Text("Based on unpaid sales, not the customer's full history. Sunday bills do not extend payment deadlines.",style=MaterialTheme.typography.bodyMedium)
         }
         if(owner && content != CustomerCreditContent.Summary) {
             if(!credit.enabled) {
-                Text("Sync and enable credit terms after every posting phone is updated. Existing credit posting stays on its recorded default.")
+                Text("Update and sync every device used for sales before enabling this. Until then, credit sales keep the default payment terms.")
                 OutlinedButton(onClick=hapticAction { dialog="enable" },enabled=!busy,
                     modifier=Modifier.fillMaxWidth().testTag("credit-enable")) { Text("Enable agreed terms") }
             } else {
@@ -67,12 +67,12 @@ internal fun CustomerCreditBody(detail: NativeOwnerCustomerDetail, owner: Boolea
                     mode=when(credit.term) { CreditPaymentTerm.Weekly->"7 days"; CreditPaymentTerm.Monthly->"Calendar month"
                         CreditPaymentTerm(CreditTermKind.NET_DAYS,30)->"30 days"; else->"Custom days" }
                     days=credit.term.value.toString(); dialog="terms"
-                },enabled=!busy,modifier=Modifier.fillMaxWidth().testTag("credit-edit-terms")) { Text("Change future sale terms") }
+                },enabled=!busy,modifier=Modifier.fillMaxWidth().testTag("credit-edit-terms")) { Text("Change terms for new sales") }
                 OutlinedButton(onClick=hapticAction { reason=""; dialog="set" },enabled=!busy,
-                    modifier=Modifier.fillMaxWidth().testTag("credit-set-flag")) { Text("Flag for Owner review") }
+                    modifier=Modifier.fillMaxWidth().testTag("credit-set-flag")) { Text("Mark for Owner review") }
                 if(credit.activeSetUids.isNotEmpty()) OutlinedButton(onClick=hapticAction {
                     reviewedSets=credit.activeSetUids.toSet(); reason=""; dialog="clear"
-                },enabled=!busy,modifier=Modifier.fillMaxWidth().testTag("credit-clear-flag")) { Text("Clear reviewed flags") }
+                },enabled=!busy,modifier=Modifier.fillMaxWidth().testTag("credit-clear-flag")) { Text("Clear reviewed marks") }
             }
         }
         if(content == CustomerCreditContent.Summary) Box(Modifier.fillMaxWidth().height(4.dp)) {
@@ -83,13 +83,13 @@ internal fun CustomerCreditBody(detail: NativeOwnerCustomerDetail, owner: Boolea
     if(credit.pending.isNotEmpty()) CreditInformationSection(content,Modifier.fillMaxWidth().testTag("credit-pending")) {
         Text("Changes awaiting sync",style=MaterialTheme.typography.titleMedium)
         for(change in credit.pending) {
-            Text("${change.description} · ${if(change.held) "Held for Owner review" else "Pending server acceptance"}")
+            Text("${change.description} · ${if(change.held) "Needs Owner review" else "Waiting for sync"}")
             if(owner && change.held && credit.enabled) {
                 TextButton(onClick=hapticAction { pendingUid=change.uid; dialog="retry" },enabled=!busy) { Text("Review and retry") }
-                if(change.kind=="TERM_REVISION") TextButton(onClick=hapticAction { pendingUid=change.uid; dialog="discard" },enabled=!busy) { Text("Discard held terms proposal") }
+                if(change.kind=="TERM_REVISION") TextButton(onClick=hapticAction { pendingUid=change.uid; dialog="discard" },enabled=!busy) { Text("Discard unsynced terms") }
             }
         }
-        Text("Pending actions do not replace accepted terms or flags. Sync, then refresh this customer.",style=MaterialTheme.typography.bodySmall)
+        Text("These changes are not confirmed yet. Current terms and review marks still apply. Sync, then refresh this customer.",style=MaterialTheme.typography.bodySmall)
     }
     if(content == CustomerCreditContent.All) {
     TextButton(onClick=hapticAction { showLedger=!showLedger },modifier=Modifier.testTag("credit-history")) {
@@ -101,12 +101,12 @@ internal fun CustomerCreditBody(detail: NativeOwnerCustomerDetail, owner: Boolea
             Text("${entry.occurredAt} · ${entry.taskLabel} · ${entry.stateLabel}",style=MaterialTheme.typography.labelLarge)
             NativeInformationFact(entry.movementLabel,"Balance ${entry.balanceAfterLabel}")
         }
-        if(detail.ledger?.entries.isNullOrEmpty()) Text("No ledger movements yet.")
+        if(detail.ledger?.entries.isNullOrEmpty()) Text("No account activity yet.")
     }
     TextButton(onClick=hapticAction { showAudit=!showAudit },modifier=Modifier.testTag("credit-audit")) { Text(if(showAudit) "Close review history" else "Terms and review history") }
     }
     if(showAudit || content == CustomerCreditContent.Management) CreditInformationSection(content,Modifier.fillMaxWidth().testTag("credit-audit-history")) {
-        Text("Owner review actions and accepted payment terms.",style=MaterialTheme.typography.bodySmall)
+        Text("Payment terms and Owner review history.",style=MaterialTheme.typography.bodySmall)
         credit.history.sortedDescending().forEach { Text(it,style=MaterialTheme.typography.bodyMedium) }
         if(credit.history.isEmpty()) Text("No terms changes or review actions.")
     }
@@ -114,12 +114,12 @@ internal fun CustomerCreditBody(detail: NativeOwnerCustomerDetail, owner: Boolea
         val custom=days.toIntOrNull()?.takeIf { it in 1..365 }
         val valid=when(dialog) { "terms" -> mode!="Custom days" || custom!=null; "set","clear" -> reason.trim().length in 1..500; else->true }
         AlertDialog(onDismissRequest={ if(!busy) dialog="" },title={ Text(when(dialog) {
-            "terms"->"Future sale terms"; "set"->"Owner review flag"; "clear"->"Clear reviewed flags"
-            "enable"->"Enable agreed credit terms?"; "discard"->"Discard held proposal?"; else->"Retry this change?"
+            "terms"->"Terms for new sales"; "set"->"Owner review mark"; "clear"->"Clear reviewed marks"
+            "enable"->"Enable agreed credit terms?"; "discard"->"Discard unsynced terms?"; else->"Retry this change?"
         }) },text={ Column(Modifier.imePadding().verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(8.dp)) {
             when(dialog) {
                 "terms" -> {
-                    Text("Applies to future new credit sales after server acceptance. Existing sales keep their agreed terms.")
+                    Text("Applies to new credit sales after sync confirms the change. Existing sales keep their agreed terms.")
                     listOf("7 days","Calendar month","30 days","Custom days").forEach { option ->
                         Row(Modifier.fillMaxWidth().clickable(onClick=hapticAction { mode=option }),verticalAlignment=androidx.compose.ui.Alignment.CenterVertically) {
                             RadioButton(mode==option,onClick=hapticAction { mode=option }); Text(option)
@@ -127,15 +127,15 @@ internal fun CustomerCreditBody(detail: NativeOwnerCustomerDetail, owner: Boolea
                     }
                     if(mode=="Custom days") OutlinedTextField(days,{ days=it },label={ Text("Days (1–365)") },singleLine=true,
                         keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number),modifier=Modifier.testTag("credit-custom-days"))
-                    Text("Calendar month means the same date next month, clamped to its final day. It is different from 30 days.")
+                    Text("A calendar month ends on the same date next month, or its last day if that date is missing. This is different from 30 days.")
                 }
                 "set","clear" -> {
-                    Text(if(dialog=="clear") "Clear only the flags reviewed now. Any unseen flag remains active. Overdue debt stays overdue." else "This judgment is separate from the calculated debt status. Payments do not clear it automatically.")
+                    Text(if(dialog=="clear") "Clear only the marks you reviewed. Any other marks stay active. Overdue debt stays overdue." else "This review mark is separate from the debt status. It stays until cleared, even if the customer pays.")
                     OutlinedTextField(reason,{reason=it},label={ Text("Reason") },modifier=Modifier.fillMaxWidth().testTag("credit-review-reason"))
                 }
-                "enable" -> Text("Confirm every phone used to post sales has this compatible version and has synced. Old offline versions must stay out of use. The server will refuse new credit sales without recorded terms.")
-                "discard" -> Text("Only this unaccepted terms proposal is removed; its reviewed body remains in the security audit. Accepted agreements and history stay unchanged. You can then choose terms again.")
-                else -> Text("Retry the same immutable change after reviewing sync. If terms changed elsewhere, discard the held terms proposal and choose again.")
+                "enable" -> Text("Update and sync every device used for sales. Stop using old versions, including offline devices. New credit sales must include recorded payment terms to sync.")
+                "discard" -> Text("Remove only this unsynced terms change. Its details stay in the security history. Confirmed terms and history stay unchanged. You can then choose terms again.")
+                else -> Text("Check Sync, then retry this same change. If another device changed the terms, discard this unsynced change and choose again.")
             }
         } },confirmButton={ TextButton(onClick=hapticCommitAction {
             if(!valid || busy) return@hapticCommitAction
@@ -148,7 +148,7 @@ internal fun CustomerCreditBody(detail: NativeOwnerCustomerDetail, owner: Boolea
                 else->CustomerCreditCommand.Retry(pendingUid)
             }
             dialog=""; onAction(command)
-        },enabled=valid && !busy,modifier=Modifier.testTag("credit-confirm")) { Text(if(dialog=="enable") "All posting phones are updated" else "Confirm") } },
+        },enabled=valid && !busy,modifier=Modifier.testTag("credit-confirm")) { Text(if(dialog=="enable") "All sales devices are updated" else "Confirm") } },
             dismissButton={ TextButton(onClick=hapticAction { dialog="" },enabled=!busy) { Text("Cancel") } })
     }
 }

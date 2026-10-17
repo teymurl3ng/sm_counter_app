@@ -16,10 +16,10 @@ data class CustomerReminder(val customerId: Long,val customerUid: String,val cus
     val knownOverduePaisa: Long=0,val partialOverdue: Boolean=false) {
     val message: String? get()=if(balancePaisa<=0) null else
         "Hello $customerName, your outstanding balance with $shopName is ${statementMoney(balancePaisa)} as of $asOf."+
-        (if(knownOverduePaisa>0) " ${if(partialOverdue) "Known overdue amount (partial coverage)" else "Overdue amount"}: ${statementMoney(knownOverduePaisa)}." else "")+
+        (if(knownOverduePaisa>0) " ${if(partialOverdue) "Confirmed overdue amount (some records need checking)" else "Overdue amount"}: ${statementMoney(knownOverduePaisa)}." else "")+
         " Please arrange payment according to your agreed terms. If you have already paid, please let us know. Thank you."
 }
-enum class CommunicationEvent(val label: String) { PREPARED("Draft prepared"),CHOOSER_OPENED("Share menu opened"),COMPOSER_OPENED("Composer opened"),HANDOFF_FAILED("Handoff failed") }
+enum class CommunicationEvent(val label: String) { PREPARED("Draft prepared"),CHOOSER_OPENED("Share menu opened"),COMPOSER_OPENED("Message app opened"),HANDOFF_FAILED("Could not confirm the app opened") }
 data class CustomerCommunicationAction(val operationId: String,val customerUid: String,val kind: String,
     val channel: String,val context: String,val event: CommunicationEvent) {
     fun json(): String=JSONObject().put("version",1).put("operation",operationId).put("customer",customerUid)
@@ -41,7 +41,7 @@ data class CustomerCommunicationHistory(val occurredAt: String,val kind: String,
 internal class CustomerCommunicationService(private val db: MilkShopDatabase,private val security: UserSecurityService) {
     private suspend fun authorized(session: String,accountId: Long): Pair<AppUserEntity,AccountEntity> {
         val actor=security.requirePermission(session,AppPermission.VIEW_FULL_FINANCIAL)
-        require(AppRole.parse(actor.role) in setOf(AppRole.OWNER,AppRole.MANAGER,AppRole.ADMIN)) {"Customer communication requires leadership access."}
+        require(AppRole.parse(actor.role) in setOf(AppRole.OWNER,AppRole.MANAGER,AppRole.ADMIN)) {"Sign in as Owner, Admin or Manager to prepare customer messages."}
         val account=requireNotNull(db.accountDao().findById(accountId)) {"Customer is no longer available."}
         require(account.category=="Customer") {"Choose a customer account."}
         return actor to account

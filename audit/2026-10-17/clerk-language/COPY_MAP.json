@@ -1,0 +1,1032 @@
+{
+  "baseline": "6945500",
+  "changes": [
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Request review is unavailable.",
+      "new": "Action review is unavailable.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "The request could not be checked. Try again.",
+      "new": "The action could not be checked. Try again.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Shared follow-up activity",
+      "new": "Follow-up activity",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Shared activity & request review",
+      "new": "Activity & unfinished actions",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Set aside local request",
+      "new": "Remove from this device",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Set aside this local request?",
+      "new": "Remove from this device?",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Set aside",
+      "new": "Remove from this device",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Keep request",
+      "new": "Keep for review",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Unfinished follow-up save",
+      "new": "Save needs checking",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Shared state may have changed · Check the unfinished save",
+      "new": "Changes may already be saved · Check the result",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "The save is unfinished. Check its result before making another change.",
+      "new": "The save was not confirmed. Check its result before making another change.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Local unfinished save set aside. This does not undo a server change.",
+      "new": "Removed from this device. Any change already synced stays in place.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Save result checked. Current shared settings are shown.",
+      "new": "Save checked. The latest synced settings are shown.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "The save result is still unresolved. Refresh or set aside only this local request.",
+      "new": "The save is still unconfirmed. Refresh, or remove only this device's unfinished action.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Local request set aside. Shared changes and message attempts are unchanged.",
+      "new": "Removed from this device. Synced changes and message attempts stay in place.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Request result checked. No app was opened and no alert was posted.",
+      "new": "Action checked. No message app opened and no alert was shown.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "The request is still unfinished. Review the current shared state before trying again.",
+      "new": "The action is still unconfirmed. Check the latest synced records before trying again.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Check save result",
+      "new": "Check save",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Automatic follow-ups are off.",
+      "new": "Follow-up reminders are off.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "No current follow-up snapshot. Refresh to continue.",
+      "new": "Follow-ups are not up to date. Refresh to continue.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "This only removes the unfinished request from this device. A change accepted by the server stays in place. Refresh to see its current state. It does not cancel or undo that change.",
+      "new": "Remove only this device's unfinished save. Any change already synced stays in place. Refresh to see the latest result.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Connect before a coordinated message handoff. You can still review the draft and statement.",
+      "new": "Connect before opening a message app. You can still review the draft and statement offline.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Review the statement here, or compose the reviewed message manually on the shop's separate phone. This app cannot confirm that sending.",
+      "new": "Review the statement here, or type and send the checked message on the shop's separate phone. This app cannot confirm whether you sent it.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Owner attention",
+      "new": "Owner reminders",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Automatic follow-ups",
+      "new": "Follow-up reminders",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Notifications may run late. Customer records stay inside the app.",
+      "new": "Alerts may arrive late. Customer details are not shown in alerts.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Around (HH:mm)",
+      "new": "Alert time (HH:mm)",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Shop statement weekday",
+      "new": "Weekly statement day",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Overdue follow-up interval (1–30 days)",
+      "new": "Repeat overdue reviews after (1–30 days)",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Automatic SMS: not configured. The tablet does not send through the separate shop phone.",
+      "new": "Automatic SMS is not set up. To use the separate shop phone, type and send the message there.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Use a 1–30 day interval, valid HH:mm times and different quiet-hour endpoints.",
+      "new": "Enter 1–30 days and valid HH:mm times. Quiet hours must start and end at different times. Keep the alert time outside quiet hours.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Only Owner can change the shop policy.",
+      "new": "Only Owner can change these shop settings.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Connect to save shared settings.",
+      "new": "Connect to save settings for all devices.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "One device receives owner alerts. Synced devices need a connection to check message settings before opening a customer message, including when follow-ups are off. Drafts and statements remain available offline. The app cannot see payments on another offline device.",
+      "new": "One device receives Owner alerts. Synced devices must connect before opening customer messages, even with reminders off. Drafts and statements work offline. Payments on another offline device may be missing.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "All posting devices have the compatible update",
+      "new": "All sales devices are updated",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Owner needs to save shop follow-up settings before a customer schedule can be saved.",
+      "new": "Ask Owner to save the shop follow-up settings first.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Payment terms stay attached to each sale. This only changes statement review timing.",
+      "new": "This changes when to review statements. Each sale keeps its payment deadline.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Day of month (1–31; 0 for last day)",
+      "new": "Day of month (1–31, or 0 for last day)",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Short months use their last day; the original day resumes next month.",
+      "new": "If the day is missing, use the last day of that month. Later months keep the day you chose.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt",
+      "old": "Paused removes automated attention; manual account review stays available.",
+      "new": "Paused customers do not appear in follow-up reminders. You can still open their accounts manually.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpSharedReview.kt",
+      "old": "Set aside local request",
+      "new": "Remove from this device",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpSharedReview.kt",
+      "old": "Check request result",
+      "new": "Check action",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpSharedReview.kt",
+      "old": "Checking a request never opens a messaging app or posts an alert. Staff reports do not prove sending, delivery or payment.",
+      "new": "Checking can finish an unconfirmed save. It never opens a message app or shows an alert. Staff reports do not confirm sending, delivery or payment.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpSharedReview.kt",
+      "old": "Unfinished requests",
+      "new": "Unfinished actions",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpSharedReview.kt",
+      "old": "No unfinished requests on this device.",
+      "new": "No unfinished actions on this device.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpSharedReview.kt",
+      "old": "From a different connection. It cannot be retried here. Setting it aside removes only this local copy.",
+      "new": "Saved under another connection. You cannot retry it here. Removing it clears only this device's copy.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpSharedReview.kt",
+      "old": "Message preparations & handoffs",
+      "new": "Message attempts",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpSharedReview.kt",
+      "old": "No active shared message attempts.",
+      "new": "No message attempts waiting for review.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpSharedReview.kt",
+      "old": "A messaging app may have opened. This handoff stays unresolved until reviewed.",
+      "new": "A message app may have opened. Review this attempt before starting another.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpSharedReview.kt",
+      "old": "A device has reserved message preparation. Nothing is confirmed sent.",
+      "new": "A device is preparing this message. Sending is not confirmed.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpSharedReview.kt",
+      "old": "The preparing device or Owner must review this attempt.",
+      "new": "Review this attempt on the device that started it, or ask Owner.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpSharedReview.kt",
+      "old": "Latest shared activity",
+      "new": "Latest synced activity",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpSharedReview.kt",
+      "old": "Latest 100 accepted actions. This is separate from preparation history saved on one phone.",
+      "new": "Latest 100 actions confirmed by sync. Each device also has its own draft and share history.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpSharedReview.kt",
+      "old": "No shared activity yet.",
+      "new": "No synced activity yet.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpReviewModels.kt",
+      "old": "Message preparation reserved",
+      "new": "Message preparation started",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpReviewModels.kt",
+      "old": "Message preparation extended",
+      "new": "Message preparation time extended",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpReviewModels.kt",
+      "old": "Message app handoff started",
+      "new": "Message app may have opened",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpReviewModels.kt",
+      "old": "Message handoff reviewed",
+      "new": "Message attempt reviewed",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpReviewModels.kt",
+      "old": "Handoff marked reviewed by staff",
+      "new": "Message attempt marked reviewed by staff",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpReviewModels.kt",
+      "old": "Staff reported no composer opened",
+      "new": "Staff reported the message app did not open",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpReviewModels.kt",
+      "old": "Owner alert reserved",
+      "new": "Owner alert check recorded",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpReviewModels.kt",
+      "old": "Request needs review",
+      "new": "Action needs review",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspaceBinding.kt",
+      "old": "This request is no longer present. Refresh first.",
+      "new": "This action is no longer listed. Refresh first.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspaceBinding.kt",
+      "old": "Only Owner can change the shop policy.",
+      "new": "Only Owner can change these shop settings.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspaceBinding.kt",
+      "old": "Saved reminder state · Sync needed",
+      "new": "Saved on this device · Sync needed",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspaceBinding.kt",
+      "old": "Checked against shared records",
+      "new": "Checked against synced records",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspaceBinding.kt",
+      "old": "Check or set aside the unfinished save first.",
+      "new": "Check the unfinished save first, or remove it from this device.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspaceBinding.kt",
+      "old": "Confirm that all posting devices are updated.",
+      "new": "Confirm that all sales devices are updated.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspaceBinding.kt",
+      "old": "A message or notification request requires its separate review flow.",
+      "new": "Review this message or alert under Activity & unfinished actions.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspaceBinding.kt",
+      "old": "Only Owner can review an unfinished shop-policy save.",
+      "new": "Only Owner can check an unfinished shop-settings save.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspaceBinding.kt",
+      "old": "Connect to check the current shared state before reviewing this request.",
+      "new": "Connect to check the latest synced records before reviewing this action.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspaceBinding.kt",
+      "old": "This request belongs to a different connection. It cannot be replayed here.",
+      "new": "This action was saved under another connection. You cannot retry it here.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspaceBinding.kt",
+      "old": "Only Owner can review a shop-settings request.",
+      "new": "Only Owner can check a shop-settings change.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerFollowUpScheduleScreen.kt",
+      "old": "Set aside local request",
+      "new": "Remove from this device",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerFollowUpScheduleScreen.kt",
+      "old": "Set aside local request?",
+      "new": "Remove from this device?",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerFollowUpScheduleScreen.kt",
+      "old": "Keep request",
+      "new": "Keep for review",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerFollowUpScheduleScreen.kt",
+      "old": "The save needs review. Check the unfinished request in Follow-up settings before changing it again.",
+      "new": "The save was not confirmed. Check it in Follow-up settings before changing it again.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerFollowUpScheduleScreen.kt",
+      "old": "Review unfinished requests under Customers → Follow-ups → Settings → Shared activity & request review.",
+      "new": "Check unfinished actions under Customers → Follow-ups → Settings → Activity & unfinished actions.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerFollowUpScheduleScreen.kt",
+      "old": "The server may already have accepted this request. This removes only the unfinished copy on this device. It does not undo a shared change, cancel a message preparation, resolve a handoff or confirm sending. The original connection or Owner may still need to review the shared attempt.",
+      "new": "This action may already be saved online. Remove only this device's unfinished copy. Synced changes, message preparation and unreviewed attempts stay in place. This does not confirm sending. The original account or Owner may still need to review the attempt.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "Set aside local request",
+      "new": "Remove from this device",
+      "count": 2
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "Set aside local request?",
+      "new": "Remove from this device?",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "Keep request",
+      "new": "Keep for review",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "Composer opened. Review and send in the other app; sending is not confirmed.",
+      "new": "Message app opened. Review and send there. Sending is not confirmed.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "No composer opened. Review this handoff before trying another channel. Keep the draft or share the statement manually.",
+      "new": "The message app did not open. Review this attempt before trying another option. You can keep the draft or share the statement.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "WhatsApp is unavailable. Choose SMS or enable WhatsApp, then try again.",
+      "new": "WhatsApp is not available. Set it up, or choose another option.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "The composer could not open. Try again.",
+      "new": "The message app could not open. Try again.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "Refresh the shared handoff before continuing.",
+      "new": "Refresh this message attempt before continuing.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": " Local history could not be saved.",
+      "new": " History on this device could not be saved.",
+      "count": 2
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "Handoff review updated. Sending or payment is not confirmed.",
+      "new": "Message review saved. Sending or payment is not confirmed.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "The handoff could not be checked. Refresh before continuing.",
+      "new": "The message attempt could not be checked. Refresh before continuing.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "Enter one full international number before opening a composer.",
+      "new": "Enter one full number with + and the country code before opening a message app.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "I checked the recipient",
+      "new": "I checked this number",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "Shared message check",
+      "new": "Check before messaging",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "Checking current shared records…",
+      "new": "Checking the latest synced records…",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "Check unfinished request",
+      "new": "Check unfinished action",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "Review handoff",
+      "new": "Review message attempt",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "The server may already have accepted this request. This only removes the unfinished request on this phone. It does not cancel a preparation, undo a handoff or confirm sending. Current shared records will still block another message when needed.",
+      "new": "This action may already be saved online. Remove only this device's unfinished copy. Message preparation and unreviewed attempts stay in place. This does not confirm sending.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "Review message handoff",
+      "new": "Review message attempt",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "A composer may already have opened. This app cannot confirm sending or delivery. Choose what you know before another attempt.",
+      "new": "A message app may have opened. This app cannot confirm sending or delivery. Record what you know before trying again.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "No composer opened",
+      "new": "Message app did not open",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "I understand this is my report, not proof of sending or payment",
+      "new": "This records my report. It does not confirm sending or payment.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "Preparation history",
+      "new": "Draft & share history",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "Latest 50 actions stored on this phone, including restored backups. This is not shared sending or delivery history.",
+      "new": "Latest 50 actions saved on this device, including restored backups. This history is not shared across devices and does not confirm sending or delivery.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+      "old": "No preparation actions recorded yet.",
+      "new": "No drafts or share actions recorded yet.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Pending server acceptance",
+      "new": "Waiting for sync",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Held for Owner review",
+      "new": "Needs Owner review",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Future sale terms",
+      "new": "Terms for new sales",
+      "count": 2
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Change future sale terms",
+      "new": "Change terms for new sales",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Flag for Owner review",
+      "new": "Mark for Owner review",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Clear reviewed flags",
+      "new": "Clear reviewed marks",
+      "count": 2
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Owner review flag",
+      "new": "Owner review mark",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Discard held terms proposal",
+      "new": "Discard unsynced terms",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Discard held proposal?",
+      "new": "Discard unsynced terms?",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Current debt only; this is not a lifetime reliability score. Sunday bills do not change payment deadlines.",
+      "new": "Based on unpaid sales, not the customer's full history. Sunday bills do not extend payment deadlines.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Sync and enable credit terms after every posting phone is updated. Existing credit posting stays on its recorded default.",
+      "new": "Update and sync every device used for sales before enabling this. Until then, credit sales keep the default payment terms.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Pending actions do not replace accepted terms or flags. Sync, then refresh this customer.",
+      "new": "These changes are not confirmed yet. Current terms and review marks still apply. Sync, then refresh this customer.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "No ledger movements yet.",
+      "new": "No account activity yet.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Owner review actions and accepted payment terms.",
+      "new": "Payment terms and Owner review history.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Applies to future new credit sales after server acceptance. Existing sales keep their agreed terms.",
+      "new": "Applies to new credit sales after sync confirms the change. Existing sales keep their agreed terms.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Calendar month means the same date next month, clamped to its final day. It is different from 30 days.",
+      "new": "A calendar month ends on the same date next month, or its last day if that date is missing. This is different from 30 days.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Clear only the flags reviewed now. Any unseen flag remains active. Overdue debt stays overdue.",
+      "new": "Clear only the marks you reviewed. Any other marks stay active. Overdue debt stays overdue.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "This judgment is separate from the calculated debt status. Payments do not clear it automatically.",
+      "new": "This review mark is separate from the debt status. It stays until cleared, even if the customer pays.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Confirm every phone used to post sales has this compatible version and has synced. Old offline versions must stay out of use. The server will refuse new credit sales without recorded terms.",
+      "new": "Update and sync every device used for sales. Stop using old versions, including offline devices. New credit sales must include recorded payment terms to sync.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Only this unaccepted terms proposal is removed; its reviewed body remains in the security audit. Accepted agreements and history stay unchanged. You can then choose terms again.",
+      "new": "Remove only this unsynced terms change. Its details stay in the security history. Confirmed terms and history stay unchanged. You can then choose terms again.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "Retry the same immutable change after reviewing sync. If terms changed elsewhere, discard the held terms proposal and choose again.",
+      "new": "Check Sync, then retry this same change. If another device changed the terms, discard this unsynced change and choose again.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+      "old": "All posting phones are updated",
+      "new": "All sales devices are updated",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerStatementScreen.kt",
+      "old": "Held for Owner review. Accepted terms and flags remain in effect.",
+      "new": "Needs Owner review. Current confirmed terms and review marks still apply.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerStatementScreen.kt",
+      "old": "Pending server acceptance. Accepted terms and flags remain in effect.",
+      "new": "Waiting for sync. Current confirmed terms and review marks still apply.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerStatementScreen.kt",
+      "old": "Prepared $generated. This snapshot reflects local records for the selected period. Product names are current catalog labels.",
+      "new": "Prepared $generated from records on this device for the selected period. Product names match the current product list.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerStatementScreen.kt",
+      "old": "No ledger movements yet.",
+      "new": "No account activity yet.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerStatementScreen.kt",
+      "old": "Preparation history",
+      "new": "Draft & share history",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/StatementExportUi.kt",
+      "old": " Local history could not be saved.",
+      "new": " History on this device could not be saved.",
+      "count": 2
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/StatementExportUi.kt",
+      "old": "Rendering page…",
+      "new": "Preparing page…",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/StatementExportUi.kt",
+      "old": "Choose the recipient in Android's share menu. Opening it does not confirm sending.",
+      "new": "Choose who to share with in the share menu. Opening it does not confirm sending.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCustomersController.kt",
+      "old": "Terms proposal saved. Effective after sync acceptance.",
+      "new": "Terms saved on this device. They apply after sync confirms the change.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCustomersController.kt",
+      "old": "Held change queued for retry",
+      "new": "Change ready to retry on the next sync",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCustomersController.kt",
+      "old": "Held terms proposal discarded",
+      "new": "Unsynced terms discarded",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCustomersController.kt",
+      "old": "Review action saved. Pending sync acceptance.",
+      "new": "Review saved on this device. Waiting for sync.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerCreditView.kt",
+      "old": "Pending server acceptance",
+      "new": "Waiting for sync",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerCreditView.kt",
+      "old": "Some debt cannot be dated or its agreement is unavailable. Review the account history.",
+      "new": "Some debt has no confirmed date or payment terms. Check the account history.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerCreditView.kt",
+      "old": "Next unpaid deadline: ${status.nextDeadline}.",
+      "new": "Next payment due: ${status.nextDeadline}.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerCreditView.kt",
+      "old": "Payment terms proposal",
+      "new": "Terms change",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "Request review is unavailable.",
+      "new": "Action review is unavailable.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "Connect to check shared follow-ups before opening a message.",
+      "new": "Connect to check follow-up records before opening a message app.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "Shared follow-ups are unavailable. Refresh the shop settings.",
+      "new": "Follow-up records are unavailable. Refresh the shop settings.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "Check the unfinished message request before trying again.",
+      "new": "Check the unfinished message action before trying again.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "A message handoff needs review before another message can open.",
+      "new": "Review the previous message attempt before opening another.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "Shared follow-ups are off. Review the shop settings before opening a coordinated message.",
+      "new": "Follow-up reminders are off. Review the shop settings before opening a message app.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "This customer is paused or snoozed. Resume follow-ups before opening a coordinated message.",
+      "new": "Follow-ups for this customer are paused or postponed. Resume them before opening a message app.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "The message request needs review. Check its result before trying again.",
+      "new": "The message action needs checking. Check its result before trying again.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "Shared records changed. Review them before continuing.",
+      "new": "Synced records changed. Review them before continuing.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "The handoff is uncertain. Review it before opening another message.",
+      "new": "The last attempt is unconfirmed. Review it before opening another message.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "Records changed before opening. Review the started handoff before trying again.",
+      "new": "Records changed before the message app opened. Review this attempt before trying again.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "Composer opened; sending is not confirmed. Review this handoff before opening another message.",
+      "new": "Message app opened. Sending is not confirmed. Review this attempt before opening another message.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "This unfinished request is no longer present. Refresh first.",
+      "new": "This unfinished action is no longer listed. Refresh first.",
+      "count": 2
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "This request belongs to another shop or installation.",
+      "new": "This action belongs to another shop or device.",
+      "count": 2
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "This request belongs to a different task.",
+      "new": "This action belongs to a different task.",
+      "count": 2
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "Confirm that setting aside a local request does not undo a server change.",
+      "new": "Confirm that removing this copy does not undo a synced change.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "Confirm what is known about this handoff.",
+      "new": "Confirm what you know about this message attempt.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+      "old": "The handoff changed or requires Owner review. Refresh first.",
+      "new": "The message attempt changed or needs Owner review. Refresh first.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerCommunication.kt",
+      "old": "Composer opened",
+      "new": "Message app opened",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerCommunication.kt",
+      "old": "Handoff failed",
+      "new": "Could not confirm the app opened",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerCommunication.kt",
+      "old": "Customer communication requires leadership access.",
+      "new": "Sign in as Owner, Admin or Manager to prepare customer messages.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerCommunication.kt",
+      "old": "Known overdue amount (partial coverage)",
+      "new": "Confirmed overdue amount (some records need checking)",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerStatement.kt",
+      "old": "Customer statements require leadership access.",
+      "new": "Sign in as Owner, Admin or Manager to prepare statements.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerStatement.kt",
+      "old": "This period contains too many movements. Choose a smaller period.",
+      "new": "There are too many entries for one statement. Choose a shorter period.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerStatement.kt",
+      "old": "Statement movements do not reconcile. Refresh or choose a smaller period; no statement was prepared.",
+      "new": "The statement entries do not add up. Refresh or choose a shorter period. No statement was prepared.",
+      "count": 1
+    },
+    {
+      "file": "phase18/app/src/main/java/com/saaf/milkshop/statements/ReminderIntents.kt",
+      "old": "WhatsApp is unavailable. Choose SMS or enable WhatsApp, then try again.",
+      "new": "WhatsApp is not available. Set it up, or choose another option.",
+      "count": 1
+    }
+  ],
+  "exactCopyOnlyFiles": [
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpSharedReview.kt",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpReviewModels.kt",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspaceBinding.kt",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerFollowUpScheduleScreen.kt",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerReminderScreen.kt",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerCreditPanel.kt",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/CustomerStatementScreen.kt",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/StatementExportUi.kt",
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/OwnerCustomersController.kt",
+    "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerSharedHandoff.kt",
+    "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerCommunication.kt",
+    "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerStatement.kt",
+    "phase18/app/src/main/java/com/saaf/milkshop/statements/ReminderIntents.kt"
+  ],
+  "displayOnlyDeltasForManualReview": {
+    "phase18/app/src/main/java/com/saaf/milkshop/nativeui/owner/FollowUpWorkspace.kt": "--- mapped baseline\n+++ final display\n@@ -138,7 +138,7 @@\n         if(state!=null) {\n             if(page!=\"activity\") state.unfinished.forEach {pending->NativeInformationSection {\n                 Text(\"Save needs checking\",style=nativeSectionTextStyle())\n-                Text(\"${pending.kind.lowercase().replaceFirstChar {it.uppercase()}}: the server may already have accepted it. Checking uses the same request.\",style=nativeSupportingTextStyle())\n+                Text(\"This settings change may already be saved online. Check its result before changing it again.\",style=nativeSupportingTextStyle())\n                 TextButton(onClick=hapticAction {recover(pending.uid,false)},enabled=!busy && state.online,modifier=Modifier.testTag(\"followup-check-save\")) {Text(\"Check save\")}\n                 TextButton(onClick=hapticAction {setAside=pending.uid},enabled=!busy,modifier=Modifier.testTag(\"followup-set-aside\")) {Text(\"Remove from this device\")}\n             }}\n",
+    "phase18/app/src/main/java/com/saaf/milkshop/application/owner/CustomerCreditView.kt": "--- mapped baseline\n+++ final display\n@@ -17,10 +17,10 @@\n     val history: List<String>,\n     val pending: List<CustomerCreditPending>,\n ) {\n-    val label: String get() = status.kind.label + if(status.ownerFlagged) \" · Owner flagged\" else \"\"\n+    val label: String get() = status.kind.label + if(status.ownerFlagged) \" · Marked for Owner review\" else \"\"\n     val explanation: String get() = when {\n         status.coverageIssues.isNotEmpty() -> \"Some debt has no confirmed date or payment terms. Check the account history.\" +\n-            if(status.overduePaisa>0) \" Known overdue: PKR ${\"%,.2f\".format(java.util.Locale.US,status.overduePaisa/100.0)} (partial).\" else \"\"\n+            if(status.overduePaisa>0) \" Confirmed overdue: PKR ${\"%,.2f\".format(java.util.Locale.US,status.overduePaisa/100.0)}. Other debt still needs checking.\" else \"\"\n         status.overduePaisa > 0 -> \"PKR ${\"%,.2f\".format(java.util.Locale.US,status.overduePaisa/100.0)} overdue · oldest ${status.oldestOverdueDays} days.\"\n         status.nextDeadline != null -> \"Next payment due: ${status.nextDeadline}.\"\n         status.kind == CreditStatusKind.ADVANCE -> \"The customer has an advance balance.\"\n@@ -93,10 +93,16 @@\n                 revision?.let { CreditPaymentTerm(CreditTermKind.valueOf(it.termKind),it.termValue) }?:CreditPaymentTerm.Weekly,\n                 revision?.revisionUid?:CreditMetadataStore.DEFAULT_REVISION,state?.enabled==true && state.contractVersion==1,\n                 flag.activeSetUids,\n-                revisions.values.filter { it.customerUid==uid }.map { \"${it.acceptedAt.take(10)} · Accepted terms: ${CreditPaymentTerm(CreditTermKind.valueOf(it.termKind),it.termValue).label} · ${it.localActorUid}\" }+\n-                    actions[uid].orEmpty().map { \"${it.businessDate} · ${it.kind} · ${it.reason} · ${if(it.actionUid in pendingUids) \"Waiting for sync\" else \"Accepted\"} · ${it.localActorUid}\" },\n+                revisions.values.filter { it.customerUid==uid }.map { \"${it.acceptedAt.take(10)} · Confirmed terms: ${CreditPaymentTerm(CreditTermKind.valueOf(it.termKind),it.termValue).label} · Staff ID: ${it.localActorUid}\" }+\n+                    actions[uid].orEmpty().map { \"${it.businessDate} · ${creditReviewActionLabel(it.kind)} · ${it.reason} · ${if(it.actionUid in pendingUids) \"Waiting for sync\" else \"Confirmed by sync\"} · Staff ID: ${it.localActorUid}\" },\n                 customerPending.map { CustomerCreditPending(it.operationUid,it.kind,\n-                    if(it.kind==\"TERM_REVISION\") \"Terms change\" else \"Owner flag ${org.json.JSONObject(it.payloadJson).optString(\"kind\").lowercase()}\",it.held) })\n+                    if(it.kind==\"TERM_REVISION\") \"Terms change\" else creditReviewActionLabel(org.json.JSONObject(it.payloadJson).optString(\"kind\")),it.held) })\n         }\n     }\n }\n+\n+private fun creditReviewActionLabel(kind: String): String = when(kind) {\n+    \"SET\" -> \"Marked for Owner review\"\n+    \"CLEAR\" -> \"Reviewed marks cleared\"\n+    else -> \"Owner review action\"\n+}\n"
+  }
+}

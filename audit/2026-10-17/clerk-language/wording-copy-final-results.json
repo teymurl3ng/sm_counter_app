@@ -1,0 +1,49 @@
+{
+  "label": "wording-copy-final",
+  "device": "SM-A065F",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.CreditFinishUiTest#lightTermsReviewAndHistoryKeepChromeStable",
+    "com.saaf.milkshop.CreditFinishUiTest#darkLargeTextTermsReviewAndHistoryKeepChromeStable",
+    "com.saaf.milkshop.CreditFinishTest#pendingAndRestoredClearsCannotHideAcceptedFlag",
+    "com.saaf.milkshop.StatementSharingUiTest#observableShareHistoryDoesNotTurnPostLaunchAuditFailureIntoHandoffFailure",
+    "com.saaf.milkshop.CustomerCommunicationTest#reminderUsesCurrentBalanceAndKnownOverdueWithoutLeakingPrivateFacts"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.CreditFinishUiTest",
+      "test": "lightTermsReviewAndHistoryKeepChromeStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditFinishUiTest",
+      "test": "darkLargeTextTermsReviewAndHistoryKeepChromeStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditFinishTest",
+      "test": "pendingAndRestoredClearsCannotHideAcceptedFlag",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "observableShareHistoryDoesNotTurnPostLaunchAuditFailureIntoHandoffFailure",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerCommunicationTest",
+      "test": "reminderUsesCurrentBalanceAndKnownOverdueWithoutLeakingPrivateFacts",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 5,
+  "expected": 5,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "3f960f2ce2989c2362b80af100472db1657890d82f85cbb839d1dad64df79915"
+}

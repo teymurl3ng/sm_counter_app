@@ -45,7 +45,7 @@ internal fun CustomerFollowUpScheduleScreen(customerId: Long,access: FollowUpWor
                 val result=access.command(FollowUpCommand.Preference(customer.uid,value),before.saveToken)
                 if(result.accepted) {snapshot=result.snapshot;guard.clear();draftEpoch++;notice="Statement schedule saved. Payment terms are unchanged."}
                 else {snapshot=before.copy(online=result.snapshot.online,unfinished=result.snapshot.unfinished,requests=result.snapshot.requests,saveToken=result.snapshot.saveToken)
-                    error="The save needs review. Check the unfinished request in Follow-up settings before changing it again."}
+                    error="The save was not confirmed. Check it in Follow-up settings before changing it again."}
             } catch(cancelled: CancellationException) {throw cancelled}
             catch(failure: Exception) {error=failure.message ?: "The schedule could not save. Your draft is still here."}
             finally {busy=false}
@@ -63,7 +63,7 @@ internal fun CustomerFollowUpScheduleScreen(customerId: Long,access: FollowUpWor
             if(customer==null) Text("Customer is no longer available. Return and refresh.")
             else key(draftEpoch) {FollowUpScheduleEditor(customer,state,busy||error!=null||state.unfinished.isNotEmpty()||state.requests.any {it.sameBinding},
                 {guard.markDirty();notice=null},::save)}
-            if(state.requests.any {it.sameBinding}||state.unfinished.isNotEmpty()) Text("Review unfinished requests under Customers → Follow-ups → Settings → Shared activity & request review.",style=nativeSupportingTextStyle())
+            if(state.requests.any {it.sameBinding}||state.unfinished.isNotEmpty()) Text("Check unfinished actions under Customers → Follow-ups → Settings → Activity & unfinished actions.",style=nativeSupportingTextStyle())
         }
         OutlinedButton(onClick=hapticAction {guard.requestLeave {draftEpoch++;retry++}},enabled=!busy,modifier=Modifier.fillMaxWidth()) {Text("Refresh schedule")}
     }
@@ -75,9 +75,9 @@ internal fun CustomerFollowUpScheduleScreen(customerId: Long,access: FollowUpWor
 
 @Composable
 internal fun FollowUpSetAsideDialog(onDismiss: ()->Unit,onConfirm: ()->Unit) {
-    AlertDialog(onDismissRequest=onDismiss,title={Text("Set aside local request?")},
+    AlertDialog(onDismissRequest=onDismiss,title={Text("Remove from this device?")},
         text={Column(Modifier.heightIn(max=360.dp).verticalScroll(rememberScrollState())) {
-            Text("The server may already have accepted this request. This removes only the unfinished copy on this device. It does not undo a shared change, cancel a message preparation, resolve a handoff or confirm sending. The original connection or Owner may still need to review the shared attempt.")
-        }},confirmButton={TextButton(onClick=hapticAction(onConfirm),modifier=Modifier.testTag("followup-review-aside-confirm")) {Text("Set aside local request")}},
-        dismissButton={TextButton(onClick=hapticAction(onDismiss)) {Text("Keep request")}})
+            Text("This action may already be saved online. Remove only this device's unfinished copy. Synced changes, message preparation and unreviewed attempts stay in place. This does not confirm sending. The original account or Owner may still need to review the attempt.")
+        }},confirmButton={TextButton(onClick=hapticAction(onConfirm),modifier=Modifier.testTag("followup-review-aside-confirm")) {Text("Remove from this device")}},
+        dismissButton={TextButton(onClick=hapticAction(onDismiss)) {Text("Keep for review")}})
 }

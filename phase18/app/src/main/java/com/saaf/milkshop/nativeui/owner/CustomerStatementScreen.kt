@@ -63,7 +63,7 @@ internal fun CustomerDetailOverview(detail: NativeOwnerCustomerDetail, owner: Bo
         detail.row.credit?.pending?.takeIf { it.isNotEmpty() }?.let { changes ->
             NativeInformationSection(Modifier.testTag("customer-credit-attention")) {
                 Text("${changes.size} credit changes awaiting sync",style=nativeSectionTextStyle())
-                Text(if(changes.any { it.held }) "Held for Owner review. Accepted terms and flags remain in effect." else "Pending server acceptance. Accepted terms and flags remain in effect.")
+                Text(if(changes.any { it.held }) "Needs Owner review. Current confirmed terms and review marks still apply." else "Waiting for sync. Current confirmed terms and review marks still apply.")
                 TextButton(onClick=hapticAction { disclosure="credit" },enabled=!busy) { Text("Review changes") }
             }
         }
@@ -72,7 +72,7 @@ internal fun CustomerDetailOverview(detail: NativeOwnerCustomerDetail, owner: Bo
                 Text("${entry.occurredAt} · ${entry.taskLabel} · ${entry.stateLabel}",style=MaterialTheme.typography.labelLarge)
                 NativeInformationFact(entry.movementLabel,"Balance ${entry.balanceAfterLabel}")
             }
-            if(detail.ledger?.entries.isNullOrEmpty()) Text("No ledger movements yet.")
+            if(detail.ledger?.entries.isNullOrEmpty()) Text("No account activity yet.")
         }
         CustomerDetailDisclosure("Customer details","profile",disclosure,{disclosure=it}) {
             NativeInformationHeading("Profile",actionLabel="Edit customer",actionTag=com.saaf.milkshop.nativeui.NativeUiTags.OwnerCustomersDetailEdit,onAction=onEdit)
@@ -179,10 +179,10 @@ internal fun CustomerStatementScreen(customerId: Long,customerName: String,load:
                 verticalAlignment=androidx.compose.ui.Alignment.CenterVertically,content={controls()})
             val generated=Instant.parse(statement.generatedAt).atZone(java.time.ZoneId.systemDefault())
                 .format(java.time.format.DateTimeFormatter.ofPattern("d MMM uuuu, HH:mm"))
-            Text("Prepared $generated. This snapshot reflects local records for the selected period. Product names are current catalog labels.",style=nativeSupportingTextStyle())
+            Text("Prepared $generated from records on this device for the selected period. Product names match the current product list.",style=nativeSupportingTextStyle())
             StatementShareControls(currentDocument,engine,usable,load,onRefresh={retry++},onBusy={sharing=it},launcher=shareLauncher,record={communication.record(customerId,it)})
             OutlinedButton(onClick=hapticAction(onReminder),enabled=!loading && !sharing,modifier=Modifier.fillMaxWidth().testTag("statement-prepare-reminder")) {Text("Prepare reminder")}
-            TextButton(onClick=hapticAction(onHistory),enabled=!sharing,modifier=Modifier.fillMaxWidth().testTag("statement-preparation-history")) {Text("Preparation history")}
+            TextButton(onClick=hapticAction(onHistory),enabled=!sharing,modifier=Modifier.fillMaxWidth().testTag("statement-preparation-history")) {Text("Draft & share history")}
             OutlinedButton(onClick=hapticAction { retry++ },enabled=!loading && !sharing,modifier=Modifier.fillMaxWidth().testTag("statement-refresh")) { Text("Refresh statement") }
         }
     }

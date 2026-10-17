@@ -27,7 +27,7 @@ class CustomerStatementUiTest {
     @get:Rule val rule=createAndroidComposeRule<ComponentActivity>()
     private val row=NativeOwnerCustomerRow(7,"Northern market community cafe and delivery counter","PKR 300.00","Active",null,"North",
         CustomerCreditView(CustomerCreditStatus(CreditStatusKind.LATE,30000,3,ownerFlagged=true),CreditPaymentTerm.Weekly,"weekly-default-v1",true,setOf("a"),
-            listOf("Accepted Owner review"),listOf(CustomerCreditPending("held","TERM_REVISION","Payment terms proposal",true))))
+            listOf("Accepted Owner review"),listOf(CustomerCreditPending("held","TERM_REVISION","Terms change",true))))
     private val detail=NativeOwnerCustomerDetail(row,"Long address by the community market","Private owner note",500.0,null,true,"PKR 500.00",null)
     private fun statement(period: CustomerStatementPeriod)=CustomerStatement(7,"synthetic-customer",row.name,"Configured shop",null,"Market Road","PKR",period,
         "2026-10-16T00:00:00Z",10000,30000,listOf(
@@ -78,7 +78,7 @@ class CustomerStatementUiTest {
         rule.onNodeWithTag("customer-disclosure-credit").performScrollTo().performClick()
         rule.onNodeWithTag(NativeUiTags.OwnerCustomersDetailEdit).assertDoesNotExist()
         rule.onNodeWithTag("credit-edit-terms").performScrollTo().assertIsDisplayed()
-        rule.onNodeWithText("Discard held terms proposal").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithText("Discard unsynced terms").performScrollTo().assertIsDisplayed()
     }
     @Test fun statementLightPreviewAndReturnKeepChromeAndDisclosure()=preview(1f,false)
     @Test fun statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure()=preview(2f,true)

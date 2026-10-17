@@ -1,0 +1,49 @@
+{
+  "label": "wording-final",
+  "device": "SM-A065F",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#unfinishedSaveBlocksEditsAndSetAsideExplainsServerOutcome",
+    "com.saaf.milkshop.FollowUpReviewUiTest#sharedActivityAndRecoveryNeverLaunch",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementReminderAndHistoryKeepOneHostAndReturnToCustomer",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure",
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#uncertainSaveRecoversOriginalIdAndNeverDuplicates"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "unfinishedSaveBlocksEditsAndSetAsideExplainsServerOutcome",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewUiTest",
+      "test": "sharedActivityAndRecoveryNeverLaunch",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementReminderAndHistoryKeepOneHostAndReturnToCustomer",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "uncertainSaveRecoversOriginalIdAndNeverDuplicates",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 5,
+  "expected": 5,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "191bcf78904d2873513b693f5d09c748b00806e1b285ad71d6a86952e09892ba"
+}

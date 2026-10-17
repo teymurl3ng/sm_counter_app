@@ -49,7 +49,7 @@ internal sealed interface FollowUpCommand {
 internal data class FollowUpWorkspaceAccess(val load: suspend ()->FollowUpWorkspaceSnapshot,
     val command: suspend (FollowUpCommand,String)->FollowUpWorkspaceSave,
     val recover: suspend (String,Boolean)->FollowUpWorkspaceSave = {_,_->error("Unfinished-save review is unavailable.")},
-    val reviewRequest: suspend (String,Boolean)->FollowUpWorkspaceSave = {_,_->error("Request review is unavailable.")})
+    val reviewRequest: suspend (String,Boolean)->FollowUpWorkspaceSave = {_,_->error("Action review is unavailable.")})
 
 /** Bound presentation; ordinary navigation waits for B's shared external-handoff gate. */
 @Composable
@@ -87,9 +87,9 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
                 // A conflicting server revision must not replace the operator's failed draft.
                 snapshot=if(result.accepted) result.snapshot else previous.copy(unfinished=result.snapshot.unfinished,
                     online=result.snapshot.online,reviewReady=false,saveToken=result.snapshot.saveToken,
-                    freshness="Shared state may have changed · Check the unfinished save")
+                    freshness="Changes may already be saved · Check the result")
                 if(result.accepted) {guard.clear();page="list";notice=success}
-                else error="The save is unfinished. Check its result before making another change."
+                else error="The save was not confirmed. Check its result before making another change."
             }
             catch(cancelled: CancellationException) {throw cancelled}
             catch(failure: Exception) {error=failure.message ?: "Could not save. Check the connection and try again."}
@@ -102,8 +102,8 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
         scope.launch {
             try {
                 val result=access.recover(uid,setAside);snapshot=result.snapshot
-                if(result.accepted) {guard.clear();page="list";notice=if(setAside) "Local unfinished save set aside. This does not undo a server change." else "Save result checked. Current shared settings are shown."}
-                else error="The save result is still unresolved. Refresh or set aside only this local request."
+                if(result.accepted) {guard.clear();page="list";notice=if(setAside) "Removed from this device. Any change already synced stays in place." else "Save checked. The latest synced settings are shown."}
+                else error="The save is still unconfirmed. Refresh, or remove only this device's unfinished action."
             } catch(cancelled: CancellationException) {throw cancelled}
             catch(failure: Exception) {error=failure.message ?: "Could not check the save. Try again."}
             finally {busy=false}
@@ -117,11 +117,11 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
         scope.launch {
             try {
                 val result=access.reviewRequest(uid,aside);snapshot=result.snapshot
-                notice=if(aside) "Local request set aside. Shared changes and message attempts are unchanged."
-                    else if(result.accepted) "Request result checked. No app was opened and no alert was posted."
-                    else "The request is still unfinished. Review the current shared state before trying again."
+                notice=if(aside) "Removed from this device. Synced changes and message attempts stay in place."
+                    else if(result.accepted) "Action checked. No message app opened and no alert was shown."
+                    else "The action is still unconfirmed. Check the latest synced records before trying again."
             } catch(cancelled: CancellationException) {throw cancelled}
-            catch(failure: Exception) {error=failure.message ?: "The request could not be checked. Try again."}
+            catch(failure: Exception) {error=failure.message ?: "The action could not be checked. Try again."}
             finally {busy=false}
         }
     }
@@ -129,7 +129,7 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
     Column(Modifier.fillMaxSize().imePadding().verticalScroll(scroll).padding(16.dp).testTag("followup-workspace"),
         verticalArrangement=Arrangement.spacedBy(16.dp)) {
         TextButton(onClick=hapticAction {back()},enabled=!busy&&!openingCustomer) {Text(if(page=="list") "Back to customers" else "Back")}
-        NativeInformationHeading(when(page) {"settings"->"Follow-up settings";"activity"->"Shared follow-up activity";"review"->"Review follow-up";"schedule"->"Statement schedule";else->"Follow-ups"},
+        NativeInformationHeading(when(page) {"settings"->"Follow-up settings";"activity"->"Follow-up activity";"review"->"Review follow-up";"schedule"->"Statement schedule";else->"Follow-ups"},
             actionLabel=if(page=="list") "Settings" else null,actionTag="followup-settings",onAction=if(page=="list") ({leave {page="settings"}}) else null)
         Box(Modifier.fillMaxWidth().height(4.dp)) {if(busy||openingCustomer) LinearProgressIndicator(Modifier.fillMaxWidth().testTag("followup-progress"))}
         error?.let {Text(it,color=MaterialTheme.colorScheme.error,modifier=Modifier.testTag("followup-error").semantics {liveRegion=LiveRegionMode.Polite})}
@@ -137,10 +137,10 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
         val state=snapshot
         if(state!=null) {
             if(page!="activity") state.unfinished.forEach {pending->NativeInformationSection {
-                Text("Unfinished follow-up save",style=nativeSectionTextStyle())
-                Text("${pending.kind.lowercase().replaceFirstChar {it.uppercase()}}: the server may already have accepted it. Checking uses the same request.",style=nativeSupportingTextStyle())
-                TextButton(onClick=hapticAction {recover(pending.uid,false)},enabled=!busy && state.online,modifier=Modifier.testTag("followup-check-save")) {Text("Check save result")}
-                TextButton(onClick=hapticAction {setAside=pending.uid},enabled=!busy,modifier=Modifier.testTag("followup-set-aside")) {Text("Set aside local request")}
+                Text("Save needs checking",style=nativeSectionTextStyle())
+                Text("This settings change may already be saved online. Check its result before changing it again.",style=nativeSupportingTextStyle())
+                TextButton(onClick=hapticAction {recover(pending.uid,false)},enabled=!busy && state.online,modifier=Modifier.testTag("followup-check-save")) {Text("Check save")}
+                TextButton(onClick=hapticAction {setAside=pending.uid},enabled=!busy,modifier=Modifier.testTag("followup-set-aside")) {Text("Remove from this device")}
             }}
             val editingBlocked=busy || openingCustomer || state.unfinished.isNotEmpty()
             val rows=CustomerFollowUps.ordered(state.customers.mapNotNull {customer->CustomerFollowUps.evaluate(customer,state.policy,
@@ -149,7 +149,7 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
                 "settings"->{
                     FollowUpPolicyEditor(state,editingBlocked,{guard.markDirty()}) {submit(it,"Follow-up settings saved.")}
                     OutlinedButton(onClick=hapticAction {leave {page="activity"}},enabled=!busy,
-                        modifier=Modifier.fillMaxWidth().testTag("followup-shared-activity")) {Text("Shared activity & request review")}
+                        modifier=Modifier.fillMaxWidth().testTag("followup-shared-activity")) {Text("Activity & unfinished actions")}
                 }
                 "activity"->FollowUpSharedReview(state,busy||openingCustomer||error!=null,{reviewRequest(it,false)},{reviewAside=it},onReminder)
                 "schedule"->{
@@ -168,7 +168,7 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
                 }
                 else->{
                     Text("${state.today} · ${state.freshness}",style=nativeSupportingTextStyle())
-                    if(!state.policy.enabled) NativeInformationSection {Text("Automatic follow-ups are off.");Text("Manual statements and reminders remain available from each customer.")}
+                    if(!state.policy.enabled) NativeInformationSection {Text("Follow-up reminders are off.");Text("Manual statements and reminders remain available from each customer.")}
                     if(!state.notificationsAllowed) Text("Android notifications are unavailable. Follow-ups remain visible here.",style=nativeSupportingTextStyle())
                     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
                         listOf("All","Statements","Overdue","Check records").forEach {choice->FilterChip(filter==choice,onClick=hapticAction {filter=choice},label={Text(choice)})}
@@ -195,14 +195,14 @@ internal fun FollowUpWorkspace(access: FollowUpWorkspaceAccess,onBack: ()->Unit,
                     TextButton(onClick=hapticAction {postponed=!postponed}) {Text(if(postponed) "Hide postponed" else "View postponed")}
                 }
             }
-        } else if(!busy) Text("No current follow-up snapshot. Refresh to continue.")
+        } else if(!busy) Text("Follow-ups are not up to date. Refresh to continue.")
         OutlinedButton(onClick=hapticAction {leave {retry++}},enabled=!busy,modifier=Modifier.fillMaxWidth().testTag("followup-refresh")) {Text("Refresh follow-ups")}
     }
     reviewAside?.let {uid->FollowUpSetAsideDialog({reviewAside=null}) {reviewAside=null;reviewRequest(uid,true)}}
-    if(setAside!=null) AlertDialog(onDismissRequest={setAside=null},title={Text("Set aside this local request?")},
-        text={Column(Modifier.heightIn(max=360.dp).verticalScroll(rememberScrollState())) {Text("This only removes the unfinished request from this device. A change accepted by the server stays in place. Refresh to see its current state. It does not cancel or undo that change.")}},
-        confirmButton={TextButton(onClick=hapticAction {val uid=requireNotNull(setAside);setAside=null;recover(uid,true)}) {Text("Set aside")}},
-        dismissButton={TextButton(onClick=hapticAction {setAside=null}) {Text("Keep request")}})
+    if(setAside!=null) AlertDialog(onDismissRequest={setAside=null},title={Text("Remove from this device?")},
+        text={Column(Modifier.heightIn(max=360.dp).verticalScroll(rememberScrollState())) {Text("Remove only this device's unfinished save. Any change already synced stays in place. Refresh to see the latest result.")}},
+        confirmButton={TextButton(onClick=hapticAction {val uid=requireNotNull(setAside);setAside=null;recover(uid,true)}) {Text("Remove from this device")}},
+        dismissButton={TextButton(onClick=hapticAction {setAside=null}) {Text("Keep for review")}})
     if(guard.discardConfirmationOpen) AlertDialog(onDismissRequest=guard::keepEditing,title={Text("Leave without saving?")},
         text={Text("Your follow-up setting changes will be discarded.")},confirmButton={TextButton(onClick=hapticAction(guard::confirmDiscard)) {Text("Discard changes")}},
         dismissButton={TextButton(onClick=hapticAction(guard::keepEditing)) {Text("Keep editing")}})
@@ -227,9 +227,9 @@ private fun FollowUpReview(row: CustomerFollowUp,state: FollowUpWorkspaceSnapsho
         modifier=Modifier.fillMaxWidth()) {Text(if(FollowUpReason.STATEMENT in row.reasons) "Prepare reminder" else "Prepare statement")}
     if(!state.hasMessageApp) NativeInformationSection {
         Text("No messaging app is configured on this device.",style=nativeValueTextStyle(),modifier=Modifier.testTag("followup-manual-fallback"))
-        Text("Review the statement here, or compose the reviewed message manually on the shop's separate phone. This app cannot confirm that sending.")
+        Text("Review the statement here, or type and send the checked message on the shop's separate phone. This app cannot confirm whether you sent it.")
     }
-    if(!state.online) Text("Connect before a coordinated message handoff. You can still review the draft and statement.",style=nativeSupportingTextStyle())
+    if(!state.online) Text("Connect before opening a message app. You can still review the draft and statement offline.",style=nativeSupportingTextStyle())
     TextButton(onClick=hapticAction(onSchedule),enabled=!busy,modifier=Modifier.testTag("followup-schedule")) {Text("Schedule & pause")}
     TextButton(onClick=hapticAction(onReviewed),enabled=!busy && state.online && state.reviewReady,modifier=Modifier.testTag("followup-reviewed")) {Text("Mark reviewed")}
     Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
@@ -257,36 +257,36 @@ private fun FollowUpPolicyEditor(state: FollowUpWorkspaceSnapshot,busy: Boolean,
         preferredTime=LocalTime.parse(preferred),quietStart=LocalTime.parse(start),quietEnd=LocalTime.parse(end))
         .also {require(!it.isQuiet(it.preferredTime));require(it.preferredTime.second==0&&it.quietStart.second==0&&it.quietEnd.second==0)}}.getOrNull()
     NativeInformationSection {
-        Text("Owner attention",style=nativeSectionTextStyle())
-        Row(verticalAlignment=Alignment.CenterVertically) {Switch(enabled,onCheckedChange={enabled=it;dirty()},enabled=canEdit,modifier=Modifier.testTag("followup-enabled"));Text("Automatic follow-ups",Modifier.weight(1f))}
+        Text("Owner reminders",style=nativeSectionTextStyle())
+        Row(verticalAlignment=Alignment.CenterVertically) {Switch(enabled,onCheckedChange={enabled=it;dirty()},enabled=canEdit,modifier=Modifier.testTag("followup-enabled"));Text("Follow-up reminders",Modifier.weight(1f))}
         NativeInformationFact("Notification device",state.primaryDevice)
         TextButton(onClick=hapticAction {phonesUpdated=false;primary=true;confirm=FollowUpCommand.Policy(requireNotNull(proposed),makePrimary=true)},enabled=canEdit && proposed!=null,
             modifier=Modifier.testTag("followup-primary")) {Text("Use this device for notifications")}
         NativeInformationFact("Timezone",state.shopZone)
-        Text("Notifications may run late. Customer records stay inside the app.",style=nativeSupportingTextStyle())
-        OutlinedTextField(preferred,{preferred=it;dirty()},label={Text("Around (HH:mm)")},singleLine=true,enabled=canEdit,modifier=Modifier.fillMaxWidth())
+        Text("Alerts may arrive late. Customer details are not shown in alerts.",style=nativeSupportingTextStyle())
+        OutlinedTextField(preferred,{preferred=it;dirty()},label={Text("Alert time (HH:mm)")},singleLine=true,enabled=canEdit,modifier=Modifier.fillMaxWidth())
         OutlinedTextField(start,{start=it;dirty()},label={Text("Quiet hours start (HH:mm)")},singleLine=true,enabled=canEdit,modifier=Modifier.fillMaxWidth())
         OutlinedTextField(end,{end=it;dirty()},label={Text("Quiet hours end (HH:mm)")},singleLine=true,enabled=canEdit,modifier=Modifier.fillMaxWidth())
         FollowUpNotificationSettings()
     }
     NativeInformationSection {
         Text("Review schedule",style=nativeSectionTextStyle())
-        Text("Shop statement weekday",style=nativeValueTextStyle())
+        Text("Weekly statement day",style=nativeValueTextStyle())
         DayOfWeek.entries.forEach {day->FollowUpChoice(day.name.lowercase().replaceFirstChar {it.uppercase()},weekday==day,canEdit) {weekday=day;dirty()}}
-        OutlinedTextField(repeat,{repeat=it;dirty()},label={Text("Overdue follow-up interval (1–30 days)")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number,imeAction=ImeAction.Done),
+        OutlinedTextField(repeat,{repeat=it;dirty()},label={Text("Repeat overdue reviews after (1–30 days)")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number,imeAction=ImeAction.Done),
             singleLine=true,enabled=canEdit,modifier=Modifier.fillMaxWidth().testTag("followup-repeat"))
         Text("Statement timing does not change payment deadlines.",style=nativeSupportingTextStyle())
     }
-    NativeInformationSection {Text("Customer contact",style=nativeSectionTextStyle());Text("Review and send manually",style=nativeValueTextStyle());Text("Automatic SMS: not configured. The tablet does not send through the separate shop phone.")}
-    if(proposed==null) Text("Use a 1–30 day interval, valid HH:mm times and different quiet-hour endpoints.",color=MaterialTheme.colorScheme.error)
-    if(!state.owner) Text("Only Owner can change the shop policy.")
-    else if(!state.online) Text("Connect to save shared settings.")
+    NativeInformationSection {Text("Customer contact",style=nativeSectionTextStyle());Text("Review and send manually",style=nativeValueTextStyle());Text("Automatic SMS is not set up. To use the separate shop phone, type and send the message there.")}
+    if(proposed==null) Text("Enter 1–30 days and valid HH:mm times. Quiet hours must start and end at different times. Keep the alert time outside quiet hours.",color=MaterialTheme.colorScheme.error)
+    if(!state.owner) Text("Only Owner can change these shop settings.")
+    else if(!state.online) Text("Connect to save settings for all devices.")
     Button(onClick=hapticAction {proposed?.let {
         if(it.enabled) {phonesUpdated=false;primary=state.primaryDevice=="Not selected";confirm=FollowUpCommand.Policy(it)} else onSave(FollowUpCommand.Policy(it))
     }},enabled=canEdit && proposed!=null,modifier=Modifier.fillMaxWidth().testTag("followup-save-policy")) {Text("Save settings")}
     if(confirm!=null) AlertDialog(onDismissRequest={confirm=null},title={Text("Confirm follow-up settings")},text={Column(Modifier.heightIn(max=360.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(12.dp)) {
-        Text("One device receives owner alerts. Synced devices need a connection to check message settings before opening a customer message, including when follow-ups are off. Drafts and statements remain available offline. The app cannot see payments on another offline device.")
-        Row(verticalAlignment=Alignment.CenterVertically) {Checkbox(phonesUpdated,{phonesUpdated=it},modifier=Modifier.testTag("followup-confirm-updated"));Text("All posting devices have the compatible update",Modifier.weight(1f))}
+        Text("One device receives Owner alerts. Synced devices must connect before opening customer messages, even with reminders off. Drafts and statements work offline. Payments on another offline device may be missing.")
+        Row(verticalAlignment=Alignment.CenterVertically) {Checkbox(phonesUpdated,{phonesUpdated=it},modifier=Modifier.testTag("followup-confirm-updated"));Text("All sales devices are updated",Modifier.weight(1f))}
         Row(verticalAlignment=Alignment.CenterVertically) {Checkbox(primary,{primary=it},modifier=Modifier.testTag("followup-confirm-primary"));Text("Use this device for owner alerts",Modifier.weight(1f))}
     }},confirmButton={TextButton(onClick=hapticAction {val proposal=requireNotNull(confirm);confirm=null;onSave(proposal.copy(makePrimary=primary,phonesUpdated=phonesUpdated))},
         enabled=phonesUpdated && (state.primaryDevice!="Not selected" || primary),modifier=Modifier.testTag("followup-confirm-policy")) {Text("Confirm settings")}},
@@ -304,7 +304,7 @@ internal fun FollowUpScheduleEditor(customer: FollowUpCustomer,state: FollowUpWo
     var first by rememberSaveable(key) {mutableStateOf(((current?.schedule as? StatementReviewSchedule.Interval)?.firstDate ?: state.today).toString())}
     var choose by remember {mutableStateOf(false)}
     val canEdit=state.online && state.configured && !busy
-    if(!state.configured) Text("Owner needs to save shop follow-up settings before a customer schedule can be saved.",style=nativeSupportingTextStyle())
+    if(!state.configured) Text("Ask Owner to save the shop follow-up settings first.",style=nativeSupportingTextStyle())
     val proposed=runCatching {
         val schedule=when(mode) {"Weekly"->StatementReviewSchedule.Weekly(weekday);"Monthly"->StatementReviewSchedule.Monthly(monthly.toInt());"Custom interval"->StatementReviewSchedule.Interval(days.toInt(),LocalDate.parse(first));"Paused"->current?.schedule;else->null}
         CustomerFollowUpPreference(key,state.today,schedule,mode=="Paused",current?.snoozedUntil)
@@ -312,11 +312,11 @@ internal fun FollowUpScheduleEditor(customer: FollowUpCustomer,state: FollowUpWo
     Text(customer.name,style=nativeValueTextStyle())
     NativeInformationSection {
         Text("Statement schedule",style=nativeSectionTextStyle())
-        Text("Payment terms stay attached to each sale. This only changes statement review timing.",style=nativeSupportingTextStyle())
+        Text("This changes when to review statements. Each sale keeps its payment deadline.",style=nativeSupportingTextStyle())
         listOf("Use shop schedule","Weekly","Monthly","Custom interval","Paused").forEach {choice->FollowUpChoice(choice,mode==choice,canEdit) {mode=choice;dirty()}}
         when(mode) {
             "Weekly"->DayOfWeek.entries.forEach {day->FollowUpChoice(day.name.lowercase().replaceFirstChar {it.uppercase()},weekday==day,canEdit) {weekday=day;dirty()}}
-            "Monthly"->OutlinedTextField(monthly,{monthly=it;dirty()},label={Text("Day of month (1–31; 0 for last day)")},supportingText={Text("Short months use their last day; the original day resumes next month.")},
+            "Monthly"->OutlinedTextField(monthly,{monthly=it;dirty()},label={Text("Day of month (1–31, or 0 for last day)")},supportingText={Text("If the day is missing, use the last day of that month. Later months keep the day you chose.")},
                 enabled=canEdit,singleLine=true,keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number),modifier=Modifier.fillMaxWidth().testTag("followup-monthly-day"))
             "Custom interval"->{
                 OutlinedTextField(days,{days=it;dirty()},label={Text("Every (1–365 days)")},enabled=canEdit,singleLine=true,keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number),modifier=Modifier.fillMaxWidth().testTag("followup-custom-days"))
@@ -324,7 +324,7 @@ internal fun FollowUpScheduleEditor(customer: FollowUpCustomer,state: FollowUpWo
                 Text(first,style=nativeValueTextStyle())
             }
         }
-        Text("Paused removes automated attention; manual account review stays available.",style=nativeSupportingTextStyle())
+        Text("Paused customers do not appear in follow-up reminders. You can still open their accounts manually.",style=nativeSupportingTextStyle())
     }
     if(proposed==null) Text("Check the day or interval before saving.",color=MaterialTheme.colorScheme.error)
     Button(onClick=hapticAction {proposed?.let(onSave)},enabled=canEdit && proposed!=null,modifier=Modifier.fillMaxWidth().testTag("followup-save-schedule")) {Text("Save schedule")}

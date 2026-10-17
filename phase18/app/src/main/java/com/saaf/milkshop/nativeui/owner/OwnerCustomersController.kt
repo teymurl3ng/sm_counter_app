@@ -323,10 +323,10 @@ internal class OwnerCustomersController(
                 if(runtime.isCurrent(token)) com.saaf.milkshop.nativeui.common.NativeFeedbackBus.saved(
                     when(action) {
                         com.saaf.milkshop.application.owner.CustomerCreditCommand.Enable -> "Credit terms enabled"
-                        is com.saaf.milkshop.application.owner.CustomerCreditCommand.Terms -> "Terms proposal saved. Effective after sync acceptance."
-                        is com.saaf.milkshop.application.owner.CustomerCreditCommand.Retry -> "Held change queued for retry"
-                        is com.saaf.milkshop.application.owner.CustomerCreditCommand.DiscardTerm -> "Held terms proposal discarded"
-                        else -> "Review action saved. Pending sync acceptance."
+                        is com.saaf.milkshop.application.owner.CustomerCreditCommand.Terms -> "Terms saved on this device. They apply after sync confirms the change."
+                        is com.saaf.milkshop.application.owner.CustomerCreditCommand.Retry -> "Change ready to retry on the next sync"
+                        is com.saaf.milkshop.application.owner.CustomerCreditCommand.DiscardTerm -> "Unsynced terms discarded"
+                        else -> "Review saved on this device. Waiting for sync."
                     })
             } catch(error: Throwable) { handleFailure(token,error) }
         }

@@ -102,7 +102,7 @@ class FollowUpWorkspaceUiTest {
         rule.waitUntil(10000) {rule.onAllNodesWithTag("followup-count").fetchSemanticsNodes().isNotEmpty()}
         rule.onNodeWithTag("followup-count").performScrollTo().assertTextEquals("1 customer")
         rule.onNodeWithTag("followup-settings").performScrollTo().performClick()
-        rule.onNodeWithText("Automatic SMS: not configured. The tablet does not send through the separate shop phone.").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithText("Automatic SMS is not set up. To use the separate shop phone, type and send the message there.").performScrollTo().assertIsDisplayed()
         capture("settings-$scale-$dark")
         assertEquals(title,rule.onNodeWithText("Customers",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot)
         assertEquals(nav,rule.onNodeWithTag(NativeUiTags.OwnerNavMore).fetchSemanticsNode().boundsInRoot)
@@ -209,11 +209,12 @@ class FollowUpWorkspaceUiTest {
         rule.onNodeWithTag("followup-repeat").performScrollTo().assertTextContains("10")
         rule.onNodeWithTag("followup-save-policy").performScrollTo().assertIsNotEnabled()
         rule.onNodeWithTag("followup-set-aside").performScrollTo().performClick()
-        rule.onNodeWithText("Keep request").performClick();assertTrue(recoveries.isEmpty())
-        rule.onNodeWithTag("followup-set-aside").performClick();rule.onNodeWithText("Set aside",useUnmergedTree=true).performClick()
+        rule.onNodeWithText("Keep for review").performClick();assertTrue(recoveries.isEmpty())
+        rule.onNodeWithTag("followup-set-aside").performClick()
+        rule.onNode(hasText("Remove from this device") and hasAnyAncestor(isDialog())).performClick()
         rule.waitUntil(10000) {recoveries.size==1}
         assertEquals("synthetic-id" to true,recoveries.single());assertEquals(1,commands.size)
-        rule.onNodeWithTag("followup-notice").assertTextEquals("Local unfinished save set aside. This does not undo a server change.")
+        rule.onNodeWithTag("followup-notice").assertTextEquals("Removed from this device. Any change already synced stays in place.")
         rule.onNodeWithTag("followup-check-save").assertDoesNotExist()
     }
 }

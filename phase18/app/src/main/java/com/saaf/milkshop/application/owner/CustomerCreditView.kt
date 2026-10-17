@@ -17,12 +17,12 @@ data class CustomerCreditView(
     val history: List<String>,
     val pending: List<CustomerCreditPending>,
 ) {
-    val label: String get() = status.kind.label + if(status.ownerFlagged) " · Owner flagged" else ""
+    val label: String get() = status.kind.label + if(status.ownerFlagged) " · Marked for Owner review" else ""
     val explanation: String get() = when {
-        status.coverageIssues.isNotEmpty() -> "Some debt cannot be dated or its agreement is unavailable. Review the account history." +
-            if(status.overduePaisa>0) " Known overdue: PKR ${"%,.2f".format(java.util.Locale.US,status.overduePaisa/100.0)} (partial)." else ""
+        status.coverageIssues.isNotEmpty() -> "Some debt has no confirmed date or payment terms. Check the account history." +
+            if(status.overduePaisa>0) " Confirmed overdue: PKR ${"%,.2f".format(java.util.Locale.US,status.overduePaisa/100.0)}. Other debt still needs checking." else ""
         status.overduePaisa > 0 -> "PKR ${"%,.2f".format(java.util.Locale.US,status.overduePaisa/100.0)} overdue · oldest ${status.oldestOverdueDays} days."
-        status.nextDeadline != null -> "Next unpaid deadline: ${status.nextDeadline}."
+        status.nextDeadline != null -> "Next payment due: ${status.nextDeadline}."
         status.kind == CreditStatusKind.ADVANCE -> "The customer has an advance balance."
         status.kind == CreditStatusKind.SETTLED -> "No unpaid debt."
         else -> "Within the recorded payment terms."
@@ -93,10 +93,16 @@ internal class CustomerCreditViews(private val db: MilkShopDatabase) {
                 revision?.let { CreditPaymentTerm(CreditTermKind.valueOf(it.termKind),it.termValue) }?:CreditPaymentTerm.Weekly,
                 revision?.revisionUid?:CreditMetadataStore.DEFAULT_REVISION,state?.enabled==true && state.contractVersion==1,
                 flag.activeSetUids,
-                revisions.values.filter { it.customerUid==uid }.map { "${it.acceptedAt.take(10)} · Accepted terms: ${CreditPaymentTerm(CreditTermKind.valueOf(it.termKind),it.termValue).label} · ${it.localActorUid}" }+
-                    actions[uid].orEmpty().map { "${it.businessDate} · ${it.kind} · ${it.reason} · ${if(it.actionUid in pendingUids) "Pending server acceptance" else "Accepted"} · ${it.localActorUid}" },
+                revisions.values.filter { it.customerUid==uid }.map { "${it.acceptedAt.take(10)} · Confirmed terms: ${CreditPaymentTerm(CreditTermKind.valueOf(it.termKind),it.termValue).label} · Staff ID: ${it.localActorUid}" }+
+                    actions[uid].orEmpty().map { "${it.businessDate} · ${creditReviewActionLabel(it.kind)} · ${it.reason} · ${if(it.actionUid in pendingUids) "Waiting for sync" else "Confirmed by sync"} · Staff ID: ${it.localActorUid}" },
                 customerPending.map { CustomerCreditPending(it.operationUid,it.kind,
-                    if(it.kind=="TERM_REVISION") "Payment terms proposal" else "Owner flag ${org.json.JSONObject(it.payloadJson).optString("kind").lowercase()}",it.held) })
+                    if(it.kind=="TERM_REVISION") "Terms change" else creditReviewActionLabel(org.json.JSONObject(it.payloadJson).optString("kind")),it.held) })
         }
     }
+}
+
+private fun creditReviewActionLabel(kind: String): String = when(kind) {
+    "SET" -> "Marked for Owner review"
+    "CLEAR" -> "Reviewed marks cleared"
+    else -> "Owner review action"
 }

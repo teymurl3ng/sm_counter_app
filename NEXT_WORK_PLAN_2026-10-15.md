@@ -132,7 +132,7 @@ These items have not been cancelled. They are deliberately unscheduled or condit
 | NRV, old affected feeds, TalkBack, physical power loss, provider hardening/monitoring and public-repo review | Original conditions remain in the detailed inventory. No action unless the relevant trigger/need is established. |
 | Costing tab selection at large text and old sign-in transition observation | Verify the specific observation first; no renewed whole-app design or animation crawl. |
 
-**Deferred wording pass (16 October):** the owner requested simpler clerk-facing language in the new reminder implementation. [Recorded examples and boundary](audit/2026-10-16/reminder-automation-plan/LATER.md). Keep it outside phase6 B's coordination scope; do not lose it or mark it done.
+**Wording pass selected 17 October:** ✅ ~~Simplify clerk-facing language in the recent Credit, statements/messages and reminder implementation.~~ [Completed scope and 24 distinct affected checks](audit/2026-10-17/clerk-language/RESULT.md). Core meaning, permissions and stored/protocol values are retained. This closes the [earlier wording deferral](audit/2026-10-16/reminder-automation-plan/LATER.md); ordinary signed delivery remains phase 1.
 
 ## Rules that keep the plan finite
 

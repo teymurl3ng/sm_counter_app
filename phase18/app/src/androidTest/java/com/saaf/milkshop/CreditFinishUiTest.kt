@@ -26,7 +26,7 @@ import java.io.File
 
 class CreditFinishUiTest {
     @get:Rule val rule=createAndroidComposeRule<ComponentActivity>()
-    private val view=CustomerCreditView(CustomerCreditStatus(CreditStatusKind.LATE,125000,3,ownerFlagged=true),CreditPaymentTerm.Monthly,"monthly",true,setOf("a"),listOf("2026-10-15 · SET · Reviewed · Accepted"),listOf(CustomerCreditPending("held","TERM_REVISION","Payment terms proposal",true)))
+    private val view=CustomerCreditView(CustomerCreditStatus(CreditStatusKind.LATE,125000,3,ownerFlagged=true),CreditPaymentTerm.Monthly,"monthly",true,setOf("a"),listOf("2026-10-15 · Marked for Owner review · Reviewed · Confirmed by sync · Staff ID: synthetic-owner"),listOf(CustomerCreditPending("held","TERM_REVISION","Terms change",true)))
     private val row=NativeOwnerCustomerRow(7,"Long customer name with a market and duplicate identity reference","PKR 1,250.00","Active",null,null,view)
     private val detail=NativeOwnerCustomerDetail(row,null,null,2000.0,null,true,"PKR 2,000",null)
     @Test fun lightTermsReviewAndHistoryKeepChromeStable()=panel(1f,false)

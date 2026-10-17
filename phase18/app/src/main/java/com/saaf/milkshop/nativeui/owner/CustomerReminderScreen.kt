@@ -75,9 +75,9 @@ internal fun CustomerReminderScreen(customerId: Long,access: CustomerCommunicati
         if(busy) return
         busy=true;notice=null;sharedError=null
         scope.launch {
-            try {sharedState=work();snapshot=access.reminder(customerId);confirmed=false;notice="Handoff review updated. Sending or payment is not confirmed."}
+            try {sharedState=work();snapshot=access.reminder(customerId);confirmed=false;notice="Message review saved. Sending or payment is not confirmed."}
             catch(cancelled: CancellationException) {throw cancelled}
-            catch(failure: Exception) {sharedError=failure.message ?: "The handoff could not be checked. Refresh before continuing."}
+            catch(failure: Exception) {sharedError=failure.message ?: "The message attempt could not be checked. Refresh before continuing."}
             finally {busy=false}
         }
     }
@@ -99,11 +99,11 @@ internal fun CustomerReminderScreen(customerId: Long,access: CustomerCommunicati
                         modifier=Modifier.fillMaxWidth().testTag("reminder-phone"))
                     TextButton(onClick=hapticAction {guard.requestLeave(onEdit)},enabled=!busy) {Text("Edit customer")}
                 } else Text(normalized,style=nativeValueTextStyle(),modifier=Modifier.testTag("reminder-recipient"))
-                if(normalized==null) Text("Enter one full international number before opening a composer.",color=MaterialTheme.colorScheme.error)
+                if(normalized==null) Text("Enter one full number with + and the country code before opening a message app.",color=MaterialTheme.colorScheme.error)
                 Row(Modifier.fillMaxWidth().heightIn(min=48.dp).clickable(enabled=!busy && normalized!=null,onClick=hapticAction {confirmed=!confirmed}),
                     verticalAlignment=Alignment.CenterVertically) {
                     Checkbox(confirmed,onCheckedChange={toggleRecipient()},enabled=!busy && normalized!=null,modifier=Modifier.testTag("reminder-confirm-recipient"))
-                    Text("I checked the recipient",Modifier.weight(1f))
+                    Text("I checked this number",Modifier.weight(1f))
                 }
             }
             NativeInformationSection {
@@ -118,19 +118,19 @@ internal fun CustomerReminderScreen(customerId: Long,access: CustomerCommunicati
                 Text("Based on current local records, not the selected statement period.",style=nativeSupportingTextStyle())
             }
             access.sharedHandoff?.let {shared->NativeInformationSection {
-                Text("Shared message check",style=nativeSectionTextStyle())
-                Text(sharedError ?: sharedState?.blockedReason ?: if(loading) "Checking current shared records…" else "Current records will be checked again before opening.",
+                Text("Check before messaging",style=nativeSectionTextStyle())
+                Text(sharedError ?: sharedState?.blockedReason ?: if(loading) "Checking the latest synced records…" else "Current records will be checked again before opening.",
                     style=nativeSupportingTextStyle(),modifier=Modifier.testTag("reminder-shared-status"))
                 sharedState?.pending?.forEach {request->
                     TextButton(onClick=hapticAction {sharedWork {shared.recover(customerId,request.uid)}},enabled=!busy,
-                        modifier=Modifier.testTag("reminder-check-request")) {Text("Check unfinished request")}
+                        modifier=Modifier.testTag("reminder-check-request")) {Text("Check unfinished action")}
                     TextButton(onClick=hapticAction {setAside=request.uid},enabled=!busy,
-                        modifier=Modifier.testTag("reminder-set-aside")) {Text("Set aside local request")}
+                        modifier=Modifier.testTag("reminder-set-aside")) {Text("Remove from this device")}
                 }
                 if(sharedState?.canRelease==true) TextButton(onClick=hapticAction {val attempt=requireNotNull(sharedState?.attemptUid);sharedWork {shared.release(customerId,attempt)}},
                     enabled=!busy&&sharedState?.pending?.isEmpty()==true,modifier=Modifier.testTag("reminder-cancel-preparation")) {Text("Cancel preparation")}
                 if(sharedState?.canResolve==true) TextButton(onClick=hapticAction {resolution=sharedState?.attemptUid},enabled=!busy&&sharedState?.pending?.isEmpty()==true,
-                    modifier=Modifier.testTag("reminder-review-handoff")) {Text("Review handoff")}
+                    modifier=Modifier.testTag("reminder-review-handoff")) {Text("Review message attempt")}
             }}
             val sharedReady=access.sharedHandoff==null || (sharedError==null&&sharedState!=null&&sharedState?.blockedReason==null&&sharedState?.pending?.isEmpty()==true)
             Button(enabled=!busy && !loading && error==null && normalized!=null && confirmed && facts.message!=null && sharedReady,
@@ -159,24 +159,24 @@ internal fun CustomerReminderScreen(customerId: Long,access: CustomerCommunicati
                             }}
                             if(access.sharedHandoff!=null) sharedState=access.sharedHandoff.open(customerId,reviewed,phone,selectedChannel.name,launch)
                             else launch()
-                            opened=true;notice="Composer opened. Review and send in the other app; sending is not confirmed."
+                            opened=true;notice="Message app opened. Review and send there. Sending is not confirmed."
                             try {access.record(customerId,action(CommunicationEvent.COMPOSER_OPENED))}
                             catch(cancelled: CancellationException) {throw cancelled}
-                            catch(failure: Exception) {notice+=" Local history could not be saved."}
+                            catch(failure: Exception) {notice+=" History on this device could not be saved."}
                         } catch(cancelled: CancellationException) {throw cancelled}
                         catch(failure: Exception) {
                             notice=if(failure is ActivityNotFoundException) {
-                                if(access.sharedHandoff!=null) "No composer opened. Review this handoff before trying another channel. Keep the draft or share the statement manually."
-                                else if(selectedChannel==ReminderChannel.WhatsApp) "WhatsApp is unavailable. Choose SMS or enable WhatsApp, then try again."
+                                if(access.sharedHandoff!=null) "The message app did not open. Review this attempt before trying another option. You can keep the draft or share the statement."
+                                else if(selectedChannel==ReminderChannel.WhatsApp) "WhatsApp is not available. Set it up, or choose another option."
                                 else "No SMS app is available. Enable an SMS app and try again."
-                            } else failure.message ?: "The composer could not open. Try again."
+                            } else failure.message ?: "The message app could not open. Try again."
                             access.sharedHandoff?.let {shared->
                                 try {sharedState=shared.load(customerId)} catch(cancelled: CancellationException) {throw cancelled}
-                                catch(checkError: Exception) {sharedError=checkError.message ?: "Refresh the shared handoff before continuing."}
+                                catch(checkError: Exception) {sharedError=checkError.message ?: "Refresh this message attempt before continuing."}
                             }
                             if(!opened) try {access.record(customerId,action(CommunicationEvent.HANDOFF_FAILED))}
                             catch(cancelled: CancellationException) {throw cancelled}
-                            catch(historyError: Exception) {notice+=" Local history could not be saved."}
+                            catch(historyError: Exception) {notice+=" History on this device could not be saved."}
                         } finally {busy=false}
                     }
                 }) {Text("Open ${channel.name}")}
@@ -192,12 +192,12 @@ internal fun CustomerReminderScreen(customerId: Long,access: CustomerCommunicati
         val shared=requireNotNull(access.sharedHandoff)
         sharedWork {shared.resolve(customerId,attempt,outcome,ack)}
     }}
-    setAside?.let {request->AlertDialog(onDismissRequest={if(!busy) setAside=null},title={Text("Set aside local request?")},
-        text={Text("The server may already have accepted this request. This only removes the unfinished request on this phone. It does not cancel a preparation, undo a handoff or confirm sending. Current shared records will still block another message when needed.")},
+    setAside?.let {request->AlertDialog(onDismissRequest={if(!busy) setAside=null},title={Text("Remove from this device?")},
+        text={Text("This action may already be saved online. Remove only this device's unfinished copy. Message preparation and unreviewed attempts stay in place. This does not confirm sending.")},
         confirmButton={TextButton(onClick=hapticAction {
             setAside=null;sharedWork {requireNotNull(access.sharedHandoff).setAside(customerId,request,true)}
-        },enabled=!busy,modifier=Modifier.testTag("reminder-set-aside-confirm")) {Text("Set aside local request")}},
-        dismissButton={TextButton(onClick=hapticAction {setAside=null},enabled=!busy) {Text("Keep request")}})}
+        },enabled=!busy,modifier=Modifier.testTag("reminder-set-aside-confirm")) {Text("Remove from this device")}},
+        dismissButton={TextButton(onClick=hapticAction {setAside=null},enabled=!busy) {Text("Keep for review")}})}
     if(guard.discardConfirmationOpen) AlertDialog(onDismissRequest=guard::keepEditing,title={Text("Leave this draft?")},
         text={Text("The number entered for this draft will be cleared. The customer's saved number stays as it is.")},
         confirmButton={TextButton(onClick=hapticAction(guard::confirmDiscard),modifier=Modifier.testTag("reminder-discard")) {Text("Discard and leave")}},
@@ -208,17 +208,17 @@ internal fun CustomerReminderScreen(customerId: Long,access: CustomerCommunicati
 private fun CustomerHandoffResolutionDialog(busy: Boolean,onDismiss: ()->Unit,onResolve: (String,Boolean)->Unit) {
     var outcome by remember {mutableStateOf<String?>(null)}
     var acknowledged by remember {mutableStateOf(false)}
-    AlertDialog(onDismissRequest={if(!busy) onDismiss()},title={Text("Review message handoff")},text={
+    AlertDialog(onDismissRequest={if(!busy) onDismiss()},title={Text("Review message attempt")},text={
         Column(Modifier.heightIn(max=360.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(12.dp)) {
-            Text("A composer may already have opened. This app cannot confirm sending or delivery. Choose what you know before another attempt.")
-            listOf("REVIEWED" to "Mark reviewed","REPORTED_NOT_OPENED" to "No composer opened","RETRY_UNCERTAIN" to "Allow another attempt").forEach {(value,label)->
+            Text("A message app may have opened. This app cannot confirm sending or delivery. Record what you know before trying again.")
+            listOf("REVIEWED" to "Mark reviewed","REPORTED_NOT_OPENED" to "Message app did not open","RETRY_UNCERTAIN" to "Allow another attempt").forEach {(value,label)->
                 Row(Modifier.fillMaxWidth().heightIn(min=56.dp).clickable(enabled=!busy,onClick=hapticAction {outcome=value}),verticalAlignment=Alignment.CenterVertically) {
                     RadioButton(outcome==value,onClick=hapticAction {outcome=value},enabled=!busy,modifier=Modifier.testTag("reminder-resolution-$value"))
                     Text(label,Modifier.weight(1f))
                 }
             }
             Text("Allowing another attempt may cause duplicate contact if a message was already sent.",style=nativeSupportingTextStyle())
-            Row(verticalAlignment=Alignment.CenterVertically) {Checkbox(acknowledged,{acknowledged=it},enabled=!busy,modifier=Modifier.testTag("reminder-resolution-ack"));Text("I understand this is my report, not proof of sending or payment",Modifier.weight(1f))}
+            Row(verticalAlignment=Alignment.CenterVertically) {Checkbox(acknowledged,{acknowledged=it},enabled=!busy,modifier=Modifier.testTag("reminder-resolution-ack"));Text("This records my report. It does not confirm sending or payment.",Modifier.weight(1f))}
         }
     },confirmButton={TextButton(onClick=hapticAction {outcome?.let {onResolve(it,acknowledged)}},enabled=!busy&&acknowledged&&outcome!=null,
         modifier=Modifier.testTag("reminder-resolution-confirm")) {Text("Confirm review")}},dismissButton={TextButton(onClick=hapticAction(onDismiss),enabled=!busy) {Text("Keep unresolved")}})
@@ -237,10 +237,10 @@ internal fun CustomerPreparationHistory(customerId: Long,access: CustomerCommuni
     }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp).testTag("customer-preparation-history"),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         TextButton(onClick=hapticAction(onBack)) {Text("Back to statement")}
-        Text("Preparation history",style=MaterialTheme.typography.titleLarge)
-        Text("Latest 50 actions stored on this phone, including restored backups. This is not shared sending or delivery history.",style=nativeSupportingTextStyle())
+        Text("Draft & share history",style=MaterialTheme.typography.titleLarge)
+        Text("Latest 50 actions saved on this device, including restored backups. This history is not shared across devices and does not confirm sending or delivery.",style=nativeSupportingTextStyle())
         Box(Modifier.fillMaxWidth().height(4.dp)) {if(loading) LinearProgressIndicator(Modifier.fillMaxWidth())}
-        if(!loading && error==null && entries.isEmpty()) Text("No preparation actions recorded yet.")
+        if(!loading && error==null && entries.isEmpty()) Text("No drafts or share actions recorded yet.")
         entries.forEach {entry->NativeInformationSection {
             Text(if(entry.kind=="statement" && entry.event==CommunicationEvent.PREPARED) "Statement prepared" else entry.event.label,style=nativeSectionTextStyle())
             Text("${entry.channel} ${entry.kind}",style=nativeValueTextStyle())

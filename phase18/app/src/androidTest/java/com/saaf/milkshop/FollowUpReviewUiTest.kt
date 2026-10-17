@@ -12,7 +12,7 @@ import org.junit.Assert.*
 
 internal class FollowUpReviewUiTest: FollowUpNavigationUiTest() {
     private var state=FollowUpWorkspaceSnapshot(FollowUpPolicy("fixture",date.minusDays(2),true),date,
-        listOf(FollowUpCustomer(7,"fixture",row.name,null,true,0,null)),online=true,owner=true,saveToken="fixture",freshness="Checked against shared records")
+        listOf(FollowUpCustomer(7,"fixture",row.name,null,true,0,null)),online=true,owner=true,saveToken="fixture",freshness="Checked against synced records")
     private val commands=mutableListOf<FollowUpCommand>()
     private val requests=mutableListOf<Pair<String,Boolean>>()
     private var loadFailure=false
@@ -37,7 +37,7 @@ internal class FollowUpReviewUiTest: FollowUpNavigationUiTest() {
         rule.onNodeWithTag("followup-attention-entry").performClick()
         rule.onNodeWithTag("followup-settings").performScrollTo().performClick()
         rule.onNodeWithTag("followup-shared-activity").performScrollTo().performClick()
-        rule.onNodeWithText("Shared follow-up activity").assertIsDisplayed()
+        rule.onNodeWithText("Follow-up activity").assertIsDisplayed()
     }
     @Test fun directScheduleForSettledCustomerKeepsReturnAndTerms() {
         show(workspaceAccess=access,balancePaisa=0);schedule()
@@ -71,18 +71,18 @@ internal class FollowUpReviewUiTest: FollowUpNavigationUiTest() {
         rule.onNodeWithTag("followup-custom-days").assertDoesNotExist();assertTrue(commands.isEmpty())
     }
     @Test fun sharedActivityAndRecoveryNeverLaunch() {
-        state=state.copy(requests=listOf(FollowUpRequestRow("original","Owner alert reserved",null,true,true,true,true)),
-            activity=listOf(FollowUpActivityRow(1,"Staff reported no composer opened",row.name,"Another staff account · Another device","18 Oct 2026, 12:00")))
+        state=state.copy(requests=listOf(FollowUpRequestRow("original","Owner alert check recorded",null,true,true,true,true)),
+            activity=listOf(FollowUpActivityRow(1,"Staff reported the message app did not open",row.name,"Another staff account · Another device","18 Oct 2026, 12:00")))
         show(workspaceAccess=access);activity()
         rule.onNodeWithText("Restored from backup · Result needs review").performScrollTo().assertIsDisplayed();capture("shared-restored-request")
         rule.onNodeWithTag("followup-review-check-original").performScrollTo().performClick()
         rule.waitUntil(10000) {requests.size==1}
         assertEquals(listOf("original" to false),requests);assertEquals(0,gates.get())
-        rule.onNodeWithTag("followup-notice").performScrollTo().assertTextEquals("Request result checked. No app was opened and no alert was posted.")
-        rule.onNodeWithText("Staff reported no composer opened").performScrollTo().assertIsDisplayed()
+        rule.onNodeWithTag("followup-notice").performScrollTo().assertTextEquals("Action checked. No message app opened and no alert was shown.")
+        rule.onNodeWithText("Staff reported the message app did not open").performScrollTo().assertIsDisplayed()
     }
     @Test fun foreignRestoreRequiresExplicitOwnerSetAside() {
-        state=state.copy(owner=false,requests=listOf(FollowUpRequestRow("foreign","Message preparation reserved",null,true,false,false,false)),
+        state=state.copy(owner=false,requests=listOf(FollowUpRequestRow("foreign","Message preparation started",null,true,false,false,false)),
             claims=listOf(FollowUpClaimRow("shared-attempt",7,row.name,"HANDOFF_STARTED",false)))
         show(initialRole=AppRole.MANAGER,workspaceAccess=access);activity()
         rule.onNodeWithTag("followup-review-aside-foreign").performScrollTo().assertIsNotEnabled()
@@ -90,7 +90,7 @@ internal class FollowUpReviewUiTest: FollowUpNavigationUiTest() {
         rule.waitForIdle();activity()
         rule.onNodeWithTag("followup-review-check-foreign").performScrollTo().assertIsNotEnabled()
         rule.onNodeWithTag("followup-review-aside-foreign").performScrollTo().performClick()
-        rule.onNodeWithText("Keep request").performClick();assertTrue(requests.isEmpty())
+        rule.onNodeWithText("Keep for review").performClick();assertTrue(requests.isEmpty())
         rule.onNodeWithTag("followup-review-aside-foreign").performScrollTo().performClick()
         rule.onNodeWithTag("followup-review-aside-confirm").performClick();rule.waitUntil(10000) {requests.size==1}
         assertEquals(listOf("foreign" to true),requests);assertEquals(1,state.claims.size);assertEquals(0,gates.get())
@@ -104,6 +104,6 @@ internal class FollowUpReviewUiTest: FollowUpNavigationUiTest() {
         rule.waitUntil(10000) {rule.onAllNodesWithTag("reminder-review-handoff").fetchSemanticsNodes().isNotEmpty()}
         rule.onNodeWithTag("reminder-open").performScrollTo().assertIsNotEnabled()
         rule.onNodeWithText("Back to follow-up").performScrollTo().performClick()
-        rule.onNodeWithText("Shared follow-up activity").assertIsDisplayed();assertEquals(0,gates.get())
+        rule.onNodeWithText("Follow-up activity").assertIsDisplayed();assertEquals(0,gates.get())
     }
 }

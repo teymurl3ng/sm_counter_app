@@ -1,0 +1,182 @@
+{
+  "label": "wording-first",
+  "device": "SM-A065F",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.CreditFinishUiTest#lightTermsReviewAndHistoryKeepChromeStable",
+    "com.saaf.milkshop.CreditFinishUiTest#darkLargeTextTermsReviewAndHistoryKeepChromeStable",
+    "com.saaf.milkshop.CreditFinishTest#pendingAndRestoredClearsCannotHideAcceptedFlag",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#lightListReviewAndSettingsRetainChromeAndManualFallback",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#darkLargeTextListReviewAndSettingsRetainChromeAndManualFallback",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#primaryTransferRequiresExplicitCompatibleDeviceConfirmation",
+    "com.saaf.milkshop.FollowUpWorkspaceUiTest#unfinishedSaveBlocksEditsAndSetAsideExplainsServerOutcome",
+    "com.saaf.milkshop.FollowUpReviewUiTest#darkLargeScheduleKeepsDraftAndChrome",
+    "com.saaf.milkshop.FollowUpReviewUiTest#sharedActivityAndRecoveryNeverLaunch",
+    "com.saaf.milkshop.FollowUpReviewUiTest#foreignRestoreRequiresExplicitOwnerSetAside",
+    "com.saaf.milkshop.CustomerReminderUiTest#lightReviewHandoffHasStableChromeAndTruthfulHistory",
+    "com.saaf.milkshop.CustomerReminderUiTest#darkLargeTextReviewHandoffHasStableChromeAndTruthfulHistory",
+    "com.saaf.milkshop.CustomerReminderUiTest#sharedUncertaintyRequiresExactConfirmedResolution",
+    "com.saaf.milkshop.CustomerReminderUiTest#sharedMissingHandlerNeverSilentlySwitchesChannel",
+    "com.saaf.milkshop.StatementSharingUiTest#lightChooserHandoffHasTruthfulFeedbackAndStableChrome",
+    "com.saaf.milkshop.StatementSharingUiTest#darkLargeTextChooserHandoffHasTruthfulFeedbackAndStableChrome",
+    "com.saaf.milkshop.StatementSharingUiTest#observableShareHistoryDoesNotTurnPostLaunchAuditFailureIntoHandoffFailure",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementReminderAndHistoryKeepOneHostAndReturnToCustomer",
+    "com.saaf.milkshop.CustomerStatementUiTest#statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure",
+    "com.saaf.milkshop.FollowUpReviewBindingTest#activityMapsActorsAndNeverClaimsDelivery",
+    "com.saaf.milkshop.FollowUpWorkspaceBindingTest#uncertainSaveRecoversOriginalIdAndNeverDuplicates",
+    "com.saaf.milkshop.CustomerCommunicationTest#reminderUsesCurrentBalanceAndKnownOverdueWithoutLeakingPrivateFacts",
+    "com.saaf.milkshop.FollowUpHandoffTest#restoredRequestsStayOriginalAndRecoveryNeverLaunches",
+    "com.saaf.milkshop.FollowUpHandoffTest#cancellationOrFailedHandlerLeavesStartedUncertainty"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.CreditFinishUiTest",
+      "test": "lightTermsReviewAndHistoryKeepChromeStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditFinishUiTest",
+      "test": "darkLargeTextTermsReviewAndHistoryKeepChromeStable",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CreditFinishTest",
+      "test": "pendingAndRestoredClearsCannotHideAcceptedFlag",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "lightListReviewAndSettingsRetainChromeAndManualFallback",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "primaryTransferRequiresExplicitCompatibleDeviceConfirmation",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "unfinishedSaveBlocksEditsAndSetAsideExplainsServerOutcome",
+      "code": -2,
+      "stack": "java.lang.AssertionError: Failed to inject touch input."
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceUiTest",
+      "test": "darkLargeTextListReviewAndSettingsRetainChromeAndManualFallback",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewUiTest",
+      "test": "sharedActivityAndRecoveryNeverLaunch",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewUiTest",
+      "test": "darkLargeScheduleKeepsDraftAndChrome",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewUiTest",
+      "test": "foreignRestoreRequiresExplicitOwnerSetAside",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerReminderUiTest",
+      "test": "sharedUncertaintyRequiresExactConfirmedResolution",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerReminderUiTest",
+      "test": "lightReviewHandoffHasStableChromeAndTruthfulHistory",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerReminderUiTest",
+      "test": "sharedMissingHandlerNeverSilentlySwitchesChannel",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerReminderUiTest",
+      "test": "darkLargeTextReviewHandoffHasStableChromeAndTruthfulHistory",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "darkLargeTextChooserHandoffHasTruthfulFeedbackAndStableChrome",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "lightChooserHandoffHasTruthfulFeedbackAndStableChrome",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.StatementSharingUiTest",
+      "test": "observableShareHistoryDoesNotTurnPostLaunchAuditFailureIntoHandoffFailure",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementReminderAndHistoryKeepOneHostAndReturnToCustomer",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerStatementUiTest",
+      "test": "statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpReviewBindingTest",
+      "test": "activityMapsActorsAndNeverClaimsDelivery",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpWorkspaceBindingTest",
+      "test": "uncertainSaveRecoversOriginalIdAndNeverDuplicates",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.CustomerCommunicationTest",
+      "test": "reminderUsesCurrentBalanceAndKnownOverdueWithoutLeakingPrivateFacts",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpHandoffTest",
+      "test": "cancellationOrFailedHandlerLeavesStartedUncertainty",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.FollowUpHandoffTest",
+      "test": "restoredRequestsStayOriginalAndRecoveryNeverLaunches",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 23,
+  "expected": 24,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "3037d0e915dd224dbd746cc0563274bd5cc4d611097fb2b1c57896a6c902140e"
+}

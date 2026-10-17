@@ -38,7 +38,7 @@ internal class FollowUpWorkspaceBinding(private val db: MilkShopDatabase,private
         basis=b
         return FollowUpWorkspaceSnapshot(remote.policy ?: FollowUpPolicy("not-configured",today),today,customers,
             remote.preferences,remote.acknowledgments,
-            freshness=if(!online) "Saved reminder state · Sync needed" else if(fresh) "Checked against shared records" else "Sync needed before reviewing customer work",
+            freshness=if(!online) "Saved on this device · Sync needed" else if(fresh) "Checked against synced records" else "Sync needed before reviewing customer work",
             online=online,owner=a.owner,primaryDevice=when(remote.primaryInstallation) {null->"Not selected";a.binding.installation->"This device";else->"Another device"},
             notificationsAllowed=notificationsAllowed(),shopZone=remote.zone?.id ?: "Shop timezone unavailable",hasMessageApp=hasMessageApp(),
             saveToken=b.token,reviewReady=b.reviewReady,unfinished=pending,configured=remote.policy!=null,
@@ -65,12 +65,12 @@ internal class FollowUpWorkspaceBinding(private val db: MilkShopDatabase,private
     private suspend fun save(command: FollowUpCommand,token: String): FollowUpWorkspaceSave=runtime.withFollowUpSession(session) { a->
         val b=basis ?: error("Refresh follow-ups before saving.")
         check(b.token==token&&b.binding==a.binding&&b.online) {"This review changed. Refresh follow-ups before saving."}
-        check(db.followUpDataDao().commands().none {it.bindingKey==a.binding.key}) {"Check or set aside the unfinished save first."}
+        check(db.followUpDataDao().commands().none {it.bindingKey==a.binding.key}) {"Check the unfinished save first, or remove it from this device."}
         val op=when(command) {
             is FollowUpCommand.Policy->{
-                check(a.owner) {"Only Owner can change the shop policy."}
+                check(a.owner) {"Only Owner can change these shop settings."}
                 check(command.value.revision==(b.remote.policy?.revision ?: "not-configured")) {"The shop schedule changed. Refresh first."}
-                check(!command.value.enabled||command.phonesUpdated) {"Confirm that all posting devices are updated."}
+                check(!command.value.enabled||command.phonesUpdated) {"Confirm that all sales devices are updated."}
                 val v=command.value
                 JSONObject().put("kind","POLICY").put("expected_revision",b.remote.heads.policyRevision ?: JSONObject.NULL)
                     .put("make_primary",command.makePrimary).put("phones_updated",command.phonesUpdated)
@@ -111,8 +111,8 @@ internal class FollowUpWorkspaceBinding(private val db: MilkShopDatabase,private
         val row=db.followUpDataDao().command(uid) ?: error("This unfinished save is no longer present. Refresh first.")
         check(row.bindingKey==a.binding.key) {"This save belongs to another shop or sign-in."}
         val op=JSONObject(row.operationJson);val kind=FollowUpWire.operation(op)
-        check(kind in metadataKinds) {"A message or notification request requires its separate review flow."}
-        check(kind!="POLICY"||a.owner) {"Only Owner can review an unfinished shop-policy save."}
+        check(kind in metadataKinds) {"Review this message or alert under Activity & unfinished actions."}
+        check(kind!="POLICY"||a.owner) {"Only Owner can check an unfinished shop-settings save."}
         if(setAside) {
             // Explicit local bookkeeping only. Never claims to cancel or undo server acceptance.
             db.followUpDataDao().complete(uid)
@@ -125,13 +125,13 @@ internal class FollowUpWorkspaceBinding(private val db: MilkShopDatabase,private
     private suspend fun reviewRequest(uid: String,setAside: Boolean): FollowUpWorkspaceSave=runtime.withFollowUpSession(session) {a->
         // New central review is online-only. A cached mode cannot authorize replay/foreign-restore removal.
         val current=read(a)
-        check(current.online) {"Connect to check the current shared state before reviewing this request."}
-        val row=db.followUpDataDao().command(uid) ?: error("This request is no longer present. Refresh first.")
+        check(current.online) {"Connect to check the latest synced records before reviewing this action."}
+        val row=db.followUpDataDao().command(uid) ?: error("This action is no longer listed. Refresh first.")
         val same=row.bindingKey==a.binding.key
         val operation=runCatching {JSONObject(row.operationJson).also {FollowUpWire.operation(it)}}.getOrNull()
         val kind=operation?.getString("kind")
-        check(same||setAside&&a.owner) {"This request belongs to a different connection. It cannot be replayed here."}
-        check(kind!="POLICY"||a.owner) {"Only Owner can review a shop-settings request."}
+        check(same||setAside&&a.owner) {"This action was saved under another connection. You cannot retry it here."}
+        check(kind!="POLICY"||a.owner) {"Only Owner can check a shop-settings change."}
         a.validate()
         if(setAside) {
             db.followUpDataDao().complete(uid) // Local copy only; never releases a claim or confirms an outcome.

@@ -33,7 +33,7 @@ internal object ReminderIntents {
                 try {context.startActivity(request);return} catch(missing: ActivityNotFoundException) { /* Try the other installed WhatsApp edition. */ }
             }
         }
-        throw ActivityNotFoundException("WhatsApp is unavailable. Choose SMS or enable WhatsApp, then try again.")
+        throw ActivityNotFoundException("WhatsApp is not available. Set it up, or choose another option.")
     }
     private val PACKAGES=listOf("com.whatsapp","com.whatsapp.w4b")
 }

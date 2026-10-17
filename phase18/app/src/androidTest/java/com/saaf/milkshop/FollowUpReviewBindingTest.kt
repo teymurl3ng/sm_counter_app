@@ -32,7 +32,7 @@ internal class FollowUpReviewBindingTest: FollowUpWorkspaceBindingTest() {
             .put("attempt_uid",if(index==0) JSONObject.NULL else id()).put("cycle",JSONObject.NULL).put("accepted_at",instant))
         val activity=workspace.load().activity
         assertEquals(listOf(3L,2L,1L),activity.map {it.sequence})
-        assertEquals("Staff allowed another attempt",activity[0].label);assertEquals("Message app handoff started",activity[1].label)
+        assertEquals("Staff allowed another attempt",activity[0].label);assertEquals("Message app may have opened",activity[1].label)
         assertEquals("Another staff account · Another device",activity[1].by);assertEquals("Cafe",activity[1].customer)
         assertFalse(activity.any {it.label.contains("delivered",true)||it.label.contains("sent",true)||it.label.contains("paid",true)})
         assertEquals(before,db.backupDataDao().financialLogs());assertTrue(sent.isEmpty())

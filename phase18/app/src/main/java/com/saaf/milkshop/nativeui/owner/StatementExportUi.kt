@@ -42,7 +42,7 @@ internal fun StatementPageView(document: StatementDocument,page: Int,engine: Sta
         Box(Modifier.fillMaxWidth().aspectRatio(StatementDocumentEngine.WIDTH.toFloat()/StatementDocumentEngine.HEIGHT)
             .border(1.dp,Color(0xFFC9C3B3)).testTag("statement-paper")) {
             bitmap?.let {Image(it.asImageBitmap(),"Statement page ${page+1} of ${document.pages.size}",Modifier.fillMaxSize())}
-            if(bitmap==null) Text(if(failure) "Image preview could not load. Read the statement text below." else "Rendering page…",Modifier.padding(16.dp))
+            if(bitmap==null) Text(if(failure) "Image preview could not load. Read the statement text below." else "Preparing page…",Modifier.padding(16.dp))
         }
         TextButton(onClick=hapticAction {textOpen=!textOpen},modifier=Modifier.testTag("statement-read-text")) {Text(if(textOpen) "Close statement text" else "Read statement text")}
         if(textOpen) NativeInformationSection(Modifier.testTag("statement-page-text")) {
@@ -89,7 +89,7 @@ internal fun StatementShareControls(document: StatementDocument,engine: Statemen
                     Text(choice.label,Modifier.weight(1f))
                 }
             }
-            Text("Choose the recipient in Android's share menu. Opening it does not confirm sending.",style=MaterialTheme.typography.bodyMedium)
+            Text("Choose who to share with in the share menu. Opening it does not confirm sending.",style=MaterialTheme.typography.bodyMedium)
             Box(Modifier.fillMaxWidth().height(4.dp)) {if(busy) LinearProgressIndicator()}
             if(busy) Text("Preparing ${format.label.lowercase()}…",style=MaterialTheme.typography.bodyMedium)
         }
@@ -122,7 +122,7 @@ internal fun StatementShareControls(document: StatementDocument,engine: Statemen
                 opened=true;dialog=false;notice="Share menu opened. Sending is managed in the other app."
                 try {record(action(CommunicationEvent.CHOOSER_OPENED))}
                 catch(cancelled: CancellationException) {throw cancelled}
-                catch(historyError: Exception) {notice+=" Local history could not be saved."}
+                catch(historyError: Exception) {notice+=" History on this device could not be saved."}
             } catch(cancelled: CancellationException) {throw cancelled}
             catch(error: Exception) {
                 dialog=false
@@ -130,7 +130,7 @@ internal fun StatementShareControls(document: StatementDocument,engine: Statemen
                     else error.message?.takeIf {it.isNotBlank()} ?: "Statement sharing failed. Refresh and try again."
                 if(!opened) try {record(action(CommunicationEvent.HANDOFF_FAILED))}
                 catch(cancelled: CancellationException) {throw cancelled}
-                catch(historyError: Exception) {notice+=" Local history could not be saved."}
+                catch(historyError: Exception) {notice+=" History on this device could not be saved."}
             }
             finally {
                 withContext(NonCancellable+Dispatchers.IO) {export?.let {if(opened) it.close() else it.discard()}}

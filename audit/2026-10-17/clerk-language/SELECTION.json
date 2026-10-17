@@ -1,0 +1,48 @@
+{
+  "CreditFinishUiTest": [
+    "lightTermsReviewAndHistoryKeepChromeStable",
+    "darkLargeTextTermsReviewAndHistoryKeepChromeStable"
+  ],
+  "CreditFinishTest": [
+    "pendingAndRestoredClearsCannotHideAcceptedFlag"
+  ],
+  "FollowUpWorkspaceUiTest": [
+    "lightListReviewAndSettingsRetainChromeAndManualFallback",
+    "darkLargeTextListReviewAndSettingsRetainChromeAndManualFallback",
+    "primaryTransferRequiresExplicitCompatibleDeviceConfirmation",
+    "unfinishedSaveBlocksEditsAndSetAsideExplainsServerOutcome"
+  ],
+  "FollowUpReviewUiTest": [
+    "darkLargeScheduleKeepsDraftAndChrome",
+    "sharedActivityAndRecoveryNeverLaunch",
+    "foreignRestoreRequiresExplicitOwnerSetAside"
+  ],
+  "CustomerReminderUiTest": [
+    "lightReviewHandoffHasStableChromeAndTruthfulHistory",
+    "darkLargeTextReviewHandoffHasStableChromeAndTruthfulHistory",
+    "sharedUncertaintyRequiresExactConfirmedResolution",
+    "sharedMissingHandlerNeverSilentlySwitchesChannel"
+  ],
+  "StatementSharingUiTest": [
+    "lightChooserHandoffHasTruthfulFeedbackAndStableChrome",
+    "darkLargeTextChooserHandoffHasTruthfulFeedbackAndStableChrome",
+    "observableShareHistoryDoesNotTurnPostLaunchAuditFailureIntoHandoffFailure"
+  ],
+  "CustomerStatementUiTest": [
+    "statementReminderAndHistoryKeepOneHostAndReturnToCustomer",
+    "statementDarkLargeTextPreviewAndReturnKeepChromeAndDisclosure"
+  ],
+  "FollowUpReviewBindingTest": [
+    "activityMapsActorsAndNeverClaimsDelivery"
+  ],
+  "FollowUpWorkspaceBindingTest": [
+    "uncertainSaveRecoversOriginalIdAndNeverDuplicates"
+  ],
+  "CustomerCommunicationTest": [
+    "reminderUsesCurrentBalanceAndKnownOverdueWithoutLeakingPrivateFacts"
+  ],
+  "FollowUpHandoffTest": [
+    "restoredRequestsStayOriginalAndRecoveryNeverLaunches",
+    "cancellationOrFailedHandlerLeavesStartedUncertainty"
+  ]
+}

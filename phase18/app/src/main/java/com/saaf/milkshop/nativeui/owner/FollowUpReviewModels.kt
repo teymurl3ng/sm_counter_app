@@ -9,11 +9,11 @@ import java.time.format.DateTimeFormatter
 
 internal fun followUpActionLabel(kind: String): String=when(kind) {
     "POLICY"->"Shop follow-up settings changed";"PREFERENCE"->"Customer schedule or pause changed"
-    "REVIEW"->"Follow-up marked reviewed";"SNOOZE"->"Follow-up postponed";"ACQUIRE"->"Message preparation reserved"
-    "RENEW"->"Message preparation extended";"START"->"Message app handoff started";"RELEASE"->"Message preparation cancelled"
-    "RESOLVE"->"Message handoff reviewed";"REVIEWED"->"Handoff marked reviewed by staff"
-    "REPORTED_NOT_OPENED"->"Staff reported no composer opened";"RETRY_UNCERTAIN"->"Staff allowed another attempt"
-    "DIGEST"->"Owner alert reserved";else->"Request needs review"
+    "REVIEW"->"Follow-up marked reviewed";"SNOOZE"->"Follow-up postponed";"ACQUIRE"->"Message preparation started"
+    "RENEW"->"Message preparation time extended";"START"->"Message app may have opened";"RELEASE"->"Message preparation cancelled"
+    "RESOLVE"->"Message attempt reviewed";"REVIEWED"->"Message attempt marked reviewed by staff"
+    "REPORTED_NOT_OPENED"->"Staff reported the message app did not open";"RETRY_UNCERTAIN"->"Staff allowed another attempt"
+    "DIGEST"->"Owner alert check recorded";else->"Action needs review"
 }
 
 internal fun followUpActivity(remote: FollowUpRemoteSnapshot,binding: FollowUpBinding,customers: List<FollowUpCustomer>): List<FollowUpActivityRow> {

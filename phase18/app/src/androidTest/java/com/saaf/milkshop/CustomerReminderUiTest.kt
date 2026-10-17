@@ -88,7 +88,7 @@ class CustomerReminderUiTest {
         rule.onNodeWithTag("reminder-message").performScrollTo().assertTextEquals(fixture.message!!)
         capture("message-$scale-$dark");open()
         rule.waitUntil(10000) {launches.size==1 && events.size==2}
-        rule.onNodeWithTag("reminder-notice").performScrollTo().assertTextEquals("Composer opened. Review and send in the other app; sending is not confirmed.")
+        rule.onNodeWithTag("reminder-notice").performScrollTo().assertTextEquals("Message app opened. Review and send there. Sending is not confirmed.")
         assertEquals(listOf(CommunicationEvent.PREPARED,CommunicationEvent.COMPOSER_OPENED),events.map {it.event})
         assertEquals(1,events.map {it.operationId}.distinct().size)
         assertEquals(title,rule.onNodeWithText("Customers",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot)
@@ -134,7 +134,7 @@ class CustomerReminderUiTest {
         show(load={delay(150);fixture},launch={c,p,m->if(c==ReminderChannel.WhatsApp) throw ActivityNotFoundException() else launches.add(Triple(c,p,m))})
         confirm();open();rule.onNodeWithTag("reminder-open").assertIsNotEnabled()
         rule.waitUntil(10000) {events.any {it.event==CommunicationEvent.HANDOFF_FAILED}}
-        rule.onNodeWithTag("reminder-notice").performScrollTo().assertTextEquals("WhatsApp is unavailable. Choose SMS or enable WhatsApp, then try again.")
+        rule.onNodeWithTag("reminder-notice").performScrollTo().assertTextEquals("WhatsApp is not available. Set it up, or choose another option.")
         assertTrue(launches.isEmpty())
         rule.onNodeWithText("SMS",useUnmergedTree=true).performScrollTo().performClick()
         rule.onNodeWithText("Review and send in your SMS app. Carrier charges may apply. No file is attached.").performScrollTo().assertIsDisplayed()
@@ -186,7 +186,7 @@ class CustomerReminderUiTest {
     @Test fun sharedUncertaintyRequiresExactConfirmedResolution() {
         val attempt="pinned-attempt";val calls=CopyOnWriteArrayList<String>()
         var state=CustomerSharedHandoffState(attempt,"HANDOFF_STARTED",canResolve=true,
-            pending=listOf(CustomerSharedRequest("original-request","START")),blockedReason="Check unfinished request")
+            pending=listOf(CustomerSharedRequest("original-request","START")),blockedReason="Check unfinished action")
         val shared=CustomerSharedHandoffAccess(load={state},open={_,_,_,_,_->error("Recovery must never open")},recover={id,request->
             assertEquals(7L,id);assertEquals("original-request",request);calls+="recover"
             state
@@ -202,7 +202,7 @@ class CustomerReminderUiTest {
         rule.onNodeWithTag("reminder-check-request").performScrollTo().performClick()
         rule.waitUntil(10000) {calls.size==1};rule.waitForIdle()
         rule.onNodeWithTag("reminder-set-aside").performScrollTo().performClick()
-        rule.onNodeWithText("Keep request").performClick();assertEquals(listOf("recover"),calls.toList())
+        rule.onNodeWithText("Keep for review").performClick();assertEquals(listOf("recover"),calls.toList())
         rule.onNodeWithTag("reminder-set-aside").performScrollTo().performClick()
         rule.onNodeWithTag("reminder-set-aside-confirm").performClick()
         rule.waitUntil(10000) {calls.size==2};rule.waitForIdle()
@@ -223,7 +223,7 @@ class CustomerReminderUiTest {
         },recover={_,_->error("Unexpected recovery")},release={_,_->error("Unexpected release")},resolve={_,_,_,_->error("Must require an explicit review")})
         show(shared=shared,launch={_,_,_->throw ActivityNotFoundException("Synthetic missing handler")})
         confirm();open();rule.waitUntil(10000) {events.any {it.event==CommunicationEvent.HANDOFF_FAILED}}
-        rule.onNodeWithTag("reminder-notice").performScrollTo().assertTextEquals("No composer opened. Review this handoff before trying another channel. Keep the draft or share the statement manually.")
+        rule.onNodeWithTag("reminder-notice").performScrollTo().assertTextEquals("The message app did not open. Review this attempt before trying another option. You can keep the draft or share the statement.")
         rule.onNodeWithText("SMS",useUnmergedTree=true).performScrollTo().performClick()
         rule.onNodeWithTag("reminder-open").performScrollTo().assertIsNotEnabled()
         rule.onNodeWithTag("reminder-review-handoff").performScrollTo().assertIsEnabled()

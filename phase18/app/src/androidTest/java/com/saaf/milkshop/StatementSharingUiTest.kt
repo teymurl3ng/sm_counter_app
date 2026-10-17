@@ -57,7 +57,7 @@ class StatementSharingUiTest {
         rule.onNodeWithTag("statement-share").performClick()
         rule.onNodeWithTag("statement-open-share-menu").performClick()
         rule.waitUntil(20000) {actions.size==2 && launched.get()!=null}
-        rule.onNodeWithTag("statement-share-notice").performScrollTo().assertTextEquals("Share menu opened. Sending is managed in the other app. Local history could not be saved.")
+        rule.onNodeWithTag("statement-share-notice").performScrollTo().assertTextEquals("Share menu opened. Sending is managed in the other app. History on this device could not be saved.")
         assertEquals(listOf(CommunicationEvent.PREPARED,CommunicationEvent.CHOOSER_OPENED),actions.map {it.event})
         assertEquals(1,actions.map {it.operationId}.distinct().size)
         assertEquals("statement",actions.first().kind)

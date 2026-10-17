@@ -50,7 +50,7 @@ internal class CustomerStatementReader(private val db: MilkShopDatabase, private
         today: LocalDate = BusinessClock.today()): CustomerStatement = db.withReadTransaction {
         period.validate(today)
         val actor = security.requirePermission(session, AppPermission.VIEW_FULL_FINANCIAL)
-        require(AppRole.parse(actor.role) in setOf(AppRole.OWNER, AppRole.MANAGER, AppRole.ADMIN)) { "Customer statements require leadership access." }
+        require(AppRole.parse(actor.role) in setOf(AppRole.OWNER, AppRole.MANAGER, AppRole.ADMIN)) { "Sign in as Owner, Admin or Manager to prepare statements." }
         val account = requireNotNull(db.accountDao().findById(accountId)) { "Customer no longer available." }
         require(account.category == "Customer") { "Choose a customer account." }
         val identity = requireNotNull(db.storeProfileDao().get()) { "Set the shop name in Shop settings before preparing a statement." }
@@ -59,7 +59,7 @@ internal class CustomerStatementReader(private val db: MilkShopDatabase, private
         val opening = money(dao.statementBalanceBefore(accountId, period.start.toString()))
         val closing = money(dao.statementBalanceBefore(accountId, period.endExclusive))
         val rows = dao.statementMovements(accountId, period.start.toString(), period.endExclusive)
-        require(rows.size <= 10000) { "This period contains too many movements. Choose a smaller period." }
+        require(rows.size <= 10000) { "There are too many entries for one statement. Choose a shorter period." }
         val products = dao.statementProducts(accountId, period.start.toString(), period.endExclusive).groupBy { it.eventId }
         var previous = opening
         val lines = rows.map { row ->
@@ -76,7 +76,7 @@ internal class CustomerStatementReader(private val db: MilkShopDatabase, private
                 }, products[row.eventId]?.joinToString(" · ") { "${it.productName} ${decimal(-it.quantity)} ${it.unit}" },
                 movement, balance, movement != money(row.movementAmount))
         }
-        check(previous == closing) { "Statement movements do not reconcile. Refresh or choose a smaller period; no statement was prepared." }
+        check(previous == closing) { "The statement entries do not add up. Refresh or choose a shorter period. No statement was prepared." }
         if (period.endInclusive == today) {
             val current = db.readModelDao().accountBalances().singleOrNull { it.accountId == accountId }?.balance ?: 0.0
             check(money(current) == closing) { "Current balance includes entries outside this statement. Review account history before preparing it." }

@@ -20,7 +20,7 @@ data class CustomerSharedHandoffAccess(
     val recover: suspend (Long,String)->CustomerSharedHandoffState,
     val release: suspend (Long,String)->CustomerSharedHandoffState,
     val resolve: suspend (Long,String,String,Boolean)->CustomerSharedHandoffState,
-    val setAside: suspend (Long,String,Boolean)->CustomerSharedHandoffState = {_,_,_->error("Request review is unavailable.")},
+    val setAside: suspend (Long,String,Boolean)->CustomerSharedHandoffState = {_,_,_->error("Action review is unavailable.")},
 )
 
 /** Explicit coordinated mode only. Ordinary factory/mode selection is the remaining B integration. */
@@ -37,9 +37,9 @@ internal class CustomerSharedHandoff(private val db: MilkShopDatabase,private va
     }
     private suspend fun remote(a: FollowUpSessionAccess): FollowUpRemoteSnapshot {
         val result=FollowUpDataStore(db).refresh(a.binding,a.call)
-        check(result is FollowUpLoad.Loaded) {"Connect to check shared follow-ups before opening a message."}
+        check(result is FollowUpLoad.Loaded) {"Connect to check follow-up records before opening a message app."}
         val r=result.snapshot
-        check(r.policy!=null&&r.zone!=null&&r.heads.date!=null&&TrustedTime.isAnchored()) {"Shared follow-ups are unavailable. Refresh the shop settings."}
+        check(r.policy!=null&&r.zone!=null&&r.heads.date!=null&&TrustedTime.isAnchored()) {"Follow-up records are unavailable. Refresh the shop settings."}
         return r
     }
     private suspend fun facts(r: FollowUpRemoteSnapshot,id: Long): Facts=db.withReadTransaction {
@@ -67,14 +67,14 @@ internal class CustomerSharedHandoff(private val db: MilkShopDatabase,private va
         val pref=r.preferences[uid]
         val reason=when {
             !f.fresh->"Sync current records before opening a customer message."
-            pending.isNotEmpty()->"Check the unfinished message request before trying again."
+            pending.isNotEmpty()->"Check the unfinished message action before trying again."
             unfinished->"Check the unfinished shop or customer save before opening a message."
-            claim?.phase=="HANDOFF_STARTED"->"A message handoff needs review before another message can open."
+            claim?.phase=="HANDOFF_STARTED"->"Review the previous message attempt before opening another."
             claim!=null->if(own) "A preparation is active on this device. Cancel it before starting again." else "Another device is preparing this customer's message."
-            r.policy?.enabled!=true->"Shared follow-ups are off. Review the shop settings before opening a coordinated message."
+            r.policy?.enabled!=true->"Follow-up reminders are off. Review the shop settings before opening a message app."
             !f.active->"This customer is inactive. Review the customer record first."
             f.reminder.message==null->"No payment reminder is needed for the current balance."
-            pref?.paused==true||pref?.snoozedUntil?.let {it>r.heads.date}==true->"This customer is paused or snoozed. Resume follow-ups before opening a coordinated message."
+            pref?.paused==true||pref?.snoozedUntil?.let {it>r.heads.date}==true->"Follow-ups for this customer are paused or postponed. Resume them before opening a message app."
             else->null
         }
         return CustomerSharedHandoffState(claim?.attemptUid,claim?.phase,own&&claim?.phase=="PREPARING",
@@ -88,7 +88,7 @@ internal class CustomerSharedHandoff(private val db: MilkShopDatabase,private va
         }
     private suspend fun execute(a: FollowUpSessionAccess,p: JSONObject): FollowUpCommandOutcome.Accepted {
         val result=FollowUpDataStore(db).execute(a.binding,UUID.randomUUID().toString(),p,a.call)
-        check(result is FollowUpCommandOutcome.Accepted) {"The message request needs review. Check its result before trying again."}
+        check(result is FollowUpCommandOutcome.Accepted) {"The message action needs checking. Check its result before trying again."}
         return result
     }
     private suspend fun load(id: Long)=run {a->state(a,remote(a),id)}
@@ -104,35 +104,35 @@ internal class CustomerSharedHandoff(private val db: MilkShopDatabase,private va
         check(claim?.attemptUid==attempt&&claim.phase=="PREPARING"&&claim.actor==a.binding.staff&&claim.installation==a.binding.installation&&
             (claim.leaseUntil ?: Instant.MIN)>Instant.ofEpochMilli(ready.serverTime)) {"The preparation changed. Refresh before trying again."}
         check(first.heads.sync==ready.heads.sync&&first.heads.credit==ready.heads.credit&&first.heads.policyRevision==ready.heads.policyRevision&&
-            first.heads.date==ready.heads.date&&first.customerRevisions[uid]==ready.customerRevisions[uid]) {"Shared records changed. Review them before continuing."}
+            first.heads.date==ready.heads.date&&first.customerRevisions[uid]==ready.customerRevisions[uid]) {"Synced records changed. Review them before continuing."}
         val current=facts(ready,id)
         check(current.fresh&&current.active&&current.reminder==reviewed) {"Records changed. Refresh the message and check the recipient again."}
         val started=execute(a,operation("START",ready,uid,attempt).put("channel",if(channel=="SMS") "SMS" else "WHATSAPP"))
-        check(started.grant==FollowUpLiveGrant.LAUNCH) {"The handoff is uncertain. Review it before opening another message."}
+        check(started.grant==FollowUpLiveGrant.LAUNCH) {"The last attempt is unconfirmed. Review it before opening another message."}
         currentCoroutineContext().ensureActive();a.validate()
         val final=facts(ready,id)
-        check(final.fresh&&final.active&&final.reminder==reviewed) {"Records changed before opening. Review the started handoff before trying again."}
+        check(final.fresh&&final.active&&final.reminder==reviewed) {"Records changed before the message app opened. Review this attempt before trying again."}
         currentCoroutineContext().ensureActive()
         launch() // Consumed here; no launch token escapes or survives a restart.
         CustomerSharedHandoffState(attempt,"HANDOFF_STARTED",canResolve=true,
-            blockedReason="Composer opened; sending is not confirmed. Review this handoff before opening another message.")
+            blockedReason="Message app opened. Sending is not confirmed. Review this attempt before opening another message.")
     }
     private suspend fun recover(id: Long,request: String): CustomerSharedHandoffState=run {a->
         val r=remote(a);val uid=facts(r,id).reminder.customerUid
-        val row=db.followUpDataDao().command(request) ?: error("This unfinished request is no longer present. Refresh first.")
-        check(row.bindingKey==a.binding.key) {"This request belongs to another shop or installation."}
+        val row=db.followUpDataDao().command(request) ?: error("This unfinished action is no longer listed. Refresh first.")
+        check(row.bindingKey==a.binding.key) {"This action belongs to another shop or device."}
         val p=JSONObject(row.operationJson);val kind=FollowUpWire.operation(p)
-        check(kind in kinds&&p.getString("customer_uid")==uid) {"This request belongs to a different task."}
+        check(kind in kinds&&p.getString("customer_uid")==uid) {"This action belongs to a different task."}
         FollowUpDataStore(db).execute(a.binding,request,p,a.call) // Recovery can never invoke a launcher.
         state(a,remote(a),id)
     }
     private suspend fun setAside(id: Long,request: String,acknowledged: Boolean): CustomerSharedHandoffState=run {a->
-        require(acknowledged) {"Confirm that setting aside a local request does not undo a server change."}
+        require(acknowledged) {"Confirm that removing this copy does not undo a synced change."}
         val r=remote(a);val uid=facts(r,id).reminder.customerUid
-        val row=db.followUpDataDao().command(request) ?: error("This unfinished request is no longer present. Refresh first.")
-        check(row.bindingKey==a.binding.key) {"This request belongs to another shop or installation."}
+        val row=db.followUpDataDao().command(request) ?: error("This unfinished action is no longer listed. Refresh first.")
+        check(row.bindingKey==a.binding.key) {"This action belongs to another shop or device."}
         val p=JSONObject(row.operationJson)
-        check(FollowUpWire.operation(p) in kinds&&p.getString("customer_uid")==uid) {"This request belongs to a different task."}
+        check(FollowUpWire.operation(p) in kinds&&p.getString("customer_uid")==uid) {"This action belongs to a different task."}
         // Removing local bookkeeping never releases a lease, resolves a START or grants a launch.
         db.followUpDataDao().complete(request)
         state(a,r,id)
@@ -144,9 +144,9 @@ internal class CustomerSharedHandoff(private val db: MilkShopDatabase,private va
         state(a,remote(a),id)
     }
     private suspend fun resolve(id: Long,attempt: String,outcome: String,acknowledged: Boolean): CustomerSharedHandoffState=run {a->
-        require(acknowledged&&outcome in setOf("REVIEWED","REPORTED_NOT_OPENED","RETRY_UNCERTAIN")) {"Confirm what is known about this handoff."}
+        require(acknowledged&&outcome in setOf("REVIEWED","REPORTED_NOT_OPENED","RETRY_UNCERTAIN")) {"Confirm what you know about this message attempt."}
         val r=remote(a);val current=state(a,r,id)
-        check(current.attemptUid==attempt&&current.canResolve&&current.pending.isEmpty()) {"The handoff changed or requires Owner review. Refresh first."}
+        check(current.attemptUid==attempt&&current.canResolve&&current.pending.isEmpty()) {"The message attempt changed or needs Owner review. Refresh first."}
         execute(a,operation("RESOLVE",r,facts(r,id).reminder.customerUid,attempt).put("outcome",outcome).put("acknowledge_uncertainty",true))
         state(a,remote(a),id)
     }

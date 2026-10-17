@@ -4,6 +4,8 @@
 
 **A06 and S24:** both updated and verified, with their existing installations retained. S24 reconnected and received the same verified APK. Private ordinary-app record/sync acceptance and human staff outcomes remain pending. The owner confirmed independent backup copies have not yet been made; backup/recovery/signing custody remains open.
 
+**Current private steps:** Owner remembers Quick PIN; A06's Quick PIN screen is ready for private entry. The owner selected Google Drive folder **SaafMilk-backup**, under their **zaza.zaza.1476** account. Drive access/account ownership and folder privacy/contents are not yet verified: the available Google Drive integration is unconnected, browser access is disabled in Work settings, and the named folder was not found at the checked local Drive mount locations. No secret has been entered by the agent and no backup copy/upload has been made.
+
 Start with [the short handover guide](audit/2026-10-17/final-delivery/START_HERE.md). [Technical result and exact pending actions](audit/2026-10-17/final-delivery/RESULT.md), [release manifest](audit/2026-10-17/final-delivery/RELEASE_MANIFEST.json), [phone installation evidence](audit/2026-10-17/final-delivery/RELEASE_INSTALLS.json), [local signed APK](audit/2026-10-17/final-delivery/Saaf-Milk-0.6.0.apk).
 
 This includes completed statements, manual messages, Owner reminders and simpler wording. Automatic customer SMS is not set up and is not a prerequisite to using those completed features. No real shop was opted in by the delivery process.

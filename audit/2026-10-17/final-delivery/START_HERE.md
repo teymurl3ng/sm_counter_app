@@ -1,6 +1,6 @@
-# Your app handover — 0.6.1 on A06
+# Your app handover — 0.6.1 on both phones
 
-**Current delivery:** A06 has0.6.1; S24 retains0.6.0 until reconnected. Drive is connected on A06 and its encrypted shop backup uploaded and inspected successfully. Find it in **Backup & restore → Cloud recovery points**; Google's app-specific storage is hidden from ordinary Drive folders. Keep the recovery passphrase privately. Current-device inspection does not replace independent recovery/custody acceptance. [Latest status](../../../FINAL_HANDOVER.md).
+**Current delivery:** Both phones have verified0.6.1, with their installations retained. Drive is connected on A06 and its encrypted shop backup uploaded and inspected successfully. Find it in **Backup & restore → Cloud recovery points**; Google's app-specific storage is hidden from ordinary Drive folders. Keep the recovery passphrase privately. Current-device inspection does not replace independent recovery/custody acceptance. [Latest status](../../../FINAL_HANDOVER.md).
 
 Use **Saaf Milk**, the ordinary app. **Shop Day QA**, **Native Preview** and other QA apps are separate test copies. Never enter real shop transactions in those test apps.
 

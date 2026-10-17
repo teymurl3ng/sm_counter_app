@@ -33,6 +33,55 @@
     "apkHashMatches": true,
     "verified": true,
     "operation": "install -r --user 0; no uninstall or data clear",
-    "realDriveAcceptance": "pending private owner authentication/consent"
+    "realDriveAcceptance": "Owner consent, encrypted upload/listing and local-key inspection accepted; see PHONE_DRIVE_CHECK.json. No restore."
+  },
+  {
+    "phone": "S24",
+    "before": {
+      "versionName": [
+        "0.6.0"
+      ],
+      "versionCode": [
+        "9"
+      ],
+      "uid": [
+        "10743"
+      ],
+      "firstInstall": [
+        "2026-10-14 15:54:25",
+        "1970-01-01 05:00:00",
+        "1970-01-01 05:00:00"
+      ]
+    },
+    "after": {
+      "versionName": [
+        "0.6.1"
+      ],
+      "versionCode": [
+        "10"
+      ],
+      "uid": [
+        "10743"
+      ],
+      "firstInstall": [
+        "2026-10-14 15:54:25",
+        "1970-01-01 05:00:00",
+        "1970-01-01 05:00:00"
+      ]
+    },
+    "sameInstallationAndUid": true,
+    "apkHashMatches": true,
+    "verified": true,
+    "operation": "install -r --user 0; no uninstall or data clear",
+    "realDriveAcceptance": "pending private owner authentication/consent",
+    "startup": {
+      "phone": "S24",
+      "version": "0.6.1",
+      "launchStatusOk": true,
+      "ordinaryPackageVisible": true,
+      "processRunning": true,
+      "systemCrashDialogObserved": false,
+      "credentialEntered": false
+    }
   }
 ]

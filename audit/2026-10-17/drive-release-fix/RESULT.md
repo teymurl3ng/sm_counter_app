@@ -8,7 +8,7 @@
 - Exact user-approved ordinary Android client created and read back in saaf-milk-qa. Current release package/signing SHA-1 match. Existing Web/QA clients and backups retained. Drive API already enabled; declared only the app-data scope already requested in app code.
 - Verified Web identifier persisted in ignored local configuration. Actual release preflight rejects missing/malformed values and accepts the verified local-file configuration (3/3). No client secret is used.
 - Signed0.6.1/code10 from native production source b125417 passes release build/lint, expected package/version, unchanged certificate, production flags, embedded ID and tracked input hash checks. [Manifest](RELEASE_MANIFEST.json). APK SHA-256: 1aca09f069ea337c4dccf9b4c561c8f91f39b42067e5ed91c38a5695ba9083e0. Database schema19 unchanged; no migration/provider/cryptography change or whole-app suite.
-- A06 received the exact APK with install -r --user0. Installed bytes, retained UID and first-install values verified. [Installation](RELEASE_INSTALLS.json). No uninstall, data clear, fabricated financial posting or account reset. S24 is absent and still has the prior0.6.0 delivery.
+- A06 received the exact APK with install -r --user0. Installed bytes, retained UID and first-install values verified. [Installation](RELEASE_INSTALLS.json). No uninstall, data clear, fabricated financial posting or account reset. S24 has now received the same frozen0.6.1 artifact over its authorized wired connection: exact installed hash, retained UID/first-install values and ordinary launch/process checks pass. No credential was entered.
 - User selected the existing admin site for public Google app information. Only the existing landing page and new /privacy changed in sm-server-view source7a00363. Touched-file ESLint, TypeScript/production build, five local and five live anonymous route checks pass. Existing middleware/session/protected-layout/API source unchanged. Git integration published exact7a00363 to the existing production project; no duplicate deployment, new project or paid service. [Checks](ADMIN_PAGES_CHECKS.json), [publication](ADMIN_PUBLICATION.json).
 - Public URLs: https://sm-server-view.vercel.app/ and https://sm-server-view.vercel.app/privacy. The privacy page is a factual description of the current app/backup/hosting behavior, not a new customer-data collection flow or a claim of formal legal certification.
 
@@ -22,7 +22,7 @@
 
 ## Exact remaining boundary
 
-1. S24 is absent and retains0.6.0. Install the frozen0.6.1 artifact when reconnected; no repeat A06 install or rebuild is needed.
+1. Both authorized phones now have verified0.6.1/code10. S24 launch passed; its private sign-in/Drive enrollment was not performed. A06 real Drive acceptance remains credited. No rebuild or repeat A06 update ran.
 2. The encrypted shop recovery point is in Drive's **hidden app-specific backup storage**, accessible through the app's Cloud recovery points. It is separate from the visible **SaafMilk-backup** folder holding the independently verified signing files. No manual shop export to that visible folder is claimed.
 3. Independent passphrase custody/supported isolated recovery, known-record/live-sync confirmation and actual human staff outcomes remain the existing phase1 handover boundary. Never restore over the sole live shop for a test. No repeated whole-app test run is scheduled here.
 

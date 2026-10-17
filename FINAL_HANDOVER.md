@@ -2,9 +2,11 @@
 
 17 October 2026. Current signed candidate: **0.6.0/code9**.
 
-**A06 and S24:** both updated and verified, with their existing installations retained. S24 reconnected and received the same verified APK. Private ordinary-app record/sync acceptance and human staff outcomes remain pending. The owner confirmed independent backup copies have not yet been made; backup/recovery/signing custody remains open.
+**A06 and S24:** both run verified signed **0.6.0/code9**, with their existing installations retained. A signed-in ordinary Overview was observed on A06 after private sign-in. Known financial records, live sync and human staff outcomes still need acceptance.
 
-**Current private steps:** Owner remembers Quick PIN; A06's Quick PIN screen is ready for private entry. The owner selected Google Drive folder **SaafMilk-backup**, under their **zaza.zaza.1476** account. Drive access/account ownership and folder privacy/contents are not yet verified: the available Google Drive integration is unconnected, browser access is disabled in Work settings, and the named folder was not found at the checked local Drive mount locations. No secret has been entered by the agent and no backup copy/upload has been made.
+**Independent signing backup verified:** the selected **SaafMilk-backup** folder is on the correct Google account and is private, with only the owner permission reported. Its existing keystore matches the current release key byte for byte. The downloaded key and settings successfully signed and verified a random challenge with the release certificate. Temporary private downloads were removed; no Drive file was changed. These are password-protected keystore and separate signing-settings files, not an additional encrypted archive. Keep the folder private. [Non-secret verification](audit/2026-10-17/final-delivery/CUSTODY_VERIFICATION.json).
+
+**Next private step:** no shop-data backup was present in that folder at inspection. Finish or cancel any current rate edits, then use **More → Backup & restore → Export backup**. Privately choose/save a separate backup passphrase of at least15 characters and export to **Google Drive → SaafMilk-backup**. Never send that passphrase here. The encrypted shop copy and supported isolated recovery remain unverified; never restore over the sole live database as a test.
 
 Start with [the short handover guide](audit/2026-10-17/final-delivery/START_HERE.md). [Technical result and exact pending actions](audit/2026-10-17/final-delivery/RESULT.md), [release manifest](audit/2026-10-17/final-delivery/RELEASE_MANIFEST.json), [phone installation evidence](audit/2026-10-17/final-delivery/RELEASE_INSTALLS.json), [local signed APK](audit/2026-10-17/final-delivery/Saaf-Milk-0.6.0.apk).
 

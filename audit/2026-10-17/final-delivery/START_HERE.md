@@ -1,6 +1,8 @@
-# Your app handover — 0.6.1 on both phones
+# Your app handover — 0.6.2 on S24; 0.6.1 on A06
 
-**Current delivery:** Both phones have verified0.6.1, with their installations retained. Drive is connected on A06 and its encrypted shop backup uploaded and inspected successfully. Find it in **Backup & restore → Cloud recovery points**; Google's app-specific storage is hidden from ordinary Drive folders. Keep the recovery passphrase privately. Current-device inspection does not replace independent recovery/custody acceptance. [Latest status](../../../FINAL_HANDOVER.md).
+**Current delivery:** S24 now has verified0.6.2 with the selected-backup feedback repair; A06 retains verified0.6.1 until its UI update. Both installations are retained. Drive is connected on A06 and its encrypted shop backup uploaded and inspected successfully. Find it in **Backup & restore → Cloud recovery points**; Google's app-specific storage is hidden from ordinary Drive folders. Keep the recovery passphrase privately. Current-device inspection does not replace independent recovery/custody acceptance. [Latest status](../../../FINAL_HANDOVER.md).
+
+On another phone, selecting **Inspect** may ask for the backup recovery passphrase chosen on the phone that created that backup. Enter it in the selected backup card and choose **Inspect with recovery passphrase**. Success says **Backup checked**. This only checks the backup; it does not replace shop data. Google account connection and your app sign-in are separate from unlocking that backup.
 
 Use **Saaf Milk**, the ordinary app. **Shop Day QA**, **Native Preview** and other QA apps are separate test copies. Never enter real shop transactions in those test apps.
 

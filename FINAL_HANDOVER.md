@@ -1,6 +1,8 @@
 # Current app delivery and handover
 
-17 October 2026. Current delivery: **verified0.6.1/code10 on both A06 and S24**, with existing installations retained.
+17 October 2026. Current delivery: **verified0.6.2/code11 on S24; verified0.6.1/code10 on A06**, with existing installations retained.
+
+**S24 inspection feedback repaired:** backup passphrase/error/result now stay in the selected card. Successful inspection says **Backup checked** and removes the selected device-key Inspect action. Selection survives Owner reauthentication; choosing another backup clears restore consent. Three affected checks pass in the isolated test package. Signed0.6.2 exact bytes, retained installation and ordinary launch verified on S24. A06's UI update and S24 private passphrase recheck remain pending. No restore occurred. [Scoped result](audit/2026-10-17/drive-inspection-ui/RESULT.md).
 
 **Built-in Google Drive repair accepted on A06:** signed0.6.1/code10 has the corrected release configuration/registration. Google OAuth is **In production**. Owner privately connected Drive; encrypted upload and refreshed recovery-point listing pass. Inspection reports format5 with security settings included. Restore stayed disabled and no shop data was replaced. The app is back at **Drive vault protected**. [Repair result](audit/2026-10-17/drive-release-fix/RESULT.md), [phone evidence](audit/2026-10-17/drive-release-fix/PHONE_DRIVE_CHECK.json). S24 received the same frozen update over USB; exact installed hash/retained installation and ordinary startup pass.
 
@@ -10,7 +12,7 @@
 
 **Shop backup now exists:** the encrypted recovery point is in Google's hidden app-specific storage, available through **Backup & restore → Cloud recovery points**. It is separate from the visible **SaafMilk-backup** signing folder. Privately keep the recovery passphrase chosen during connection. Current-device inspection passed; independent passphrase-only restoration on an isolated installation and custody confirmation remain unverified. Never restore over the sole live shop as a test.
 
-Start with [the short handover guide](audit/2026-10-17/final-delivery/START_HERE.md). [Technical result and exact pending actions](audit/2026-10-17/final-delivery/RESULT.md), [release manifest](audit/2026-10-17/final-delivery/RELEASE_MANIFEST.json), [phone installation evidence](audit/2026-10-17/final-delivery/RELEASE_INSTALLS.json), [current local signed APK](audit/2026-10-17/drive-release-fix/Saaf-Milk-0.6.1.apk).
+Start with [the short handover guide](audit/2026-10-17/final-delivery/START_HERE.md). [Technical result and exact pending actions](audit/2026-10-17/final-delivery/RESULT.md), [release manifest](audit/2026-10-17/final-delivery/RELEASE_MANIFEST.json), [phone installation evidence](audit/2026-10-17/final-delivery/RELEASE_INSTALLS.json), [current local signed APK](audit/2026-10-17/drive-inspection-ui/Saaf-Milk-0.6.2.apk).
 
 This includes completed statements, manual messages, Owner reminders and simpler wording. Automatic customer SMS is not set up and is not a prerequisite to using those completed features. No real shop was opted in by the delivery process.
 

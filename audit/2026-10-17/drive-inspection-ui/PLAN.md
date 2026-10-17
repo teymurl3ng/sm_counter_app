@@ -18,3 +18,11 @@ Android's [field feedback guidance](https://developer.android.com/develop/ui/com
 ## Finish line
 
 Selected fallback/result stay in the same card even with a long list, successful check cannot launch a null-passphrase retry, changing backup resets restore consent, and Restore remains disabled until deliberate new confirmation. No independent restore claim from UI tests. Record unrelated findings for later.
+
+## Progress
+
+- [x] Scoped selected-card UI and wording; selected backup retained through Owner confirmation.
+- [x] Three selected isolated-S24 methods pass.
+- [x] Signed0.6.2/code11 production/signature/provenance checks and S24 exact replacement/launch accepted.
+- [ ] S24 ordinary private passphrase recheck; no restore.
+- [ ] A06 same-artifact UI update when reachable. Existing phase1 isolated recovery/private staff boundary remains.

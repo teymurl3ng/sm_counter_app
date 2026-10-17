@@ -8,6 +8,8 @@ Date: 15 October 2026. Status: phases 2–6 complete at their documented technic
 
 **17 October Drive acceptance update:** ✅ ~~A06 signed0.6.1 repair, approved Google Production publication, private consent, encrypted upload/listing and non-destructive local-key inspection.~~ Security state included; Restore remained disabled and no restore occurred. Hidden app-data shop backup is separate from the visible signing folder. S24 same-artifact update, retained installation and ordinary launch now pass. Independent passphrase-only recovery/custody, known-record/live-sync and staff acceptance remain phase1. [Current result](audit/2026-10-17/drive-release-fix/RESULT.md). Cosmetic brand review is a later note.
 
+**17 October selected-backup UI update:** ✅ ~~Scoped0.6.2 UI repair, three affected checks, signed package and S24 retained-installation/launch verification.~~ This fixes recovery/result placement and accidental local-key retry after success; selecting another backup resets consent. A06's same-artifact UI update and S24 private passphrase recheck remain phase1, alongside existing isolated recovery and private/human acceptance. No new phase or broad audit. [Result](audit/2026-10-17/drive-inspection-ui/RESULT.md).
+
 **Per-phase working rule:** Before each phase is implemented, record its source baseline, targeted primary-source research, independent judgment, exact inclusions/exclusions and affected acceptance checks. This is the owner's 15 October instruction. Planning/research does not count as implementation completion. The first pinned brief is [phase 2's plan](audit/2026-10-15/sync-attention-plan/PLAN.md).
 
 This is the current reading order for unfinished work. It replaces the sequence in the recovered-plan document, not the accepted results or original business decisions. The [detailed recovered inventory](LATER_FEATURE_PLAN_2026-10-15.md) remains the source for each item's origin, exclusions and acceptance details. Completed engineering is not scheduled again.
@@ -150,7 +152,7 @@ These items have not been cancelled. They are deliberately unscheduled or condit
 
 ## Progress
 
-- [ ] 1. Final delivery and handover — ✅ ~~signed0.6.0 on both phones; independent signing-key recovery; signed0.6.1 on both phones; Google Production; private Drive consent/upload/listing/local-key inspection~~. Private known-record/live-sync, staff outcomes and independent passphrase recovery/custody remain. [Current handover](FINAL_HANDOVER.md).
+- [ ] 1. Final delivery and handover — ✅ ~~signed0.6.0 on both phones; independent signing-key recovery; signed0.6.1 on both phones; Google Production; private Drive consent/upload/listing/local-key inspection~~. S24 additionally has verified0.6.2 UI repair. A06 same-artifact update, S24 private passphrase recheck, known-record/live-sync, staff outcomes and independent supported recovery/custody remain. [Current handover](FINAL_HANDOVER.md).
 - [x] ✅ ~~2. Persistent Owner attention for held sync entries.~~ Accepted at local Owner scope; audit-only conflict policy remains a separate retained B8 boundary. [Result](audit/2026-10-15/sync-attention-plan/RESULT.md).
 - [x] ✅ ~~3. Credit basics: aging, customer search and advisory warning.~~ [Result](audit/2026-10-15/credit-basics-plan/RESULT.md). Delivered in signed 0.5.0; private/human acceptance remains phase 1.
 - [x] ✅ ~~4. Customer payment terms, credit categories, overrides and history.~~ Implementation, affected checks, two-phone recovery and PROD/signed rollout complete. [Finish result](audit/2026-10-15/credit-status-plan/FINISH_RESULT.md).

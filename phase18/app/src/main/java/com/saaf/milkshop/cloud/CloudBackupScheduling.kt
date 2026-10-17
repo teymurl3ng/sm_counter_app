@@ -299,7 +299,7 @@ class HybridGoogleDriveAuthorization(
     private fun googleWebClientId(): String = BuildConfig.GOOGLE_WEB_CLIENT_ID.trim().also { clientId ->
         if (clientId.isEmpty()) {
             throw CloudBackupFailure.NotConfigured(
-                "This build has no Google OAuth web client ID. Set -Psaaf.googleWebClientId before packaging.",
+                "Google Drive is not set up in this app version. Install an updated app before connecting.",
             )
         }
     }

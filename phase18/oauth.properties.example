@@ -1,0 +1,5 @@
+# Copy to oauth.properties after verifying the Google Cloud registration.
+# Use the Web application client ID, not the Android client ID.
+# Register com.saaf.milkshop and its release signing SHA-1 in the same project.
+# An OAuth client ID is a public app identifier. Never add a client secret here.
+googleWebClientId=

@@ -39,6 +39,7 @@ __pycache__/
 # Sync release signing (never commit)
 keystore.properties
 phase18/keystore/
+phase18/oauth.properties
 
 # Local agent workspace + one-off leftovers (never commit)
 .zcode/

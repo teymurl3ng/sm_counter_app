@@ -25,7 +25,17 @@ val qaClassFilter = if (rootProject.extra.has("qa.connected.classFilter")) {
     null
 }
 val performanceTestBuild = providers.gradleProperty("saaf.performanceTestBuild").orNull.equals("true", ignoreCase = true)
-val googleWebClientId = providers.gradleProperty("saaf.googleWebClientId").orNull.orEmpty()
+// Keep the verified OAuth identifier available to ordinary release builds instead
+// of relying on a one-off command-line flag. No OAuth client secret belongs here.
+val googleOAuthProperties = Properties()
+val googleOAuthPropertiesFile = rootProject.file("oauth.properties")
+if (googleOAuthPropertiesFile.exists()) {
+    googleOAuthPropertiesFile.inputStream().use { googleOAuthProperties.load(it) }
+}
+val googleWebClientId = (
+    providers.gradleProperty("saaf.googleWebClientId").orNull
+        ?: googleOAuthProperties.getProperty("googleWebClientId", "")
+).trim()
 val escapedGoogleWebClientId = googleWebClientId.replace("\\", "\\\\").replace("\"", "\\\"")
 
 // Release signing (sync go-live): keystore.properties lives next to the
@@ -45,8 +55,8 @@ android {
         applicationId = "com.saaf.milkshop"
         minSdk = 26
         targetSdk = 36
-        versionCode = 9
-        versionName = "0.6.0"
+        versionCode = 10
+        versionName = "0.6.1"
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$escapedGoogleWebClientId\"")
         buildConfigField("String", "GIT_SHA", "\"$buildGitSha\"")
         buildConfigField("boolean", "ENABLE_NATIVE_PREVIEW_FIXTURES", "false")
@@ -154,6 +164,23 @@ val verifyHybridWebAssets by tasks.registering {
 
 tasks.matching { it.name == "preBuild" }.configureEach {
     dependsOn(verifyHybridWebAssets)
+}
+
+val validateReleaseGoogleOAuth by tasks.registering {
+    group = "verification"
+    description = "Refuses an ordinary release without a Google OAuth Web client ID."
+    inputs.property("googleWebClientId", googleWebClientId)
+    doLast {
+        check(googleWebClientId.matches(Regex("[A-Za-z0-9_-]+\\.apps\\.googleusercontent\\.com"))) {
+            "Google Drive release configuration is missing or invalid. Set googleWebClientId in " +
+                "phase18/oauth.properties or supply -Psaaf.googleWebClientId. Use the Web client " +
+                "from the Google project that registers the release package and signing SHA-1."
+        }
+    }
+}
+
+tasks.matching { it.name == "preReleaseBuild" }.configureEach {
+    dependsOn(validateReleaseGoogleOAuth)
 }
 
 tasks.matching { it.name == "connectedDebugAndroidTest" }.configureEach {

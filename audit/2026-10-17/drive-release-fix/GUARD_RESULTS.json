@@ -1,0 +1,10 @@
+[
+  {
+    "case": "missing",
+    "releasePreBuildRejectedByOAuthGuard": true
+  },
+  {
+    "case": "malformed",
+    "releasePreBuildRejectedByOAuthGuard": true
+  }
+]

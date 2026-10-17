@@ -30,7 +30,7 @@ Cashier can count and close. Owner/Admin reopening requires authentication and a
 
 ## Backup and recovery custody
 
-Before replacing your previous record system, make a supported **encrypted** shop backup from the app's backup screen. Store a copy outside the phone and outside this working project folder. Keep the correct recovery secret privately and make sure its intended custodian can retrieve it. A copied file is not proof it can be restored; verify through the supported isolated recovery path, never by overwriting the sole live shop database.
+Before replacing your previous record system, choose **Export backup** in the app's backup screen and make a supported **encrypted** shop backup. Choose and privately save its **Backup passphrase**. This is separate from your sign-in passphrase, Quick PIN and Owner recovery code. Store a copy outside the phone and outside this working project folder, and make sure its intended custodian can retrieve the correct backup passphrase. A copied file is not proof it can be restored; verify through the supported isolated recovery path, never by overwriting the sole live shop database.
 
 The app signing keystore and its protected signing settings/passwords also need an independent private backup. Losing them can prevent future ordinary updates. A working current signing key is not proof of an independent recovered copy. Do not put keys, signing passwords, recovery secrets or raw shop exports into Git or chat.
 

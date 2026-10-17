@@ -10,5 +10,16 @@
     "financialRowsVerified": false,
     "note": "Continued past welcome only; no account selected or credential entered.",
     "accountWithFullPassphraseShown": true
+  },
+  {
+    "phone": "S24",
+    "ordinaryAppVisible": true,
+    "welcomeContinueShown": true,
+    "chooseAccountShown": false,
+    "signedInNavigationVisible": false,
+    "systemCrashDialog": false,
+    "privateValuesRecorded": false,
+    "financialRowsVerified": false,
+    "note": "Observed post-update screen only; no credential entered."
   }
 ]

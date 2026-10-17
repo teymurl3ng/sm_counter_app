@@ -4,7 +4,7 @@ Date: 15 October 2026. Status: phases 2, 3, 4 and 5 complete at their documented
 
 **Execution update:** Phases 2–5 are complete at their documented implementation/affected-QA scopes. Signed 0.5.0/code8 on both phones includes phases 2–4; phase 5 is in source and the isolated QA build, awaiting ordinary signed delivery under phase 1. Human/private handover remains phase 1; reminder automation/automatic-SMS decision remains phase 6. B8 audit-only conflict attention remains a separate partial boundary.
 
-**17 October delivery update (supersedes older delivery wording):** signed0.6.0/code9 includes accepted phase5, phase6 Owner reminders and the wording pass. ✅ ~~Release/signature/provenance, three upgrade/recovery checks and A06 ordinary installation/account presence~~ complete. S24 disconnected and still needs its update. Private record/live-sync acceptance, staff outcomes and independent backup/recovery/signing custody remain phase1. [Current handover](FINAL_HANDOVER.md), [exact result/pending actions](audit/2026-10-17/final-delivery/RESULT.md). Automatic customer SMS remains unconfigured and separate.
+**17 October delivery update (supersedes older delivery wording):** signed0.6.0/code9 includes accepted phase5, phase6 Owner reminders and the wording pass. ✅ ~~Release/signature/provenance, three upgrade/recovery checks, both ordinary phone updates and A06 account presence~~ complete. S24 reconnected and its exact APK/installation/launch checks passed. Owner needs sign-in help and confirmed no independent backup copies yet. Private record/live-sync acceptance, staff outcomes and independent backup/recovery/signing custody remain phase1. [Current handover](FINAL_HANDOVER.md), [exact result/pending actions](audit/2026-10-17/final-delivery/RESULT.md). Automatic customer SMS remains unconfigured and separate.
 
 **Per-phase working rule:** Before each phase is implemented, record its source baseline, targeted primary-source research, independent judgment, exact inclusions/exclusions and affected acceptance checks. This is the owner's 15 October instruction. Planning/research does not count as implementation completion. The first pinned brief is [phase 2's plan](audit/2026-10-15/sync-attention-plan/PLAN.md).
 
@@ -17,7 +17,7 @@ This is the current reading order for unfinished work. It replaces the sequence 
 **Goal:** finish the remaining release participation without restarting accepted engineering.
 
 - [x] ✅ ~~Install matching signed updates on A06 and S24.~~ Both now run 0.5.0/code8 with verified APK hashes, retained installations and native launch. Earlier A06 private login/live sync/sampled records were accepted on 0.4.3; private acceptance of the latest version remains below.
-- Deliver the accepted phase5/Owner-reminder/wording features as signed0.6.0/code9: ✅ ~~A06 update and retained installation/account presence~~; S24 reconnect/update pending. This is the existing handover delivery gate, not a new phase.
+- [x] ✅ ~~Deliver the accepted phase5/Owner-reminder/wording features as signed0.6.0/code9 on A06 and S24, with exact APK and retained installation verification.~~ Private financial-record/live-sync acceptance remains below. This is the existing handover delivery gate, not a new phase.
 - Complete the prepared human/staff checks: actual private phone-security unlock, readability, motion/vibration, uncoached shop-day tasks and next supported date observation.
 - Confirm independent recovery-secret/signing-backup custody, complete the outstanding recovered-backup acceptance, and hand over the intended staff/device setup using the existing instructions.
 
@@ -146,7 +146,7 @@ These items have not been cancelled. They are deliberately unscheduled or condit
 
 ## Progress
 
-- [ ] 1. Final signed delivery, human acceptance and independent backup/signing custody — ✅ ~~signed0.6.0/code9 and A06 delivery~~; S24 reconnect/update, private known-record/live-sync acceptance, staff outcomes and independent custody/recovery remain. [Handover](FINAL_HANDOVER.md).
+- [ ] 1. Final signed delivery, human acceptance and independent backup/signing custody — ✅ ~~signed0.6.0/code9 on A06 and S24~~; sign-in help/private known-record/live-sync acceptance, staff outcomes and independent custody/recovery remain. Owner confirmed independent copies are not yet made. [Handover](FINAL_HANDOVER.md).
 - [x] ✅ ~~2. Persistent Owner attention for held sync entries.~~ Accepted at local Owner scope; audit-only conflict policy remains a separate retained B8 boundary. [Result](audit/2026-10-15/sync-attention-plan/RESULT.md).
 - [x] ✅ ~~3. Credit basics: aging, customer search and advisory warning.~~ [Result](audit/2026-10-15/credit-basics-plan/RESULT.md). Delivered in signed 0.5.0; private/human acceptance remains phase 1.
 - [x] ✅ ~~4. Customer payment terms, credit categories, overrides and history.~~ Implementation, affected checks, two-phone recovery and PROD/signed rollout complete. [Finish result](audit/2026-10-15/credit-status-plan/FINISH_RESULT.md).

@@ -42,5 +42,53 @@
     "sameInstallationAndUid": true,
     "processAlive": true,
     "privateLoginAndBusinessRecords": "Awaiting private sign-in and ordinary-app observation; installation identity alone is not ledger proof"
+  },
+  {
+    "phone": "S24",
+    "serial": "adb-RFCX116CYYX-JYuekC._adb-tls-connect._tcp",
+    "before": {
+      "versionName": [
+        "0.5.0"
+      ],
+      "versionCode": [
+        "8"
+      ],
+      "uid": [
+        "10743"
+      ],
+      "firstInstall": [
+        "2026-10-14 15:54:25",
+        "1970-01-01 05:00:00",
+        "1970-01-01 05:00:00"
+      ],
+      "lastUpdate": [
+        "2026-10-15 23:08:01"
+      ]
+    },
+    "operation": "install -r --user 0; no uninstall or data clear",
+    "verified": true,
+    "after": {
+      "versionName": [
+        "0.6.0"
+      ],
+      "versionCode": [
+        "9"
+      ],
+      "uid": [
+        "10743"
+      ],
+      "firstInstall": [
+        "2026-10-14 15:54:25",
+        "1970-01-01 05:00:00",
+        "1970-01-01 05:00:00"
+      ],
+      "lastUpdate": [
+        "2026-10-17 12:59:59"
+      ]
+    },
+    "apkHashMatches": true,
+    "sameInstallationAndUid": true,
+    "processAlive": true,
+    "privateLoginAndBusinessRecords": "Awaiting private sign-in and ordinary-app observation; installation identity alone is not ledger proof"
   }
 ]

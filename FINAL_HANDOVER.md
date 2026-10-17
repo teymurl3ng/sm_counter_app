@@ -2,7 +2,7 @@
 
 17 October 2026. Current signed candidate: **0.6.0/code9**.
 
-**A06:** updated and verified, existing installation retained. **S24:** still needs reconnection/update; it disconnected during the build. Private ordinary-app record/sync acceptance, human staff outcomes and independent backup/recovery/signing custody remain pending.
+**A06 and S24:** both updated and verified, with their existing installations retained. S24 reconnected and received the same verified APK. Private ordinary-app record/sync acceptance and human staff outcomes remain pending. The owner confirmed independent backup copies have not yet been made; backup/recovery/signing custody remains open.
 
 Start with [the short handover guide](audit/2026-10-17/final-delivery/START_HERE.md). [Technical result and exact pending actions](audit/2026-10-17/final-delivery/RESULT.md), [release manifest](audit/2026-10-17/final-delivery/RELEASE_MANIFEST.json), [phone installation evidence](audit/2026-10-17/final-delivery/RELEASE_INSTALLS.json), [local signed APK](audit/2026-10-17/final-delivery/Saaf-Milk-0.6.0.apk).
 

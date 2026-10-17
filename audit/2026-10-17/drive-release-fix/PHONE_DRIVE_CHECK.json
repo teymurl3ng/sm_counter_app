@@ -1,0 +1,39 @@
+{
+  "phone": "A06",
+  "version": "0.6.1",
+  "privateConsentCompletedByOwner": true,
+  "firstObservation": "configured/enabled; queued upload",
+  "refreshedStatus": {
+    "Configured": "Yes",
+    "Enabled": "Yes",
+    "Last success": "2026-10-17T13:39:35.733827Z",
+    "Last attempt": "2026-10-17T13:39:35.733827Z",
+    "Stale": "No",
+    "Pending upload": "No",
+    "statusHeadline": "Drive vault protected"
+  },
+  "remoteListingAndInspectionVerified": true,
+  "remoteListingVerified": true,
+  "inspectionObservation": {
+    "inspectionFacts": {
+      "Created": "2026-10-17T18:39:36.195393",
+      "Format": "5",
+      "Security state": "Included"
+    },
+    "restoreActionAncestors": [
+      {
+        "enabled": "false",
+        "class": "android.view.View",
+        "clickable": "true"
+      }
+    ],
+    "confirmationCheckboxChecked": false,
+    "restorePerformed": false,
+    "inspectionUsed": "current device local vault key",
+    "portablePassphraseRestoreProven": false,
+    "createdDisplayFormat": "Local ISO inspection value corresponds to selected 17 Oct 2026 \u00b7 6:39 pm recovery point",
+    "restoreActionEnabled": false
+  },
+  "restorePerformed": false,
+  "inspectionUsed": "current device local vault key"
+}

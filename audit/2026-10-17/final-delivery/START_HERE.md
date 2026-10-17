@@ -1,4 +1,6 @@
-# Your app handover — 0.6.0
+# Your app handover — 0.6.1 on A06
+
+**Current delivery:** A06 has0.6.1; S24 retains0.6.0 until reconnected. Drive is connected on A06 and its encrypted shop backup uploaded and inspected successfully. Find it in **Backup & restore → Cloud recovery points**; Google's app-specific storage is hidden from ordinary Drive folders. Keep the recovery passphrase privately. Current-device inspection does not replace independent recovery/custody acceptance. [Latest status](../../../FINAL_HANDOVER.md).
 
 Use **Saaf Milk**, the ordinary app. **Shop Day QA**, **Native Preview** and other QA apps are separate test copies. Never enter real shop transactions in those test apps.
 
@@ -30,9 +32,9 @@ Cashier can count and close. Owner/Admin reopening requires authentication and a
 
 ## Backup and recovery custody
 
-Before replacing your previous record system, choose **Export backup** in the app's backup screen and make a supported **encrypted** shop backup. Choose and privately save its **Backup passphrase**. This is separate from your sign-in passphrase, Quick PIN and Owner recovery code. Store a copy outside the phone and outside this working project folder, and make sure its intended custodian can retrieve the correct backup passphrase. A copied file is not proof it can be restored; verify through the supported isolated recovery path, never by overwriting the sole live shop database.
+An encrypted Drive shop recovery point now exists and was inspected on A06. You can also choose **Export backup** to create a separate visible encrypted file. Choose and privately save its **Backup passphrase**. This is separate from your sign-in passphrase, Quick PIN and Owner recovery code. Store a copy outside the phone and outside this working project folder, and make sure its intended custodian can retrieve the correct backup passphrase. A copied file is not proof it can be restored; verify through the supported isolated recovery path, never by overwriting the sole live shop database.
 
-The app signing keystore and its protected signing settings/passwords also need an independent private backup. Losing them can prevent future ordinary updates. A working current signing key is not proof of an independent recovered copy. Do not put keys, signing passwords, recovery secrets or raw shop exports into Git or chat.
+The existing independent signing keystore/settings copy in the private SaafMilk-backup folder has been recovered and verified. Keep it private and retain custody of the signing settings/passwords. Losing them can prevent future ordinary updates. That recovered copy passed a signing challenge; keep the independent copy available for future updates. Do not put keys, signing passwords, recovery secrets or raw shop exports into Git or chat.
 
 If independent copies are missing, name a private destination/custodian and we can finish that step. No key or secret needs to be pasted here. Phone-security PIN convenience does not replace the portable-backup recovery secret; server sign-in credentials are a separate recovery concern.
 

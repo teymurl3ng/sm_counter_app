@@ -9,9 +9,9 @@
   "existingAndroidPackage": "com.saaf.milkshop.qa",
   "existingAndroidSha1": "97:ED:12:6E:03:31:B5:4C:11:10:10:6C:98:A9:2C:FA:A8:CB:4A:CC",
   "releaseAndroidClientPresent": true,
-  "audienceStatus": "Testing",
+  "audienceStatus": "In production",
   "selectedBackupAccountIsExistingTestUser": true,
-  "publishCurrentlyDisabled": true,
+  "publishCurrentlyDisabled": false,
   "driveApiEnabled": true,
   "configuredScopesAtInspection": [],
   "brandingAtInspection": {
@@ -26,7 +26,7 @@
   "releaseAndroidClientName": "Saaf Milk Release Android",
   "releaseAndroidSavedValuesReadBack": true,
   "unattendedProductionReady": false,
-  "remainingPublicationBoundary": "External/Testing; publish disabled pending branding completion; no publication change authorized or performed",
+  "remainingPublicationBoundary": "None for current non-sensitive Drive permission: Google Production is active and A06 consent/upload/listing/local-key inspection passed. Cosmetic branding review is deferred.",
   "declaredScopesAfterRepair": [
     "https://www.googleapis.com/auth/drive.appdata"
   ],
@@ -36,6 +36,15 @@
     "homepage": "https://sm-server-view.vercel.app/",
     "privacy": "https://sm-server-view.vercel.app/privacy",
     "authorizedDomain": "sm-server-view.vercel.app",
-    "saved": false
-  }
+    "saved": true
+  },
+  "productionModeApprovedByOwner": true,
+  "productionModeSavedAndReadBack": true,
+  "brandVerificationComplete": false,
+  "brandingValuesReadBack": true,
+  "googleProductionModeActive": true,
+  "dataAccessVerificationRequired": false,
+  "brandingShownToUsers": false,
+  "ordinaryConnectionUploadInspectionAccepted": true,
+  "unattendedProductionReadyMeaning": "Long-duration unattended operation has not been tested; this is not a remaining Google publication blocker."
 }

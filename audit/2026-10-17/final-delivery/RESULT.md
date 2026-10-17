@@ -1,5 +1,7 @@
 # Signed 0.6.0 delivery — both phones complete, private handover pending
 
+**Superseding repair update:** A06 now has verified0.6.1/code10. Google Production publication and private Drive consent/upload/listing/local-key inspection passed; encrypted shop recovery point exists in hidden app-specific storage, separate from the visible signing folder. No restore occurred. S24's0.6.1 update and independent passphrase recovery/private human acceptance remain pending. [Current repair result](../drive-release-fix/RESULT.md). Earlier0.6.0 observations below are historical.
+
 17 October 2026. Frozen [scope](SCOPE.md). [Plain-language handover](START_HERE.md).
 
 ## Completed

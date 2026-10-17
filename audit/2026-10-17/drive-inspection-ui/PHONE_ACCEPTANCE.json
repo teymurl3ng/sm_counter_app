@@ -1,0 +1,18 @@
+{
+  "phone": "S24",
+  "version": "0.6.2",
+  "ownerReportsOriginalA06PassphraseUsed": true,
+  "ownerReportsBackupCheckedRemainsVisible": true,
+  "backupCheckedVisible": true,
+  "shopUnchangedFeedbackVisible": true,
+  "localKeyErrorVisible": false,
+  "inspectionFacts": {
+    "Format": "5",
+    "Security state": "Included"
+  },
+  "confirmationChecked": false,
+  "restorePerformed": false,
+  "restoreEnabled": false,
+  "portablePassphraseInspectionAccepted": true,
+  "restoreControlObservedDisabled": true
+}

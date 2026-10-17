@@ -1,4 +1,4 @@
-# Drive inspection feedback repair — S24 installed; private passphrase recheck pending
+# Drive inspection feedback repair — S24 second-phone passphrase inspection accepted
 
 17 October 2026. [Finite scope/research/judgment](PLAN.md).
 
@@ -12,4 +12,6 @@ Signed0.6.2/code11 built from committed source `d259cb2`; release lint/packaging
 
 APK SHA-256: `0085b9a9d4a21dc9de9b780f2e1fd8447afe6dfeee3d3aa7e3e6d44eec22b046`. S24 received exact bytes with install -r --user0. UID/first-install retained, ordinary package visible, process/launch pass, no crash dialog or credential entry. [Install proof](RELEASE_INSTALLS.json). A06's advertised wireless endpoint refused connection; it retains accepted0.6.1 and awaits this UI update. No repeat A06 install ran.
 
-Owner has been asked to privately recheck A06's17 October6:39pm backup on S24. Ordinary passphrase success/stability is pending that observation; the earlier reported format5/Included is credited only as an Owner report, not independently captured portable restoration. Never restore over the live shop. Independent supported isolated restore and remaining private/staff acceptance retain the existing phase1 boundary. No whole-app suite, cloud change, new vault or customer contact. Raw logs, APK and credentials stay out of Git.
+Owner confirmed the selected backup continues to show **Backup checked** after privately entering A06's backup recovery passphrase on S24. Read-only device observation independently found **Backup checked**, **This backup can be opened. Your shop has not been changed.**, format **5**, security state **Included**, no local-key error, unchecked confirmation and disabled Restore. No passphrase was read or recorded and no restore occurred. [Non-secret ordinary-phone acceptance](PHONE_ACCEPTANCE.json). The phrase/source-backup selection is Owner-reported; successful inspection/status and untouched restore controls are directly observed.
+
+This accepts second-phone passphrase decryption/inspection and the stable selected-card feedback. It does not claim an actual isolated restore or durable external secret custody. A06's same-artifact UI update, private known-record/live-sync and human staff outcomes retain the existing phase1 boundary. No new test/build/cloud change, vault or customer contact. Raw logs, APK and credentials stay out of Git.

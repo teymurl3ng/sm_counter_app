@@ -24,5 +24,5 @@ Selected fallback/result stay in the same card even with a long list, successful
 - [x] Scoped selected-card UI and wording; selected backup retained through Owner confirmation.
 - [x] Three selected isolated-S24 methods pass.
 - [x] Signed0.6.2/code11 production/signature/provenance checks and S24 exact replacement/launch accepted.
-- [ ] S24 ordinary private passphrase recheck; no restore.
+- [x] S24 ordinary private passphrase recheck: Owner confirms stable success; Backup checked / format5 / security Included and disabled Restore directly observed. No restore.
 - [ ] A06 same-artifact UI update when reachable. Existing phase1 isolated recovery/private staff boundary remains.

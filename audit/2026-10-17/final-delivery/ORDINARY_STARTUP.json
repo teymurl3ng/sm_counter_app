@@ -1,0 +1,14 @@
+[
+  {
+    "phone": "A06",
+    "ordinaryAppVisible": true,
+    "chooseAccountShown": true,
+    "existingOwnerRoleShown": true,
+    "signedInNavigationVisible": false,
+    "systemCrashDialog": false,
+    "privateValuesRecorded": false,
+    "financialRowsVerified": false,
+    "note": "Continued past welcome only; no account selected or credential entered.",
+    "accountWithFullPassphraseShown": true
+  }
+]

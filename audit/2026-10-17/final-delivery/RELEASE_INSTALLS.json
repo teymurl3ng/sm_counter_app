@@ -1,0 +1,46 @@
+[
+  {
+    "phone": "A06",
+    "serial": "R8VXA02SNKH",
+    "before": {
+      "versionName": [
+        "0.5.0"
+      ],
+      "versionCode": [
+        "8"
+      ],
+      "uid": [
+        "11498"
+      ],
+      "firstInstall": [
+        "2026-10-10 19:31:03"
+      ],
+      "lastUpdate": [
+        "2026-10-15 23:07:55"
+      ]
+    },
+    "operation": "install -r --user 0; no uninstall or data clear",
+    "verified": true,
+    "after": {
+      "versionName": [
+        "0.6.0"
+      ],
+      "versionCode": [
+        "9"
+      ],
+      "uid": [
+        "11498"
+      ],
+      "firstInstall": [
+        "2026-10-10 19:31:03"
+      ],
+      "lastUpdate": [
+        "2026-10-17 12:24:34"
+      ]
+    },
+    "apkHashMatches": true,
+    "sameInstallationAndUid": true,
+    "processAlive": true,
+    "privateLoginAndBusinessRecords": "Awaiting private sign-in and ordinary-app observation; installation identity alone is not ledger proof"
+  }
+]

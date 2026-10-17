@@ -6,7 +6,15 @@ import androidx.compose.ui.platform.SoftwareKeyboardController
 import android.net.Uri
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -19,6 +27,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.saaf.milkshop.application.authentication.NativeSignedInIdentity
 import com.saaf.milkshop.application.owner.NativeOwnerBackupInspection
 import com.saaf.milkshop.application.owner.NativeOwnerBackupSnapshot
+import com.saaf.milkshop.application.owner.NativeOwnerCloudRemoteSnapshotRow
 import com.saaf.milkshop.application.owner.NativeOwnerMoreContext
 import com.saaf.milkshop.domain.AppRole
 import com.saaf.milkshop.domain.RolePermissions
@@ -292,6 +301,106 @@ class NativeOwnerBackupScreenContractTest {
         assertEquals(1, navigated)
     }
 
+    @Test
+    fun cloudRecoveryFeedbackStaysInSelectedCardAndCannotRetryLocalKeyAfterSuccess() {
+        val inspection = mutableStateOf<NativeOwnerBackupInspection?>(null)
+        val error = mutableStateOf<String?>(null)
+        var localAttempts = 0
+        var phraseAttempts = 0
+        var restores = 0
+        setScreen(
+            snapshot = cloudSnapshot(), cloudOpen = true,
+            cloudInspection = { inspection.value }, cloudError = { error.value },
+            onInspectCloud = { id, secret ->
+                assertEquals("remote-1", id)
+                if (secret == null) {
+                    localAttempts++
+                    error.value = "This phone does not hold the local key for this backup vault"
+                } else {
+                    phraseAttempts++
+                    if (phraseAttempts == 1) {
+                        error.value = "The cloud recovery passphrase is incorrect, or the backup was altered"
+                    } else {
+                        error.value = null
+                        inspection.value = cloudInspection()
+                    }
+                    secret.fill('\u0000')
+                }
+            },
+            onConfirmCloudRestore = { restores++ },
+        )
+        composeRule.onAllNodesWithTag(NativeUiTags.OwnerBackupCloudInspect)[0]
+            .performScrollTo().performClick()
+        val parent = hasAnyAncestor(hasTestTag(NativeUiTags.ownerBackupCloudRemote("remote-1")))
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupCloudRecoveryPassphrase)
+            .performScrollTo().assert(parent).performTextInput("synthetic wrong phrase")
+        composeRule.runOnIdle { keyboard?.hide() }
+        composeRule.onNodeWithText("Inspect with recovery passphrase").performScrollTo().performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupError).assert(parent)
+        composeRule.onNodeWithText("The cloud recovery passphrase is incorrect, or the backup was altered")
+            .performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupCloudRecoveryPassphrase)
+            .performScrollTo().performTextInput("synthetic recovery phrase")
+        composeRule.runOnIdle { keyboard?.hide() }
+        composeRule.onNodeWithText("Inspect with recovery passphrase").performScrollTo().performClick()
+        composeRule.onNodeWithText("Backup checked").performScrollTo().assertIsDisplayed().assert(parent)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupCloudRecoveryPassphrase).assertDoesNotExist()
+        composeRule.onAllNodesWithTag(NativeUiTags.OwnerBackupCloudInspect).assertCountEquals(7)
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupCloudConfirmRestore)
+            .performScrollTo().assertIsNotEnabled()
+        assertEquals(1, localAttempts)
+        assertEquals(2, phraseAttempts)
+        assertEquals(0, restores)
+    }
+
+    @Test
+    fun choosingAnotherCloudBackupResetsRestoreConsent() {
+        val inspection = mutableStateOf<NativeOwnerBackupInspection?>(null)
+        var restores = 0
+        val reauth = mutableStateOf(false)
+        setScreen(
+            snapshot = cloudSnapshot(), cloudOpen = true,
+            cloudInspection = { inspection.value },
+            cloudReauth = { reauth.value },
+            onInspectCloud = { _, secret ->
+                secret?.fill('\u0000')
+                inspection.value = cloudInspection()
+            },
+            onConfirmCloudRestore = { restores++ },
+        )
+        composeRule.onAllNodesWithTag(NativeUiTags.OwnerBackupCloudInspect)[0]
+            .performScrollTo().performClick()
+        // Recent Owner authentication temporarily replaces the cloud pane.
+        composeRule.runOnIdle { reauth.value = true }
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupReauth).assertIsDisplayed()
+        composeRule.runOnIdle { reauth.value = false }
+        composeRule.onNodeWithText("Backup checked").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupCloudConfirmCheck)
+            .performScrollTo().performClick()
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupCloudConfirmRestore)
+            .performScrollTo().assertIsEnabled()
+        composeRule.onNode(hasText("Inspect") and hasAnyAncestor(
+            hasTestTag(NativeUiTags.ownerBackupCloudRemote("remote-2"))))
+            .performScrollTo().performClick()
+        composeRule.onNodeWithText("Backup checked").assert(hasAnyAncestor(
+            hasTestTag(NativeUiTags.ownerBackupCloudRemote("remote-2"))))
+        composeRule.onNodeWithTag(NativeUiTags.OwnerBackupCloudConfirmRestore)
+            .performScrollTo().assertIsNotEnabled()
+        assertEquals(0, restores)
+    }
+
+    private fun cloudInspection() = NativeOwnerBackupInspection(
+        restoreTicket = "synthetic-ticket", createdAt = "2026-10-17T13:39:36Z",
+        formatVersion = 5, containsSecurityState = true, fileName = "synthetic.milkbackup",
+    )
+
+    private fun cloudSnapshot() = sampleSnapshot(configured = true).copy(
+        remoteSnapshots = (1..8).map { index ->
+            NativeOwnerCloudRemoteSnapshotRow("remote-$index", "snapshot-$index",
+                "2026-10-17T13:39:36Z", 1024, "Synthetic backup $index")
+        },
+    )
+
     private fun setScreen(
         snapshot: NativeOwnerBackupSnapshot?,
         loading: Boolean = false,
@@ -324,6 +433,12 @@ class NativeOwnerBackupScreenContractTest {
         onSubmitReauth: (CharArray) -> Unit = { it.fill('\u0000') },
         onCancelReauth: () -> Unit = {},
         onNavigate: (OwnerSection) -> Unit = {},
+        cloudOpen: Boolean = false,
+        cloudInspection: () -> NativeOwnerBackupInspection? = { inspection },
+        cloudError: () -> String? = { error },
+        cloudReauth: () -> Boolean = { reauthOpen },
+        onInspectCloud: (String, CharArray?) -> Unit = { _, secret -> secret?.fill('\u0000') },
+        onConfirmCloudRestore: (Boolean) -> Unit = {},
     ) {
         composeRule.setContent {
             SaafTheme(darkTheme = false) {
@@ -344,13 +459,13 @@ class NativeOwnerBackupScreenContractTest {
                     ),
                     snapshot = snapshot,
                     loading = loading,
-                    error = error,
+                    error = cloudError(),
                     exportOpen = exportOpen,
                     restoreOpen = restoreOpen,
                     connectOpen = connectOpen,
-                    inspection = inspection,
+                    inspection = cloudInspection(),
                     busy = busy,
-                    reauthOpen = reauthOpen,
+                    reauthOpen = cloudReauth(),
                     reauthBusy = reauthBusy,
                     disconnectConfirmOpen = disconnectConfirmOpen,
                     onBackToMenu = onBackToMenu,
@@ -372,6 +487,9 @@ class NativeOwnerBackupScreenContractTest {
                     onCancelDisconnect = onCancelDisconnect,
                     onSubmitReauth = onSubmitReauth,
                     onCancelReauth = onCancelReauth,
+                    cloudOpen = cloudOpen,
+                    onInspectCloud = onInspectCloud,
+                    onConfirmCloudRestore = onConfirmCloudRestore,
                     hostedScaffold = { snackbar, mod, wrapNav, content ->
                         OwnerScaffold(
                             snackbarHostState = snackbar,

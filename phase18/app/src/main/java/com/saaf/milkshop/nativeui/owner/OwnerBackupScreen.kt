@@ -257,6 +257,11 @@ private fun OwnerBackupScreenPane(
     cloudOpen: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
+    // Keep the selection while the cloud pane is temporarily replaced by Owner authentication.
+    var selectedCloudRemoteId by rememberSaveable { mutableStateOf<String?>(null) }
+    LaunchedEffect(cloudOpen) {
+        if (!cloudOpen) selectedCloudRemoteId = null
+    }
     val androidContext = LocalContext.current
     val exportFileName = remember(androidContext) {
         BackupManager.displayName(androidContext)
@@ -306,6 +311,8 @@ private fun OwnerBackupScreenPane(
             busy = busy,
             error = error,
             inspection = inspection,
+            selectedRemoteId = selectedCloudRemoteId,
+            onSelectRemote = { selectedCloudRemoteId = it },
             onBack = onBackFromCloud,
             onRefresh = onRefreshCloud,
             onInspect = onInspectCloud,
@@ -1140,6 +1147,8 @@ private fun OwnerBackupCloudScreen(
     busy: Boolean,
     error: String?,
     inspection: NativeOwnerBackupInspection?,
+    selectedRemoteId: String?,
+    onSelectRemote: (String) -> Unit,
     onBack: () -> Unit,
     onRefresh: () -> Unit,
     onInspect: (String, CharArray?) -> Unit,
@@ -1148,13 +1157,13 @@ private fun OwnerBackupCloudScreen(
     modifier: Modifier,
 ) {
     val leaveGuard = rememberEntryLeaveGuard()
-    var selectedRemoteId by rememberSaveable { mutableStateOf<String?>(null) }
     var recoveryPassphrase by remember { mutableStateOf("") }
     var confirmed by rememberSaveable { mutableStateOf(false) }
     var draftTouched by rememberSaveable { mutableStateOf(false) }
     val remotes = snapshot?.remoteSnapshots.orEmpty()
     val needsRecovery = error?.contains("recovery passphrase", ignoreCase = true) == true ||
         error?.contains("key is unavailable", ignoreCase = true) == true ||
+        error?.contains("local key", ignoreCase = true) == true ||
         error?.contains("key_unavailable", ignoreCase = true) == true
     val dirty = draftTouched && !busy && (recoveryPassphrase.isNotEmpty() || confirmed)
 
@@ -1196,7 +1205,7 @@ private fun OwnerBackupCloudScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    error?.let {
+                    error?.takeIf { selectedRemoteId == null }?.let {
                         Text(
                             it,
                             color = MaterialTheme.colorScheme.error,
@@ -1218,90 +1227,112 @@ private fun OwnerBackupCloudScreen(
                         )
                     } else {
                         remotes.forEach { remote ->
+                            val selected = selectedRemoteId == remote.remoteFileId
                             NativeInformationSection(Modifier.fillMaxWidth()
                                 .testTag(NativeUiTags.ownerBackupCloudRemote(remote.remoteFileId))) {
                                 NativeInformationHeading(remote.name)
                                 NativeInformationFact("Created", AppTimeFormats.dateTime(remote.createdAt))
-                                Button(
-                                    onClick = com.saaf.milkshop.nativeui.common.hapticAction {
-                                        selectedRemoteId = remote.remoteFileId
-                                        draftTouched = true
-                                        onInspect(remote.remoteFileId, null)
-                                    },
-                                    enabled = !busy,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .testTag(NativeUiTags.OwnerBackupCloudInspect),
-                                ) { Text("Inspect") }
+                                if (!selected || (inspection == null && !needsRecovery)) {
+                                    Button(
+                                        onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                                            onSelectRemote(remote.remoteFileId)
+                                            recoveryPassphrase = ""
+                                            confirmed = false
+                                            draftTouched = true
+                                            onInspect(remote.remoteFileId, null)
+                                        },
+                                        enabled = !busy,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .testTag(NativeUiTags.OwnerBackupCloudInspect),
+                                    ) { Text("Inspect") }
+                                }
+                                if (selected) {
+                                    error?.let {
+                                        Text(
+                                            if (it.contains("local key", ignoreCase = true) ||
+                                                it.contains("key_unavailable", ignoreCase = true))
+                                                "Enter this backup's recovery passphrase to check it on this phone." else it,
+                                            color = MaterialTheme.colorScheme.error,
+                                            modifier = Modifier.testTag(NativeUiTags.OwnerBackupError),
+                                        )
+                                    }
+                                    if (inspection == null) {
+                                        Text(
+                                            "Enter the backup recovery passphrase chosen on the phone that made this backup. Checking it will not change your shop.",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                        )
+                                        OutlinedTextField(
+                                            value = recoveryPassphrase,
+                                            onValueChange = {
+                                                recoveryPassphrase = it
+                                                draftTouched = true
+                                            },
+                                            label = { Text("Recovery passphrase") },
+                                            visualTransformation = PasswordVisualTransformation(),
+                                            enabled = !busy,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .testTag(NativeUiTags.OwnerBackupCloudRecoveryPassphrase),
+                                        )
+                                        Button(
+                                            onClick = com.saaf.milkshop.nativeui.common.hapticAction {
+                                                val remoteId = selectedRemoteId ?: return@hapticAction
+                                                val secret = recoveryPassphrase.toCharArray()
+                                                recoveryPassphrase = ""
+                                                onInspect(remoteId, secret)
+                                            },
+                                            enabled = !busy && selectedRemoteId != null && recoveryPassphrase.isNotEmpty(),
+                                            modifier = Modifier.fillMaxWidth(),
+                                        ) { Text("Inspect with recovery passphrase") }
+                                    }
+                                    inspection?.let { inspected ->
+                                        Column(
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .testTag(NativeUiTags.OwnerBackupRestoreInspection),
+                                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                                        ) {
+                                            Text("Backup checked", color = MaterialTheme.colorScheme.primary,
+                                                fontWeight = FontWeight.SemiBold)
+                                            Text("This backup can be opened. Your shop has not been changed.",
+                                                style = MaterialTheme.typography.bodyMedium)
+                                            Column {
+                                                OwnerBackupFact("File", inspected.fileName)
+                                                OwnerBackupFact("Created", AppTimeFormats.dateTime(inspected.createdAt))
+                                                OwnerBackupFact("Format", inspected.formatVersion.toString())
+                                                OwnerBackupFact(
+                                                    "Security state",
+                                                    if (inspected.containsSecurityState) "Included" else "Missing",
+                                                )
+                                            }
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Checkbox(
+                                                    checked = confirmed,
+                                                    onCheckedChange = {
+                                                        confirmed = it
+                                                        draftTouched = true
+                                                    },
+                                                    enabled = !busy,
+                                                    modifier = Modifier.testTag(NativeUiTags.OwnerBackupCloudConfirmCheck),
+                                                )
+                                                Text("I understand this replaces the current installation")
+                                            }
+                                            Button(
+                                                onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction { onConfirmRestore(confirmed) },
+                                                enabled = !busy && confirmed,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .testTag(NativeUiTags.OwnerBackupCloudConfirmRestore),
+                                            ) { Text(if (busy) "Restoring…" else "Restore from Drive") }
+                                        }
+                                    }
+                                }
+
                             }
                         }
                     }
-                    if (needsRecovery || selectedRemoteId != null) {
-                        Text(
-                            "If the local vault key is unavailable, enter the Drive recovery passphrase.",
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                        OutlinedTextField(
-                            value = recoveryPassphrase,
-                            onValueChange = {
-                                recoveryPassphrase = it
-                                draftTouched = true
-                            },
-                            label = { Text("Recovery passphrase") },
-                            visualTransformation = PasswordVisualTransformation(),
-                            enabled = !busy,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .testTag(NativeUiTags.OwnerBackupCloudRecoveryPassphrase),
-                        )
-                        Button(
-                            onClick = com.saaf.milkshop.nativeui.common.hapticAction {
-                                val remoteId = selectedRemoteId ?: return@hapticAction
-                                val secret = recoveryPassphrase.toCharArray()
-                                recoveryPassphrase = ""
-                                onInspect(remoteId, secret)
-                            },
-                            enabled = !busy && selectedRemoteId != null && recoveryPassphrase.isNotEmpty(),
-                            modifier = Modifier.fillMaxWidth(),
-                        ) { Text("Inspect with recovery passphrase") }
-                    }
-                    inspection?.let { inspected ->
-                        Column(
-                            Modifier
-                                .fillMaxWidth()
-                                .testTag(NativeUiTags.OwnerBackupRestoreInspection),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            NativeInformationSection {
-                                OwnerBackupFact("File", inspected.fileName)
-                                OwnerBackupFact("Created", AppTimeFormats.dateTime(inspected.createdAt))
-                                OwnerBackupFact("Format", inspected.formatVersion.toString())
-                                OwnerBackupFact(
-                                    "Security state",
-                                    if (inspected.containsSecurityState) "Included" else "Missing",
-                                )
-                            }
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(
-                                    checked = confirmed,
-                                    onCheckedChange = {
-                                        confirmed = it
-                                        draftTouched = true
-                                    },
-                                    enabled = !busy,
-                                    modifier = Modifier.testTag(NativeUiTags.OwnerBackupCloudConfirmCheck),
-                                )
-                                Text("I understand this replaces the current installation")
-                            }
-                            Button(
-                                onClick = com.saaf.milkshop.nativeui.common.hapticCommitAction { onConfirmRestore(confirmed) },
-                                enabled = !busy && confirmed,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .testTag(NativeUiTags.OwnerBackupCloudConfirmRestore),
-                            ) { Text(if (busy) "Restoring…" else "Restore from Drive") }
-                        }
-                    }
+
                 }
             }
         }

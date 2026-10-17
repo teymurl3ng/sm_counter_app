@@ -1,0 +1,7 @@
+{
+  "NativeOwnerBackupScreenContractTest": [
+    "cloudRecoveryFeedbackStaysInSelectedCardAndCannotRetryLocalKeyAfterSuccess",
+    "choosingAnotherCloudBackupResetsRestoreConsent",
+    "restoreInspectionShowsConfirmControls"
+  ]
+}

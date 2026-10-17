@@ -1,0 +1,35 @@
+{
+  "label": "selected-final",
+  "device": "S24",
+  "target": "com.saaf.milkshop.qa.tests",
+  "selection": [
+    "com.saaf.milkshop.NativeOwnerBackupScreenContractTest#cloudRecoveryFeedbackStaysInSelectedCardAndCannotRetryLocalKeyAfterSuccess",
+    "com.saaf.milkshop.NativeOwnerBackupScreenContractTest#choosingAnotherCloudBackupResetsRestoreConsent",
+    "com.saaf.milkshop.NativeOwnerBackupScreenContractTest#restoreInspectionShowsConfirmControls"
+  ],
+  "tests": [
+    {
+      "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+      "test": "restoreInspectionShowsConfirmControls",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+      "test": "choosingAnotherCloudBackupResetsRestoreConsent",
+      "code": 0,
+      "stack": null
+    },
+    {
+      "class": "com.saaf.milkshop.NativeOwnerBackupScreenContractTest",
+      "test": "cloudRecoveryFeedbackStaysInSelectedCardAndCannotRetryLocalKeyAfterSuccess",
+      "code": 0,
+      "stack": null
+    }
+  ],
+  "passed": 3,
+  "expected": 3,
+  "notificationPermission": "revoked for isolated package",
+  "realShopPackageModified": false,
+  "appApkSha256": "2234ba4c3f93a63c14b3241c3198e94ada6c608a80c2d2e48ecbc1cdd37e6adb"
+}

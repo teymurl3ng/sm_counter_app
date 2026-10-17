@@ -6,5 +6,10 @@
   {
     "case": "malformed",
     "releasePreBuildRejectedByOAuthGuard": true
+  },
+  {
+    "case": "verified-web-id-local-file",
+    "releasePreBuildAccepted": true,
+    "googleSideReleaseRegistrationAndLiveDrive": "still pending"
   }
 ]

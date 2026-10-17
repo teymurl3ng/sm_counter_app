@@ -1,0 +1,43 @@
+{
+  "localRoutes": [
+    {
+      "path": "/",
+      "status": 200,
+      "location": null,
+      "passed": true
+    },
+    {
+      "path": "/privacy",
+      "status": 200,
+      "location": null,
+      "passed": true
+    },
+    {
+      "path": "/overview",
+      "status": 307,
+      "location": "/login?next=%2Foverview",
+      "passed": true
+    },
+    {
+      "path": "/staff",
+      "status": 307,
+      "location": "/login?next=%2Fstaff",
+      "passed": true
+    },
+    {
+      "path": "/api/overview",
+      "status": 401,
+      "location": null,
+      "passed": true
+    }
+  ],
+  "protectedSourcesUnchanged": [
+    "src/middleware.ts",
+    "src/app/(app)/layout.tsx",
+    "src/lib/session.ts",
+    "src/app/api/overview/route.ts"
+  ],
+  "eslintTouchedPages": "passed",
+  "typescriptAndProductionBuild": "passed",
+  "reactReview": "Static server privacy page; no new hooks, client fetches, session serialization or dependencies. Existing colors, semantic headings, labelled nav and focus rules reused."
+}

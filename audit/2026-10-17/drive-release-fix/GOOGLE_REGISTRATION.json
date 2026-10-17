@@ -2,5 +2,40 @@
   "package": "com.saaf.milkshop",
   "releaseSigningSha1": "4E:F6:28:33:3D:8B:DF:29:E8:D4:06:F5:F6:72:6C:12:90:F3:14:13",
   "releaseSigningSha256": "9c9e03d7969d79018e2880b79b8d9ec46c43ab50eaf30512ee3fb989bc6abfa1",
-  "registrationVerified": false
+  "registrationVerified": true,
+  "projectId": "saaf-milk-qa",
+  "webClientIdSha256": "faecb3e7d7bfc2a383315c8d5ff6a5c9a3f0006cb934f7f980435b50bc4dd05b",
+  "webClientVerified": true,
+  "existingAndroidPackage": "com.saaf.milkshop.qa",
+  "existingAndroidSha1": "97:ED:12:6E:03:31:B5:4C:11:10:10:6C:98:A9:2C:FA:A8:CB:4A:CC",
+  "releaseAndroidClientPresent": true,
+  "audienceStatus": "Testing",
+  "selectedBackupAccountIsExistingTestUser": true,
+  "publishCurrentlyDisabled": true,
+  "driveApiEnabled": true,
+  "configuredScopesAtInspection": [],
+  "brandingAtInspection": {
+    "appName": "Saaf Milk QA",
+    "logoPresent": true,
+    "homepagePresent": false,
+    "privacyPolicyPresent": false,
+    "termsPresent": false
+  },
+  "browserAccess": "available after user permission change; prior restriction resolved",
+  "releaseAndroidClientId": "531437313322-m2bd9mt29bi5fs3mesg9dd76josdkv5b.apps.googleusercontent.com",
+  "releaseAndroidClientName": "Saaf Milk Release Android",
+  "releaseAndroidSavedValuesReadBack": true,
+  "unattendedProductionReady": false,
+  "remainingPublicationBoundary": "External/Testing; publish disabled pending branding completion; no publication change authorized or performed",
+  "declaredScopesAfterRepair": [
+    "https://www.googleapis.com/auth/drive.appdata"
+  ],
+  "scopeDeclarationSavedAndReadBack": true,
+  "preparedBranding": {
+    "appName": "Saaf Milk",
+    "homepage": "https://sm-server-view.vercel.app/",
+    "privacy": "https://sm-server-view.vercel.app/privacy",
+    "authorizedDomain": "sm-server-view.vercel.app",
+    "saved": false
+  }
 }

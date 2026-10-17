@@ -146,7 +146,7 @@ These items have not been cancelled. They are deliberately unscheduled or condit
 
 ## Progress
 
-- [ ] 1. Final signed delivery, human acceptance and independent backup/signing custody — ✅ ~~signed0.6.0/code9 on A06 and S24~~; signed-in A06 Overview and independent Drive signing-key recovery verified; known-record/live-sync acceptance, staff outcomes and encrypted shop-data backup/recovery remain. [Handover](FINAL_HANDOVER.md).
+- [ ] 1. Final signed delivery, human acceptance and independent backup/signing custody — ✅ ~~signed0.6.0 on both phones; independent Drive signing-key recovery; configured signed0.6.1 Drive repair installed/verified on A06~~. Google branding/Production confirmation, private Drive consent/upload/inspection, S24 repair update, known-record/live-sync acceptance, staff outcomes and encrypted shop-data recovery remain. [Current handover](FINAL_HANDOVER.md).
 - [x] ✅ ~~2. Persistent Owner attention for held sync entries.~~ Accepted at local Owner scope; audit-only conflict policy remains a separate retained B8 boundary. [Result](audit/2026-10-15/sync-attention-plan/RESULT.md).
 - [x] ✅ ~~3. Credit basics: aging, customer search and advisory warning.~~ [Result](audit/2026-10-15/credit-basics-plan/RESULT.md). Delivered in signed 0.5.0; private/human acceptance remains phase 1.
 - [x] ✅ ~~4. Customer payment terms, credit categories, overrides and history.~~ Implementation, affected checks, two-phone recovery and PROD/signed rollout complete. [Finish result](audit/2026-10-15/credit-status-plan/FINISH_RESULT.md).

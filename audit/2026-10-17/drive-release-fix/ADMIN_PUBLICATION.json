@@ -1,0 +1,43 @@
+{
+  "id": "dpl_3SSvtyDPTWNifGj91Sy1unK9FFsA",
+  "url": "sm-server-view-ckf1xyx4e-mkrc.vercel.app",
+  "readyState": "READY",
+  "target": "production",
+  "projectId": "prj_x3nKY8gE7Qllsl5Dvf0oyoivjIsR",
+  "sourceCommit": "7a003634204ca8016f0f4687e1a1a4c5157783d7",
+  "anonymousRoutes": [
+    {
+      "path": "/",
+      "status": 200,
+      "location": null,
+      "passed": true
+    },
+    {
+      "path": "/privacy",
+      "status": 200,
+      "location": null,
+      "passed": true
+    },
+    {
+      "path": "/overview",
+      "status": 307,
+      "location": "/login?next=%2Foverview",
+      "passed": true
+    },
+    {
+      "path": "/staff",
+      "status": 307,
+      "location": "/login?next=%2Fstaff",
+      "passed": true
+    },
+    {
+      "path": "/api/overview",
+      "status": 401,
+      "location": null,
+      "passed": true
+    }
+  ],
+  "deploymentMethod": "Existing Git integration published main; no duplicate CLI deployment",
+  "publicHomepage": "https://sm-server-view.vercel.app/",
+  "publicPrivacy": "https://sm-server-view.vercel.app/privacy"
+}

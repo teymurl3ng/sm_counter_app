@@ -27,7 +27,12 @@ No backup redesign, new account system, general UI audit, server migration, SMS 
 
 ## Progress
 
-- [ ] Google-side release registration verified/corrected.
-- [ ] Persistent verified local configuration; release guard already rejects missing and malformed IDs through actual preReleaseBuild (2/2).
-- [ ] Signed 0.6.1 package checks accepted.
-- [ ] Ordinary update and real Drive connection/upload/inspection accepted.
+- [x] Verified the existing Web client and Drive API. Created the exact approved ordinary Android registration and read back its package/release fingerprint. Existing clients/backups retained. Declared only the app-data scope already used by the app. Google remains in Testing; prepared branding/Production change awaits explicit confirmation.
+- [x] Persistent ignored Web configuration and release guard accepted: missing/malformed rejection and real configured local-file acceptance pass3/3.
+- [x] Signed0.6.1/code10 built from native production source b125417; package/certificate/embedded ID/production flags/hash checks pass. Database schema19 unchanged.
+- [x] A06 ordinary replacement update verified by exact installed APK hash and retained UID/first-install values. S24 absent; no repeat A06 install is needed.
+- [x] User selected the existing admin site for Google branding. Exact admin source7a00363 changed only the landing page and added a public privacy page. Touched-page lint, TypeScript/production build, five local and five live anonymous checks pass; auth source hashes unchanged. Existing Git integration published the verified production commit. No extra site/project or paid service created.
+- [ ] Save the prepared app name/public links/domain and publish Google OAuth for normal use after the requested confirmation; complete any actual Google requirement without inventing verification status.
+- [ ] Owner private ordinary-app Google consent, encrypted upload/listing/non-destructive inspection. Never restore over the sole live shop. Phone sign-in request is pending; no secret is requested in chat.
+
+The minimum admin-site extension is two files: existing public homepage information/link and /privacy. No separate About page was needed. Runtime Google publication state is tracked separately from the APK's packaging-time snapshot; changing that state does not require rebuilding identical app code.

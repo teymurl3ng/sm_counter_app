@@ -1,0 +1,38 @@
+[
+  {
+    "phone": "A06",
+    "before": {
+      "versionName": [
+        "0.6.0"
+      ],
+      "versionCode": [
+        "9"
+      ],
+      "uid": [
+        "11498"
+      ],
+      "firstInstall": [
+        "2026-10-10 19:31:03"
+      ]
+    },
+    "after": {
+      "versionName": [
+        "0.6.1"
+      ],
+      "versionCode": [
+        "10"
+      ],
+      "uid": [
+        "11498"
+      ],
+      "firstInstall": [
+        "2026-10-10 19:31:03"
+      ]
+    },
+    "sameInstallationAndUid": true,
+    "apkHashMatches": true,
+    "verified": true,
+    "operation": "install -r --user 0; no uninstall or data clear",
+    "realDriveAcceptance": "pending private owner authentication/consent"
+  }
+]

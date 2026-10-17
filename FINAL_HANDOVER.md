@@ -1,10 +1,10 @@
 # Current app delivery and handover
 
-17 October 2026. Current signed candidate: **0.6.0/code9**.
+17 October 2026. Current repair: **0.6.1/code10 on A06**; S24 retains verified0.6.0/code9 until reconnected.
 
-**Open release defect — built-in Google Drive connection:** 0.6.0 has an empty Google OAuth Web client ID and cannot connect through the app's built-in Drive flow. Manual encrypted export and the independently verified signing backup are separate paths. A scoped 0.6.1/code10 repair is in preparation; it is not yet built or installed. Missing/malformed configuration rejection passes2/2; actual Google-side release registration, configured packaging and real consent/upload/inspection remain pending. [Repair scope and progress](audit/2026-10-17/drive-release-fix/PLAN.md).
+**Built-in Google Drive repair:** the missing Web ID and missing ordinary Android registration are corrected, with three configuration checks and signed package checks accepted. A06 has verified0.6.1/code10 with its installation retained. The selected admin site now provides public app information and /privacy, with protected routes unchanged. Google branding/Production-mode confirmation and actual private phone consent/upload/inspection remain pending; built-in Drive success is not yet claimed. [Repair result and exact pending boundary](audit/2026-10-17/drive-release-fix/RESULT.md).
 
-**A06 and S24:** both run verified signed **0.6.0/code9**, with their existing installations retained. A signed-in ordinary Overview was observed on A06 after private sign-in. Known financial records, live sync and human staff outcomes still need acceptance.
+**A06 and S24:** both received verified0.6.0/code9; A06 now additionally has the signed0.6.1 Drive repair, with existing installations retained. A signed-in ordinary Overview was observed on A06 after private sign-in. Known financial records, live sync and human staff outcomes still need acceptance.
 
 **Independent signing backup verified:** the selected **SaafMilk-backup** folder is on the correct Google account and is private, with only the owner permission reported. Its existing keystore matches the current release key byte for byte. The downloaded key and settings successfully signed and verified a random challenge with the release certificate. Temporary private downloads were removed; no Drive file was changed. These are password-protected keystore and separate signing-settings files, not an additional encrypted archive. Keep the folder private. [Non-secret verification](audit/2026-10-17/final-delivery/CUSTODY_VERIFICATION.json).
 

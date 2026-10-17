@@ -64,6 +64,8 @@ manifest = {
     "testPassphraseBlank": True, "databaseSchema": 19,
     "googleWebClientIdPresent": True, "webClientIdSha256": client_hash,
     "googleReleaseRegistrationVerified": True,
+    "googleAudienceStatusAtPackaging": registration["audienceStatus"],
+    "unattendedProductionReadyAtPackaging": registration["unattendedProductionReady"],
     "realDriveConsentUploadInspection": "pending ordinary-device acceptance",
     "sourceSha256": hashes,
 }
